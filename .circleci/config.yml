@@ -228,7 +228,7 @@ jobs:
       - persist_to_workspace:
           root: ~/reference_check
           paths:
-            - "*"
+            - "."
 
   generator_syntax:
     <<: *env
@@ -320,13 +320,6 @@ jobs:
           at: ~/JHUGen
       - attach_workspace:
           at: ~/reference_check
-      - run: '! [ -f ~/reference_check/reference_failed_ggH ]'
-      - run:
-          <<: *cmsrelcmsenv
-          when: on_fail
-      - run:
-          command: echo "export LHEDIR=$HOME/artifacts/ggH" >> $BASH_ENV
-          when: on_fail
       - restore_cache:
           key: v1_boost_1_61_0
       - restore_cache:
@@ -335,7 +328,7 @@ jobs:
           command: |
             cd
             if ! [ -d ~/CMSJHU_AnalysisMacros/ ]; then
-              git clone -b noMELA git@github.com:hroskes/CMSJHU_AnalysisMacros
+              git clone -b noMELA https://github.com/hroskes/CMSJHU_AnalysisMacros
             fi
             cd CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer
             git pull
@@ -343,6 +336,14 @@ jobs:
       - save_cache:
           key: v1_analyzer
           paths: ~/CMSJHU_AnalysisMacros/
+
+      - run: '! [ -f ~/reference_check/reference_failed_ggH ]'
+      - run:
+          <<: *cmsrelcmsenv
+          when: on_fail
+      - run:
+          command: echo "export LHEDIR=$HOME/artifacts/ggH" >> $BASH_ENV
+          when: on_fail
       - run:
           command: mkdir -p $LHEDIR/
           when: on_fail
@@ -385,13 +386,6 @@ jobs:
           at: ~/JHUGen
       - attach_workspace:
           at: ~/reference_check
-      - run: '! [ -f ~/reference_check/reference_failed_VBF ]'
-      - run:
-          <<: *cmsrelcmsenv
-          when: on_fail
-      - run:
-          command: echo "export LHEDIR=$HOME/artifacts/VBF" >> $BASH_ENV
-          when: on_fail
       - restore_cache:
           key: v1_boost_1_61_0
       - restore_cache:
@@ -400,7 +394,7 @@ jobs:
           command: |
             cd
             if ! [ -d ~/CMSJHU_AnalysisMacros/ ]; then
-              git clone -b noMELA git@github.com:hroskes/CMSJHU_AnalysisMacros
+              git clone -b noMELA https://github.com/hroskes/CMSJHU_AnalysisMacros
             fi
             cd CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer
             git pull
@@ -408,6 +402,14 @@ jobs:
       - save_cache:
           key: v1_analyzer
           paths: ~/CMSJHU_AnalysisMacros/
+
+      - run: '! [ -f ~/reference_check/reference_failed_VBF ]'
+      - run:
+          <<: *cmsrelcmsenv
+          when: on_fail
+      - run:
+          command: echo "export LHEDIR=$HOME/artifacts/VBF" >> $BASH_ENV
+          when: on_fail
       - run:
           command: mkdir -p $LHEDIR/
           when: on_fail
