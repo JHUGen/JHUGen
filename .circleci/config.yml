@@ -185,7 +185,7 @@ jobs:
                   touch reference_check/reference_failed_VBF
                 fi
               }
-            fi
+            done
             exit $exitstatus
       - run:
           name: "compare to reference"
