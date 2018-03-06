@@ -640,10 +640,10 @@ jobs:
       #no need to spend lots of time downloading the CMSSW image
       #when all we use is cat
       - image: library/alpine
-    working_directory: ~/JHUGen/JHUGenerator
+    working_directory: /home/cmsbld/JHUGen/JHUGenerator
     steps:
       - attach_workspace:
-          at: ~/JHUGen
+          at: /home/cmsbld/JHUGen
       - run: cat reference_check/output
       - run: exit $(cat reference_check/exit_status)
 
