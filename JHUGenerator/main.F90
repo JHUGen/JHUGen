@@ -417,7 +417,7 @@ type(SaveValues) :: tosave, oldsavevalues
 
    DataFile="./data/output"
 
-   tosave = SaveValues()
+   tosave = SaveValuesConstructor()
 
 #if compiler==1
    NumArgs = NArgs()-1

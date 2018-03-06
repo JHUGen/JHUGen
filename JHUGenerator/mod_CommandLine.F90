@@ -29,10 +29,6 @@ contains
   procedure :: ReadFromFile => ReadSaveValuesFromFile
 end type SaveValues
 
-interface SaveValues
-  procedure :: SaveValuesConstructor
-end interface SaveValues
-
 contains
 
 function SaveValuesConstructor() result(self)
