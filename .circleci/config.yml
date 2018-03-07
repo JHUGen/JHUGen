@@ -633,17 +633,11 @@ jobs:
             ~/artifacts/misc/
 
   reference_check:
-    docker:
-      #chosen basically at random from google "minimal docker image"
-      #"A minimal Docker image based on Alpine Linux with a
-      #complete package index and only 5 MB in size!"
-      #no need to spend lots of time downloading the CMSSW image
-      #when all we use is cat
-      - image: library/alpine
-    working_directory: /home/cmsbld/JHUGen/JHUGenerator
+    <<: *env
+    working_directory: ~/JHUGen/JHUGenerator
     steps:
       - attach_workspace:
-          at: /home/cmsbld/JHUGen
+          at: ~/JHUGen
       - run: cat reference_check/output
       - run: exit $(cat reference_check/exit_status)
 
