@@ -18,17 +18,27 @@ from mela import Mela, SimpleParticle_t, SimpleParticleCollection_t
 
 InputEvent = collections.namedtuple("InputEvent", "daughters associated mothers isgen")
 
-class LHEEvent(InputEvent):
+class LHEEvent(object):
   __metaclass__ = abc.ABCMeta
-  def __new__(cls, event, isgen):
+  def __init__(self, event, isgen):
     lines = event.split("\n")
-    lines = [line for line in lines if not ("<event>" in line or "</event>" in line or not line.split("#")[0].strip())]
-    nparticles, _, _, _, _, _ = lines[0].split()
+
+    self.weights = {}
+    for line in lines:
+      if "<wgt" not in line: continue
+      match = re.match("<wgt id='(.*)'>([0-9+Ee.-]*)</wgt>", line)
+      if match: self.weights[match.group(1)] = float(match.group(2))
+
+    lines = [line for line in lines if not ("<" in line or ">" in line or not line.split("#")[0].strip())]
+    nparticles, _, weight, _, _, _ = lines[0].split()
+
     nparticles = int(nparticles)
+    self.weight = float(weight)
     if nparticles != len(lines)-1:
-      raise ValueError("Wrong number of particles! Should be {}, have {}".replace(nparticles, len(lines)-1))
-    daughters, associated, mothers = (SimpleParticleCollection_t(_) for _ in cls.extracteventparticles(lines[1:], isgen))
-    return super(LHEEvent, cls).__new__(cls, daughters, associated, mothers, isgen)
+      raise ValueError("Wrong number of particles! Should be {}, have {}".format(nparticles, len(lines)-1))
+
+    daughters, associated, mothers = (SimpleParticleCollection_t(_) for _ in self.extracteventparticles(lines[1:], isgen))
+    self.daughters, self.associated, self.mothers, self.isgen = self.inputevent = InputEvent(daughters, associated, mothers, isgen)
 
   @abc.abstractmethod
   def extracteventparticles(cls, lines, isgen): "has to be a classmethod that returns daughters, associated, mothers"
@@ -162,11 +172,13 @@ class LHEFileBase(object):
     self.daughters = lheevent.daughters
     self.associated = lheevent.associated
     self.mothers = lheevent.mothers
-    self.setInputEvent(*lheevent)
+    self.weight = lheevent.weight
+    self.weights = lheevent.weights
+    self.setInputEvent(*lheevent.inputevent)
 
   @classmethod
   def _LHEclassattributes(cls):
-    return "filename", "f", "mela", "isgen", "daughters", "mothers", "associated"
+    return "filename", "f", "mela", "isgen", "daughters", "mothers", "associated", "weight", "weights"
 
   def __getattr__(self, attr):
     if attr == "mela": raise RuntimeError("Something is wrong, trying to access mela before it's created")
