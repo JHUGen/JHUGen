@@ -43,6 +43,9 @@ class LHEEvent(object):
   @abc.abstractmethod
   def extracteventparticles(cls, lines, isgen): "has to be a classmethod that returns daughters, associated, mothers"
 
+  def __iter__(self):
+    return iter(self.inputevent)
+
 class LHEEvent_Hwithdecay(LHEEvent):
   @classmethod
   def extracteventparticles(cls, lines, isgen):
@@ -174,7 +177,7 @@ class LHEFileBase(object):
     self.mothers = lheevent.mothers
     self.weight = lheevent.weight
     self.weights = lheevent.weights
-    self.setInputEvent(*lheevent.inputevent)
+    self.setInputEvent(*lheevent)
 
   @classmethod
   def _LHEclassattributes(cls):
