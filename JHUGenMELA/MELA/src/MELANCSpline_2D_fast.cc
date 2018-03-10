@@ -13,9 +13,11 @@ using namespace TNumericUtil;
 ClassImp(MELANCSpline_2D_fast)
 
 MELANCSpline_2D_fast::MELANCSpline_2D_fast() :
-MELANCSplineCore(),
-rangeYmin(1), rangeYmax(-1),
-theYVar("theYVar", "theYVar", this)
+  MELANCSplineCore(),
+  rangeYmin(1), rangeYmax(-1),
+  bcBeginX(MELANCSplineCore::bcNaturalSpline), bcEndX(MELANCSplineCore::bcNaturalSpline),
+  bcBeginY(MELANCSplineCore::bcNaturalSpline), bcEndY(MELANCSplineCore::bcNaturalSpline),
+  theYVar("theYVar", "theYVar", this)
 {}
 
 MELANCSpline_2D_fast::MELANCSpline_2D_fast(
@@ -24,6 +26,8 @@ MELANCSpline_2D_fast::MELANCSpline_2D_fast(
   ) :
   MELANCSplineCore(name, title),
   rangeYmin(1), rangeYmax(-1),
+  bcBeginX(MELANCSplineCore::bcNaturalSpline), bcEndX(MELANCSplineCore::bcNaturalSpline),
+  bcBeginY(MELANCSplineCore::bcNaturalSpline), bcEndY(MELANCSplineCore::bcNaturalSpline),
   theYVar("theYVar", "theYVar", this)
 {}
 
@@ -35,12 +39,18 @@ MELANCSpline_2D_fast::MELANCSpline_2D_fast(
   const std::vector<T>& inXList,
   const std::vector<T>& inYList,
   const std::vector<std::vector<T>>& inFcnList,
+  MELANCSplineCore::BoundaryCondition const bcBeginX_,
+  MELANCSplineCore::BoundaryCondition const bcEndX_,
+  MELANCSplineCore::BoundaryCondition const bcBeginY_,
+  MELANCSplineCore::BoundaryCondition const bcEndY_,
   Bool_t inUseFloor,
   T inFloorEval,
   T inFloorInt
   ) :
   MELANCSplineCore(name, title, inXVar, inXList, inUseFloor, inFloorEval, inFloorInt),
   rangeYmin(1), rangeYmax(-1),
+  bcBeginX(bcBeginX_), bcEndX(bcEndX_),
+  bcBeginY(bcBeginY_), bcEndY(bcEndY_),
   theYVar("theYVar", "theYVar", this, inYVar),
   YList(inYList),
   FcnList(inFcnList)
@@ -50,7 +60,7 @@ MELANCSpline_2D_fast::MELANCSpline_2D_fast(
     int npoints;
     Double_t det;
 
-    vector<vector<MELANCSplineCore::T>> xA; getKappas(kappaX, 0); getAArray(kappaX, xA);
+    vector<vector<MELANCSplineCore::T>> xA; getKappas(kappaX, 0); getAArray(kappaX, xA, bcBeginX, bcEndX);
     npoints=kappaX.size();
     TMatrix_t xAtrans(npoints, npoints);
     for (int i=0; i<npoints; i++){ for (int j=0; j<npoints; j++){ xAtrans[i][j]=xA.at(i).at(j); } }
@@ -61,7 +71,7 @@ MELANCSpline_2D_fast::MELANCSpline_2D_fast(
       assert(0);
     }
 
-    vector<vector<MELANCSplineCore::T>> yA; getKappas(kappaY, 1); getAArray(kappaY, yA);
+    vector<vector<MELANCSplineCore::T>> yA; getKappas(kappaY, 1); getAArray(kappaY, yA, bcBeginY, bcEndY);
     npoints=kappaY.size();
     TMatrix_t yAtrans(npoints, npoints);
     for (int i=0; i<npoints; i++){ for (int j=0; j<npoints; j++){ yAtrans[i][j]=yA.at(i).at(j); } }
@@ -77,7 +87,7 @@ MELANCSpline_2D_fast::MELANCSpline_2D_fast(
     int npoldim=0;
     int nxbins=0;
     for (unsigned int j=0; j<npointsY(); j++){
-      vector<vector<MELANCSplineCore::T>> xcoefsAtYj = getCoefficientsPerY(kappaX, xAinv, j, -1); // [ix][Ax,Bx,Cx,Dx] at each y_j
+      vector<vector<MELANCSplineCore::T>> xcoefsAtYj = getCoefficientsPerY(kappaX, xAinv, j, bcBeginX, bcEndX, -1); // [ix][Ax,Bx,Cx,Dx] at each y_j
       if (j==0){
         nxbins=xcoefsAtYj.size();
         npoldim=xcoefsAtYj.at(0).size();
@@ -103,7 +113,7 @@ MELANCSpline_2D_fast::MELANCSpline_2D_fast(
       // Get the x coefficients interpolated across y
       vector<vector<vector<MELANCSplineCore::T>>> xCoefs;
       for (int ic=0; ic<npoldim; ic++){
-        vector<vector<MELANCSplineCore::T>> yCoefs = getCoefficientsAlongDirection(kappaY, yAinv, coefsAlongY.at(ic).at(ix), -1); // [iy][A,B,C,D]
+        vector<vector<MELANCSplineCore::T>> yCoefs = getCoefficientsAlongDirection(kappaY, yAinv, coefsAlongY.at(ic).at(ix), bcBeginY, bcEndY, -1); // [iy][A,B,C,D]
         xCoefs.push_back(yCoefs);
       }
       coefficients.push_back(xCoefs);
@@ -125,6 +135,8 @@ MELANCSpline_2D_fast::MELANCSpline_2D_fast(
   ) :
   MELANCSplineCore(other, name),
   rangeYmin(other.rangeYmin), rangeYmax(other.rangeYmax),
+  bcBeginX(other.bcBeginX), bcEndX(other.bcEndX),
+  bcBeginY(other.bcBeginY), bcEndY(other.bcEndY),
   theYVar("theYVar", this, other.theYVar),
   YList(other.YList),
   FcnList(other.FcnList),
@@ -291,10 +303,10 @@ MELANCSplineCore::T MELANCSpline_2D_fast::getTVar(const vector<MELANCSplineCore:
   return (val-coord->at(bin))*K;
 }
 
-vector<vector<MELANCSplineCore::T>> MELANCSpline_2D_fast::getCoefficientsPerY(const std::vector<MELANCSplineCore::T>& kappaX, const TMatrix_t& xAinv, const Int_t& ybin, const Int_t xbin)const{
+vector<vector<MELANCSplineCore::T>> MELANCSpline_2D_fast::getCoefficientsPerY(const std::vector<MELANCSplineCore::T>& kappaX, const TMatrix_t& xAinv, const Int_t& ybin, MELANCSplineCore::BoundaryCondition const& bcBegin, MELANCSplineCore::BoundaryCondition const& bcEnd, const Int_t xbin)const{
   vector<MELANCSplineCore::T> fcnList;
   for (unsigned int bin=0; bin<npointsX(); bin++){ fcnList.push_back(FcnList.at(ybin).at(bin)); }
-  vector<vector<MELANCSplineCore::T>> coefs = getCoefficientsAlongDirection(kappaX, xAinv, fcnList, xbin);
+  vector<vector<MELANCSplineCore::T>> coefs = getCoefficientsAlongDirection(kappaX, xAinv, fcnList, bcBegin, bcEnd, xbin);
   return coefs;
 }
 

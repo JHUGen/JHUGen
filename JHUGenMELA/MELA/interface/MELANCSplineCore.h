@@ -24,6 +24,14 @@ public:
     kVerbose
   };
 
+  enum BoundaryCondition{
+    bcApproximatedSlope, // D1 is the same as deltaY/deltaX in the first/last segment
+    bcClamped, // D1=0 at endpoint
+    bcApproximatedSecondDerivative, // D2 is approximated
+    bcNaturalSpline, // D2=0 at endpoint
+    NBoundaryConditions
+  };
+
   MELANCSplineCore();
   MELANCSplineCore(
     const char* name,
@@ -82,9 +90,9 @@ protected:
   virtual T interpolateFcn(Int_t code, const char* rangeName=0)const = 0;
   virtual Double_t evaluate()const = 0;
 
-  virtual void getBArray(const std::vector<T>& kappas, const std::vector<T>& fcnList, std::vector<T>& BArray)const;
-  virtual void getAArray(const std::vector<T>& kappas, std::vector<std::vector<T>>& AArray)const;
-  virtual std::vector<std::vector<T>> getCoefficientsAlongDirection(const std::vector<T>& kappas, const TMatrix_t& Ainv, const std::vector<T>& fcnList, const Int_t pickBin)const;
+  virtual void getBArray(const std::vector<T>& kappas, const std::vector<T>& fcnList, std::vector<T>& BArray, BoundaryCondition const& bcBegin, BoundaryCondition const& bcEnd)const;
+  virtual void getAArray(const std::vector<T>& kappas, std::vector<std::vector<T>>& AArray, BoundaryCondition const& bcBegin, BoundaryCondition const& bcEnd)const;
+  virtual std::vector<std::vector<T>> getCoefficientsAlongDirection(const std::vector<T>& kappas, const TMatrix_t& Ainv, const std::vector<T>& fcnList, BoundaryCondition const& bcBegin, BoundaryCondition const& bcEnd, const Int_t pickBin)const;
   virtual std::vector<T> getCoefficients(const TVector_t& S, const std::vector<T>& kappas, const std::vector<T>& fcnList, const Int_t& bin)const;
 
   virtual T evalSplineSegment(const std::vector<T>& coefs, const T& kappa, const T& tup, const T& tdn, Bool_t doIntegrate=false)const;

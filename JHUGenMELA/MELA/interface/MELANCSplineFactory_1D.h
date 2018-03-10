@@ -13,6 +13,9 @@ class MELANCSplineFactory_1D{
 protected:
   TString appendName;
 
+  MELANCSplineCore::BoundaryCondition bcBeginX;
+  MELANCSplineCore::BoundaryCondition bcEndX;
+
   RooAbsReal* splineVar;
   MELANCSpline_1D_fast* fcn;
   MELAFuncPdf* PDF;
@@ -23,11 +26,21 @@ protected:
   void initPDF(const std::vector<std::pair<MELANCSplineCore::T, MELANCSplineCore::T>>& pList);
 
 public:
-  MELANCSplineFactory_1D(RooAbsReal& splineVar_, TString appendName_="");
+  MELANCSplineFactory_1D(
+    RooAbsReal& splineVar_, TString appendName_="",
+    MELANCSplineCore::BoundaryCondition const bcBeginX_=MELANCSplineCore::bcNaturalSpline,
+    MELANCSplineCore::BoundaryCondition const bcEndX_=MELANCSplineCore::bcNaturalSpline
+  );
   ~MELANCSplineFactory_1D();
 
   MELANCSpline_1D_fast* getFunc(){ return fcn; }
   MELAFuncPdf* getPDF(){ return PDF; }
+
+  void setEndConditions(
+    MELANCSplineCore::BoundaryCondition const bcBegin,
+    MELANCSplineCore::BoundaryCondition const bcEnd,
+    const unsigned int direction=0
+  );
 
   void setPoints(TTree* tree);
   void setPoints(TGraph* tg);

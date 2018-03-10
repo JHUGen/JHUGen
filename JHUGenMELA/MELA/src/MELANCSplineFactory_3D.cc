@@ -3,11 +3,22 @@
 using namespace std;
 
 
-MELANCSplineFactory_3D::MELANCSplineFactory_3D(RooAbsReal& XVar_, RooAbsReal& YVar_, RooAbsReal& ZVar_, TString appendName_) :
-appendName(appendName_),
-XVar(&XVar_), YVar(&YVar_), ZVar(&ZVar_),
-fcn(0),
-PDF(0)
+MELANCSplineFactory_3D::MELANCSplineFactory_3D(
+  RooAbsReal& XVar_, RooAbsReal& YVar_, RooAbsReal& ZVar_, TString appendName_,
+  MELANCSplineCore::BoundaryCondition const bcBeginX_,
+  MELANCSplineCore::BoundaryCondition const bcEndX_,
+  MELANCSplineCore::BoundaryCondition const bcBeginY_,
+  MELANCSplineCore::BoundaryCondition const bcEndY_,
+  MELANCSplineCore::BoundaryCondition const bcBeginZ_,
+  MELANCSplineCore::BoundaryCondition const bcEndZ_
+) :
+  appendName(appendName_),
+  bcBeginX(bcBeginX_), bcEndX(bcEndX_),
+  bcBeginY(bcBeginY_), bcEndY(bcEndY_),
+  bcBeginZ(bcBeginZ_), bcEndZ(bcEndZ_),
+  XVar(&XVar_), YVar(&YVar_), ZVar(&ZVar_),
+  fcn(0),
+  PDF(0)
 {}
 MELANCSplineFactory_3D::~MELANCSplineFactory_3D(){
   destroyPDF();
@@ -84,8 +95,11 @@ void MELANCSplineFactory_3D::initPDF(const std::vector<splineQuadruplet_t>& pLis
     name.Data(),
     title.Data(),
     *XVar, *YVar, *ZVar,
-    XList, YList, ZList, FcnList
-    );
+    XList, YList, ZList, FcnList,
+    bcBeginX, bcEndX,
+    bcBeginY, bcEndY,
+    bcBeginZ, bcEndZ
+  );
 
   name.Prepend("PDF_"); title=name;
   PDF = new MELAFuncPdf(
@@ -105,4 +119,28 @@ void MELANCSplineFactory_3D::setPoints(TTree* tree){
   int n = tree->GetEntries();
   for (int ip=0; ip<n; ip++){ tree->GetEntry(ip); pList.push_back(splineQuadruplet_t(x, y, z, fcn)); }
   setPoints(pList);
+}
+
+void MELANCSplineFactory_3D::setEndConditions(
+  MELANCSplineCore::BoundaryCondition const bcBegin,
+  MELANCSplineCore::BoundaryCondition const bcEnd,
+  const unsigned int direction
+){
+  switch (direction){
+  case 0:
+    bcBeginX=bcBegin;
+    bcEndX=bcEnd;
+    break;
+  case 1:
+    bcBeginY=bcBegin;
+    bcEndY=bcEnd;
+    break;
+  case 2:
+    bcBeginZ=bcBegin;
+    bcEndZ=bcEnd;
+    break;
+  default:
+    // Do nothing
+    break;
+  }
 }

@@ -15,6 +15,13 @@ protected:
   T rangeZmin;
   T rangeZmax;
 
+  BoundaryCondition const bcBeginX;
+  BoundaryCondition const bcEndX;
+  BoundaryCondition const bcBeginY;
+  BoundaryCondition const bcEndY;
+  BoundaryCondition const bcBeginZ;
+  BoundaryCondition const bcEndZ;
+
   RooRealProxy theYVar;
   RooRealProxy theZVar;
   std::vector<T> YList;
@@ -47,6 +54,12 @@ public:
     const std::vector<T>& inYList,
     const std::vector<T>& inZList,
     const std::vector<std::vector<std::vector<T>>>& inFcnList,
+    MELANCSplineCore::BoundaryCondition const bcBeginX_=MELANCSplineCore::bcNaturalSpline,
+    MELANCSplineCore::BoundaryCondition const bcEndX_=MELANCSplineCore::bcNaturalSpline,
+    MELANCSplineCore::BoundaryCondition const bcBeginY_=MELANCSplineCore::bcNaturalSpline,
+    MELANCSplineCore::BoundaryCondition const bcEndY_=MELANCSplineCore::bcNaturalSpline,
+    MELANCSplineCore::BoundaryCondition const bcBeginZ_=MELANCSplineCore::bcNaturalSpline,
+    MELANCSplineCore::BoundaryCondition const bcEndZ_=MELANCSplineCore::bcNaturalSpline,
     Bool_t inUseFloor=true,
     T inFloorEval=0,
     T inFloorInt=0
@@ -76,6 +89,7 @@ protected:
   virtual std::vector<std::vector<T>> getCoefficientsPerYPerZ(
     const std::vector<T>& kappaX, const TMatrix_t& xAinv,
     const Int_t& ybin, const Int_t& zbin,
+    MELANCSplineCore::BoundaryCondition const& bcBegin, MELANCSplineCore::BoundaryCondition const& bcEnd,
     const Int_t xbin
     )const; // xbin can be -1, which means push all of them
 
@@ -84,7 +98,7 @@ protected:
   virtual Double_t evaluate()const;
 
 
-  ClassDef(MELANCSpline_3D_fast, 1)
+  ClassDef(MELANCSpline_3D_fast, 2)
 
 };
  

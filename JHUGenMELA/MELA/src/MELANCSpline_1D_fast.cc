@@ -13,14 +13,16 @@ using namespace TNumericUtil;
 ClassImp(MELANCSpline_1D_fast)
 
 MELANCSpline_1D_fast::MELANCSpline_1D_fast() :
-MELANCSplineCore()
+  MELANCSplineCore(),
+  bcBeginX(MELANCSplineCore::bcNaturalSpline), bcEndX(MELANCSplineCore::bcNaturalSpline)
 {}
 
 MELANCSpline_1D_fast::MELANCSpline_1D_fast(
   const char* name,
   const char* title
   ) :
-  MELANCSplineCore(name, title)
+  MELANCSplineCore(name, title),
+  bcBeginX(MELANCSplineCore::bcNaturalSpline), bcEndX(MELANCSplineCore::bcNaturalSpline)
 {}
 
 MELANCSpline_1D_fast::MELANCSpline_1D_fast(
@@ -29,17 +31,20 @@ MELANCSpline_1D_fast::MELANCSpline_1D_fast(
   RooAbsReal& inXVar,
   const std::vector<T>& inXList,
   const std::vector<T>& inFcnList,
+  MELANCSplineCore::BoundaryCondition const bcBeginX_,
+  MELANCSplineCore::BoundaryCondition const bcEndX_,
   Bool_t inUseFloor,
   T inFloorEval,
   T inFloorInt
   ) :
   MELANCSplineCore(name, title, inXVar, inXList, inUseFloor, inFloorEval, inFloorInt),
+  bcBeginX(bcBeginX_), bcEndX(bcEndX_),
   FcnList(inFcnList)
 {
   if (npointsX()>1){
     int npoints;
 
-    vector<vector<MELANCSplineCore::T>> xA; getKappas(kappaX, 0); getAArray(kappaX, xA);
+    vector<vector<MELANCSplineCore::T>> xA; getKappas(kappaX, 0); getAArray(kappaX, xA, bcBeginX, bcEndX);
     npoints=kappaX.size();
     TMatrix_t xAtrans(npoints, npoints);
     for (int i=0; i<npoints; i++){ for (int j=0; j<npoints; j++){ xAtrans[i][j]=xA.at(i).at(j); } }
@@ -50,7 +55,7 @@ MELANCSpline_1D_fast::MELANCSpline_1D_fast(
       assert(0);
     }
 
-    coefficients = getCoefficientsAlongDirection(kappaX, xAinv, FcnList, -1);
+    coefficients = getCoefficientsAlongDirection(kappaX, xAinv, FcnList, bcBeginX, bcEndX, -1);
   }
   else assert(0);
 
@@ -66,6 +71,7 @@ MELANCSpline_1D_fast::MELANCSpline_1D_fast(
   const char* name
   ) :
   MELANCSplineCore(other, name),
+  bcBeginX(other.bcBeginX), bcEndX(other.bcEndX),
   FcnList(other.FcnList),
   kappaX(other.kappaX),
   coefficients(other.coefficients)

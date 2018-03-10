@@ -15,6 +15,13 @@ class MELANCSplineFactory_3D{
 protected:
   TString appendName;
 
+  MELANCSplineCore::BoundaryCondition bcBeginX;
+  MELANCSplineCore::BoundaryCondition bcEndX;
+  MELANCSplineCore::BoundaryCondition bcBeginY;
+  MELANCSplineCore::BoundaryCondition bcEndY;
+  MELANCSplineCore::BoundaryCondition bcBeginZ;
+  MELANCSplineCore::BoundaryCondition bcEndZ;
+
   RooAbsReal* XVar;
   RooAbsReal* YVar;
   RooAbsReal* ZVar;
@@ -29,11 +36,25 @@ protected:
   void addUnique(std::vector<MELANCSplineCore::T>& list, MELANCSplineCore::T val);
 
 public:
-  MELANCSplineFactory_3D(RooAbsReal& XVar_, RooAbsReal& YVar_, RooAbsReal& ZVar_, TString appendName_="");
+  MELANCSplineFactory_3D(
+    RooAbsReal& XVar_, RooAbsReal& YVar_, RooAbsReal& ZVar_, TString appendName_="",
+    MELANCSplineCore::BoundaryCondition const bcBeginX_=MELANCSplineCore::bcNaturalSpline,
+    MELANCSplineCore::BoundaryCondition const bcEndX_=MELANCSplineCore::bcNaturalSpline,
+    MELANCSplineCore::BoundaryCondition const bcBeginY_=MELANCSplineCore::bcNaturalSpline,
+    MELANCSplineCore::BoundaryCondition const bcEndY_=MELANCSplineCore::bcNaturalSpline,
+    MELANCSplineCore::BoundaryCondition const bcBeginZ_=MELANCSplineCore::bcNaturalSpline,
+    MELANCSplineCore::BoundaryCondition const bcEndZ_=MELANCSplineCore::bcNaturalSpline
+  );
   ~MELANCSplineFactory_3D();
 
   MELANCSpline_3D_fast* getFunc(){ return fcn; }
   MELAFuncPdf* getPDF(){ return PDF; }
+
+  void setEndConditions(
+    MELANCSplineCore::BoundaryCondition const bcBegin,
+    MELANCSplineCore::BoundaryCondition const bcEnd,
+    const unsigned int direction
+  );
 
   void setPoints(TTree* tree);
   void setPoints(const std::vector<splineQuadruplet_t>& pList){ initPDF(pList); }

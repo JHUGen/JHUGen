@@ -13,6 +13,11 @@ protected:
   T rangeYmin;
   T rangeYmax;
 
+  BoundaryCondition const bcBeginX;
+  BoundaryCondition const bcEndX;
+  BoundaryCondition const bcBeginY;
+  BoundaryCondition const bcEndY;
+
   RooRealProxy theYVar;
   std::vector<T> YList;
 
@@ -36,6 +41,10 @@ public:
     const std::vector<T>& inXList,
     const std::vector<T>& inYList,
     const std::vector<std::vector<T>>& inFcnList,
+    MELANCSplineCore::BoundaryCondition const bcBeginX_=MELANCSplineCore::bcNaturalSpline,
+    MELANCSplineCore::BoundaryCondition const bcEndX_=MELANCSplineCore::bcNaturalSpline,
+    MELANCSplineCore::BoundaryCondition const bcBeginY_=MELANCSplineCore::bcNaturalSpline,
+    MELANCSplineCore::BoundaryCondition const bcEndY_=MELANCSplineCore::bcNaturalSpline,
     Bool_t inUseFloor=true,
     T inFloorEval=0,
     T inFloorInt=0
@@ -61,14 +70,14 @@ protected:
   Bool_t testRangeValidity(const T& val, const Int_t whichDirection)const;
   void cropValueForRange(T& val, const Int_t whichDirection)const;
 
-  virtual std::vector<std::vector<T>> getCoefficientsPerY(const std::vector<T>& kappaX, const TMatrix_t& xAinv, const Int_t& ybin, const Int_t xbin)const; // xbin can be -1, which means push all of them
+  virtual std::vector<std::vector<T>> getCoefficientsPerY(const std::vector<T>& kappaX, const TMatrix_t& xAinv, const Int_t& ybin, MELANCSplineCore::BoundaryCondition const& bcBegin, MELANCSplineCore::BoundaryCondition const& bcEnd, const Int_t xbin)const; // xbin can be -1, which means push all of them
 
   virtual T interpolateFcn(Int_t code, const char* rangeName=0)const;
 
   virtual Double_t evaluate()const;
 
 
-  ClassDef(MELANCSpline_2D_fast, 1)
+  ClassDef(MELANCSpline_2D_fast, 2)
 
 };
  

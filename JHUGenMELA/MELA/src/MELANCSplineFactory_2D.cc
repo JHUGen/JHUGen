@@ -3,11 +3,19 @@
 using namespace std;
 
 
-MELANCSplineFactory_2D::MELANCSplineFactory_2D(RooAbsReal& XVar_, RooAbsReal& YVar_, TString appendName_) :
-appendName(appendName_),
-XVar(&XVar_), YVar(&YVar_),
-fcn(0),
-PDF(0)
+MELANCSplineFactory_2D::MELANCSplineFactory_2D(
+  RooAbsReal& XVar_, RooAbsReal& YVar_, TString appendName_,
+  MELANCSplineCore::BoundaryCondition const bcBeginX_,
+  MELANCSplineCore::BoundaryCondition const bcEndX_,
+  MELANCSplineCore::BoundaryCondition const bcBeginY_,
+  MELANCSplineCore::BoundaryCondition const bcEndY_
+) :
+  appendName(appendName_),
+  bcBeginX(bcBeginX_), bcEndX(bcEndX_),
+  bcBeginY(bcBeginY_), bcEndY(bcEndY_),
+  XVar(&XVar_), YVar(&YVar_),
+  fcn(0),
+  PDF(0)
 {}
 MELANCSplineFactory_2D::~MELANCSplineFactory_2D(){
   destroyPDF();
@@ -71,7 +79,9 @@ void MELANCSplineFactory_2D::initPDF(const std::vector<splineTriplet_t>& pList){
     name.Data(),
     title.Data(),
     *XVar, *YVar,
-    XList, YList, FcnList
+    XList, YList, FcnList,
+    bcBeginX, bcEndX,
+    bcBeginY, bcEndY
     );
 
   name.Prepend("PDF_"); title=name;
@@ -91,4 +101,24 @@ void MELANCSplineFactory_2D::setPoints(TTree* tree){
   int n = tree->GetEntries();
   for (int ip=0; ip<n; ip++){ tree->GetEntry(ip); pList.push_back(splineTriplet_t(x, y, fcn)); }
   setPoints(pList);
+}
+
+void MELANCSplineFactory_2D::setEndConditions(
+  MELANCSplineCore::BoundaryCondition const bcBegin,
+  MELANCSplineCore::BoundaryCondition const bcEnd,
+  const unsigned int direction
+){
+  switch (direction){
+  case 0:
+    bcBeginX=bcBegin;
+    bcEndX=bcEnd;
+    break;
+  case 1:
+    bcBeginY=bcBegin;
+    bcEndY=bcEnd;
+    break;
+  default:
+    // Do nothing
+    break;
+  }
 }
