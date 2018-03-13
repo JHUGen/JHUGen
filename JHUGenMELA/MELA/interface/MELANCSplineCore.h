@@ -29,6 +29,8 @@ public:
     bcClamped, // D1=0 at endpoint
     bcApproximatedSecondDerivative, // D2 is approximated
     bcNaturalSpline, // D2=0 at endpoint
+    bcQuadratic, // Coefficient D=0
+    bcQuadraticWithNullSlope, // Coefficient D=0 and D1=0 at endpoint
     NBoundaryConditions
   };
 
