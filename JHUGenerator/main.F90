@@ -1078,6 +1078,7 @@ type(SaveValues) :: tosave, oldsavevalues
         DataFile = DataFile(1:i-4)
         !print *, DataFile
     endif
+    call system('mkdir -p ./data')! -p is suppressing error messages if directory already exists
 
     if (ReadCSmax) then
       call oldsavevalues%ReadFromFile(trim(DataFile)//"_commandlineinfo.txt")
@@ -3870,7 +3871,6 @@ integer :: i
 
    if( .not.FilesOpened ) then
        FilesOpened = .true.
-       call system('mkdir -p ./data')! -p is suppressing error messages if directory already exists
 
        print *, ""
        if( unweighted ) then

@@ -591,32 +591,32 @@ jobs:
           command: |
             cd JHUGenerator
             make
-            ./JHUGen Process=50 VegasNc0=10000 VegasNc2=100 MReso=250 GaReso=10 $REFERENCE_COUPLINGS_SPIN0 pTjetcut=30 NoInterf REFERENCE_COUPLINGS_SPIN0_ZP PDFSet=231 DataFile=VH_firstrun.lhe
+            ./JHUGen Process=50 VegasNc0=10000 VegasNc2=100 MReso=250 GaReso=10 $REFERENCE_COUPLINGS_SPIN0 pTjetcut=30 NoInterf $REFERENCE_COUPLINGS_SPIN0_ZP PDFSet=231 DataFile=VH_firstrun.lhe
             cp VH_firstrun_commandlineinfo.txt VH_readcsmax_commandlineinfo.txt
             cp VH_firstrun_CSmax.bin VH_readcsmax_CSmax.bin
             #change filename, order, boolean syntax, real syntax, VegasNc2, remove VegasNc0 - should still work
-            ./JHUGen Process=50 PDFSet=231 DataFile=VH_readcsmax.lhe MReso=250 VegasNc2=500 pTjetcut=30.0d0 Interf=0 REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0
+            ./JHUGen Process=50 PDFSet=231 DataFile=VH_readcsmax.lhe MReso=250 VegasNc2=500 pTjetcut=30.0d0 Interf=0 $REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0
             #change or remove stuff - shouldn't work
-            ! ./JHUGen Process=0 PDFSet=231 DataFile=VH_readcsmax.lhe MReso=250 VegasNc2=500 pTjetcut=30.0d0 Interf=0 REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0
-            ! ./JHUGen Process=50 PDFSet=3 DataFile=VH_readcsmax.lhe MReso=250 VegasNc2=500 pTjetcut=30.0d0 Interf=0 REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0
-            ! ./JHUGen Process=50 PDFSet=231 DataFile=VH_readcsmax.lhe MReso=250 VegasNc2=500 pTjetcut=30.0d0 Interf=0 REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10
-            ! ./JHUGen Process=50 PDFSet=231 DataFile=VH_readcsmax.lhe MReso=250 VegasNc2=500 pTjetcut=20.0d0 Interf=0 REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0
-            ! ./JHUGen Process=50 PDFSet=231 DataFile=VH_readcsmax.lhe MReso=250 VegasNc2=500 pTjetcut=30.0d0 Interf REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0
+            ! ./JHUGen Process=0 PDFSet=231 DataFile=VH_readcsmax.lhe MReso=250 VegasNc2=500 pTjetcut=30.0d0 Interf=0 $REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0
+            ! ./JHUGen Process=50 PDFSet=3 DataFile=VH_readcsmax.lhe MReso=250 VegasNc2=500 pTjetcut=30.0d0 Interf=0 $REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0
+            ! ./JHUGen Process=50 PDFSet=231 DataFile=VH_readcsmax.lhe MReso=250 VegasNc2=500 pTjetcut=30.0d0 Interf=0 $REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10
+            ! ./JHUGen Process=50 PDFSet=231 DataFile=VH_readcsmax.lhe MReso=250 VegasNc2=500 pTjetcut=20.0d0 Interf=0 $REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0
+            ! ./JHUGen Process=50 PDFSet=231 DataFile=VH_readcsmax.lhe MReso=250 VegasNc2=500 pTjetcut=30.0d0 Interf $REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0
 
             #same for process that has a grid rather than CSmax.bin
-            ./JHUGen Process=0 VegasNc0=10000 VegasNc2=100 MReso=250 GaReso=10 $REFERENCE_COUPLINGS_SPIN0 pTjetcut=30 NoInterf REFERENCE_COUPLINGS_SPIN0_ZP PDFSet=231 DataFile=ggH_firstrun.lhe
+            ./JHUGen Process=0 VegasNc0=10000 VegasNc2=100 MReso=250 GaReso=10 $REFERENCE_COUPLINGS_SPIN0 pTjetcut=30 NoInterf $REFERENCE_COUPLINGS_SPIN0_ZP PDFSet=231 DataFile=ggH_firstrun.lhe
             cp ggH_firstrun_commandlineinfo.txt ggH_readcsmax_commandlineinfo.txt
             cp ggH_firstrun.grid ggH_readcsmax.grid
             cp ggH_firstrun_step2.grid ggH_readcsmax_step2.grid
             cp ggH_firstrun_gridinfo.txt ggH_readcsmax_gridinfo.txt
             #change filename, order, boolean syntax, real syntax, VegasNc2, remove VegasNc0 - should still work
-            ./JHUGen Process=0 PDFSet=231 DataFile=ggH_readcsmax.lhe MReso=250 VegasNc2=500 pTjetcut=30.0d0 Interf=0 REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0
+            ./JHUGen Process=0 PDFSet=231 DataFile=ggH_readcsmax.lhe MReso=250 VegasNc2=500 pTjetcut=30.0d0 Interf=0 $REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0
             #change or remove stuff - shouldn't work
-            ! ./JHUGen Process=50 PDFSet=231 DataFile=ggH_readcsmax.lhe MReso=250 VegasNc2=500 pTjetcut=30.0d0 Interf=0 REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0
-            ! ./JHUGen Process=0 PDFSet=3 DataFile=ggH_readcsmax.lhe MReso=250 VegasNc2=500 pTjetcut=30.0d0 Interf=0 REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0
-            ! ./JHUGen Process=0 PDFSet=231 DataFile=ggH_readcsmax.lhe MReso=250 VegasNc2=500 pTjetcut=30.0d0 Interf=0 REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10
-            ! ./JHUGen Process=0 PDFSet=231 DataFile=ggH_readcsmax.lhe MReso=250 VegasNc2=500 pTjetcut=20.0d0 Interf=0 REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0
-            ! ./JHUGen Process=0 PDFSet=231 DataFile=ggH_readcsmax.lhe MReso=250 VegasNc2=500 pTjetcut=30.0d0 Interf REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0
+            ! ./JHUGen Process=50 PDFSet=231 DataFile=ggH_readcsmax.lhe MReso=250 VegasNc2=500 pTjetcut=30.0d0 Interf=0 $REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0
+            ! ./JHUGen Process=0 PDFSet=3 DataFile=ggH_readcsmax.lhe MReso=250 VegasNc2=500 pTjetcut=30.0d0 Interf=0 $REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0
+            ! ./JHUGen Process=0 PDFSet=231 DataFile=ggH_readcsmax.lhe MReso=250 VegasNc2=500 pTjetcut=30.0d0 Interf=0 $REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10
+            ! ./JHUGen Process=0 PDFSet=231 DataFile=ggH_readcsmax.lhe MReso=250 VegasNc2=500 pTjetcut=20.0d0 Interf=0 $REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0
+            ! ./JHUGen Process=0 PDFSet=231 DataFile=ggH_readcsmax.lhe MReso=250 VegasNc2=500 pTjetcut=30.0d0 Interf $REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0
       - run:
           name: "check that linkMELA is turned on"
           command: "grep 'linkMELA *= *Yes' JHUGenerator/makefile"
