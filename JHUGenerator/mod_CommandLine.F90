@@ -31,6 +31,29 @@ end type SaveValues
 
 contains
 
+function ForceOneWord(string)
+character(len=*), intent(in) :: string
+character(len=len(string) + 100) :: ForceOneWord
+character(len=*), parameter :: onewordchars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._"
+integer :: i
+
+ForceOneWord = string
+do while (.true.)
+  do i=1,len(trim(ForceOneWord))
+    if (ForceOneWord(i:i) == "/") then
+      ForceOneWord = ForceOneWord(:i-1) // "_SLASH_" // ForceOneWord(i+1:)
+      exit
+    endif
+    if (index(onewordchars, ForceOneWord(i:i)).eq.0) then
+      print *, "Don't know what to do with character '"//ForceOneWord(i:i)//"'"
+      stop 1
+    endif
+  enddo
+  exit
+enddo
+
+end function ForceOneWord
+
 function SaveValuesConstructor() result(self)
 implicit none
 type(SaveValues) :: self
@@ -52,11 +75,13 @@ subroutine savevalue_logical(self, name, value)
 use ModMisc
 implicit none
 class(SaveValues) :: self
-character(len=*) :: name
+character(len=*), intent(in) :: name
+character(len=len(name)+50) :: name_
 logical :: value
-  if (len(name) .gt. 100) call Error("Parameter name is too long: "//name)
+  name_ = ForceOneWord(name)
+  if (len(trim(name_)) .gt. 100) call Error("Parameter name is too long: "//name_)
   self%nlogicals = self%nlogicals + 1
-  self%logicalnames(self%nlogicals) = name
+  self%logicalnames(self%nlogicals) = name_
   self%logicals(self%nlogicals) = value
 end subroutine savevalue_logical
 
@@ -64,11 +89,13 @@ subroutine savevalue_integer(self, name, value)
 use ModMisc
 implicit none
 class(SaveValues) :: self
-character(len=*) :: name
+character(len=*), intent(in) :: name
+character(len=len(name)+50) :: name_
 integer :: value
-  if (len(name) .gt. 100) call Error("Parameter name is too long: "//name)
+  name_ = ForceOneWord(name)
+  if (len(trim(name_)) .gt. 100) call Error("Parameter name is too long: "//name_)
   self%nintegers = self%nintegers + 1
-  self%integernames(self%nintegers) = name
+  self%integernames(self%nintegers) = name_
   self%integers(self%nintegers) = value
 end subroutine savevalue_integer
 
@@ -76,11 +103,13 @@ subroutine savevalue_real8(self, name, value)
 use ModMisc
 implicit none
 class(SaveValues) :: self
-character(len=*) :: name
+character(len=*), intent(in) :: name
+character(len=len(name)+50) :: name_
 real(8) :: value
-  if (len(name) .gt. 100) call Error("Parameter name is too long: "//name)
+  name_ = ForceOneWord(name)
+  if (len(trim(name_)) .gt. 100) call Error("Parameter name is too long: "//name_)
   self%nreal8s = self%nreal8s + 1
-  self%real8names(self%nreal8s) = name
+  self%real8names(self%nreal8s) = name_
   self%real8s(self%nreal8s) = value
 end subroutine savevalue_real8
 
@@ -88,11 +117,13 @@ subroutine savevalue_complex8(self, name, value)
 use ModMisc
 implicit none
 class(SaveValues) :: self
-character(len=*) :: name
+character(len=*), intent(in) :: name
+character(len=len(name)+50) :: name_
 complex(8) :: value
-  if (len(name) .gt. 100) call Error("Parameter name is too long: "//name)
+  name_ = ForceOneWord(name)
+  if (len(trim(name_)) .gt. 100) call Error("Parameter name is too long: "//name_)
   self%ncomplex8s = self%ncomplex8s + 1
-  self%complex8names(self%ncomplex8s) = name
+  self%complex8names(self%ncomplex8s) = name_
   self%complex8s(self%ncomplex8s) = value
 end subroutine savevalue_complex8
 
@@ -100,13 +131,16 @@ subroutine savevalue_string(self, name, value)
 use ModMisc
 implicit none
 class(SaveValues) :: self
-character(len=*) :: name
-character(len=*) :: value
-  if (len(name) .gt. 100) call Error("Parameter name is too long: "//name)
-  if (len(value) .gt. 100) call Error("Parameter value is too long: "//value)
+character(len=*), intent(in) :: name, value
+character(len=len(name)+50) :: name_
+character(len=len(value)+50) :: value_
+  name_ = ForceOneWord(name)
+  value_ = ForceOneWord(value)
+  if (len(trim(name_)) .gt. 100) call Error("Parameter name is too long: "//name_)
+  if (len(trim(value_)) .gt. 100) call Error("Parameter value is too long: "//value_)
   self%nstrings = self%nstrings + 1
-  self%stringnames(self%nstrings) = name
-  self%strings(self%nstrings) = value
+  self%stringnames(self%nstrings) = name_
+  self%strings(self%nstrings) = value_
 end subroutine savevalue_string
 
 subroutine SortSaveValues(self)
