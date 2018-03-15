@@ -1,6 +1,8 @@
 MODULE ModCommandLine
 implicit none
 
+integer, parameter :: maxlogicals=20, maxintegers=20, maxreal8s=20, maxcomplex8s=150, maxstrings=10
+
 interface ReadCommandLineArgument
     module procedure ReadCommandLineArgument_logical, ReadCommandLineArgument_integer, ReadCommandLineArgument_real8,&
                      ReadCommandLineArgument_complex8, ReadCommandLineArgument_string
@@ -11,13 +13,13 @@ interface savevalue
 end interface savevalue
 
 type SaveValues
-  character(len=100) :: logicalnames(1:100), integernames(1:100), real8names(1:100), complex8names(1:100), stringnames(1:100)
+  character(len=100) :: logicalnames(1:maxlogicals), integernames(1:maxintegers), real8names(1:maxreal8s), complex8names(1:maxcomplex8s), stringnames(1:maxstrings)
   integer :: nlogicals, nintegers, nreal8s, ncomplex8s, nstrings
-  logical :: logicals(1:100)
-  integer :: integers(1:100)
-  real(8) :: real8s(1:100)
-  complex(8) :: complex8s(1:100)
-  character(len=100) :: strings(1:100)
+  logical :: logicals(1:maxlogicals)
+  integer :: integers(1:maxintegers)
+  real(8) :: real8s(1:maxreal8s)
+  complex(8) :: complex8s(1:maxcomplex8s)
+  character(len=100) :: strings(1:maxstrings)
 contains
   procedure :: savevalue_logical
   procedure :: savevalue_integer
@@ -79,6 +81,7 @@ character(len=*), intent(in) :: name
 character(len=len(name)+50) :: name_
 logical :: value
   name_ = ForceOneWord(name)
+  if (self%nlogicals .ge. maxlogicals) call Error("Too many logicals")
   if (len(trim(name_)) .gt. 100) call Error("Parameter name is too long: "//name_)
   self%nlogicals = self%nlogicals + 1
   self%logicalnames(self%nlogicals) = name_
@@ -93,6 +96,7 @@ character(len=*), intent(in) :: name
 character(len=len(name)+50) :: name_
 integer :: value
   name_ = ForceOneWord(name)
+  if (self%nintegers .ge. maxintegers) call Error("Too many integers")
   if (len(trim(name_)) .gt. 100) call Error("Parameter name is too long: "//name_)
   self%nintegers = self%nintegers + 1
   self%integernames(self%nintegers) = name_
@@ -107,6 +111,7 @@ character(len=*), intent(in) :: name
 character(len=len(name)+50) :: name_
 real(8) :: value
   name_ = ForceOneWord(name)
+  if (self%nreal8s .ge. maxreal8s) call Error("Too many real8s")
   if (len(trim(name_)) .gt. 100) call Error("Parameter name is too long: "//name_)
   self%nreal8s = self%nreal8s + 1
   self%real8names(self%nreal8s) = name_
@@ -121,6 +126,7 @@ character(len=*), intent(in) :: name
 character(len=len(name)+50) :: name_
 complex(8) :: value
   name_ = ForceOneWord(name)
+  if (self%ncomplex8s .ge. maxcomplex8s) call Error("Too many complex8s")
   if (len(trim(name_)) .gt. 100) call Error("Parameter name is too long: "//name_)
   self%ncomplex8s = self%ncomplex8s + 1
   self%complex8names(self%ncomplex8s) = name_
@@ -136,6 +142,7 @@ character(len=len(name)+50) :: name_
 character(len=len(value)+50) :: value_
   name_ = ForceOneWord(name)
   value_ = ForceOneWord(value)
+  if (self%nstrings .ge. maxstrings) call Error("Too many strings")
   if (len(trim(name_)) .gt. 100) call Error("Parameter name is too long: "//name_)
   if (len(trim(value_)) .gt. 100) call Error("Parameter value is too long: "//value_)
   self%nstrings = self%nstrings + 1
