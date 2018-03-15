@@ -47,9 +47,21 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/JHUGen
-      - checkout
       - run:
           <<: *cmsrelcmsenv
+      - run:
+          name: "git checkout -B hack"
+          command: |
+            mkdir $HOME/githack &&
+            echo '#!/bin/bash
+                  cd ~/CMSSW_9_3_2 && eval $(scram ru -sh) && cd - > /dev/null &&
+                  git "$@"
+                 ' > $HOME/githack/git &&
+            chmod u+x $HOME/githack/git
+      - checkout
+      - run:
+          name: "undo git checkout -B hack"
+          command: rm -r $HOME/githack
       - restore_cache:
           key: v2_boost_1_61_0
       - run:
