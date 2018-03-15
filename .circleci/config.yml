@@ -47,22 +47,7 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/JHUGen
-      - run:
-          name: "git checkout -B hack"
-          command: |
-            mkdir $HOME/githack &&
-            echo '#https://git-scm.com/docs/git-checkout#git-checkout-emgitcheckoutem-b-Bltnewbranchgtltstartpointgt
-                  if [ "$1" == checkout ] && [ "$2" == -q ] && [ "$3" == -B ] && [ $# == 4 ]; then
-                    git branch -f $4 &&
-                    git checkout $4
-                  else
-                    /usr/bin/git "$@"
-                  fi' > $HOME/githack/git &&
-            chmod u+x $HOME/githack/git
       - checkout
-      - run:
-          name: "undo git checkout -B hack"
-          command: rm -r $HOME/githack
       - run:
           <<: *cmsrelcmsenv
       - restore_cache:
