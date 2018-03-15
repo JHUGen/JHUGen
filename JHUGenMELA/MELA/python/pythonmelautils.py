@@ -31,7 +31,6 @@ class NamedTemporaryMacro(object):
       compile(self.f.name)
       self.compiled = True
 
-compile("")  #compiles loadMELA
 ROOT.gROOT.Macro(os.path.join(os.path.dirname(__file__), "..", "test", "loadMELA.C+"))
 include("Mela.h")
 include("TCouplingsBase.hh")

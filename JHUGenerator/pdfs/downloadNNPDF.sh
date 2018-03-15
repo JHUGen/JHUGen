@@ -11,10 +11,9 @@ fi
 
 if [ ! -f $pdf ]; then
 
-pdfsinside=$(find $rootdir -name $pdf)
-npdfsinside=${#pdfsinside[@]}
+pdfsinside="$(find $rootdir -name $pdf)"
 let found=0
-for p in "${pdfsinside[@]}"
+for p in ${pdfsinside[@]}
 do
     echo $p
     if [[ "$p" == *"$pdf"* ]];then

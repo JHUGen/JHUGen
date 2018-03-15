@@ -119,6 +119,7 @@ MainDep = mod_CrossSection.F90 \
           mod_CrossSection_BBBH.F90 \
           mod_CrossSection_TH.F90 \
           mod_PMZZ.F90 \
+          mod_CommandLine.F90 \
           main.F90
 
 # main objects
@@ -128,6 +129,7 @@ MainObj = $(ObjectDir)/mod_CrossSection.o \
           $(ObjectDir)/mod_CrossSection_BBBH.o \
           $(ObjectDir)/mod_CrossSection_TH.o \
           $(ObjectDir)/mod_PMZZ.o \
+          $(ObjectDir)/mod_CommandLine.o \
           $(ObjectDir)/main.o
 
 

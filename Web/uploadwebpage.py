@@ -223,6 +223,7 @@ Download_template = """
 #       as the generator
 versions = (
             Version("v7.1.2"),
+            Version("v7.1.4", visible=False),
             Version("v7.1.0", visible=False),
             Version("v7.0.11", visible=False),
             Version("v7.0.9", manualcommit="c14848e401c115e9e3f201bf7388cc750e4b09f3", melacommit="ebdb109745949008e16851674bb832c59ecc43a3", visible=False),

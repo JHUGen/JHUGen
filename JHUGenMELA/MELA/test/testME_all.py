@@ -163,7 +163,7 @@ for j, ref in enumerate(referencefiles, start=1):
         if match:
           pendingselfD[match.group(1)] = float(match.group(2))
 
-  print j, "/", len(referencefiles)
+  print j, "/", len(referencefiles), ref
 
 errors = []
 if different:

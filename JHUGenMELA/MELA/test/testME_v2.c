@@ -3301,6 +3301,10 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
       }
     }
 
+    // Reset these in case the function needs to be repeated
+    spinzerohiggs_anomcoupl_.AnomalCouplDK=1;
+    spinzerohiggs_anomcoupl_.AnomalCouplPR=1;
+
     cout << "Production variables:\n";
     cout << "\tmJJ = " << mjj << endl;
     cout << "\tPhi = " << Phi << endl;
