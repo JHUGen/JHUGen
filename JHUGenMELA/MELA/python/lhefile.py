@@ -73,7 +73,7 @@ class LHEEvent_Hwithdecay(LHEEvent):
           mother2 = mother2s[mother1]
           mother1 = mother1s[mother1]
 
-    if not self.isgen: mothers = None
+    if not isgen: mothers = None
     return daughters, associated, mothers
 
 class LHEEvent_StableHiggs(LHEEvent):
@@ -100,7 +100,7 @@ class LHEEvent_StableHiggs(LHEEvent):
     if len(mothers) != 2:
       raise ValueError("{} mothers in the event??\n\n".format(len(mothers))+"\n".join(lines))
 
-    if not self.isgen: mothers = None
+    if not isgen: mothers = None
     return daughters, associated, mothers
 
   nassociatedparticles = None
