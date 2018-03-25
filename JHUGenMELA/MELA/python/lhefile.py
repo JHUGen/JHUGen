@@ -60,7 +60,7 @@ class LHEEvent_Hwithdecay(LHEEvent):
         line = line.replace(str(id), "0", 1)  #replace the first instance of the jet id with 0, which means unknown jet
       mother1s.append(mother1)
       mother2s.append(mother2)
-      if status == -1 and isgen:
+      if status == -1:
         mothers.append(line)
       elif status == 1 and (1 <= abs(id) <= 6 or 11 <= abs(id) <= 16 or abs(id) in (21, 22)):
         while True:
@@ -73,6 +73,7 @@ class LHEEvent_Hwithdecay(LHEEvent):
           mother2 = mother2s[mother1]
           mother1 = mother1s[mother1]
 
+    if not self.isgen: mothers = None
     return daughters, associated, mothers
 
 class LHEEvent_StableHiggs(LHEEvent):
@@ -83,7 +84,7 @@ class LHEEvent_StableHiggs(LHEEvent):
       id, status, mother1, mother2 = (int(_) for _ in line.split()[0:4])
       if (1 <= abs(id) <= 6 or abs(id) == 21) and not isgen:
         line = line.replace(str(id), "0", 1)  #replace the first instance of the jet id with 0, which means unknown jet
-      if status == -1 and isgen:
+      if status == -1:
         mothers.append(line)
       if id == 25:
         if status != 1:
@@ -96,9 +97,10 @@ class LHEEvent_StableHiggs(LHEEvent):
       raise ValueError("More than one H in the event??\n\n"+"\n".join(lines))
     if cls.nassociatedparticles is not None and len(associated) != cls.nassociatedparticles:
       raise ValueError("Wrong number of associated particles (expected {}, found {})\n\n".format(cls.nassociatedparticles, len(associated))+"\n".join(lines))
-    if len(mothers) != 2 and isgen:
+    if len(mothers) != 2:
       raise ValueError("{} mothers in the event??\n\n".format(len(mothers))+"\n".join(lines))
 
+    if not self.isgen: mothers = None
     return daughters, associated, mothers
 
   nassociatedparticles = None

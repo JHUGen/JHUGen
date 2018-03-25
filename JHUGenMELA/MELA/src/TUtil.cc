@@ -7878,7 +7878,7 @@ MELACandidate* TUtil::ConvertVectorFormat(
   if (pDaughters==0){ MELAerr << "TUtil::ConvertVectorFormat: No daughters!" << endl; return cand; }
   else if (pDaughters->size()==0){ MELAerr << "TUtil::ConvertVectorFormat: Daughter size==0!" << endl; return cand; }
   else if (pDaughters->size()>4){ MELAerr << "TUtil::ConvertVectorFormat: Daughter size " << pDaughters->size() << ">4 is not supported!" << endl; return cand; }
-  if (pMothers!=0 && pMothers->size()!=2 && pMothers->size() != 0){ MELAerr << "TUtil::ConvertVectorFormat: Mothers momentum size (" << pMothers->size() << ") has to have had been 2! Continuing by omitting mothers." << endl; /*return cand;*/ }
+  if (pMothers!=0 && pMothers->size()!=2){ MELAerr << "TUtil::ConvertVectorFormat: Mothers momentum size (" << pMothers->size() << ") has to have had been 2! Continuing by omitting mothers." << endl; /*return cand;*/ }
 
   // Create mother, daughter and associated particle MELAParticle objects
   std::vector<MELAParticle*> daughters;
