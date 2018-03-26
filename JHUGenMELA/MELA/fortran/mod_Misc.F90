@@ -21,7 +21,9 @@ INTERFACE OPERATOR (.cross.)
    MODULE PROCEDURE VectorCross
 END INTERFACE OPERATOR (.cross.)
 
-
+interface BubleSort
+   module procedure BubleSort_realinteger, BubleSort_stringlogical, BubleSort_stringinteger, BubleSort_stringreal8, BubleSort_stringcomplex8, BubleSort_stringstring
+end interface BubleSort
 contains
 
 
@@ -253,30 +255,46 @@ END SUBROUTINE
 
 
 
+#define MakeBubleSort(typex, typey, name) \
+SUBROUTINE name(N,X, IY)                 ;\
+IMPLICIT NONE                            ;\
+integer n                                ;\
+typex :: x(1:n)                          ;\
+typey :: iy(1:n)                         ;\
+typex :: temp                            ;\
+integer :: i, j, jmax                    ;\
+typey :: itemp                           ;\
+logical :: keepgoing                     ;\
+                                         ;\
+      keepgoing = .true.                 ;\
+      jmax=n-1                           ;\
+      do i=1,n-1                         ;\
+         keepgoing = .false.             ;\
+         do j=1,jmax                     ;\
+            if(x(j).gt.x(j+1)) cycle     ;\
+              keepgoing = .true.         ;\
+              temp=x(j)                  ;\
+              x(j)=x(j+1)                ;\
+              x(j+1)=temp                ;\
+              itemp=iy(j)                ;\
+              iy(j)=iy(j+1)              ;\
+              iy(j+1)=itemp              ;\
+         enddo                           ;\
+         if(.not.keepgoing) return       ;\
+         jmax=jmax-1                     ;\
+       enddo                             ;\
+                                         ;\
+RETURN                                   ;\
+END SUBROUTINE
 
-SUBROUTINE BubleSort(N,X, IY)
-IMPLICIT NONE
-integer n
-real(8) x(1:n)
-integer iy(1:n)
-real(8) temp
-integer i, j, jmax, itemp
+MakeBubleSort(real(8), integer, BubleSort_realinteger)
+MakeBubleSort(character(len=100), logical, BubleSort_stringlogical)
+MakeBubleSort(character(len=100), integer, BubleSort_stringinteger)
+MakeBubleSort(character(len=100), real(8), BubleSort_stringreal8)
+MakeBubleSort(character(len=100), complex(8), BubleSort_stringcomplex8)
+MakeBubleSort(character(len=100), character(len=100), BubleSort_stringstring)
 
-      jmax=n-1
-      do i=1,n-1
-         temp=1d38
-         do j=1,jmax
-            if(x(j).gt.x(j+1)) cycle
-              temp=x(j)
-              x(j)=x(j+1)
-              x(j+1)=temp
-              itemp=iy(j)
-              iy(j)=iy(j+1)
-              iy(j+1)=itemp
-         enddo
-         if(temp.eq.1d38) return
-         jmax=jmax-1
-       enddo
+#undef MakeBubleSort
 
 ! check the routine
 ! real(8) :: x(1:10)
@@ -288,9 +306,6 @@ integer i, j, jmax, itemp
 !     print *, x(:)
 !     print *, iy(:)
 !     stop
-
-RETURN
-END SUBROUTINE
 
 
 

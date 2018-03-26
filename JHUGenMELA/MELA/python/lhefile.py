@@ -18,20 +18,33 @@ from mela import Mela, SimpleParticle_t, SimpleParticleCollection_t
 
 InputEvent = collections.namedtuple("InputEvent", "daughters associated mothers isgen")
 
-class LHEEvent(InputEvent):
+class LHEEvent(object):
   __metaclass__ = abc.ABCMeta
-  def __new__(cls, event, isgen):
+  def __init__(self, event, isgen):
     lines = event.split("\n")
-    lines = [line for line in lines if not ("<event>" in line or "</event>" in line or not line.split("#")[0].strip())]
-    nparticles, _, _, _, _, _ = lines[0].split()
+
+    self.weights = {}
+    for line in lines:
+      if "<wgt" not in line: continue
+      match = re.match("<wgt id='(.*)'>([0-9+Ee.-]*)</wgt>", line)
+      if match: self.weights[match.group(1)] = float(match.group(2))
+
+    lines = [line for line in lines if not ("<" in line or ">" in line or not line.split("#")[0].strip())]
+    nparticles, _, weight, _, _, _ = lines[0].split()
+
     nparticles = int(nparticles)
+    self.weight = float(weight)
     if nparticles != len(lines)-1:
-      raise ValueError("Wrong number of particles! Should be {}, have {}".replace(nparticles, len(lines)-1))
-    daughters, associated, mothers = (SimpleParticleCollection_t(_) for _ in cls.extracteventparticles(lines[1:], isgen))
-    return super(LHEEvent, cls).__new__(cls, daughters, associated, mothers, isgen)
+      raise ValueError("Wrong number of particles! Should be {}, have {}".format(nparticles, len(lines)-1))
+
+    daughters, associated, mothers = (SimpleParticleCollection_t(_) for _ in self.extracteventparticles(lines[1:], isgen))
+    self.daughters, self.associated, self.mothers, self.isgen = self.inputevent = InputEvent(daughters, associated, mothers, isgen)
 
   @abc.abstractmethod
   def extracteventparticles(cls, lines, isgen): "has to be a classmethod that returns daughters, associated, mothers"
+
+  def __iter__(self):
+    return iter(self.inputevent)
 
 class LHEEvent_Hwithdecay(LHEEvent):
   @classmethod
@@ -47,7 +60,7 @@ class LHEEvent_Hwithdecay(LHEEvent):
         line = line.replace(str(id), "0", 1)  #replace the first instance of the jet id with 0, which means unknown jet
       mother1s.append(mother1)
       mother2s.append(mother2)
-      if status == -1 and isgen:
+      if status == -1:
         mothers.append(line)
       elif status == 1 and (1 <= abs(id) <= 6 or 11 <= abs(id) <= 16 or abs(id) in (21, 22)):
         while True:
@@ -60,6 +73,7 @@ class LHEEvent_Hwithdecay(LHEEvent):
           mother2 = mother2s[mother1]
           mother1 = mother1s[mother1]
 
+    if not isgen: mothers = None
     return daughters, associated, mothers
 
 class LHEEvent_StableHiggs(LHEEvent):
@@ -70,7 +84,7 @@ class LHEEvent_StableHiggs(LHEEvent):
       id, status, mother1, mother2 = (int(_) for _ in line.split()[0:4])
       if (1 <= abs(id) <= 6 or abs(id) == 21) and not isgen:
         line = line.replace(str(id), "0", 1)  #replace the first instance of the jet id with 0, which means unknown jet
-      if status == -1 and isgen:
+      if status == -1:
         mothers.append(line)
       if id == 25:
         if status != 1:
@@ -83,9 +97,10 @@ class LHEEvent_StableHiggs(LHEEvent):
       raise ValueError("More than one H in the event??\n\n"+"\n".join(lines))
     if cls.nassociatedparticles is not None and len(associated) != cls.nassociatedparticles:
       raise ValueError("Wrong number of associated particles (expected {}, found {})\n\n".format(cls.nassociatedparticles, len(associated))+"\n".join(lines))
-    if len(mothers) != 2 and isgen:
+    if len(mothers) != 2:
       raise ValueError("{} mothers in the event??\n\n".format(len(mothers))+"\n".join(lines))
 
+    if not isgen: mothers = None
     return daughters, associated, mothers
 
   nassociatedparticles = None
@@ -162,11 +177,13 @@ class LHEFileBase(object):
     self.daughters = lheevent.daughters
     self.associated = lheevent.associated
     self.mothers = lheevent.mothers
+    self.weight = lheevent.weight
+    self.weights = lheevent.weights
     self.setInputEvent(*lheevent)
 
   @classmethod
   def _LHEclassattributes(cls):
-    return "filename", "f", "mela", "isgen", "daughters", "mothers", "associated"
+    return "filename", "f", "mela", "isgen", "daughters", "mothers", "associated", "weight", "weights"
 
   def __getattr__(self, attr):
     if attr == "mela": raise RuntimeError("Something is wrong, trying to access mela before it's created")

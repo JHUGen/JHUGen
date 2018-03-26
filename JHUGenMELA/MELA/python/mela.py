@@ -242,6 +242,13 @@ class Mela(object):
     else:
       super(Mela, self).__setattr__(name, value)
 
+  def setInputEvent(self, daughters, associated=None, mothers=None, isGen=False):
+    if daughters is None: daughters = ROOT.nullptr  #but ConvertVectorFormat will be unhappy and just return an empty candidate
+    if associated is None: associated = ROOT.nullptr
+    if mothers is None: mothers = ROOT.nullptr
+
+    self.__mela.setInputEvent(daughters, associated, mothers, isGen)
+
   def setInputEvent_fromLHE_Hwithdecay(self, event, isgen=False):
     "For any LHE event that writes H (id=25 or 39) explicitly and decays it"
     from lhefile import LHEEvent_Hwithdecay
