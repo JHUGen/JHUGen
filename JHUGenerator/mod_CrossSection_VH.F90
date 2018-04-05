@@ -1665,7 +1665,9 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
       if(HbbDecays) then
         PSWgt2 = s_channel_decay(Mom_save(:,5),getMass(convertLHEreverse(id(8)))**2,getMass(convertLHEreverse(id(9)))**2,yRnd(10:11),Mom_save(:,8),Mom_save(:,9))
       endif
-      call boost2Lab(eta1,eta2,4,Mom_save(:,6:9))
+
+      if(Collider.eq.1.or.Collider.eq.2)call boost2Lab(eta1,eta2,4,Mom_save(:,6:9))
+
       Mom(:,6:9)=Mom_save(:,6:9)
 
       !write events
