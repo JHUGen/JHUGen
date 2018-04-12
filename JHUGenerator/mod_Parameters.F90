@@ -3,7 +3,7 @@ implicit none
 save
 !
 !
-character(len=*),parameter :: JHUGen_Version="v7.1.4"
+character(len=*),parameter :: JHUGen_Version="v7.1.5"
 !
 !
 !=====================================================
@@ -43,6 +43,8 @@ integer(8), public :: AccepCounter=0
 integer(8), public :: AlertCounter=0
 integer(8), public :: AccepCounter_part(-6:6,-6:6)=0,RejeCounter_part(-6:6,-6:6)=0,RequEvents(-6:+6,-6:+6)
 real(8), public :: CrossSecMax(-6:+6,-6:+6),CrossSec(-6:+6,-6:+6)
+integer(8), public :: RequEvents2(1:164),AccepCounter_part2(1:164)
+real(8), public :: CrossSec2(1:164),CrossSecMax2(164)
 integer, public :: iPart_sel, jPart_sel, iChann_sel
 real(8) :: time_start,time_end,time_int
 logical, public :: warmup
@@ -95,6 +97,7 @@ real(8), public :: PMZZdistribution(1:PMZZsize,1:2)  !huge array, in normal case
 integer, public :: PMZZminindex=-1, PMZZmaxindex=-1  !store the largest and smallest values currently used
 complex(8), public :: PrintPMZZ   !real part is the minimum, imaginary part is the maximum
 integer, public :: PrintPMZZIntervals
+integer, public :: VBFoffsh_run=-1
 !=====================================================
 
 
