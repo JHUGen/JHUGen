@@ -145,8 +145,13 @@ EvalWeighted_HJJ_fulldecay = 0d0
    enddo
 
 
+#if linkMELA==1
    call EvalAmp_qqVVqq(id_MCFM, p_MCFM, msq_MCFM) ! 1 for ZZ decay, 2 for WW decay, 3 for ZZ+WW mixture
-      
+#else
+   print *, "To use this process, please set linkMELA=Yes in the makefile and recompile."
+   print *, "You will also need to have a compiled JHUGenMELA in the directory specified by JHUGenMELADir in the makefile."
+   stop 1
+#endif
 
    PreFac = fbGeV2 * FluxFac * PSWgt * sHatJacobi
    msq_MCFM = msq_MCFM * PreFac / (GeV**8)  ! adjust msq_MCFM for GeV units of MCFM mat.el.

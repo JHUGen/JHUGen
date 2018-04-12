@@ -1174,6 +1174,46 @@ end subroutine
 
 
 
+
+subroutine HouseOfRepresentatives2(XSecArray, NumberOfSeats, TotalNumberOfSeats)
+!same as above with one-dim. arrays
+implicit none
+real(8), intent(in) :: XSecArray(:)
+real(8) :: totalxsec, CrossSecNormalized(size(XSecArray)), yRnd
+integer :: n,i
+integer, intent(in) :: TotalNumberOfSeats
+integer(8), intent(out) :: NumberOfSeats(:)
+
+  NumberOfSeats(:) = 0
+
+  totalxsec = sum(XSecArray(:))
+  CrossSecNormalized = XSecArray / totalxsec
+
+  do n=1,TotalNumberOfSeats
+    do while(.true.)
+      call random_number(yRnd)
+      do i=1,size(XSecArray)
+          if (yRnd .lt. CrossSecNormalized(i)) then
+            NumberOfSeats(i) = NumberOfSeats(i)+1
+            goto 99
+          endif
+          yRnd = yRnd - CrossSecNormalized(i)
+      enddo
+      !in case a rounding error causes sum(CrossSecNormalized) != 1
+      print *, "Warning: rounding error, try again"
+    enddo
+99  continue
+  enddo
+
+  if (sum(NumberOfSeats(:)).ne.TotalNumberOfSeats) then
+    print *, "Wrong total number of events, shouldn't be able to happen"
+    stop 1
+  endif
+end subroutine
+
+
+
+
 !========================================================================
 
     subroutine convert_to_MCFM(p,pout)
