@@ -453,8 +453,8 @@ type(SaveValues) :: tosave, oldsavevalues
 #endif
     call ReadCommandLineArgument(arg, "MReso", success, M_Reso, multiply=GeV, tosave=tosave)
     call ReadCommandLineArgument(arg, "GaReso", success, Ga_Reso, multiply=GeV, tosave=tosave)
-    call ReadCommandLineArgument(arg, "MReso2", success, M_Reso2, multiply=GeV, tosave=tosave)     !undocumented temporarily
-    call ReadCommandLineArgument(arg, "GaReso2", success, Ga_Reso2, multiply=GeV, tosave=tosave)   !undocumented temporarily
+    call ReadCommandLineArgument(arg, "MReso2", success, M_Reso2, multiply=GeV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "GaReso2", success, Ga_Reso2, multiply=GeV, tosave=tosave)
     call ReadCommandLineArgument(arg, "ctauReso", success, HiggsDecayLengthMM, tosave=tosave)
     call ReadCommandLineArgument(arg, "VegasNc0", success, VegasNc0)
     call ReadCommandLineArgument(arg, "VegasNc1", success, VegasNc1)
@@ -1055,16 +1055,16 @@ type(SaveValues) :: tosave, oldsavevalues
 
     !cuts
     call ReadCommandLineArgument(arg, "pTjetcut", success, pTjetcut, multiply=GeV, success2=SetpTjetcut, tosave=tosave)
-    call ReadCommandLineArgument(arg, "etajetcut", success, etajetcut, success2=Setetajetcut, tosave=tosave) !undocumented temporarily
-    call ReadCommandLineArgument(arg, "detajetcut", success, detajetcut, success2=Setdetajetcut, tosave=tosave)!undocumented temporarily
+    call ReadCommandLineArgument(arg, "etajetcut", success, etajetcut, success2=Setetajetcut, tosave=tosave)
+    call ReadCommandLineArgument(arg, "detajetcut", success, detajetcut, success2=Setdetajetcut, tosave=tosave)
     call ReadCommandLineArgument(arg, "deltaRcut", success, Rjet, success2=SetdeltaRcut, tosave=tosave)
     call ReadCommandLineArgument(arg, "mJJcut", success, mJJcut, multiply=GeV, tosave=tosave)
-    call ReadCommandLineArgument(arg, "m4l_min", success, m4l_minmax(1), multiply=GeV, tosave=tosave)!undocumented temporarily
-    call ReadCommandLineArgument(arg, "m4l_max", success, m4l_minmax(2), multiply=GeV, tosave=tosave)!undocumented temporarily
+    call ReadCommandLineArgument(arg, "m4l_min", success, m4l_minmax(1), multiply=GeV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "m4l_max", success, m4l_minmax(2), multiply=GeV, tosave=tosave)
     call ReadCommandLineArgument(arg, "MPhotonCutoff", success, MPhotonCutoff, multiply=GeV, success2=SetMPhotonCutoff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "pTlepcut", success, pTlepcut, multiply=GeV, success2=SetpTlepcut, tosave=tosave)!undocumented temporarily
-    call ReadCommandLineArgument(arg, "etalepcut", success, etalepcut, success2=Setetalepcut, tosave=tosave)!undocumented temporarily
-    call ReadCommandLineArgument(arg, "JetsOppositeEta", success, JetsOppositeEta, tosave=tosave)!undocumented temporarily
+    call ReadCommandLineArgument(arg, "pTlepcut", success, pTlepcut, multiply=GeV, success2=SetpTlepcut, tosave=tosave)
+    call ReadCommandLineArgument(arg, "etalepcut", success, etalepcut, success2=Setetalepcut, tosave=tosave)
+    call ReadCommandLineArgument(arg, "JetsOppositeEta", success, JetsOppositeEta, tosave=tosave)
 
     if( .not.success ) then
         call Error("Unknown command line argument: " // trim(arg))
@@ -5875,7 +5875,9 @@ implicit none
         print *, "   ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,"
         print *, "                      250 GeV for e+e-"
         print *, "   Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH,"
-        print *, "                      60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=ttH, 90=bbH,"
+        print *, "                      60=weakVBF, 61=pp->Hjj, 62=pp->Hj,"
+        print *, "                      66=VVHVV offshell, 67=VVVVbkg, 68=VVHVV+VVVV,"
+        print *, "                      69=QCD JJVV bkg, 80=ttH, 90=bbH,"
         print *, "                      110=t+H t channel, 111=tbar+H t channel,"
         print *, "                      112=t+H s channel, 113=tbar+H s channel"
         print *, "                      114=t/tbar+H t/s channels"
@@ -5917,6 +5919,8 @@ implicit none
         print *, "   ctauReso:          resonance decay length in mm (default=0)"
         print *, "   OffshellX:         Whether to allow resonance (X) to go offshell"
         print *, "                      in processes 0, 1 or 2"
+        print *, "   MReso2:            2nd resonance mass in GeV in offshell VBF"
+        print *, "   GaReso2:           2nd resonance width in GeV in offshell VBF"
         print *, " EW coupling parameters:"
         print *, "   Vud:               CKM element for W-ud couplings"
         print *, "   Vus:               CKM element for W-us couplings"
@@ -5932,6 +5936,13 @@ implicit none
         print *, "   deltaRcut:         Minimum deltaR for jets (default: 0.3)"
         print *, "   mJJcut:            Minimum dijet mass in GeV (default: 0)"
         print *, "   MPhotonCutoff:     Minimum mass for offshell photons in GeV, when included (default: 4)"
+        print *, "   etajetcut:         Maximum |eta| for jets in offshell VBF (default: 4)"
+        print *, "   detajetcut:        Minimum deltaeta between jets in offshell VBF (default: 2)"
+        print *, "   JetsOppositeEta:   Require sgn(eta) to be opposite for the two jets in offshell VBF"
+        print *, "                      (default: true)"
+        print *, "   pTlepcut:          Minimum pT for leptons in offshell VBF, in GeV (default: 3)"
+        print *, "   etalepcut:         Maximum |eta| for leptons in offshell VBF (default: 2.7)"
+        print *, "   m4l_min, m4l_max:  Minimum and maximum four-lepton mass in offshell VBF"
         print *, " Renormalization and factorization scales:"
         print *, "   FacScheme:         PDF factorization scale scheme"
         print *, "   MuFacMultiplier:   Multiplier for the factorization scale chosen by FacScheme"

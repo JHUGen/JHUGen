@@ -40,7 +40,7 @@ Only relative values of cross sections are supposed to produce meaningful result
 
 Additionally, the package includes code for computing the matrix elements standalone which can be used in a numerical matrix element analysis.
 Please reference the above papers and refer to ``MELA'' when using the matrix element likelihood approach.
-The latter was also introduced in Ref.~\cite{Chatrchyan:2012ufa}. The matrix element package (MELA) also depends on MCFM libraries for background parameterization which should be referenced~\cite{Campbell:2010ff} when used.
+The latter was also introduced in Ref.~\cite{Chatrchyan:2012ufa}. The matrix element package (MELA) and offshell VBF generation also depend on MCFM libraries for background parameterization which should be referenced~\cite{Campbell:2010ff} when used.
 
 \vspace{0.5cm}
 \begin{center}
@@ -165,7 +165,9 @@ This is the list of command line configurables (also defined in the \verb|README
     ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,
                        250 GeV for e+e-
     Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH,
-                       60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=ttH, 90=bbH,
+                       60=weakVBF, 61=pp->Hjj, 62=pp->Hj,
+                       66=VVHVV offshell, 67=VVVVbkg, 68=VVHVV+VVVV,
+                       69=QCD JJVV bkg, 80=ttH, 90=bbH,
                        110=t+H t channel, 111=tbar+H t channel,
                        112=t+H s channel, 113=tbar+H s channel
                        114=t/tbar+H t/s channels
@@ -207,6 +209,8 @@ This is the list of command line configurables (also defined in the \verb|README
     ctauReso:          resonance decay length in mm (default=0)
     OffshellX:         Whether to allow resonance (X) to go offshell
                        in processes 0, 1 or 2
+    MReso2:            2nd resonance mass in GeV in offshell VBF
+    GaReso2:           2nd resonance width in GeV in offshell VBF
   EW coupling parameters:
     Vud:               CKM element for W-ud couplings
     Vus:               CKM element for W-us couplings
@@ -222,6 +226,13 @@ This is the list of command line configurables (also defined in the \verb|README
     deltaRcut:         Minimum deltaR for jets (default: 0.3)
     mJJcut:            Minimum dijet mass in GeV (default: 0)
     MPhotonCutoff:     Minimum mass for offshell photons in GeV, when included (default: 4)
+    etajetcut:         Maximum |eta| for jets in offshell VBF (default: 4)
+    detajetcut:        Minimum deltaeta between jets in offshell VBF (default: 2)
+    JetsOppositeEta:   Require sgn(eta) to be opposite for the two jets in offshell VBF
+                       (default: true)
+    pTlepcut:          Minimum pT for leptons in offshell VBF, in GeV (default: 3)
+    etalepcut:         Maximum |eta| for leptons in offshell VBF (default: 2.7)
+    m4l_min, m4l_max:  Minimum and maximum four-lepton mass in offshell VBF
   Renormalization and factorization scales:
     FacScheme:         PDF factorization scale scheme
     MuFacMultiplier:   Multiplier for the factorization scale chosen by FacScheme
@@ -287,6 +298,8 @@ This is the list of command line configurables (also defined in the \verb|README
 \item \verb|ChannelRatio|: In the case when \verb|PChannel=2| for a spin-2 resonance, this parameter determines an approximate fraction of the events that should come from $q\bar{q}$.  This is equivalent to appropriately scaling the $Xq\bar{q}$ couplings with respect to the $Xgg$ ones, but can be done without advance knowledge of the relative cross sections.
 \item \verb|PDFSet|, \verb|LHAPDF|, \verb|LHAPDFMem|: To use LHAPDF, this functionality must be enabled in the makefile and the relevant environment variables must be set.  See the instructions in Sec.~\ref{sec:LHAPDF}.  Otherwise \verb|PDFSet| gives the choice between a more limited number of PDF sets.
 \end{itemize}
+\paragraph{Offshell VBF}
+Processes 66--69 provide an interface to a modified version of MCFM~\cite{Campbell:2010ff} to produce offshell VBF production $VV\to VV$, including all anomalous couplings.  For these processes, a second spin-zero resonance can be activated by setting \verb|MReso2| and \verb|GaReso2| to nonzero values.  The second resonance's couplings can be set to arbitrary values, similar to the first resonance's.
 \subsubsection{Resonance parameters}
 \begin{itemize}
 \item {\verb|OffshellX|}: The flag specifies whether the events for processes 0, 1 or 2 feature a delta-function resonance mass (when set to 0) at or a finite-width distribution around the resonance mass (when set to 1). This option replaces the \verb|OffXVV| numerical flag in previous versions.
@@ -480,6 +493,8 @@ real(8),    public, parameter :: Lambda_zgs1 = 10000d0*GeV.
 \end{verbatim}
 
 Each \verb|ghzX|, \verb|ghzX_primeY|, \verb|Lambda_zXY|, and \verb|cz_qXsq| parameter has a \verb|ghwX|, \verb|ghzwX_primeY|, \verb|Lambda_wXY|, and \verb|cw_qXsq| counterpart, which are used for the $WWH$ coupling in VBF if at least one of them is set on the command line.
+
+In addition, \verb|gh2zX|, \verb|gh2zX_primeY|, \verb|Lambda2_zXY|, \verb|c2z_qXsq|, \verb|gh2wX|, \verb|gh2wX_primeY|, \verb|Lambda2_wXY|, and \verb|c2w_qXsq| can be used to set the couplings of the second resonance in offshell VBF production.
 
 \subparagraph{Contact terms}
 \label{contactterms}

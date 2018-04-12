@@ -17,7 +17,9 @@ command line parameter quick reference:
     ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,
                        250 GeV for e+e-
     Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH,
-                       60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=ttH, 90=bbH,
+                       60=weakVBF, 61=pp->Hjj, 62=pp->Hj,
+                       66=VVHVV offshell, 67=VVVVbkg, 68=VVHVV+VVVV,
+                       69=QCD JJVV bkg, 80=ttH, 90=bbH,
                        110=t+H t channel, 111=tbar+H t channel,
                        112=t+H s channel, 113=tbar+H s channel
                        114=t/tbar+H t/s channels
@@ -59,6 +61,8 @@ command line parameter quick reference:
     ctauReso:          resonance decay length in mm (default=0)
     OffshellX:         Whether to allow resonance (X) to go offshell
                        in processes 0, 1 or 2
+    MReso2:            2nd resonance mass in GeV in offshell VBF
+    GaReso2:           2nd resonance width in GeV in offshell VBF
   EW coupling parameters:
     Vud:               CKM element for W-ud couplings
     Vus:               CKM element for W-us couplings
@@ -74,6 +78,13 @@ command line parameter quick reference:
     deltaRcut:         Minimum deltaR for jets (default: 0.3)
     mJJcut:            Minimum dijet mass in GeV (default: 0)
     MPhotonCutoff:     Minimum mass for offshell photons in GeV, when included (default: 4)
+    etajetcut:         Maximum |eta| for jets in offshell VBF (default: 4)
+    detajetcut:        Minimum deltaeta between jets in offshell VBF (default: 2)
+    JetsOppositeEta:   Require sgn(eta) to be opposite for the two jets in offshell VBF
+                       (default: true)
+    pTlepcut:          Minimum pT for leptons in offshell VBF, in GeV (default: 3)
+    etalepcut:         Maximum |eta| for leptons in offshell VBF (default: 2.7)
+    m4l_min, m4l_max:  Minimum and maximum four-lepton mass in offshell VBF
   Renormalization and factorization scales:
     FacScheme:         PDF factorization scale scheme
     MuFacMultiplier:   Multiplier for the factorization scale chosen by FacScheme
