@@ -2188,10 +2188,12 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
       signPhi1 = sign(1d0,  (dummy(2)*ScatteringAxis(2)+dummy(3)*ScatteringAxis(3)+dummy(4)*ScatteringAxis(4))  )! use q1
 
       Phi1 = signPhi1 * acos(MomLeptPlane1(2)*MomBeamScatterPlane(2) + MomLeptPlane1(3)*MomBeamScatterPlane(3) + MomLeptPlane1(4)*MomBeamScatterPlane(4))
+      
+      
  !     binning
        NBin(:) = 1
        NBin(1)  = WhichBin(1,m_jj)
-       NBin(2)  = WhichBin(2,dphi_jj)
+       NBin(2)  = WhichBin(2,m_jj)
        NBin(3)  = WhichBin(3,pT_H)
        NBin(4)  = WhichBin(4,pT_jl)
        NBin(5)  = WhichBin(5,dy_j1j2)
@@ -5196,43 +5198,55 @@ END SUBROUTINE
 
 
 
-
-
-SUBROUTINE EvalPhasespace_VBF_H4f(xchannel,xRnd,Energy,Mom,Jac,EqualLeptons)
+SUBROUTINE EvalPhasespace_VBF_H4f(xchannel,xRnd,Energy,Mom,Jac,InQuarks,EqualLeptons)
 use ModParameters
 use ModPhasespace
 use ModMisc
 implicit none
 real(8) :: xchannel,xRnd(:), Energy, Mom(:,:)
-integer :: EqualLeptons
+integer :: EqualLeptons,InQuarks(1:2)
 integer :: iChannel
 real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7,Jac8,Jac9
 real(8) :: s3H,s4H,s56,s78,s910,s34,s35,s46,Mom_Dummy(1:4),Mom_Dummy2(1:4),xRndLeptInterf,Emin,Emax
 real(8), parameter :: RescaleWidth=1d0
-integer, parameter :: NumChannels=5   !7
+integer :: NumChannels
+logical :: ZHchannel
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
 
 
    Mom(1:4,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
    Mom(1:4,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
 
-!    iChannel = int(xchannel * NumChannels -1d-10)+1
+  
+   if( InQuarks(1)+InQuarks(2).eq.0  ) then
+      NumChannels = 2
+      ZHchannel=.true.! ZH
+    elseif(  (Inquarks(1).eq.Up_.and.Inquarks(2).eq.ADn_) .or. (Inquarks(1).eq.ADn_.and.Inquarks(2).eq.Up_) .or. &
+             (Inquarks(1).eq.AUp_.and.Inquarks(2).eq.Dn_) .or. (Inquarks(1).eq.Dn_.and.Inquarks(2).eq.AUp_) .or. & 
+             (Inquarks(1).eq.Chm_.and.Inquarks(2).eq.AStr_) .or. (Inquarks(1).eq.AStr_.and.Inquarks(2).eq.Chm_) .or. &
+             (Inquarks(1).eq.AChm_.and.Inquarks(2).eq.Str_) .or. (Inquarks(1).eq.Str_.and.Inquarks(2).eq.AChm_)  ) then
+      NumChannels = 2
+      ZHchannel=.false.! WH
+    else
+      NumChannels = 1
+    endif
+
+
+   iChannel = int(xchannel * NumChannels -1d-10)+1
    
 ! DebugCounter(0) = DebugCounter(0) + 1
 ! DebugCounter(iChannel) = DebugCounter(iChannel) + 1
 
 ! if( xchannel.gt.0.5d0 ) then
 ! if( m4l_minmax(1).ge.300d0*GeV ) then
-  iChannel = 5
+!   iChannel = 5
 ! endif
 ! else
 ! iChannel =6
 ! endif
 
 
-! call random_number(xchannel)
-
-
+!   call random_number(xchannel)
 !   if( m4l_minmax(1).lt.0d0 ) then
 !      if( xchannel.lt.1d0/3d0 ) then
 !        Emin = 100d0*GeV
@@ -5244,19 +5258,21 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
 !        Emin = M_Reso+Ga_Reso
 !        Emax = Collider_Energy
 !      endif
-!      
-!   elseif( m4l_minmax(1).gt.M_Reso+Ga_Reso ) then 
+!   elseif( m4l_minmax(1).gt.M_Reso+2*Ga_Reso ) then 
+  
+!   if( m4l_minmax(1).gt.M_Reso+2*Ga_Reso ) then 
 !        Emin = m4l_minmax(1)
 !        Emax = dmin1( Collider_Energy,m4l_minmax(2) )
 !   else
+! !      call random_number(xchannel)
 !      if( xchannel.lt.1d0/3d0 ) then
 !        Emin = dmax1( 0d0,m4l_minmax(1) )
-!        Emax = M_Reso-RescaleWidth*Ga_Reso
+!        Emax = M_Reso-2.00001d0*Ga_Reso
 !      elseif(  xchannel.gt.2d0/3d0 ) then
-!        Emin = -1d0
-!        Emax = -1d0
+!        Emin = M_Reso-2.00001d0*Ga_Reso
+!        Emax = M_Reso+2.00001d0*Ga_Reso
 !      else
-!        Emin = M_Reso+RescaleWidth*Ga_Reso
+!        Emin = M_Reso+2.00001d0*Ga_Reso
 !        Emax = dmin1( Collider_Energy,m4l_minmax(2) )
 !      endif
 !   endif
@@ -5265,164 +5281,33 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
   EMax = m4l_minmax(2)
   
   if( EMin.lt.0d0 .or. EMin.gt.EMax ) call Error("m4l_minmax is not set correctly")
-  
-  
-IF( iChannel.EQ.1 ) THEN! 34 + WW-->H-->ZZ
-
-!  masses
-   if( Emin.lt.0d0 ) then
-      Jac1 = s_channel_propagator(M_Reso**2,RescaleWidth*Ga_Reso,0d0,Energy**2,xRnd(1),s56)                   !  int d(s56)    = Higgs resonance
-   else
-      Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)                                            !  int d(s56)    = linear mapping
-   endif
-   Jac2 = k_l(xRnd(2),s56,Energy**2,s3H)                                                                                          !  int d(s3H)
-   Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
-   Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                           !  int d(s910) = Z2
-
-!  splittings
-   Jac5 = t_channel_prop_decay(Mom(:,1),Mom(:,2),M_W**2,s3H,0d0,xRnd(5:6),Mom_Dummy(1:4),Mom(:,4))                                !  1+2 --> (3H)+4
-   Jac6 = t_channel_prop_decay(Mom(:,1),Mom(:,2)-Mom(:,4),M_W**2,0d0,s56,xRnd(7:8),Mom(:,3),Mom_Dummy(1:4))                       !  1+(24) --> 3+H
-   Jac7 = s_channel_decay(Mom_Dummy(1:4),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))                                                   !  H --> 5+6
-   Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))                                                         !  5 --> 7+8
-   Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))                                                        !  6 --> 9+10
-
-
-
-ELSEIF( iChannel.EQ.2 ) THEN! 43 + WW-->H-->ZZ
-
-!  masses
-   if( Emin.lt.0d0 ) then
-      Jac1 = s_channel_propagator(M_Reso**2,RescaleWidth*Ga_Reso,0d0,Energy**2,xRnd(1),s56)                                                    !  int d(s56)    = Higgs resonance
-   else
-      Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)                                            !  int d(s56)    = linear mapping
-   endif
-   Jac2 = k_l(xRnd(2),s56,Energy**2,s4H)                                                                                          !  int d(s4H)
-   Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
-   Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                           !  int d(s910) = Z2
-
-!  splittings
-   Jac5 = t_channel_prop_decay(Mom(:,1),Mom(:,2),M_W**2,s4H,0d0,xRnd(5:6),Mom_Dummy(1:4),Mom(:,3))                                !  1+2 --> (4H)+3
-   Jac6 = t_channel_prop_decay(Mom(:,1),Mom(:,2)-Mom(:,3),M_W**2,0d0,s56,xRnd(7:8),Mom(:,4),Mom_Dummy(1:4))                       !  1+(23) --> 4+H
-   Jac7 = s_channel_decay(Mom_Dummy(1:4),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))                                                   !  H --> 5+6
-   Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))                                                         !  5 --> 7+8
-   Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))                                                        !  6 --> 9+10
-
+    
    
-   
-ELSEIF( iChannel.EQ.3 ) THEN! 34 + ZZ-->H-->ZZ
-
-!  masses
-   if( Emin.lt.0d0 ) then
-      Jac1 = s_channel_propagator(M_Reso**2,RescaleWidth*Ga_Reso,0d0,Energy**2,xRnd(1),s56)                                                    !  int d(s56)    = Higgs resonance
-   else
-      Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)                                            !  int d(s56)    = linear mapping
-   endif
-   Jac2 = k_l(xRnd(2),s56,Energy**2,s3H)                                                                                          !  int d(s3H)
-   Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
-   Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                           !  int d(s910) = Z2
-
-!  splittings
-   Jac5 = t_channel_prop_decay(Mom(:,1),Mom(:,2),M_Z**2,s3H,0d0,xRnd(5:6),Mom_Dummy(1:4),Mom(:,4))                                !  1+2 --> (3H)+4
-   Jac6 = t_channel_prop_decay(Mom(:,1),Mom(:,2)-Mom(:,4),M_Z**2,0d0,s56,xRnd(7:8),Mom(:,3),Mom_Dummy(1:4))                       !  1+(24) --> 3+H
-   Jac7 = s_channel_decay(Mom_Dummy(1:4),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))                                                   !  H --> 5+6
-   Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))                                                         !  5 --> 7+8
-   Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))                                                        !  6 --> 9+10
-
-
-ELSEIF( iChannel.EQ.4 ) THEN! 43 + ZZ-->H-->ZZ
-
-!  masses
-   if( Emin.lt.0d0 ) then
-      Jac1 = s_channel_propagator(M_Reso**2,RescaleWidth*Ga_Reso,0d0,Energy**2,xRnd(1),s56)                                                    !  int d(s56)    = Higgs resonance
-   else
-      Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)                                            !  int d(s56)    = linear mapping
-   endif
-   Jac2 = k_l(xRnd(2),s56,Energy**2,s4H)                                                                                          !  int d(s4H)
-   Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
-   Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                           !  int d(s910) = Z2
-
-!  splittings
-   Jac5 = t_channel_prop_decay(Mom(:,1),Mom(:,2),M_Z**2,s4H,0d0,xRnd(5:6),Mom_Dummy(1:4),Mom(:,3))                                !  1+2 --> (4H)+3
-   Jac6 = t_channel_prop_decay(Mom(:,1),Mom(:,2)-Mom(:,3),M_Z**2,0d0,s56,xRnd(7:8),Mom(:,4),Mom_Dummy(1:4))                       !  1+(23) --> 4+H
-   Jac7 = s_channel_decay(Mom_Dummy(1:4),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))                                                   !  H --> 5+6
-   Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))                                                         !  5 --> 7+8
-   Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))                                                        !  6 --> 9+10
-
-   
-   
-! ELSEIF( iChannel.EQ.5 ) THEN
-! 
-! 
-! 
-! !  Z boson emissions from either of the two quark lines with t-channel Z
-! 
-!    Jac1 = s_channel_propagator(M_Z**2,Ga_Z,0d0,Energy**2,xRnd(1),s78)                  
-!    Jac2 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(Energy-dsqrt(s78))**2,xRnd(2),s910)    
-! 
-!    Jac3 = s_channel_propagator(0d0,0d0,s78,(Energy-dsqrt(s910))**2,xRnd(3),s35)                                                          
-!    Jac4 = s_channel_propagator(0d0,0d0,s910,(Energy-dsqrt(s35))**2,xRnd(4),s46)    
-!    Jac5 = t_channel_prop_decay(Mom(:,1),Mom(:,2),M_Z**2,s35,s46,xRnd(5:6),Mom_Dummy(1:4),Mom_Dummy2(1:4))
-! 
-!    Jac6 = s_channel_decay(Mom_Dummy(1:4),0d0,s78,xRnd(7:8),Mom(:,3),Mom(:,5))                                              
-!    Jac7 = s_channel_decay(Mom_Dummy2(1:4),0d0,s910,xRnd(9:10),Mom(:,4),Mom(:,6))
-! 
-!    Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))  
-!    Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10)) 
-!  
-! 
-! ! -------------------------------
-! 
-!    
-! ELSEIF( iChannel.EQ.6 ) THEN
-! 
-! !  W boson emissions from either of the two quark lines with t-channel W   (??? why??)
-!  
-!    Jac1 = s_channel_propagator(M_W**2,Ga_W,0d0,Energy**2,xRnd(1),s78)                  
-!    Jac2 = s_channel_propagator(M_W**2,Ga_W,0d0,(Energy-dsqrt(s78))**2,xRnd(2),s910)    
-! 
-!    Jac3 = s_channel_propagator(0d0,0d0,s78,(Energy-dsqrt(s910))**2,xRnd(3),s35)                                                          
-!    Jac4 = s_channel_propagator(0d0,0d0,s910,(Energy-dsqrt(s35))**2,xRnd(4),s46)    
-!    Jac5 = t_channel_prop_decay(Mom(:,1),Mom(:,2),M_W**2,s35,s46,xRnd(5:6),Mom_Dummy(1:4),Mom_Dummy2(1:4))
-! 
-!    Jac6 = s_channel_decay(Mom_Dummy(1:4),0d0,s78,xRnd(7:8),Mom(:,3),Mom(:,5))                                              
-!    Jac7 = s_channel_decay(Mom_Dummy2(1:4),0d0,s910,xRnd(9:10),Mom(:,4),Mom(:,6))
-! 
-!    Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))  
-!    Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10)) 
-!  
-
- 
- 
- 
-
-! -------------------------------
-
-
-   
-ELSEIF( iChannel.EQ.5 ) THEN
+IF( iChannel.EQ.1 ) THEN
 
 
 !  ZH phase space with flat Z-->jj propagator
    
    
 !  masses
-   if( Emin.gt.M_Reso+2*Ga_Reso .or. Process.eq.67 ) then 
-      Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)
+   if( Emin.gt.M_Reso+2*Ga_Reso .or. Emax.lt.M_Reso-2*Ga_Reso .or. Process.eq.67 ) then 
+      Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56) !  PS2 files
+      
+! Jac1 = k_BreitWigner(xRnd(1),M_Z**2,Ga_Z*10d0,Emin**2,min(Energy**2,Emax**2),s56)  !   this will map out the Z->Z->4l propagators  with 10*Ga_Z   PS3 files
+      
    else
 !       Jac1 = k_BreitWigner_Quadr(xRnd(1),M_Reso**2,Ga_Reso,Emin**2,Emax**2,s56)
-     Jac1 = k_BreitWigner(xRnd(1),M_Reso**2,Ga_Reso,Emin**2,Emax**2,s56)
-   endif  
+     Jac1 = k_BreitWigner(xRnd(1),M_Reso**2,Ga_Reso*RescaleWidth,Emin**2,Emax**2,s56)
+   endif
    
-      
-!    Jac2 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(Energy-dsqrt(s56))**2,xRnd(2),s34)
    Jac2 = k_l(xRnd(2),mJJcut**2,(Energy-dsqrt(s56))**2,s34)    ! s34 = mjj^2, hence the minumum is set to mJJcut                                       
    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                             
    Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                         
    
 !  splittings
-   Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:)) !   Z* --> Z+H
-   Jac6 = s_channel_decay(Mom_Dummy(:),0d0,0d0,xRnd(7:8),Mom(:,3),Mom(:,4)) !  Z --> 34
-   Jac7 = s_channel_decay(Mom_Dummy2(:),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))  !   H --> ZZ
+   Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:))
+   Jac6 = s_channel_decay(Mom_Dummy(:),0d0,0d0,xRnd(7:8),Mom(:,3),Mom(:,4))
+   Jac7 = s_channel_decay(Mom_Dummy2(:),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))
    
    if( includeInterference .and. EqualLeptons.eq.0 ) then!   EqualLeptons=0 means equal leptons
       call random_number(xRndLeptInterf)
@@ -5433,90 +5318,360 @@ ELSEIF( iChannel.EQ.5 ) THEN
           Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))       !   Z --> ffbar                                    
           Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))      !   Z --> ffbar  
       endif
-      Jac8 = Jac8 * 2d0
+!       Jac8 = Jac8 * 2d0
    else
       Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))       !   Z --> ffbar                                    
       Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))      !   Z --> ffbar  
    endif
+  
+  
 
    
-ELSEIF( iChannel.EQ.6 ) THEN
+ELSEIF( iChannel.EQ.2 ) THEN
 
 
-!  ZH phase space with BW Z-->jj propagator
+
+!  ZH phase space with BW Z/W-->jj propagator
    
-
+   
 !  masses
-   if( Emin.lt.0d0 ) then
-      Jac1 = s_channel_propagator(M_Reso**2,RescaleWidth*Ga_Reso,0d0,Energy**2,xRnd(1),s56)                                       
+   if( Emin.gt.M_Reso+2*Ga_Reso .or. Emax.lt.M_Reso-2*Ga_Reso .or. Process.eq.67 ) then 
+      Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)! PS2
+      
+! Jac1 = k_BreitWigner(xRnd(1),M_Z**2,Ga_Z*10d0,Emin**2,min(Energy**2,Emax**2),s56)  !   this will map out the Z->Z->4l propagators  with 10*Ga_Z   PS3 files
+      
+      
    else
-      Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)                                           
-   endif   
-   Jac2 = s_channel_propagator(M_Z**2,Ga_Z,mJJcut**2,(Energy-dsqrt(s56))**2,xRnd(2),s34) ! s34 = mjj^2, hence the minumum is set to mJJcut       
-!    Jac2 = k_l(xRnd(2),0d0,(Energy-dsqrt(s56))**2,s34)                                           
+!       Jac1 = k_BreitWigner_Quadr(xRnd(1),M_Reso**2,Ga_Reso,Emin**2,Emax**2,s56)
+     Jac1 = k_BreitWigner(xRnd(1),M_Reso**2,Ga_Reso*RescaleWidth,Emin**2,Emax**2,s56)
+   endif
+   
+   if( ZHchannel ) then 
+       Jac2 = s_channel_propagator(M_Z**2,Ga_Z*5,mJJcut**2,(Energy-dsqrt(s56))**2,xRnd(2),s34)
+   else
+       Jac2 = s_channel_propagator(M_W**2,Ga_W*5,mJJcut**2,(Energy-dsqrt(s56))**2,xRnd(2),s34)
+   endif
    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                             
    Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                         
    
-   
 !  splittings
-   Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:)) !   Z* --> Z+H
-   Jac6 = s_channel_decay(Mom_Dummy(:),0d0,0d0,xRnd(7:8),Mom(:,3),Mom(:,4)) !  Z --> 34
-   Jac7 = s_channel_decay(Mom_Dummy2(:),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))  !   H --> ZZ                                            
-   Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))       !   Z --> ffbar                                    
-   Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))      !   Z --> ffbar  
+   Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:))
+   Jac6 = s_channel_decay(Mom_Dummy(:),0d0,0d0,xRnd(7:8),Mom(:,3),Mom(:,4))
+   Jac7 = s_channel_decay(Mom_Dummy2(:),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))
    
-
- 
-   
-   
-ELSEIF( iChannel.EQ.7 ) THEN
-
-
-!  WH phase space with BW W-->jj propagator
-   
-
-!  masses
-   if( Emin.lt.0d0 ) then
-      Jac1 = s_channel_propagator(M_Reso**2,RescaleWidth*Ga_Reso,0d0,Energy**2,xRnd(1),s56)                                       
+   if( includeInterference .and. EqualLeptons.eq.0 ) then!   EqualLeptons=0 means equal leptons
+      call random_number(xRndLeptInterf)
+      if( xRndLeptInterf.gt.0.5d0 ) then
+          Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,9),Mom(:,8))       !   Z --> ffbar                                    
+          Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,7),Mom(:,10))      !   Z --> ffbar  
+      else
+          Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))       !   Z --> ffbar                                    
+          Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))      !   Z --> ffbar  
+      endif
+!       Jac8 = Jac8 * 2d0
    else
-      Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)                                           
-   endif   
-   Jac2 = s_channel_propagator(M_W**2,Ga_W,mJJcut**2,(Energy-dsqrt(s56))**2,xRnd(2),s34) ! s34 = mjj^2, hence the minumum is set to mJJcut       
-!    Jac2 = k_l(xRnd(2),0d0,(Energy-dsqrt(s56))**2,s34)                                           
-   Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                             
-   Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                         
-   
-   
-!  splittings
-   Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:)) !   Z* --> Z+H
-   Jac6 = s_channel_decay(Mom_Dummy(:),0d0,0d0,xRnd(7:8),Mom(:,3),Mom(:,4)) !  Z --> 34
-   Jac7 = s_channel_decay(Mom_Dummy2(:),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))  !   H --> ZZ                                            
-   Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))       !   Z --> ffbar                                    
-   Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))      !   Z --> ffbar  
-   
+      Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))       !   Z --> ffbar                                    
+      Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))      !   Z --> ffbar  
+   endif
+  
 
- 
- 
-ELSEIF( iChannel.EQ.999 ) THEN
 
-   call genps(6,Energy,xRnd(1:14),(/0d0,0d0,0d0,0d0,0d0,0d0/),Mom(1:4,3:8),Jac)
-   Mom(1:4,10)= Mom(1:4,8)
-   Mom(1:4,9) = Mom(1:4,7)
-   Mom(1:4,8) = Mom(1:4,6)
-   Mom(1:4,7) = Mom(1:4,5)
-   Mom(1:4,5) = Mom(1:4,7)+Mom(1:4,8)
-   Mom(1:4,6) = Mom(1:4,9)+Mom(1:4,10)
-   Jac = Jac * (2d0*Pi)**(4-(6)*3) * (4d0*Pi)**((6)-1)
-   RETURN
 
-ELSE
-   call Error("PS channel not available in EvalPhasespace_VBF_H4f",ichannel)
+! ELSEIF( iChannel.EQ.3 ) THEN
+! 
+! 
+! !  WH phase space with BW W-->jj propagator
+!    
+!    
+! !  masses
+!    if( Emin.gt.M_Reso+2*Ga_Reso .or. Emax.lt.M_Reso-2*Ga_Reso .or. Process.eq.67 ) then 
+!       Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)
+!    else
+! !       Jac1 = k_BreitWigner_Quadr(xRnd(1),M_Reso**2,Ga_Reso,Emin**2,Emax**2,s56)
+!      Jac1 = k_BreitWigner(xRnd(1),M_Reso**2,Ga_Reso,Emin**2,Emax**2,s56)
+!    endif
+!    
+!    Jac2 = s_channel_propagator(M_W**2,Ga_W,mJJcut**2,(Energy-dsqrt(s56))**2,xRnd(2),s34)
+!    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                             
+!    Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                         
+!    
+! !  splittings
+!    Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:))
+!    Jac6 = s_channel_decay(Mom_Dummy(:),0d0,0d0,xRnd(7:8),Mom(:,3),Mom(:,4))
+!    Jac7 = s_channel_decay(Mom_Dummy2(:),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))
+!    
+!    if( includeInterference .and. EqualLeptons.eq.0 ) then!   EqualLeptons=0 means equal leptons
+!       call random_number(xRndLeptInterf)
+!       if( xRndLeptInterf.gt.0.5d0 ) then
+!           Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,9),Mom(:,8))       !   Z --> ffbar                                    
+!           Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,7),Mom(:,10))      !   Z --> ffbar  
+!       else
+!           Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))       !   Z --> ffbar                                    
+!           Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))      !   Z --> ffbar  
+!       endif
+! !       Jac8 = Jac8 * 2d0
+!    else
+!       Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))       !   Z --> ffbar                                    
+!       Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))      !   Z --> ffbar  
+!    endif
+  
+
 ENDIF
+
+  
+  
+  
+  
+! IF( iChannel.EQ.1 ) THEN! 34 + WW-->H-->ZZ
+! 
+! !  masses
+!    if( Emin.lt.0d0 ) then
+!       Jac1 = s_channel_propagator(M_Reso**2,RescaleWidth*Ga_Reso,0d0,Energy**2,xRnd(1),s56)                   !  int d(s56)    = Higgs resonance
+!    else
+!       Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)                                            !  int d(s56)    = linear mapping
+!    endif
+!    Jac2 = k_l(xRnd(2),s56,Energy**2,s3H)                                                                                          !  int d(s3H)
+!    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
+!    Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                           !  int d(s910) = Z2
+! 
+! !  splittings
+!    Jac5 = t_channel_prop_decay(Mom(:,1),Mom(:,2),M_W**2,s3H,0d0,xRnd(5:6),Mom_Dummy(1:4),Mom(:,4))                                !  1+2 --> (3H)+4
+!    Jac6 = t_channel_prop_decay(Mom(:,1),Mom(:,2)-Mom(:,4),M_W**2,0d0,s56,xRnd(7:8),Mom(:,3),Mom_Dummy(1:4))                       !  1+(24) --> 3+H
+!    Jac7 = s_channel_decay(Mom_Dummy(1:4),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))                                                   !  H --> 5+6
+!    Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))                                                         !  5 --> 7+8
+!    Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))                                                        !  6 --> 9+10
+! 
+! 
+! 
+! ELSEIF( iChannel.EQ.2 ) THEN! 43 + WW-->H-->ZZ
+! 
+! !  masses
+!    if( Emin.lt.0d0 ) then
+!       Jac1 = s_channel_propagator(M_Reso**2,RescaleWidth*Ga_Reso,0d0,Energy**2,xRnd(1),s56)                                                    !  int d(s56)    = Higgs resonance
+!    else
+!       Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)                                            !  int d(s56)    = linear mapping
+!    endif
+!    Jac2 = k_l(xRnd(2),s56,Energy**2,s4H)                                                                                          !  int d(s4H)
+!    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
+!    Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                           !  int d(s910) = Z2
+! 
+! !  splittings
+!    Jac5 = t_channel_prop_decay(Mom(:,1),Mom(:,2),M_W**2,s4H,0d0,xRnd(5:6),Mom_Dummy(1:4),Mom(:,3))                                !  1+2 --> (4H)+3
+!    Jac6 = t_channel_prop_decay(Mom(:,1),Mom(:,2)-Mom(:,3),M_W**2,0d0,s56,xRnd(7:8),Mom(:,4),Mom_Dummy(1:4))                       !  1+(23) --> 4+H
+!    Jac7 = s_channel_decay(Mom_Dummy(1:4),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))                                                   !  H --> 5+6
+!    Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))                                                         !  5 --> 7+8
+!    Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))                                                        !  6 --> 9+10
+! 
+!    
+!    
+! ELSEIF( iChannel.EQ.3 ) THEN! 34 + ZZ-->H-->ZZ
+! 
+! !  masses
+!    if( Emin.lt.0d0 ) then
+!       Jac1 = s_channel_propagator(M_Reso**2,RescaleWidth*Ga_Reso,0d0,Energy**2,xRnd(1),s56)                                                    !  int d(s56)    = Higgs resonance
+!    else
+!       Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)                                            !  int d(s56)    = linear mapping
+!    endif
+!    Jac2 = k_l(xRnd(2),s56,Energy**2,s3H)                                                                                          !  int d(s3H)
+!    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
+!    Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                           !  int d(s910) = Z2
+! 
+! !  splittings
+!    Jac5 = t_channel_prop_decay(Mom(:,1),Mom(:,2),M_Z**2,s3H,0d0,xRnd(5:6),Mom_Dummy(1:4),Mom(:,4))                                !  1+2 --> (3H)+4
+!    Jac6 = t_channel_prop_decay(Mom(:,1),Mom(:,2)-Mom(:,4),M_Z**2,0d0,s56,xRnd(7:8),Mom(:,3),Mom_Dummy(1:4))                       !  1+(24) --> 3+H
+!    Jac7 = s_channel_decay(Mom_Dummy(1:4),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))                                                   !  H --> 5+6
+!    Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))                                                         !  5 --> 7+8
+!    Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))                                                        !  6 --> 9+10
+! 
+! 
+! ELSEIF( iChannel.EQ.4 ) THEN! 43 + ZZ-->H-->ZZ
+! 
+! !  masses
+!    if( Emin.lt.0d0 ) then
+!       Jac1 = s_channel_propagator(M_Reso**2,RescaleWidth*Ga_Reso,0d0,Energy**2,xRnd(1),s56)                                                    !  int d(s56)    = Higgs resonance
+!    else
+!       Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)                                            !  int d(s56)    = linear mapping
+!    endif
+!    Jac2 = k_l(xRnd(2),s56,Energy**2,s4H)                                                                                          !  int d(s4H)
+!    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
+!    Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                           !  int d(s910) = Z2
+! 
+! !  splittings
+!    Jac5 = t_channel_prop_decay(Mom(:,1),Mom(:,2),M_Z**2,s4H,0d0,xRnd(5:6),Mom_Dummy(1:4),Mom(:,3))                                !  1+2 --> (4H)+3
+!    Jac6 = t_channel_prop_decay(Mom(:,1),Mom(:,2)-Mom(:,3),M_Z**2,0d0,s56,xRnd(7:8),Mom(:,4),Mom_Dummy(1:4))                       !  1+(23) --> 4+H
+!    Jac7 = s_channel_decay(Mom_Dummy(1:4),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))                                                   !  H --> 5+6
+!    Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))                                                         !  5 --> 7+8
+!    Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))                                                        !  6 --> 9+10
+! 
+!    
+!    
+! ! ELSEIF( iChannel.EQ.5 ) THEN
+! ! 
+! ! 
+! ! 
+! ! !  Z boson emissions from either of the two quark lines with t-channel Z
+! ! 
+! !    Jac1 = s_channel_propagator(M_Z**2,Ga_Z,0d0,Energy**2,xRnd(1),s78)                  
+! !    Jac2 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(Energy-dsqrt(s78))**2,xRnd(2),s910)    
+! ! 
+! !    Jac3 = s_channel_propagator(0d0,0d0,s78,(Energy-dsqrt(s910))**2,xRnd(3),s35)                                                          
+! !    Jac4 = s_channel_propagator(0d0,0d0,s910,(Energy-dsqrt(s35))**2,xRnd(4),s46)    
+! !    Jac5 = t_channel_prop_decay(Mom(:,1),Mom(:,2),M_Z**2,s35,s46,xRnd(5:6),Mom_Dummy(1:4),Mom_Dummy2(1:4))
+! ! 
+! !    Jac6 = s_channel_decay(Mom_Dummy(1:4),0d0,s78,xRnd(7:8),Mom(:,3),Mom(:,5))                                              
+! !    Jac7 = s_channel_decay(Mom_Dummy2(1:4),0d0,s910,xRnd(9:10),Mom(:,4),Mom(:,6))
+! ! 
+! !    Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))  
+! !    Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10)) 
+! !  
+! ! 
+! ! ! -------------------------------
+! ! 
+! !    
+! ! ELSEIF( iChannel.EQ.6 ) THEN
+! ! 
+! ! !  W boson emissions from either of the two quark lines with t-channel W   (??? why??)
+! !  
+! !    Jac1 = s_channel_propagator(M_W**2,Ga_W,0d0,Energy**2,xRnd(1),s78)                  
+! !    Jac2 = s_channel_propagator(M_W**2,Ga_W,0d0,(Energy-dsqrt(s78))**2,xRnd(2),s910)    
+! ! 
+! !    Jac3 = s_channel_propagator(0d0,0d0,s78,(Energy-dsqrt(s910))**2,xRnd(3),s35)                                                          
+! !    Jac4 = s_channel_propagator(0d0,0d0,s910,(Energy-dsqrt(s35))**2,xRnd(4),s46)    
+! !    Jac5 = t_channel_prop_decay(Mom(:,1),Mom(:,2),M_W**2,s35,s46,xRnd(5:6),Mom_Dummy(1:4),Mom_Dummy2(1:4))
+! ! 
+! !    Jac6 = s_channel_decay(Mom_Dummy(1:4),0d0,s78,xRnd(7:8),Mom(:,3),Mom(:,5))                                              
+! !    Jac7 = s_channel_decay(Mom_Dummy2(1:4),0d0,s910,xRnd(9:10),Mom(:,4),Mom(:,6))
+! ! 
+! !    Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))  
+! !    Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10)) 
+! !  
+! 
+!  
+!  
+!  
+! 
+! ! -------------------------------
+! 
+! 
+!    
+! ELSEIF( iChannel.EQ.5 ) THEN
+! 
+! 
+! !  ZH phase space with flat Z-->jj propagator
+!    
+!    
+! !  masses
+!    if( Emin.gt.M_Reso+2*Ga_Reso .or. Emax.lt.M_Reso-2*Ga_Reso .or. Process.eq.67 ) then 
+!       Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)
+!    else
+! !       Jac1 = k_BreitWigner_Quadr(xRnd(1),M_Reso**2,Ga_Reso,Emin**2,Emax**2,s56)
+!      Jac1 = k_BreitWigner(xRnd(1),M_Reso**2,Ga_Reso,Emin**2,Emax**2,s56)
+!    endif
+!    
+!    
+! !    Jac2 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(Energy-dsqrt(s56))**2,xRnd(2),s34)
+!    Jac2 = k_l(xRnd(2),mJJcut**2,(Energy-dsqrt(s56))**2,s34)    ! s34 = mjj^2, hence the minumum is set to mJJcut                                       
+!    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                             
+!    Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                         
+!    
+! !  splittings
+!    Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:)) !   Z* --> Z+H
+!    Jac6 = s_channel_decay(Mom_Dummy(:),0d0,0d0,xRnd(7:8),Mom(:,3),Mom(:,4)) !  Z --> 34
+!    Jac7 = s_channel_decay(Mom_Dummy2(:),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))  !   H --> ZZ
+!    
+!    if( includeInterference .and. EqualLeptons.eq.0 ) then!   EqualLeptons=0 means equal leptons
+!       call random_number(xRndLeptInterf)
+!       if( xRndLeptInterf.gt.0.5d0 ) then
+!           Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,9),Mom(:,8))       !   Z --> ffbar                                    
+!           Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,7),Mom(:,10))      !   Z --> ffbar  
+!       else
+!           Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))       !   Z --> ffbar                                    
+!           Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))      !   Z --> ffbar  
+!       endif
+! !       Jac8 = Jac8 * 2d0
+!    else
+!       Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))       !   Z --> ffbar                                    
+!       Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))      !   Z --> ffbar  
+!    endif
+! 
+! 
+! ELSEIF( iChannel.EQ.6 ) THEN
+! 
+! 
+! !  ZH phase space with BW Z-->jj propagator
+!    
+! 
+! !  masses
+!    if( Emin.lt.0d0 ) then
+!       Jac1 = s_channel_propagator(M_Reso**2,RescaleWidth*Ga_Reso,0d0,Energy**2,xRnd(1),s56)                                       
+!    else
+!       Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)                                           
+!    endif   
+!    Jac2 = s_channel_propagator(M_Z**2,Ga_Z,mJJcut**2,(Energy-dsqrt(s56))**2,xRnd(2),s34) ! s34 = mjj^2, hence the minumum is set to mJJcut       
+! !    Jac2 = k_l(xRnd(2),0d0,(Energy-dsqrt(s56))**2,s34)                                           
+!    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                             
+!    Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                         
+!    
+!    
+! !  splittings
+!    Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:)) !   Z* --> Z+H
+!    Jac6 = s_channel_decay(Mom_Dummy(:),0d0,0d0,xRnd(7:8),Mom(:,3),Mom(:,4)) !  Z --> 34
+!    Jac7 = s_channel_decay(Mom_Dummy2(:),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))  !   H --> ZZ                                            
+!    Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))       !   Z --> ffbar                                    
+!    Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))      !   Z --> ffbar  
+!    
+! 
+!  
+!    
+!    
+! ELSEIF( iChannel.EQ.7 ) THEN
+! 
+! 
+! !  WH phase space with BW W-->jj propagator
+!    
+! 
+! !  masses
+!    if( Emin.lt.0d0 ) then
+!       Jac1 = s_channel_propagator(M_Reso**2,RescaleWidth*Ga_Reso,0d0,Energy**2,xRnd(1),s56)                                       
+!    else
+!       Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)                                           
+!    endif   
+!    Jac2 = s_channel_propagator(M_W**2,Ga_W,mJJcut**2,(Energy-dsqrt(s56))**2,xRnd(2),s34) ! s34 = mjj^2, hence the minumum is set to mJJcut       
+! !    Jac2 = k_l(xRnd(2),0d0,(Energy-dsqrt(s56))**2,s34)                                           
+!    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                             
+!    Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                         
+!    
+!    
+! !  splittings
+!    Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:)) !   Z* --> Z+H
+!    Jac6 = s_channel_decay(Mom_Dummy(:),0d0,0d0,xRnd(7:8),Mom(:,3),Mom(:,4)) !  Z --> 34
+!    Jac7 = s_channel_decay(Mom_Dummy2(:),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))  !   H --> ZZ                                            
+!    Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))       !   Z --> ffbar                                    
+!    Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))      !   Z --> ffbar  
+!    
+! 
+!  
+!  
+! ELSEIF( iChannel.EQ.999 ) THEN
+! 
+!    call genps(6,Energy,xRnd(1:14),(/0d0,0d0,0d0,0d0,0d0,0d0/),Mom(1:4,3:8),Jac)
+!    Mom(1:4,10)= Mom(1:4,8)
+!    Mom(1:4,9) = Mom(1:4,7)
+!    Mom(1:4,8) = Mom(1:4,6)
+!    Mom(1:4,7) = Mom(1:4,5)
+!    Mom(1:4,5) = Mom(1:4,7)+Mom(1:4,8)
+!    Mom(1:4,6) = Mom(1:4,9)+Mom(1:4,10)
+!    Jac = Jac * (2d0*Pi)**(4-(6)*3) * (4d0*Pi)**((6)-1)
+!    RETURN
+! 
+! ELSE
+!    call Error("PS channel not available in EvalPhasespace_VBF_H4f",ichannel)
+! ENDIF
 
 
    Jac = Jac1*Jac2*Jac3*Jac4*Jac5*Jac6*Jac7*Jac8*Jac9 * PSNorm6
 
-
+!    Jac = Jac * NumChannels
 
    if( isNan(jac) ) then
       print *, "EvalPhasespace_VBF_H4f NaN"
@@ -5545,6 +5700,8 @@ ENDIF
 
 RETURN
 END SUBROUTINE
+
+
 
 
 SUBROUTINE EvalPhasespace_H4f(xchannel,xRnd,Energy,Mom,id,Jac)
