@@ -47,7 +47,8 @@ integer, public :: iPart_sel, jPart_sel, iChann_sel
 real(8) :: time_start,time_end,time_int
 logical, public :: warmup
 character(len=500) :: DataFile
-character(len=100) :: LogFile
+character(len=500) :: CSmaxFile
+character(len=500) :: LogFile
 character(len=500) :: LHEProdFile
 ! PDFset variables, present regardless of useLHAPDF value due to MELA
 character(len=100) :: LHAPDFString

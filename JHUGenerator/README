@@ -105,6 +105,9 @@ command line parameter quick reference:
     VegasNc1:          number of evaluations for accept-reject sampling
     VegasNc2:          number of events for accept-reject sampling
     ReadCSmax:         Read the results of the grid generation step from a file
+    CSmaxFile:         File to use for reading (if ReadCSmax is set) or writing (otherwise)
+                       the results of the grid generation step.  Depending on the process,
+                       suffixes are appended to this base name. (default: DataFile without .lhe)
     Seed:              Random seed for event generation
   I/O options:
     Unweighted:        0=weighted events, 1=unweighted events

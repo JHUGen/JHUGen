@@ -344,6 +344,7 @@ logical :: SetCKM,SetCKMub,SetCKMcb,SetCKMtd
 logical :: SetpTjetcut, Setetajetcut, Setdetajetcut, SetdeltaRcut
 logical :: SetpTlepcut, Setetalepcut, SetMPhotonCutoff
 logical :: SetColliderEnergy
+logical :: SetCSmaxFile
 integer :: i
 type(SaveValues) :: tosave, oldsavevalues
 
@@ -415,6 +416,8 @@ type(SaveValues) :: tosave, oldsavevalues
 
    SetColliderEnergy=.false.
 
+   SetCSmaxFile=.false.
+
    DataFile="./data/output"
 
    tosave = SaveValuesConstructor()
@@ -457,6 +460,7 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "VegasNc2", success, VegasNc2)
     call ReadCommandLineArgument(arg, "PChannel", success, PChannel, tosave=tosave)
     call ReadCommandLineArgument(arg, "DataFile", success, DataFile)
+    call ReadCommandLineArgument(arg, "CSmaxFile", success, CSmaxFile, success2=SetCSmaxFile)
     call ReadCommandLineArgument(arg, "Process", success, Process, tosave=tosave)
     call ReadCommandLineArgument(arg, "DecayMode1", success, DecayMode1, tosave=tosave)
     call ReadCommandLineArgument(arg, "DecayMode2", success, DecayMode2, tosave=tosave)
@@ -1080,11 +1084,13 @@ type(SaveValues) :: tosave, oldsavevalues
     endif
     call system('mkdir -p ./data')! -p is suppressing error messages if directory already exists
 
+    if( .not. SetCSmaxFile) CSmaxFile = DataFile
+
     if (ReadCSmax) then
-      call oldsavevalues%ReadFromFile(trim(DataFile)//"_commandlineinfo.txt")
+      call oldsavevalues%ReadFromFile(trim(CSmaxFile)//"_commandlineinfo.txt")
       call CompareSaveValues(tosave, oldsavevalues)
     else
-      call tosave%WriteToFile(trim(DataFile)//"_commandlineinfo.txt")
+      call tosave%WriteToFile(trim(CSmaxFile)//"_commandlineinfo.txt")
     endif
 
     !PChannel
@@ -2190,11 +2196,11 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
             PChannel = PChannel_aux
         enddo
 
-        open(unit=io_CSmaxFile,file=trim(DataFile)//'_CSmax.bin',form='unformatted',status='replace')
+        open(unit=io_CSmaxFile,file=trim(CSmaxFile)//'_CSmax.bin',form='unformatted',status='replace')
         WRITE(io_CSmaxFile) CSMAX
         close(io_CSmaxFile)
     else
-        open(unit=io_CSmaxFile,file=trim(DataFile)//'_CSmax.bin',form='unformatted')
+        open(unit=io_CSmaxFile,file=trim(CSmaxFile)//'_CSmax.bin',form='unformatted')
         READ(io_CSmaxFile) CSMAX
         close(io_CSmaxFile)
     endif
@@ -2405,7 +2411,7 @@ logical :: UseBetaVersion=.false.
     PChannel_aux = PChannel
 
 
-    outgridfile=trim(DataFile)//'.grid'
+    outgridfile=trim(CSmaxFile)//'.grid'
     ingridfile=trim(outgridfile)
 
 
@@ -2497,8 +2503,8 @@ if( UseBetaVersion ) then
     if( ReadCSmax ) then
         readin=.true.
         writeout=.false.
-        ingridfile = trim(DataFile)//'_step2.grid'
-        open(unit=io_TmpFile,file=trim(DataFile)//'_gridinfo.txt',form='formatted',status='old')
+        ingridfile = trim(CSmaxFile)//'_step2.grid'
+        open(unit=io_TmpFile,file=trim(CSmaxFile)//'_gridinfo.txt',form='formatted',status='old')
         read(io_TmpFile,fmt=*) calls1
         read(io_TmpFile,fmt=*) CrossSec
         read(io_TmpFile,fmt=*) CrossSecMax
@@ -2520,7 +2526,7 @@ if( UseBetaVersion ) then
 
         itmx = 2
         writeout=.true.
-        outgridfile = trim(DataFile)//'_step2.grid'
+        outgridfile = trim(CSmaxFile)//'_step2.grid'
         if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
 !         if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2) ! adjust to LHE format
 !         if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
@@ -2555,7 +2561,7 @@ if( UseBetaVersion ) then
         call vegas_get_calls(calls1)
         CrossSec(:,:) = CrossSec(:,:)/dble(itmx)
 
-        open(unit=io_TmpFile,file=trim(DataFile)//'_gridinfo.txt',form='formatted',status='replace')
+        open(unit=io_TmpFile,file=trim(CSmaxFile)//'_gridinfo.txt',form='formatted',status='replace')
         write(io_TmpFile,fmt=*) calls1
         write(io_TmpFile,fmt=*) CrossSec
         write(io_TmpFile,fmt=*) CrossSecMax
@@ -2766,11 +2772,11 @@ else! not beta version
                 VG(:,:) = VG(:,:) + RES(:,:)
                 PChannel = PChannel_aux
         enddo
-        open(unit=io_CSmaxFile,file=trim(DataFile)//'_CSmax.bin',form='unformatted',status='replace')
+        open(unit=io_CSmaxFile,file=trim(CSmaxFile)//'_CSmax.bin',form='unformatted',status='replace')
         WRITE(io_CSmaxFile) CSMAX,VG
         close(io_CSmaxFile)
     else
-        open(unit=io_CSmaxFile,file=trim(DataFile)//'_CSmax.bin',form='unformatted')
+        open(unit=io_CSmaxFile,file=trim(CSmaxFile)//'_CSmax.bin',form='unformatted')
         READ(io_CSmaxFile) CSMAX,VG
         close(io_CSmaxFile)
     endif
@@ -5794,6 +5800,9 @@ implicit none
         print *, "   VegasNc1:          number of evaluations for accept-reject sampling"
         print *, "   VegasNc2:          number of events for accept-reject sampling"
         print *, "   ReadCSmax:         Read the results of the grid generation step from a file"
+        print *, "   CSmaxFile:         File to use for reading (if ReadCSmax is set) or writing (otherwise)"
+        print *, "                      the results of the grid generation step.  Depending on the process,"
+        print *, "                      suffixes are appended to this base name. (default: DataFile without .lhe)"
         print *, "   Seed:              Random seed for event generation"
         print *, " I/O options:"
         print *, "   Unweighted:        0=weighted events, 1=unweighted events"
