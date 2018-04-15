@@ -52,6 +52,26 @@
       return
       end
 
+      function isAQuark(idpart)
+      implicit none
+      logical isAQuark
+      integer idpart
+      isAQuark =
+     & idpart.gt.0 .and.
+     & idpart.le.6
+      return
+      end
+
+      function isALightQuark(idpart)
+      implicit none
+      logical isALightQuark
+      integer idpart
+      isALightQuark =
+     & idpart.gt.0 .and.
+     & idpart.lt.6
+      return
+      end
+
       function isAGluon(idpart)
       implicit none
       logical isAGluon

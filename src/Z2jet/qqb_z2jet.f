@@ -18,8 +18,9 @@ c--all momenta incoming
       include 'flags.f'
       include 'nflav.f'
       include 'pid_pdg.f'
-      logical isAGluon,isAnUnknownJet
+      logical isAGluon,isALightQuark,isAnUnknownJet
       integer i,j,k,pq,pl,nquark,nup,ndo,j1,j2,j3,icol
+      integer p5,p6
       integer,parameter::swap(2)=(/2,1/),swap1(0:2)=(/0,2,1/)
       logical useGamps, useQamps
       double precision msq(-nf:nf,-nf:nf),p(mxpart,4),fac,faclo,
@@ -80,25 +81,72 @@ c    .   qbqZgg2(2,2),qbgZqbg2(2,2),gqbZqbg2(2,2),
 
 c--- calculate 2-quark, 2-gluon amplitudes
       if (useGamps) then
-        call z2jetsq(1,2,3,4,5,6,za,zb,qqbZgg2)
-        call storecsz(qqbZgg2_cs)
-        call z2jetsq(1,5,3,4,2,6,za,zb,qgZqg2)
-        call storecsz(qgZqg2_cs)
-        call z2jetsq(2,5,3,4,1,6,za,zb,gqZqg2)
-        call storecsz(gqZqg2_cs)
+        p5=-1; p6=-1
+        if (
+     . (isAnUnknownJet(pid_pdg(5)) .or. isAGluon(pid_pdg(5))) .and.
+     . (isAnUnknownJet(pid_pdg(6)) .or. isAGluon(pid_pdg(6)))
+     .  ) then
+        p5=5; p6=6
+        endif
+        if (p5.ge.0 .and. p6.ge.0) then
+          call z2jetsq(1,2,3,4,p5,p6,za,zb,qqbZgg2)
+          call storecsz(qqbZgg2_cs)
+          do j=1,2;do k=1,2;do i=0,2
+            qbqZgg2_cs(i,j,k)=qqbZgg2_cs(swap1(i),swap(j),k)
+          enddo;enddo;enddo
+        endif
 
-        do j=1,2
-        do k=1,2
-c        qbqZgg2(j,k)=qqbZgg2(swap(j),k)
-c        qbgZqbg2(j,k)=qgZqg2(swap(j),k)
-c        gqbZqbg2(j,k)=gqZqg2(swap(j),k)
-        do i=0,2
-        qbqZgg2_cs(i,j,k)=qqbZgg2_cs(swap1(i),swap(j),k)
-        qbgZqbg2_cs(i,j,k)=qgZqg2_cs(swap1(i),swap(j),k)
-        gqbZqbg2_cs(i,j,k)=gqZqg2_cs(swap1(i),swap(j),k)
-        enddo
-        enddo
-        enddo
+        p5=-1; p6=-1
+        if (
+     . (isAnUnknownJet(pid_pdg(5)) .or. .not.isAGluon(pid_pdg(5))) .and.
+     . (isAnUnknownJet(pid_pdg(6)) .or. isAGluon(pid_pdg(6)))
+     .  ) then
+        p5=5; p6=6
+        else if (
+     . (isAnUnknownJet(pid_pdg(5)) .or. isAGluon(pid_pdg(5))) .and.
+     . (isAnUnknownJet(pid_pdg(6)) .or. .not.isAGluon(pid_pdg(6)))
+     .  ) then
+        p5=6; p6=5
+        endif
+        if (p5.ge.0 .and. p6.ge.0) then
+          call z2jetsq(1,p5,3,4,2,p6,za,zb,qgZqg2)
+          call storecsz(qgZqg2_cs)
+          do j=1,2;do k=1,2;do i=0,2
+            qbgZqbg2_cs(i,j,k)=qgZqg2_cs(swap1(i),swap(j),k)
+          enddo;enddo;enddo
+c-- Veto MEs as necessary - U. Sarica
+          if (isALightQuark(pid_pdg(p5))) then
+            qbgZqbg2_cs=czip
+          else if (isALightQuark(-pid_pdg(p5))) then
+            qgZqg2_cs=czip
+          endif
+        endif
+
+        p5=-1; p6=-1
+        if (
+     . (isAnUnknownJet(pid_pdg(5)) .or. .not.isAGluon(pid_pdg(5))) .and.
+     . (isAnUnknownJet(pid_pdg(6)) .or. isAGluon(pid_pdg(6)))
+     .  ) then
+        p5=5; p6=6
+        else if (
+     . (isAnUnknownJet(pid_pdg(5)) .or. isAGluon(pid_pdg(5))) .and.
+     . (isAnUnknownJet(pid_pdg(6)) .or. .not.isAGluon(pid_pdg(6)))
+     .  ) then
+        p5=6; p6=5
+        endif
+        if (p5.ge.0 .and. p6.ge.0) then
+          call z2jetsq(2,p5,3,4,1,p6,za,zb,gqZqg2)
+          call storecsz(gqZqg2_cs)
+          do j=1,2;do k=1,2;do i=0,2
+            gqbZqbg2_cs(i,j,k)=gqZqg2_cs(swap1(i),swap(j),k)
+          enddo;enddo;enddo
+c-- Veto MEs as necessary - U. Sarica
+          if (isALightQuark(pid_pdg(p5))) then
+            gqbZqbg2_cs=czip
+          else if (isALightQuark(-pid_pdg(p5))) then
+            gqZqg2_cs=czip
+          endif
+        endif
 
 c        call z2jetsq(2,1,3,4,5,6,za,zb,qbqZgg2)
 c        call storecsz(qbqZgg2_cs)
@@ -108,8 +156,30 @@ c        call z2jetsq(5,2,3,4,1,6,za,zb,gqbZqbg2)
 c        call storecsz(gqbZqbg2_cs)
 
 C --NB this is the matrix element for gg->Z qb(5) q(6)
-        call z2jetsq(5,6,3,4,1,2,za,zb,ggZqbq2)
-        call storecsz(ggZqbq2_cs)
+        p5=-1; p6=-1
+        if (
+     . (isAnUnknownJet(pid_pdg(5)) .and. isAnUnknownJet(pid_pdg(6)))
+     . .or.
+     . (isAnUnknownJet(pid_pdg(5)) .and. isALightQuark(pid_pdg(6)))
+     . .or.
+     . (isAnUnknownJet(pid_pdg(6)) .and. isALightQuark(-pid_pdg(5)))
+     . .or.
+     . (isALightQuark(-pid_pdg(5)) .and. isALightQuark(pid_pdg(6)))
+     .  ) then
+        p5=5; p6=6
+        else if (
+     . (isAnUnknownJet(pid_pdg(6)) .and. isALightQuark(pid_pdg(5)))
+     . .or.
+     . (isAnUnknownJet(pid_pdg(5)) .and. isALightQuark(-pid_pdg(6)))
+     . .or.
+     . (isALightQuark(-pid_pdg(6)) .and. isALightQuark(pid_pdg(5)))
+     .  ) then
+        p5=6; p6=5
+        endif
+        if (p5.ge.0 .and. p6.ge.0) then
+          call z2jetsq(p5,p6,3,4,1,2,za,zb,ggZqbq2)
+          call storecsz(ggZqbq2_cs)
+        endif
 
         fac=v*xn/four*(esq*gsq)**2
         do pq=1,2
@@ -122,29 +192,13 @@ C --NB this is the matrix element for gg->Z qb(5) q(6)
           gqbZqbg2_cs(i,pq,pl)= aveqg*fac*gqbZqbg2_cs(i,pq,pl)
           qbgZqbg2_cs(i,pq,pl)= aveqg*fac*qbgZqbg2_cs(i,pq,pl)
           ggZqbq2_cs(i,pq,pl) = avegg*fac*ggZqbq2_cs(i,pq,pl)
-       enddo
-
-        qqbZgg2(pq,pl) = qqbZgg2_cs(1,pq,pl)+qqbZgg2_cs(2,pq,pl)
-     .                  +qqbZgg2_cs(0,pq,pl)
-        gqZqg2(pq,pl)  = gqZqg2_cs(1,pq,pl) +gqZqg2_cs(2,pq,pl)
-     .                  +gqZqg2_cs(0,pq,pl)
-        qgZqg2(pq,pl)  = qgZqg2_cs(1,pq,pl)  +qgZqg2_cs(2,pq,pl)
-     .                  +qgZqg2_cs(0,pq,pl)
-c        qbqZgg2(pq,pl) = qbqZgg2_cs(1,pq,pl)+qbqZgg2_cs(2,pq,pl)
-c     .                  +qbqZgg2_cs(0,pq,pl)
-c        gqbZqbg2(pq,pl)= gqbZqbg2_cs(1,pq,pl)+gqbZqbg2_cs(2,pq,pl)
-c     .                  +gqbZqbg2_cs(0,pq,pl)
-c        qbgZqbg2(pq,pl)= qbgZqbg2_cs(1,pq,pl)+qbgZqbg2_cs(2,pq,pl)
-c     .                  +qbgZqbg2_cs(0,pq,pl)
-        ggZqbq2(pq,pl) = ggZqbq2_cs(1,pq,pl) +ggZqbq2_cs(2,pq,pl)
-     .                  +ggZqbq2_cs(0,pq,pl)
+        enddo
         enddo
         enddo
       endif
 
 
       if (useQamps) then
-      call spinoru(6,p,za,zb)
 
 c--- qRb->qRb
       call ampqqb_qqb(1,5,2,6,qRb_a,qRb_b)
@@ -158,9 +212,6 @@ c instead of calling ampqqb_qqb(1,5,6,2,qR_a,qR_b)
       enddo
       enddo
       enddo
-c--- qbR->qbR
-      call ampqqb_qqb(6,1,5,2,qbR_a,qbR_b)
-
 c--- qbRb->qbRb
 c instead of calling ampqqb_qqb(5,1,2,6,qbRb_a,qbRb_b)
       do j1=1,2
@@ -172,9 +223,12 @@ c instead of calling ampqqb_qqb(5,1,2,6,qbRb_a,qbRb_b)
       enddo
       enddo
 
-c--- qqb->qqb
+c--- qbR->Rqb
+      call ampqqb_qqb(6,1,5,2,qbR_a,qbR_b)
+
+c--- qqb->RRb
       call ampqqb_qqb(1,2,5,6,qqb_a,qqb_b)
-c--- qbq->qqb
+c--- qbq->RRb
 c instead of calling ampqqb_qqb(2,1,5,6,qbq_a,qbq_b)
       do j1=1,2
       do j2=1,2
@@ -185,9 +239,9 @@ c instead of calling ampqqb_qqb(2,1,5,6,qbq_a,qbq_b)
       enddo
       enddo
 
-c--- qq->qq
+c--- qR->Rq
       call ampqqb_qqb(1,6,5,2,qq_a,qq_b)
-c--- qbqb->qbqb
+c--- qbRb->Rbqb
 c instead of calling ampqqb_qqb(6,1,2,5,qbqb_a,qbqb_b)
       do j1=1,2
       do j2=1,2
