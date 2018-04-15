@@ -489,10 +489,11 @@ void Mela::computeDecayAngles(
   float& Phi1
 ){
   using TVar::simple_event_record;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela: Begin computeDecayAngles" << endl;
 
   qH=0; m1=0; m2=0; costheta1=0; costheta2=0; Phi=0; costhetastar=0; Phi1=0;
 
-  if (melaCand==0) melaCand = getCurrentCandidate();
+  melaCand = getCurrentCandidate();
   if (melaCand!=0){
     TLorentzVector nullVector(0, 0, 0, 0);
 
@@ -533,6 +534,9 @@ void Mela::computeDecayAngles(
     if (!(Phi1==Phi1)) Phi1=0;
   }
   else if (myVerbosity_>=TVar::DEBUG) MELAerr << "Mela::computeDecayAngles: No possible melaCand in TEvtProb to compute angles." << endl;
+
+  reset_CandRef();
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela: End computeDecayAngles" << endl;
 }
 
 // VBF angles computation script of Mela to convert MELACandidates to m1, m2 etc.
@@ -546,10 +550,11 @@ void Mela::computeVBFAngles(
   float& Phi1
 ){
   using TVar::simple_event_record;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela: Begin computeVBFAngles" << endl;
 
   Q2V1=0; Q2V2=0; costheta1=0; costheta2=0; Phi=0; costhetastar=0; Phi1=0;
 
-  if (melaCand==0) melaCand = getCurrentCandidate();
+  melaCand = getCurrentCandidate();
   if (melaCand!=0){
     TLorentzVector nullVector(0, 0, 0, 0);
 
@@ -611,6 +616,9 @@ void Mela::computeVBFAngles(
       << costhetastar << ", " << Phi1 << endl;
   }
   else if (myVerbosity_>=TVar::DEBUG) MELAerr << "Mela::computeVBFAngles: No possible melaCand in TEvtProb to compute angles." << endl;
+
+  reset_CandRef();
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela: End computeVBFAngles" << endl;
 }
 void Mela::computeVBFAngles_ComplexBoost(
   float& Q2V1,
@@ -622,10 +630,11 @@ void Mela::computeVBFAngles_ComplexBoost(
   float& Phi1
 ){
   using TVar::simple_event_record;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela: Begin computeVBFAngles_ComplexBoost" << endl;
 
   Q2V1=0; Q2V2=0; costheta1_real=0; costheta2_real=0; costheta1_imag=0; costheta2_imag=0; Phi=0; costhetastar=0; Phi1=0;
 
-  if (melaCand==0) melaCand = getCurrentCandidate();
+  melaCand = getCurrentCandidate();
   if (melaCand!=0){
     TLorentzVector nullVector(0, 0, 0, 0);
 
@@ -687,6 +696,9 @@ void Mela::computeVBFAngles_ComplexBoost(
       << Phi << ", " << costhetastar << ", " << Phi1 << endl;
   }
   else if (myVerbosity_>=TVar::DEBUG) MELAerr << "Mela::computeVBFAngles_ComplexBoost: No possible melaCand in TEvtProb to compute angles." << endl;
+
+  reset_CandRef();
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela: End computeVBFAngles_ComplexBoost" << endl;
 }
 
 // VH angles computation script of Mela to convert MELACandidates to production angles.
@@ -698,10 +710,11 @@ void Mela::computeVHAngles(
   float& Phi1
 ){
   using TVar::simple_event_record;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela: Begin computeVHAngles" << endl;
 
   costheta1=0; costheta2=0; Phi=0; costhetastar=0; Phi1=0;
 
-  if (melaCand==0) melaCand = getCurrentCandidate();
+  melaCand = getCurrentCandidate();
   if (melaCand!=0){
     TLorentzVector nullVector(0, 0, 0, 0);
 
@@ -789,6 +802,9 @@ void Mela::computeVHAngles(
       << costhetastar << ", " << Phi1 << endl;
   }
   else if (myVerbosity_>=TVar::DEBUG) MELAerr << "Mela::computeVHAngles: No possible melaCand in TEvtProb to compute angles." << endl;
+
+  reset_CandRef();
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela: End computeVHAngles" << endl;
 }
 
 // Regular probabilities
