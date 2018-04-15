@@ -17,8 +17,11 @@ c--all momenta incoming
       include 'msq_cs.f'
       include 'flags.f'
       include 'nflav.f'
+      include 'pid_pdg.f'
+      logical isAGluon,isAnUnknownJet
       integer i,j,k,pq,pl,nquark,nup,ndo,j1,j2,j3,icol
       integer,parameter::swap(2)=(/2,1/),swap1(0:2)=(/0,2,1/)
+      logical useGamps, useQamps
       double precision msq(-nf:nf,-nf:nf),p(mxpart,4),fac,faclo,
      .   qqbZgg2(2,2),qgZqg2(2,2),
 c    .   qbqZgg2(2,2),qbgZqbg2(2,2),gqbZqbg2(2,2),
@@ -57,11 +60,26 @@ c    .   qbqZgg2(2,2),qbgZqbg2(2,2),gqbZqbg2(2,2),
 
 
       call spinoru(6,p,za,zb)
+      call convertPLabelsToPDGIds()
+      if (isAGluon(pid_pdg(1)) .and. isAGluon(pid_pdg(2)) .and.
+     . isAGluon(pid_pdg(5)) .and. isAGluon(pid_pdg(6))) then
+        return
+      endif
+      useGamps = Gflag .and.
+     . (isAnUnknownJet(pid_pdg(1)) .or. isAGluon(pid_pdg(1))) .and.
+     . (isAnUnknownJet(pid_pdg(2)) .or. isAGluon(pid_pdg(2))) .and.
+     . (isAnUnknownJet(pid_pdg(5)) .or. isAGluon(pid_pdg(5))) .and.
+     . (isAnUnknownJet(pid_pdg(6)) .or. isAGluon(pid_pdg(6)))
+      useQamps = Qflag .and.
+     . (isAnUnknownJet(pid_pdg(1)) .or. .not.isAGluon(pid_pdg(1))) .and.
+     . (isAnUnknownJet(pid_pdg(2)) .or. .not.isAGluon(pid_pdg(2))) .and.
+     . (isAnUnknownJet(pid_pdg(5)) .or. .not.isAGluon(pid_pdg(5))) .and.
+     . (isAnUnknownJet(pid_pdg(6)) .or. .not.isAGluon(pid_pdg(6)))
 
       prop=s(3,4)/dcmplx((s(3,4)-zmass**2),zmass*zwidth)
 
 c--- calculate 2-quark, 2-gluon amplitudes
-      if (Gflag) then
+      if (useGamps) then
         call z2jetsq(1,2,3,4,5,6,za,zb,qqbZgg2)
         call storecsz(qqbZgg2_cs)
         call z2jetsq(1,5,3,4,2,6,za,zb,qgZqg2)
@@ -125,7 +143,7 @@ c     .                  +qbgZqbg2_cs(0,pq,pl)
       endif
 
 
-      if (Qflag) then
+      if (useQamps) then
       call spinoru(6,p,za,zb)
 
 c--- qRb->qRb
@@ -185,7 +203,7 @@ c instead of calling ampqqb_qqb(6,1,2,5,qbqb_a,qbqb_b)
 
 
 
-      if (Gflag) then
+      if (useGamps) then
       do j=-nf,nf
       do k=-nf,nf
 
@@ -265,7 +283,7 @@ c---Statistical factor already included above
       enddo
       endif
 
-      if (Qflag) then
+      if (useQamps) then
 
       do j=-nf,nf
       do k=-nf,nf
@@ -431,6 +449,11 @@ C---q-qb case
 
             elseif (j .eq. -k) then
 c--case where final state from annihilation diagrams is the same quark
+c--U. Sarica: Add check on final states
+       if (
+     .  (pid_pdg(5).eq.0 .or. abs(pid_pdg(5)).eq.abs(j)) .and.
+     .  (pid_pdg(6).eq.0 .or. abs(pid_pdg(6)).eq.abs(j))
+     .  ) then
             a111=(Q(j)*q1+L(j)*l1*prop)*(qRb_a(1,1,1)+qRb_b(1,1,1))
             b111=(Q(j)*q1+L(j)*l1*prop)*(qqb_a(1,1,1)+qqb_b(1,1,1))
 
@@ -470,7 +493,13 @@ c--case where final state from annihilation diagrams is the same quark
             mqq(2,j,k)=faclo*
      .      (abs(a111)**2+abs(a112)**2+abs(a221)**2+abs(a222)**2
      .      +abs(a122)**2+abs(a212)**2+abs(a121)**2+abs(a211)**2)
+       endif
 
+c--U. Sarica: Add check on final states
+       if (
+     .  (pid_pdg(5).eq.0 .or. abs(pid_pdg(5)).ne.abs(j)) .and.
+     .  (pid_pdg(6).eq.0 .or. abs(pid_pdg(6)).ne.abs(j))
+     .  ) then
        if ((j.eq.1).or.(j.eq.3).or.(j.eq.5)) then
            nup=2
            ndo=nf-3
@@ -521,6 +550,7 @@ c--case where final state from annihilation diagrams is the same quark
      .          +abs(b122)**2+abs(b212)**2+abs(b121)**2+abs(b211)**2)
 
       mqq(1,j,k)=mqq(1,j,k)+dfloat(nup)*tup+dfloat(ndo)*tdo
+       endif
       endif
       elseif ((j .lt. 0) .and. (k .gt. 0)) then
 C---Qb-q case
@@ -548,7 +578,11 @@ C---Qb-q case
      .      +faclo*(abs(a111)**2+abs(a112)**2+abs(a221)**2+abs(a222)**2
      .             +abs(a122)**2+abs(a212)**2+abs(a121)**2+abs(a211)**2)
             elseif (j .eq. -k) then
-
+c--U. Sarica: Add check on final states
+       if (
+     .  (pid_pdg(5).eq.0 .or. abs(pid_pdg(5)).eq.abs(j)) .and.
+     .  (pid_pdg(6).eq.0 .or. abs(pid_pdg(6)).eq.abs(j))
+     .  ) then
             a111=(Q(-j)*q1+L(-j)*l1*prop)*(qbR_a(1,1,1)+qbR_b(1,1,1))
             b111=(Q(-j)*q1+L(-j)*l1*prop)*(qbq_a(1,1,1)+qbq_b(1,1,1))
             a112=(Q(-j)*q1+L(-j)*r1*prop)*(qbR_a(1,1,2)+qbR_b(1,1,2))
@@ -585,9 +619,15 @@ C---Qb-q case
             mqq(1,j,k)=faclo*(
      .      +abs(b111)**2+abs(b112)**2+abs(b221)**2+abs(b222)**2
      .      +abs(b122)**2+abs(b212)**2+abs(b121)**2+abs(b211)**2)
+       endif
 
 c--Here we must also add the contribution of other final state quarks
 c  unequal to initial annihilating quarks
+c--U. Sarica: Add check on final states
+       if (
+     .  (pid_pdg(5).eq.0 .or. abs(pid_pdg(5)).ne.abs(j)) .and.
+     .  (pid_pdg(6).eq.0 .or. abs(pid_pdg(6)).ne.abs(j))
+     .  ) then
        if ((k.eq.1).or.(k.eq.3).or.(k.eq.5)) then
            nup=2
            ndo=nf-3
@@ -636,6 +676,7 @@ c  unequal to initial annihilating quarks
      .          +abs(b122)**2+abs(b212)**2+abs(b121)**2+abs(b211)**2)
 
       mqq(1,j,k)=mqq(1,j,k)+dfloat(nup)*tup+dfloat(ndo)*tdo
+       endif
 
           endif
           endif
