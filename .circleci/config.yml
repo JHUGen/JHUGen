@@ -309,7 +309,7 @@ jobs:
             ! grep -q '!' checklheoutput.txt
           when: always
       - store_artifacts:
-          path: ~/artifacts/reference_lhes
+          path: ~/artifacts/syntax_check
 
   plots_ggH:
     <<: *env
