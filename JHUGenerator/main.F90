@@ -345,7 +345,7 @@ logical :: SetCKM,SetCKMub,SetCKMcb,SetCKMtd
 logical :: SetpTjetcut, Setetajetcut, Setdetajetcut, SetdeltaRcut
 logical :: SetpTlepcut, Setetalepcut, SetMPhotonCutoff
 logical :: SetColliderEnergy
-logical :: SetCSmaxFile
+logical :: SetCSmaxFile, SetVBFoffsh_run
 integer :: i
 type(SaveValues) :: tosave, oldsavevalues
 
@@ -418,6 +418,7 @@ type(SaveValues) :: tosave, oldsavevalues
    SetColliderEnergy=.false.
 
    SetCSmaxFile=.false.
+   SetVBFoffsh_run = .false.
 
    DataFile="./data/output"
 
@@ -509,7 +510,7 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "ChannelRatio", success, channels_ratio_fix, success2=fix_channels_ratio, tosave=tosave)
     call ReadCommandLineArgument(arg, "UnformattedRead", success, UseUnformattedRead)
     call ReadCommandLineArgument(arg, "WriteWeightedLHE", success, WriteWeightedLHE)
-    call ReadCommandLineArgument(arg, "VBFoffsh_run", success, VBFoffsh_run)
+    call ReadCommandLineArgument(arg, "VBFoffsh_run", success, VBFoffsh_run, success2=setVBFoffsh_run)
 
     !anomalous couplings
     !If any anomalous couplings are set, the default ones have to be set explicitly to keep them on or turn them off
@@ -1078,11 +1079,11 @@ type(SaveValues) :: tosave, oldsavevalues
     !Command line argument processing
     !================================
 
+    !output file
+
     i = len(trim(DataFile))
     if( DataFile(i-3:i).eq.".lhe" ) then
-        !print *, DataFile
         DataFile = DataFile(1:i-4)
-        !print *, DataFile
     endif
     call system('mkdir -p ./data')! -p is suppressing error messages if directory already exists
 
@@ -1090,15 +1091,28 @@ type(SaveValues) :: tosave, oldsavevalues
     if( VBFoffsh_run.eq.2 ) DataFile = trim(DataFile)//"2"
     if( VBFoffsh_run.eq.3 ) DataFile = trim(DataFile)//"3"
     if( VBFoffsh_run.eq.4 ) DataFile = trim(DataFile)//"4"
-    if( VBFoffsh_run.eq.0 ) DataFile = trim(DataFile)//"0"    
-    
-    if( .not. SetCSmaxFile) CSmaxFile = DataFile
+    if( VBFoffsh_run.eq.0 ) DataFile = trim(DataFile)//"0"
+
+    if( SetCSmaxFile ) then
+      if( VBFoffsh_run.eq.1 ) CSmaxFile = trim(CSmaxFile)//"1"
+      if( VBFoffsh_run.eq.2 ) CSmaxFile = trim(CSmaxFile)//"2"
+      if( VBFoffsh_run.eq.3 ) CSmaxFile = trim(CSmaxFile)//"3"
+      if( VBFoffsh_run.eq.4 ) CSmaxFile = trim(CSmaxFile)//"4"
+      if( VBFoffsh_run.eq.0 ) CSmaxFile = trim(CSmaxFile)//"0"
+    else
+      CSmaxFile = DataFile
+    endif
 
     if (ReadCSmax) then
       call oldsavevalues%ReadFromFile(trim(CSmaxFile)//"_commandlineinfo.txt")
       call CompareSaveValues(tosave, oldsavevalues)
     else
       call tosave%WriteToFile(trim(CSmaxFile)//"_commandlineinfo.txt")
+    endif
+
+    !VBF offshell
+    if( .not. (Process.ge.66 .and. Process.le.69) .and. SetVBFoffsh_run ) then
+      call Error("VBFoffsh_run is only for VBF offshell")
     endif
 
     !PChannel
