@@ -1094,6 +1094,10 @@ type(SaveValues) :: tosave, oldsavevalues
     if( VBFoffsh_run.eq.0 ) DataFile = trim(DataFile)//"0"
 
     if( SetCSmaxFile ) then
+      i = len(trim(CSmaxFile))
+      if( CSmaxFile(i-3:i).eq.".lhe" ) then
+          CSmaxFile = CSmaxFile(1:i-4)
+      endif
       if( VBFoffsh_run.eq.1 ) CSmaxFile = trim(CSmaxFile)//"1"
       if( VBFoffsh_run.eq.2 ) CSmaxFile = trim(CSmaxFile)//"2"
       if( VBFoffsh_run.eq.3 ) CSmaxFile = trim(CSmaxFile)//"3"
