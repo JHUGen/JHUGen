@@ -5914,6 +5914,8 @@ implicit none
         print *, "                      stable; if it is 1, they decay to Wnu, with the W's decaying"
         print *, "                      according to DecayModes1,2."
         print *, "   HbbDK:             For VH production, decay H->bb"
+        print *, "   VBFoffsh_run:      For VBF offshell production, set this to a number from 1-4"
+        print *, "                      for each of the 4 jobs.  See manual for more details."
         print *, " Resonance parameters:"
         print *, "   MReso:             resonance mass in GeV (default=125.00)"
         print *, "   GaReso:            resonance width in GeV (default=0.00407)"

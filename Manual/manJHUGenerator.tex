@@ -203,6 +203,8 @@ This is the list of command line configurables (also defined in the \verb|README
                        stable; if it is 1, they decay to Wnu, with the W's decaying
                        according to DecayModes1,2.
     HbbDK:             For VH production, decay H->bb
+    VBFoffsh_run:      For VBF offshell production, set this to a number from 1-4
+                       for each of the 4 jobs.  See below for more details.
   Resonance parameters:
     MReso:             resonance mass in GeV (default=125.00)
     GaReso:            resonance width in GeV (default=0.00407)
@@ -298,8 +300,32 @@ This is the list of command line configurables (also defined in the \verb|README
 \item \verb|ChannelRatio|: In the case when \verb|PChannel=2| for a spin-2 resonance, this parameter determines an approximate fraction of the events that should come from $q\bar{q}$.  This is equivalent to appropriately scaling the $Xq\bar{q}$ couplings with respect to the $Xgg$ ones, but can be done without advance knowledge of the relative cross sections.
 \item \verb|PDFSet|, \verb|LHAPDF|, \verb|LHAPDFMem|: To use LHAPDF, this functionality must be enabled in the makefile and the relevant environment variables must be set.  See the instructions in Sec.~\ref{sec:LHAPDF}.  Otherwise \verb|PDFSet| gives the choice between a more limited number of PDF sets.
 \end{itemize}
+
 \paragraph{Offshell VBF}
 Processes 66--69 provide an interface to a modified version of MCFM~\cite{Campbell:2010ff} to produce offshell VBF production $VV\to VV$, including all anomalous couplings.  For these processes, a second spin-zero resonance can be activated by setting \verb|MReso2| and \verb|GaReso2| to nonzero values.  The second resonance's couplings can be set to arbitrary values, similar to the first resonance's.
+
+When producing unweighted VBF offshell events, jobs must be submitted in two steps, with four jobs per step.  Each set of four jobs can be run in parallel, but none of the jobs in the the second set can start until all four jobs of the first set finish.
+
+\begin{enumerate}
+	\item Grid generation:
+	\begin{itemize}
+		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=1}
+		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=2}
+		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=3}
+		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=4}
+	\end{itemize}
+	\item Event generation, which can only begin after all four previous jobs have ended:
+	\begin{itemize}
+		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=1 VegasNc2=10000 ReadCSmax}
+		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=2 VegasNc2=10000 ReadCSmax}
+		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=3 VegasNc2=10000 ReadCSmax}
+		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=4 VegasNc2=10000 ReadCSmax}
+	\end{itemize}
+\end{enumerate}
+
+The final result will be four \texttt{.lhe} files, each containing events from some of the partonic channels.  The number of events in each file will be proportional to the cross section of those channels.  The total number of events in the four files may be larger or smaller than the number of events requested.  If you want the exact number of events, use the same random seed four all four jobs of the second step.
+
+
 \subsubsection{Resonance parameters}
 \begin{itemize}
 \item {\verb|OffshellX|}: The flag specifies whether the events for processes 0, 1 or 2 feature a delta-function resonance mass (when set to 0) at or a finite-width distribution around the resonance mass (when set to 1). This option replaces the \verb|OffXVV| numerical flag in previous versions.
