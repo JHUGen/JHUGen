@@ -1086,14 +1086,14 @@ type(SaveValues) :: tosave, oldsavevalues
     endif
     call system('mkdir -p ./data')! -p is suppressing error messages if directory already exists
 
-    if( .not. SetCSmaxFile) CSmaxFile = DataFile
-
     if( VBFoffsh_run.eq.1 ) DataFile = trim(DataFile)//"1"
     if( VBFoffsh_run.eq.2 ) DataFile = trim(DataFile)//"2"
     if( VBFoffsh_run.eq.3 ) DataFile = trim(DataFile)//"3"
     if( VBFoffsh_run.eq.4 ) DataFile = trim(DataFile)//"4"
     if( VBFoffsh_run.eq.0 ) DataFile = trim(DataFile)//"0"    
     
+    if( .not. SetCSmaxFile) CSmaxFile = DataFile
+
     if (ReadCSmax) then
       call oldsavevalues%ReadFromFile(trim(CSmaxFile)//"_commandlineinfo.txt")
       call CompareSaveValues(tosave, oldsavevalues)
@@ -2715,41 +2715,42 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
     warmup = .true.
     
     if( ReadCSmax ) then
-        open(unit=io_TmpFile,file=trim(CSmaxFile)//'1_gridinfo.txt',form='formatted',status='old',iostat=ios)
+        i=len(trim(CSmaxFile))
+        open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'1_gridinfo.txt',form='formatted',status='old',iostat=ios)
         read(io_TmpFile,fmt=*) calls1_in(1)
         read(io_TmpFile,fmt=*) CrossSec2_in(1,:)
         read(io_TmpFile,fmt=*) CrossSecMax2_in(1,:)
         read(io_TmpFile,fmt=*) VG_Result_in(1)
         read(io_TmpFile,fmt=*) VG_Error_in(1)
         close(unit=io_TmpFile)
-        if( ios.eq.0 ) print *, "read ",trim(CSmaxFile)//'1_gridinfo.txt'
+        if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'1_gridinfo.txt'
 
-        open(unit=io_TmpFile,file=trim(CSmaxFile)//'2_gridinfo.txt',form='formatted',status='old',iostat=ios)
+        open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'2_gridinfo.txt',form='formatted',status='old',iostat=ios)
         read(io_TmpFile,fmt=*) calls1_in(2)
         read(io_TmpFile,fmt=*) CrossSec2_in(2,:)
         read(io_TmpFile,fmt=*) CrossSecMax2_in(2,:)
         read(io_TmpFile,fmt=*) VG_Result_in(2)
         read(io_TmpFile,fmt=*) VG_Error_in(2)
         close(unit=io_TmpFile)
-        if( ios.eq.0 ) print *, "read ",trim(CSmaxFile)//'2_gridinfo.txt'
+        if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'2_gridinfo.txt'
 
-        open(unit=io_TmpFile,file=trim(CSmaxFile)//'3_gridinfo.txt',form='formatted',status='old',iostat=ios)
+        open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'3_gridinfo.txt',form='formatted',status='old',iostat=ios)
         read(io_TmpFile,fmt=*) calls1_in(3)
         read(io_TmpFile,fmt=*) CrossSec2_in(3,:)
         read(io_TmpFile,fmt=*) CrossSecMax2_in(3,:)
         read(io_TmpFile,fmt=*) VG_Result_in(3)
         read(io_TmpFile,fmt=*) VG_Error_in(3)
         close(unit=io_TmpFile)
-        if( ios.eq.0 ) print *, "read ",trim(CSmaxFile)//'3_gridinfo.txt'
+        if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'3_gridinfo.txt'
 
-        open(unit=io_TmpFile,file=trim(CSmaxFile)//'4_gridinfo.txt',form='formatted',status='old',iostat=ios)
+        open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'4_gridinfo.txt',form='formatted',status='old',iostat=ios)
         read(io_TmpFile,fmt=*) calls1_in(4)
         read(io_TmpFile,fmt=*) CrossSec2_in(4,:)
         read(io_TmpFile,fmt=*) CrossSecMax2_in(4,:)
         read(io_TmpFile,fmt=*) VG_Result_in(4)
         read(io_TmpFile,fmt=*) VG_Error_in(4)
         close(unit=io_TmpFile)
-        if( ios.eq.0 ) print *, "read ",trim(CSmaxFile)//'4_gridinfo.txt'
+        if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'4_gridinfo.txt'
 
         if( calls1_in(1).ne.calls1_in(2) .or. calls1_in(1).ne.calls1_in(3) .or. calls1_in(2).ne.calls1_in(3) .or. calls1_in(1).ne.calls1_in(4) ) call Error("Mismatch in calls1")
         calls1 = calls1_in(1)
