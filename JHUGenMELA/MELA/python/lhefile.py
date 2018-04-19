@@ -38,6 +38,7 @@ class LHEEvent(object):
       raise ValueError("Wrong number of particles! Should be {}, have {}".format(nparticles, len(lines)-1))
 
     daughters, associated, mothers = (SimpleParticleCollection_t(_) for _ in self.extracteventparticles(lines[1:], isgen))
+    if not list(mothers): mothers = None
     self.daughters, self.associated, self.mothers, self.isgen = self.inputevent = InputEvent(daughters, associated, mothers, isgen)
 
   @abc.abstractmethod
