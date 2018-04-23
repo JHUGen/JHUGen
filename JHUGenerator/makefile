@@ -104,21 +104,6 @@ ccomp = gcc -O0
 Exec = ./JHUGen
 
 
-# kinematics dependencies
-KinDep = mod_HashCollection.F90 \
-         mod_Phasespace.F90 \
-         mod_Kinematics.F90
-
-# kinematics objects
-KinObj = $(ObjectDir)/mod_HashCollection.o \
-         $(ObjectDir)/mod_Phasespace.o \
-         $(ObjectDir)/mod_Kinematics.o
-
-ifeq ($(linkMELA),Yes)
-    KinDep += mod_MCFMWrapper.F90
-    KinObj += $(ObjectDir)/mod_MCFMWrapper.o
-endif
-
 # main dependencies
 MainDep = mod_CrossSection.F90 \
           mod_CrossSection_HJJ.F90 \
@@ -149,7 +134,8 @@ AuxDep = mod_Misc.F90 \
          mod_Phasespace.F90 \
          mod_Kinematics.F90 \
          mod_Kinematics_VH.F90 \
-         mod_Kinematics_HH.F90
+         mod_Kinematics_HH.F90 \
+         mod_HashCollection.F90
 
 ggVHAmpDep = \
          gg_VH_Boxes/mod_ffbH_Box7_8_mmm.F90 \
@@ -275,13 +261,19 @@ AmpDep = mod_Parameters.F90 \
          mod_TTBHiggs.F90 \
          mod_THiggs.F90
 
-AuxObj =  $(ObjectDir)/mod_Misc.o \
+AuxObj =  $(ObjectDir)/mod_HashCollection.o \
+          $(ObjectDir)/mod_Misc.o \
           $(ObjectDir)/mod_Parameters.o \
           $(ObjectDir)/mod_VH_aux.o \
           $(ObjectDir)/mod_Phasespace.o \
           $(ObjectDir)/mod_Kinematics.o \
           $(ObjectDir)/mod_Kinematics_VH.o\
           $(ObjectDir)/mod_Kinematics_HH.o
+ifeq ($(linkMELA),Yes)
+    AuxDep += mod_MCFMWrapper.F90
+    AuxObj += $(ObjectDir)/mod_MCFMWrapper.o
+endif
+
 
 ggVHAmpObj = \
           $(ObjectDir)/mod_ffbH_Box7_8_mmm.o \
@@ -387,9 +379,7 @@ ggHH5AmpObj = \
           $(ObjectDir)/mod_gg_box_HH5_6_pm.o \
           $(ObjectDir)/mod_gg_box_HH5_6_pp.o
 
-AmpObj =  $(ObjectDir)/mod_Parameters.o \
-          $(ObjectDir)/mod_Misc.o \
-          $(ObjectDir)/mod_TopDecay.o \
+AmpObj =  $(ObjectDir)/mod_TopDecay.o \
           $(ObjectDir)/mod_Graviton.o \
           $(ObjectDir)/mod_Higgs.o \
           $(ObjectDir)/mod_Zprime.o \
@@ -478,7 +468,7 @@ MadGraphObj = $(ObjectDir)/gg_ttbh.o \
 
 
 
-JHUGenerator: colliermodules $(CPSObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(AuxObj) $(ggVHAmpObj) $(LHAPDFInterfaceObj) $(KinObj) $(ggVH5AmpObj) $(ggHHAmpObj) $(ggHH5AmpObj) $(AmpObj) $(KinObj) $(MainObj)
+JHUGenerator: colliermodules $(CPSObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(AuxObj) $(ggVHAmpObj) $(LHAPDFInterfaceObj) $(ggVH5AmpObj) $(ggHHAmpObj) $(ggHH5AmpObj) $(AmpObj) $(MainObj)
 	@echo " linking"
 ifeq ($(UseLHAPDF),Yes)
 	echo " -> interfaced with LHAPDF"
@@ -487,10 +477,24 @@ else
 endif
 	@echo " executable file "$(Exec)" is compiled with "$(Comp)
 	@echo " "
-	$(fcomp) -o $(Exec) $(MainObj) $(KinObj) $(AmpObj) $(PSGenObj) $(AuxObj) $(ggVHAmpObj) $(ggVH5AmpObj) $(ggHHAmpObj) $(ggHH5AmpObj) $(AmpObj) $(VegasObj) $(PDFObj) $(CPSObj) $(MCFM_Obj) $(LHAPDFflags) $(QCDLoopflags)
+	$(fcomp) -o $(Exec) $(MainObj) $(AmpObj) $(PSGenObj) $(AuxObj) $(ggVHAmpObj) $(ggVH5AmpObj) $(ggHHAmpObj) $(ggHH5AmpObj) $(AmpObj) $(VegasObj) $(PDFObj) $(CPSObj) $(MCFM_Obj) $(LHAPDFflags) $(QCDLoopflags)
 
 $(AuxObj): $(AuxDep) $(Makefile)
 	@echo " compiling misc. and aux. tools"
+	$(fcomp) -c $(AuxDep)
+	mv *.o $(ObjectDir)
+ifeq ($(linkMELA),Yes)
+	echo " -> interfaced with JHUGenMELA and MCFM"
+	ln -sf $(MELADataDir)/input.DAT ./
+	ln -sf $(MELADataDir)/process.DAT ./
+	ln -sf $(MELADataDir)/hto_output.dat ./
+	ln -sf $(MELADataDir)/ffwarn.dat ./
+	ln -sf $(MELADataDir)/ffperm5.dat ./
+	ln -sf $(MELADataDir)/fferr.dat ./
+	ln -sf $(MELADataDir)/dm_parameters.DAT ./
+	ln -sf $(MELADataDir)/br.sm1 ./
+	ln -sf $(MELADataDir)/br.sm2 ./
+endif
 	$(fcomp) -c $(AuxDep)
 	mv *.o $(ObjectDir)
 
@@ -517,28 +521,6 @@ $(ggHH5AmpObj): $(ggHH5AmpDep) $(Makefile)
 $(AmpObj): $(AmpDep) mod_Misc.F90 mod_Parameters.F90 $(Makefile)
 	@echo " compiling amplitude routines"
 	$(fcomp) -c $(AmpDep)
-	mv *.o $(ObjectDir)
-
-$(ggVHAmpObj): $(ggVHAmpDep) $(Makefile)
-	@echo " compiling ggVH box amplitude"
-	$(fcomp) -c $(ggVHAmpDep)
-	mv *.o $(ObjectDir)
-
-$(KinObj): $(KinDep) $(VegasDep) $(PDFDep) $(PSGenDep) mod_Parameters.F90 $(Makefile)
-	@echo " compiling kinematics routines"
-ifeq ($(linkMELA),Yes)
-	echo " -> interfaced with JHUGenMELA and MCFM"
-	ln -sf $(MELADataDir)/input.DAT ./
-	ln -sf $(MELADataDir)/process.DAT ./
-	ln -sf $(MELADataDir)/hto_output.dat ./
-	ln -sf $(MELADataDir)/ffwarn.dat ./
-	ln -sf $(MELADataDir)/ffperm5.dat ./
-	ln -sf $(MELADataDir)/fferr.dat ./
-	ln -sf $(MELADataDir)/dm_parameters.DAT ./
-	ln -sf $(MELADataDir)/br.sm1 ./
-	ln -sf $(MELADataDir)/br.sm2 ./
-endif
-	$(fcomp) -c $(KinDep)
 	mv *.o $(ObjectDir)
 
 $(MainObj): $(MainDep) $(VegasDep) $(PDFDep) $(PSGenDep) mod_Parameters.F90 $(Makefile)
