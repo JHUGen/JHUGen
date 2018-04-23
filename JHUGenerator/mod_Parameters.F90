@@ -56,7 +56,7 @@ integer, public :: LHAPDFMember, lenLHAPDFString ! lenLHAPDFString is needed in 
 integer, public :: PDFSet
 ! End PDFset variables
 logical, public :: includeInterference, writegit
-real(8), public :: M_V,Ga_V
+real(8), public :: M_V,Ga_V, M_Vprime,Ga_Vprime, M_V_ps,Ga_V_ps, M_Z_ps,Ga_Z_ps, M_W_ps,Ga_W_ps
 real(8), public, parameter :: GeV=1d0/100d0 ! we are using units of 100GeV, i.e. Lambda=10 is 1TeV
 real(8), public, parameter :: percent=1d0/100d0
 ! real(8),public :: GlobalMax=-1d99
@@ -98,8 +98,8 @@ integer, public :: PrintPMZZIntervals
 ! then the seeds are used to generate the (compiler dependent) required number of seeds
 ! and THOSE are used for event generation
 !note that even if the same seed is provided, results are compiler dependent
-integer, public, parameter :: nmaxseeds = 20
-integer, public, parameter :: DefaultSeeds(1:nmaxseeds) = (/847362834,470115596,392845769,191039475,372910496,192049687,695820194,218930493,902943834,471748302,123958674,390534012,938576849,386472918,938576483,891928354,593857698,938576432,948576849,192847564/)
+integer, public, parameter :: nmaxseeds = 33
+integer, public, parameter :: DefaultSeeds(1:nmaxseeds) = (/847362834,470115596,392845769,191039475,372910496,192049687,695820194,218930493,902943834,471748302,123958674,390534012,938576849,386472918,938576483,891928354,593857698,938576432,948576849,192847564     ,218940493,902943854,471748304,123958670,390534013,938576846,386472917,938576484,891928359,593857698,938576434,948576848,192847565/)
 integer, public            :: TheSeeds(1:nmaxseeds) = DefaultSeeds
 !changing the default seeds is not advised, since then results from before the change
 ! will not be reproducible
@@ -117,23 +117,42 @@ logical, public :: RandomizeVVdecays = .true.    ! randomize DecayMode1 and Deca
 
 logical, public :: UseUnformattedRead = .false.  !Set this to true if the regular reading fails for whatever reason
 
+logical, public :: HbbDecays =.false.                 ! default to false so H in V* > VH (Process = 51) does not decay to bbbar
+
 logical, public :: H_DK =.false.                 ! default to false so H in V* > VH (Process = 50) does not decay to bbbar
 
 !leave this one as a parameter, no reason to ever turn it off
 logical, public, parameter :: importExternal_LHEinit = .true.
 !=====================================================
 
+! new VH
+character(len=2), public :: VH_PC = "lo"                ! VH partonic channel and mode selection, in development.
+                                                            ! "ee" ( = e+ e- @LO)
+                                                            ! "gg" ( = triangles + boxes of gg)
+                                                            ! "qq" ( = q qbar @LO)
+                                                            ! "lo" ( = q qbar @LO)
+                                                            ! "tr" ( = triangles of gg)
+                                                            ! "bo" ( = boxes of gg)
+                                                            ! "qg" or "gq" ( = qg + gq)
+                                                            ! "nl" ( = full oneloop = q qbar @LO + NLO + gg + gq)
+                                                            ! "sb" ( = real - dipoles, for development only)
+                                                            ! "sp" ( = virtual + dipoles, for development only)
+! new VH
+!=====================================================
 
 !=====================================================
 !cuts - should be set on the command line
 real(8), public :: pTjetcut = -1d0*GeV                        ! jet min pt, default is set in main (0 in VH, 15 GeV otherwise)
+real(8), public :: etajet_max = 999d0                         ! jet max eta
 real(8), public :: Rjet = -1d0                                ! jet deltaR, anti-kt algorithm, default is set in main (0 in VH, 0.3 otherwise)
 real(8), public :: mJJcut = 0d0*GeV                           ! minimum mJJ for VBF, HJJ, bbH, VH
 real(8), public :: m4l_minmax(1:2) = (/ -1d0,-1d0 /)*GeV      ! min and max for m_4l in off-shell VBF production;   default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
 logical, public :: includeGammaStar = .false.                 ! include offshell photons?
+logical, public :: includeVprime = .false.
 real(8), public :: MPhotonCutoff = 4d0*GeV                    ! minimum |mass| for offshell photons when includeGammaStar = .true.
+real(8), public :: pTlepton_min = 10d0*GeV
+real(8), public :: etalepton_max = 2.5d0
 !=====================================================
-
 
 !=====================================================
 !constants
@@ -267,65 +286,64 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
 !-- parameters that define on-shell spin 0 coupling to SM fields, see note
    logical, public, parameter :: generate_as = .false. ! .true. uses ah* instead of gh*
    complex(8), public, parameter :: ahg1 = (1.0d0,0d0)
-   complex(8), public, parameter :: ahg2 = (0.0d0,0d0)
-   complex(8), public, parameter :: ahg3 = (0.0d0,0d0)  ! pseudoscalar
+   complex(8), public, parameter :: ahg2 = (0d0,0d0)
+   complex(8), public, parameter :: ahg3 = (0d0,0d0)  ! pseudoscalar
    complex(8), public, parameter :: ahz1 = (1.0d0,0d0)
-   complex(8), public, parameter :: ahz2 = (0.0d0,0d0)  ! this coupling does not contribute for gamma+gamma final states
-   complex(8), public, parameter :: ahz3 = (0.0d0,0d0)  ! pseudoscalar
+   complex(8), public, parameter :: ahz2 = (0d0,0d0)  ! this coupling does not contribute for gamma+gamma final states
+   complex(8), public, parameter :: ahz3 = (0d0,0d0)  ! pseudoscalar
 
 !-- parameters that define off-shell spin 0 coupling to SM fields, see note
 !-- Hgg couplings to gluons for point-like vertices
    complex(8), public :: ghg2 = (1.0d0,0d0)
-   complex(8), public :: ghg3 = (0.0d0,0d0)
-   complex(8), public :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
+   complex(8), public :: ghg3 = (0d0,0d0)
+   complex(8), public :: ghg4 = (0d0,0d0)   ! pseudoscalar
 
 !-- HVV' couplings to ZZ/ZA/AA and WW
    complex(8), public :: ghz1 = (2.0d0,0d0)   ! SM=2
-   complex(8), public :: ghz2 = (0.0d0,0d0)
-   complex(8), public :: ghz3 = (0.0d0,0d0)
-   complex(8), public :: ghz4 = (0.0d0,0d0)   ! pseudoscalar
-
-   complex(8), public :: ghzgs2  = (0.00d0,0d0)
-   complex(8), public :: ghzgs3  = (0.00d0,0d0)
-   complex(8), public :: ghzgs4  = (0.00d0,0d0)
-   complex(8), public :: ghgsgs2 = (0.00d0,0d0)
-   complex(8), public :: ghgsgs3 = (0.00d0,0d0)
-   complex(8), public :: ghgsgs4 = (0.00d0,0d0)
+   complex(8), public :: ghz2 = (0d0,0d0)
+   complex(8), public :: ghz3 = (0d0,0d0)
+   complex(8), public :: ghz4 = (0d0,0d0)   ! pseudoscalar
 
 !-- parameters that define q^2 dependent form factors
-   complex(8), public :: ghz1_prime = (0.0d0,0d0)
-   complex(8), public :: ghz1_prime2= (0.0d0,0d0)
-   complex(8), public :: ghz1_prime3= (0.0d0,0d0)
-   complex(8), public :: ghz1_prime4= (0.0d0,0d0)
-   complex(8), public :: ghz1_prime5= (0.0d0,0d0)
-   complex(8), public :: ghz1_prime6= (0.0d0,0d0)
-   complex(8), public :: ghz1_prime7= (0.0d0,0d0)
+   complex(8), public :: ghz1_prime = (0d0,0d0)
+   complex(8), public :: ghz1_prime2= (0d0,0d0)
+   complex(8), public :: ghz1_prime3= (0d0,0d0)
+   complex(8), public :: ghz1_prime4= (0d0,0d0)
+   complex(8), public :: ghz1_prime5= (0d0,0d0)
+   complex(8), public :: ghz1_prime6= (0d0,0d0)
+   complex(8), public :: ghz1_prime7= (0d0,0d0)
 
-   complex(8), public :: ghz2_prime = (0.0d0,0d0)
-   complex(8), public :: ghz2_prime2= (0.0d0,0d0)
-   complex(8), public :: ghz2_prime3= (0.0d0,0d0)
-   complex(8), public :: ghz2_prime4= (0.0d0,0d0)
-   complex(8), public :: ghz2_prime5= (0.0d0,0d0)
-   complex(8), public :: ghz2_prime6= (0.0d0,0d0)
-   complex(8), public :: ghz2_prime7= (0.0d0,0d0)
+   complex(8), public :: ghz2_prime = (0d0,0d0)
+   complex(8), public :: ghz2_prime2= (0d0,0d0)
+   complex(8), public :: ghz2_prime3= (0d0,0d0)
+   complex(8), public :: ghz2_prime4= (0d0,0d0)
+   complex(8), public :: ghz2_prime5= (0d0,0d0)
+   complex(8), public :: ghz2_prime6= (0d0,0d0)
+   complex(8), public :: ghz2_prime7= (0d0,0d0)
 
-   complex(8), public :: ghz3_prime = (0.0d0,0d0)
-   complex(8), public :: ghz3_prime2= (0.0d0,0d0)
-   complex(8), public :: ghz3_prime3= (0.0d0,0d0)
-   complex(8), public :: ghz3_prime4= (0.0d0,0d0)
-   complex(8), public :: ghz3_prime5= (0.0d0,0d0)
-   complex(8), public :: ghz3_prime6= (0.0d0,0d0)
-   complex(8), public :: ghz3_prime7= (0.0d0,0d0)
+   complex(8), public :: ghz3_prime = (0d0,0d0)
+   complex(8), public :: ghz3_prime2= (0d0,0d0)
+   complex(8), public :: ghz3_prime3= (0d0,0d0)
+   complex(8), public :: ghz3_prime4= (0d0,0d0)
+   complex(8), public :: ghz3_prime5= (0d0,0d0)
+   complex(8), public :: ghz3_prime6= (0d0,0d0)
+   complex(8), public :: ghz3_prime7= (0d0,0d0)
 
-   complex(8), public :: ghz4_prime = (0.0d0,0d0)
-   complex(8), public :: ghz4_prime2= (0.0d0,0d0)
-   complex(8), public :: ghz4_prime3= (0.0d0,0d0)
-   complex(8), public :: ghz4_prime4= (0.0d0,0d0)
-   complex(8), public :: ghz4_prime5= (0.0d0,0d0)
-   complex(8), public :: ghz4_prime6= (0.0d0,0d0)
-   complex(8), public :: ghz4_prime7= (0.0d0,0d0)
+   complex(8), public :: ghz4_prime = (0d0,0d0)
+   complex(8), public :: ghz4_prime2= (0d0,0d0)
+   complex(8), public :: ghz4_prime3= (0d0,0d0)
+   complex(8), public :: ghz4_prime4= (0d0,0d0)
+   complex(8), public :: ghz4_prime5= (0d0,0d0)
+   complex(8), public :: ghz4_prime6= (0d0,0d0)
+   complex(8), public :: ghz4_prime7= (0d0,0d0)
 
-   complex(8), public :: ghzgs1_prime2= (0.0d0,0d0)
+   complex(8), public :: ghzgs1_prime2= (0d0,0d0)
+   complex(8), public :: ghzgs2  = (0d0,0d0)
+   complex(8), public :: ghzgs3  = (0d0,0d0)
+   complex(8), public :: ghzgs4  = (0d0,0d0)
+   complex(8), public :: ghgsgs2 = (0d0,0d0)
+   complex(8), public :: ghgsgs3 = (0d0,0d0)
+   complex(8), public :: ghgsgs4 = (0d0,0d0)
 
    real(8),    public, parameter :: Lambda_z1 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_z2 = 10000d0*GeV
@@ -354,49 +372,48 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
 !-- extra HWW couplings for weak boson fusion when WW-spin-0 couplings are required to be different from ZZ-spin-0
 !-- note: ZZ-spin-0 couplings are used in processes other than VBF, and WW is distinguished from ZZ only in case distinguish_HWWcouplings=.true.
    logical, public :: distinguish_HWWcouplings=.false.
-   complex(8), public :: ghw1 = (0.0d0,0d0)
-   complex(8), public :: ghw2 = (0.0d0,0d0)
-   complex(8), public :: ghw3 = (0.0d0,0d0)
-   complex(8), public :: ghw4 = (0.0d0,0d0)
+   complex(8), public :: ghw1 = (0d0,0d0)
+   complex(8), public :: ghw2 = (0d0,0d0)
+   complex(8), public :: ghw3 = (0d0,0d0)
+   complex(8), public :: ghw4 = (0d0,0d0)
 
 !-- parameters that define q^2 dependent form factors in WBF WW-spin-0 case described above
-   complex(8), public :: ghw1_prime = (0.0d0,0d0)
-   complex(8), public :: ghw1_prime2= (0.0d0,0d0)
-   complex(8), public :: ghw1_prime3= (0.0d0,0d0)
-   complex(8), public :: ghw1_prime4= (0.0d0,0d0)
-   complex(8), public :: ghw1_prime5= (0.0d0,0d0)
-   complex(8), public :: ghw1_prime6= (0.0d0,0d0)
-   complex(8), public :: ghw1_prime7= (0.0d0,0d0)
+   complex(8), public :: ghw1_prime = (0d0,0d0)
+   complex(8), public :: ghw1_prime2= (0d0,0d0)
+   complex(8), public :: ghw1_prime3= (0d0,0d0)
+   complex(8), public :: ghw1_prime4= (0d0,0d0)
+   complex(8), public :: ghw1_prime5= (0d0,0d0)
+   complex(8), public :: ghw1_prime6= (0d0,0d0)
+   complex(8), public :: ghw1_prime7= (0d0,0d0)
 
-   complex(8), public :: ghw2_prime = (0.0d0,0d0)
-   complex(8), public :: ghw2_prime2= (0.0d0,0d0)
-   complex(8), public :: ghw2_prime3= (0.0d0,0d0)
-   complex(8), public :: ghw2_prime4= (0.0d0,0d0)
-   complex(8), public :: ghw2_prime5= (0.0d0,0d0)
-   complex(8), public :: ghw2_prime6= (0.0d0,0d0)
-   complex(8), public :: ghw2_prime7= (0.0d0,0d0)
+   complex(8), public :: ghw2_prime = (0d0,0d0)
+   complex(8), public :: ghw2_prime2= (0d0,0d0)
+   complex(8), public :: ghw2_prime3= (0d0,0d0)
+   complex(8), public :: ghw2_prime4= (0d0,0d0)
+   complex(8), public :: ghw2_prime5= (0d0,0d0)
+   complex(8), public :: ghw2_prime6= (0d0,0d0)
+   complex(8), public :: ghw2_prime7= (0d0,0d0)
 
-   complex(8), public :: ghw3_prime = (0.0d0,0d0)
-   complex(8), public :: ghw3_prime2= (0.0d0,0d0)
-   complex(8), public :: ghw3_prime3= (0.0d0,0d0)
-   complex(8), public :: ghw3_prime4= (0.0d0,0d0)
-   complex(8), public :: ghw3_prime5= (0.0d0,0d0)
-   complex(8), public :: ghw3_prime6= (0.0d0,0d0)
-   complex(8), public :: ghw3_prime7= (0.0d0,0d0)
+   complex(8), public :: ghw3_prime = (0d0,0d0)
+   complex(8), public :: ghw3_prime2= (0d0,0d0)
+   complex(8), public :: ghw3_prime3= (0d0,0d0)
+   complex(8), public :: ghw3_prime4= (0d0,0d0)
+   complex(8), public :: ghw3_prime5= (0d0,0d0)
+   complex(8), public :: ghw3_prime6= (0d0,0d0)
+   complex(8), public :: ghw3_prime7= (0d0,0d0)
 
-   complex(8), public :: ghw4_prime = (0.0d0,0d0)
-   complex(8), public :: ghw4_prime2= (0.0d0,0d0)
-   complex(8), public :: ghw4_prime3= (0.0d0,0d0)
-   complex(8), public :: ghw4_prime4= (0.0d0,0d0)
-   complex(8), public :: ghw4_prime5= (0.0d0,0d0)
-   complex(8), public :: ghw4_prime6= (0.0d0,0d0)
-   complex(8), public :: ghw4_prime7= (0.0d0,0d0)
+   complex(8), public :: ghw4_prime = (0d0,0d0)
+   complex(8), public :: ghw4_prime2= (0d0,0d0)
+   complex(8), public :: ghw4_prime3= (0d0,0d0)
+   complex(8), public :: ghw4_prime4= (0d0,0d0)
+   complex(8), public :: ghw4_prime5= (0d0,0d0)
+   complex(8), public :: ghw4_prime6= (0d0,0d0)
+   complex(8), public :: ghw4_prime7= (0d0,0d0)
 
    real(8),    public, parameter :: Lambda_w1 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_w2 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_w3 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_w4 = 10000d0*GeV
-   !real(8),    public, parameter :: Lambda_w5 = 10000d0*GeV ! Not used
 
    integer,    public :: cw_q1sq = 0 ! Sign of q1,2,12**2 for the following Lambda's, set to 1 or -1 to get q**2-dependence from these form factor Lambdas
    integer,    public :: cw_q2sq = 0
@@ -414,6 +431,355 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
    real(8),    public :: Lambda_w30 = 100d0*GeV
    real(8),    public :: Lambda_w40 = 100d0*GeV
 
+!-- HVV contact terms
+   complex(8), public :: ghzzp1 = (0d0,0d0)
+   complex(8), public :: ghzzp2 = (0d0,0d0)
+   complex(8), public :: ghzzp3 = (0d0,0d0)
+   complex(8), public :: ghzzp4 = (0d0,0d0)
+
+!-- parameters that define q^2 dependent form factors
+   complex(8), public :: ghzzp1_prime = (0d0,0d0)
+   complex(8), public :: ghzzp1_prime2= (0d0,0d0)
+   complex(8), public :: ghzzp1_prime3= (0d0,0d0)
+   complex(8), public :: ghzzp1_prime4= (0d0,0d0)
+   complex(8), public :: ghzzp1_prime5= (0d0,0d0)
+   complex(8), public :: ghzzp1_prime6= (0d0,0d0)
+   complex(8), public :: ghzzp1_prime7= (0d0,0d0)
+
+   complex(8), public :: ghzzp2_prime = (0d0,0d0)
+   complex(8), public :: ghzzp2_prime2= (0d0,0d0)
+   complex(8), public :: ghzzp2_prime3= (0d0,0d0)
+   complex(8), public :: ghzzp2_prime4= (0d0,0d0)
+   complex(8), public :: ghzzp2_prime5= (0d0,0d0)
+   complex(8), public :: ghzzp2_prime6= (0d0,0d0)
+   complex(8), public :: ghzzp2_prime7= (0d0,0d0)
+
+   complex(8), public :: ghzzp3_prime = (0d0,0d0)
+   complex(8), public :: ghzzp3_prime2= (0d0,0d0)
+   complex(8), public :: ghzzp3_prime3= (0d0,0d0)
+   complex(8), public :: ghzzp3_prime4= (0d0,0d0)
+   complex(8), public :: ghzzp3_prime5= (0d0,0d0)
+   complex(8), public :: ghzzp3_prime6= (0d0,0d0)
+   complex(8), public :: ghzzp3_prime7= (0d0,0d0)
+
+   complex(8), public :: ghzzp4_prime = (0d0,0d0)
+   complex(8), public :: ghzzp4_prime2= (0d0,0d0)
+   complex(8), public :: ghzzp4_prime3= (0d0,0d0)
+   complex(8), public :: ghzzp4_prime4= (0d0,0d0)
+   complex(8), public :: ghzzp4_prime5= (0d0,0d0)
+   complex(8), public :: ghzzp4_prime6= (0d0,0d0)
+   complex(8), public :: ghzzp4_prime7= (0d0,0d0)
+
+!-- Zpgs
+   complex(8), public :: ghzpgs1_prime2= (0d0,0d0)
+   complex(8), public :: ghzpgs2  = (0d0,0d0)
+   complex(8), public :: ghzpgs3  = (0d0,0d0)
+   complex(8), public :: ghzpgs4  = (0d0,0d0)
+
+!-- ZpZp
+   complex(8), public :: ghzpzp1 = (0d0,0d0)
+   complex(8), public :: ghzpzp2 = (0d0,0d0)
+   complex(8), public :: ghzpzp3 = (0d0,0d0)
+   complex(8), public :: ghzpzp4 = (0d0,0d0)
+
+!-- parameters that define q^2 dependent form factors
+   complex(8), public :: ghzpzp1_prime = (0d0,0d0)
+   complex(8), public :: ghzpzp1_prime2= (0d0,0d0)
+   complex(8), public :: ghzpzp1_prime3= (0d0,0d0)
+   complex(8), public :: ghzpzp1_prime4= (0d0,0d0)
+   complex(8), public :: ghzpzp1_prime5= (0d0,0d0)
+   complex(8), public :: ghzpzp1_prime6= (0d0,0d0)
+   complex(8), public :: ghzpzp1_prime7= (0d0,0d0)
+
+   complex(8), public :: ghzpzp2_prime = (0d0,0d0)
+   complex(8), public :: ghzpzp2_prime2= (0d0,0d0)
+   complex(8), public :: ghzpzp2_prime3= (0d0,0d0)
+   complex(8), public :: ghzpzp2_prime4= (0d0,0d0)
+   complex(8), public :: ghzpzp2_prime5= (0d0,0d0)
+   complex(8), public :: ghzpzp2_prime6= (0d0,0d0)
+   complex(8), public :: ghzpzp2_prime7= (0d0,0d0)
+
+   complex(8), public :: ghzpzp3_prime = (0d0,0d0)
+   complex(8), public :: ghzpzp3_prime2= (0d0,0d0)
+   complex(8), public :: ghzpzp3_prime3= (0d0,0d0)
+   complex(8), public :: ghzpzp3_prime4= (0d0,0d0)
+   complex(8), public :: ghzpzp3_prime5= (0d0,0d0)
+   complex(8), public :: ghzpzp3_prime6= (0d0,0d0)
+   complex(8), public :: ghzpzp3_prime7= (0d0,0d0)
+
+   complex(8), public :: ghzpzp4_prime = (0d0,0d0)
+   complex(8), public :: ghzpzp4_prime2= (0d0,0d0)
+   complex(8), public :: ghzpzp4_prime3= (0d0,0d0)
+   complex(8), public :: ghzpzp4_prime4= (0d0,0d0)
+   complex(8), public :: ghzpzp4_prime5= (0d0,0d0)
+   complex(8), public :: ghzpzp4_prime6= (0d0,0d0)
+   complex(8), public :: ghzpzp4_prime7= (0d0,0d0)
+
+
+   complex(8), public :: ezp_El_left  = (0d0,0d0)
+   complex(8), public :: ezp_El_right  = (0d0,0d0)
+   complex(8), public :: ezp_Mu_left  = (0d0,0d0)
+   complex(8), public :: ezp_Mu_right  = (0d0,0d0)
+   complex(8), public :: ezp_Ta_left  = (0d0,0d0)
+   complex(8), public :: ezp_Ta_right  = (0d0,0d0)
+   complex(8), public :: ezp_NuE_left  = (0d0,0d0)   !same for NuMu and NuTau
+   complex(8), public :: ezp_NuE_right  = (0d0,0d0)  !same for NuMu and NuTau
+   complex(8), public :: ezp_Up_left  = (0d0,0d0)
+   complex(8), public :: ezp_Up_right  = (0d0,0d0)
+   complex(8), public :: ezp_Chm_left  = (0d0,0d0)
+   complex(8), public :: ezp_Chm_right  = (0d0,0d0)
+   complex(8), public :: ezp_Dn_left  = (0d0,0d0)
+   complex(8), public :: ezp_Dn_right  = (0d0,0d0)
+   complex(8), public :: ezp_Str_left  = (0d0,0d0)
+   complex(8), public :: ezp_Str_right  = (0d0,0d0)
+   complex(8), public :: ezp_Bot_left  = (0d0,0d0)
+   complex(8), public :: ezp_Bot_right  = (0d0,0d0)
+   complex(8), public :: ezp_Top_left  = (0d0,0d0)
+   complex(8), public :: ezp_Top_right  = (0d0,0d0)
+
+   real(8), public :: M_Zprime = -1d0 ! <0: CT interaction, >=0: Heavy Zprime propagator
+   real(8), public :: Ga_Zprime = 0d0
+!--
+!-- HVV contact terms
+   complex(8), public :: ghwwp1 = (0d0,0d0)
+   complex(8), public :: ghwwp2 = (0d0,0d0)
+   complex(8), public :: ghwwp3 = (0d0,0d0)
+   complex(8), public :: ghwwp4 = (0d0,0d0)
+
+!-- parameters that define q^2 dependent form factors
+   complex(8), public :: ghwwp1_prime = (0d0,0d0)
+   complex(8), public :: ghwwp1_prime2= (0d0,0d0)
+   complex(8), public :: ghwwp1_prime3= (0d0,0d0)
+   complex(8), public :: ghwwp1_prime4= (0d0,0d0)
+   complex(8), public :: ghwwp1_prime5= (0d0,0d0)
+   complex(8), public :: ghwwp1_prime6= (0d0,0d0)
+   complex(8), public :: ghwwp1_prime7= (0d0,0d0)
+
+   complex(8), public :: ghwwp2_prime = (0d0,0d0)
+   complex(8), public :: ghwwp2_prime2= (0d0,0d0)
+   complex(8), public :: ghwwp2_prime3= (0d0,0d0)
+   complex(8), public :: ghwwp2_prime4= (0d0,0d0)
+   complex(8), public :: ghwwp2_prime5= (0d0,0d0)
+   complex(8), public :: ghwwp2_prime6= (0d0,0d0)
+   complex(8), public :: ghwwp2_prime7= (0d0,0d0)
+
+   complex(8), public :: ghwwp3_prime = (0d0,0d0)
+   complex(8), public :: ghwwp3_prime2= (0d0,0d0)
+   complex(8), public :: ghwwp3_prime3= (0d0,0d0)
+   complex(8), public :: ghwwp3_prime4= (0d0,0d0)
+   complex(8), public :: ghwwp3_prime5= (0d0,0d0)
+   complex(8), public :: ghwwp3_prime6= (0d0,0d0)
+   complex(8), public :: ghwwp3_prime7= (0d0,0d0)
+
+   complex(8), public :: ghwwp4_prime = (0d0,0d0)
+   complex(8), public :: ghwwp4_prime2= (0d0,0d0)
+   complex(8), public :: ghwwp4_prime3= (0d0,0d0)
+   complex(8), public :: ghwwp4_prime4= (0d0,0d0)
+   complex(8), public :: ghwwp4_prime5= (0d0,0d0)
+   complex(8), public :: ghwwp4_prime6= (0d0,0d0)
+   complex(8), public :: ghwwp4_prime7= (0d0,0d0)
+
+   complex(8), public :: ghwpwp1 = (0d0,0d0)
+   complex(8), public :: ghwpwp2 = (0d0,0d0)
+   complex(8), public :: ghwpwp3 = (0d0,0d0)
+   complex(8), public :: ghwpwp4 = (0d0,0d0)
+
+!-- parameters that define q^2 dependent form factors
+   complex(8), public :: ghwpwp1_prime = (0d0,0d0)
+   complex(8), public :: ghwpwp1_prime2= (0d0,0d0)
+   complex(8), public :: ghwpwp1_prime3= (0d0,0d0)
+   complex(8), public :: ghwpwp1_prime4= (0d0,0d0)
+   complex(8), public :: ghwpwp1_prime5= (0d0,0d0)
+   complex(8), public :: ghwpwp1_prime6= (0d0,0d0)
+   complex(8), public :: ghwpwp1_prime7= (0d0,0d0)
+
+   complex(8), public :: ghwpwp2_prime = (0d0,0d0)
+   complex(8), public :: ghwpwp2_prime2= (0d0,0d0)
+   complex(8), public :: ghwpwp2_prime3= (0d0,0d0)
+   complex(8), public :: ghwpwp2_prime4= (0d0,0d0)
+   complex(8), public :: ghwpwp2_prime5= (0d0,0d0)
+   complex(8), public :: ghwpwp2_prime6= (0d0,0d0)
+   complex(8), public :: ghwpwp2_prime7= (0d0,0d0)
+
+   complex(8), public :: ghwpwp3_prime = (0d0,0d0)
+   complex(8), public :: ghwpwp3_prime2= (0d0,0d0)
+   complex(8), public :: ghwpwp3_prime3= (0d0,0d0)
+   complex(8), public :: ghwpwp3_prime4= (0d0,0d0)
+   complex(8), public :: ghwpwp3_prime5= (0d0,0d0)
+   complex(8), public :: ghwpwp3_prime6= (0d0,0d0)
+   complex(8), public :: ghwpwp3_prime7= (0d0,0d0)
+
+   complex(8), public :: ghwpwp4_prime = (0d0,0d0)
+   complex(8), public :: ghwpwp4_prime2= (0d0,0d0)
+   complex(8), public :: ghwpwp4_prime3= (0d0,0d0)
+   complex(8), public :: ghwpwp4_prime4= (0d0,0d0)
+   complex(8), public :: ghwpwp4_prime5= (0d0,0d0)
+   complex(8), public :: ghwpwp4_prime6= (0d0,0d0)
+   complex(8), public :: ghwpwp4_prime7= (0d0,0d0)
+
+   complex(8), public :: ewp_El_left  = (0d0,0d0)
+   complex(8), public :: ewp_El_right  = (0d0,0d0)
+   complex(8), public :: ewp_Mu_left  = (0d0,0d0)
+   complex(8), public :: ewp_Mu_right  = (0d0,0d0)
+   complex(8), public :: ewp_Ta_left  = (0d0,0d0)
+   complex(8), public :: ewp_Ta_right  = (0d0,0d0)
+   complex(8), public :: ewp_Up_left  = (0d0,0d0)
+   complex(8), public :: ewp_Up_right  = (0d0,0d0)
+   complex(8), public :: ewp_Chm_left  = (0d0,0d0)
+   complex(8), public :: ewp_Chm_right  = (0d0,0d0)
+   complex(8), public :: ewp_Top_left  = (0d0,0d0)
+   complex(8), public :: ewp_Top_right  = (0d0,0d0)
+
+   real(8), public :: M_Wprime = -1d0 ! <0: CT interaction, >=0: Heavy Zprime propagator
+   real(8), public :: Ga_Wprime = 0d0
+!--
+
+
+
+
+!-- second resonance (H2) couplings for off-shell VBF
+!-- HVV' couplings to ZZ/ZA/AA and WW
+   complex(8), public :: gh2z1 = (0.0d0,0d0)
+   complex(8), public :: gh2z2 = (0.0d0,0d0)
+   complex(8), public :: gh2z3 = (0.0d0,0d0)
+   complex(8), public :: gh2z4 = (0.0d0,0d0)   ! pseudoscalar
+
+   complex(8), public :: gh2zgs2  = (0.00d0,0d0)
+   complex(8), public :: gh2zgs3  = (0.00d0,0d0)
+   complex(8), public :: gh2zgs4  = (0.00d0,0d0)
+   complex(8), public :: gh2gsgs2 = (0.00d0,0d0)
+   complex(8), public :: gh2gsgs3 = (0.00d0,0d0)
+   complex(8), public :: gh2gsgs4 = (0.00d0,0d0)
+
+!-- parameters that define q^2 dependent form factors
+   complex(8), public :: gh2z1_prime = (0.0d0,0d0)
+   complex(8), public :: gh2z1_prime2= (0.0d0,0d0)
+   complex(8), public :: gh2z1_prime3= (0.0d0,0d0)
+   complex(8), public :: gh2z1_prime4= (0.0d0,0d0)
+   complex(8), public :: gh2z1_prime5= (0.0d0,0d0)
+   complex(8), public :: gh2z1_prime6= (0.0d0,0d0)
+   complex(8), public :: gh2z1_prime7= (0.0d0,0d0)
+
+   complex(8), public :: gh2z2_prime = (0.0d0,0d0)
+   complex(8), public :: gh2z2_prime2= (0.0d0,0d0)
+   complex(8), public :: gh2z2_prime3= (0.0d0,0d0)
+   complex(8), public :: gh2z2_prime4= (0.0d0,0d0)
+   complex(8), public :: gh2z2_prime5= (0.0d0,0d0)
+   complex(8), public :: gh2z2_prime6= (0.0d0,0d0)
+   complex(8), public :: gh2z2_prime7= (0.0d0,0d0)
+
+   complex(8), public :: gh2z3_prime = (0.0d0,0d0)
+   complex(8), public :: gh2z3_prime2= (0.0d0,0d0)
+   complex(8), public :: gh2z3_prime3= (0.0d0,0d0)
+   complex(8), public :: gh2z3_prime4= (0.0d0,0d0)
+   complex(8), public :: gh2z3_prime5= (0.0d0,0d0)
+   complex(8), public :: gh2z3_prime6= (0.0d0,0d0)
+   complex(8), public :: gh2z3_prime7= (0.0d0,0d0)
+
+   complex(8), public :: gh2z4_prime = (0.0d0,0d0)
+   complex(8), public :: gh2z4_prime2= (0.0d0,0d0)
+   complex(8), public :: gh2z4_prime3= (0.0d0,0d0)
+   complex(8), public :: gh2z4_prime4= (0.0d0,0d0)
+   complex(8), public :: gh2z4_prime5= (0.0d0,0d0)
+   complex(8), public :: gh2z4_prime6= (0.0d0,0d0)
+   complex(8), public :: gh2z4_prime7= (0.0d0,0d0)
+
+   complex(8), public :: gh2zgs1_prime2= (0.0d0,0d0)
+
+   real(8),    public, parameter :: Lambda2_z1 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda2_z2 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda2_z3 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda2_z4 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda2_zgs1 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda2_Q  = 10000d0*GeV
+
+   integer,    public :: c2z_q1sq = 0 ! Sign of q1,2,12**2 for the following Lambda2's, set to 1 or -1 to get q**2-dependence from these form factor Lambda2s
+   integer,    public :: c2z_q2sq = 0
+   integer,    public :: c2z_q12sq = 0
+   real(8),    public :: Lambda2_z11 = 100d0*GeV ! For Z1
+   real(8),    public :: Lambda2_z21 = 100d0*GeV
+   real(8),    public :: Lambda2_z31 = 100d0*GeV
+   real(8),    public :: Lambda2_z41 = 100d0*GeV
+   real(8),    public :: Lambda2_z12 = 100d0*GeV ! For Z2
+   real(8),    public :: Lambda2_z22 = 100d0*GeV
+   real(8),    public :: Lambda2_z32 = 100d0*GeV
+   real(8),    public :: Lambda2_z42 = 100d0*GeV
+   real(8),    public :: Lambda2_z10 = 100d0*GeV ! For the Higgs
+   real(8),    public :: Lambda2_z20 = 100d0*GeV
+   real(8),    public :: Lambda2_z30 = 100d0*GeV
+   real(8),    public :: Lambda2_z40 = 100d0*GeV
+
+
+!-- extra HWW couplings for weak boson fusion when WW-spin-0 couplings are required to be different from ZZ-spin-0
+!-- note: ZZ-spin-0 couplings are used in processes other than VBF, and WW is distinguished from ZZ only in case distinguish_HWWcouplings=.true.
+!    logical, public :: distinguish_HWWcouplings=.false.
+   complex(8), public :: gh2w1 = (0.0d0,0d0)
+   complex(8), public :: gh2w2 = (0.0d0,0d0)
+   complex(8), public :: gh2w3 = (0.0d0,0d0)
+   complex(8), public :: gh2w4 = (0.0d0,0d0)
+
+!-- parameters that define q^2 dependent form factors in WBF WW-spin-0 case described above
+   complex(8), public :: gh2w1_prime = (0.0d0,0d0)
+   complex(8), public :: gh2w1_prime2= (0.0d0,0d0)
+   complex(8), public :: gh2w1_prime3= (0.0d0,0d0)
+   complex(8), public :: gh2w1_prime4= (0.0d0,0d0)
+   complex(8), public :: gh2w1_prime5= (0.0d0,0d0)
+   complex(8), public :: gh2w1_prime6= (0.0d0,0d0)
+   complex(8), public :: gh2w1_prime7= (0.0d0,0d0)
+
+   complex(8), public :: gh2w2_prime = (0.0d0,0d0)
+   complex(8), public :: gh2w2_prime2= (0.0d0,0d0)
+   complex(8), public :: gh2w2_prime3= (0.0d0,0d0)
+   complex(8), public :: gh2w2_prime4= (0.0d0,0d0)
+   complex(8), public :: gh2w2_prime5= (0.0d0,0d0)
+   complex(8), public :: gh2w2_prime6= (0.0d0,0d0)
+   complex(8), public :: gh2w2_prime7= (0.0d0,0d0)
+
+   complex(8), public :: gh2w3_prime = (0.0d0,0d0)
+   complex(8), public :: gh2w3_prime2= (0.0d0,0d0)
+   complex(8), public :: gh2w3_prime3= (0.0d0,0d0)
+   complex(8), public :: gh2w3_prime4= (0.0d0,0d0)
+   complex(8), public :: gh2w3_prime5= (0.0d0,0d0)
+   complex(8), public :: gh2w3_prime6= (0.0d0,0d0)
+   complex(8), public :: gh2w3_prime7= (0.0d0,0d0)
+
+   complex(8), public :: gh2w4_prime = (0.0d0,0d0)
+   complex(8), public :: gh2w4_prime2= (0.0d0,0d0)
+   complex(8), public :: gh2w4_prime3= (0.0d0,0d0)
+   complex(8), public :: gh2w4_prime4= (0.0d0,0d0)
+   complex(8), public :: gh2w4_prime5= (0.0d0,0d0)
+   complex(8), public :: gh2w4_prime6= (0.0d0,0d0)
+   complex(8), public :: gh2w4_prime7= (0.0d0,0d0)
+
+   real(8),    public, parameter :: Lambda2_w1 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda2_w2 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda2_w3 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda2_w4 = 10000d0*GeV
+
+   integer,    public :: c2w_q1sq = 0 ! Sign of q1,2,12**2 for the following Lambda2's, set to 1 or -1 to get q**2-dependence from these form factor Lambda2s
+   integer,    public :: c2w_q2sq = 0
+   integer,    public :: c2w_q12sq = 0
+   real(8),    public :: Lambda2_w11 = 100d0*GeV ! For W+
+   real(8),    public :: Lambda2_w21 = 100d0*GeV
+   real(8),    public :: Lambda2_w31 = 100d0*GeV
+   real(8),    public :: Lambda2_w41 = 100d0*GeV
+   real(8),    public :: Lambda2_w12 = 100d0*GeV ! For W-
+   real(8),    public :: Lambda2_w22 = 100d0*GeV
+   real(8),    public :: Lambda2_w32 = 100d0*GeV
+   real(8),    public :: Lambda2_w42 = 100d0*GeV
+   real(8),    public :: Lambda2_w10 = 100d0*GeV ! For the Higgs
+   real(8),    public :: Lambda2_w20 = 100d0*GeV
+   real(8),    public :: Lambda2_w30 = 100d0*GeV
+   real(8),    public :: Lambda2_w40 = 100d0*GeV
+
+
+
+
+
+
+
+
+
 !-- Hff couplings for ttbar+H and bbar+H
    complex(8), public :: kappa       = (1d0,0d0)
    complex(8), public :: kappa_tilde = (0d0,0d0)
@@ -424,8 +790,8 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
 !---parameters that define spin 1 coupling to SM fields, see note
    complex(8), public :: zprime_qq_left  = (1.0d0,0d0)
    complex(8), public :: zprime_qq_right = (1.0d0,0d0)
-   complex(8), public :: zprime_zz_1 =  (0.0d0,0d0)!  =1 for JP=1- vector
-   complex(8), public :: zprime_zz_2 =  (0.0d0,0d0)!  =1 for JP=1+ pseudovector
+   complex(8), public :: zprime_zz_1 =  (0d0,0d0)!  =1 for JP=1- vector
+   complex(8), public :: zprime_zz_2 =  (0d0,0d0)!  =1 for JP=1+ pseudovector
 
 
 !--------------------!
@@ -433,11 +799,11 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
 !--------------------!
 !-- parameters that define spin 2 coupling to SM fields, see note
 ! minimal coupling corresponds to a1 = b1 = b5 = 1 everything else 0
-  complex(8), public :: a1 = (0.0d0,0d0)    ! g1  -- c.f. draft
-  complex(8), public :: a2 = (0.0d0,0d0)    ! g2
-  complex(8), public :: a3 = (0.0d0,0d0)    ! g3
-  complex(8), public :: a4 = (0.0d0,0d0)    ! g4
-  complex(8), public :: a5 = (0.0d0,0d0)    ! pseudoscalar, g8
+  complex(8), public :: a1 = (0d0,0d0)    ! g1  -- c.f. draft
+  complex(8), public :: a2 = (0d0,0d0)    ! g2
+  complex(8), public :: a3 = (0d0,0d0)    ! g3
+  complex(8), public :: a4 = (0d0,0d0)    ! g4
+  complex(8), public :: a5 = (0d0,0d0)    ! pseudoscalar, g8
   complex(8), public :: graviton_qq_left  = (1.0d0,0d0)! graviton coupling to quarks
   complex(8), public :: graviton_qq_right = (1.0d0,0d0)
 
@@ -445,25 +811,67 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
   logical, public, parameter :: generate_bis = .true.
   logical, public, parameter :: use_dynamic_MG = .true.
 
-  complex(8), public :: b1 = (0.0d0,0d0)  !  all b' below are g's in the draft
-  complex(8), public :: b2 = (0.0d0,0d0)
-  complex(8), public :: b3 = (0.0d0,0d0)
-  complex(8), public :: b4 = (0.0d0,0d0)
-  complex(8), public :: b5 = (0.0d0,0d0)
-  complex(8), public :: b6 = (0.0d0,0d0)
-  complex(8), public :: b7 = (0.0d0,0d0)
-  complex(8), public :: b8 = (0.0d0,0d0)
-  complex(8), public :: b9 = (0.0d0,0d0)  ! this coupling does not contribute to gamma+gamma final states
-  complex(8), public :: b10 =(0.0d0,0d0)  ! this coupling does not contribute to gamma+gamma final states
+  !  all b' below are g's in the draft
+  complex(8), public :: b1 = (0d0,0d0)
+  complex(8), public :: b2 = (0d0,0d0)
+  complex(8), public :: b3 = (0d0,0d0)
+  complex(8), public :: b4 = (0d0,0d0)
+  complex(8), public :: b5 = (0d0,0d0)  ! this coupling does not contribute to V+gamma final states
+  complex(8), public :: b6 = (0d0,0d0)  ! this coupling does not contribute to V+gamma final states
+  complex(8), public :: b7 = (0d0,0d0)  ! this coupling does not contribute to V+gamma final states
+  complex(8), public :: b8 = (0d0,0d0)
+  complex(8), public :: b9 = (0d0,0d0)  ! this coupling does not contribute to V+gamma final states
+  complex(8), public :: b10 =(0d0,0d0)  ! this coupling does not contribute to V+gamma final states
+
+  complex(8), public :: bzzp1 = (0d0,0d0)
+  complex(8), public :: bzzp2 = (0d0,0d0)
+  complex(8), public :: bzzp3 = (0d0,0d0)
+  complex(8), public :: bzzp4 = (0d0,0d0)
+  complex(8), public :: bzzp5 = (0d0,0d0)
+  complex(8), public :: bzzp6 = (0d0,0d0)
+  complex(8), public :: bzzp7 = (0d0,0d0)
+  complex(8), public :: bzzp8 = (0d0,0d0)
+  complex(8), public :: bzzp9 = (0d0,0d0)
+  complex(8), public :: bzzp10 =(0d0,0d0)
+
+  complex(8), public :: bzpzp1 = (0d0,0d0)
+  complex(8), public :: bzpzp2 = (0d0,0d0)
+  complex(8), public :: bzpzp3 = (0d0,0d0)
+  complex(8), public :: bzpzp4 = (0d0,0d0)
+  complex(8), public :: bzpzp5 = (0d0,0d0)
+  complex(8), public :: bzpzp6 = (0d0,0d0)
+  complex(8), public :: bzpzp7 = (0d0,0d0)
+  complex(8), public :: bzpzp8 = (0d0,0d0)
+  complex(8), public :: bzpzp9 = (0d0,0d0)
+  complex(8), public :: bzpzp10 =(0d0,0d0)
+
+  complex(8), public :: bzgs1 = (0d0,0d0)
+  complex(8), public :: bzgs2 = (0d0,0d0)
+  complex(8), public :: bzgs3 = (0d0,0d0)
+  complex(8), public :: bzgs4 = (0d0,0d0)
+  complex(8), public :: bzgs8 = (0d0,0d0)
+
+  complex(8), public :: bgsgs1 = (0d0,0d0)
+  complex(8), public :: bgsgs2 = (0d0,0d0)
+  complex(8), public :: bgsgs3 = (0d0,0d0)
+  complex(8), public :: bgsgs4 = (0d0,0d0)
+  complex(8), public :: bgsgs8 = (0d0,0d0)
+
+  complex(8), public :: bzpgs1 = (0d0,0d0)
+  complex(8), public :: bzpgs2 = (0d0,0d0)
+  complex(8), public :: bzpgs3 = (0d0,0d0)
+  complex(8), public :: bzpgs4 = (0d0,0d0)
+  complex(8), public :: bzpgs8 = (0d0,0d0)
+
 
   complex(8), public, parameter  :: c1 = (1.0d0,0d0)
-  complex(8), public, parameter  :: c2 = (0.0d0,0d0)
-  complex(8), public, parameter  :: c3 = (0.0d0,0d0)
-  complex(8), public, parameter  :: c41= (0.0d0,0d0)
-  complex(8), public, parameter  :: c42= (0.0d0,0d0)
-  complex(8), public, parameter  :: c5 = (0.0d0,0d0)
-  complex(8), public, parameter  :: c6 = (0.0d0,0d0) ! this coupling does not contribute to gamma+gamma final states
-  complex(8), public, parameter  :: c7 = (0.0d0,0d0) ! this coupling does not contribute to gamma+gamma final states
+  complex(8), public, parameter  :: c2 = (0d0,0d0)
+  complex(8), public, parameter  :: c3 = (0d0,0d0)
+  complex(8), public, parameter  :: c41= (0d0,0d0)
+  complex(8), public, parameter  :: c42= (0d0,0d0)
+  complex(8), public, parameter  :: c5 = (0d0,0d0)
+  complex(8), public, parameter  :: c6 = (0d0,0d0) ! this coupling does not contribute to gamma+gamma final states
+  complex(8), public, parameter  :: c7 = (0d0,0d0) ! this coupling does not contribute to gamma+gamma final states
 
 
 !=====================================================
@@ -561,6 +969,8 @@ integer, public, target :: NuM_ = 15
 integer, public, target :: NuT_ = 16
 integer, public, target :: Hig_ = 25
 integer, public, target :: Zpr_ = 32
+integer, public, target :: Zpr2_ = 33
+integer, public, target :: Wppr_ = 34
 integer, public, target :: Gra_ = 39
 
 integer, public, target :: AUp_  = -1
@@ -576,6 +986,7 @@ integer, public, target :: Wm_   = -13
 integer, public, target :: ANuE_ = -14
 integer, public, target :: ANuM_ = -15
 integer, public, target :: ANuT_ = -16
+integer, public, target :: Wmpr_ = -34
 
 integer, public, parameter :: Not_a_particle_  = -9000
 real(8), public, parameter :: Mom_Not_a_particle(1:4) = (/0d0,0d0,0d0,0d0/)
@@ -596,14 +1007,15 @@ integer, public, parameter :: pdfATop_ = -6 ! Dummy
 
 real(dp), public, parameter :: pi =3.141592653589793238462643383279502884197_dp
 real(dp), public, parameter :: sqrt2 = 1.4142135623730950488016887242096980786_dp
+real(dp), public, parameter :: gamma_0 = 0.5772156649015328606065120900824024310421_dp  !Euler–Mascheroni constant
 real(dp), public, parameter :: pisq = pi**2
 real(8), public, parameter :: one = 1.0d0, mone = -1.0d0
 real(8), public, parameter :: half  = 0.5d0,two = 2.0d0
-real(8), public, parameter :: zero  = 0.0d0
-complex(8), parameter, public :: czero = (0.0d0,0.0d0)
+real(8), public, parameter :: zero  = 0d0
+complex(8), parameter, public :: czero = (0d0,0d0)
 complex(8), parameter, public :: cone = 1.0d0
-complex(8), parameter, public :: ci=(0.0d0,1.0d0)
-complex(8), parameter, public :: ne=(0.0d0,1.0d0)
+complex(8), parameter, public :: ci=(0d0,1.0d0)
+complex(8), parameter, public :: ne=(0d0,1.0d0)
 
 integer,parameter :: io_stdout=6
 integer,parameter :: io_LHEOutFile=14
@@ -758,9 +1170,8 @@ logical :: computeQsqCompundCoupl
       endif
    endif
 
+return
 end function
-
-
 
 FUNCTION ScaleFactor(id1in,id2in)
 implicit none
@@ -813,6 +1224,7 @@ else
   ScaleFactor = 1d0
 endif
 
+return
 END FUNCTION
 
 FUNCTION CKMbare(id1in,id2in)
@@ -852,6 +1264,112 @@ integer :: id1in, id2in
   CKM=CKMbare(id1in, id2in)*sqrt(ScaleFactor(id1in,id2in))
 END FUNCTION
 
+! for VH use
+FUNCTION ZFFbare(id1in,id2in,h1,h2)
+implicit none
+real(8) :: ZFFbare
+integer :: id1, id2, id1in, id2in
+real(8) :: h1,h2
+
+id1 = abs(id1in)
+id2 = abs(id2in)
+
+  if(id1.ne.id2)then
+    print*,"Not a valid Z to fermion pair vertex!",id1in,id2in
+    stop
+  !Zll
+  else if(id1.eq.convertLHE(ElM_).or.id1.eq.convertLHE(MuM_).or.id1.eq.convertLHE(TaM_))then
+    if((id1in*h1).gt.0d0)then
+      ZFFbare = aR_lep
+    else
+      ZFFbare = aL_lep
+    endif
+  !Zuu
+  else if(id1.eq.convertLHE(Up_).or.id1.eq.convertLHE(Chm_).or.id1.eq.convertLHE(Top_))then
+    if((id1in*h1).gt.0d0)then
+      ZFFbare = aR_QUp
+    else
+      ZFFbare = aL_QUp
+    endif
+  !Zdd
+  else if(id1.eq.convertLHE(Dn_).or.id1.eq.convertLHE(Str_).or.id1.eq.convertLHE(Bot_))then
+    if((id1in*h1).gt.0d0)then
+      ZFFbare = aR_QDn
+    else
+      ZFFbare = aL_QDn
+    endif
+  !Z nu nu
+  else if(id1.eq.convertLHE(NuE_).or.id1.eq.convertLHE(NuM_).or.id1.eq.convertLHE(NuT_))then
+    if((id1in*h1).gt.0d0)then
+      ZFFbare = aL_neu
+    else
+      print*,"Noright-handed neutrino here!",id1in,h1
+      stop
+    endif
+  else
+    print*,"Not a valid Z to fermion pair vertex!",id1in,id2in
+    stop
+  endif
+
+return
+END FUNCTION
+
+FUNCTION ZFF(id1in,id2in,h1,h2)
+implicit none
+real(8) :: ZFF
+integer :: id1in, id2in
+real(8) :: h1,h2
+  ZFF = ZFFbare(id1in,id2in,h1,h2) * sqrt(ScaleFactor(id1in,id2in))
+return
+END FUNCTION
+
+FUNCTION AFF(id1in,id2in,h1,h2)
+implicit none
+real(8) :: AFF
+integer :: id1, id2, id1in, id2in
+real(8) :: h1,h2
+
+id1 = abs(id1in)
+id2 = abs(id2in)
+
+  if(id1.ne.id2)then
+    print*,"Not a valid Z to fermion pair vertex!",id1in,id2in
+    stop
+  !photon ll
+  else if(id1.eq.convertLHE(ElM_).or.id1.eq.convertLHE(MuM_).or.id1.eq.convertLHE(TaM_))then
+    if((id1in*h1).gt.0d0)then
+      AFF = QlR
+    else
+      AFF = QlL
+    endif
+  !photon uu
+  else if(id1.eq.convertLHE(Up_).or.id1.eq.convertLHE(Chm_).or.id1.eq.convertLHE(Top_))then
+    if((id1in*h1).gt.0d0)then
+      AFF = QuR
+    else
+      AFF = QuL
+    endif
+  !photon dd
+  else if(id1.eq.convertLHE(Dn_).or.id1.eq.convertLHE(Str_).or.id1.eq.convertLHE(Bot_))then
+    if((id1in*h1).gt.0d0)then
+      AFF = QdR
+    else
+      AFF = QdL
+    endif
+  !photon nu nu
+  else if(id1.eq.convertLHE(NuE_).or.id1.eq.convertLHE(NuM_).or.id1.eq.convertLHE(NuT_))then
+    AFF = 0d0
+    print*,"Warning, gamma > nu nu~ gives 0.",id1in,id2in
+  else
+    print*,"Not a valid photon to fermion pair vertex!",id1in,id2in
+    stop
+  endif
+
+return
+END FUNCTION
+
+! for VH use
+>>>>>>> ee9d1eda... Proc=51,52
 
 
 FUNCTION convertLHEreverse(Part)
@@ -923,6 +1441,14 @@ integer :: Part
       convertLHEreverse = Hig_
   elseif( Part.eq.-25) then
       convertLHEreverse = Hig_
+  elseif( Part.eq.32) then
+      convertLHEreverse = Zpr_
+  elseif( Part.eq.33) then
+      convertLHEreverse = Zpr2_
+  elseif( Part.eq.34) then
+      convertLHEreverse = Wppr_
+  elseif( Part.eq.-34) then
+      convertLHEreverse = Wmpr_
   else
       print *, "MYLHE format not implemented for ",Part
       stop
@@ -1003,6 +1529,12 @@ integer :: Part
       convertLHE =25
   elseif( Part.eq.Zpr_) then
       convertLHE =32
+  elseif( Part.eq.Zpr2_) then
+      convertLHE =33
+  elseif( Part.eq.Wppr_) then
+      convertLHE =34
+  elseif( Part.eq.Wmpr_) then
+      convertLHE =-34
   elseif( Part.eq.Gra_) then
       convertLHE =39
   elseif( Part.le.Not_a_particle_) then
@@ -1178,8 +1710,12 @@ integer :: Part
       getMass = m_top
   elseif( abs(Part).eq.abs(Z0_) ) then
       getMass = M_Z
+  elseif( abs(Part).eq.abs(Zpr_) ) then
+      getMass = M_Zprime
   elseif( abs(Part).eq.abs(Wp_) ) then
       getMass = M_W
+  elseif( abs(Part).eq.abs(Wppr_) ) then
+      getMass = M_Wprime
   elseif( abs(Part).eq.abs(Pho_) ) then
       getMass = 0d0
   elseif( abs(Part).eq.abs(Hig_) ) then
@@ -1204,8 +1740,12 @@ integer :: Part
       getDecayWidth = Ga_Top
   elseif( abs(Part).eq.abs(Z0_) ) then
       getDecayWidth = Ga_Z
+  elseif( abs(Part).eq.abs(Zpr_) ) then
+      getDecayWidth = Ga_Zprime
   elseif( abs(Part).eq.abs(Wp_) ) then
       getDecayWidth = Ga_W
+  elseif( abs(Part).eq.abs(Wppr_) ) then
+      getDecayWidth = Ga_Wprime
   elseif( abs(Part).eq.abs(Hig_) ) then
       getDecayWidth = Ga_Reso
   elseif( abs(Part).eq.abs(TaM_) ) then
@@ -1275,10 +1815,16 @@ integer :: Part
       getParticle = "Atop"
   elseif( Part.eq.Z0_ ) then
       getParticle = " Z0"
+  elseif( Part.eq.Zpr_ ) then
+      getParticle = " Zprime"
   elseif( Part.eq.Wp_ ) then
       getParticle = " W+"
   elseif( Part.eq.Wm_ ) then
       getParticle = " W-"
+  elseif( Part.eq.Wppr_ ) then
+      getParticle = " W+prime"
+  elseif( Part.eq.Wmpr_ ) then
+      getParticle = " W-prime"
   elseif( Part.eq.Pho_ ) then
       getParticle = "pho"
   elseif( Part.eq.Hig_ ) then
@@ -1574,6 +2120,53 @@ integer :: Part
 END FUNCTION
 
 
+Function CouplToLHEWp(Part)
+  implicit none
+  logical :: CouplToLHEWp
+  integer, intent(in) :: Part(1:2)
+
+  CouplToLHEWp = &
+     ((Part(1).eq.2 .and.Part(2).eq.-1) &
+  .or.(Part(1).eq.2 .and.Part(2).eq.-3) &
+  .or.(Part(1).eq.2 .and.Part(2).eq.-5) &
+  .or.(Part(1).eq.4 .and.Part(2).eq.-1) &
+  .or.(Part(1).eq.4 .and.Part(2).eq.-3) &
+  .or.(Part(1).eq.4 .and.Part(2).eq.-5) &
+  .or.(Part(1).eq.-1.and.Part(2).eq. 2) &
+  .or.(Part(1).eq.-3.and.Part(2).eq. 2) &
+  .or.(Part(1).eq.-5.and.Part(2).eq. 2) &
+  .or.(Part(1).eq.-1.and.Part(2).eq. 4) &
+  .or.(Part(1).eq.-3.and.Part(2).eq. 4) &
+  .or.(Part(1).eq.-5.and.Part(2).eq. 4))
+
+  return
+end function CouplToLHEWp
+
+
+Function CouplToLHEWm(Part)
+  implicit none
+  logical :: CouplToLHEWm
+  integer, intent(in) :: Part(1:2)
+
+  CouplToLHEWm = &
+     ((Part(1).eq.-2.and.Part(2).eq. 1) &
+  .or.(Part(1).eq.-2.and.Part(2).eq. 3) &
+  .or.(Part(1).eq.-2.and.Part(2).eq. 5) &
+  .or.(Part(1).eq.-4.and.Part(2).eq. 1) &
+  .or.(Part(1).eq.-4.and.Part(2).eq. 3) &
+  .or.(Part(1).eq.-4.and.Part(2).eq. 5) &
+  .or.(Part(1).eq. 1.and.Part(2).eq.-2) &
+  .or.(Part(1).eq. 3.and.Part(2).eq.-2) &
+  .or.(Part(1).eq. 5.and.Part(2).eq.-2) &
+  .or.(Part(1).eq. 1.and.Part(2).eq.-4) &
+  .or.(Part(1).eq. 3.and.Part(2).eq.-4) &
+  .or.(Part(1).eq. 5.and.Part(2).eq.-4))
+
+  return
+end function CouplToLHEWm
+
+
+
 
 
 FUNCTION ChargeFlip(Part)
@@ -1708,6 +2301,7 @@ implicit none
    ! Normalizations used in VH and VBF
    couplWffsq = gwsq/2.0_dp
    couplZffsq = gwsq/4.0_dp/(1.0_dp-xw)
+   !couplZffsq = alpha_QED*4d0*pi/xw/4.0_dp/(1.0_dp-xw)
    couplAZff = -gwsq*sitW/2.0_dp/sqrt(1.0_dp-xw)
    couplAffsq = gwsq*xw
 
@@ -2274,6 +2868,43 @@ subroutine spinoru(p,za,zb,s)
       enddo
 
     end subroutine spinoru
+
+
+
+
+SUBROUTINE getHiggsDecayLength(ctau)
+!use ModParameters
+implicit none
+real(8) :: x,xp,xpp,Len0,propa,ctau,ctau0
+integer :: loop
+
+     ctau  = 0d0
+     ctau0 = HiggsDecayLengthMM
+     if( ctau0.lt.1d-16 ) RETURN
+
+     do loop=1,4000000!  4Mio. tries otherwise return zero
+          call random_number(x)
+          xp = 10*x*ctau0             ! scan between 0..10*ctau0
+
+          propa = dexp( -xp/(ctau0) ) ! the max of propa is 1.0
+          call random_number(xpp)
+          if( xpp.lt.propa ) then!   accept
+                ctau = xp
+                RETURN
+          endif
+     enddo
+
+RETURN
+END SUBROUTINE
+
+
+
+
+
+
+
+
+
 !========================================================================
 
 

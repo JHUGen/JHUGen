@@ -1885,6 +1885,10 @@ ENDIF! GENEVT
  END FUNCTION EvalUnWeighted_HJ
 
 
+
+
+
+
 Function EvalWeighted_VHiggs(yRnd,VgsWgt)
  use ModKinematics
  use ModParameters
@@ -1910,7 +1914,7 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
     real(8) :: yRnd(1:20),VgsWgt, EvalWeighted_VHiggs
     real(8) :: pdf(-6:6,1:2)
     real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
-    real(8) :: MomExt(1:4,1:9), PSWgt, PSWgt2
+    real(8) :: MomExt(1:4,1:9), PSWgt, PSWgt2,NewME2(1:6)
     real(8) :: me2!, lheweight(-6:6,-6:6)
     integer :: i,j,k,NBin(1:NumHistograms),NHisto
     real(8) :: LO_Res_Unpol, PreFac
@@ -2201,7 +2205,7 @@ if( IsAZDecay(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -2216,6 +2220,18 @@ if( IsAZDecay(DecayMode1) ) then
         id(1:2) = (/LHA2M_PDF(i),LHA2M_PDF(j)/)
         if (abs(LHA2M_PDF(i)).ne.6   .and.   abs(LHA2M_PDF(j)).ne.6.  .and.  i.ne.0)then
           call EvalAmp_VHiggs(id,helicity,MomExt,me2)
+          
+          
+!     if( me2.lt.1d-8 ) cycle
+!     NewME2(1:6) = cdabs(TreeAmp_qqb_ZH((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,8),MomExt(1:4,9),MomExt(1:4,6),MomExt(1:4,7)/),int((/helicity(1),helicity(2),helicity(6),helicity(7)/))))**2
+!     print *, "heli",helicity(1),helicity(2),helicity(6),helicity(7)
+!     print *, "Mes", me2,NewME2(up_)
+!     print *, "ratio", me2/NewME2(up_)
+!     pause
+      
+              
+                  
+          
         else
           me2=0d0
         endif
@@ -2240,7 +2256,7 @@ if( IsAZDecay(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -2273,7 +2289,7 @@ elseif( IsAWDecay(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -2333,7 +2349,7 @@ elseif( IsAPhoton(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell=.true.)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell=.true.)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell=.true.)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -2371,7 +2387,7 @@ elseif( IsAPhoton(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell=.true.)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell=.true.)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell=.true.)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -2732,7 +2748,7 @@ if( IsAZDecay(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -2757,7 +2773,7 @@ if( IsAZDecay(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -2782,7 +2798,7 @@ elseif( IsAWDecay(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -2810,7 +2826,7 @@ elseif( IsAPhoton(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell=.true.)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell=.true.)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell=.true.)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -2835,7 +2851,7 @@ elseif( IsAPhoton(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell=.true.)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell=.true.)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell=.true.)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -3013,6 +3029,9 @@ ENDIF! GENEVT
 
  RETURN
  end Function EvalUnWeighted_VHiggs
+
+
+
 
 
  FUNCTION EvalWeighted_tautau(yRnd,VgsWgt)

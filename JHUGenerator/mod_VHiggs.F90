@@ -44,22 +44,31 @@ subroutine EvalAmp_VHiggs(id,helicity,MomExt,me2)
 
       A_VV(:)=czero
       if(idin(1).ne.convertLHE(Pho_) .and. idin(6).ne.convertLHE(Pho_)) then
+         !print *,"Case1:"
          A_VV(1)=MATRIXELEMENT0(pin,mass,helin,idin,(/.false., .false./))
          if(includeGammaStar) then
+            !print *,"Case2:"
             A_VV(2) = MATRIXELEMENT0(pin,mass,helin,idin,(/.false., .true./))
+            !print *,"Case3:"
             A_VV(3) = MATRIXELEMENT0(pin,mass,helin,idin,(/.true., .false./))
+            !print *,"Case4:"
             A_VV(4) = MATRIXELEMENT0(pin,mass,helin,idin,(/.true., .true./))
          endif
       else if(idin(1).eq.convertLHE(Pho_) .and. idin(6).eq.convertLHE(Pho_)) then
+         !print *,"Case5:"
          A_VV(1)=MATRIXELEMENT0(pin,mass,helin,idin,(/.true., .true./))
       else if(idin(1).eq.convertLHE(Pho_)) then
+         !print *,"Case6:"
          A_VV(1)=MATRIXELEMENT0(pin,mass,helin,idin,(/.true., .false./))
          if(includeGammaStar) then
+            !print *,"Case7:"
             A_VV(2) = MATRIXELEMENT0(pin,mass,helin,idin,(/.true., .true./))
          endif
       else !if(idin(6).eq.convertLHE(Pho_)) then
+         !print *,"Case8:"
          A_VV(1)=MATRIXELEMENT0(pin,mass,helin,idin,(/.false., .true./))
          if(includeGammaStar) then
+            !print *,"Case9:"
             A_VV(2) = MATRIXELEMENT0(pin,mass,helin,idin,(/.true., .true./))
          endif
       endif
@@ -100,49 +109,89 @@ end subroutine EvalAmp_VHiggs
       logical, intent(in) :: useA(2)
 
       integer mu3,mu4
-      complex(8) PVVX0P
-      complex(8) Vcurrent1(4), Acurrent1(4), current1(4), Vcurrent2(4)
-      complex(8) Acurrent2(4), current2(4),POL1(3,4), POL2(3,4)
-      complex(8) g_mu_nu(4,4), pp(4,4), epp(4,4)
-      complex(8) VVX0(4,4)
-      complex(8) PROP1, PROP2, PROP3, gVVP, gVVS1, gVVS2, gFFZ, gFFA, gFFW
-      complex(8) ghz1_dyn,ghz2_dyn,ghz3_dyn,ghz4_dyn
       real(8) qq,q3_q3,q4_q4,q5_q5
+      complex(8) PVVX0P
+      complex(8) Vcurrent1(4), Acurrent1(4), current1(4), currentVp1(4)
+      complex(8) Vcurrent2(4), Acurrent2(4), current2(4), currentVp2(4)
+      complex(8) Vpffcoupl(2,2)
+      complex(8) POL1(3,4), POL2(3,4)
+      complex(8) g_mu_nu(4,4), pp(4,4), epp(4,4)
+      complex(8) PROP1, PROP2, PROP3
+      complex(8) PROP_Vp1, PROP_Vp2
+      complex(8) gFFZ, gFFA, gFFW
+      complex(8) gVVP, gVVS1, gVVS2
+      complex(8) ghz1_dyn,ghz2_dyn,ghz3_dyn,ghz4_dyn
+      complex(8) gVVpP, gVVpS1, gVVpS2
+      complex(8) ghzzp1_dyn,ghzzp2_dyn,ghzzp3_dyn,ghzzp4_dyn
+      complex(8) gVpVP, gVpVS1, gVpVS2
+      complex(8) ghzpz1_dyn,ghzpz2_dyn,ghzpz3_dyn,ghzpz4_dyn
+      complex(8) gVpVpP, gVpVpS1, gVpVpS2
+      complex(8) ghzpzp1_dyn,ghzpzp2_dyn,ghzpzp3_dyn,ghzpzp4_dyn
 
+      MATRIXELEMENT0=czero
       if( &
          (id(1).ne.convertLHE(Pho_) .and. useA(1) .and. .not.includeGammaStar) .or. &
          (id(6).ne.convertLHE(Pho_) .and. useA(2) .and. .not.includeGammaStar) .or. &
          ((id(1)+id(2)).ne.0 .and. id(1).ne.convertLHE(Pho_) .and. useA(1)) .or. &
          ((id(6)+id(7)).ne.0 .and. id(6).ne.convertLHE(Pho_) .and. useA(2))      &
         ) then
-         MATRIXELEMENT0=czero
          return
       endif
 
-      gFFZ = ci*2d0*dsqrt(couplZffsq) ! = gwsq/(1.0_dp-xw)
-      gFFA = -ci*dsqrt(couplAffsq) ! = gwsq*xw
-      gFFW = ci*dsqrt(couplWffsq) ! = gwsq/2.0_dp
+      gFFZ = ci*2d0*dsqrt(couplZffsq) ! = sqrt(gwsq/(1.0_dp-xw))
+      gFFA = -ci*dsqrt(couplAffsq) ! = sqrt(gwsq*xw)
+      gFFW = ci*dsqrt(couplWffsq) ! = sqrt(gwsq/2.0_dp)
 
       qq = -scr(MomExt(:,3),MomExt(:,4))
-      q3_q3 = scr(MomExt(:,3),MomExt(:,3))
-      q4_q4 = scr(MomExt(:,4),MomExt(:,4))
+      if (id(1).eq.convertLHE(Pho_) .and. useA(1)) then
+         q3_q3 = 0d0
+      else
+         q3_q3 = scr(MomExt(:,3),MomExt(:,3))
+      endif
+      if (id(6).eq.convertLHE(Pho_) .and. useA(2)) then
+         q4_q4 = 0d0
+      else
+         q4_q4 = scr(MomExt(:,4),MomExt(:,4))
+      endif
       q5_q5 = scr(MomExt(:,5),MomExt(:,5))
       PROP3 = PROPAGATOR(dsqrt(q5_q5),mass(5,1),mass(5,2))
 
-      Vcurrent1 = (0d0,0d0)
-      Acurrent1 = (0d0,0d0)
-      Vcurrent2 = (0d0,0d0)
-      Acurrent2 = (0d0,0d0)
+      if (includeVprime) then
+         if(.not.useA(1)) then
+            Vpffcoupl(1,1)=GetVpffCoupling_VH(id(1), -1, ((id(1)+id(2)).ne.0))
+            Vpffcoupl(1,2)=GetVpffCoupling_VH(id(1), +1, ((id(1)+id(2)).ne.0))
+         endif
+         if(.not.useA(2)) then
+            Vpffcoupl(2,1)=GetVpffCoupling_VH(id(6), -1, ((id(6)+id(7)).ne.0))
+            Vpffcoupl(2,2)=GetVpffCoupling_VH(id(6), +1, ((id(6)+id(7)).ne.0))
+         endif
+      endif
+
 
       if(.not.useA(1)) then
          PROP1 = PROPAGATOR(dsqrt(q3_q3),mass(3,1),mass(3,2))
          if(id(1).gt.0)then
-           call FFV(id(2), MomExt(:,2), helicity(2), id(1), MomExt(:,1), helicity(1), Vcurrent1)
-           call FFA(id(2), MomExt(:,2), helicity(2), id(1), MomExt(:,1), helicity(1), Acurrent1)
+            call FFV(id(2), MomExt(:,2), helicity(2), id(1), MomExt(:,1), helicity(1), Vcurrent1)
+            call FFA(id(2), MomExt(:,2), helicity(2), id(1), MomExt(:,1), helicity(1), Acurrent1)
          else
-           call FFV(id(1), MomExt(:,1), helicity(1), id(2), MomExt(:,2), helicity(2), Vcurrent1)
-           call FFA(id(1), MomExt(:,1), helicity(1), id(2), MomExt(:,2), helicity(2), Acurrent1)
+            call FFV(id(1), MomExt(:,1), helicity(1), id(2), MomExt(:,2), helicity(2), Vcurrent1)
+            call FFA(id(1), MomExt(:,1), helicity(1), id(2), MomExt(:,2), helicity(2), Acurrent1)
          endif
+
+         ! Vpff current without the prefactor
+         if (includeVprime) then
+            if((id(1)*helicity(1)).le.0d0)then
+               currentVp1=( &
+                  Vcurrent1*(Vpffcoupl(1,1)+Vpffcoupl(1,2))*0.5 - &
+                  Acurrent1*(Vpffcoupl(1,1)-Vpffcoupl(1,2))*0.5   &
+                  )
+            else
+               currentVp1=( &
+                  Vcurrent1*Vpffcoupl(1,2)                        &
+                  )
+            endif
+         endif
+
          !WH
          if((id(1)+id(2)).ne.0)then
            if((id(1)*helicity(1)).le.0d0)then
@@ -151,37 +200,47 @@ end subroutine EvalAmp_VHiggs
              current1=0d0
            endif
          !ZH
-         !e+ e- Z vertex for incoming states
-         else if((abs(id(1)).eq.11).or.(abs(id(1)).eq.13).or.(abs(id(1)).eq.15))then
-           if((id(1)*helicity(1)).gt.0d0)then
-             current1=(0.5d0*T3lR - QlR*sitW**2) *Vcurrent1 -(0.5d0*T3lR)*Acurrent1
-           else
-             current1=(0.5d0*T3lL - QlL*sitW**2) *Vcurrent1 -(0.5d0*T3lL)*Acurrent1
-           endif
-           current1=current1*gFFZ
-         !u u~ Z vertex for incoming states
-         else if((abs(id(1)).eq.2).or.(abs(id(1)).eq.4))then
-           if((id(1)*helicity(1)).gt.0d0)then
-             current1=(0.5d0*T3uR - QuR*sitW**2) *Vcurrent1 -(0.5d0*T3uR)*Acurrent1
-           else
-             current1=(0.5d0*T3uL - QuL*sitW**2) *Vcurrent1 -(0.5d0*T3uL)*Acurrent1
-           endif
-           current1=current1*gFFZ
-         !d d~ Z vertex for incoming states
-         else if((abs(id(1)).eq.1).or.(abs(id(1)).eq.3).or.(abs(id(1)).eq.5))then
-           if((id(1)*helicity(1)).gt.0d0)then
-             current1=(0.5d0*T3dR - QdR*sitW**2) *Vcurrent1 -(0.5d0*T3dR)*Acurrent1
-           else
-             current1=(0.5d0*T3dL - QdL*sitW**2) *Vcurrent1 -(0.5d0*T3dL)*Acurrent1
-           endif
-           current1=current1*gFFZ
          else
-           current1=0d0
-           print *, "invalid incoming state"
+            if (includeVprime) then
+               if (getMass(Zpr_).ge.0d0) then
+                  !print *,"Compute prop for Zpr"
+                  PROP_Vp1 = PROPAGATOR(dsqrt(q3_q3),getMass(Zpr_),getDecayWidth(Zpr_))
+               else
+                  PROP_Vp1 = PROPAGATOR(M_Z,0d0,0d0)
+               endif
+               currentVp1 = currentVp1*gFFZ
+            endif
+            !e+ e- Z vertex for incoming states
+            if((abs(id(1)).eq.11).or.(abs(id(1)).eq.13).or.(abs(id(1)).eq.15))then
+              if((id(1)*helicity(1)).gt.0d0)then
+                current1=(0.5d0*T3lR - QlR*sitW**2) *Vcurrent1 -(0.5d0*T3lR)*Acurrent1
+              else
+                current1=(0.5d0*T3lL - QlL*sitW**2) *Vcurrent1 -(0.5d0*T3lL)*Acurrent1
+              endif
+              current1=current1*gFFZ
+            !u u~ Z vertex for incoming states
+            else if((abs(id(1)).eq.2).or.(abs(id(1)).eq.4))then
+              if((id(1)*helicity(1)).gt.0d0)then
+                current1=(0.5d0*T3uR - QuR*sitW**2) *Vcurrent1 -(0.5d0*T3uR)*Acurrent1
+              else
+                current1=(0.5d0*T3uL - QuL*sitW**2) *Vcurrent1 -(0.5d0*T3uL)*Acurrent1
+              endif
+              current1=current1*gFFZ
+            !d d~ Z vertex for incoming states
+            else if((abs(id(1)).eq.1).or.(abs(id(1)).eq.3).or.(abs(id(1)).eq.5))then
+              if((id(1)*helicity(1)).gt.0d0)then
+                current1=(0.5d0*T3dR - QdR*sitW**2) *Vcurrent1 -(0.5d0*T3dR)*Acurrent1
+              else
+                current1=(0.5d0*T3dL - QdL*sitW**2) *Vcurrent1 -(0.5d0*T3dL)*Acurrent1
+              endif
+              current1=current1*gFFZ
+            else
+              current1=0d0
+              currentVp1=0d0
+              print *, "invalid incoming state"
+            endif
          endif
       else
-         PROP1 = PROPAGATOR(dsqrt(q3_q3),0d0,0d0)
-
          if(abs(id(1)).eq.convertLHE(Pho_)) then
            PROP1=cone
            if((id(1)*helicity(1)).gt.0d0) then
@@ -189,10 +248,13 @@ end subroutine EvalAmp_VHiggs
            else
              call POLARIZATION_SINGLE(MomExt(:,3),-1,Vcurrent1)
            endif
-         else if(id(1).gt.0)then
-           call FFV(id(2), MomExt(:,2), helicity(2), id(1), MomExt(:,1), helicity(1), Vcurrent1)
          else
-           call FFV(id(1), MomExt(:,1), helicity(1), id(2), MomExt(:,2), helicity(2), Vcurrent1)
+           PROP1 = PROPAGATOR(dsqrt(q3_q3),0d0,0d0)
+           if(id(1).gt.0)then
+             call FFV(id(2), MomExt(:,2), helicity(2), id(1), MomExt(:,1), helicity(1), Vcurrent1)
+           else
+             call FFV(id(1), MomExt(:,1), helicity(1), id(2), MomExt(:,2), helicity(2), Vcurrent1)
+           endif
          endif
 
          !ZH
@@ -239,8 +301,30 @@ end subroutine EvalAmp_VHiggs
            call FFA(id(7), MomExt(:,7), helicity(7), id(6), MomExt(:,6), helicity(6), Acurrent2)
          endif
 
+         ! Vpff current without the prefactor
+         if (includeVprime) then
+            if((id(6)*helicity(6)).le.0d0)then
+               currentVp2=( &
+                  Vcurrent2*(Vpffcoupl(2,1)+Vpffcoupl(2,2))*0.5 - &
+                  Acurrent2*(Vpffcoupl(2,1)-Vpffcoupl(2,2))*0.5   &
+                  )
+            else
+               currentVp2=( &
+                  Vcurrent2*Vpffcoupl(2,2)                        &
+                  )
+            endif
+         endif
+
          !WH
          if((id(6)+id(7)).ne.0)then
+           if (includeVprime) then
+             if (getMass(Wppr_).ge.0d0) then
+               PROP_Vp2 = PROPAGATOR(dsqrt(q4_q4),getMass(Wppr_),getDecayWidth(Wppr_))
+             else
+               PROP_Vp2 = PROPAGATOR(M_W,0d0,0d0)
+             endif
+             currentVp2 = currentVp2*gFFW*CKMbare(id(6),id(7))
+           endif
            if((id(6)*helicity(6)).le.0d0)then
              current2=(Vcurrent2-Acurrent2)/2d0*gFFW*CKM(id(6),id(7))
            else
@@ -248,6 +332,14 @@ end subroutine EvalAmp_VHiggs
            endif
          !ZH
          else
+           if (includeVprime) then
+             if (getMass(Zpr_).ge.0d0) then
+               PROP_Vp2 = PROPAGATOR(dsqrt(q4_q4),getMass(Zpr_),getDecayWidth(Zpr_))
+             else
+               PROP_Vp2 = PROPAGATOR(M_Z,0d0,0d0)
+             endif
+             currentVp2 = currentVp2*gFFZ
+           endif
            !l+ l- Z vertex for final state
            if((abs(id(6)).eq.11).or.(abs(id(6)).eq.13))then
              if((id(6)*helicity(6)).gt.0d0)then
@@ -286,13 +378,12 @@ end subroutine EvalAmp_VHiggs
              current2=current2*gFFZ*dsqrt(scale_alpha_Z_nn)
            else
              current2=0d0
+             currentVp2 = 0d0
              print *, "invalid final state", id(6:7), helicity(6:7)
              stop
            endif
          endif
       else
-         PROP2 = PROPAGATOR(dsqrt(q4_q4),0d0,0d0)
-
          if(abs(id(6)).eq.convertLHE(Pho_)) then
            PROP2=cone
            if((id(6)*helicity(6)).gt.0d0) then
@@ -301,10 +392,13 @@ end subroutine EvalAmp_VHiggs
              call POLARIZATION_SINGLE(MomExt(:,4),-1,Vcurrent2)
            endif
            Vcurrent2 = dconjg(Vcurrent2)
-         else if(id(6).gt.0)then
-           call FFV(id(6), MomExt(:,6), helicity(6), id(7), MomExt(:,7), helicity(7), Vcurrent2)
          else
-           call FFV(id(7), MomExt(:,7), helicity(7), id(6), MomExt(:,6), helicity(6), Vcurrent2)
+           PROP2 = PROPAGATOR(dsqrt(q4_q4),0d0,0d0)
+           if(id(6).gt.0)then
+             call FFV(id(6), MomExt(:,6), helicity(6), id(7), MomExt(:,7), helicity(7), Vcurrent2)
+           else
+             call FFV(id(7), MomExt(:,7), helicity(7), id(6), MomExt(:,6), helicity(6), Vcurrent2)
+           endif
          endif
 
          !ZH
@@ -355,17 +449,32 @@ end subroutine EvalAmp_VHiggs
 
       if(.not.(useA(1) .and. abs(id(1)).eq.convertLHE(Pho_))) then
          current1 = -current1 + scrc(MomExt(:,3),current1)/q3_q3
+         currentVp1 = -currentVp1 + scrc(MomExt(:,3),currentVp1)/q3_q3
       endif
       if(.not.(useA(2) .and. abs(id(6)).eq.convertLHE(Pho_))) then
          current2 = -current2 + scrc(MomExt(:,4),current2)/q4_q4
+         currentVp2 = -currentVp2 + scrc(MomExt(:,4),currentVp2)/q4_q4
       endif
+
+      !print *,"current1=",current1
+      !print *,"currentVp1=",currentVp1
+      !print *,"PROP1=",PROP1
+      !print *,"PROP_Vp1=",PROP_Vp1
+      !print *,"current2=",current2
+      !print *,"currentVp2=",currentVp2
+      !print *,"PROP2=",PROP2
+      !print *,"PROP_Vp2=",PROP_Vp2
+
       current1 = current1*PROP1
       current2 = current2*PROP2
+      currentVp1 = currentVp1*PROP_Vp1
+      currentVp2 = currentVp2*PROP_Vp2
 
 !XVV vertex
       if(id(3).eq.convertLHE(Wp_))then
          call swap(q3_q3,q4_q4)
          call swap(current1,current2)
+         call swap(currentVp1,currentVp2)
       endif
 
       if(.not.useA(1) .and. .not.useA(2)) then
@@ -373,6 +482,23 @@ end subroutine EvalAmp_VHiggs
          ghz2_dyn = HVVSpinZeroDynamicCoupling(2,q3_q3,q4_q4,q5_q5)
          ghz3_dyn = HVVSpinZeroDynamicCoupling(3,q3_q3,q4_q4,q5_q5)
          ghz4_dyn = HVVSpinZeroDynamicCoupling(4,q3_q3,q4_q4,q5_q5)
+
+         if (includeVprime) then
+            ghzzp1_dyn = HVVSpinZeroDynamicCoupling(12,q3_q3,q4_q4,q5_q5)
+            ghzzp2_dyn = HVVSpinZeroDynamicCoupling(13,q3_q3,q4_q4,q5_q5)
+            ghzzp3_dyn = HVVSpinZeroDynamicCoupling(14,q3_q3,q4_q4,q5_q5)
+            ghzzp4_dyn = HVVSpinZeroDynamicCoupling(15,q3_q3,q4_q4,q5_q5)
+
+            ghzpz1_dyn = HVVSpinZeroDynamicCoupling(12,q4_q4,q3_q3,q5_q5)
+            ghzpz2_dyn = HVVSpinZeroDynamicCoupling(13,q4_q4,q3_q3,q5_q5)
+            ghzpz3_dyn = HVVSpinZeroDynamicCoupling(14,q4_q4,q3_q3,q5_q5)
+            ghzpz4_dyn = HVVSpinZeroDynamicCoupling(15,q4_q4,q3_q3,q5_q5)
+
+            ghzpzp1_dyn = HVVSpinZeroDynamicCoupling(16,q3_q3,q4_q4,q5_q5)
+            ghzpzp2_dyn = HVVSpinZeroDynamicCoupling(17,q3_q3,q4_q4,q5_q5)
+            ghzpzp3_dyn = HVVSpinZeroDynamicCoupling(18,q3_q3,q4_q4,q5_q5)
+            ghzpzp4_dyn = HVVSpinZeroDynamicCoupling(19,q3_q3,q4_q4,q5_q5)
+         endif
       else if(useA(1) .and. useA(2)) then
          ghz1_dyn = czero
          ghz2_dyn = HVVSpinZeroDynamicCoupling(9,q3_q3,q4_q4,q5_q5)
@@ -394,16 +520,22 @@ end subroutine EvalAmp_VHiggs
       gVVS2 = -( 2d0*ghz2_dyn + ghz3_dyn*qq/Lambda**2 )
       gVVP = -2d0*ghz4_dyn
 
-      VVX0 = 0d0
-      if(gVVS1.ne.0d0)then
-        call VVS1(g_mu_nu)
-        VVX0 = VVX0 + gVVS1*g_mu_nu
+      if(.not.useA(1) .and. .not.useA(2)) then
+         if (includeVprime) then
+            gVVpS1 = ghzzp1_dyn*(mass(3,1)**2) + qq * ( 2d0*ghzzp2_dyn + ghzzp3_dyn*qq/Lambda**2 )
+            gVVpS2 = -( 2d0*ghzzp2_dyn + ghzzp3_dyn*qq/Lambda**2 )
+            gVVpP = -2d0*ghzzp4_dyn
+
+            gVpVS1 = ghzpz1_dyn*(mass(3,1)**2) + qq * ( 2d0*ghzpz2_dyn + ghzpz3_dyn*qq/Lambda**2 )
+            gVpVS2 = -( 2d0*ghzpz2_dyn + ghzpz3_dyn*qq/Lambda**2 )
+            gVpVP = -2d0*ghzpz4_dyn
+
+            gVpVpS1 = ghzpzp1_dyn*(mass(3,1)**2) + qq * ( 2d0*ghzpzp2_dyn + ghzpzp3_dyn*qq/Lambda**2 )
+            gVpVpS2 = -( 2d0*ghzpzp2_dyn + ghzpzp3_dyn*qq/Lambda**2 )
+            gVpVpP = -2d0*ghzpzp4_dyn
+         endif
       endif
 
-      if(gVVS2.ne.0d0)then
-        call VVS2(MomExt(:,5),MomExt(:,5),pp)
-        VVX0 = VVX0 + gVVS2*pp
-      endif
 
       if(gVVP.ne.0d0)then
         if(id(3).eq.convertLHE(Wp_))then
@@ -414,16 +546,37 @@ end subroutine EvalAmp_VHiggs
         VVX0 = VVX0 + gVVP*epp
       endif
 
-      VVX0 = (0d0,1d0)/vev*VVX0
-
-
 ! assemble everything and get iM
       MATRIXELEMENT0=(0d0,0d0)
       do mu3=1,4
       do mu4=1,4
-         MATRIXELEMENT0=MATRIXELEMENT0 + VVX0(mu3,mu4)*current1(mu3)*current2(mu4)
+         MATRIXELEMENT0 = MATRIXELEMENT0 +      &
+            current1(mu3)*current2(mu4)*(       &
+               gVVS1*g_mu_nu(mu3,mu4)         + &
+               gVVS2*pp     (mu3,mu4)         + &
+               gVVP *epp    (mu3,mu4)           &
+            )                                   &
+            +                                   &
+            current1(mu3)*currentVp2(mu4)*(    &
+               gVVpS1*g_mu_nu(mu3,mu4)        + &
+               gVVpS2*pp     (mu3,mu4)        + &
+               gVVpP *epp    (mu3,mu4)          &
+            )                                   &
+            +                                   &
+            currentVp1(mu3)*current2(mu4)*(    &
+               gVpVS1*g_mu_nu(mu3,mu4)        + &
+               gVpVS2*pp     (mu3,mu4)        + &
+               gVpVP *epp    (mu3,mu4)          &
+            )                                   &
+            +                                   &
+            currentVp1(mu3)*currentVp2(mu4)*( &
+               gVpVpS1*g_mu_nu(mu3,mu4)       + &
+               gVpVpS2*pp     (mu3,mu4)       + &
+               gVpVpP *epp    (mu3,mu4)         &
+            )
       enddo !mu4
       enddo !mu3
+      MATRIXELEMENT0 = MATRIXELEMENT0*ci/vev
 
       if(H_DK.eqv..false.)then
         MATRIXELEMENT0=MATRIXELEMENT0 *PROP3
@@ -436,8 +589,26 @@ end subroutine EvalAmp_VHiggs
         MATRIXELEMENT0=czero
       endif
 
+      !print *,"MATRIXELEMENT0=",MATRIXELEMENT0
+
       return
       END function
+
+
+
+function GetVpffCoupling_VH(pdgid, hel, useWp)
+integer, intent(in) :: pdgid
+integer, intent(in) :: hel
+logical, intent(in) :: useWp
+complex(8) :: GetVpffCoupling_VH
+   GetVpffCoupling_VH=VpffCoupling_PDG(pdgid,hel,useWp)
+   if(useWp) then
+     GetVpffCoupling_VH = GetVpffCoupling_VH / bL ! Bc of the couplings formalism from decay
+   else
+     GetVpffCoupling_VH = GetVpffCoupling_VH / 2.0_dp
+   endif
+end function
+
 
 !ANGLES.F
 !VERSION 20130531
@@ -1132,7 +1303,12 @@ end subroutine EvalAmp_VHiggs
 !    &             (0d0,1d0)*dcmplx(mass,0d0)*dcmplx(width,0d0))
 
 !assuming auto-conversion. works with gfortran
-      PROPAGATOR = ci / ( inv_mass**2 - mass**2 + ci*mass*width )
+      !print *,"Called propagator with",inv_mass,mass,width
+      if (mass.ge.0d0) then
+         PROPAGATOR = ci / ( inv_mass**2 - mass**2 + ci*mass*width )
+      else
+         PROPAGATOR = ci / ( inv_mass**2 )
+      endif
 !     print *, PROPAGATOR
 
       return
