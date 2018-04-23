@@ -5,6 +5,55 @@ module ModHH
   use ModMisc
   use ModVHaux
   use Collier
+  use ModggboxHH1mm
+  use ModggboxHH1mp
+  use ModggboxHH1pm
+  use ModggboxHH1pp
+  use ModggboxHH2mm
+  use ModggboxHH2mp
+  use ModggboxHH2pm
+  use ModggboxHH2pp
+  use ModggboxHH3mm
+  use ModggboxHH3mp
+  use ModggboxHH3pm
+  use ModggboxHH3pp
+  use ModggboxHH4mm
+  use ModggboxHH4mp
+  use ModggboxHH4pm
+  use ModggboxHH4pp
+  use ModggboxHH5mm
+  use ModggboxHH5mp
+  use ModggboxHH5pm
+  use ModggboxHH5pp
+  use ModggboxHH6mm
+  use ModggboxHH6mp
+  use ModggboxHH6pm
+  use ModggboxHH6pp
+
+  use Modggbox5HH1mm
+  use Modggbox5HH1mp
+  use Modggbox5HH1pm
+  use Modggbox5HH1pp
+  use Modggbox5HH2mm
+  use Modggbox5HH2mp
+  use Modggbox5HH2pm
+  use Modggbox5HH2pp
+  use Modggbox5HH3mm
+  use Modggbox5HH3mp
+  use Modggbox5HH3pm
+  use Modggbox5HH3pp
+  use Modggbox5HH4mm
+  use Modggbox5HH4mp
+  use Modggbox5HH4pm
+  use Modggbox5HH4pp
+  use Modggbox5HH5mm
+  use Modggbox5HH5mp
+  use Modggbox5HH5pm
+  use Modggbox5HH5pp
+  use Modggbox5HH6mm
+  use Modggbox5HH6mp
+  use Modggbox5HH6pm
+  use Modggbox5HH6pp
   implicit none
 
 
@@ -23,7 +72,7 @@ subroutine Amp_HH(Mom,mass,helicity,id,amp)
   complex(8) :: PROP3, PROP4, PROP5
   real(8) :: q3_q3, q4_q4, q5_q5
   complex(8) :: gHHH
-  complex(8) :: TriH, BoxHH
+  complex(8) :: TriH, BoxHH, Box5HH
   complex(8) :: Spaa(1:4,1:4),Spbb(1:4,1:4)
   real(8) :: sprod(1:4,1:4)
   integer :: i
@@ -38,14 +87,14 @@ subroutine Amp_HH(Mom,mass,helicity,id,amp)
   PROP4 = -PROPAGATOR(q4_q4,mass(4,1),mass(4,2))
   PROP5 = -PROPAGATOR(q5_q5,mass(5,1),mass(5,2))
 
-  gHHH = -ci*3d0/2d0*dsqrt(gwsq)*(M_reso**2)/(M_W**2)
-!gHHH = -ci*3d0*M_W/vev*M_reso**2/M_W**2
+  gHHH = -ci*3d0*(M_reso**2)/vev
 
   call spinoru2(4,(/Mom(1:4,1),Mom(1:4,2),Mom(1:4,6),Mom(1:4,7)/),Spaa,Spbb,sprod)
   call ggTriH(Mom,Spaa,Spbb,sprod,helicity,TriH)
   call ggBoxHH(Mom,Spaa,Spbb,sprod,helicity,BoxHH)
+  call ggBox5HH(Mom,Spaa,Spbb,sprod,helicity,Box5HH)
 
-  amp = BoxHH + TriH*PROP3*gHHH
+  amp = kappa*BoxHH + ci*kappa_tilde*Box5HH + TriH*PROP3*gHHH
 !print*, gHHH
 !pause
   amp = amp * (-1d0) * gs**2 !-1 = i^2 from g_s each
@@ -113,16 +162,130 @@ subroutine ggBoxHH(Mom,Spaa,Spbb,sprod,helicity,BoxHH)
   real(8), intent(in) :: sprod(1:4,1:4)
   real(8), intent(in) :: helicity(9)
   real(8) :: m_top_run
-  complex(8) C0
   complex(8) BoxHH
+  complex(8) ggboxHH1,ggboxHH2,ggboxHH3,ggboxHH4,ggboxHH5,ggboxHH6  
 
-  BoxHH=0d0
+  if(    helicity(1).gt.0d0.and.helicity(2).lt.0d0)then!+-
+    call ggboxHH1pm(Mom,Spaa,Spbb,sprod,ggboxHH1)
+    !call ggboxHH2pm(Mom,Spaa,Spbb,sprod,ggboxHH2)
+    call ggboxHH3pm(Mom,Spaa,Spbb,sprod,ggboxHH3)
+    !call ggboxHH4pm(Mom,Spaa,Spbb,sprod,ggboxHH4)
+    call ggboxHH5pm(Mom,Spaa,Spbb,sprod,ggboxHH5)
+    call ggboxHH6pm(Mom,Spaa,Spbb,sprod,ggboxHH6)
+  elseif(helicity(1).lt.0d0.and.helicity(2).gt.0d0)then!-+
+    call ggboxHH1mp(Mom,Spaa,Spbb,sprod,ggboxHH1)
+    !call ggboxHH2mp(Mom,Spaa,Spbb,sprod,ggboxHH2)
+    call ggboxHH3mp(Mom,Spaa,Spbb,sprod,ggboxHH3)
+    !call ggboxHH4mp(Mom,Spaa,Spbb,sprod,ggboxHH4)
+    call ggboxHH5mp(Mom,Spaa,Spbb,sprod,ggboxHH5)
+    call ggboxHH6mp(Mom,Spaa,Spbb,sprod,ggboxHH6)
+  elseif(helicity(1).gt.0d0.and.helicity(2).gt.0d0)then!++
+    call ggboxHH1pp(Mom,Spaa,Spbb,sprod,ggboxHH1)
+    !call ggboxHH2pp(Mom,Spaa,Spbb,sprod,ggboxHH2)
+    call ggboxHH3pp(Mom,Spaa,Spbb,sprod,ggboxHH3)
+    !call ggboxHH4pp(Mom,Spaa,Spbb,sprod,ggboxHH4)
+    call ggboxHH5pp(Mom,Spaa,Spbb,sprod,ggboxHH5)
+    call ggboxHH6pp(Mom,Spaa,Spbb,sprod,ggboxHH6)
+  else                                                 !--
+    call ggboxHH1mm(Mom,Spaa,Spbb,sprod,ggboxHH1)
+    !call ggboxHH2mm(Mom,Spaa,Spbb,sprod,ggboxHH2)
+    call ggboxHH3mm(Mom,Spaa,Spbb,sprod,ggboxHH3)
+    !call ggboxHH4mm(Mom,Spaa,Spbb,sprod,ggboxHH4)
+    call ggboxHH5mm(Mom,Spaa,Spbb,sprod,ggboxHH5)
+    call ggboxHH6mm(Mom,Spaa,Spbb,sprod,ggboxHH6)
+  endif
+
+!print*,helicity(1:2)
+!print*,ggboxHH1
+!print*,ggboxHH2
+!print*,ggboxHH3
+!print*,ggboxHH4
+!if(helicity(1).eq.helicity(2))then
+!!print*,helicity(1:2)
+!call ggboxHH5pp(Mom,Spaa,Spbb,sprod,ggboxHH5)
+!call ggboxHH6pp(Mom,Spaa,Spbb,sprod,ggboxHH6)
+!print*,ggboxHH5
+!print*,ggboxHH6
+!call ggboxHH5mm(Mom,Spaa,Spbb,sprod,ggboxHH5)
+!call ggboxHH6mm(Mom,Spaa,Spbb,sprod,ggboxHH6)
+!print*,ggboxHH5
+!print*,ggboxHH6
+!print*,"-----------"
+
+!endif
+  BoxHH = ggboxHH1*2d0 + ggboxHH3*2d0 + ggboxHH5 + ggboxHH6
+  BoxHH = -BoxHH * ci * pisq / (2d0*pi)**4 ! -1 = -1 (fermion loop) i^4 (4 fermion propagators)
 
   return
 end subroutine ggBoxHH
 
 
 
+
+
+subroutine ggBox5HH(Mom,Spaa,Spbb,sprod,helicity,Box5HH)
+  implicit none
+  real(8) , intent(in) :: Mom(1:4,1:9)
+  complex(8), intent(in) :: Spaa(1:4,1:4),Spbb(1:4,1:4)
+  real(8), intent(in) :: sprod(1:4,1:4)
+  real(8), intent(in) :: helicity(9)
+  real(8) :: m_top_run
+  complex(8) Box5HH
+  complex(8) ggbox5HH1,ggbox5HH2,ggbox5HH3,ggbox5HH4,ggbox5HH5,ggbox5HH6  
+
+  if(    helicity(1).gt.0d0.and.helicity(2).lt.0d0)then!+-
+    call ggbox5HH1pm(Mom,Spaa,Spbb,sprod,ggbox5HH1)
+    !call ggbox5HH2pm(Mom,Spaa,Spbb,sprod,ggbox5HH2)
+    call ggbox5HH3pm(Mom,Spaa,Spbb,sprod,ggbox5HH3)
+    !call ggbox5HH4pm(Mom,Spaa,Spbb,sprod,ggbox5HH4)
+    call ggbox5HH5pm(Mom,Spaa,Spbb,sprod,ggbox5HH5)
+    call ggbox5HH6pm(Mom,Spaa,Spbb,sprod,ggbox5HH6)
+  elseif(helicity(1).lt.0d0.and.helicity(2).gt.0d0)then!-+
+    call ggbox5HH1mp(Mom,Spaa,Spbb,sprod,ggbox5HH1)
+    !call ggbox5HH2mp(Mom,Spaa,Spbb,sprod,ggbox5HH2)
+    call ggbox5HH3mp(Mom,Spaa,Spbb,sprod,ggbox5HH3)
+    !call ggbox5HH4mp(Mom,Spaa,Spbb,sprod,ggbox5HH4)
+    call ggbox5HH5mp(Mom,Spaa,Spbb,sprod,ggbox5HH5)
+    call ggbox5HH6mp(Mom,Spaa,Spbb,sprod,ggbox5HH6)
+  elseif(helicity(1).gt.0d0.and.helicity(2).gt.0d0)then!++
+    call ggbox5HH1pp(Mom,Spaa,Spbb,sprod,ggbox5HH1)
+    !call ggbox5HH2pp(Mom,Spaa,Spbb,sprod,ggbox5HH2)
+    call ggbox5HH3pp(Mom,Spaa,Spbb,sprod,ggbox5HH3)
+    !call ggbox5HH4pp(Mom,Spaa,Spbb,sprod,ggbox5HH4)
+    call ggbox5HH5pp(Mom,Spaa,Spbb,sprod,ggbox5HH5)
+    call ggbox5HH6pp(Mom,Spaa,Spbb,sprod,ggbox5HH6)
+  else                                                 !--
+    call ggbox5HH1mm(Mom,Spaa,Spbb,sprod,ggbox5HH1)
+    !call ggbox5HH2mm(Mom,Spaa,Spbb,sprod,ggbox5HH2)
+    call ggbox5HH3mm(Mom,Spaa,Spbb,sprod,ggbox5HH3)
+    !call ggbox5HH4mm(Mom,Spaa,Spbb,sprod,ggbox5HH4)
+    call ggbox5HH5mm(Mom,Spaa,Spbb,sprod,ggbox5HH5)
+    call ggbox5HH6mm(Mom,Spaa,Spbb,sprod,ggbox5HH6)
+  endif
+
+!print*,helicity(1:2)
+!print*,ggbox5HH1
+!print*,ggbox5HH2
+!print*,ggbox5HH3
+!print*,ggbox5HH4
+!if(helicity(1).eq.helicity(2))then
+!!print*,helicity(1:2)
+!call ggboxHH5pp(Mom,Spaa,Spbb,sprod,ggboxHH5)
+!call ggboxHH6pp(Mom,Spaa,Spbb,sprod,ggboxHH6)
+!print*,ggbox5HH5
+!print*,ggbox5HH6
+!call ggboxHH5mm(Mom,Spaa,Spbb,sprod,ggboxHH5)
+!call ggboxHH6mm(Mom,Spaa,Spbb,sprod,ggboxHH6)
+!print*,ggboxHH5
+!print*,ggboxHH6
+!print*,"==========="
+!pause
+!endif
+  Box5HH = ggbox5HH1*2d0 + ggbox5HH3*2d0 + ggbox5HH5 + ggbox5HH6
+  Box5HH = -Box5HH * ci * pisq / (2d0*pi)**4 ! -1 = -1 (fermion loop) i^4 (4 fermion propagators)
+
+  return
+end subroutine ggBox5HH
 
 
 

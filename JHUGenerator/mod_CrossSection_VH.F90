@@ -57,6 +57,7 @@ Function EvalWeighted_VH(yRnd,VgsWgt)
   integer id(10), id2(10)
   real(8) :: finite_factor
   real(8) :: Mu_Fact_real, Mu_ren_real, alphas_real, PSWgt_real, PreFac_real
+  real(8) :: Mom_save(1:4,1:9)
 ! for tests!!!!!!!!!!!!!!
 real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:10),MomExt1t(1:4,1:9),MomExt2t(1:4,1:9),MomExt3t(1:4,1:9)
 ! for tests!!!!!!!!!!!!!!
@@ -370,6 +371,7 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
 !if e+ e- collider
   if(Collider.eq.0.and.VH_PC.eq."ee")then  
     call EvalPhasespace_VH(yRnd(6:13),ILC_Energy,Mom(:,1:9),id(6:9),PSWgt,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+    Mom_save(1:4,1:9)=Mom(1:4,1:9)
     call Kinematics_VH(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
     if( applyPSCut .or. PSWgt.eq.zero ) return    
     FluxFac = 1d0/(2d0*ILC_Energy**2)
@@ -400,6 +402,7 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
     if(VH_PC.eq."qq".or.VH_PC.eq."lo".or.VH_PC.eq."tr".or.VH_PC.eq."bo".or.VH_PC.eq."gg".or.VH_PC.eq."sp".or.VH_PC.eq."gq".or.VH_PC.eq."qg".or.VH_PC.eq."nl")then
       call EvalPhasespace_VH(yRnd(6:13),Ehat,Mom(:,1:9),id(6:9),PSWgt,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
       Mom(:,10)=0d0 ! no QCD particle emitted
+      Mom_save(:,1:9)=Mom(:,1:9)
       !boost from center of mass frame to lab frame
       call boost2Lab(eta1,eta2,10,Mom)
 !print*,"=========="
@@ -1141,12 +1144,16 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
   !JHUGen requires final state fermions being massive
   !Z/W > f f~
   if(.not.IsAPhoton(DecayMode1) .and. writeWeightedLHE) then
-    PSWgt2 = s_channel_decay(Mom(:,4),getMass(convertLHEreverse(id(6)))**2,getMass(convertLHEreverse(id(7)))**2,yRnd(8:9),Mom(:,6),Mom(:,7))
+    PSWgt2 = s_channel_decay(Mom_save(:,4),getMass(convertLHEreverse(id(6)))**2,getMass(convertLHEreverse(id(7)))**2,yRnd(8:9),Mom_save(:,6),Mom_save(:,7))
+    if(Collider.eq.1.or.Collider.eq.2)call boost2Lab(eta1,eta2,2,Mom_save(:,6:7))
+    Mom(:,6:7)=Mom_save(:,6:7)
   endif
 
   !H > b b~
   if(HbbDecays .and. writeWeightedLHE) then
-    PSWgt2 = s_channel_decay(Mom(:,5),getMass(convertLHEreverse(id(8)))**2,getMass(convertLHEreverse(id(9)))**2,yRnd(10:11),Mom(:,8),Mom(:,9))
+    PSWgt2 = s_channel_decay(Mom_save(:,5),getMass(convertLHEreverse(id(8)))**2,getMass(convertLHEreverse(id(9)))**2,yRnd(10:11),Mom_save(:,8),Mom_save(:,9))
+    if(Collider.eq.1.or.Collider.eq.2)call boost2Lab(eta1,eta2,2,Mom_save(:,8:9))
+    Mom(:,8:9)=Mom_save(:,8:9)
   endif
 
 !  !boost from center of mass frame to lab frame
