@@ -1509,6 +1509,8 @@ function CalculatesXsec(Process)
     CalculatesXsec=.true.
   elseif (Process.eq.50) then
     CalculatesXsec=.false.
+  elseif (Process.ge.51 .and. Process.le.52) then
+    CalculatesXsec=.false.
   elseif (Process.eq.60) then
     CalculatesXsec=.true.
   elseif (Process.eq.61) then

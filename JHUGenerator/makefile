@@ -17,7 +17,7 @@ Opt  = Yes
 Comp = gfort
 
 # link pdfs via LHA library ('Yes' or 'No')
-UseLHAPDF=No
+UseLHAPDF=Yes
 # remember to export
 #          LD_LIBRARY_PATH=/.../LHAPDF-x.y.z/lib/:${LD_LIBRARY_PATH}
 #          LHAPDF_DATA_PATH=/.../LHAPDF-x.y.z/share/LHAPDF/:${LHAPDF_DATA_PATH}
@@ -460,7 +460,7 @@ else
 endif
 	@echo " executable file "$(Exec)" is compiled with "$(Comp)
 	@echo " "
-	$(fcomp) -o $(Exec) $(MainObj) $(PSGenObj) $(AuxObj) $(AmpObj) $(ggVHAmpObj) $(ggVH5AmpObj) $(ggHHAmpObj) $(ggHH5AmpObj) $(VegasObj) $(PDFObj) $(CPSObj) $(MCFM_Obj) $(LHAPDFflags)
+	$(fcomp) -o $(Exec) $(MainObj) $(PSGenObj) $(AuxObj) $(AmpObj) $(ggVHAmpObj) $(LHAPDFInterfaceObj) $(ggVH5AmpObj) $(ggHHAmpObj) $(ggHH5AmpObj) $(VegasObj) $(PDFObj) $(CPSObj) $(MCFM_Obj) $(LHAPDFflags)
 
 $(AuxObj): $(AuxDep) $(Makefile)
 	@echo " compiling misc. and aux. tools"

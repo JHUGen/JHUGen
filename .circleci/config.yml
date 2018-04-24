@@ -657,7 +657,7 @@ jobs:
           name: "check that newlines are not annoying"
           command: |
             dos2unix $(git ls-files)
-            git diff --exit-code
+            git diff --exit-code --stat
           when: always
       - save_cache:
           key: v1_dos2unix-7.4.0
