@@ -10,7 +10,6 @@ MELALibDir = $(MELADataDir)/slc6_amd64_gcc530
 MCFMLib = mcfm_705 # libmcfm_705.so
 PDFDir = $(Here)/pdfs
 VegasDir = $(Here)/vegas
-QCDLibDir = $(Here)/../lib/QCD-Loop2/lib64
 CollierDir = $(Here)/../lib/COLLIER-1.1/
 
 # compiler options, Comp='ifort' or 'gfort'
@@ -40,16 +39,6 @@ else
 endif
 
 
-#include QCD Loop Integral Library
-linkQCDLoopLib = No
-
-ifeq ($(linkQCDLoopLib),Yes)
-   QCDLoopLibflags = -DuseQCDLoopLib=1
-else
-   QCDLoopLibflags = -DuseQCDLoopLib=0
-endif
-
-
 #include Collier Loop Integral Library
 linkCollierLib = Yes
 
@@ -61,8 +50,6 @@ endif
 
 
 MELAflags = -DlinkMELA=0
-
-#QCDLoopflags = -L$(QLDir) -lqcdloop -L$(FFDir) -lff
 
 COLLIERflags = -L$(COLLIERDir) -lcollier
 
@@ -81,7 +68,7 @@ ifeq ($(Comp),gfort)
  else
     OptOpts  = -O0 -fcheck=all
  endif
- fcomp = gfortran $(OptOpts) -ffree-line-length-none -I$(VegasDir) -I$(ModuleDir) -J$(ModuleDir) $(LHAPDFflags) $(MELAflags) $(QCDLoopLibflags) $(CollierLibflags) -Dcompiler=2
+ fcomp = gfortran $(OptOpts) -ffree-line-length-none -I$(VegasDir) -I$(ModuleDir) -J$(ModuleDir) $(LHAPDFflags) $(MELAflags) $(CollierLibflags) -Dcompiler=2
 endif
 
 
@@ -92,7 +79,7 @@ ifeq ($(Comp),ifort)
  else
     OptOpts  = -O0 -implicitnone -check bounds -check pointer -warn interfaces -ftrapuv  -diag-disable remark -debug extended -g -traceback -fpe0 -check uninit
  endif
- fcomp = ifort -fpp $(OptOpts) -module $(ModuleDir) -I$(VegasDir) -Dcompiler=1 $(LHAPDFflags) $(MELAflags) $(QCDLoopLibflags)  $(CollierLibflags)
+ fcomp = ifort -fpp $(OptOpts) -module $(ModuleDir) -I$(VegasDir) -Dcompiler=1 $(LHAPDFflags) $(MELAflags) $(CollierLibflags)
 endif
 
 
@@ -434,20 +421,6 @@ LHAPDFInterfaceObj =
 endif
 
 
-# #uncommented this because the library is already included in MCFMLib
-# ifeq ($(linkQCDLoopLib),Yes)
-# #   QCDLib_Obj = $(QCDLibDir)/ql/libqcdloop.a\
-# #                $(QCDLibDir)/ff/libff.a
-# #    QCDLib_Flags=
-# 
-#    QCDLib_Obj = $(QCDLibDir)/libqcdloop.a
-#    QCDLib_Flags= -Wl,-rpath,/mnt/pep/mschulze/lib/QCD-Loop2/lib64 -L/mnt/pep/mschulze/lib/QCD-Loop2/lib64 -lqcdloop -lquadmath
-# else
-#    QCDLib_Obj = 
-#    QCDLib_Flags=
-# endif
-
-
 # MadGraphDep = h_emepemep.f \
 #               h_emepemep_noint.f \
 #               h_tamtaptamtap.f \
@@ -473,7 +446,7 @@ else
 endif
 	@echo " executable file "$(Exec)" is compiled with "$(Comp)
 	@echo " "
-	$(fcomp) -o $(Exec) $(MainObj) $(PSGenObj) $(AuxObj) $(AmpObj) $(ggVHAmpObj) $(ggVH5AmpObj) $(ggHHAmpObj) $(ggHH5AmpObj) $(VegasObj) $(PDFObj) $(CPSObj) $(MCFM_Obj) $(LHAPDFflags) $(QCDLoopflags)
+	$(fcomp) -o $(Exec) $(MainObj) $(PSGenObj) $(AuxObj) $(AmpObj) $(ggVHAmpObj) $(ggVH5AmpObj) $(ggHHAmpObj) $(ggHH5AmpObj) $(VegasObj) $(PDFObj) $(CPSObj) $(MCFM_Obj) $(LHAPDFflags)
 
 $(AuxObj): $(AuxDep) $(Makefile)
 	@echo " compiling misc. and aux. tools"
@@ -555,23 +528,6 @@ endif
 # 	@echo " compiling MG files"
 # 	$(fcomp) -O0 -c $(MadGraphDep) -I/home/schulze/lib/HELAS-3.0/
 # 	mv *.o $(ObjectDir)
-
-#ffdir:
-#	@echo " compiling QCDLoop directory ff"
-##	FC=$(CompFullName) overrides FC specified in that makefile
-##	http://stackoverflow.com/questions/2826029/passing-additional-variables-from-command-line-to-make#comment51986622_2826178
-#	(cd $(FFDir); $(MAKE) FC=$(CompFullName); ranlib libff.a)
-#
-#
-#qldir:
-#	@echo " compiling QCDLoop directory ql"
-##	FC=$(CompFullName) overrides FC specified in that makefile
-##	http://stackoverflow.com/questions/2826029/passing-additional-variables-from-command-line-to-make#comment51986622_2826178
-#	(cd $(QLDir); $(MAKE) FC=$(CompFullName))
-	
-#COLLIERDir:
-#	@echo " linking Collier static library libcollier.a"
-#	(cd $(COLLIERDir); ranlib libcollier.a)
 
 clean:
 	@echo " deleting executable, object and module files"
