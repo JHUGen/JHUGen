@@ -3041,39 +3041,6 @@ subroutine spinoru(p,za,zb,s)
 
 
 
-SUBROUTINE getHiggsDecayLength(ctau)
-!use ModParameters
-implicit none
-real(8) :: x,xp,xpp,Len0,propa,ctau,ctau0
-integer :: loop
-
-     ctau  = 0d0
-     ctau0 = HiggsDecayLengthMM
-     if( ctau0.lt.1d-16 ) RETURN
-
-     do loop=1,4000000!  4Mio. tries otherwise return zero
-          call random_number(x)
-          xp = 10*x*ctau0             ! scan between 0..10*ctau0
-
-          propa = dexp( -xp/(ctau0) ) ! the max of propa is 1.0
-          call random_number(xpp)
-          if( xpp.lt.propa ) then!   accept
-                ctau = xp
-                RETURN
-          endif
-     enddo
-
-RETURN
-END SUBROUTINE
-
-
-
-
-
-
-
-
-
 !========================================================================
 
 !========================================================================
