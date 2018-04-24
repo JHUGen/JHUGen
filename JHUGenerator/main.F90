@@ -8,8 +8,10 @@ use ifport
 #endif
 use ModCrossSection
 use ModKinematics
+use ModMisc
 use ModParameters
 use ModPMZZ
+use ModHashCollection
 implicit none
 real(8) :: VG_Result,VG_Error
 
@@ -23,13 +25,14 @@ real(8) :: VG_Result,VG_Error
    call InitVegas()
    call InitRandomSeed()
    call OpenFiles()
-   call PrintLogo(io_stdout)
-   call PrintLogo(io_LogFile)
+   call PrintLogo(io_stdout, "JHU Generator")
+   call PrintLogo(io_LogFile, "JHU Generator")
    call WriteParameters(io_stdout)
    call WriteParameters(io_LogFile)
-   if ( .not. ReadLHEFile .and. .not. ConvertLHEFile .and. .not.((Process.le.2 .or. Process.eq.60 .or. Process.eq.61 .or. (Process.ge.110.and.Process.le.114)) .and. unweighted) ) then
+   if ( .not. ReadLHEFile .and. .not. ConvertLHEFile .and. .not.(CalculatesXsec(Process) .and. unweighted) ) then
       call InitOutput(1d0, 1d14)   !for VBF/HJJ the cross section is calculated, so use that in the <init> block
    endif
+   call SetupHashes()
 #if linkMELA==1
    call SetupMCFM(Process)
 #endif
@@ -41,8 +44,9 @@ real(8) :: VG_Result,VG_Error
    elseif( DoPrintPMZZ ) then
         call PrintMZZdistribution()
    else
-        if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 .or. Process.eq.80 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 .or. Process.eq.90 .or. &
-            Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113 .or. Process.eq.114 ) then
+        if( Process.eq.0 .or. Process.eq.1  .or. Process.eq.2 .or. Process.eq.80 &
+                         .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 .or. Process.eq.67 .or. Process.eq.68 .or. Process.eq.69 &
+                         .or. Process.eq.90 .or. Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113 .or. Process.eq.114 ) then
            call StartVegas_NEW(VG_Result,VG_Error)
         else
            call StartVegas(VG_Result,VG_Error)
@@ -72,7 +76,11 @@ END PROGRAM
 subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to the appropriate numbers
    use ModParameters
    use ModMisc
+#if useCollier==1
+   use COLLIER
+#endif
    implicit none
+   integer :: Nmax,rmax
 
       if( .not.                 &
          (                      &
@@ -250,6 +258,17 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
       ) call Error("Invalid scheme for the H+0J processes. Choose a different renormalization or factorization scheme.")
 
 
+   if( Process.eq.50 ) then
+#if useCollier==1
+     Nmax = 4
+     rmax = 4
+     call Init_cll(Nmax,rmax,"output_collier")
+     call InitCacheSystem_cll(1,Nmax)
+     call InitEvent_cll
+#endif
+   endif
+
+
    return
 end subroutine
 
@@ -305,10 +324,12 @@ SUBROUTINE SetJHUGenDefaults()
    PrintPMZZIntervals = 20
    GenerateEvents=.false.
    RequestNLeptons = -1
+   RequestNJets = -1
    RequestOS=-1
    RequestOSSF=-1
    CountTauAsAny = .true.
    WriteFailedEvents=0
+   VBFoffsh_run = -1
 
 END SUBROUTINE SetJHUGenDefaults
 
@@ -316,21 +337,31 @@ SUBROUTINE GetCommandlineArgs()
 use ModParameters
 use ModKinematics
 use ModMisc
+use ModCommandLine
 implicit none
 character :: arg*(500)
 integer :: NumArgs,NArg
-logical :: help, success, SetLastArgument, interfSet
+logical :: help, DryRun, success, SetLastArgument, interfSet
 logical :: SetRenScheme, SetMuRenMultiplier, SetFacScheme, SetMuFacMultiplier
-logical :: SetAnomalousSpin0gg, Setghg2, SetAnomalousSpin0ZZ, Setghz1
-logical :: SetZgammacoupling, Setgammagammacoupling
-logical :: SetAnomalousSpin1qq, Setspin1qqleft, Setspin1qqright
-logical :: SetAnomalousSpin2gg, SetAnomalousSpin2qq, Setspin2qqleft, Setspin2qqright
+logical :: SetAnomalousSpin0gg, Setghg2, SetAnomalousSpin0VV, Setghz1
+logical :: SetZZcoupling, SetZZprimecoupling, SetZprimeZprimecoupling
+logical :: SetZgammacoupling, Setgammagammacoupling, SetZprimegammacoupling
+logical :: SetWWcoupling, SetWWprimecoupling, SetWprimeWprimecoupling
+logical :: SetAnomalousSpin1qq, Setspin1qqleft, Setspin1qqright, SetSpin1VV
+logical :: SetAnomalousSpin2gg, SetAnomalousSpin2qq, Setspin2qqleft, Setspin2qqright, SetSpin2VV
 logical :: SetAnomalousHff, Setkappa
+logical :: SetZprimeff, SetWprimeff, SetHZprime, SetHWprime
+logical :: SetMZprime, SetGaZprime, SetMWprime, SetGaWprime
 logical :: SetCKM,SetCKMub,SetCKMcb,SetCKMtd
-logical :: SetpTcut, SetdeltaRcut
+logical :: SetpTjetcut, Setetajetcut, Setdetajetcut, SetdeltaRcut
+logical :: SetpTlepcut, Setetalepcut, SetMPhotonCutoff
 logical :: SetColliderEnergy
+logical :: SetCSmaxFile, SetVBFoffsh_run
+integer :: i
+type(SaveValues) :: tosave, oldsavevalues
 
    help = .false.
+   DryRun = .false.
 
 #if useLHAPDF==1
    LHAPDFString = ""
@@ -368,10 +399,12 @@ logical :: SetColliderEnergy
    SetAnomalousSpin1qq=.false.
    Setspin1qqleft=.false.
    Setspin1qqright=.false.
+   Setspin1VV=.false.
    SetAnomalousSpin2gg=.false.
    SetAnomalousSpin2qq=.false.
    Setspin2qqleft=.false.
    Setspin2qqright=.false.
+   Setspin2VV=.false.
    SetAnomalousHff=.false.
    Setkappa=.false.
 
@@ -387,13 +420,20 @@ logical :: SetColliderEnergy
    SetpTjetcut=.false.
    Setetajetcut=.false.
    Setdetajetcut=.false.
-   SetpTcut=.false.
    SetdeltaRcut=.false.
+
+   SetpTlepcut=.false.
+   Setetalepcut=.false.
+   SetMPhotonCutoff=.false.
 
    SetColliderEnergy=.false.
 
+   SetCSmaxFile=.false.
+   SetVBFoffsh_run = .false.
+
    DataFile="./data/output"
 
+   tosave = SaveValuesConstructor()
 
 #if compiler==1
    NumArgs = NArgs()-1
@@ -412,67 +452,65 @@ logical :: SetColliderEnergy
     !ReadCommandLineArgument is overloaded, it puts the value into the last argument
     ! by detecting the type.  It also sets success to .true. if the argument name (before =)
     ! is correct.
-    call ReadCommandLineArgument(arg, "Collider", success, Collider)
-    call ReadCommandLineArgument(arg, "ColliderEnergy", success, Collider_Energy, SetLastArgument, success2=SetColliderEnergy)
-    if( SetLastArgument ) Collider_Energy = Collider_Energy * 1000*GeV
-    call ReadCommandLineArgument(arg, "epPolarization", success, POL_A)
-    call ReadCommandLineArgument(arg, "emPolarization", success, POL_B)
+    call ReadCommandLineArgument(arg, "DryRun", success, DryRun)
+    call ReadCommandLineArgument(arg, "Collider", success, Collider, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ColliderEnergy", success, Collider_Energy, multiply=1000*GeV, success2=SetColliderEnergy, tosave=tosave)
+    call ReadCommandLineArgument(arg, "epPolarization", success, POL_A, tosave=tosave)
+    call ReadCommandLineArgument(arg, "emPolarization", success, POL_B, tosave=tosave)
 #if useLHAPDF==1
-    call ReadCommandLineArgument(arg, "LHAPDF", success, LHAPDFString)
-    call ReadCommandLineArgument(arg, "LHAPDFMem", success, LHAPDFMember)
+    call ReadCommandLineArgument(arg, "LHAPDF", success, LHAPDFString, tosave=tosave)
+    call ReadCommandLineArgument(arg, "LHAPDFMem", success, LHAPDFMember, tosave=tosave)
 #else
-    call ReadCommandLineArgument(arg, "PDFSet", success, PDFSet)
+    call ReadCommandLineArgument(arg, "PDFSet", success, PDFSet, tosave=tosave)
 #endif
-    call ReadCommandLineArgument(arg, "MReso", success, M_Reso, SetLastArgument)
-    if( SetLastArgument ) M_Reso = M_Reso*GeV
-    call ReadCommandLineArgument(arg, "GaReso", success, Ga_Reso, SetLastArgument)
-    if( SetLastArgument ) Ga_Reso = Ga_Reso*GeV
-    call ReadCommandLineArgument(arg, "ctauReso", success, HiggsDecayLengthMM)
+    call ReadCommandLineArgument(arg, "MReso", success, M_Reso, multiply=GeV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "GaReso", success, Ga_Reso, multiply=GeV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "MReso2", success, M_Reso2, multiply=GeV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "GaReso2", success, Ga_Reso2, multiply=GeV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ctauReso", success, HiggsDecayLengthMM, tosave=tosave)
     call ReadCommandLineArgument(arg, "VegasNc0", success, VegasNc0)
     call ReadCommandLineArgument(arg, "VegasNc1", success, VegasNc1)
     call ReadCommandLineArgument(arg, "VegasNc2", success, VegasNc2)
-    call ReadCommandLineArgument(arg, "PChannel", success, PChannel)
-! gg > ZH
-    call ReadCommandLineArgument(arg, "VH_PC", success, VH_PC)  !undocumented, in development
-! gg > ZH
+    call ReadCommandLineArgument(arg, "PChannel", success, PChannel, tosave=tosave)
+    call ReadCommandLineArgument(arg, "VH_PC", success, VH_PC, tosave=tosave)
     call ReadCommandLineArgument(arg, "DataFile", success, DataFile)
-    call ReadCommandLineArgument(arg, "Process", success, Process)
-    call ReadCommandLineArgument(arg, "DecayMode1", success, DecayMode1)
-    call ReadCommandLineArgument(arg, "DecayMode2", success, DecayMode2)
-    call ReadCommandLineArgument(arg, "FacScheme", success, FacScheme, success2=SetFacScheme)
-    call ReadCommandLineArgument(arg, "RenScheme", success, RenScheme, SetLastArgument, success2=SetRenScheme)
-    call ReadCommandLineArgument(arg, "MuFacMultiplier", success, MuFacMultiplier, success2=SetMuFacMultiplier)
-    call ReadCommandLineArgument(arg, "MuRenMultiplier", success, MuRenMultiplier, success2=SetMuRenMultiplier)
-    call ReadCommandLineArgument(arg, "TopDK", success, TopDecays)
-    call ReadCommandLineArgument(arg, "TauDK", success, TauDecays)
-    call ReadCommandLineArgument(arg, "HbbDK", success, HbbDecays)
-    call ReadCommandLineArgument(arg, "HbbDK", success, H_DK)
+    call ReadCommandLineArgument(arg, "CSmaxFile", success, CSmaxFile, success2=SetCSmaxFile)
+    call ReadCommandLineArgument(arg, "Process", success, Process, tosave=tosave)
+    call ReadCommandLineArgument(arg, "DecayMode1", success, DecayMode1, tosave=tosave)
+    call ReadCommandLineArgument(arg, "DecayMode2", success, DecayMode2, tosave=tosave)
+    call ReadCommandLineArgument(arg, "FacScheme", success, FacScheme, success2=SetFacScheme, tosave=tosave)
+    call ReadCommandLineArgument(arg, "RenScheme", success, RenScheme, success2=SetRenScheme, tosave=tosave)
+    call ReadCommandLineArgument(arg, "MuFacMultiplier", success, MuFacMultiplier, success2=SetMuFacMultiplier, tosave=tosave)
+    call ReadCommandLineArgument(arg, "MuRenMultiplier", success, MuRenMultiplier, success2=SetMuRenMultiplier, tosave=tosave)
+    call ReadCommandLineArgument(arg, "TopDK", success, TopDecays, tosave=tosave)
+    call ReadCommandLineArgument(arg, "TauDK", success, TauDecays, tosave=tosave)
+    call ReadCommandLineArgument(arg, "HbbDK", success, H_DK, tosave=tosave)
+    call ReadCommandLineArgument(arg, "HbbDK", success, HbbDecays, tosave=tosave)
     call ReadCommandLineArgument(arg, "ReweightDecay", success, ReweightDecay)
-    call ReadCommandLineArgument(arg, "WidthScheme", success, WidthScheme)
+    call ReadCommandLineArgument(arg, "WidthScheme", success, WidthScheme, tosave=tosave)
     call ReadCommandLineArgument(arg, "WidthSchemeIn", success, WidthSchemeIn)
 
     call ReadCommandLineArgument(arg, "ReadPmHstar", success, ReadPMZZ)
     call ReadCommandLineArgument(arg, "PmHstarFile", success, PMZZfile)
-    call ReadCommandLineArgument(arg, "PrintPmHstar", success, PrintPMZZ, SetLastArgument, success2=DoPrintPMZZ) !undocumented, for internal testing
-    if( SetLastArgument ) PrintPMZZ = PrintPMZZ*GeV !PrintPMZZ is a complex(8), the real and imaginary parts are the minimum and maximum values to print
+    call ReadCommandLineArgument(arg, "PrintPmHstar", success, PrintPMZZ, multiplyreal=GeV, success2=DoPrintPMZZ) !undocumented, for internal testing.  PrintPMZZ is a complex(8), the real and imaginary parts are the minimum and maximum values to print
     call ReadCommandLineArgument(arg, "PrintPmHstarIntervals", success, PrintPMZZIntervals)                      !undocumented, for internal testing
     call ReadCommandLineArgument(arg, "PmHstarEvals", success, PMZZEvals)
 
     !same thing again for compatibility
     call ReadCommandLineArgument(arg, "ReadPMZZ", success, ReadPMZZ)   !undocumented, for compatibility
     call ReadCommandLineArgument(arg, "PMZZFile", success, PMZZfile)   !undocumented, for compatibility
-    call ReadCommandLineArgument(arg, "PrintPMZZ", success, PrintPMZZ, SetLastArgument, success2=DoPrintPMZZ)   !undocumented, for compatibility
-    if( SetLastArgument ) PrintPMZZ = PrintPMZZ*GeV !PrintPMZZ is a complex(8), the real and imaginary parts are the minimum and maximum values to print
+    call ReadCommandLineArgument(arg, "PrintPMZZ", success, PrintPMZZ, multiplyreal=GeV, success2=DoPrintPMZZ)   !undocumented, for compatibility
     call ReadCommandLineArgument(arg, "PrintPMZZIntervals", success, PrintPMZZIntervals)                        !undocumented, for compatibility
     call ReadCommandLineArgument(arg, "PMZZEvals", success, PMZZEvals)   !undocumented, for compatibility
 
-    call ReadCommandLineArgument(arg, "OffshellX", success, OffShellReson)
+    call ReadCommandLineArgument(arg, "OffshellX", success, OffShellReson, tosave=tosave)
     call ReadCommandLineArgument(arg, "FilterNLept", success, RequestNLeptons)
     call ReadCommandLineArgument(arg, "FilterOSPairs", success, RequestOS)
     call ReadCommandLineArgument(arg, "FilterOSSFPairs", success, RequestOSSF)
     call ReadCommandLineArgument(arg, "CountTauAsAny", success, CountTauAsAny)
+    call ReadCommandLineArgument(arg, "FilterNJets", success, RequestNJets)
     call ReadCommandLineArgument(arg, "Unweighted", success, Unweighted)
-    call ReadCommandLineArgument(arg, "Interf", success, includeInterference, success2=interfSet)
+    call ReadCommandLineArgument(arg, "Interf", success, includeInterference, success2=interfSet, tosave=tosave)
     call ReadCommandLineArgument(arg, "ReadLHE", success, LHEProdFile, success2=ReadLHEFile)
     call ReadCommandLineArgument(arg, "ConvertLHE", success, LHEProdFile, success2=ConvertLHEFile)
     call ReadCommandLineArgument(arg, "ReadCSmax", success, ReadCSmax)
@@ -481,240 +519,620 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "WriteFailedEvents", success, WriteFailedEvents)
     call ReadCommandLineArgument(arg, "Seed", success, UserSeed)
     call ReadCommandLineArgument(arg, "WriteGit", success, writegit) !undocumented, for testing purposes
-    call ReadCommandLineArgument(arg, "RandomizeVVdecays", success, RandomizeVVdecays)
-    call ReadCommandLineArgument(arg, "ChannelRatio", success, channels_ratio_fix, success2=fix_channels_ratio)
+    call ReadCommandLineArgument(arg, "RandomizeVVdecays", success, RandomizeVVdecays, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ChannelRatio", success, channels_ratio_fix, success2=fix_channels_ratio, tosave=tosave)
     call ReadCommandLineArgument(arg, "UnformattedRead", success, UseUnformattedRead)
     call ReadCommandLineArgument(arg, "WriteWeightedLHE", success, WriteWeightedLHE)
+    call ReadCommandLineArgument(arg, "VBFoffsh_run", success, VBFoffsh_run, success2=setVBFoffsh_run)
 
     !anomalous couplings
     !If any anomalous couplings are set, the default ones have to be set explicitly to keep them on or turn them off
     !e.g. just setting ghz4=0.2982,0 is ambiguous if you mean to leave g1 on (so fa3=0.5)
     !                                                      or to turn it off (fa3=1 with a weird prefactor)
     !spin 0 gg couplings
-    call ReadCommandLineArgument(arg, "ghg2", success, ghg2, success2=SetAnomalousSpin0gg, success3=Setghg2)
-    call ReadCommandLineArgument(arg, "ghg3", success, ghg3, success2=SetAnomalousSpin0gg)
-    call ReadCommandLineArgument(arg, "ghg4", success, ghg4, success2=SetAnomalousSpin0gg)
+    call ReadCommandLineArgument(arg, "ghg2", success, ghg2, success2=SetAnomalousSpin0gg, success3=Setghg2, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghg3", success, ghg3, success2=SetAnomalousSpin0gg, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghg4", success, ghg4, success2=SetAnomalousSpin0gg, tosave=tosave)
 
     !spin 0 ZZ couplings
-    call ReadCommandLineArgument(arg, "ghz1", success, ghz1, success2=SetAnomalousSpin0ZZ, success3=Setghz1)
-    call ReadCommandLineArgument(arg, "ghz2", success, ghz2, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghz3", success, ghz3, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghz4", success, ghz4, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz1", success, ghz1, success2=SetAnomalousSpin0VV, success3=Setghz1, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz2", success, ghz2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz3", success, ghz3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz4", success, ghz4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
 
     !spin 0 Zgamma couplings
-    call ReadCommandLineArgument(arg, "ghzgs2", success, ghzgs2, success2=SetZgammacoupling)
-    call ReadCommandLineArgument(arg, "ghzgs3", success, ghzgs3, success2=SetZgammacoupling)
-    call ReadCommandLineArgument(arg, "ghzgs4", success, ghzgs4, success2=SetZgammacoupling)
+    call ReadCommandLineArgument(arg, "ghzgs2", success, ghzgs2, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzgs3", success, ghzgs3, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzgs4", success, ghzgs4, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling, tosave=tosave)
 
     !spin 0 gammagamma couplings
-    call ReadCommandLineArgument(arg, "ghgsgs2", success, ghgsgs2, success2=Setgammagammacoupling)
-    call ReadCommandLineArgument(arg, "ghgsgs3", success, ghgsgs3, success2=Setgammagammacoupling)
-    call ReadCommandLineArgument(arg, "ghgsgs4", success, ghgsgs4, success2=Setgammagammacoupling)
+    call ReadCommandLineArgument(arg, "ghgsgs2", success, ghgsgs2, success2=SetAnomalousSpin0VV, success3=Setgammagammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghgsgs3", success, ghgsgs3, success2=SetAnomalousSpin0VV, success3=Setgammagammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghgsgs4", success, ghgsgs4, success2=SetAnomalousSpin0VV, success3=Setgammagammacoupling, tosave=tosave)
 
     !spin 0 ZZ momentum dependent couplings
-    call ReadCommandLineArgument(arg, "ghz1_prime", success, ghz1_prime, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghz1_prime2", success, ghz1_prime2, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghz1_prime3", success, ghz1_prime3, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghz1_prime4", success, ghz1_prime4, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghz1_prime5", success, ghz1_prime5, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghz1_prime6", success, ghz1_prime6, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghz1_prime7", success, ghz1_prime7, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz1_prime", success, ghz1_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz1_prime2", success, ghz1_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz1_prime3", success, ghz1_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz1_prime4", success, ghz1_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz1_prime5", success, ghz1_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz1_prime6", success, ghz1_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz1_prime7", success, ghz1_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghz2_prime", success, ghz2_prime, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghz2_prime2", success, ghz2_prime2, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghz2_prime3", success, ghz2_prime3, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghz2_prime4", success, ghz2_prime4, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghz2_prime5", success, ghz2_prime5, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghz2_prime6", success, ghz2_prime6, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghz2_prime7", success, ghz2_prime7, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz2_prime", success, ghz2_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz2_prime2", success, ghz2_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz2_prime3", success, ghz2_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz2_prime4", success, ghz2_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz2_prime5", success, ghz2_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz2_prime6", success, ghz2_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz2_prime7", success, ghz2_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghz3_prime", success, ghz3_prime, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghz3_prime2", success, ghz3_prime2, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghz3_prime3", success, ghz3_prime3, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghz3_prime4", success, ghz3_prime4, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghz3_prime5", success, ghz3_prime5, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghz3_prime6", success, ghz3_prime6, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghz3_prime7", success, ghz3_prime7, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz3_prime", success, ghz3_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz3_prime2", success, ghz3_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz3_prime3", success, ghz3_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz3_prime4", success, ghz3_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz3_prime5", success, ghz3_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz3_prime6", success, ghz3_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz3_prime7", success, ghz3_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghz4_prime", success, ghz4_prime, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghz4_prime2", success, ghz4_prime2, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghz4_prime3", success, ghz4_prime3, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghz4_prime4", success, ghz4_prime4, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghz4_prime5", success, ghz4_prime5, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghz4_prime6", success, ghz4_prime6, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghz4_prime7", success, ghz4_prime7, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz4_prime", success, ghz4_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz4_prime2", success, ghz4_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz4_prime3", success, ghz4_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz4_prime4", success, ghz4_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz4_prime5", success, ghz4_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz4_prime6", success, ghz4_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz4_prime7", success, ghz4_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
 
     !spin 0 Zgamma momentum dependent coupling
-    call ReadCommandLineArgument(arg, "ghzgs1_prime2", success, ghzgs1_prime2, success2=SetZgammacoupling)
+    call ReadCommandLineArgument(arg, "ghzgs1_prime2", success, ghzgs1_prime2, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling, tosave=tosave)
 
     ! Sign of q1,2,12**2 for the Lambda's, set to 1 or -1 to get q**2-dependence from these form factor Lambdas
-    call ReadCommandLineArgument(arg, "cz_q1sq", success, cz_q1sq, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "cz_q2sq", success, cz_q2sq, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "cz_q12sq", success, cz_q12sq, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "cz_q1sq", success, cz_q1sq, success2=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "cz_q2sq", success, cz_q2sq, success2=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "cz_q12sq", success, cz_q12sq, success2=SetAnomalousSpin0VV, tosave=tosave)
     ! Lambda's for q1,2,12**2 for the Lambda's
-    call ReadCommandLineArgument(arg, "Lambda_z11", success, Lambda_z11, SetLastArgument, success2=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda_z11 = Lambda_z11*GeV
-    call ReadCommandLineArgument(arg, "Lambda_z21", success, Lambda_z21, SetLastArgument, success2=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda_z21 = Lambda_z21*GeV
-    call ReadCommandLineArgument(arg, "Lambda_z31", success, Lambda_z31, SetLastArgument, success2=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda_z31 = Lambda_z31*GeV
-    call ReadCommandLineArgument(arg, "Lambda_z41", success, Lambda_z41, SetLastArgument, success2=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda_z41 = Lambda_z41*GeV
-    call ReadCommandLineArgument(arg, "Lambda_z12", success, Lambda_z12, SetLastArgument, success2=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda_z12 = Lambda_z12*GeV
-    call ReadCommandLineArgument(arg, "Lambda_z22", success, Lambda_z22, SetLastArgument, success2=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda_z22 = Lambda_z22*GeV
-    call ReadCommandLineArgument(arg, "Lambda_z32", success, Lambda_z32, SetLastArgument, success2=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda_z32 = Lambda_z32*GeV
-    call ReadCommandLineArgument(arg, "Lambda_z42", success, Lambda_z42, SetLastArgument, success2=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda_z42 = Lambda_z42*GeV
-    call ReadCommandLineArgument(arg, "Lambda_z10", success, Lambda_z10, SetLastArgument, success2=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda_z10 = Lambda_z10*GeV
-    call ReadCommandLineArgument(arg, "Lambda_z20", success, Lambda_z20, SetLastArgument, success2=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda_z20 = Lambda_z20*GeV
-    call ReadCommandLineArgument(arg, "Lambda_z30", success, Lambda_z30, SetLastArgument, success2=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda_z30 = Lambda_z30*GeV
-    call ReadCommandLineArgument(arg, "Lambda_z40", success, Lambda_z40, SetLastArgument, success2=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda_z40 = Lambda_z40*GeV
+    call ReadCommandLineArgument(arg, "Lambda_z11", success, Lambda_z11, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_z21", success, Lambda_z21, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_z31", success, Lambda_z31, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_z41", success, Lambda_z41, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_z12", success, Lambda_z12, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_z22", success, Lambda_z22, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_z32", success, Lambda_z32, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_z42", success, Lambda_z42, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_z10", success, Lambda_z10, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_z20", success, Lambda_z20, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_z30", success, Lambda_z30, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_z40", success, Lambda_z40, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
 
     !spin 0 WW couplings
-    call ReadCommandLineArgument(arg, "ghw1", success, ghw1, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw2", success, ghw2, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw3", success, ghw3, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw4", success, ghw4, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw1", success, ghw1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw2", success, ghw2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw3", success, ghw3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw4", success, ghw4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghw1_prime", success, ghw1_prime, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw1_prime2", success, ghw1_prime2, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw1_prime3", success, ghw1_prime3, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw1_prime4", success, ghw1_prime4, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw1_prime5", success, ghw1_prime5, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw1_prime6", success, ghw1_prime6, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw1_prime7", success, ghw1_prime7, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw1_prime", success, ghw1_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw1_prime2", success, ghw1_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw1_prime3", success, ghw1_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw1_prime4", success, ghw1_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw1_prime5", success, ghw1_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw1_prime6", success, ghw1_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw1_prime7", success, ghw1_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghw2_prime", success, ghw2_prime, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw2_prime2", success, ghw2_prime2, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw2_prime3", success, ghw2_prime3, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw2_prime4", success, ghw2_prime4, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw2_prime5", success, ghw2_prime5, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw2_prime6", success, ghw2_prime6, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw2_prime7", success, ghw2_prime7, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw2_prime", success, ghw2_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw2_prime2", success, ghw2_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw2_prime3", success, ghw2_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw2_prime4", success, ghw2_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw2_prime5", success, ghw2_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw2_prime6", success, ghw2_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw2_prime7", success, ghw2_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghw3_prime", success, ghw3_prime, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw3_prime2", success, ghw3_prime2, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw3_prime3", success, ghw3_prime3, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw3_prime4", success, ghw3_prime4, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw3_prime5", success, ghw3_prime5, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw3_prime6", success, ghw3_prime6, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw3_prime7", success, ghw3_prime7, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw3_prime", success, ghw3_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw3_prime2", success, ghw3_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw3_prime3", success, ghw3_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw3_prime4", success, ghw3_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw3_prime5", success, ghw3_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw3_prime6", success, ghw3_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw3_prime7", success, ghw3_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghw4_prime", success, ghw4_prime, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw4_prime2", success, ghw4_prime2, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw4_prime3", success, ghw4_prime3, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw4_prime4", success, ghw4_prime4, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw4_prime5", success, ghw4_prime5, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw4_prime6", success, ghw4_prime6, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw4_prime7", success, ghw4_prime7, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw4_prime", success, ghw4_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw4_prime2", success, ghw4_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw4_prime3", success, ghw4_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw4_prime4", success, ghw4_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw4_prime5", success, ghw4_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw4_prime6", success, ghw4_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw4_prime7", success, ghw4_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
 
     ! Sign of q1,2,12**2 for the Lambda's, set to 1 or -1 to get q**2-dependence from these form factor Lambdas
-    call ReadCommandLineArgument(arg, "cw_q1sq", success, cw_q1sq, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "cw_q2sq", success, cw_q2sq, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "cw_q12sq", success, cw_q12sq, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "cw_q1sq", success, cw_q1sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "cw_q2sq", success, cw_q2sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "cw_q12sq", success, cw_q12sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
     ! Lambda's for q1,2,12**2 for the Lambda's
-    call ReadCommandLineArgument(arg, "Lambda_w11", success, Lambda_w11, SetLastArgument, success2=distinguish_HWWcouplings)
-    if (SetLastArgument)  Lambda_w11 = Lambda_w11*GeV
-    call ReadCommandLineArgument(arg, "Lambda_w21", success, Lambda_w21, SetLastArgument, success2=distinguish_HWWcouplings)
-    if (SetLastArgument)  Lambda_w21 = Lambda_w21*GeV
-    call ReadCommandLineArgument(arg, "Lambda_w31", success, Lambda_w31, SetLastArgument, success2=distinguish_HWWcouplings)
-    if (SetLastArgument)  Lambda_w31 = Lambda_w31*GeV
-    call ReadCommandLineArgument(arg, "Lambda_w41", success, Lambda_w41, SetLastArgument, success2=distinguish_HWWcouplings)
-    if (SetLastArgument)  Lambda_w41 = Lambda_w41*GeV
-    call ReadCommandLineArgument(arg, "Lambda_w12", success, Lambda_w12, SetLastArgument, success2=distinguish_HWWcouplings)
-    if (SetLastArgument)  Lambda_w12 = Lambda_w12*GeV
-    call ReadCommandLineArgument(arg, "Lambda_w22", success, Lambda_w22, SetLastArgument, success2=distinguish_HWWcouplings)
-    if (SetLastArgument)  Lambda_w22 = Lambda_w22*GeV
-    call ReadCommandLineArgument(arg, "Lambda_w32", success, Lambda_w32, SetLastArgument, success2=distinguish_HWWcouplings)
-    if (SetLastArgument)  Lambda_w32 = Lambda_w32*GeV
-    call ReadCommandLineArgument(arg, "Lambda_w42", success, Lambda_w42, SetLastArgument, success2=distinguish_HWWcouplings)
-    if (SetLastArgument)  Lambda_w42 = Lambda_w42*GeV
-    call ReadCommandLineArgument(arg, "Lambda_w10", success, Lambda_w10, SetLastArgument, success2=distinguish_HWWcouplings)
-    if (SetLastArgument)  Lambda_w10 = Lambda_w10*GeV
-    call ReadCommandLineArgument(arg, "Lambda_w20", success, Lambda_w20, SetLastArgument, success2=distinguish_HWWcouplings)
-    if (SetLastArgument)  Lambda_w20 = Lambda_w20*GeV
-    call ReadCommandLineArgument(arg, "Lambda_w30", success, Lambda_w30, SetLastArgument, success2=distinguish_HWWcouplings)
-    if (SetLastArgument)  Lambda_w30 = Lambda_w30*GeV
-    call ReadCommandLineArgument(arg, "Lambda_w40", success, Lambda_w40, SetLastArgument, success2=distinguish_HWWcouplings)
-    if (SetLastArgument)  Lambda_w40 = Lambda_w40*GeV
+    call ReadCommandLineArgument(arg, "Lambda_w11", success, Lambda_w11, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_w21", success, Lambda_w21, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_w31", success, Lambda_w31, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_w41", success, Lambda_w41, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_w12", success, Lambda_w12, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_w22", success, Lambda_w22, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_w32", success, Lambda_w32, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_w42", success, Lambda_w42, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_w10", success, Lambda_w10, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_w20", success, Lambda_w20, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_w30", success, Lambda_w30, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_w40", success, Lambda_w40, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
 
     !spin 1
-    call ReadCommandLineArgument(arg, "zprime_qq_left", success, zprime_qq_left, success2=SetAnomalousSpin1qq, success3=Setspin1qqleft)
-    call ReadCommandLineArgument(arg, "zprime_qq_right", success, zprime_qq_right, success2=SetAnomalousSpin1qq, success3=Setspin1qqright)
-    call ReadCommandLineArgument(arg, "zprime_zz_1", success, zprime_zz_1)
-    call ReadCommandLineArgument(arg, "zprime_zz_2", success, zprime_zz_2)
+    call ReadCommandLineArgument(arg, "zprime_qq_left", success, zprime_qq_left, success2=SetAnomalousSpin1qq, success3=Setspin1qqleft, tosave=tosave)
+    call ReadCommandLineArgument(arg, "zprime_qq_right", success, zprime_qq_right, success2=SetAnomalousSpin1qq, success3=Setspin1qqright, tosave=tosave)
+    call ReadCommandLineArgument(arg, "zprime_zz_1", success, zprime_zz_1, success2=SetSpin1VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "zprime_zz_2", success, zprime_zz_2, success2=SetSpin1VV, success3=SetZZcoupling, tosave=tosave)
 
     !spin 2
-    call ReadCommandLineArgument(arg, "a1", success, a1, success2=SetAnomalousSpin2gg)
-    call ReadCommandLineArgument(arg, "a2", success, a2, success2=SetAnomalousSpin2gg)
-    call ReadCommandLineArgument(arg, "a3", success, a3, success2=SetAnomalousSpin2gg)
-    call ReadCommandLineArgument(arg, "a4", success, a4, success2=SetAnomalousSpin2gg)
-    call ReadCommandLineArgument(arg, "a5", success, a5, success2=SetAnomalousSpin2gg)
-    call ReadCommandLineArgument(arg, "graviton_qq_left", success, graviton_qq_left, success2=SetAnomalousSpin2qq, success3=Setspin2qqleft)
-    call ReadCommandLineArgument(arg, "graviton_qq_right", success, graviton_qq_right, success2=SetAnomalousSpin2qq, success3=Setspin2qqright)
-    call ReadCommandLineArgument(arg, "b1", success, b1)
-    call ReadCommandLineArgument(arg, "b2", success, b2)
-    call ReadCommandLineArgument(arg, "b3", success, b3)
-    call ReadCommandLineArgument(arg, "b4", success, b4)
-    call ReadCommandLineArgument(arg, "b5", success, b5)
-    call ReadCommandLineArgument(arg, "b6", success, b6)
-    call ReadCommandLineArgument(arg, "b7", success, b7)
-    call ReadCommandLineArgument(arg, "b8", success, b8)
-    call ReadCommandLineArgument(arg, "b9", success, b9)
-    call ReadCommandLineArgument(arg, "b10", success, b10)
+    call ReadCommandLineArgument(arg, "a1", success, a1, success2=SetAnomalousSpin2gg, tosave=tosave)
+    call ReadCommandLineArgument(arg, "a2", success, a2, success2=SetAnomalousSpin2gg, tosave=tosave)
+    call ReadCommandLineArgument(arg, "a3", success, a3, success2=SetAnomalousSpin2gg, tosave=tosave)
+    call ReadCommandLineArgument(arg, "a4", success, a4, success2=SetAnomalousSpin2gg, tosave=tosave)
+    call ReadCommandLineArgument(arg, "a5", success, a5, success2=SetAnomalousSpin2gg, tosave=tosave)
+    call ReadCommandLineArgument(arg, "graviton_qq_left", success, graviton_qq_left, success2=SetAnomalousSpin2qq, success3=Setspin2qqleft, tosave=tosave)
+    call ReadCommandLineArgument(arg, "graviton_qq_right", success, graviton_qq_right, success2=SetAnomalousSpin2qq, success3=Setspin2qqright, tosave=tosave)
+    call ReadCommandLineArgument(arg, "b1", success, b1, success2=SetSpin2VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "b2", success, b2, success2=SetSpin2VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "b3", success, b3, success2=SetSpin2VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "b4", success, b4, success2=SetSpin2VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "b5", success, b5, success2=SetSpin2VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "b6", success, b6, success2=SetSpin2VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "b7", success, b7, success2=SetSpin2VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "b8", success, b8, success2=SetSpin2VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "b9", success, b9, success2=SetSpin2VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "b10", success, b10, success2=SetSpin2VV, success3=SetZZcoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "bzgs1", success, bzgs1, success2=SetSpin2VV, success3=SetZgammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzgs2", success, bzgs2, success2=SetSpin2VV, success3=SetZgammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzgs3", success, bzgs3, success2=SetSpin2VV, success3=SetZgammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzgs4", success, bzgs4, success2=SetSpin2VV, success3=SetZgammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzgs8", success, bzgs8, success2=SetSpin2VV, success3=SetZgammacoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "bgsgs1", success, bgsgs1, success2=SetSpin2VV, success3=Setgammagammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bgsgs2", success, bgsgs2, success2=SetSpin2VV, success3=Setgammagammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bgsgs3", success, bgsgs3, success2=SetSpin2VV, success3=Setgammagammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bgsgs4", success, bgsgs4, success2=SetSpin2VV, success3=Setgammagammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bgsgs8", success, bgsgs8, success2=SetSpin2VV, success3=Setgammagammacoupling, tosave=tosave)
 
     !Hff couplings
-    call ReadCommandLineArgument(arg, "kappa", success, kappa, success2=SetAnomalousHff, success3=Setkappa)
-    call ReadCommandLineArgument(arg, "kappa_tilde", success, kappa_tilde, success2=SetAnomalousHff)
+    call ReadCommandLineArgument(arg, "kappa", success, kappa, success2=SetAnomalousHff, success3=Setkappa, tosave=tosave)
+    call ReadCommandLineArgument(arg, "kappa_tilde", success, kappa_tilde, success2=SetAnomalousHff, tosave=tosave)
+
+!   similar as above for the 2nd resonance in offshell VBF
+    !spin 0 ZZ couplings
+    call ReadCommandLineArgument(arg, "gh2z1", success, gh2z1, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z2", success, gh2z2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z3", success, gh2z3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z4", success, gh2z4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+
+    !spin 0 Zgamma couplings
+    call ReadCommandLineArgument(arg, "gh2zgs2", success, gh2zgs2, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2zgs3", success, gh2zgs3, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2zgs4", success, gh2zgs4, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling, tosave=tosave)
+
+    !spin 0 gammagamma couplings
+    call ReadCommandLineArgument(arg, "gh2gsgs2", success, gh2gsgs2, success2=SetAnomalousSpin0VV, success3=Setgammagammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2gsgs3", success, gh2gsgs3, success2=SetAnomalousSpin0VV, success3=Setgammagammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2gsgs4", success, gh2gsgs4, success2=SetAnomalousSpin0VV, success3=Setgammagammacoupling, tosave=tosave)
+
+    !spin 0 ZZ momentum dependent couplings
+    call ReadCommandLineArgument(arg, "gh2z1_prime", success, gh2z1_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z1_prime2", success, gh2z1_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z1_prime3", success, gh2z1_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z1_prime4", success, gh2z1_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z1_prime5", success, gh2z1_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z1_prime6", success, gh2z1_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z1_prime7", success, gh2z1_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "gh2z2_prime", success, gh2z2_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z2_prime2", success, gh2z2_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z2_prime3", success, gh2z2_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z2_prime4", success, gh2z2_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z2_prime5", success, gh2z2_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z2_prime6", success, gh2z2_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z2_prime7", success, gh2z2_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "gh2z3_prime", success, gh2z3_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z3_prime2", success, gh2z3_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z3_prime3", success, gh2z3_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z3_prime4", success, gh2z3_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z3_prime5", success, gh2z3_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z3_prime6", success, gh2z3_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z3_prime7", success, gh2z3_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "gh2z4_prime", success, gh2z4_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z4_prime2", success, gh2z4_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z4_prime3", success, gh2z4_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z4_prime4", success, gh2z4_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z4_prime5", success, gh2z4_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z4_prime6", success, gh2z4_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z4_prime7", success, gh2z4_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+
+    !spin 0 Zgamma momentum dependent coupling
+    call ReadCommandLineArgument(arg, "gh2zgs1_prime2", success, gh2zgs1_prime2, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling, tosave=tosave)
+
+    ! Sign of q1,2,12**2 for the Lambda's, set to 1 or -1 to get q**2-dependence from these form factor Lambdas
+    call ReadCommandLineArgument(arg, "c2z_q1sq", success, c2z_q1sq, success2=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "c2z_q2sq", success, c2z_q2sq, success2=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "c2z_q12sq", success, c2z_q12sq, success2=SetAnomalousSpin0VV, tosave=tosave)
+    ! Lambda's for q1,2,12**2 for the Lambda's
+    call ReadCommandLineArgument(arg, "Lambda2_z11", success, Lambda2_z11, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_z21", success, Lambda2_z21, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_z31", success, Lambda2_z31, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_z41", success, Lambda2_z41, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_z12", success, Lambda2_z12, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_z22", success, Lambda2_z22, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_z32", success, Lambda2_z32, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_z42", success, Lambda2_z42, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_z10", success, Lambda2_z10, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_z20", success, Lambda2_z20, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_z30", success, Lambda2_z30, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_z40", success, Lambda2_z40, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
+
+    !spin 0 WW couplings
+    call ReadCommandLineArgument(arg, "gh2w1", success, gh2w1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w2", success, gh2w2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w3", success, gh2w3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w4", success, gh2w4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "gh2w1_prime", success, gh2w1_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w1_prime2", success, gh2w1_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w1_prime3", success, gh2w1_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w1_prime4", success, gh2w1_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w1_prime5", success, gh2w1_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w1_prime6", success, gh2w1_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w1_prime7", success, gh2w1_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "gh2w2_prime", success, gh2w2_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w2_prime2", success, gh2w2_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w2_prime3", success, gh2w2_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w2_prime4", success, gh2w2_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w2_prime5", success, gh2w2_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w2_prime6", success, gh2w2_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w2_prime7", success, gh2w2_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "gh2w3_prime", success, gh2w3_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w3_prime2", success, gh2w3_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w3_prime3", success, gh2w3_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w3_prime4", success, gh2w3_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w3_prime5", success, gh2w3_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w3_prime6", success, gh2w3_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w3_prime7", success, gh2w3_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "gh2w4_prime", success, gh2w4_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w4_prime2", success, gh2w4_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w4_prime3", success, gh2w4_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w4_prime4", success, gh2w4_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w4_prime5", success, gh2w4_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w4_prime6", success, gh2w4_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w4_prime7", success, gh2w4_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+
+    ! Sign of q1,2,12**2 for the Lambda's, set to 1 or -1 to get q**2-dependence from these form factor Lambdas
+    call ReadCommandLineArgument(arg, "c2w_q1sq", success, c2w_q1sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "c2w_q2sq", success, c2w_q2sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "c2w_q12sq", success, c2w_q12sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    ! Lambda's for q1,2,12**2 for the Lambda's
+    call ReadCommandLineArgument(arg, "Lambda2_w11", success, Lambda2_w11, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_w21", success, Lambda2_w21, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_w31", success, Lambda2_w31, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_w41", success, Lambda2_w41, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_w12", success, Lambda2_w12, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_w22", success, Lambda2_w22, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_w32", success, Lambda2_w32, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_w42", success, Lambda2_w42, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_w10", success, Lambda2_w10, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_w20", success, Lambda2_w20, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_w30", success, Lambda2_w30, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_w40", success, Lambda2_w40, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+
+
+    !contact interactions
+    !spin 0 ZZp couplings
+    call ReadCommandLineArgument(arg, "ghzzp1", success, ghzzp1, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp2", success, ghzzp2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp3", success, ghzzp3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp4", success, ghzzp4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "ghzzp1_prime", success, ghzzp1_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp1_prime2", success, ghzzp1_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp1_prime3", success, ghzzp1_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp1_prime4", success, ghzzp1_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp1_prime5", success, ghzzp1_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp1_prime6", success, ghzzp1_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp1_prime7", success, ghzzp1_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "ghzzp2_prime", success, ghzzp2_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp2_prime2", success, ghzzp2_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp2_prime3", success, ghzzp2_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp2_prime4", success, ghzzp2_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp2_prime5", success, ghzzp2_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp2_prime6", success, ghzzp2_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp2_prime7", success, ghzzp2_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "ghzzp3_prime", success, ghzzp3_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp3_prime2", success, ghzzp3_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp3_prime3", success, ghzzp3_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp3_prime4", success, ghzzp3_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp3_prime5", success, ghzzp3_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp3_prime6", success, ghzzp3_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp3_prime7", success, ghzzp3_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "ghzzp4_prime", success, ghzzp4_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp4_prime2", success, ghzzp4_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp4_prime3", success, ghzzp4_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp4_prime4", success, ghzzp4_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp4_prime5", success, ghzzp4_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp4_prime6", success, ghzzp4_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp4_prime7", success, ghzzp4_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+
+    !spin 0 Zpgamma couplings
+    call ReadCommandLineArgument(arg, "ghzpgs1_prime2", success, ghzpgs1_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimegammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpgs2", success, ghzpgs2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimegammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpgs3", success, ghzpgs3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimegammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpgs4", success, ghzpgs4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimegammacoupling, tosave=tosave)
+
+    !spin 0 ZpZp couplings
+    call ReadCommandLineArgument(arg, "ghzpzp1", success, ghzpzp1, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp2", success, ghzpzp2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp3", success, ghzpzp3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp4", success, ghzpzp4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "ghzpzp1_prime", success, ghzpzp1_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp1_prime2", success, ghzpzp1_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp1_prime3", success, ghzpzp1_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp1_prime4", success, ghzpzp1_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp1_prime5", success, ghzpzp1_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp1_prime6", success, ghzpzp1_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp1_prime7", success, ghzpzp1_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "ghzpzp2_prime", success, ghzpzp2_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp2_prime2", success, ghzpzp2_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp2_prime3", success, ghzpzp2_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp2_prime4", success, ghzpzp2_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp2_prime5", success, ghzpzp2_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp2_prime6", success, ghzpzp2_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp2_prime7", success, ghzpzp2_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "ghzpzp3_prime", success, ghzpzp3_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp3_prime2", success, ghzpzp3_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp3_prime3", success, ghzpzp3_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp3_prime4", success, ghzpzp3_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp3_prime5", success, ghzpzp3_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp3_prime6", success, ghzpzp3_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp3_prime7", success, ghzpzp3_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "ghzpzp4_prime", success, ghzpzp4_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp4_prime2", success, ghzpzp4_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp4_prime3", success, ghzpzp4_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp4_prime4", success, ghzpzp4_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp4_prime5", success, ghzpzp4_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp4_prime6", success, ghzpzp4_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp4_prime7", success, ghzpzp4_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "bzzp1", success, bzzp1, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzzp2", success, bzzp2, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzzp3", success, bzzp3, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzzp4", success, bzzp4, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzzp5", success, bzzp5, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzzp6", success, bzzp6, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzzp7", success, bzzp7, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzzp8", success, bzzp8, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzzp9", success, bzzp9, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzzp10", success, bzzp10, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "bzpzp1", success, bzpzp1, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzpzp2", success, bzpzp2, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzpzp3", success, bzpzp3, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzpzp4", success, bzpzp4, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzpzp5", success, bzpzp5, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzpzp6", success, bzpzp6, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzpzp7", success, bzpzp7, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzpzp8", success, bzpzp8, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzpzp9", success, bzpzp9, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzpzp10", success, bzpzp10, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "bzpgs1", success, bzpgs1, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimegammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzpgs2", success, bzpgs2, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimegammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzpgs3", success, bzpgs3, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimegammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzpgs4", success, bzpgs4, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimegammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzpgs8", success, bzpgs8, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimegammacoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "ezp_El_left", success, ezp_El_left, success2=SetZprimeff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_El_right", success, ezp_El_right, success2=SetZprimeff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_Mu_left", success, ezp_Mu_left, success2=SetZprimeff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_Mu_right", success, ezp_Mu_right, success2=SetZprimeff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_Ta_left", success, ezp_Ta_left, success2=SetZprimeff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_Ta_right", success, ezp_Ta_right, success2=SetZprimeff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_Up_left", success, ezp_Up_left, success2=SetZprimeff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_Up_right", success, ezp_Up_right, success2=SetZprimeff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_Chm_left", success, ezp_Chm_left, success2=SetZprimeff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_Chm_right", success, ezp_Chm_right, success2=SetZprimeff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_Top_left", success, ezp_Top_left, success2=SetZprimeff, tosave=tosave)    !undocumented because it's useless
+    call ReadCommandLineArgument(arg, "ezp_Top_right", success, ezp_Top_right, success2=SetZprimeff, tosave=tosave)  !undocumented because it's useless
+    call ReadCommandLineArgument(arg, "ezp_Dn_left", success, ezp_Dn_left, success2=SetZprimeff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_Dn_right", success, ezp_Dn_right, success2=SetZprimeff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_Str_left", success, ezp_Str_left, success2=SetZprimeff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_Str_right", success, ezp_Str_right, success2=SetZprimeff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_Bot_left", success, ezp_Bot_left, success2=SetZprimeff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_Bot_right", success, ezp_Bot_right, success2=SetZprimeff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_NuE_left", success, ezp_NuE_left, success2=SetZprimeff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_NuE_right", success, ezp_NuE_right, success2=SetZprimeff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "MZprime", success, M_Zprime, multiply=GeV, success2=SetMZprime, tosave=tosave)
+    call ReadCommandLineArgument(arg, "GaZprime", success, Ga_Zprime, multiply=GeV, success2=SetGaZprime, tosave=tosave)
+
+    !spin 0 WWp couplings
+    call ReadCommandLineArgument(arg, "ghwwp1", success, ghwwp1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp2", success, ghwwp2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp3", success, ghwwp3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp4", success, ghwwp4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "ghwwp1_prime", success, ghwwp1_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp1_prime2", success, ghwwp1_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp1_prime3", success, ghwwp1_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp1_prime4", success, ghwwp1_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp1_prime5", success, ghwwp1_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp1_prime6", success, ghwwp1_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp1_prime7", success, ghwwp1_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "ghwwp2_prime", success, ghwwp2_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp2_prime2", success, ghwwp2_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp2_prime3", success, ghwwp2_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp2_prime4", success, ghwwp2_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp2_prime5", success, ghwwp2_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp2_prime6", success, ghwwp2_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp2_prime7", success, ghwwp2_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "ghwwp3_prime", success, ghwwp3_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp3_prime2", success, ghwwp3_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp3_prime3", success, ghwwp3_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp3_prime4", success, ghwwp3_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp3_prime5", success, ghwwp3_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp3_prime6", success, ghwwp3_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp3_prime7", success, ghwwp3_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "ghwwp4_prime", success, ghwwp4_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp4_prime2", success, ghwwp4_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp4_prime3", success, ghwwp4_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp4_prime4", success, ghwwp4_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp4_prime5", success, ghwwp4_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp4_prime6", success, ghwwp4_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp4_prime7", success, ghwwp4_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+
+    !spin 0 WpWp couplings
+    call ReadCommandLineArgument(arg, "ghwpwp1", success, ghwpwp1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp2", success, ghwpwp2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp3", success, ghwpwp3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp4", success, ghwpwp4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "ghwpwp1_prime", success, ghwpwp1_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp1_prime2", success, ghwpwp1_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp1_prime3", success, ghwpwp1_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp1_prime4", success, ghwpwp1_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp1_prime5", success, ghwpwp1_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp1_prime6", success, ghwpwp1_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp1_prime7", success, ghwpwp1_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "ghwpwp2_prime", success, ghwpwp2_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp2_prime2", success, ghwpwp2_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp2_prime3", success, ghwpwp2_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp2_prime4", success, ghwpwp2_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp2_prime5", success, ghwpwp2_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp2_prime6", success, ghwpwp2_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp2_prime7", success, ghwpwp2_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "ghwpwp3_prime", success, ghwpwp3_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp3_prime2", success, ghwpwp3_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp3_prime3", success, ghwpwp3_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp3_prime4", success, ghwpwp3_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp3_prime5", success, ghwpwp3_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp3_prime6", success, ghwpwp3_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp3_prime7", success, ghwpwp3_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "ghwpwp4_prime", success, ghwpwp4_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp4_prime2", success, ghwpwp4_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp4_prime3", success, ghwpwp4_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp4_prime4", success, ghwpwp4_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp4_prime5", success, ghwpwp4_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp4_prime6", success, ghwpwp4_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp4_prime7", success, ghwpwp4_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+
+    call ReadCommandLineArgument(arg, "ewp_El_left", success, ewp_El_left, success2=SetWprimeff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ewp_El_right", success, ewp_El_right, success2=SetWprimeff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ewp_Mu_left", success, ewp_Mu_left, success2=SetWprimeff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ewp_Mu_right", success, ewp_Mu_right, success2=SetWprimeff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ewp_Ta_left", success, ewp_Ta_left, success2=SetWprimeff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ewp_Ta_right", success, ewp_Ta_right, success2=SetWprimeff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ewp_Up_left", success, ewp_Up_left, success2=SetWprimeff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ewp_Up_right", success, ewp_Up_right, success2=SetWprimeff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ewp_Chm_left", success, ewp_Chm_left, success2=SetWprimeff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ewp_Chm_right", success, ewp_Chm_right, success2=SetWprimeff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ewp_Top_left", success, ewp_Top_left, success2=SetWprimeff, tosave=tosave)    !undocumented because it's useless (until contact terms are included in tH)
+    call ReadCommandLineArgument(arg, "ewp_Top_right", success, ewp_Top_right, success2=SetWprimeff, tosave=tosave)  !undocumented because it's useless (until contact terms are included in tH)
+    call ReadCommandLineArgument(arg, "MWprime", success, M_Wprime, multiply=GeV, success2=SetMWprime, tosave=tosave)
+    call ReadCommandLineArgument(arg, "GaWprime", success, Ga_Wprime, multiply=GeV, success2=SetGaWprime, tosave=tosave)
+
 
     ! CKM elements
-    call ReadCommandLineArgument(arg, "Vud", success, VCKM_ud, success2=SetCKM)
-    call ReadCommandLineArgument(arg, "Vus", success, VCKM_us, success2=SetCKM)
-    call ReadCommandLineArgument(arg, "Vcd", success, VCKM_cd, success2=SetCKM)
-    call ReadCommandLineArgument(arg, "Vcs", success, VCKM_cs, success2=SetCKM)
-    call ReadCommandLineArgument(arg, "Vts", success, VCKM_ts, success2=SetCKM)
-    call ReadCommandLineArgument(arg, "Vtb", success, VCKM_tb, success2=SetCKM)
-    call ReadCommandLineArgument(arg, "Vub", success, VCKM_ub, success2=SetCKM, success3=SetCKMub)
-    call ReadCommandLineArgument(arg, "Vcb", success, VCKM_cb, success2=SetCKM, success3=SetCKMcb)
-    call ReadCommandLineArgument(arg, "Vtd", success, VCKM_td, success2=SetCKM, success3=SetCKMtd)
+    call ReadCommandLineArgument(arg, "Vud", success, VCKM_ud, success2=SetCKM, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Vus", success, VCKM_us, success2=SetCKM, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Vcd", success, VCKM_cd, success2=SetCKM, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Vcs", success, VCKM_cs, success2=SetCKM, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Vts", success, VCKM_ts, success2=SetCKM, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Vtb", success, VCKM_tb, success2=SetCKM, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Vub", success, VCKM_ub, success2=SetCKM, success3=SetCKMub, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Vcb", success, VCKM_cb, success2=SetCKM, success3=SetCKMcb, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Vtd", success, VCKM_td, success2=SetCKM, success3=SetCKMtd, tosave=tosave)
 
 
     !cuts
-    call ReadCommandLineArgument(arg, "pTjetcut", success, pTjetcut, SetLastArgument, success2=SetpTcut)
-    if( SetLastArgument ) pTjetcut = pTjetcut*GeV
-    call ReadCommandLineArgument(arg, "deltaRcut", success, Rjet, success2=SetdeltaRcut)
-    call ReadCommandLineArgument(arg, "mJJcut", success, mJJcut, SetLastArgument)
-    if( SetLastArgument ) mJJcut = mJJcut*GeV
-    call ReadCommandLineArgument(arg, "VBF_m4l_min", success, m4l_minmax(1), SetLastArgument)   !undocumented, for internal testing
-    if( SetLastArgument ) m4l_minmax(1) = m4l_minmax(1)*GeV
-    call ReadCommandLineArgument(arg, "VBF_m4l_max", success, m4l_minmax(2), SetLastArgument)   !undocumented, for internal testing
-    if( SetLastArgument ) m4l_minmax(2) = m4l_minmax(2)*GeV
-    call ReadCommandLineArgument(arg, "MPhotonCutoff", success, MPhotonCutoff, SetLastArgument)
-    if( SetLastArgument ) MPhotonCutoff = MPhotonCutoff*GeV
-    call ReadCommandLineArgument(arg, "pTlepton_min", success, pTlepton_min, SetLastArgument)
-    if( SetLastArgument ) pTlepton_min = pTlepton_min*GeV
-    call ReadCommandLineArgument(arg, "etalepton_max", success, etalepton_max, SetLastArgument)
-    if( SetLastArgument ) etalepton_max = etalepton_max*GeV
-
+    call ReadCommandLineArgument(arg, "pTjetcut", success, pTjetcut, multiply=GeV, success2=SetpTjetcut, tosave=tosave)
+    call ReadCommandLineArgument(arg, "etajetcut", success, etajetcut, success2=Setetajetcut, tosave=tosave)
+    call ReadCommandLineArgument(arg, "detajetcut", success, detajetcut, success2=Setdetajetcut, tosave=tosave)
+    call ReadCommandLineArgument(arg, "deltaRcut", success, Rjet, success2=SetdeltaRcut, tosave=tosave)
+    call ReadCommandLineArgument(arg, "mJJcut", success, mJJcut, multiply=GeV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "m4l_min", success, m4l_minmax(1), multiply=GeV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "m4l_max", success, m4l_minmax(2), multiply=GeV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "MPhotonCutoff", success, MPhotonCutoff, multiply=GeV, success2=SetMPhotonCutoff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "pTlepcut", success, pTlepcut, multiply=GeV, success2=SetpTlepcut, tosave=tosave)
+    call ReadCommandLineArgument(arg, "etalepcut", success, etalepcut, success2=Setetalepcut, tosave=tosave)
+    call ReadCommandLineArgument(arg, "JetsOppositeEta", success, JetsOppositeEta, tosave=tosave)
 
     if( .not.success ) then
         call Error("Unknown command line argument: " // trim(arg))
     endif
    enddo
 
+   SetHZprime = SetZZprimecoupling .or. SetZprimeZprimecoupling .or. SetZprimegammacoupling
+   SetHWprime = SetWWprimecoupling .or. SetWprimeWprimecoupling
+
     !================================
     !Command line argument processing
     !================================
 
-    !PChannel
+    !output file
 
+    i = len(trim(DataFile))
+    if( DataFile(i-3:i).eq.".lhe" ) then
+        DataFile = DataFile(1:i-4)
+    endif
+    call system('mkdir -p ./data')! -p is suppressing error messages if directory already exists
+
+    if( VBFoffsh_run.eq.1 ) DataFile = trim(DataFile)//"1"
+    if( VBFoffsh_run.eq.2 ) DataFile = trim(DataFile)//"2"
+    if( VBFoffsh_run.eq.3 ) DataFile = trim(DataFile)//"3"
+    if( VBFoffsh_run.eq.4 ) DataFile = trim(DataFile)//"4"
+    if( VBFoffsh_run.eq.0 ) DataFile = trim(DataFile)//"0"
+
+    if( SetCSmaxFile ) then
+      i = len(trim(CSmaxFile))
+      if( CSmaxFile(i-3:i).eq.".lhe" ) then
+          CSmaxFile = CSmaxFile(1:i-4)
+      endif
+      if( VBFoffsh_run.eq.1 ) CSmaxFile = trim(CSmaxFile)//"1"
+      if( VBFoffsh_run.eq.2 ) CSmaxFile = trim(CSmaxFile)//"2"
+      if( VBFoffsh_run.eq.3 ) CSmaxFile = trim(CSmaxFile)//"3"
+      if( VBFoffsh_run.eq.4 ) CSmaxFile = trim(CSmaxFile)//"4"
+      if( VBFoffsh_run.eq.0 ) CSmaxFile = trim(CSmaxFile)//"0"
+    else
+      CSmaxFile = DataFile
+    endif
+
+    if (ReadCSmax) then
+      call oldsavevalues%ReadFromFile(trim(CSmaxFile)//"_commandlineinfo.txt")
+      call CompareSaveValues(tosave, oldsavevalues)
+    else
+      call tosave%WriteToFile(trim(CSmaxFile)//"_commandlineinfo.txt")
+    endif
+
+    !VBF offshell
+    if( .not. (Process.ge.66 .and. Process.le.69) .and. SetVBFoffsh_run ) then
+      call Error("VBFoffsh_run is only for VBF offshell")
+    endif
+
+    !PChannel
     if (Process.eq.0) PChannel = 0   !only gluons
 !Yaofu Zhou ggZH
     !if (Process.eq.1 .or. Process.eq.51 .or. Process.eq.60 .or. Process.eq.66 .or. Process.eq.67 .or. Process.eq.68) PChannel = 1   !only quarks
@@ -813,6 +1231,26 @@ logical :: SetColliderEnergy
        Ga_Vprime = 0d0
     endif
 
+    M_V_ps = M_V
+    Ga_V_ps = Ga_V
+    M_Z_ps = M_Z
+    Ga_Z_ps = Ga_Z
+    M_W_ps = M_W
+    Ga_W_ps = Ga_W
+
+    if(      .not.SetZZcoupling .and. .not.SetZgammacoupling .and. .not.SetZZprimecoupling &
+       .and. (Process.ne.0 .or. ghz1.eq.0d0) &    !for Process=0 you have to have explicitly turned off the SM coupling
+       .and. (SetZprimeZprimecoupling .or. SetZprimegammacoupling) &
+       .and. Process.le.2 .and. (SetMZprime.and.IsAZDecay(DecayMode1) .or. SetMWprime.and.IsAWDecay(DecayMode1))) then
+       !need more complicated logic here if this is done for VBF
+       M_V_ps = M_Vprime
+       Ga_V_ps = Ga_Vprime
+       M_Z_ps = M_Zprime
+       Ga_Z_ps = Ga_Zprime
+       M_W_ps = M_Wprime
+       Ga_W_ps = Ga_Wprime
+    endif
+
     !ReadLHE and ConvertLHE
     !MUST HAPPEN BEFORE DETERMINING INTERFERENCE
     !so that the mass and width can be read
@@ -856,12 +1294,12 @@ logical :: SetColliderEnergy
     endif
 
     !decay mode checks
-    if( (IsAZDecay(DecayMode1) .and. IsAZDecay(DecayMode2) .and. Process.le.2) .or. (Process.eq.50 .and. IsAZDecay(DecayMode1)) .or. (Process.eq.51 .and. IsAZDecay(DecayMode1)) .or. Process.eq.60 .or. Process.eq.66 ) then
-        includeGammaStar = (SetZgammacoupling .or. Setgammagammacoupling)
-    elseif( (IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. Process.le.2) .or. (Process.eq.50 .and. IsAZDecay(DecayMode1)) .or. (Process.eq.51 .and. IsAPhoton(DecayMode1)) ) then
+    if( (IsAZDecay(DecayMode1) .and. IsAZDecay(DecayMode2) .and. (Process.eq.0 .or. Process.eq.2) .and. TauDecays.lt.0) .or. (Process.ge.50 .and. Process.le.51 .and. IsAZDecay(DecayMode1)) .or. Process.eq.60 .or. Process.eq.66 ) then
+        includeGammaStar = (SetZgammacoupling .or. Setgammagammacoupling .or. SetZprimegammacoupling)
+    elseif( (IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. (Process.eq.0 .or. Process.eq.2) .and. TauDecays.lt.0) .or. (Process.ge.50 .and. Process.le.51 .and. IsAPhoton(DecayMode1)) ) then
         includeGammaStar = Setgammagammacoupling
     else if (Process.eq.67 .or. Process.eq.68 .or. Process.eq.69) then
-        includeGammaStar = .true. ! Not really gamma*, but rather gamma* or gluon, set to true to manipulate pahsespace generation
+        includeGammaStar = .true. ! Not really gamma*, but rather gamma* or gluon, set to true to manipulate phasespace generation
     endif
 
     if( (DecayMode1.ge.12) .or. (DecayMode2.ge.12) .or. (DecayMode1.lt..0) .or. (DecayMode2.lt.0) ) then
@@ -878,32 +1316,49 @@ logical :: SetColliderEnergy
     endif
 
 
-    if( IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. .not.SetZgammacoupling .and. .not.Setgammagammacoupling .and. (Process.eq.0)) then
-        print *, "To decay the resonance to Z+photon, you need to set one of the HZgamma (ghzgs*) or Hgammagamma (ghgsgs*) couplings."
+    if( IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. .not.SetZgammacoupling .and. .not.Setgammagammacoupling .and. .not.SetZprimegammacoupling .and. (Process.eq.0 .or. Process.eq.2)) then
+        if (Process.eq.0) then
+          print *, "To decay the resonance to Z+photon, you need to set one of the HZgamma (ghzgs*) or Hgammagamma (ghgsgs*) couplings."
+        else if (Process.eq.2) then
+          print *, "To decay the resonance to Z+photon, you need to set one of the GZgamma (bzgs*) or Ggammagamma (bgsgs*) couplings."
+        end if
         stop 1
     endif
 
-    if( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) .and. .not.Setgammagammacoupling .and. (Process.eq.0)) then
-        print *, "To decay the resonance to photon+photon, you need to set one of the Hgammagamma (ghgsgs*) couplings."
+    if( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) .and. .not.Setgammagammacoupling .and. (Process.eq.0 .or. Process.eq.2)) then
+        if (Process.eq.0) then
+          print *, "To decay the resonance to photon+photon, you need to set one of the Hgammagamma (ghgsgs*) couplings."
+        else if (Process.eq.2) then
+          print *, "To decay the resonance to photon+photon, you need to set one of the Ggammagamma (bgsgs*) couplings."
+        end if
         stop 1
     endif
 
-    if( Process.eq.51 .and. IsAPhoton(DecayMode1) .and. .not.SetZgammacoupling .and. .not.Setgammagammacoupling ) then
-        print *, "To produce gammaH, you need to set one of the HZgamma (ghzgs*) or Hgammagamma(ghgsgs*) couplings."
-        stop 1
-    endif
-
-    if( Process.eq.50 .and. IsAPhoton(DecayMode1) .and. .not.SetZgammacoupling .and. .not.Setgammagammacoupling .and. .not.SetZprimegammacoupling ) then
+    if( Process.ge.50 .and. Process.le.51 .and. IsAPhoton(DecayMode1) .and. .not.SetZgammacoupling .and. .not.Setgammagammacoupling ) then
         print *, "To produce gammaH, you need to set one of the HZgamma (ghzgs*) or Hgammagamma(ghgsgs*) couplings."
         stop 1
     endif
 
     !cut checks
-    if(.not.SetpTcut) then
+    if(.not.SetpTjetcut) then
         if(Process.eq.50) then
             pTjetcut = 0d0*GeV
         else
-            pTjetcut=15d0*GeV
+            pTjetcut = 15d0*GeV
+        endif
+    endif
+    if(.not.Setetajetcut) then
+        if(Process.ge.66 .and. Process.le.69) then
+            etajetcut = 4d0
+        else
+            etajetcut = infinity()
+        endif
+    endif
+    if(.not.Setdetajetcut) then
+        if(Process.ge.66 .and. Process.le.69) then
+            detajetcut = 2d0
+        else
+            detajetcut = 0d0
         endif
     endif
     if(.not.SetdeltaRcut) then
@@ -913,8 +1368,31 @@ logical :: SetColliderEnergy
             Rjet = 0.3d0
         endif
     endif
+    if(.not.SetpTlepcut) then
+        if(Process.ge.66 .and. Process.le.69) then
+            pTlepcut = 3d0*GeV
+        else
+            pTlepcut = 0d0*GeV
+        endif
+    endif
+    if(.not.Setetalepcut) then
+        if(Process.ge.66 .and. Process.le.69) then
+            etalepcut = 2.7d0
+        else
+            etalepcut = infinity()
+        endif
+    endif
+    if(.not.SetMPhotonCutoff) then
+        if(includeGammaStar) then
+            MPhotonCutoff = 4d0*GeV
+        elseif(Process.ge.66.and.Process.le.69) then
+            MPhotonCutoff = 2.5d0*GeV
+        else
+            MPhotonCutoff = 0d0
+        endif
+    endif
     if((Process.eq.60 .or. Process.eq.66 .or. Process.eq.67 .or. Process.eq.68 .or. Process.eq.69) .and. includeGammaStar .and. pTjetcut.le.0d0) then
-       print *, " Process=",Process," with off-shell photons requires a non-zero pT cut instead of photon mass cutoff. Current setting cut ",pTjetcut/GeV," GeV is not allowed."
+       print *, " Process=",Process," with offshell photons requires a non-zero pT cut. Current setting cut ",pTjetcut/GeV," GeV is not allowed."
        stop 1
     endif
     if((Process.eq.61 .or. Process.eq.62) .and. pTjetcut.le.0d0) then
@@ -926,7 +1404,7 @@ logical :: SetColliderEnergy
     !           Set OffShellV1/V2           !
     !---------------------------------------!
     if( IsAPhoton(DecayMode2) .and. IsAZDecay(DecayMode1) ) then
-       print *,"Z is off-shell and photon is on-shell in Z+photon production."
+       print *,"Z is offshell and photon is on-shell in Z+photon production."
        print *,"Randomization of the order of writing of the decay products to the LHE file is disabled."
        RandomizeVVdecays = .false.
     elseif( IsAPhoton(DecayMode2) .and. IsAPhoton(DecayMode1) .and. Process.le.2 ) then
@@ -997,11 +1475,35 @@ logical :: SetColliderEnergy
     !---------------------------------------!
     !            Check couplings            !
     !---------------------------------------!
+
+    if( Process.eq.1 ) then
+      if( SetAnomalousSpin0gg .or. SetAnomalousSpin0VV .or. SetAnomalousHff ) then
+        call Error("There is no point setting spin 0 couplings for spin 1 production")
+      endif
+      if( SetAnomalousSpin2gg .or. SetAnomalousSpin2qq .or. SetSpin2VV ) then
+        call Error("There is no point setting spin 2 couplings for spin 1 production")
+      endif
+    else if( Process.eq.2 ) then
+      if( SetAnomalousSpin0gg .or. SetAnomalousSpin0VV .or. SetAnomalousHff ) then
+        call Error("There is no point setting spin 0 couplings for spin 2 production")
+      endif
+      if( SetAnomalousSpin1qq .or. SetSpin1VV ) then
+        call Error("There is no point setting spin 1 couplings for spin 2 production")
+      endif
+    else !spin 0
+      if( SetAnomalousSpin1qq .or. SetSpin1VV ) then
+        call Error("There is no point setting spin 1 couplings for spin 0 production")
+      endif
+      if( SetAnomalousSpin2gg .or. SetAnomalousSpin2qq .or. SetSpin2VV ) then
+        call Error("There is no point setting spin 2 couplings for spin 0 production")
+      endif
+    endif
+
     ! Spin-0 (incomplete)
     if( SetAnomalousSpin0gg .and. .not.Setghg2 ) then
         call Error("If you set an anomalous spin 0 gg coupling, you need to explicitly set ghg2 as well. This coupling is initialized to a non-zero value.")
     endif
-    if( .not.Setghz1 .and. OffShellV1 .and. OffShellV2 .and. (SetAnomalousSpin0ZZ .or. ((SetZgammacoupling .or. Setgammagammacoupling) .and. IsAZDecay(DecayMode1)))) then
+    if( .not.Setghz1 .and. OffShellV1 .and. OffShellV2 .and. SetAnomalousSpin0VV) then
         call Error("If you set an anomalous spin 0 VV coupling, you need to explicitly set ghz1 as well. This couplings is initialized to a non-zero value.")
     endif
     if( SetAnomalousHff .and. .not.Setkappa ) then
@@ -1039,6 +1541,81 @@ logical :: SetColliderEnergy
         !in MELA/test/testME_more.py to not remove the Z'gamma couplings for process = 50 or 60
     endif
 
+    ! Contact terms
+    if (Process.le.2 .or. Process.eq.50) then
+        if (IsAZDecay(DecayMode1) .or. (Process.eq.50 .and. IsAPhoton(DecayMode1))) then
+            if ((SetHZprime .and. .not.SetZprimeff) .or. (.not.SetHZprime .and. SetZprimeff)) then
+                call Error("To use Z' contact terms, you have to set both HVZ' and Z'ff couplings")
+            endif
+            if ((SetMZprime.or.SetGaZprime) .and. .not.SetHZprime) then
+                call Error("Setting the mass and width of Z' doesn't do anything if you don't set HVZ' couplings")
+            endif
+            if (SetMWprime .or. SetGaWprime) then
+                call Error("Don't set the W' mass and width in ZZ decay")
+            endif
+        elseif (IsAWDecay(DecayMode1)) then
+            if ((SetHZprime .and. .not.SetWprimeff) .or. (.not.SetHZprime .and. SetWprimeff)) then
+                call Error("To use W' contact terms, you have to set both HZZ'/HZ'Z' (which are used for HWW'/HW'W') and W'ff couplings")
+            endif
+            if ((SetMWprime.or.SetGaWprime) .and. .not.SetHZprime) then
+                call Error("Setting the mass and width of W' doesn't do anything if you don't set HZZ'/HZ'Z' couplings (which are used for HWW'/HW'W')")
+            endif
+            if (SetMZprime .or. SetGaZprime) then
+                call Error("Don't set the Z' mass and width in WW decay")
+            endif
+        endif
+    endif
+    if (Process.eq.60 .or. (Process.ge.66 .and. Process.le.69)) then
+        if ((SetHZprime .and. .not.SetZprimeff) .or. (.not.SetHZprime .and. SetZprimeff)) then
+            call Error("To use Z' contact terms, you have to set both HVZ' and Z'ff couplings")
+        endif
+
+        if (distinguish_HWWcouplings) then
+            if ((SetHWprime .and. .not.SetWprimeff) .or. (.not.SetHWprime .and. SetWprimeff)) then
+                call Error("To use W' contact terms, you have to set both HVW' and W'ff couplings")
+            endif
+            if ((SetMZprime.or.SetGaZprime) .and. .not.SetHZprime) then
+                call Error("Setting the mass and width of Z' doesn't do anything if you don't set HVZ' couplings")
+            endif
+            if ((SetMWprime.or.SetGaWprime) .and. .not.SetHWprime) then
+                call Error("Setting the mass and width of W' doesn't do anything if you don't set HVW' couplings")
+            endif
+        else
+            if (SetHZprime .and. .not.SetWprimeff) then
+                call Error("HZZ'/HZ'Z' couplings are also used for HWW'/HW'W', so if you set them you also need to set W'ff couplings (possibly to 0).")
+            endif
+            if (SetWprimeff .and. .not.SetHZprime) then
+                call Error("If you set W'ff couplings, and you don't distinguish HZZ and HWW couplings, then you also have to set HZZ'/HZ'Z' couplings, which are also used for HWW'/HW'W'")
+            endif
+            if ((SetMZprime.or.SetGaZprime) .and. .not.SetHZprime) then
+                call Error("Setting the mass and width of Z' doesn't do anything if you don't set HVZ' couplings")
+            endif
+            if ((SetMWprime.or.SetGaWprime) .and. .not.SetHZprime) then
+                call Error("Setting the mass and width of W' doesn't do anything if you don't set HZZ'/HZ'Z' couplings (which are used for HWW'/HW'W')")
+            endif
+        endif
+    endif
+
+
+    if( SetMZprime .and. .not.SetGaZprime ) then
+        call Error("If you set the mass of Zprime, you also have to set the width! GaZprime=...")
+    endif
+    if( SetGaZprime .and. .not.SetMZprime ) then
+        call Error("If you set the width of Zprime, you also have to set the mass! MZprime=...")
+    endif
+    if( SetMWprime .and. .not.SetGaWprime ) then
+        call Error("If you set the mass of Wprime, you also have to set the width! GaWprime=...")
+    endif
+    if( SetGaWprime .and. .not.SetMWprime ) then
+        call Error("If you set the width of Wprime, you also have to set the mass! MWprime=...")
+    endif
+
+    if( (Process.eq.50 .or. Process.eq.60) .and. SetZprimegammacoupling ) then
+        call Error("Z'gamma couplings are not implemented for VBF or VH")
+        !If you implement them and remove this error, also edit the Vprimekwargs function
+        !in MELA/test/testME_more.py to not remove the Z'gamma couplings for process = 50 or 60
+    endif
+
     ! Spin-1
     if( Process.eq.1) then
        if( SetAnomalousSpin1qq .and. .not.(Setspin1qqleft.and.Setspin1qqright) ) then
@@ -1063,11 +1640,8 @@ logical :: SetColliderEnergy
        if ((a1.eq.czero .and. a2.eq.czero .and. a3.eq.czero .and. a4.eq.czero .and. a5.eq.czero) .and. PChannel.ne.1) then
           call Error("In spin 2 gg production, the couplings cannot all be zero. You can use PChannel=1 for qq-only production, or explicitly set at least one of the gg couplings a1, a2, a3, a4, or a5 non-zero.")
        endif
-       if (b1.eq.czero .and. b2.eq.czero .and. b3.eq.czero .and. b4.eq.czero .and. b5.eq.czero .and. b6.eq.czero .and. b7.eq.czero .and. b8.eq.czero .and. b9.eq.czero .and. b10.eq.czero) then
-          call Error("Spin 2 VV decay cannot be done with zero couplings.  You need to explicitly set b1, b2, b3, b4, b5, b6, b7, b8, b9, or b10 non-zero.")
-       endif
-       if (.not.(OffShellV1 .and. OffShellV2) .and. (b5.ne.czero .or. b6.ne.czero .or. b7.ne.czero .or. b9.ne.czero .or. b10.ne.czero)) then
-          call Error("Spin 2 Z+gamma or gamma+gamma decay cannot be done with b5-7 or b9-10.")
+       if (.not. SetSpin2VV) then
+          call Error("For spin 2 production you need to explicitly set one of the spin 2 couplings to ZZ, Zgamma, gammagamma, ZZ', Z'Z', or Z'gamma non-zero.")
        endif
     endif
 
@@ -1096,6 +1670,11 @@ logical :: SetColliderEnergy
       call ComputeCKMElements(VCKM_ud, VCKM_us, VCKM_cd, VCKM_cs, VCKM_ts, VCKM_tb, inVCKM_ub=VCKM_ub, inVCKM_cb=VCKM_cb, inVCKM_td=VCKM_td)
    endif
 
+   if (DryRun) then
+     print *, "Running JHUGen with these options should work."
+     stop
+   endif
+
 return
 END SUBROUTINE
 
@@ -1108,6 +1687,8 @@ SUBROUTINE InitVegas()
 use ModKinematics
 implicit none
 include "vegas_common.f"
+include 'maxwt.f'
+
 
   xl(1:mxdim) = 0d0
   xu(1:mxdim) = 1d0
@@ -1116,6 +1697,7 @@ include "vegas_common.f"
   readin=.false.
   writeout=.false.
   stopvegas=.false.
+  evtgen=.false.
 
 return
 END SUBROUTINE
@@ -1149,9 +1731,15 @@ SUBROUTINE InitPDFs()
    use ModParameters
    implicit none
    DOUBLE PRECISION alphasPDF
+   character(len=5) :: LHAPDFversionnumber
 
    if (.not.ReadLHEFile .and. .not.ConvertLHEFile) then
-     call InitPDFset(trim(LHAPDFString)) ! Let LHAPDF handle everything
+     call LHAPDFversion(LHAPDFversionnumber)
+     if (LHAPDFversionnumber .ge. "6.2.1") then
+       call InitPDFSetByName(trim(LHAPDFString)) ! Let LHAPDF handle everything
+     else
+       call InitPDFSet(trim(LHAPDFString)) ! Let LHAPDF handle everything
+     endif
      call InitPDF(LHAPDFMember)
 
      alphas_mz=alphasPDF(zmass_pdf)
@@ -1188,7 +1776,7 @@ SUBROUTINE InitPDFs()
         alphas_mz=0.13939d0
         !nloops_pdf=1
      else ! Everything else
-        write(6,*),"main.F90::InitPDFs: PDFSet",PDFSet,"QCD parameters are unknown. Please double-check! Stopping JHUGen..."
+        write(6,*) "main.F90::InitPDFs: PDFSet",PDFSet,"QCD parameters are unknown. Please double-check! Stopping JHUGen..."
         stop
         ! Could also have used these instead of the stop statement, but why introduce arbitrary number?
         !alphas_mz = 0.13229060d0
@@ -1577,15 +2165,22 @@ END SUBROUTINE
 #if linkMELA==1
 subroutine SetupMCFM(Process)
 use ModMCFMWrapper
+use ModMisc
 implicit none
 integer, intent(in) :: Process
-
-   call MCFM_firsttime()
 
    if( &
       (Process.ge.66 .and. Process.le.69) &
       ) then
-      call Setup_MCFM_qqVVqq_firsttime(Process)
+      call MCFM_firsttime()
+      if( &
+         (Process.ge.66 .and. Process.le.69) &
+         ) then
+         call Setup_MCFM_qqVVqq_firsttime(Process)
+      !else if ... add more processes here
+      else
+         call Error("Don't know how to set up this process for MCFM")
+      endif
    endif
 
 end subroutine
@@ -1752,11 +2347,11 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
             PChannel = PChannel_aux
         enddo
 
-        open(unit=io_CSmaxFile,file='CSmax.bin',form='unformatted',status='replace')
+        open(unit=io_CSmaxFile,file=trim(CSmaxFile)//'_CSmax.bin',form='unformatted',status='replace')
         WRITE(io_CSmaxFile) CSMAX
         close(io_CSmaxFile)
     else
-        open(unit=io_CSmaxFile,file='CSmax.bin',form='unformatted')
+        open(unit=io_CSmaxFile,file=trim(CSmaxFile)//'_CSmax.bin',form='unformatted')
         READ(io_CSmaxFile) CSMAX
         close(io_CSmaxFile)
     endif
@@ -1932,15 +2527,20 @@ use ModMisc
 use ModParameters
 implicit none
 include "vegas_common.f"
+include 'maxwt.f'
 real(8) :: VG_Result,VG_Error,VG_Chi2
 real(8) :: yRnd(1:22),calls1,calls2,calls_rescale
 real(8) :: dum, RES(-5:5,-5:5),ResFrac(-5:5,-5:5),TotalXSec
-integer :: i, i1, j1,PChannel_aux, PChannel_aux1,NHisto,ijSel(1:121,1:3)
+integer :: i, i1, j1,PChannel_aux, PChannel_aux1,NHisto
+integer, pointer :: ijSel(:,:)
 include 'csmaxvalue.f'
 integer :: flav1,flav2,StatusPercent,MissingEvents,MaxEvts,imax
-integer :: VegasSeed
+integer :: VegasSeed,PreviousSum,ios
 character :: ProcessStr*(3)
 logical :: UseBetaVersion=.false.
+real(8) :: VG_Result_in(1:4),VG_Error_in(1:4),calls1_in(1:4),calls2_in(1:4)
+real(8) :: CrossSec2_in(1:4,1:164),CrossSecMax2_in(1:4,164)
+
 
     VG_Result = -13d0
     VG_Error  = -13d0
@@ -1975,7 +2575,11 @@ logical :: UseBetaVersion=.false.
     PChannel_aux = PChannel
 
 
+    outgridfile=trim(CSmaxFile)//'.grid'
+    ingridfile=trim(outgridfile)
 
+
+    if( Process.ge.69 .and. Process.le.79 ) call Error("Missing ChannelHash for Process 69") !can change 79 if we add more processes in between
 
 if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !----------------------- weighted events
 
@@ -1987,8 +2591,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
         return
     endif
 
-    outgridfile=trim(DataFile)//'.grid'
-    ingridfile=trim(outgridfile)
+
 
     ! WARM-UP RUN
     if( .not. ReadCSmax ) then
@@ -2050,68 +2653,94 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
 
 elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 
-if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) UseBetaVersion=.true.
-if( Process.eq.60 ) UseBetaVersion=.true.
-if( Process.eq.61 ) UseBetaVersion=.true.
-if( Process.ge.66 .and. Process.le.69 ) UseBetaVersion=.true.
-
-if( Process.eq.110 ) UseBetaVersion=.true.
-if( Process.eq.111 ) UseBetaVersion=.true.
-if( Process.eq.112 ) UseBetaVersion=.true.
-if( Process.eq.113 ) UseBetaVersion=.true.
-if( Process.eq.114 ) UseBetaVersion=.true.
+UseBetaVersion = CalculatesXsec(Process)
 
 
 if( UseBetaVersion ) then
 ! !-------------------new stuff -------------------
+
+IF( .NOT. (Process.ge.66 .and. Process.le.69) ) THEN! special treatment for offshell VBF
+
     write(io_stdout,"(2X,A)")  "Scanning the integrand"
     warmup = .true.
-    itmx = 5
+    itmx = 10
     ncall= VegasNc0
-    outgridfile="vegas_"//trim(ProcessStr)//".grid"
-    ingridfile=trim(outgridfile)
+
 
     if( ReadCSmax ) then
         readin=.true.
         writeout=.false.
-        itmx = 3
+        ingridfile = trim(CSmaxFile)//'_step2.grid'
+        open(unit=io_TmpFile,file=trim(CSmaxFile)//'_gridinfo.txt',form='formatted',status='old')
+        read(io_TmpFile,fmt=*) calls1
+        read(io_TmpFile,fmt=*) CrossSec
+        read(io_TmpFile,fmt=*) CrossSecMax
+        read(io_TmpFile,fmt=*) VG_Result
+        read(io_TmpFile,fmt=*) VG_Error
+        close(unit=io_TmpFile)
     else
         readin=.false.
         writeout=.true.
         if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-        if( Process.ge.66 .and. Process.le.69 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+!        if( Process.ge.66 .and. Process.le.69 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.110) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.111) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.112) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.113) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.114) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-        itmx = 3
+
+        itmx = 2
+        writeout=.true.
+        outgridfile = trim(CSmaxFile)//'_step2.grid'
+        if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
+!         if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2) ! adjust to LHE format
+!         if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+!        if( Process.ge.66 .and. Process.le.69 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.110) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.111) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.112) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.113) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.114) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+
+
+        CrossSecMax(:,:) = 0d0
+        CrossSec(:,:) = 0d0
+        print *, "resetting CrossSecMax(:,:)"
+        itmx = 1
+        if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
+!         if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2) ! adjust to LHE format
+!         if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+!        if( Process.ge.66 .and. Process.le.69 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.110) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.111) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.112) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.113) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.114) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+        writeout=.false.
+        ingridfile=trim(outgridfile)
+
+        call vegas_get_calls(calls1)
+        CrossSec(:,:) = CrossSec(:,:)/dble(itmx)
+
+        open(unit=io_TmpFile,file=trim(CSmaxFile)//'_gridinfo.txt',form='formatted',status='replace')
+        write(io_TmpFile,fmt=*) calls1
+        write(io_TmpFile,fmt=*) CrossSec
+        write(io_TmpFile,fmt=*) CrossSecMax
+        write(io_TmpFile,fmt=*) VG_Result
+        write(io_TmpFile,fmt=*) VG_Error
+        close(unit=io_TmpFile)
     endif
 
-
-    CrossSecMax(:,:) = 0d0
-    CrossSec(:,:) = 0d0
-
-    if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
-!     if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2) ! adjust to LHE format
-!     if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-    if( Process.ge.66 .and. Process.le.69 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.110) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.111) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.112) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.113) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.114) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-
-
-    call vegas_get_calls(calls1)
-    CrossSec(:,:) = CrossSec(:,:)/dble(itmx)
     write(io_stdout,"(A)")  ""
     write(io_stdout,*) "Total xsec: ",VG_Result, " +/-",VG_Error, " fb    vs.",sum(CrossSec(:,:))
     call InitOutput(VG_Result, VG_Error)
+
 
     RequEvents(:,:) = 0
     if (VegasNc2.ne.-1) then
@@ -2119,31 +2748,16 @@ if( UseBetaVersion ) then
     endif
 
     if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2) then
-       call get_PPXchannelHash(ijSel)
+       call getRef_PPXchannelHash(ijSel)
     elseif( Process.eq.60 ) then
-       call get_VBFchannelHash(ijSel)
+       call getRef_VBFchannelHash(ijSel)
     elseif( Process.eq.61 ) then
-       call get_HJJchannelHash(ijSel)
-    elseif( Process.eq.110 ) then
-       call get_THchannelHash(ijSel)
-    elseif( Process.eq.111 ) then
-       call get_THchannelHash(ijSel)
-    elseif( Process.eq.112 ) then
-       call get_THchannelHash(ijSel)
-    elseif( Process.eq.113 ) then
-       call get_THchannelHash(ijSel)
-    elseif( Process.eq.114 ) then
-       call get_THchannelHash(ijSel)
+       call getRef_HJJchannelHash(ijSel)
+    elseif( Process.ge.110 .and. Process .le.114 ) then
+       call getRef_THchannelHash(ijSel)
     else
-       call get_GENchannelHash(ijSel)
+       call getRef_GENchannelHash(ijSel)
     endif
-! do i=1,121
-!          i1 = ijSel(i,1)
-!          j1 = ijSel(i,2)
-!          if( j1.gt.i1 ) cycle
-!          write(io_stdout,"(1X,I3,A,I3,I3,A,3X,F8.3,I9)") i," Fractional partonic xsec ",i1,j1," "//getLHEParticle(i1)//" "//getLHEParticle(j1)//" ",CrossSec(i1,j1)/VG_Result,RequEvents(i1,j1)
-! enddo
-! pause
 
     do i=1,121
          i1 = ijSel(i,1)
@@ -2154,11 +2768,15 @@ if( UseBetaVersion ) then
 
 
 
+
+
+
     write(io_stdout,"(A)")  ""
     write(io_stdout,"(2X,A)")  "Event generation"
 
     call ClearHisto()
     warmup = .false.
+    evtgen = .true.
     itmx = 1
 !     nprn = 0
     EvalCounter = 0
@@ -2172,38 +2790,62 @@ if( UseBetaVersion ) then
     call cpu_time(time_start)
 
 
-    itmx=200000
-    ncall= VegasNc0/10
+
+    itmx=1
+    ncall= VegasNc0    !/10     dmax inside vegas needs to be adapted for this. or at least thisdmax inside mod_Crosssection
+    nprn =-1 !0
+    writeout=.false.
+
     call vegas_get_calls(calls2)
     calls_rescale = calls1/calls2
     CrossSecMax(:,:) = CrossSecMax(:,:) * calls_rescale
+    print *, "Rescale CrossSecMax by ",calls_rescale
 
+    PreviousSum = 0
+    do while( StatusPercent.lt.100d0  )
+!     do while( AccepCounter_part(iPart_sel,jPart_sel).lt.RequEvents(iPart_sel,jPart_sel) )
+        call cpu_time(time_start)
+        readin=.true.  ! this prevents adapting the grid during this while-loop
 
-!     do while( StatusPercent.lt.100d0  )
         if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
 !         if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)! adjust to LHE format
     !     if( Process.eq.90 ) call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-        if( Process.ge.66 .and. Process.le.69 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+ !       if( Process.ge.66 .and. Process.le.69 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.110) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.111) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.112) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.113) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.114) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+
+
 !         call system('clear')
-!         write(io_stdout,*) ""
-!         do i1=-5,5
-!         do j1=-5,5
-!             if( RequEvents(i1,j1).gt.0 ) then
-! !                write(io_stdout,"(1X,A,I4,I4,2X,I7,2X,I7,2X,F8.3,1X,A)") "Generated events ", i1,j1,(AccepCounter_part(i1,j1)),(RequEvents(i1,j1)),dble(AccepCounter_part(i1,j1))/dble(RequEvents(i1,j1))*100d0,"%"
+        write(io_stdout,*) ""
+        do i1=-5,5
+        do j1=-5,5
+            if( RequEvents(i1,j1).gt.0 .and. AccepCounter_part(i1,j1).lt.RequEvents(i1,j1)  ) then
+!                write(io_stdout,"(1X,A,I4,I4,2X,I7,2X,I7,2X,F8.3,1X,A)") "Generated events ", i1,j1,(AccepCounter_part(i1,j1)),(RequEvents(i1,j1)),dble(AccepCounter_part(i1,j1))/dble(RequEvents(i1,j1))*100d0,"%"
 !                call PrintStatusBar2(int(dble(AccepCounter_part(i1,j1))/(dble(RequEvents(i1,j1)))*100),"channel "//getLHEParticle(i1)//" "//getLHEParticle(j1)//" ")
-!             endif
-!         enddo
-!         enddo
-!         StatusPercent = int(100d0*dble(sum(AccepCounter_part(:,:)))/dble(sum(RequEvents(:,:)))  )
-!     enddo
-    call cpu_time(time_end)
+               write(*,"(I3,I3,I7,I7,F16.6,E16.3)") i1,j1, &
+               AccepCounter_part(i1,j1), RequEvents(i1,j1), &
+               dble(AccepCounter_part(i1,j1))/dble(RejeCounter_part(i1,j1))*100d0, &
+               CrossSecMax(i1,j1)
+            endif
+        enddo
+        enddo
+        write(*,"(A,I10,I10,F16.6)") "PS gen eff. ",DebugCounter(10),DebugCounter(9),dble(DebugCounter(10))/dble(DebugCounter(9))*100d0
+        DebugCounter(9:10)=0
+        StatusPercent = int(100d0*dble(sum(AccepCounter_part(:,:)))/dble(sum(RequEvents(:,:)))  )
+        print *, "StatusPercent=",StatusPercent, "  Events=",sum(AccepCounter_part(:,:))
+        call cpu_time(time_end)
+        write(io_stdout,*)  "Event generation rate (events,events/sec)",sum(AccepCounter_part(:,:))-PreviousSum,dble(sum(AccepCounter_part(:,:))-PreviousSum)/(time_end-time_start+1d-10)
+        PreviousSum = sum(AccepCounter_part(:,:))
+    enddo
+
+! enddo
+
+
 
     print *, " Alert  Counter: ",AlertCounter
     if( dble(AlertCounter)/dble(AccepCounter+1d-10) .gt. 1d0*percent ) then
@@ -2217,30 +2859,221 @@ if( UseBetaVersion ) then
 
 
 
-    if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) then
-          write(*,*) ""
-          write(*,"(A)") "                 el              mu             tau             neu              jet"
-          write(*,"(A,5F16.4)") " el ",dble(Br_counter(1,1:5))/dble(AccepCounter)
-          write(*,"(A,5F16.4)") " mu ",dble(Br_counter(2,1:5))/dble(AccepCounter)
-          write(*,"(A,5F16.4)") " tau",dble(Br_counter(3,1:5))/dble(AccepCounter)
-          write(*,"(A,5F16.4)") " neu",dble(Br_counter(4,1:5))/dble(AccepCounter)
-          write(*,"(A,5F16.4)") " jet",dble(Br_counter(5,1:5))/dble(AccepCounter)
-          write(*,*) ""
-          write(*,"(A,5F16.3)") "llll: ",(dble(Br_counter(1,1))+dble(Br_counter(2,2))+dble(Br_counter(3,3)))/dble(AccepCounter)
-          write(*,"(A,5F16.3)") "llLL: ",(dble(Br_counter(1,2))+dble(Br_counter(1,3))+  &
-                                          dble(Br_counter(2,1))+dble(Br_counter(2,3))+  &
-                                          dble(Br_counter(3,1))+dble(Br_counter(3,2)))/dble(AccepCounter)
-          write(*,"(A,5F16.3)") "2l2q: ",(dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
-                                          dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )/dble(AccepCounter)
+ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell VBF
 
-          write(*,"(A,5F16.3)") "4l/2q2l: ",(dble(Br_counter(1,2))+dble(Br_counter(1,3))+ dble(Br_counter(1,1))+dble(Br_counter(2,2))+dble(Br_counter(3,3)) &
-                                        + dble(Br_counter(2,1))+dble(Br_counter(2,3))+   &
-                                          dble(Br_counter(3,1))+dble(Br_counter(3,2)))/  &
-                                          (dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
-                                          dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )
+
+    if( VBFoffsh_run.ne.0 .and. VBFoffsh_run.ne.1 .and. VBFoffsh_run.ne.2 .and. VBFoffsh_run.ne.3 .and. VBFoffsh_run.ne.4 ) call Error("Please specify VBFoffsh_run")
+    print *, "VBFoffsh_run = ",VBFoffsh_run
+
+    write(io_stdout,"(2X,A)")  "Scanning the integrand"
+    warmup = .true.
+    
+    if( ReadCSmax ) then
+        i=len(trim(CSmaxFile))
+        open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'1_gridinfo.txt',form='formatted',status='old',iostat=ios)
+        read(io_TmpFile,fmt=*) calls1_in(1)
+        read(io_TmpFile,fmt=*) CrossSec2_in(1,:)
+        read(io_TmpFile,fmt=*) CrossSecMax2_in(1,:)
+        read(io_TmpFile,fmt=*) VG_Result_in(1)
+        read(io_TmpFile,fmt=*) VG_Error_in(1)
+        close(unit=io_TmpFile)
+        if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'1_gridinfo.txt'
+
+        open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'2_gridinfo.txt',form='formatted',status='old',iostat=ios)
+        read(io_TmpFile,fmt=*) calls1_in(2)
+        read(io_TmpFile,fmt=*) CrossSec2_in(2,:)
+        read(io_TmpFile,fmt=*) CrossSecMax2_in(2,:)
+        read(io_TmpFile,fmt=*) VG_Result_in(2)
+        read(io_TmpFile,fmt=*) VG_Error_in(2)
+        close(unit=io_TmpFile)
+        if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'2_gridinfo.txt'
+
+        open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'3_gridinfo.txt',form='formatted',status='old',iostat=ios)
+        read(io_TmpFile,fmt=*) calls1_in(3)
+        read(io_TmpFile,fmt=*) CrossSec2_in(3,:)
+        read(io_TmpFile,fmt=*) CrossSecMax2_in(3,:)
+        read(io_TmpFile,fmt=*) VG_Result_in(3)
+        read(io_TmpFile,fmt=*) VG_Error_in(3)
+        close(unit=io_TmpFile)
+        if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'3_gridinfo.txt'
+
+        open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'4_gridinfo.txt',form='formatted',status='old',iostat=ios)
+        read(io_TmpFile,fmt=*) calls1_in(4)
+        read(io_TmpFile,fmt=*) CrossSec2_in(4,:)
+        read(io_TmpFile,fmt=*) CrossSecMax2_in(4,:)
+        read(io_TmpFile,fmt=*) VG_Result_in(4)
+        read(io_TmpFile,fmt=*) VG_Error_in(4)
+        close(unit=io_TmpFile)
+        if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'4_gridinfo.txt'
+
+        if( calls1_in(1).ne.calls1_in(2) .or. calls1_in(1).ne.calls1_in(3) .or. calls1_in(2).ne.calls1_in(3) .or. calls1_in(1).ne.calls1_in(4) ) call Error("Mismatch in calls1")
+        calls1 = calls1_in(1)
+
+        CrossSec2(:) = -1d0        
+        do i=1,Hash_MCFM_qqVVqq_Size
+            if( CrossSec2_in(1,i).ne.0d0 .and. CrossSec2(i).eq.-1d0 ) CrossSec2(i) = CrossSec2_in(1,i)
+            if( CrossSec2_in(2,i).ne.0d0 .and. CrossSec2(i).eq.-1d0 ) CrossSec2(i) = CrossSec2_in(2,i)
+            if( CrossSec2_in(3,i).ne.0d0 .and. CrossSec2(i).eq.-1d0 ) CrossSec2(i) = CrossSec2_in(3,i)
+            if( CrossSec2_in(4,i).ne.0d0 .and. CrossSec2(i).eq.-1d0 ) CrossSec2(i) = CrossSec2_in(4,i)
+            if( CrossSec2(i).lt.0d0 ) then
+                print *, "WARNING: CrossSec2(i) has not been filled",i,CrossSec2_in(1:4,i)
+                CrossSec2(i) = 0d0
+            endif
+        enddo        
+
+        CrossSecMax2(:) = -1d0        
+        do i=1,Hash_MCFM_qqVVqq_Size
+            CrossSecMax2(i) = CrossSecMax2_in( max(1,VBFoffsh_run),i)
+        enddo        
+
+        VG_Result = VG_Result_in(1)+VG_Result_in(2)+VG_Result_in(3)+VG_Result_in(4)
+        VG_Error  = dsqrt(VG_Error_in(1)**2+VG_Error_in(2)**2+VG_Error_in(3)**2+VG_Error_in(4)**2)
+
+    else
+        itmx = 10
+        ncall= VegasNc0
+        readin=.false.
+        writeout=.true.
+        if( Process.ge.66 .and. Process.le.69 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+
+        itmx = 2
+        writeout=.true.
+        outgridfile = trim(CSmaxFile)//'_step2.grid'
+        if( Process.ge.66 .and. Process.le.69 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+
+
+        CrossSecMax2(:) = 0d0
+        CrossSec2(:) = 0d0
+        print *, "resetting CrossSecMax2(:)"
+        itmx = 1
+        call ClearHisto()
+        if( Process.ge.66 .and. Process.le.69 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+        writeout=.false.
+        ingridfile=trim(outgridfile)
+
+        call vegas_get_calls(calls1)
+        CrossSec2(:) = CrossSec2(:)/dble(itmx)
+
+        open(unit=io_TmpFile,file=trim(CSmaxFile)//'_gridinfo.txt',form='formatted',status='replace')
+        write(io_TmpFile,fmt=*) calls1
+        write(io_TmpFile,fmt=*) CrossSec2
+        write(io_TmpFile,fmt=*) CrossSecMax2
+        write(io_TmpFile,fmt=*) VG_Result
+        write(io_TmpFile,fmt=*) VG_Error
+        close(unit=io_TmpFile)
+    endif
+
+    write(io_stdout,"(A)")  ""
+    write(io_stdout,*) "Total xsec: ",VG_Result, " +/-",VG_Error, " fb    vs.",sum(CrossSec2(:))
+    call InitOutput(VG_Result, VG_Error)
+
+    RequEvents2(:) = 0
+    
+    
+    call HouseOfRepresentatives2(CrossSec2, RequEvents2, VegasNc2)
+
+    call getRef_MCFM_qqVVqq_Hash(ijSel)
+    RequEvents(:,:) = 0d0
+    do i=1,Hash_MCFM_qqVVqq_Size
+         i1 = convertToPartIndex(ijSel(i,1))
+         j1 = convertToPartIndex(ijSel(i,2))
+         if( RequEvents2(i).ne.0 ) write(*,"(I4,I4,I4,F18.8,I10,I10)") i, i1,j1,CrossSec2(i)/VG_Result,RequEvents2(i)         
+    enddo
+    write(io_stdout,"(2X,A,F18.3,I10)") "Sum        partonic xsec:",sum(CrossSec2(:))/VG_Result,sum(RequEvents2(:))
+
+
+    if( .not. ReadCSmax ) then! For ReadCSmax=.false. the program ends here
+       if( VBFoffsh_run.ne.1 .and. VBFoffsh_run.ne.2 .and. VBFoffsh_run.ne.3 .and. VBFoffsh_run.ne.4 ) print *, "WARNING: These are not the final number of events because the total cross section needs to be assembled from VBFoffsh_run=1,2,3,4"
+       RETURN
     endif
 
 
+    if( VBFoffsh_run.eq.1 ) then ! removing the requested events for the wrong VBFoffsh_run
+         RequEvents2(3:164) = 0
+    elseif( VBFoffsh_run.eq.2 ) then 
+         RequEvents2(1:2) = 0
+         RequEvents2(10:164) = 0
+    elseif( VBFoffsh_run.eq.3 ) then
+         RequEvents2(1:9) = 0
+         RequEvents2(41:164) = 0         
+    elseif( VBFoffsh_run.eq.4 ) then
+         RequEvents2(1:40) = 0
+    endif
+    ingridfile = trim(CSmaxFile)//'_step2.grid'
+
+
+
+
+!--------------------------------------------------------------------
+    write(io_stdout,"(A)")  ""
+    write(io_stdout,"(2X,A)")  "Event generation"
+
+    call ClearHisto()
+    warmup = .false.
+    evtgen = .true.
+!     nprn = 0
+    EvalCounter = 0
+    Br_counter(:,:) = 0
+    RejeCounter = 0
+    AlertCounter = 0
+    AccepCounter_part2(:) = 0
+    StatusPercent = 0d0
+
+    CrossSecMax2(:) = 1.5d0 * CrossSecMax2(:)    !  adjustment factor
+    call cpu_time(time_start)
+
+
+
+    itmx=1
+    ncall= VegasNc0    !/10     dmax inside vegas needs to be adapted for this. or at least thisdmax inside mod_Crosssection
+    nprn =-1 !0
+    writeout=.false.
+
+    call vegas_get_calls(calls2)
+    calls_rescale = calls1/calls2
+    CrossSecMax2(:) = CrossSecMax2(:) * calls_rescale
+    print *, "Rescale CrossSecMax2 by ",calls_rescale
+
+    PreviousSum = 0
+    do while( StatusPercent.lt.100d0  )
+        call cpu_time(time_start)
+        readin=.true.  ! this prevents adapting the grid during this while-loop
+
+        if( Process.ge.66 .and. Process.le.69 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+        write(io_stdout,*) ""
+
+        do i1=1,Hash_MCFM_qqVVqq_Size
+            if( RequEvents2(i1).gt.0 .and. AccepCounter_part2(i1).lt.RequEvents2(i1)  ) then
+               write(*,"(I3,I7,I7,E16.3)") i1, &
+               AccepCounter_part2(i1), RequEvents2(i1), &
+               CrossSecMax2(i1)
+            endif
+        enddo
+
+        StatusPercent = int(100d0*dble(sum(AccepCounter_part2(:)))/dble(sum(RequEvents2(:)))  )
+        print *, "StatusPercent=",StatusPercent, "  Events=",sum(AccepCounter_part2(:))
+        call cpu_time(time_end)
+        write(io_stdout,*)  "Event generation rate (events,events/sec)",sum(AccepCounter_part2(:))-PreviousSum,dble(sum(AccepCounter_part2(:))-PreviousSum)/(time_end-time_start+1d-10)
+        PreviousSum = sum(AccepCounter_part2(:))
+    enddo
+
+
+
+
+
+    print *, " Alert  Counter: ",AlertCounter
+    if( dble(AlertCounter)/dble(AccepCounter+1d-10) .gt. 1d0*percent ) then
+        write(io_LogFile,*) "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
+        write(io_LogFile,*) "       Increase CSMAX in main.F90."
+        write(io_stdout, *) "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
+        write(io_stdout, *) "       Increase CSMAX in main.F90."
+    endif
+    write(io_stdout,*)  " event generation rate (events/sec)",dble(sum(AccepCounter_part(:,:)))/(time_end-time_start+1d-10)
+
+
+
+
+ENDIF
 
 
 else! not beta version
@@ -2279,11 +3112,11 @@ else! not beta version
                 VG(:,:) = VG(:,:) + RES(:,:)
                 PChannel = PChannel_aux
         enddo
-        open(unit=io_CSmaxFile,file='CSmax.bin',form='unformatted',status='replace')
+        open(unit=io_CSmaxFile,file=trim(CSmaxFile)//'_CSmax.bin',form='unformatted',status='replace')
         WRITE(io_CSmaxFile) CSMAX,VG
         close(io_CSmaxFile)
     else
-        open(unit=io_CSmaxFile,file='CSmax.bin',form='unformatted')
+        open(unit=io_CSmaxFile,file=trim(CSmaxFile)//'_CSmax.bin',form='unformatted')
         READ(io_CSmaxFile) CSMAX,VG
         close(io_CSmaxFile)
     endif
@@ -2631,14 +3464,16 @@ SUBROUTINE InitReadLHE(BeginEventLine)
 use ModParameters
 use ModMisc
 implicit none
-logical :: FirstEvent, WroteHeader
+logical :: FirstEvent, WroteHeader, IsThisTheFirstInitLine
 character(len=160) :: FirstLines
-integer :: stat
+integer :: stat, InitFieldIndex, i, IDWTUPIndex(1:2), IDWTUP
+character(len=4) :: IDWTUPFmt
 character(len=100), intent(out) :: BeginEventLine
 
      write(io_LHEOutFile ,'(A)') '<LesHouchesEvents version="1.0">'
      FirstEvent = .false.
      WroteHeader = .false.
+     IsThisTheFirstInitLine = .false.
      do while ( .not.FirstEvent )
         read(io_LHEInFile,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
         if ( FirstLines(1:4).eq."<!--" .and. .not.WroteHeader ) then
@@ -2650,20 +3485,51 @@ character(len=100), intent(out) :: BeginEventLine
             write(io_LHEOutFile, "(A)") "-->"                          ! proc card, etc.
             WroteHeader = .true.                                       !and put the Higgs mass/width in a separate comment
         endif
-        if (Index(FirstLines,"<init>").ne.0 .and. .not.WroteHeader ) then !If not now, when?
-            call InitOutput(1d0, 1d14)
-            WroteHeader = .true.
+        if( IsThisTheFirstInitLine ) then
+          !See https://arxiv.org/pdf/hep-ph/0109068v1.pdf under IDWTUP
+          !For some processes, POWHEG writes all events with a weight of 1 (or +/-1)
+          !and writes IDWTUP as 3 (-3).  When Pythia sees IDWTUP=3 (-3), it assumes
+          !all weights are 1 (+/-1) and ignores the weights (abs(weights)) written
+          !in the LHE file. If we want to modify those weights, we have to set
+          !IDWTUP to 4 (-4).
+          if( ReweightDecay .or. WidthScheme.ne.WidthSchemeIn ) then
+            InitFieldIndex = 1
+            i = 1
+            do while( InitFieldIndex.le.9 )
+              do while( FirstLines(i:i).eq." " )
+                i=i+1
+              enddo
+              if( InitFieldIndex.eq.9 ) IDWTUPIndex(1) = i
+              do while( FirstLines(i:i).ne." " )
+                i=i+1
+              enddo
+              if( InitFieldIndex.eq.9 ) IDWTUPIndex(2) = i-1
+              InitFieldIndex=InitFieldIndex+1
+            enddo
+            read(FirstLines(IDWTUPIndex(1):IDWTUPIndex(2)), fmt=*) IDWTUP
+            if( abs(IDWTUP).eq.3 ) IDWTUP = IDWTUP * 4 / 3
+
+            write(IDWTUPFmt, fmt="(A,I1,A)") "(I", IDWTUPIndex(2)-IDWTUPIndex(1)+1, ")"
+
+            write(FirstLines(IDWTUPIndex(1):IDWTUPIndex(2)), fmt=IDWTUPFmt) IDWTUP
+          endif
+          IsThisTheFirstInitLine = .false.
+        endif
+        if (Index(FirstLines,"<init>").ne.0 ) then
+            if( .not.WroteHeader ) then !If not now, when?
+                call InitOutput(1d0, 1d14)
+                WroteHeader = .true.
+            endif
+            IsThisTheFirstInitLine = .true.
         endif
 
         if( Index(FirstLines, "<event").ne.0 ) then
             FirstEvent=.true.
             BeginEventLine = trim(FirstLines)
         else
-            if( importExternal_LHEinit ) then
-                if( Index(FirstLines,"<LesHouchesEvents").ne.0 .or. Index(FirstLines,"<!--").ne.0 ) then
-                else
-                  write(io_LHEOutFile,"(A)") trim(firstlines)
-                endif
+            if( Index(FirstLines,"<LesHouchesEvents").ne.0 .or. Index(FirstLines,"<!--").ne.0 ) then
+            else
+              write(io_LHEOutFile,"(A)") trim(firstlines)
             endif
         endif
 
@@ -2763,6 +3629,7 @@ call InitReadLHE(BeginEventLine)
      do while ( .true. )
          NEvent=NEvent + 1
          LeptInEvent(:) = 0
+         JetsInEvent(:) = 0
          read(io_LHEInFile,"(A)") EventLine(0)
          if (UseUnformattedRead) then
              read(EventLine(0),*) EventNumPart, EventProcessId, WeightScaleAqedAqcd
@@ -2795,9 +3662,13 @@ call InitReadLHE(BeginEventLine)
                   pH2sq = dsqrt(abs(MomHiggs(1:4).dot.MomHiggs(1:4)))
                   iHiggs = nline
             endif
-            if( IsALHELepton(LHE_IDUP(nline)) ) then
+            if( IsALHELepton(LHE_IDUP(nline)) .and. LHE_IntExt(nline).eq.1 ) then
                   LeptInEvent(0) = LeptInEvent(0) + 1
                   LeptInEvent( LeptInEvent(0) ) = LHE_IDUP(nline)
+            endif
+            if( IsALHEJet(LHE_IDUP(nline)) .and. LHE_IntExt(nline).eq.1 ) then
+                  JetsInEvent(0) = JetsInEvent(0) + 1
+                  JetsInEvent( JetsInEvent(0) ) = LHE_IDUP(nline)
             endif
          enddo
 
@@ -2904,8 +3775,8 @@ call InitReadLHE(BeginEventLine)
               tries = tries +1
               read(io_LHEInFile,fmt="(A160)",IOSTAT=stat,END=99) OtherLines(1:160)
               if(OtherLines(1:30).eq."</LesHouchesEvents>") then
-                  if( RequestNLeptons.gt.0 ) then
-                    write(io_LHEOutFile,"(A)") "<!-- Lepton filter information:"
+                  if( RequestNLeptons.gt.0 .or. RequestNJets.gt.0 ) then
+                    write(io_LHEOutFile,"(A)") "<!-- Filter information:"
                     write(io_LHEOutFile,"(A,I8)") "     events processed:  ", NEvent
                     write(io_LHEOutFile,"(A,I8)") "     events accepted:   ", AccepCounter
                     write(io_LHEOutFile,"(A,1F6.2,A)") "     filter efficiency: ", dble(AccepCounter)/dble(NEvent)*100d0,"% -->"
@@ -2942,7 +3813,7 @@ call InitReadLHE(BeginEventLine)
         write(io_stdout,*) "       Increase CSMAX in main.F90 or VegasNc1."
     endif
    write(io_stdout,*)  "Event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
-   if( RequestNLeptons.gt.0 ) write(io_stdout,"(A,1F6.2,A)") " Lepton filter efficiency:",dble(AccepCounter)/dble(NEvent)*100d0," %"
+   if( RequestNLeptons.gt.0 .or. RequestNJets.gt.0 ) write(io_stdout,"(A,1F6.2,A)") " Filter efficiency:",dble(AccepCounter)/dble(NEvent)*100d0," %"
 
 
     write(io_LogFile,*) ""
@@ -2955,7 +3826,7 @@ call InitReadLHE(BeginEventLine)
         write(io_LogFile,*) "       Increase CSMAX in main.F90 or VegasNc1."
     endif
    write(io_LogFile,*)  "Event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
-   if( RequestNLeptons.gt.0 ) write(io_LogFile,"(A,1F6.2,A)") " Lepton filter efficiency:",dble(AccepCounter)/dble(NEvent)*100d0," %"
+   if( RequestNLeptons.gt.0 .or. RequestNJets.gt.0 ) write(io_LogFile,"(A,1F6.2,A)") " Filter efficiency:",dble(AccepCounter)/dble(NEvent)*100d0," %"
 
 
 
@@ -3346,14 +4217,6 @@ integer :: i
 
    if( .not.FilesOpened ) then
        FilesOpened = .true.
-       call system('mkdir -p ./data')! -p is suppressing error messages if directory already exists
-
-       i = len(trim(DataFile))
-       if( DataFile(i-3:i).eq.".lhe" ) then
-           !print *, DataFile
-           DataFile = DataFile(1:i-4)
-           !print *, DataFile
-       endif
 
        print *, ""
        if( unweighted ) then
@@ -4036,6 +4899,10 @@ integer :: AllocStatus,NHisto
 
 RETURN
 END SUBROUTINE
+
+
+
+
 SUBROUTINE InitHisto_HVBF()
 use ModMisc
 use ModKinematics
@@ -4044,24 +4911,23 @@ implicit none
 integer :: AllocStatus,NHisto
 
           it_sav = 1
-          NumHistograms =  45!   9;
-print *, "extending no. of histograms for vbf tests"
+          NumHistograms =  10
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
           endif
 
           Histo(1)%Info   = "m_jj"
-          Histo(1)%NBins  = 40
+          Histo(1)%NBins  = 100
           Histo(1)%BinSize= 50d0*GeV
           Histo(1)%LowVal = 0d0
           Histo(1)%SetScale= 1d0/GeV
 
-          Histo(2)%Info   = "dphi_jj"
-          Histo(2)%NBins  = 25
-          Histo(2)%BinSize= 0.125d0
+          Histo(2)%Info   = "m_jj"
+          Histo(2)%NBins  = 100
+          Histo(2)%BinSize= 2d0*GeV
           Histo(2)%LowVal = 0d0
-          Histo(2)%SetScale= 1d0
+          Histo(2)%SetScale= 1d0/GeV
 
           Histo(3)%Info   = "pT(H)"
           Histo(3)%NBins  = 50
@@ -4094,30 +4960,22 @@ print *, "extending no. of histograms for vbf tests"
           Histo(7)%SetScale= 1d0/GeV
 
           Histo(8)%Info   = "m_4l"
-          Histo(8)%NBins  = 50
-          Histo(8)%BinSize= 10d0*GeV
-          Histo(8)%LowVal = 120d0*GeV
+          Histo(8)%NBins  = 100
+          Histo(8)%BinSize= 40d0*GeV
+          Histo(8)%LowVal = 100d0*GeV
           Histo(8)%SetScale= 1d0/GeV
 
-          Histo(9)%Info   = "Phi1"  ! angle between plane of beam-scatterin axis and the lepton plane of Z1 in the resonance rest frame
-          Histo(9)%NBins  = 40
-          Histo(9)%BinSize= 0.078539d0 *2d0
-          Histo(9)%LowVal =-3.14159d0
-          Histo(9)%SetScale= 1d0
+          Histo(9)%Info   = "m_4l"
+          Histo(9)%NBins  = 50
+          Histo(9)%BinSize= 1d0*GeV
+          Histo(9)%LowVal = 85d0*GeV
+          Histo(9)%SetScale= 1d0/GeV
 
-do NHisto=10,45
-          Histo(NHisto)%Info   = "sij"
-          Histo(NHisto)%NBins  = 200
-          Histo(NHisto)%BinSize= 2d0*GeV
-          Histo(NHisto)%LowVal = 0d0*GeV
-          Histo(NHisto)%SetScale= 1d0/GeV
-enddo
-!
-!           Histo(7)%Info   = "weights"
-!           Histo(7)%NBins  = 50
-!           Histo(7)%BinSize= 0.25d0
-!           Histo(7)%LowVal = -18d0
-!           Histo(7)%SetScale= 1d0
+          Histo(10)%Info   = "Phi1"  ! angle between plane of beam-scatterin axis and the lepton plane of Z1 in the resonance rest frame
+          Histo(10)%NBins  = 40
+          Histo(10)%BinSize= 0.078539d0 *2d0
+          Histo(10)%LowVal =-3.14159d0
+          Histo(10)%SetScale= 1d0
 
 
 
@@ -4256,8 +5114,8 @@ integer :: AllocStatus,NHisto
           Histo(3)%SetScale= 1d0/GeV
 
           Histo(4)%Info   = "pt(H)"
-          Histo(4)%NBins  = 80
-          Histo(4)%BinSize= 300d0*GeV/80d0
+          Histo(4)%NBins  = 100
+          Histo(4)%BinSize= 5d0*GeV
           Histo(4)%LowVal = 0d0*GeV
           Histo(4)%SetScale= 1d0/GeV
 
@@ -4290,6 +5148,12 @@ integer :: AllocStatus,NHisto
           Histo(9)%BinSize= 6.4d0/80d0
           Histo(9)%LowVal = -3.2d0
           Histo(9)%SetScale= 1d0
+
+          Histo(10)%Info   = "EHat"
+          Histo(10)%NBins  = 80
+          Histo(10)%BinSize= 10d0*GeV
+          Histo(10)%LowVal = 200d0*GeV
+          Histo(10)%SetScale= 1d0/GeV
 
   do NHisto=1,NumHistograms
       Histo(NHisto)%Value(:) = 0d0
@@ -4480,7 +5344,7 @@ integer :: stat
             write(io_LHEOutFile ,'(A)') '<LesHouchesEvents version="1.0">'
         endif
         write(io_LHEOutFile ,'(A)') '<!--'
-        write(io_LHEOutFile ,'(A,A6,A)') 'Output from the JHUGenerator ',trim(JHUGen_Version),' described in arXiv:1001.3396 [hep-ph], arXiv:1208.4018 [hep-ph], arXiv:1309.4819 [hep-ph], arXiv:1606.03107 [hep-ph]'
+        write(io_LHEOutFile ,'(A,A,A)') 'Output from the JHUGenerator ',trim(JHUGen_Version),' described in arXiv:1001.3396 [hep-ph], arXiv:1208.4018 [hep-ph], arXiv:1309.4819 [hep-ph], arXiv:1606.03107 [hep-ph]'
 
         if( writegit ) then
             write(io_LHEOutFile,'(A)') ""
@@ -4497,7 +5361,7 @@ integer :: stat
         endif
         call WriteParameters(io_LHEOutFile)
 
-        if( (ReadLHEFile .or. ConvertLHEFile) .and. (importExternal_LHEinit) ) then
+        if( ReadLHEFile .or. ConvertLHEFile ) then
             write(io_LHEOutFile ,'(A)') ''
         else
             write(io_LHEOutFile ,'(A)') '-->'
@@ -4578,7 +5442,8 @@ character :: arg*(500)
     if( Process.eq.60) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.61) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.62) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.66 .or. Process.eq.68 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( (Process.eq.66 .or. Process.eq.68) .and. M_Reso.ge.0d0  ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "1st Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( (Process.eq.66 .or. Process.eq.68) .and. M_Reso2.ge.0d0 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "2nd Resonance: spin=0, mass=",M_Reso2*100d0," width=",Ga_Reso2*100d0
     if( Process.eq.50) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.51) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.80) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
@@ -4601,8 +5466,8 @@ character :: arg*(500)
         else if( ReadLHEFile .or. Process.le.2 .or. Process .eq. 80 ) then
             write(TheUnit,"(4X,A,I2,2X,A,I2)") "DecayMode1:",DecayMode1, "DecayMode2:",DecayMode2
         endif
-        if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.69) .or. IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z-boson: mass=",M_Z*100d0,", width=",Ga_Z*100d0
-        if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.69) .or. IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W-boson: mass=",M_W*100d0,", width=",Ga_W*100d0
+        if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.69) .or. IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z boson: mass=",M_Z*100d0,", width=",Ga_Z*100d0
+        if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.69) .or. IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W boson: mass=",M_W*100d0,", width=",Ga_W*100d0
     endif
     if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or.Process.eq.112 .or. Process.eq.113 .or. Process.eq.114) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Top quark mass=",m_top*100d0,", width=",Ga_top*100d0
     if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113 .or. Process.eq.114) write(TheUnit,"(4X,A,I2)") "Top quark decay=",TOPDECAYS
@@ -4611,13 +5476,29 @@ character :: arg*(500)
        ((Process.eq.80 .or. (Process.ge.110 .and. Process.le.114)) .and. m_Top.lt.10d0*GeV) ) then
         write(TheUnit,"(4X,A)") "Jet cuts:"
         write(TheUnit,"(12X,A,F8.2,A)") "pT >= ", pTjetcut/GeV, " GeV"
+        if( Process.ge.66 .and. Process.le.69 ) then
+            write(TheUnit,"(9X,A,F8.2)") "|eta| <= ", etajetcut
+            write(TheUnit,"(4X,A,F8.2)") "|Deltaeta| >= ", detajetcut
+            if (JetsOppositeEta) write(TheUnit,"(5X,A,F8.2)") "eta1*eta2 <= ", 0d0
+        endif
         if( Process.eq.50 .or. Process.eq.60 .or. Process.eq.61 .or. (Process.ge.66 .and. Process.le.69) .or. Process.eq.80 .or. Process.eq.90) then
             write(TheUnit,"(8X,A,F8.2)") "DeltaR >= ", Rjet
             write(TheUnit,"(11X,A,F8.2,A)") "mJJ >= ", mJJcut/GeV, " GeV"
         endif
+    endif
+    if( Process.ge.66 .and. Process.le.69 ) then
+        write(TheUnit,"(4X,A)") "4l cuts:"
         if( Process.ge.66 .and. Process.le.69 ) then
-            write(TheUnit,"(11X,A,F10.2,F10.2,A)") "m4l_min/max ", m4l_minmax(1)/GeV,m4l_minmax(2)/GeV, " GeV"
+            write(TheUnit,"(12X,A,F8.2,A)") "pT >= ", pTlepcut/GeV, " GeV"
+            write(TheUnit,"(9X,A,F8.2)") "|eta| <= ", etalepcut
         endif
+        write(TheUnit,"(11X,A,F8.2,A)") "mll >= ", MPhotonCutoff/GeV, " GeV"
+        if( Process.ge.66 .and. Process.le.69 ) then
+            write(TheUnit,"(F10.2,A,F10.2,A)") m4l_minmax(1)/GeV, " GeV <= m4l <= ", m4l_minmax(2)/GeV, " GeV"
+        endif
+    endif
+    if( (Process.eq.0 .or. Process.eq.2 .or. Process.eq.50) .and. includeGammaStar ) then
+        write(TheUnit,"(6X,A,F8.2,A)") "m(gammastar) >= ", MPhotonCutoff/GeV, " GeV"
     endif
     if( (ReadLHEFile) .and. (RequestNLeptons.gt.0) ) then
         if ( RequestOS .le. 0 ) then
@@ -4660,6 +5541,13 @@ character :: arg*(500)
     endif
     if( CountTauAsAny .and. RequestOSSF.gt.0 ) then
         write(TheUnit,"(8X,A)") "(counting tau in place of e or mu of the same sign, if necessary)"
+    endif
+    if( (ReadLHEFile) .and. (RequestNJets.gt.0) ) then
+        if ( RequestNJets .eq. 1 ) then
+            write(TheUnit,"(4X,A,I2,A)") "Jet filter activated. Requesting ",RequestNJets," quark/gluon."
+        else
+            write(TheUnit,"(4X,A,I2,A)") "Jet filter activated. Requesting ",RequestNJets," quarks/gluons."
+        endif
     endif
     write(TheUnit,"(4X,A,20I11)") "Random seed: ",UserSeed
     write(TheUnit,"(4X,A)") "To reproduce results using this seed, JHUGen should be compiled with the same compiler:"
@@ -4717,21 +5605,6 @@ character :: arg*(500)
             if( cdabs(ghz2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghz2=",ghz2,"i"
             if( cdabs(ghz3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghz3=",ghz3,"i"
             if( cdabs(ghz4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghz4=",ghz4,"i"
-            if( includeGammaStar .or. IsAPhoton(DecayMode2) ) then
-                if( includeGammaStar .or. IsAZDecay(DecayMode1) ) then
-                    if( cdabs(ghzgs2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs2=",ghzgs2,"i"
-                    if( cdabs(ghzgs3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs3=",ghzgs3,"i"
-                    if( cdabs(ghzgs4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs4=",ghzgs4,"i"
-                endif
-                if( includeGammaStar .or. IsAPhoton(DecayMode1) ) then
-                    if( cdabs(ghgsgs2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs2=",ghgsgs2,"i"
-                    if( cdabs(ghgsgs3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs3=",ghgsgs3,"i"
-                    if( cdabs(ghgsgs4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs4=",ghgsgs4,"i"
-                endif
-                if( includeGammaStar .and. .not.(Process.eq.60 .or. (Process.ge.66 .or. Process.le.69))) then
-                    write(TheUnit,"(6X,A,F8.2,A)") "m(gammastar) >= ", MPhotonCutoff/GeV, " GeV"
-                endif
-            endif
             if( cdabs(ghz1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime= ",ghz1_prime ,"i,","Lambda_z1=",Lambda_z1/GeV
             if( cdabs(ghz1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime2=",ghz1_prime2,"i,","Lambda_z1=",Lambda_z1/GeV
             if( cdabs(ghz1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime3=",ghz1_prime3,"i,","Lambda_z1=",Lambda_z1/GeV
@@ -4760,7 +5633,81 @@ character :: arg*(500)
             if( cdabs(ghz4_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime5=",ghz4_prime5,"i,","Lambda_z4=",Lambda_z4/GeV
             if( cdabs(ghz4_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime6=",ghz4_prime6,"i,","Lambda_z4=",Lambda_z4/GeV
             if( cdabs(ghz4_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime7=",ghz4_prime7,"i,","Lambda_z4=",Lambda_z4/GeV
-            if( cdabs(ghzgs1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,2X,A,1PE12.4)") "ghzgs1_prime2=",ghz1_prime2,"i,","Lambda_zgs1=",Lambda_zgs1/GeV
+            if( cdabs(ghzgs2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs2=",ghzgs2,"i"
+            if( cdabs(ghzgs3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs3=",ghzgs3,"i"
+            if( cdabs(ghzgs4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs4=",ghzgs4,"i"
+            if( cdabs(ghzgs1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,2X,A,1PE12.4)") "ghzgs1_prime2=",ghzgs1_prime2,"i,","Lambda_zgs1=",Lambda_zgs1/GeV
+            if( cdabs(ghgsgs2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs2=",ghgsgs2,"i"
+            if( cdabs(ghgsgs3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs3=",ghgsgs3,"i"
+            if( cdabs(ghgsgs4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs4=",ghgsgs4,"i"
+            if( cdabs(ghzzp1 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzzp1=",ghzzp1,"i"
+            if( cdabs(ghzzp2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzzp2=",ghzzp2,"i"
+            if( cdabs(ghzzp3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzzp3=",ghzzp3,"i"
+            if( cdabs(ghzzp4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzzp4=",ghzzp4,"i"
+            if( cdabs(ghzzp1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp1_prime= ",ghzzp1_prime ,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghzzp1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp1_prime2=",ghzzp1_prime2,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghzzp1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp1_prime3=",ghzzp1_prime3,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghzzp1_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp1_prime4=",ghzzp1_prime4,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghzzp1_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp1_prime5=",ghzzp1_prime5,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghzzp1_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp1_prime6=",ghzzp1_prime6,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghzzp1_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp1_prime7=",ghzzp1_prime7,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghzzp2_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp2_prime= ",ghzzp2_prime ,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghzzp2_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp2_prime2=",ghzzp2_prime2,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghzzp2_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp2_prime3=",ghzzp2_prime3,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghzzp2_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp2_prime4=",ghzzp2_prime4,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghzzp2_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp2_prime5=",ghzzp2_prime5,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghzzp2_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp2_prime6=",ghzzp2_prime6,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghzzp2_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp2_prime7=",ghzzp2_prime7,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghzzp3_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp3_prime= ",ghzzp3_prime ,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghzzp3_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp3_prime2=",ghzzp3_prime2,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghzzp3_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp3_prime3=",ghzzp3_prime3,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghzzp3_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp3_prime4=",ghzzp3_prime4,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghzzp3_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp3_prime5=",ghzzp3_prime5,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghzzp3_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp3_prime6=",ghzzp3_prime6,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghzzp3_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp3_prime7=",ghzzp3_prime7,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghzzp4_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp4_prime= ",ghzzp4_prime ,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghzzp4_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp4_prime2=",ghzzp4_prime2,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghzzp4_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp4_prime3=",ghzzp4_prime3,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghzzp4_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp4_prime4=",ghzzp4_prime4,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghzzp4_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp4_prime5=",ghzzp4_prime5,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghzzp4_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp4_prime6=",ghzzp4_prime6,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghzzp4_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp4_prime7=",ghzzp4_prime7,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghzpgs2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpgs2=",ghzpgs2,"i"
+            if( cdabs(ghzpgs3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpgs3=",ghzpgs3,"i"
+            if( cdabs(ghzpgs4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpgs4=",ghzpgs4,"i"
+            if( cdabs(ghzpgs1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,2X,A,1PE12.4)") "ghzpgs1_prime2=",ghzpgs1_prime2,"i,","Lambda_zgs1=",Lambda_zgs1/GeV
+            if( cdabs(ghzpzp1 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpzp1=",ghzpzp1,"i"
+            if( cdabs(ghzpzp2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpzp2=",ghzpzp2,"i"
+            if( cdabs(ghzpzp3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpzp3=",ghzpzp3,"i"
+            if( cdabs(ghzpzp4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpzp4=",ghzpzp4,"i"
+            if( cdabs(ghzpzp1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime= ",ghzpzp1_prime ,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghzpzp1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime2=",ghzpzp1_prime2,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghzpzp1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime3=",ghzpzp1_prime3,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghzpzp1_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime4=",ghzpzp1_prime4,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghzpzp1_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime5=",ghzpzp1_prime5,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghzpzp1_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime6=",ghzpzp1_prime6,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghzpzp1_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime7=",ghzpzp1_prime7,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghzpzp2_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp2_prime= ",ghzpzp2_prime ,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghzpzp2_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp2_prime2=",ghzpzp2_prime2,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghzpzp2_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp2_prime3=",ghzpzp2_prime3,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghzpzp2_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp2_prime4=",ghzpzp2_prime4,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghzpzp2_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp2_prime5=",ghzpzp2_prime5,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghzpzp2_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp2_prime6=",ghzpzp2_prime6,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghzpzp2_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp2_prime7=",ghzpzp2_prime7,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghzpzp3_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp3_prime= ",ghzpzp3_prime ,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghzpzp3_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp3_prime2=",ghzpzp3_prime2,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghzpzp3_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp3_prime3=",ghzpzp3_prime3,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghzpzp3_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp3_prime4=",ghzpzp3_prime4,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghzpzp3_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp3_prime5=",ghzpzp3_prime5,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghzpzp3_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp3_prime6=",ghzpzp3_prime6,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghzpzp3_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp3_prime7=",ghzpzp3_prime7,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghzpzp4_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp4_prime= ",ghzpzp4_prime ,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghzpzp4_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp4_prime2=",ghzpzp4_prime2,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghzpzp4_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp4_prime3=",ghzpzp4_prime3,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghzpzp4_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp4_prime4=",ghzpzp4_prime4,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghzpzp4_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp4_prime5=",ghzpzp4_prime5,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghzpzp4_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp4_prime6=",ghzpzp4_prime6,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghzpzp4_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp4_prime7=",ghzpzp4_prime7,"i,","Lambda_z4=",Lambda_z4/GeV
             if( cz_q1sq.ne.0) then
                write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z11= ",Lambda_z11/GeV
                write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z21= ",Lambda_z21/GeV
@@ -4813,6 +5760,70 @@ character :: arg*(500)
                if( cdabs(ghw4_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw4_prime5=",ghw4_prime5,"i,","Lambda_w4=",Lambda_w4/GeV
                if( cdabs(ghw4_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw4_prime6=",ghw4_prime6,"i,","Lambda_w4=",Lambda_w4/GeV
                if( cdabs(ghw4_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw4_prime7=",ghw4_prime7,"i,","Lambda_w4=",Lambda_w4/GeV
+               if( cdabs(ghwwp1 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwwp1=",ghwwp1,"i"
+               if( cdabs(ghwwp2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwwp2=",ghwwp2,"i"
+               if( cdabs(ghwwp3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwwp3=",ghwwp3,"i"
+               if( cdabs(ghwwp4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwwp4=",ghwwp4,"i"
+               if( cdabs(ghwwp1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp1_prime= ",ghwwp1_prime ,"i,","Lambda_w1=",Lambda_w1/GeV
+               if( cdabs(ghwwp1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp1_prime2=",ghwwp1_prime2,"i,","Lambda_w1=",Lambda_w1/GeV
+               if( cdabs(ghwwp1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp1_prime3=",ghwwp1_prime3,"i,","Lambda_w1=",Lambda_w1/GeV
+               if( cdabs(ghwwp1_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp1_prime4=",ghwwp1_prime4,"i,","Lambda_w1=",Lambda_w1/GeV
+               if( cdabs(ghwwp1_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp1_prime5=",ghwwp1_prime5,"i,","Lambda_w1=",Lambda_w1/GeV
+               if( cdabs(ghwwp1_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp1_prime6=",ghwwp1_prime6,"i,","Lambda_w1=",Lambda_w1/GeV
+               if( cdabs(ghwwp1_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp1_prime7=",ghwwp1_prime7,"i,","Lambda_w1=",Lambda_w1/GeV
+               if( cdabs(ghwwp2_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp2_prime= ",ghwwp2_prime ,"i,","Lambda_w2=",Lambda_w2/GeV
+               if( cdabs(ghwwp2_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp2_prime2=",ghwwp2_prime2,"i,","Lambda_w2=",Lambda_w2/GeV
+               if( cdabs(ghwwp2_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp2_prime3=",ghwwp2_prime3,"i,","Lambda_w2=",Lambda_w2/GeV
+               if( cdabs(ghwwp2_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp2_prime4=",ghwwp2_prime4,"i,","Lambda_w2=",Lambda_w2/GeV
+               if( cdabs(ghwwp2_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp2_prime5=",ghwwp2_prime5,"i,","Lambda_w2=",Lambda_w2/GeV
+               if( cdabs(ghwwp2_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp2_prime6=",ghwwp2_prime6,"i,","Lambda_w2=",Lambda_w2/GeV
+               if( cdabs(ghwwp2_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp2_prime7=",ghwwp2_prime7,"i,","Lambda_w2=",Lambda_w2/GeV
+               if( cdabs(ghwwp3_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp3_prime= ",ghwwp3_prime ,"i,","Lambda_w3=",Lambda_w3/GeV
+               if( cdabs(ghwwp3_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp3_prime2=",ghwwp3_prime2,"i,","Lambda_w3=",Lambda_w3/GeV
+               if( cdabs(ghwwp3_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp3_prime3=",ghwwp3_prime3,"i,","Lambda_w3=",Lambda_w3/GeV
+               if( cdabs(ghwwp3_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp3_prime4=",ghwwp3_prime4,"i,","Lambda_w3=",Lambda_w3/GeV
+               if( cdabs(ghwwp3_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp3_prime5=",ghwwp3_prime5,"i,","Lambda_w3=",Lambda_w3/GeV
+               if( cdabs(ghwwp3_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp3_prime6=",ghwwp3_prime6,"i,","Lambda_w3=",Lambda_w3/GeV
+               if( cdabs(ghwwp3_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp3_prime7=",ghwwp3_prime7,"i,","Lambda_w3=",Lambda_w3/GeV
+               if( cdabs(ghwwp4_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp4_prime= ",ghwwp4_prime ,"i,","Lambda_w4=",Lambda_w4/GeV
+               if( cdabs(ghwwp4_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp4_prime2=",ghwwp4_prime2,"i,","Lambda_w4=",Lambda_w4/GeV
+               if( cdabs(ghwwp4_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp4_prime3=",ghwwp4_prime3,"i,","Lambda_w4=",Lambda_w4/GeV
+               if( cdabs(ghwwp4_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp4_prime4=",ghwwp4_prime4,"i,","Lambda_w4=",Lambda_w4/GeV
+               if( cdabs(ghwwp4_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp4_prime5=",ghwwp4_prime5,"i,","Lambda_w4=",Lambda_w4/GeV
+               if( cdabs(ghwwp4_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp4_prime6=",ghwwp4_prime6,"i,","Lambda_w4=",Lambda_w4/GeV
+               if( cdabs(ghwwp4_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp4_prime7=",ghwwp4_prime7,"i,","Lambda_w4=",Lambda_w4/GeV
+               if( cdabs(ghwpwp1 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwpwp1=",ghwpwp1,"i"
+               if( cdabs(ghwpwp2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwpwp2=",ghwpwp2,"i"
+               if( cdabs(ghwpwp3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwpwp3=",ghwpwp3,"i"
+               if( cdabs(ghwpwp4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwpwp4=",ghwpwp4,"i"
+               if( cdabs(ghwpwp1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp1_prime= ",ghwpwp1_prime ,"i,","Lambda_w1=",Lambda_w1/GeV
+               if( cdabs(ghwpwp1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp1_prime2=",ghwpwp1_prime2,"i,","Lambda_w1=",Lambda_w1/GeV
+               if( cdabs(ghwpwp1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp1_prime3=",ghwpwp1_prime3,"i,","Lambda_w1=",Lambda_w1/GeV
+               if( cdabs(ghwpwp1_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp1_prime4=",ghwpwp1_prime4,"i,","Lambda_w1=",Lambda_w1/GeV
+               if( cdabs(ghwpwp1_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp1_prime5=",ghwpwp1_prime5,"i,","Lambda_w1=",Lambda_w1/GeV
+               if( cdabs(ghwpwp1_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp1_prime6=",ghwpwp1_prime6,"i,","Lambda_w1=",Lambda_w1/GeV
+               if( cdabs(ghwpwp1_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp1_prime7=",ghwpwp1_prime7,"i,","Lambda_w1=",Lambda_w1/GeV
+               if( cdabs(ghwpwp2_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp2_prime= ",ghwpwp2_prime ,"i,","Lambda_w2=",Lambda_w2/GeV
+               if( cdabs(ghwpwp2_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp2_prime2=",ghwpwp2_prime2,"i,","Lambda_w2=",Lambda_w2/GeV
+               if( cdabs(ghwpwp2_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp2_prime3=",ghwpwp2_prime3,"i,","Lambda_w2=",Lambda_w2/GeV
+               if( cdabs(ghwpwp2_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp2_prime4=",ghwpwp2_prime4,"i,","Lambda_w2=",Lambda_w2/GeV
+               if( cdabs(ghwpwp2_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp2_prime5=",ghwpwp2_prime5,"i,","Lambda_w2=",Lambda_w2/GeV
+               if( cdabs(ghwpwp2_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp2_prime6=",ghwpwp2_prime6,"i,","Lambda_w2=",Lambda_w2/GeV
+               if( cdabs(ghwpwp2_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp2_prime7=",ghwpwp2_prime7,"i,","Lambda_w2=",Lambda_w2/GeV
+               if( cdabs(ghwpwp3_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp3_prime= ",ghwpwp3_prime ,"i,","Lambda_w3=",Lambda_w3/GeV
+               if( cdabs(ghwpwp3_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp3_prime2=",ghwpwp3_prime2,"i,","Lambda_w3=",Lambda_w3/GeV
+               if( cdabs(ghwpwp3_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp3_prime3=",ghwpwp3_prime3,"i,","Lambda_w3=",Lambda_w3/GeV
+               if( cdabs(ghwpwp3_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp3_prime4=",ghwpwp3_prime4,"i,","Lambda_w3=",Lambda_w3/GeV
+               if( cdabs(ghwpwp3_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp3_prime5=",ghwpwp3_prime5,"i,","Lambda_w3=",Lambda_w3/GeV
+               if( cdabs(ghwpwp3_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp3_prime6=",ghwpwp3_prime6,"i,","Lambda_w3=",Lambda_w3/GeV
+               if( cdabs(ghwpwp3_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp3_prime7=",ghwpwp3_prime7,"i,","Lambda_w3=",Lambda_w3/GeV
+               if( cdabs(ghwpwp4_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp4_prime= ",ghwpwp4_prime ,"i,","Lambda_w4=",Lambda_w4/GeV
+               if( cdabs(ghwpwp4_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp4_prime2=",ghwpwp4_prime2,"i,","Lambda_w4=",Lambda_w4/GeV
+               if( cdabs(ghwpwp4_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp4_prime3=",ghwpwp4_prime3,"i,","Lambda_w4=",Lambda_w4/GeV
+               if( cdabs(ghwpwp4_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp4_prime4=",ghwpwp4_prime4,"i,","Lambda_w4=",Lambda_w4/GeV
+               if( cdabs(ghwpwp4_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp4_prime5=",ghwpwp4_prime5,"i,","Lambda_w4=",Lambda_w4/GeV
+               if( cdabs(ghwpwp4_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp4_prime6=",ghwpwp4_prime6,"i,","Lambda_w4=",Lambda_w4/GeV
+               if( cdabs(ghwpwp4_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp4_prime7=",ghwpwp4_prime7,"i,","Lambda_w4=",Lambda_w4/GeV
                if( cw_q1sq.ne.0) then
                   write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w11= ",Lambda_w11/GeV
                   write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w21= ",Lambda_w21/GeV
@@ -4832,7 +5843,54 @@ character :: arg*(500)
                   write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w40= ",Lambda_w40/GeV
                endif
             endif
-
+        endif
+        if(includeVprime) then
+            if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.69) .or. IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) then
+                if(M_Zprime.gt.0d0) then
+                  write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z' boson: mass=",M_Zprime*100d0,", width=",Ga_Zprime*100d0
+                else
+                  write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z' boson: heavy mass limit (contact interaction)"
+                endif
+                if( cdabs(ezp_El_left  ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_El_left=  ",ezp_El_left  ,"i"
+                if( cdabs(ezp_El_right ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_El_right= ",ezp_El_right ,"i"
+                if( cdabs(ezp_Mu_left  ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Mu_left=  ",ezp_Mu_left  ,"i"
+                if( cdabs(ezp_Mu_right ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Mu_right= ",ezp_Mu_right ,"i"
+                if( cdabs(ezp_Ta_left  ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Ta_left=  ",ezp_Ta_left  ,"i"
+                if( cdabs(ezp_Ta_right ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Ta_right= ",ezp_Ta_right ,"i"
+                if( cdabs(ezp_NuE_left ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_NuE_left= ",ezp_NuE_left ,"i"
+                if( cdabs(ezp_NuE_right).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_NuE_right=",ezp_NuE_right,"i"
+                if( cdabs(ezp_Up_left  ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Up_left=  ",ezp_Up_left  ,"i"
+                if( cdabs(ezp_Up_right ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Up_right= ",ezp_Up_right ,"i"
+                if( cdabs(ezp_Dn_left  ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Dn_left=  ",ezp_Dn_left  ,"i"
+                if( cdabs(ezp_Dn_right ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Dn_right= ",ezp_Dn_right ,"i"
+                if( cdabs(ezp_Str_left ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Str_left= ",ezp_Str_left ,"i"
+                if( cdabs(ezp_Str_right).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Str_right=",ezp_Str_right,"i"
+                if( cdabs(ezp_Chm_left ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Chm_left= ",ezp_Chm_left ,"i"
+                if( cdabs(ezp_Chm_right).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Chm_right=",ezp_Chm_right,"i"
+                if( cdabs(ezp_Bot_left ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Bot_left= ",ezp_Bot_left ,"i"
+                if( cdabs(ezp_Bot_right).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Bot_right=",ezp_Bot_right,"i"
+                if( cdabs(ezp_Top_left ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Top_left= ",ezp_Top_left ,"i"
+                if( cdabs(ezp_Top_right).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Top_right=",ezp_Top_right,"i"
+            endif
+            if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.69) .or. IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) then
+                if(M_Wprime.gt.0d0) then
+                  write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W' boson: mass=",M_Wprime*100d0,", width=",Ga_Wprime*100d0
+                else
+                  write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W' boson: mass=heavy (contact interaction)"
+                endif
+                if( cdabs(ewp_El_left  ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_El_left=  ",ewp_El_left  ,"i"
+                if( cdabs(ewp_El_right ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_El_right= ",ewp_El_right ,"i"
+                if( cdabs(ewp_Mu_left  ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_Mu_left=  ",ewp_Mu_left  ,"i"
+                if( cdabs(ewp_Mu_right ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_Mu_right= ",ewp_Mu_right ,"i"
+                if( cdabs(ewp_Ta_left  ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_Ta_left=  ",ewp_Ta_left  ,"i"
+                if( cdabs(ewp_Ta_right ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_Ta_right= ",ewp_Ta_right ,"i"
+                if( cdabs(ewp_Up_left  ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_Up_left=  ",ewp_Up_left  ,"i"
+                if( cdabs(ewp_Up_right ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_Up_right= ",ewp_Up_right ,"i"
+                if( cdabs(ewp_Chm_left ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_Chm_left= ",ewp_Chm_left ,"i"
+                if( cdabs(ewp_Chm_right).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_Chm_right=",ewp_Chm_right,"i"
+                if( cdabs(ewp_Top_left ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_Top_left= ",ewp_Top_left ,"i"
+                if( cdabs(ewp_Top_right).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_Top_right=",ewp_Top_right,"i"
+            endif
         endif
     elseif( Process.eq.1 ) then
         write(TheUnit,"(4X,A)") "spin-1-VV couplings: "
@@ -4850,16 +5908,72 @@ character :: arg*(500)
         write(TheUnit,"(6X,A,2E16.8,A1)") "a4 =",a4,"i"
         write(TheUnit,"(6X,A,2E16.8,A1)") "a5 =",a5,"i"
         if( generate_bis ) then
-            write(TheUnit,"(6X,A,2E16.8,A1)") "b1 =",b1,"i"
-            write(TheUnit,"(6X,A,2E16.8,A1)") "b2 =",b2,"i"
-            write(TheUnit,"(6X,A,2E16.8,A1)") "b3 =",b3,"i"
-            write(TheUnit,"(6X,A,2E16.8,A1)") "b4 =",b4,"i"
-            write(TheUnit,"(6X,A,2E16.8,A1)") "b5 =",b5,"i"
-            write(TheUnit,"(6X,A,2E16.8,A1)") "b6 =",b6,"i"
-            write(TheUnit,"(6X,A,2E16.8,A1)") "b7 =",b7,"i"
-            write(TheUnit,"(6X,A,2E16.8,A1)") "b8 =",b8,"i"
-            write(TheUnit,"(6X,A,2E16.8,A1)") "b9 =",b9,"i"
-            write(TheUnit,"(6X,A,2E16.8,A1)") "b10=",b10,"i"
+            if (b1.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "b1 =",b1,"i"
+            if (b2.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "b2 =",b2,"i"
+            if (b3.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "b3 =",b3,"i"
+            if (b4.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "b4 =",b4,"i"
+            if (b5.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "b5 =",b5,"i"
+            if (b6.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "b6 =",b6,"i"
+            if (b7.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "b7 =",b7,"i"
+            if (b8.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "b8 =",b8,"i"
+            if (b9.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "b9 =",b9,"i"
+            if (b10.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "b10=",b10,"i"
+
+            if (bzgs1.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzgs1 =",bzgs1,"i"
+            if (bzgs2.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzgs2 =",bzgs2,"i"
+            if (bzgs3.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzgs3 =",bzgs3,"i"
+            if (bzgs4.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzgs4 =",bzgs4,"i"
+            if (bzgs8.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzgs8 =",bzgs8,"i"
+
+            if (bgsgs1.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bgsgs1 =",bgsgs1,"i"
+            if (bgsgs2.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bgsgs2 =",bgsgs2,"i"
+            if (bgsgs3.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bgsgs3 =",bgsgs3,"i"
+            if (bgsgs4.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bgsgs4 =",bgsgs4,"i"
+            if (bgsgs8.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bgsgs8 =",bgsgs8,"i"
+
+            if (includeVprime) then
+                if (IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2)) then
+                    if(M_Zprime.gt.0d0) then
+                      write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z' boson: mass=",M_Zprime*100d0,", width=",Ga_Zprime*100d0
+                    else
+                      write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z' boson: heavy mass limit (contact interaction)"
+                    endif
+                elseif (IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2)) then
+                    if(M_Wprime.gt.0d0) then
+                      write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W' boson: mass=",M_Wprime*100d0,", width=",Ga_Wprime*100d0
+                    else
+                      write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W' boson: heavy mass limit (contact interaction)"
+                    endif
+                endif
+            endif
+
+            if (bzzp1.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzzp1 =",bzzp1,"i"
+            if (bzzp2.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzzp2 =",bzzp2,"i"
+            if (bzzp3.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzzp3 =",bzzp3,"i"
+            if (bzzp4.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzzp4 =",bzzp4,"i"
+            if (bzzp5.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzzp5 =",bzzp5,"i"
+            if (bzzp6.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzzp6 =",bzzp6,"i"
+            if (bzzp7.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzzp7 =",bzzp7,"i"
+            if (bzzp8.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzzp8 =",bzzp8,"i"
+            if (bzzp9.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzzp9 =",bzzp9,"i"
+            if (bzzp10.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzzp10=",bzzp10,"i"
+
+            if (bzpzp1.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpzp1 =",bzpzp1,"i"
+            if (bzpzp2.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpzp2 =",bzpzp2,"i"
+            if (bzpzp3.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpzp3 =",bzpzp3,"i"
+            if (bzpzp4.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpzp4 =",bzpzp4,"i"
+            if (bzpzp5.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpzp5 =",bzpzp5,"i"
+            if (bzpzp6.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpzp6 =",bzpzp6,"i"
+            if (bzpzp7.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpzp7 =",bzpzp7,"i"
+            if (bzpzp8.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpzp8 =",bzpzp8,"i"
+            if (bzpzp9.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpzp9 =",bzpzp9,"i"
+            if (bzpzp10.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpzp10=",bzpzp10,"i"
+
+            if (bzpgs1.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpgs1 =",bzpgs1,"i"
+            if (bzpgs2.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpgs2 =",bzpgs2,"i"
+            if (bzpgs3.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpgs3 =",bzpgs3,"i"
+            if (bzpgs4.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpgs4 =",bzpgs4,"i"
+            if (bzpgs8.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpgs8 =",bzpgs8,"i"
         else
             write(TheUnit,"(6X,A,2E16.8,A1)") "c1 =",c1,"i"
             write(TheUnit,"(6X,A,2E16.8,A1)") "c2 =",c2,"i"
@@ -5092,13 +6206,16 @@ implicit none
 
         print *, ""
         print *, " help:                Print all command line options"
+        print *, " DryRun:              Check that the command line is valid, then exit"
         print *, " Process configuration:"
         print *, "   Collider:          1=LHC (default), 2=Tevatron, 0=e+e-"
         print *, "   ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,"
         print *, "                      250 GeV for e+e-"
         print *, "   Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance,"
         print *, "                      50=old =pp/ee->VH, 51=pp/ee->VH, 52=gg->HH,"
-        print *, "                      60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=ttH, 90=bbH,"
+        print *, "                      60=weakVBF, 61=pp->Hjj, 62=pp->Hj,"
+        print *, "                      66=VVHVV offshell, 67=VVVVbkg, 68=VVHVV+VVVV,"
+        print *, "                      69=QCD JJVV bkg, 80=ttH, 90=bbH,"
         print *, "                      110=t+H t channel, 111=tbar+H t channel,"
         print *, "                      112=t+H s channel, 113=tbar+H s channel"
         print *, "                      114=t/tbar+H t/s channels"
@@ -5147,12 +6264,16 @@ implicit none
         print *, "                      VH_PC overrides Pchannel,"
         print *, "                      but Pchannel applies to VH_PC = nl,"
         print *, "                      where 0 = gg, 1 = qq, and 2 = both + gq"
+        print *, "   VBFoffsh_run:      For VBF offshell production, set this to a number from 1-4"
+        print *, "                      for each of the 4 jobs.  See manual for more details."
         print *, " Resonance parameters:"
         print *, "   MReso:             resonance mass in GeV (default=125.00)"
         print *, "   GaReso:            resonance width in GeV (default=0.00407)"
         print *, "   ctauReso:          resonance decay length in mm (default=0)"
         print *, "   OffshellX:         Whether to allow resonance (X) to go offshell"
         print *, "                      in processes 0, 1 or 2"
+        print *, "   MReso2:            2nd resonance mass in GeV in offshell VBF"
+        print *, "   GaReso2:           2nd resonance width in GeV in offshell VBF"
         print *, " EW coupling parameters:"
         print *, "   Vud:               CKM element for W-ud couplings"
         print *, "   Vus:               CKM element for W-us couplings"
@@ -5168,12 +6289,19 @@ implicit none
         print *, "   deltaRcut:         Minimum deltaR for jets (default: 0.3)"
         print *, "   mJJcut:            Minimum dijet mass in GeV (default: 0)"
         print *, "   MPhotonCutoff:     Minimum mass for offshell photons in GeV, when included (default: 4)"
+        print *, "   etajetcut:         Maximum |eta| for jets in offshell VBF (default: 4)"
+        print *, "   detajetcut:        Minimum deltaeta between jets in offshell VBF (default: 2)"
+        print *, "   JetsOppositeEta:   Require sgn(eta) to be opposite for the two jets in offshell VBF"
+        print *, "                      (default: true)"
+        print *, "   pTlepcut:          Minimum pT for leptons in offshell VBF, in GeV (default: 3)"
+        print *, "   etalepcut:         Maximum |eta| for leptons in offshell VBF (default: 2.7)"
+        print *, "   m4l_min, m4l_max:  Minimum and maximum four-lepton mass in offshell VBF"
         print *, " Renormalization and factorization scales:"
         print *, "   FacScheme:         PDF factorization scale scheme"
         print *, "   MuFacMultiplier:   Multiplier for the factorization scale chosen by FacScheme"
         print *, "   RenScheme:         QCD renormalization scale scheme"
         print *, "   MuRenMultiplier:   Multiplier for the renormalization scale chosen by RenScheme"
-        print *, " Lepton filter:"
+        print *, " Lepton and jet filter:"
         print *, "   FilterNLept:       For decay mode, reject events that have less than FilterNLept leptons"
         print *, "   FilterOSPairs:     For decay mode, reject events that have less than FilterOSPairs pairs of"
         print *, "                      sign leptons of any flavor."
@@ -5181,6 +6309,8 @@ implicit none
         print *, "                      opposite-sign-same-flavor leptons."
         print *, "   CountTauAsAny:     For FilterOSSFPairs, taus can stand in place of electrons or muons"
         print *, "                      of the same charge."
+        print *, "   FilterNJets:       For decay mode, reject events that have less than FilterNJets quarks"
+        print *, "                      and/or gluons"
         print *, "   WriteFailedEvents: Write events that fail in the LHE file, but with a weight of 0"
         print *, "                      (off by default)"
         print *, " Higgs propagator and decay width:"
@@ -5197,6 +6327,9 @@ implicit none
         print *, "   VegasNc1:          number of evaluations for accept-reject sampling"
         print *, "   VegasNc2:          number of events for accept-reject sampling"
         print *, "   ReadCSmax:         Read the results of the grid generation step from a file"
+        print *, "   CSmaxFile:         File to use for reading (if ReadCSmax is set) or writing (otherwise)"
+        print *, "                      the results of the grid generation step.  Depending on the process,"
+        print *, "                      suffixes are appended to this base name. (default: DataFile without .lhe)"
         print *, "   Seed:              Random seed for event generation"
         print *, " I/O options:"
         print *, "   Unweighted:        0=weighted events, 1=unweighted events"
@@ -5213,36 +6346,4 @@ implicit none
         print *, ""
 
 END SUBROUTINE
-
-
-
-
-SUBROUTINE PrintLogo(TheUnit)
-use modParameters
-use modMisc
-implicit none
-integer :: TheUnit
-integer, parameter :: linelength = 87
-
-    write(TheUnit, *) " "
-    write(TheUnit, *) " ", repeat("*", linelength)
-    write(TheUnit, *) " ", CenterWithStars("JHU Generator "//trim(JHUGen_Version), linelength)
-    write(TheUnit, *) " ", repeat("*", linelength)
-    write(TheUnit, *) " ", CenterWithStars("", linelength)
-    write(TheUnit, *) " ", CenterWithStars("Spin and parity determination of single-produced resonances at hadron colliders", linelength)
-    write(TheUnit, *) " ", CenterWithStars("", linelength)
-    write(TheUnit, *) " ", CenterWithStars("I. Anderson, S. Bolognesi, F. Caola, Y. Gao, A. Gritsan, Z. Guo,", linelength)
-    write(TheUnit, *) " ", CenterWithStars("C. Martin, K. Melnikov, R. Rontsch, H. Roskes, U. Sarica, M. Schulze,", linelength)
-    write(TheUnit, *) " ", CenterWithStars("N. Tran, A. Whitbeck, M. Xiao, C. You, Y. Zhou", linelength)
-    write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396  [hep-ph],", linelength)
-    write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D86 (2012) 095031;  arXiv:1208.4018  [hep-ph],", linelength)
-    write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D89 (2014) 035007;  arXiv:1309.4819  [hep-ph],", linelength)
-    write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D94 (2016) 055023;  arXiv:1606.03107 [hep-ph].", linelength)
-    write(TheUnit, *) " ", CenterWithStars("", linelength)
-    write(TheUnit, *) " ", repeat("*", linelength)
-    write(TheUnit, *) " "
-return
-END SUBROUTINE
-
-
 

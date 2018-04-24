@@ -11,12 +11,15 @@ See the manual for more details
 
 command line parameter quick reference:
   help:                Print all command line options
+  DryRun:              Check that the command line is valid, then exit
   Process configuration:
     Collider:          1=LHC (default), 2=Tevatron, 0=e+e-
     ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,
                        250 GeV for e+e-
     Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VHiggs,
-                       60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=ttH, 90=bbH,
+                       60=weakVBF, 61=pp->Hjj, 62=pp->Hj,
+                       66=VVHVV offshell, 67=VVVVbkg, 68=VVHVV+VVVV,
+                       69=QCD JJVV bkg, 80=ttH, 90=bbH,
                        110=t+H t channel, 111=tbar+H t channel,
                        112=t+H s channel, 113=tbar+H s channel
                        114=t/tbar+H t/s channels
@@ -52,12 +55,16 @@ command line parameter quick reference:
                        stable; if it is 1, they decay to Wnu, with the W's decaying
                        according to DecayModes1,2.
     HbbDK:             For VHiggs production, decay H->bb
+    VBFoffsh_run:      For VBF offshell production, set this to a number from 1-4
+                       for each of the 4 jobs.  See manual for more details.
   Resonance parameters:
     MReso:             resonance mass in GeV (default=125.00)
     GaReso:            resonance width in GeV (default=0.00407)
     ctauReso:          resonance decay length in mm (default=0)
     OffshellX:         Whether to allow resonance (X) to go offshell
                        in processes 0, 1 or 2
+    MReso2:            2nd resonance mass in GeV in offshell VBF
+    GaReso2:           2nd resonance width in GeV in offshell VBF
   EW coupling parameters:
     Vud:               CKM element for W-ud couplings
     Vus:               CKM element for W-us couplings
@@ -73,12 +80,19 @@ command line parameter quick reference:
     deltaRcut:         Minimum deltaR for jets (default: 0.3)
     mJJcut:            Minimum dijet mass in GeV (default: 0)
     MPhotonCutoff:     Minimum mass for offshell photons in GeV, when included (default: 4)
+    etajetcut:         Maximum |eta| for jets in offshell VBF (default: 4)
+    detajetcut:        Minimum deltaeta between jets in offshell VBF (default: 2)
+    JetsOppositeEta:   Require sgn(eta) to be opposite for the two jets in offshell VBF
+                       (default: true)
+    pTlepcut:          Minimum pT for leptons in offshell VBF, in GeV (default: 3)
+    etalepcut:         Maximum |eta| for leptons in offshell VBF (default: 2.7)
+    m4l_min, m4l_max:  Minimum and maximum four-lepton mass in offshell VBF
   Renormalization and factorization scales:
     FacScheme:         PDF factorization scale scheme
     MuFacMultiplier:   Multiplier for the factorization scale chosen by FacScheme
     RenScheme:         QCD renormalization scale scheme
     MuRenMultiplier:   Multiplier for the renormalization scale chosen by RenScheme
-  Lepton filter:
+  Lepton and jet filter:
     FilterNLept:       For decay mode, reject events that have less than FilterNLept leptons
     FilterOSPairs:     For decay mode, reject events that have less than FilterOSPairs pairs of
                        sign leptons of any flavor.
@@ -86,6 +100,8 @@ command line parameter quick reference:
                        opposite-sign-same-flavor leptons.
     CountTauAsAny:     For FilterOSSFPairs, taus can stand in place of electrons or muons
                        of the same charge.
+    FilterNJets:       For decay mode, reject events that have less than FilterNJets quarks
+                       and/or gluons
     WriteFailedEvents: Write events that fail in the LHE file, but with a weight of 0
                        (off by default)
   Higgs propagator and decay width:
@@ -102,6 +118,9 @@ command line parameter quick reference:
     VegasNc1:          number of evaluations for accept-reject sampling
     VegasNc2:          number of events for accept-reject sampling
     ReadCSmax:         Read the results of the grid generation step from a file
+    CSmaxFile:         File to use for reading (if ReadCSmax is set) or writing (otherwise)
+                       the results of the grid generation step.  Depending on the process,
+                       suffixes are appended to this base name. (default: DataFile without .lhe)
     Seed:              Random seed for event generation
   I/O options:
     Unweighted:        0=weighted events, 1=unweighted events
