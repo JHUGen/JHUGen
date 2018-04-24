@@ -4,6 +4,7 @@ module ModHH
   use ModKinematics
   use ModMisc
   use ModVHaux
+#if useCollier==1
   use Collier
   use ModggboxHH1mm
   use ModggboxHH1mp
@@ -54,6 +55,7 @@ module ModHH
   use Modggbox5HH6mp
   use Modggbox5HH6pm
   use Modggbox5HH6pp
+#endif
   implicit none
 
 
@@ -77,6 +79,7 @@ subroutine Amp_HH(Mom,mass,helicity,id,amp)
   real(8) :: sprod(1:4,1:4)
   integer :: i
 
+#if useCollier==1
   amp=czero
 
   q3_q3 = scr(Mom(:,3),Mom(:,3))
@@ -118,6 +121,13 @@ subroutine Amp_HH(Mom,mass,helicity,id,amp)
 !print*,massfrun(getMass(convertLHEreverse(id(6))),get_minv(Mom(:,4)))
 !print*,"-------"
   return
+#else
+print *, "Need to link COLLIER for this process."
+print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+print *, "specified in the makefile."
+stop 1
+#endif
 end subroutine Amp_HH
 
 
@@ -134,6 +144,7 @@ subroutine ggTriH(Mom,Spaa,Spbb,sprod,helicity,TriH)
   complex(8) C0
   complex(8) TriH
 
+#if useCollier==1
   call C0_cll(C0,dcmplx(0d0),dcmplx(sprod(1,2)),dcmplx(0d0),dcmplx(M_Top**2),dcmplx(M_Top**2),dcmplx(M_Top**2))
   C0 = C0 * ci * pisq / (2d0*pi)**4
 
@@ -151,6 +162,13 @@ subroutine ggTriH(Mom,Spaa,Spbb,sprod,helicity,TriH)
   TriH = 2d0 * TriH * (-ci) * kappa * m_top_run/vev !2 for 2 digrams with opposite loop momentum
 
   return
+#else
+print *, "Need to link COLLIER for this process."
+print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+print *, "specified in the makefile."
+stop 1
+#endif
 end subroutine ggTriH
 
 
@@ -165,6 +183,7 @@ subroutine ggBoxHH(Mom,Spaa,Spbb,sprod,helicity,BoxHH)
   complex(8) BoxHH
   complex(8) ggboxHH1,ggboxHH2,ggboxHH3,ggboxHH4,ggboxHH5,ggboxHH6  
 
+#if useCollier==1
   if(    helicity(1).gt.0d0.and.helicity(2).lt.0d0)then!+-
     call ggboxHH1pm(Mom,Spaa,Spbb,sprod,ggboxHH1)
     !call ggboxHH2pm(Mom,Spaa,Spbb,sprod,ggboxHH2)
@@ -217,6 +236,13 @@ subroutine ggBoxHH(Mom,Spaa,Spbb,sprod,helicity,BoxHH)
   BoxHH = -BoxHH * ci * pisq / (2d0*pi)**4 ! -1 = -1 (fermion loop) i^4 (4 fermion propagators)
 
   return
+#else
+print *, "Need to link COLLIER for this process."
+print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+print *, "specified in the makefile."
+stop 1
+#endif
 end subroutine ggBoxHH
 
 
@@ -233,6 +259,7 @@ subroutine ggBox5HH(Mom,Spaa,Spbb,sprod,helicity,Box5HH)
   complex(8) Box5HH
   complex(8) ggbox5HH1,ggbox5HH2,ggbox5HH3,ggbox5HH4,ggbox5HH5,ggbox5HH6  
 
+#if useCollier==1
   if(    helicity(1).gt.0d0.and.helicity(2).lt.0d0)then!+-
     call ggbox5HH1pm(Mom,Spaa,Spbb,sprod,ggbox5HH1)
     !call ggbox5HH2pm(Mom,Spaa,Spbb,sprod,ggbox5HH2)
@@ -285,6 +312,13 @@ subroutine ggBox5HH(Mom,Spaa,Spbb,sprod,helicity,Box5HH)
   Box5HH = -Box5HH * ci * pisq / (2d0*pi)**4 ! -1 = -1 (fermion loop) i^4 (4 fermion propagators)
 
   return
+#else
+print *, "Need to link COLLIER for this process."
+print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+print *, "specified in the makefile."
+stop 1
+#endif
 end subroutine ggBox5HH
 
 

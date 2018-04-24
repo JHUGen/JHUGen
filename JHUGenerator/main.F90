@@ -258,17 +258,6 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
       ) call Error("Invalid scheme for the H+0J processes. Choose a different renormalization or factorization scheme.")
 
 
-   if( Process.eq.50 ) then
-#if useCollier==1
-     Nmax = 4
-     rmax = 4
-     call Init_cll(Nmax,rmax,"output_collier")
-     call InitCacheSystem_cll(1,Nmax)
-     call InitEvent_cll
-#endif
-   endif
-
-
    return
 end subroutine
 
@@ -1916,7 +1905,9 @@ use ModCrossSection
 use ModCrossSection_VH
 use ModCrossSection_HH
 use ModTTBHiggs
+#if useCollier==1
 use Collier
+#endif
 implicit none
 include "vegas_common.f"
 
@@ -2018,11 +2009,12 @@ include "vegas_common.f"
       endif
       !- VH
       if(Process.eq.51) then
-         ! if Collier is used
-         call Init_cll(4,3,"data")
+#if useCollier==1
+         call Init_cll(4,3,DataFile//"_collierfiles")
          call InitCacheSystem_cll(1,4)
          call InitEvent_cll
          call setMode_cll(1)!1. use COLI branch; 2. use DD branch; 3. use both branches and compare.
+#endif
 ! if Collier is used
          NDim = 19
          if( unweighted ) NDim = NDim + 3  ! partonic channel and acceptance
@@ -2049,11 +2041,12 @@ include "vegas_common.f"
       endif
       !- HH
       if(Process.eq.52) then
-         ! if Collier is used
-         call Init_cll(4,4,"data")
+#if useCollier==1
+         call Init_cll(4,4,DataFile//"_collierfiles")
          call InitCacheSystem_cll(1,4)
          call InitEvent_cll
          call setMode_cll(1)!1. use COLI branch; 2. use DD branch; 3. use both branches and compare.
+#endif
 ! if Collier is used
          NDim = 15
          if( unweighted ) NDim = NDim + 2  ! partonic channel and acceptance

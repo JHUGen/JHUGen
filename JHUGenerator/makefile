@@ -29,7 +29,7 @@ MyLHADir=${LHAPDF_DATA_PATH}/../../lib/
 #link MCFM libraries from MELA
 # remember to export
 #          LD_LIBRARY_PATH=/.../MELA/data/$SCRAM_ARCH/:${LD_LIBRARY_PATH}
-linkMELA = Yes
+linkMELA = No
 
 
 ifeq ($(UseLHAPDF),Yes)
@@ -43,6 +43,7 @@ endif
 linkCollierLib = No
 
 ifeq ($(linkMELA),Yes)
+   linkCollierLib = Yes
    CollierLibflags = -DuseCollier=1 -I$(MELADir)/COLLIER -lcollier
 else
    ifeq ($(linkCollierLib),Yes)
@@ -126,6 +127,7 @@ AuxDep = mod_Misc.F90 \
          mod_Kinematics_HH.F90 \
          mod_HashCollection.F90
 
+ifeq ($(linkCollierLib),Yes)
 ggVHAmpDep = \
          gg_VH_Boxes/mod_ffbH_Box7_8_mmm.F90 \
          gg_VH_Boxes/mod_ffbH_Box7_8_ppm.F90 \
@@ -230,40 +232,6 @@ ggHH5AmpDep = \
          gg_HH5_Boxes/mod_gg_box_HH5_6_pm.F90 \
          gg_HH5_Boxes/mod_gg_box_HH5_6_pp.F90
 
-# amplitude dependencies
-AmpDep = mod_Parameters.F90 \
-         mod_Misc.F90 \
-         mod_TopDecay.F90 \
-         mod_Graviton.F90 \
-         mod_Higgs.F90 \
-         mod_Zprime.F90 \
-         mod_VHiggs.F90 \
-         mod_HiggsJJ.F90 \
-         mod_HiggsJ.F90 \
-         mod_VH_LO.F90 \
-         mod_VH_gg.F90 \
-         mod_VH_real.F90 \
-         mod_VH_virtual.F90 \
-         mod_VH_qg.F90 \
-         mod_VH_dipole.F90 \
-         mod_HH.F90 \
-         mod_TTBHiggs.F90 \
-         mod_THiggs.F90
-
-AuxObj =  $(ObjectDir)/mod_HashCollection.o \
-          $(ObjectDir)/mod_Misc.o \
-          $(ObjectDir)/mod_Parameters.o \
-          $(ObjectDir)/mod_VH_aux.o \
-          $(ObjectDir)/mod_Phasespace.o \
-          $(ObjectDir)/mod_Kinematics.o \
-          $(ObjectDir)/mod_Kinematics_VH.o\
-          $(ObjectDir)/mod_Kinematics_HH.o
-ifeq ($(linkMELA),Yes)
-    AuxDep += mod_MCFMWrapper.F90
-    AuxObj += $(ObjectDir)/mod_MCFMWrapper.o
-endif
-
-
 ggVHAmpObj = \
           $(ObjectDir)/mod_ffbH_Box7_8_mmm.o \
           $(ObjectDir)/mod_ffbH_Box7_8_ppm.o \
@@ -367,6 +335,50 @@ ggHH5AmpObj = \
           $(ObjectDir)/mod_gg_box_HH5_6_mp.o \
           $(ObjectDir)/mod_gg_box_HH5_6_pm.o \
           $(ObjectDir)/mod_gg_box_HH5_6_pp.o
+else
+ggVHAmpDep = 
+ggVH5AmpDep = 
+ggHHAmpDep = 
+ggHH5AmpDep = 
+ggVHAmpObj = 
+ggVH5AmpObj = 
+ggHHAmpObj = 
+ggHH5AmpObj = 
+endif
+
+# amplitude dependencies
+AmpDep = mod_Parameters.F90 \
+         mod_Misc.F90 \
+         mod_TopDecay.F90 \
+         mod_Graviton.F90 \
+         mod_Higgs.F90 \
+         mod_Zprime.F90 \
+         mod_VHiggs.F90 \
+         mod_HiggsJJ.F90 \
+         mod_HiggsJ.F90 \
+         mod_VH_LO.F90 \
+         mod_VH_gg.F90 \
+         mod_VH_real.F90 \
+         mod_VH_virtual.F90 \
+         mod_VH_qg.F90 \
+         mod_VH_dipole.F90 \
+         mod_HH.F90 \
+         mod_TTBHiggs.F90 \
+         mod_THiggs.F90
+
+AuxObj =  $(ObjectDir)/mod_HashCollection.o \
+          $(ObjectDir)/mod_Misc.o \
+          $(ObjectDir)/mod_Parameters.o \
+          $(ObjectDir)/mod_VH_aux.o \
+          $(ObjectDir)/mod_Phasespace.o \
+          $(ObjectDir)/mod_Kinematics.o \
+          $(ObjectDir)/mod_Kinematics_VH.o\
+          $(ObjectDir)/mod_Kinematics_HH.o
+ifeq ($(linkMELA),Yes)
+    AuxDep += mod_MCFMWrapper.F90
+    AuxObj += $(ObjectDir)/mod_MCFMWrapper.o
+endif
+
 
 AmpObj =  $(ObjectDir)/mod_TopDecay.o \
           $(ObjectDir)/mod_Graviton.o \
