@@ -164,7 +164,8 @@ This is the list of command line configurables (also defined in the \verb|README
     Collider:          1=LHC (default), 2=Tevatron, 0=e+e-
     ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,
                        250 GeV for e+e-
-    Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH,
+    Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance,
+                       50=old =pp/ee->VH, 51=pp/ee->VH, 52=gg->HH,
                        60=weakVBF, 61=pp->Hjj, 62=pp->Hj,
                        66=VVHVV offshell, 67=VVVVbkg, 68=VVHVV+VVVV,
                        69=QCD JJVV bkg, 80=ttH, 90=bbH,
@@ -203,6 +204,19 @@ This is the list of command line configurables (also defined in the \verb|README
                        stable; if it is 1, they decay to Wnu, with the W's decaying
                        according to DecayModes1,2.
     HbbDK:             For VH production, decay H->bb
+    VH_PC:             VH partonic channel and mode selection
+                       ee = lo = e- e+ @LO
+                       qq = lo = q qbar @LO
+                       gg = triangles + boxes of gg
+                       tr = triangles of gg
+                       bo = boxes of gg
+                       sb = for NLO development
+                       sp = for NLO development
+                       qg = gq = qg + gq
+                       nl = full oneloop = q qbar @LO + NLO + gg + gq
+                       VH_PC overrides Pchannel,
+                       but Pchannel applies to VH_PC = nl,
+                       where 0 = gg, 1 = qq, and 2 = both + gq
     VBFoffsh_run:      For VBF offshell production, set this to a number from 1-4
                        for each of the 4 jobs.  See below for more details.
   Resonance parameters:
