@@ -2554,8 +2554,8 @@ logical :: hasAonshell
 
      do i=6,7
         if(IsALHELepton(id(i)))then
-            if(get_PT(MomExt(:,i)).lt.pTlepton_min)applyPSCut=.true.
-            if(get_eta(MomExt(:,i)).gt.etalepton_max)applyPSCut=.true.
+            if(get_PT(MomExt(:,i)).lt.pTlepcut)applyPSCut=.true.
+            if(get_eta(MomExt(:,i)).gt.etalepcut)applyPSCut=.true.
         endif
      enddo
 
@@ -2754,7 +2754,7 @@ SUBROUTINE Kinematics_HH(id,Mom,NBin,applyPSCut)
 
   do i=6,9
     if(get_PT(Mom_hist(:,i)).lt.pTjetcut)applyPSCut=.true.
-    if(get_eta(Mom_hist(:,i)).gt.etajet_max)applyPSCut=.true.
+    if(get_eta(Mom_hist(:,i)).gt.etajetcut)applyPSCut=.true.
   enddo
 
 !-- FIND PLOTTING BINS
@@ -4093,37 +4093,6 @@ RETURN
 END SUBROUTINE
 
 
-SUBROUTINE getHiggsDecayLength(ctau)
-use ModParameters
-implicit none
-real(8) :: x,xp,xpp,Len0,propa,ctau,ctau0
-integer :: loop
-
-
-     ctau  = 0d0
-     ctau0 = HiggsDecayLengthMM
-     if( ctau0.lt.1d-16 ) RETURN
-
-     do loop=1,4000000!  4Mio. tries otherwise return zero
-          call random_number(x)
-          xp = 10*x*ctau0             ! scan between 0..10*ctau0
-
-          propa = dexp( -xp/(ctau0) ) ! the max of propa is 1.0
-          call random_number(xpp)
-          if( xpp.lt.propa ) then!   accept
-                ctau = xp
-                RETURN
-          endif
-     enddo
-
-
-RETURN
-END SUBROUTINE
-
-
-
-
-
 SUBROUTINE SmearExternal(xRnd,Mass,Width,MinEnergy,MaxEnergy,invMass,Jacobi)
 use ModParameters
 real(8) :: xRnd,Mass,Width,invMass,Jacobi,MinEnergy,MaxEnergy
@@ -5006,65 +4975,6 @@ end function bw_sq
 
       return
       end function KRONECKER_DELTA
-
-
-SUBROUTINE EvalPhasespace_VHglu(xRnd,Energy,Mom,Jac)! ordering 1,2:in  3,4:Higgs  56:Z  7:glu
-use ModParameters
-use ModPhasespace
-use ModMisc
-implicit none
-real(8) :: xchannel,xRnd(1:8), Energy, Mom(1:4,1:7)
-real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5
-real(8) :: s45,s345,Mom_DummyX(1:4),Mom_DummyZ(1:4),Mom_DummyZ2(1:4)
-real(8) :: SingDepth
-integer :: Pcol1,Pcol2,Steps
-
-   Mom(1:4,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
-   Mom(1:4,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
-
-!  stable Higgs,  decay not yet implemented but momenta 3+4 are allocated 
-   ! masses
-   Jac1 = s_channel_propagator(M_V**2,0d0,M_Reso**2,Energy**2,xRnd(1),s345)     ! Z*+H
-   Jac2 = s_channel_propagator(M_V**2,Ga_V,0d0,(dsqrt(s345)-m_Reso)**2,xRnd(2),s45)  ! Z-->56
-
-
-!  splittings
-   Mom_DummyX(1:4) = (/Energy,0d0,0d0,0d0/)   
-   Jac3 = s_channel_decay(Mom_DummyX(1:4),s345,0d0,xRnd(3:4),Mom_DummyZ(:),Mom(:,7)) ! Z* + glu
-   Jac4 = s_channel_decay(Mom_DummyZ(1:4),s45,M_Reso**2,xRnd(5:6),Mom_DummyZ2(:),Mom(:,3)) ! Z + H
-   Mom(1:4,4) = 0d0
-   Jac5 = s_channel_decay(Mom_DummyZ2(:),0d0,0d0,xRnd(7:8),Mom(:,5),Mom(:,6)) !  Z --> 56
-   Jac = Jac1*Jac2*Jac3*Jac4*Jac5* PSNorm4
-
-   
-!    this is for the soft/collinear limit checks only!!
-!         Pcol1= 6 -1
-!         Pcol2= 6 -1
-!         SingDepth = 1e-13
-!         Steps = 10
-!         call gensing(4,Energy,(/M_Reso,0d0,0d0,0d0/),Mom(1:4,4:7),Pcol1,Pcol2,SingDepth,Steps)
-!         Mom(1:4,3) = Mom(1:4,4)
-!         Mom(1:4,4) = 0d0
-! !       call genps(4,Energy,xRnd(1:8),(/M_Reso,0d0,0d0,0d0/),(/Mom(1:4,3),Mom(1:4,5),Mom(1:4,6),Mom(1:4,7)/),Jac)
-!         print *, "generating singular phase space"
-!         Jac=1d0        
-        
-!    end check
-   
-
-   if( isNan(jac) ) then
-      print *, "EvalPhasespace_VHglu NaN"
-      print *, Energy
-      print *, s345,s45
-      print *, Jac1,Jac2,Jac3,Jac4,Jac5
-      print *, xRnd  
-      Jac = 0d0
-   endif   
-   
-RETURN
-END SUBROUTINE
-
-
 
 
 SUBROUTINE EvalPhasespace_2to2(EHat,Masses,xRndPS,Mom,PSWgt)

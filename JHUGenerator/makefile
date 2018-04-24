@@ -51,7 +51,7 @@ endif
 
 
 #include Collier Loop Integral Library
-linkCollierLib = No
+linkCollierLib = Yes
 
 ifeq ($(linkCollierLib),Yes)
    CollierLibflags = -DuseCollier=1 -L$(CollierDir) -I$(CollierDir)/modules -lcollier
@@ -397,10 +397,6 @@ AmpObj =  $(ObjectDir)/mod_TopDecay.o \
           $(ObjectDir)/mod_THiggs.o
     
 
-ggVHAmpObj = $(ObjectDir)/ampBox_ggVH.o
-ggVHAmpDep = ampBox_ggVH.F90
-          
-
 VegasDep = $(VegasDir)/vegas.f
 VegasObj = $(ObjectDir)/vegas.o
 
@@ -468,7 +464,7 @@ MadGraphObj = $(ObjectDir)/gg_ttbh.o \
 
 
 
-JHUGenerator: colliermodules $(CPSObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(AuxObj) $(ggVHAmpObj) $(LHAPDFInterfaceObj) $(ggVH5AmpObj) $(ggHHAmpObj) $(ggHH5AmpObj) $(AmpObj) $(MainObj)
+JHUGenerator: $(CPSObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(AuxObj) $(ggVHAmpObj) $(LHAPDFInterfaceObj) $(ggVH5AmpObj) $(ggHHAmpObj) $(ggHH5AmpObj) $(AmpObj) $(MainObj)
 	@echo " linking"
 ifeq ($(UseLHAPDF),Yes)
 	echo " -> interfaced with LHAPDF"
@@ -477,7 +473,7 @@ else
 endif
 	@echo " executable file "$(Exec)" is compiled with "$(Comp)
 	@echo " "
-	$(fcomp) -o $(Exec) $(MainObj) $(AmpObj) $(PSGenObj) $(AuxObj) $(ggVHAmpObj) $(ggVH5AmpObj) $(ggHHAmpObj) $(ggHH5AmpObj) $(AmpObj) $(VegasObj) $(PDFObj) $(CPSObj) $(MCFM_Obj) $(LHAPDFflags) $(QCDLoopflags)
+	$(fcomp) -o $(Exec) $(MainObj) $(PSGenObj) $(AuxObj) $(AmpObj) $(ggVHAmpObj) $(ggVH5AmpObj) $(ggHHAmpObj) $(ggHH5AmpObj) $(VegasObj) $(PDFObj) $(CPSObj) $(MCFM_Obj) $(LHAPDFflags) $(QCDLoopflags)
 
 $(AuxObj): $(AuxDep) $(Makefile)
 	@echo " compiling misc. and aux. tools"
@@ -498,22 +494,22 @@ endif
 	$(fcomp) -c $(AuxDep)
 	mv *.o $(ObjectDir)
 
-$(ggVHAmpObj): $(ggVHAmpDep) $(Makefile)
+$(ggVHAmpObj): $(ggVHAmpDep) $(AuxObj) $(Makefile)
 	@echo " compiling ggVH box amplitudes"
 	$(fcomp) -c $(ggVHAmpDep)
 	mv *.o $(ObjectDir)
 
-$(ggVH5AmpObj): $(ggVH5AmpDep) $(Makefile)
+$(ggVH5AmpObj): $(ggVH5AmpDep) $(AuxObj) $(Makefile)
 	@echo " compiling ggVH5 box amplitudes"
 	$(fcomp) -c $(ggVH5AmpDep)
 	mv *.o $(ObjectDir)
 
-$(ggHHAmpObj): $(ggHHAmpDep) $(Makefile)
+$(ggHHAmpObj): $(ggHHAmpDep) $(AuxObj) $(Makefile)
 	@echo " compiling ggHH box amplitudes"
 	$(fcomp) -c $(ggHHAmpDep)
 	mv *.o $(ObjectDir)
 
-$(ggHH5AmpObj): $(ggHH5AmpDep) $(Makefile)
+$(ggHH5AmpObj): $(ggHH5AmpDep) $(AuxObj) $(Makefile)
 	@echo " compiling ggHH5 box amplitudes"
 	$(fcomp) -c $(ggHH5AmpDep)
 	mv *.o $(ObjectDir)
@@ -573,10 +569,6 @@ endif
 ##	http://stackoverflow.com/questions/2826029/passing-additional-variables-from-command-line-to-make#comment51986622_2826178
 #	(cd $(QLDir); $(MAKE) FC=$(CompFullName))
 	
-colliermodules:
-	@echo " moving Collier .mod to modules directory"
-	(cp $(COLLIERModuleDir)/*.mod $(ModuleDir)/)
-
 #COLLIERDir:
 #	@echo " linking Collier static library libcollier.a"
 #	(cd $(COLLIERDir); ranlib libcollier.a)

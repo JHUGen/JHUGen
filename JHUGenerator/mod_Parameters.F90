@@ -1597,7 +1597,6 @@ return
 END FUNCTION
 
 ! for VH use
->>>>>>> ee9d1eda... Proc=51,52
 
 
 FUNCTION convertLHEreverse(Part) ! PDG/PDF->JHU
