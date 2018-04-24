@@ -2010,7 +2010,7 @@ include "vegas_common.f"
       !- VH
       if(Process.eq.51) then
 #if useCollier==1
-         call Init_cll(4,3,DataFile//"_collierfiles")
+         call Init_cll(4,3,trim(DataFile)//"_collierfiles")
          call InitCacheSystem_cll(1,4)
          call InitEvent_cll
          call setMode_cll(1)!1. use COLI branch; 2. use DD branch; 3. use both branches and compare.
@@ -2042,7 +2042,7 @@ include "vegas_common.f"
       !- HH
       if(Process.eq.52) then
 #if useCollier==1
-         call Init_cll(4,4,DataFile//"_collierfiles")
+         call Init_cll(4,4,trim(DataFile)//"_collierfiles")
          call InitCacheSystem_cll(1,4)
          call InitEvent_cll
          call setMode_cll(1)!1. use COLI branch; 2. use DD branch; 3. use both branches and compare.

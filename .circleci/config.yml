@@ -635,7 +635,6 @@ jobs:
             git checkout -- makefile
             exit $exitcode
           when: always
-      - run: grep 'linkQCDLoopLib *= *No' JHUGenerator/makefile
       - run: grep 'linkCollierLib *= *No' JHUGenerator/makefile
 
       - restore_cache:
