@@ -118,8 +118,8 @@ MainObj = $(ObjectDir)/mod_CrossSection.o \
           $(ObjectDir)/mod_CommandLine.o \
           $(ObjectDir)/main.o
 
-AuxDep = mod_Misc.F90 \
-         mod_Parameters.F90 \
+AuxDep = mod_Parameters.F90 \
+         mod_Misc.F90 \
          mod_VH_aux.F90 \
          mod_Phasespace.F90 \
          mod_Kinematics.F90 \
@@ -367,8 +367,8 @@ AmpDep = mod_Parameters.F90 \
          mod_THiggs.F90
 
 AuxObj =  $(ObjectDir)/mod_HashCollection.o \
-          $(ObjectDir)/mod_Misc.o \
           $(ObjectDir)/mod_Parameters.o \
+          $(ObjectDir)/mod_Misc.o \
           $(ObjectDir)/mod_VH_aux.o \
           $(ObjectDir)/mod_Phasespace.o \
           $(ObjectDir)/mod_Kinematics.o \
