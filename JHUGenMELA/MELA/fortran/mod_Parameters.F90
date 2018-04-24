@@ -109,8 +109,8 @@ integer, public :: VBFoffsh_run=-1
 ! then the seeds are used to generate the (compiler dependent) required number of seeds
 ! and THOSE are used for event generation
 !note that even if the same seed is provided, results are compiler dependent
-integer, public, parameter :: nmaxseeds = 20
-integer, public, parameter :: DefaultSeeds(1:nmaxseeds) = (/847362834,470115596,392845769,191039475,372910496,192049687,695820194,218930493,902943834,471748302,123958674,390534012,938576849,386472918,938576483,891928354,593857698,938576432,948576849,192847564/)
+integer, public, parameter :: nmaxseeds = 33
+integer, public, parameter :: DefaultSeeds(1:nmaxseeds) = (/847362834,470115596,392845769,191039475,372910496,192049687,695820194,218930493,902943834,471748302,123958674,390534012,938576849,386472918,938576483,891928354,593857698,938576432,948576849,192847564     ,218940493,902943854,471748304,123958670,390534013,938576846,386472917,938576484,891928359,593857698,938576434,948576848,192847565/)
 integer, public            :: TheSeeds(1:nmaxseeds) = DefaultSeeds
 !changing the default seeds is not advised, since then results from before the change
 ! will not be reproducible
@@ -128,9 +128,25 @@ logical, public :: RandomizeVVdecays = .true.    ! randomize DecayMode1 and Deca
 
 logical, public :: UseUnformattedRead = .false.  !Set this to true if the regular reading fails for whatever reason
 
+logical, public :: HbbDecays =.false.                 ! default to false so H in V* > VH (Process = 51) does not decay to bbbar
+
 logical, public :: H_DK =.false.                 ! default to false so H in V* > VH (Process = 50) does not decay to bbbar
 !=====================================================
 
+! new VH
+character(len=2), public :: VH_PC = "lo"                ! VH partonic channel and mode selection, in development.
+                                                            ! "ee" ( = e+ e- @LO)
+                                                            ! "gg" ( = triangles + boxes of gg)
+                                                            ! "qq" ( = q qbar @LO)
+                                                            ! "lo" ( = q qbar @LO)
+                                                            ! "tr" ( = triangles of gg)
+                                                            ! "bo" ( = boxes of gg)
+                                                            ! "qg" or "gq" ( = qg + gq)
+                                                            ! "nl" ( = full oneloop = q qbar @LO + NLO + gg + gq)
+                                                            ! "sb" ( = real - dipoles, for development only)
+                                                            ! "sp" ( = virtual + dipoles, for development only)
+! new VH
+!=====================================================
 
 !=====================================================
 !cuts - should be set on the command line
@@ -147,7 +163,6 @@ real(8), public :: pTlepcut = -1d0*GeV
 real(8), public :: etalepcut = -1d0
 logical, public :: JetsOppositeEta = .true.
 !=====================================================
-
 
 !=====================================================
 !constants
@@ -1006,6 +1021,7 @@ integer, public, parameter :: pdfATop_ = -6 ! Dummy
 
 real(dp), public, parameter :: pi =3.141592653589793238462643383279502884197_dp
 real(dp), public, parameter :: sqrt2 = 1.4142135623730950488016887242096980786_dp
+real(dp), public, parameter :: gamma_0 = 0.5772156649015328606065120900824024310421_dp  !Euler–Mascheroni constant
 real(dp), public, parameter :: pisq = pi**2
 real(8), public, parameter :: one = 1.0d0, mone = -1.0d0
 real(8), public, parameter :: half  = 0.5d0,two = 2.0d0
@@ -1242,6 +1258,7 @@ logical :: computeQsqCompundCoupl
       endif
    endif
 
+return
 end function
 
 
@@ -1435,6 +1452,7 @@ else
   ScaleFactor = 1d0
 endif
 
+return
 END FUNCTION
 
 FUNCTION CKMbare(id1in,id2in)
@@ -1474,6 +1492,111 @@ integer :: id1in, id2in
   CKM=CKMbare(id1in, id2in)*sqrt(ScaleFactor(id1in,id2in))
 END FUNCTION
 
+! for VH use
+FUNCTION ZFFbare(id1in,id2in,h1,h2)
+implicit none
+real(8) :: ZFFbare
+integer :: id1, id2, id1in, id2in
+real(8) :: h1,h2
+
+id1 = abs(id1in)
+id2 = abs(id2in)
+
+  if(id1.ne.id2)then
+    print*,"Not a valid Z to fermion pair vertex!",id1in,id2in
+    stop
+  !Zll
+  else if(id1.eq.convertLHE(ElM_).or.id1.eq.convertLHE(MuM_).or.id1.eq.convertLHE(TaM_))then
+    if((id1in*h1).gt.0d0)then
+      ZFFbare = aR_lep
+    else
+      ZFFbare = aL_lep
+    endif
+  !Zuu
+  else if(id1.eq.convertLHE(Up_).or.id1.eq.convertLHE(Chm_).or.id1.eq.convertLHE(Top_))then
+    if((id1in*h1).gt.0d0)then
+      ZFFbare = aR_QUp
+    else
+      ZFFbare = aL_QUp
+    endif
+  !Zdd
+  else if(id1.eq.convertLHE(Dn_).or.id1.eq.convertLHE(Str_).or.id1.eq.convertLHE(Bot_))then
+    if((id1in*h1).gt.0d0)then
+      ZFFbare = aR_QDn
+    else
+      ZFFbare = aL_QDn
+    endif
+  !Z nu nu
+  else if(id1.eq.convertLHE(NuE_).or.id1.eq.convertLHE(NuM_).or.id1.eq.convertLHE(NuT_))then
+    if((id1in*h1).gt.0d0)then
+      ZFFbare = aL_neu
+    else
+      print*,"Noright-handed neutrino here!",id1in,h1
+      stop
+    endif
+  else
+    print*,"Not a valid Z to fermion pair vertex!",id1in,id2in
+    stop
+  endif
+
+return
+END FUNCTION
+
+FUNCTION ZFF(id1in,id2in,h1,h2)
+implicit none
+real(8) :: ZFF
+integer :: id1in, id2in
+real(8) :: h1,h2
+  ZFF = ZFFbare(id1in,id2in,h1,h2) * sqrt(ScaleFactor(id1in,id2in))
+return
+END FUNCTION
+
+FUNCTION AFF(id1in,id2in,h1,h2)
+implicit none
+real(8) :: AFF
+integer :: id1, id2, id1in, id2in
+real(8) :: h1,h2
+
+id1 = abs(id1in)
+id2 = abs(id2in)
+
+  if(id1.ne.id2)then
+    print*,"Not a valid Z to fermion pair vertex!",id1in,id2in
+    stop
+  !photon ll
+  else if(id1.eq.convertLHE(ElM_).or.id1.eq.convertLHE(MuM_).or.id1.eq.convertLHE(TaM_))then
+    if((id1in*h1).gt.0d0)then
+      AFF = QlR
+    else
+      AFF = QlL
+    endif
+  !photon uu
+  else if(id1.eq.convertLHE(Up_).or.id1.eq.convertLHE(Chm_).or.id1.eq.convertLHE(Top_))then
+    if((id1in*h1).gt.0d0)then
+      AFF = QuR
+    else
+      AFF = QuL
+    endif
+  !photon dd
+  else if(id1.eq.convertLHE(Dn_).or.id1.eq.convertLHE(Str_).or.id1.eq.convertLHE(Bot_))then
+    if((id1in*h1).gt.0d0)then
+      AFF = QdR
+    else
+      AFF = QdL
+    endif
+  !photon nu nu
+  else if(id1.eq.convertLHE(NuE_).or.id1.eq.convertLHE(NuM_).or.id1.eq.convertLHE(NuT_))then
+    AFF = 0d0
+    print*,"Warning, gamma > nu nu~ gives 0.",id1in,id2in
+  else
+    print*,"Not a valid photon to fermion pair vertex!",id1in,id2in
+    stop
+  endif
+
+return
+END FUNCTION
+
+! for VH use
 
 
 FUNCTION convertLHEreverse(Part) ! PDG/PDF->JHU
@@ -2326,6 +2449,53 @@ integer :: Part
 END FUNCTION
 
 
+Function CouplToLHEWp(Part)
+  implicit none
+  logical :: CouplToLHEWp
+  integer, intent(in) :: Part(1:2)
+
+  CouplToLHEWp = &
+     ((Part(1).eq.2 .and.Part(2).eq.-1) &
+  .or.(Part(1).eq.2 .and.Part(2).eq.-3) &
+  .or.(Part(1).eq.2 .and.Part(2).eq.-5) &
+  .or.(Part(1).eq.4 .and.Part(2).eq.-1) &
+  .or.(Part(1).eq.4 .and.Part(2).eq.-3) &
+  .or.(Part(1).eq.4 .and.Part(2).eq.-5) &
+  .or.(Part(1).eq.-1.and.Part(2).eq. 2) &
+  .or.(Part(1).eq.-3.and.Part(2).eq. 2) &
+  .or.(Part(1).eq.-5.and.Part(2).eq. 2) &
+  .or.(Part(1).eq.-1.and.Part(2).eq. 4) &
+  .or.(Part(1).eq.-3.and.Part(2).eq. 4) &
+  .or.(Part(1).eq.-5.and.Part(2).eq. 4))
+
+  return
+end function CouplToLHEWp
+
+
+Function CouplToLHEWm(Part)
+  implicit none
+  logical :: CouplToLHEWm
+  integer, intent(in) :: Part(1:2)
+
+  CouplToLHEWm = &
+     ((Part(1).eq.-2.and.Part(2).eq. 1) &
+  .or.(Part(1).eq.-2.and.Part(2).eq. 3) &
+  .or.(Part(1).eq.-2.and.Part(2).eq. 5) &
+  .or.(Part(1).eq.-4.and.Part(2).eq. 1) &
+  .or.(Part(1).eq.-4.and.Part(2).eq. 3) &
+  .or.(Part(1).eq.-4.and.Part(2).eq. 5) &
+  .or.(Part(1).eq. 1.and.Part(2).eq.-2) &
+  .or.(Part(1).eq. 3.and.Part(2).eq.-2) &
+  .or.(Part(1).eq. 5.and.Part(2).eq.-2) &
+  .or.(Part(1).eq. 1.and.Part(2).eq.-4) &
+  .or.(Part(1).eq. 3.and.Part(2).eq.-4) &
+  .or.(Part(1).eq. 5.and.Part(2).eq.-4))
+
+  return
+end function CouplToLHEWm
+
+
+
 
 
 FUNCTION ChargeFlip(Part)
@@ -2460,6 +2630,7 @@ implicit none
    ! Normalizations used in VH and VBF
    couplWffsq = gwsq/2.0_dp
    couplZffsq = gwsq/4.0_dp/(1.0_dp-xw)
+   !couplZffsq = alpha_QED*4d0*pi/xw/4.0_dp/(1.0_dp-xw)
    couplAZff = -gwsq*sitW/2.0_dp/sqrt(1.0_dp-xw)
    couplAffsq = gwsq*xw
 
@@ -2866,6 +3037,10 @@ subroutine spinoru(p,za,zb,s)
       enddo
 
     end subroutine spinoru
+
+
+
+
 !========================================================================
 
 !========================================================================
