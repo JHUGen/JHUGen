@@ -40,18 +40,20 @@ endif
 
 
 #include Collier Loop Integral Library
-linkCollierLib = Yes
+linkCollierLib = No
 
-ifeq ($(linkCollierLib),Yes)
-   CollierLibflags = -DuseCollier=1 -L$(CollierDir) -I$(CollierDir)/modules -lcollier
+ifeq ($(linkMELA),Yes)
+   CollierLibflags = -DuseCollier=1 -I$(MELADir)/COLLIER -lcollier
 else
-   CollierLibflags = -DuseCollier=0
+   ifeq ($(linkCollierLib),Yes)
+      CollierLibflags = -DuseCollier=1 -L$(CollierDir) -I$(CollierDir)/modules -lcollier
+   else
+      CollierLibflags = -DuseCollier=0
+   endif
 endif
 
 
 MELAflags = -DlinkMELA=0
-
-COLLIERflags = -L$(COLLIERDir) -lcollier
 
 ifeq ($(linkMELA),Yes)
  ifeq ($(Comp),gfort)
