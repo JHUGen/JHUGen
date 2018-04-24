@@ -635,7 +635,9 @@ jobs:
             git checkout -- makefile
             exit $exitcode
           when: always
-      - run: grep 'linkCollierLib *= *No' JHUGenerator/makefile
+      - run:
+          command: grep 'linkCollierLib *= *No' JHUGenerator/makefile
+          when: always
 
       - restore_cache:
           key: v1_dos2unix-7.4.0
@@ -650,11 +652,13 @@ jobs:
               sed -i -r "s/(ENABLE_NLS *=)/#\1/" Makefile
               make
             fi
+          when: always
       - run:
           name: "check that newlines are not annoying"
           command: |
             dos2unix $(git ls-files)
             git diff --exit-code
+          when: always
       - save_cache:
           key: v1_dos2unix-7.4.0
           paths: ~/dos2unix-7.4.0
