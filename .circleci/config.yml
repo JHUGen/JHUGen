@@ -8,7 +8,7 @@ env: &env
         LD_LIBRARY_PATH: "/home/cmsbld/JHUGen/JHUGenMELA/MELA/data/slc6_amd64_gcc530"
         PYTHONPATH: "/home/cmsbld/JHUGen/JHUGenMELA/MELA/python"
 
-        REFERENCE_LHES_USERNAME: "hroskes"
+        REFERENCE_LHES_USERNAME: "yaofu"
         REFERENCE_LHES_BUILD_NUMBER: "1056"
         REFERENCE_JHUGEN_VERSION: "v7.1.2"
 
@@ -135,6 +135,7 @@ jobs:
       - run: ./JHUGen Seed=$SEED PDFSet=3 Process=50 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/WH DecayMode1=11 $REFERENCE_COUPLINGS_SPIN0
       - run: ./JHUGen Seed=$SEED VegasNc0=100000 ReadLHE=compare_to_reference/WH.lhe DataFile=compare_to_reference/WH_Zgamma DecayMode1=9 DecayMode2=7 $REFERENCE_COUPLINGS_SPIN0
       - run: ./JHUGen Seed=$SEED Collider=0 Process=50 VegasNc0=100000 VegasNc2=100 HbbDK DataFile=compare_to_reference/ee_gammaH_bb DecayMode1=7 $REFERENCE_COUPLINGS_SPIN0
+      - run: ./JHUGen Seed=$SEED Collider=1 Process=51 HbbDK=1 DecayMode1=0 $REFERENCE_COUPLINGS_SPIN0 Unweighted=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/gg_ZH_llbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0
 
       #don't use WW separate in VBF.  In any case, there is interference
       - run: ./JHUGen Seed=$SEED PDFSet=3 Process=60 VegasNc0=5000000 VegasNc2=100 DataFile=compare_to_reference/VBF $REFERENCE_COUPLINGS_SPIN0
@@ -252,6 +253,7 @@ jobs:
       - run: ./JHUGen Collider=0 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/ee_ZH DecayMode1=9
       - run: ./JHUGen VegasNc0=100000 TauDK=0 ReadLHE=$LHEDIR/ee_ZH.lhe DataFile=$LHEDIR/ee_ZH_tautau
       - run: ./JHUGen Collider=0 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/ee_gammaH_bb DecayMode1=7 HbbDK ghz1=0,0 ghgsgs2=1,0 epPolarization=100 emPolarization=-100
+      - run: ./JHUGen PDFSet=2 Collider=1 Process=51 HbbDK=1 DecayMode1=0 ghz1=0.0,0.0 ghz2=1.0,0.0 Unweighted=1 VegasNc0=100000 VegasNc2=100 DataFile=data/gg_ZH_llbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0
       #H+J
       - run: ./JHUGen PDFSet=3 Process=62 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/HJ
       #ttH, bbH, tH

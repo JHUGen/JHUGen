@@ -20,6 +20,7 @@ Function EvalWeighted_VH(yRnd,VgsWgt)
   use ModVHvirtual
   use ModVHdipole
   use ModVHgg
+  use ModVHqg
   use ModPhasespace
 #if compiler==1
  use ifport
@@ -1117,9 +1118,16 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
     !gq/qg
     me2gq=0d0
     if(VH_PC.eq."qg".or.VH_PC.eq."gq".or.VH_PC.eq."nl")then
-      me2gq=0d0
+      do l=0,1
+      do p=0,1
+      do q=0,1
+        call amp_VH_qg(Mom_real,mass(3:5,1:2),(/dble(l*2-1),-dble(l*2-1),helicity(3:5),dble(p*2-1),-dble(p*2-1),helicity(8:9),dble(q*2-1)/),id,amp_dummy)
+        print*,amp_dummy
+      enddo
+      enddo
+      enddo
     endif
-
+pause
 
       !summing event weights
     EvalWeighted_VH = me2lo + me2sub + me2sup + me2gg + me2gq
@@ -1187,6 +1195,7 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
   use ModVHreal
   use ModVHdipole
   use ModVHgg
+  use ModVHqg
   use ModPhasespace
 #if compiler==1
  use ifport
@@ -1522,10 +1531,11 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
 
 !if e+ e- collider
   if(Collider.eq.0.and.VH_PC.eq."ee")then
-    call EvalPhasespace_VH(yRnd(6:13),Ehat,Mom(:,1:9),id(6:9),PSWgt,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+    call EvalPhasespace_VH(yRnd(6:13),ILC_Energy,Mom(:,1:9),id(6:9),PSWgt,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
     Mom_save=Mom
     call Kinematics_VH(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
     if( applyPSCut .or. PSWgt.eq.zero ) return    
+
     FluxFac = 1d0/(2d0*ILC_Energy**2)
     PreFac = fbGeV2 * FluxFac * PSWgt
 !    EvalWeighted_VH=0d0
@@ -1603,7 +1613,6 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
 
 
     id(1:2)=(/ifound,jfound/)!to be replaced in (/0,0/)
-
     !ee or gg
     if(ifound.eq.0.and.jfound.eq.0)then
       if(Collider.eq.0.and.VH_PC.eq."ee")then!ee
@@ -1699,6 +1708,7 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
   ELSE! NOT GENEVT =================Looking for max. weights in each partonic channel===================
 
     if(Collider.eq.0 .and. VH_PC.eq."ee")then! ee > ZH
+
       id(1:2)=(/convertLHE(ElP_),convertLHE(ElM_)/)
       call amp_VH_LO(Mom(:,1:9),mass(3:5,:),helicity(1:9),id(1:9),amp_dummy)
       EvalUnweighted_VH = dble(amp_dummy*dconjg(amp_dummy)) *PreFac *PostFac
@@ -1727,7 +1737,7 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
         me2lo=0d0
         if((VH_PC.eq."qq".or.VH_PC.eq."lo"))then
           !Z/gamma
-          if( (IsAZDecay(DecayMode1).or.IsAPhoton(DecayMode1)) .and. (i.eq.-j) )then
+          if( (IsAZDecay(DecayMode1).or.IsAPhoton(DecayMode1)) .and. (i.eq.-j) .and. (i.ne.0) )then
             id(1:2) = (/i,j/)
             call amp_VH_LO(Mom(:,1:9),mass(3:5,:),helicity(1:9),id(1:9),amp_dummy)
             me2lo = dble(amp_dummy*dconjg(amp_dummy)) *pdf(LHA2M_PDF(i),1)*pdf(LHA2M_PDF(j),2)
@@ -1770,7 +1780,7 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
           endif
   
         endif!lo/qq
-    
+
         !summing event weights
         EvalUnWeighted_VH = me2lo + me2gg
     
