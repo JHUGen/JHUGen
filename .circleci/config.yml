@@ -8,7 +8,7 @@ env: &env
         LD_LIBRARY_PATH: "/home/cmsbld/JHUGen/JHUGenMELA/MELA/data/slc6_amd64_gcc530"
         PYTHONPATH: "/home/cmsbld/JHUGen/JHUGenMELA/MELA/python"
 
-        REFERENCE_LHES_USERNAME: "yaofu"
+        REFERENCE_LHES_USERNAME: "hroskes"
         REFERENCE_LHES_BUILD_NUMBER: "1056"
         REFERENCE_JHUGEN_VERSION: "v7.1.2"
 
@@ -25,7 +25,7 @@ env: &env
 
         SEED: "765543533"
 
-        REFERENCE_FILENAMES: "ggH_ZZ.lhe ggH_WW.lhe ggH_Zgamma.lhe ggH_gammagamma.lhe ggH_ZZ_contact.lhe ggH_ZZ_Zprime.lhe spin1_ZZ.lhe spin1_WW.lhe gg_spin2_ZZ.lhe qq_spin2_WW.lhe gg_spin2_Zgamma.lhe qq_spin2_gammagamma.lhe ZH_bb.lhe WH_Zgamma.lhe ee_gammaH_bb.lhe VBF_ZZ.lhe HJJ_WW.lhe HJ_gammagamma.lhe ttH_tautau.lhe gg_bbH_tautau.lhe qq_bbH.lhe tqH_110.lhe tqH_111.lhe tqH_112.lhe tqH_113.lhe tqH_114.lhe"
+        REFERENCE_FILENAMES: "ggH_ZZ.lhe ggH_WW.lhe ggH_Zgamma.lhe ggH_gammagamma.lhe ggH_ZZ_contact.lhe ggH_ZZ_Zprime.lhe spin1_ZZ.lhe spin1_WW.lhe gg_spin2_ZZ.lhe qq_spin2_WW.lhe gg_spin2_Zgamma.lhe qq_spin2_gammagamma.lhe ZH_bb.lhe WH_Zgamma.lhe ee_gammaH_bb.lhe VBF_ZZ.lhe HJJ_WW.lhe HJ_gammagamma.lhe ttH_tautau.lhe gg_bbH_tautau.lhe qq_bbH.lhe tqH_110.lhe tqH_111.lhe tqH_112.lhe tqH_113.lhe tqH_114.lhe gg_ZH_llbb.lhe"
         REFERENCE_FILENAME_GGH: "ggH_ZZ.lhe"
         REFERENCE_FILENAME_VBF: "VBF_ZZ.lhe"
         REFERENCE_FILENAME_HJJ: "HJJ_WW.lhe"
@@ -253,7 +253,7 @@ jobs:
       - run: ./JHUGen Collider=0 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/ee_ZH DecayMode1=9
       - run: ./JHUGen VegasNc0=100000 TauDK=0 ReadLHE=$LHEDIR/ee_ZH.lhe DataFile=$LHEDIR/ee_ZH_tautau
       - run: ./JHUGen Collider=0 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/ee_gammaH_bb DecayMode1=7 HbbDK ghz1=0,0 ghgsgs2=1,0 epPolarization=100 emPolarization=-100
-      - run: ./JHUGen PDFSet=2 Collider=1 Process=51 HbbDK=1 DecayMode1=0 ghz1=0.0,0.0 ghz2=1.0,0.0 Unweighted=1 VegasNc0=100000 VegasNc2=100 DataFile=data/gg_ZH_llbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0
+      - run: ./JHUGen PDFSet=2 Collider=1 Process=51 HbbDK=1 DecayMode1=0 ghz1=0.0,0.0 ghz2=1.0,0.0 Unweighted=1 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/gg_ZH_llbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0
       #H+J
       - run: ./JHUGen PDFSet=3 Process=62 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/HJ
       #ttH, bbH, tH
