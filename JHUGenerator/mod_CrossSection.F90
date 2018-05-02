@@ -2192,7 +2192,7 @@ elseif(DecayMode1.eq.11)then
 
 else
   print *, "invalid final states"
-  stop
+  stop 1
 
 endif
 
@@ -2735,7 +2735,7 @@ elseif(DecayMode1.eq.11)then
 
 else
   print *, "invalid final states"
-  stop
+  stop 1
 
 endif
 

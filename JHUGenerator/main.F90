@@ -1766,7 +1766,7 @@ SUBROUTINE InitPDFs()
         !nloops_pdf=1
      else ! Everything else
         write(6,*) "main.F90::InitPDFs: PDFSet",PDFSet,"QCD parameters are unknown. Please double-check! Stopping JHUGen..."
-        stop
+        stop 1
         ! Could also have used these instead of the stop statement, but why introduce arbitrary number?
         !alphas_mz = 0.13229060d0
         !nloops_pdf = 1
@@ -2432,7 +2432,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 
     else
         print *, "ERROR: VegasNc1 and VegasNc2 must not be set at the same time"
-        stop
+        stop 1
     endif
     call cpu_time(time_end)
     print *, ""

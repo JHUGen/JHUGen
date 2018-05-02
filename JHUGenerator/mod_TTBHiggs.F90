@@ -441,11 +441,11 @@ integer :: i,j,Order(1:6)
                 Res(1:Ds) = cur_f_2fV(TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:2),TreeProc%Quarks(1)%PartType,TreeProc%Boson,TreeProc%NumGlu(0:2))
              else
                 print *, "requested current with a boson is not available"
-                stop
+                stop 1
              endif
           else
              print *, "requested current is not available 2q"
-             stop
+             stop 1
           endif
 
       elseif( TreeProc%NumQua.eq.4  .and. TreeProc%NumSca.eq.0) then!  4 quarks, no scalars
@@ -455,11 +455,11 @@ integer :: i,j,Order(1:6)
                  Res(1:Ds) = cur_f_4fV( TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:4),TreeProc%Quarks(1)%PartType,TreeProc%Boson,TreeProc%BosonVertex,TreeProc%NumGlu(0:4),tag_f,tag_Z )
           else
              print *, "requested current is not available 4q"
-             stop
+             stop 1
           endif
       else
            print *, "requested current is not available xx"
-           stop
+           stop 1
       endif
 
 return
@@ -2287,7 +2287,7 @@ integer :: PartKey,HelKey,CurrKey,Hel_Tmp
 !DEC$ IF (_DebugGeneralChecks==1)
    if( Quarks(2)%PartType .eq.0 .or. .not.IsAQuark(Quarks(2)%PartType)) then
       print *, "Error in cur_f_2f"
-      stop
+      stop 1
    endif
 !DEC$ ENDIF
 !DEC$ IF (_DebugCheckMyImpl1==1)
@@ -3455,7 +3455,7 @@ complex(8) :: PMom4(1:Dv)
 
       if (BosonVertex .ne. 1 .and. BosonVertex .ne. 2 .and. BosonVertex .ne. 3) then
          print *, 'cur_g_4fV not implemented for this flavor choice and BosonVertex=', BosonVertex
-         stop
+         stop 1
       endif
 
       endif! Flavor check
@@ -3953,7 +3953,7 @@ endif   ! BosonVertex
 
 if (BosonVertex .ne. 1 .and. BosonVertex .ne. 3) then
    print *, 'Not implemented for for cur_g_4fV for this flavor structure and BosonVertex=', BosonVertex
-   stop
+   stop 1
 endif
 endif
 
@@ -5734,7 +5734,7 @@ end subroutine
             f(4)=pz*fc/fc2
           else
               print *, "wrong helicity setting in ubarSpi"
-              stop
+              stop 1
           endif
 
           return

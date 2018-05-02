@@ -337,7 +337,7 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
     
   else
     print *, "invalid final states"
-    stop
+    stop 1
     
   endif
 
@@ -357,7 +357,7 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
        VH_PC.ne."qg".and. &! "qg" or "gq" ( = qg + gq)
        VH_PC.ne."nl")then  !"nl" ( = full oneloop = q qbar @LO + NLO + gg + gq)
       print*,"invalid VH_PC ", VH_PC
-      stop
+      stop 1
     endif
 
 ! begin event
@@ -366,7 +366,7 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
       (Collider.eq.0                  .and.VH_PC.ne."ee"))then
     print*,"e+ e- collisions with Collider=0 only."
     print*,"VH_PC =",VH_PC," Collider =", Collider
-    stop
+    stop 1
   endif
 
 !if e+ e- collider
@@ -772,7 +772,7 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
     if(VH_PC.eq."gg".or.VH_PC.eq."bo".or.VH_PC.eq."tr")then
       if(DecayMode1.eq.4.or.DecayMode1.eq.5.or.DecayMode1.eq.6.or.DecayMode1.eq.10.or.DecayMode1.eq.11)then
         print*,"DecayMode1 = ",DecayMode1," which is a W decay, not compatible with gg"
-        stop
+        stop 1
       endif
       id(1:2)=(/convertLHE(Glu_),convertLHE(Glu_)/)
       call amp_VH_gg(Mom(:,1:9),mass(3:5,1:2),helicity,id(1:9),amp_dummy)
@@ -1507,7 +1507,7 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
     
   else
     print *, "invalid final states"
-    stop
+    stop 1
     
   endif
 
@@ -1518,7 +1518,7 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
 
   if(VH_PC.ne."ee".and.VH_PC.ne."qq".and.VH_PC.ne."lo".and.VH_PC.ne."tr".and.VH_PC.ne."bo".and.VH_PC.ne."gg")then
     print*,"VH @NLO in development"
-    stop
+    stop 1
   endif
 
 
@@ -1526,7 +1526,7 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
       (Collider.eq.0                  .and.VH_PC.ne."ee"))then
     print*,"e+ e- collisions with Collider=0 only."
     print*,"VH_PC = ",VH_PC," Collider = ", Collider
-    stop
+    stop 1
   endif
 
 !if e+ e- collider
@@ -1627,7 +1627,7 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
 
       else
         print*,"invalid parton combination ",ifound,jfound,"for VH_PC=", VH_PC
-        stop
+        stop 1
       endif
 
     elseif(VH_PC.eq."lo".or.VH_PC.eq."qq")then
@@ -1649,12 +1649,12 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
         !summing 3 colors in intial qq, no factor from spins because they are casted randomly, not summed.
       else
         print*,"invalid parton combination ",ifound,jfound,"for VH_PC=", VH_PC
-        stop
+        stop 1
       endif
 
     else
       print*,"invalid parton combination or in development",ifound,jfound,"for VH_PC=", VH_PC
-      stop
+      stop 1
     endif
 
 
@@ -1764,7 +1764,7 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
               helicity(7)=-helicity(6)
             else
               print *, "invalid initial states for WH @LO. id(1:2) =", id2(1:2)
-              stop
+              stop 1
             endif
     
             call amp_VH_LO(Mom(:,1:9),mass(3:5,:),helicity(1:9),id2(1:9),amp_dummy)

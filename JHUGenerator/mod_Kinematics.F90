@@ -3056,7 +3056,7 @@ integer :: ZLepBranching
       ZLepBranching = MuM_
   else
       print *, "error ",xRnd
-      stop
+      stop 1
   endif
 
 !print *, "checker 2",(Brlept_Z_ee)/(100d0*percent-Brlept_Z_tt)
@@ -3097,7 +3097,7 @@ integer :: ZLepPlusTauBranching
       ZLepPlusTauBranching = TaM_
   else
       print *, "error ",xRnd
-      stop
+      stop 1
   endif
 
 ! print *, "checker 3",Brlept_Z_ee
@@ -3140,7 +3140,7 @@ integer :: ZNuBranching
       ZNuBranching = NuT_
   else
       print *, "error ",xRnd
-      stop
+      stop 1
   endif
 
 !print *, "checker 4",Brlept_Z_nn
@@ -3191,7 +3191,7 @@ real(8),parameter :: yyyy=Ncol*xxxx
       ZQuaBranching_flat = Bot_
   else
       print *, "error ",xRnd
-      stop
+      stop 1
   endif
 
 !print *, "checker 1",Brhadr_Z_uu,Brhadr_Z_dd
@@ -3223,7 +3223,7 @@ real(8),parameter :: yyyy=Ncol*xxxx
       ZQuaBranching = Bot_
   else
       print *, "error ",xRnd
-      stop
+      stop 1
   endif
 
 
@@ -3274,7 +3274,7 @@ real(8),parameter :: yy=Ncol*xx
       ZAnyBranching_flat = NuT_
   else
       print *, "error ",xRnd
-      stop
+      stop 1
   endif
 
 
@@ -3305,7 +3305,7 @@ real(8),parameter :: yy=Ncol*xx
 !       ZAnyBranching = NuT_
 !   else
 !       print *, "error ",xRnd
-!       stop
+!       stop 1
 !   endif
 
 
@@ -3347,7 +3347,7 @@ integer :: ZAnyBranching
       ZAnyBranching = NuT_
   else
       print *, "error ",xRnd
-      stop
+      stop 1
   endif
 
 
@@ -3375,7 +3375,7 @@ integer :: ZAnyBranching
 !       ZAnyBranching = NuT_
 !   else
 !       print *, "error ",xRnd
-!       stop
+!       stop 1
 !   endif
 
 
@@ -3404,7 +3404,7 @@ integer :: WLepBranching
       WLepBranching = MuM_
   else
       print *, "error ",xRnd
-      stop
+      stop 1
   endif
 
 !print *, "checker 6",Brlept_W_en /(100d0*percent-Brlept_W_tn)
@@ -3443,7 +3443,7 @@ integer :: WLepPlusTauBranching
       WLepPlusTauBranching = TaM_
   else
       print *, "error ",xRnd
-      stop
+      stop 1
   endif
 
 ! print *, "checker 7",Brlept_W_en
@@ -3484,7 +3484,7 @@ integer :: WQuaUpBranching
       WQuaUpBranching = Chm_
   else
       print *, "error ",xRnd
-      stop
+      stop 1
   endif
 
 
@@ -3532,7 +3532,7 @@ real(8),parameter :: yy=Ncol*xx
       WAnyBranching_flat = TaM_
   else
       print *, "error ",xRnd
-      stop
+      stop 1
   endif
 
 RETURN
@@ -3561,7 +3561,7 @@ integer :: WAnyBranching
       WAnyBranching = TaM_
   else
       print *, "error ",xRnd
-      stop
+      stop 1
   endif
 
 
@@ -3577,7 +3577,7 @@ integer :: WAnyBranching
 !       WAnyBranching = TaM_
 !   else
 !       print *, "error ",xRnd
-!       stop
+!       stop 1
 !   endif
 
 ! print *, "checker 2",Br_W_ud+Br_W_cs+Br_W_en+Br_W_mn+Br_W_tn
@@ -6628,7 +6628,7 @@ real(8) :: pdf(-6:6,1:2),NNpdf(1:2,-6:7)
             RETURN
         else
             print *, "PDFSet",PDFSet,"not available!"
-            stop
+            stop 1
         endif
 #endif
 
@@ -6751,17 +6751,17 @@ subroutine EvalAlphaS()
 
       IF (Mu_Ren .LE. 0d0) THEN
          WRITE(6,*) 'ModKinematics::EvalAlphaS: Mu_Ren .le. 0, Mu_Ren (GeV) = ',(Mu_Ren*GeV)
-         stop
+         stop 1
       ENDIF
       IF (nQflavors_pdf .NE. NF5) THEN
          WRITE(6,*) 'ModKinematics::EvalAlphaS: nQflavors_pdf invalid, nQflavors_pdf = ',nQflavors_pdf
          WRITE(6,*) 'ModKinematics::EvalAlphaS: Check 28472c5bfee128dde458fd4929b4d3ece9519ab8'
-         stop
+         stop 1
       ENDIF
       IF (nloops_pdf .NE. 1) THEN
          WRITE(6,*) 'ModKinematics::EvalAlphaS: nloops_pdf invalid, nloops_pdf = ',nloops_pdf
          WRITE(6,*) 'ModKinematics::EvalAlphaS: Check 28472c5bfee128dde458fd4929b4d3ece9519ab8'
-         stop
+         stop 1
       ENDIF
 
       alphas=alphas_mz/(1.0_dp+alphas_mz*B0_PDF(NF5)*2.0_dp*dlog((Mu_Ren/zmass_pdf)))
