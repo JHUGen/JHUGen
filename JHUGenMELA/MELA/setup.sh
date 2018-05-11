@@ -9,7 +9,6 @@ MELADIR="."
 DATA_LIB_DIR="slc6_amd64_gcc530"
 
 export SCRAM_ARCH=$DATA_LIB_DIR
-bash COLLIER/setup.sh "$@"
 
 printenv () {
     echo "export LD_LIBRARY_PATH=$(readlink -f $MELADIR)/data/$DATA_LIB_DIR"':$LD_LIBRARY_PATH'
@@ -19,6 +18,7 @@ printenv () {
 if [[ "$#" -ge 1 ]] && [[ "$1" == "env" ]]; then
     printenv
 elif [[ "$#" -ge 1 ]] && [[ "$1" == *"clean"* ]]; then
+    COLLIER/setup.sh "$@"
     make clean
     pushd $MELADIR"/fortran/"
     make clean
@@ -26,6 +26,7 @@ elif [[ "$#" -ge 1 ]] && [[ "$1" == *"clean"* ]]; then
     popd
     make clean
 else
+    COLLIER/setup.sh "$@"
     tcsh data/retrieve.csh $DATA_LIB_DIR mcfm_705
     bash downloadNNPDF.sh
     pushd $MELADIR"/fortran/"
