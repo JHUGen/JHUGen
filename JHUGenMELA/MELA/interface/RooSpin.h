@@ -151,7 +151,7 @@ protected:
   virtual Bool_t checkFundamentalType(const RooRealProxy& proxy) const;
 
   // Check if some amplitudes are needed, otherwise don't even compute them
-  virtual Bool_t computeNeededAmplitude(int VGammaVpmode1, int VGammaVpmode2) const { return true; }
+  virtual Bool_t computeNeededAmplitude(int /*VGammaVpmode1*/, int /*VGammaVpmode2*/) const { return true; }
 
 };
 
