@@ -1504,7 +1504,7 @@ id2 = abs(id2in)
 
   if(id1.ne.id2)then
     print*,"Not a valid Z to fermion pair vertex!",id1in,id2in
-    stop 1
+    stop
   !Zll
   else if(id1.eq.convertLHE(ElM_).or.id1.eq.convertLHE(MuM_).or.id1.eq.convertLHE(TaM_))then
     if((id1in*h1).gt.0d0)then
@@ -1532,11 +1532,11 @@ id2 = abs(id2in)
       ZFFbare = aL_neu
     else
       print*,"Noright-handed neutrino here!",id1in,h1
-      stop 1
+      stop
     endif
   else
     print*,"Not a valid Z to fermion pair vertex!",id1in,id2in
-    stop 1
+    stop
   endif
 
 return
@@ -1562,7 +1562,7 @@ id2 = abs(id2in)
 
   if(id1.ne.id2)then
     print*,"Not a valid Z to fermion pair vertex!",id1in,id2in
-    stop 1
+    stop
   !photon ll
   else if(id1.eq.convertLHE(ElM_).or.id1.eq.convertLHE(MuM_).or.id1.eq.convertLHE(TaM_))then
     if((id1in*h1).gt.0d0)then
@@ -1590,7 +1590,7 @@ id2 = abs(id2in)
     print*,"Warning, gamma > nu nu~ gives 0.",id1in,id2in
   else
     print*,"Not a valid photon to fermion pair vertex!",id1in,id2in
-    stop 1
+    stop
   endif
 
 return
@@ -1678,7 +1678,7 @@ integer :: Part
       convertLHEreverse = Wmpr_
   else
       print *, "MYLHE format not implemented for ",Part
-      stop 1
+      stop
   endif
 
 
@@ -1768,7 +1768,7 @@ integer :: Part
       convertLHE = Not_a_particle_
   else
       print *, "LHE format not implemented for ",Part
-      stop 1
+      stop
   endif
 
 END FUNCTION
@@ -1804,7 +1804,7 @@ integer :: Part
       convertToPartIndex = pdfABot_
   else
       print *, "Unsuccessful conversion to a parton ME array index from ",Part
-      stop 1
+      stop
   endif
 
 END FUNCTION
@@ -1844,7 +1844,7 @@ integer :: Part
       convertFromPartIndex = ATop_
   else
       print *, "Unsuccessful conversion to a parton id from the ME array index ",Part
-      stop 1
+      stop
   endif
 
 END FUNCTION
@@ -1957,7 +1957,7 @@ integer :: Part
       getMass = 0d0
   else
      print *, "Error in getMass",Part
-     stop 1
+     stop
   endif
 
 END FUNCTION
@@ -2110,7 +2110,7 @@ integer :: Part
       getParticle = "Hig"
   else
      print *, "Error in getParticle",Part
-     stop 1
+     stop
   endif
 
 
@@ -2443,7 +2443,7 @@ integer :: Part
       SU2flip = sign(1,Part)*TaP_
   else
       print *, "Error: Invalid flavor in SU2flip ",Part
-      stop 1
+      stop
   endif
 
 END FUNCTION
@@ -2511,7 +2511,7 @@ integer :: Part
       ChargeFlip = +Part
   else
       print *, "Error: Invalid flavor in ChargeFlip"
-      stop 1
+      stop
   endif
 
 END FUNCTION
@@ -2820,7 +2820,7 @@ end subroutine ComputeQCDVariables
          pol_mass(4)= p0/m/pv*pz
       else
          print *,"wrong helicity setting in pol_mass"
-         stop 1
+         stop
       endif
 
    end function pol_mass
