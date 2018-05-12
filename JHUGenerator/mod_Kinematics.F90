@@ -2590,8 +2590,12 @@ logical :: hasAonshell
 
      do i=6,7
         if(IsALHELepton(id(i)))then
-            if(get_PT(MomExt(:,i)).lt.pTlepton_min)applyPSCut=.true.
-            if(get_eta(MomExt(:,i)).gt.etalepton_max)applyPSCut=.true.
+            !if(pTlepcut.ge.0d0)then
+                if(get_PT(MomExt(:,i)).lt.pTlepcut)applyPSCut=.true.
+            !endif
+            if(etalepcut.ge.0d0)then
+                if(get_eta(MomExt(:,i)).gt.etalepcut)applyPSCut=.true.
+            endif
         endif
      enddo
 
