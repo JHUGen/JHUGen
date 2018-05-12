@@ -3,24 +3,24 @@ implicit none
 save
 !
 !
-character(len=*),parameter :: JHUGen_Version="v7.1.5"
+character(len=6),parameter :: JHUGen_Version="v7.0.3"
 !
 !
 !=====================================================
 !internal
 integer, public, parameter :: dp = selected_real_kind(15)
 real(8), public, parameter :: tol = 0.0000001d0
-integer, public, parameter :: InvalidMode=-1,WWMode=00,ZZMode=01,ZgsMode=02,gsZMode=03,gsgsMode=04,ZgMode=05,gsgMode=06,ggMode=07
-integer, public, parameter :: WWpMode=10,WpWMode=11,WpWpMode=12
-integer, public, parameter :: ZZpMode=20,ZpZMode=21,ZpZpMode=22
-integer, public, parameter :: gsZpMode=30,ZpgsMode=31,ZpgMode=32
+integer, public, parameter :: ZZMode=00,ZgsMode=01,gsZMode=02,gsgsMode=03
+integer, public, parameter :: WWMode=10
+integer, public, parameter :: ggMode=20
+integer, public, parameter :: ZgMode=30,gsgMode=31
 integer, public :: Collider,PChannel,Process,DecayMode1,DecayMode2,TopDecays,TauDecays
 integer, public :: VegasIt1,VegasNc0,VegasNc1,VegasNc2,PMZZEvals
 real(8), public :: Collider_Energy
 integer, public :: FacScheme,RenScheme
 real(8), public :: MuFacMultiplier,MuRenMultiplier
 integer, public :: VegasIt1_default,VegasNc0_default,VegasNc1_default,VegasNc2_default
-integer, public :: NumHistograms,RequestNLeptons,RequestOS,RequestOSSF,RequestNJets
+integer, public :: NumHistograms,RequestNLeptons,RequestOS,RequestOSSF
 logical, public :: Unweighted,OffShellReson,OffShellV1,OffShellV2,ReadLHEFile,ConvertLHEFile,DoPrintPMZZ
 logical, public :: ReadCSmax,GenerateEvents,CountTauAsAny,HasLeptonFilter, FoundHiggsMass, FoundHiggsWidth
 integer, public :: WriteFailedEvents
@@ -41,16 +41,13 @@ integer(8), public :: EvalCounter=0
 integer(8), public :: RejeCounter=0
 integer(8), public :: AccepCounter=0
 integer(8), public :: AlertCounter=0
-integer(8), public :: AccepCounter_part(-6:6,-6:6)=0,RejeCounter_part(-6:6,-6:6)=0,RequEvents(-6:+6,-6:+6)
+integer(8), public :: AccepCounter_part(-6:6,-6:6)=0,RequEvents(-6:+6,-6:+6)
 real(8), public :: CrossSecMax(-6:+6,-6:+6),CrossSec(-6:+6,-6:+6)
-integer(8), public :: RequEvents2(1:164),AccepCounter_part2(1:164)
-real(8), public :: CrossSec2(1:164),CrossSecMax2(164)
-integer, public :: iPart_sel, jPart_sel, iChann_sel
+integer, public :: iPart_sel, jPart_sel
 real(8) :: time_start,time_end,time_int
 logical, public :: warmup
 character(len=500) :: DataFile
-character(len=500) :: CSmaxFile
-character(len=500) :: LogFile
+character(len=100) :: LogFile
 character(len=500) :: LHEProdFile
 ! PDFset variables, present regardless of useLHAPDF value due to MELA
 character(len=100) :: LHAPDFString
@@ -58,12 +55,6 @@ character(len=500) :: LHAPDF_DATA_PATH
 integer, public :: LHAPDFMember, lenLHAPDFString ! lenLHAPDFString is needed in MELA
 integer, public :: PDFSet
 ! End PDFset variables
-#if useCollier==1
-! COLLIER initialization variables
-integer, public :: Collier_maxNLoopProps = -1
-integer, public :: Collier_maxRank = -1
-! End COLLIER initialization variables
-#endif
 logical, public :: includeInterference, writegit
 real(8), public :: M_V,Ga_V, M_Vprime,Ga_Vprime, M_V_ps,Ga_V_ps, M_Z_ps,Ga_Z_ps, M_W_ps,Ga_W_ps
 real(8), public, parameter :: GeV=1d0/100d0 ! we are using units of 100GeV, i.e. Lambda=10 is 1TeV
@@ -81,7 +72,6 @@ integer, public :: Br_W_ll_counter=0
 integer, public :: Br_W_ud_counter=0
 integer, public :: Br_counter(1:5,1:5)=0
 integer, public :: LeptInEvent(0:8) = 0
-integer, public :: JetsInEvent(0:8) = 0
 logical, public :: ReweightDecay = .false.
 integer, public :: UserSeed = 0
 integer, public  :: WidthScheme = 0   ! 1=running BW-width, 2=fixed BW-width (default), 3=Passarino's CPS
@@ -97,7 +87,6 @@ real(8), public :: PMZZdistribution(1:PMZZsize,1:2)  !huge array, in normal case
 integer, public :: PMZZminindex=-1, PMZZmaxindex=-1  !store the largest and smallest values currently used
 complex(8), public :: PrintPMZZ   !real part is the minimum, imaginary part is the maximum
 integer, public :: PrintPMZZIntervals
-integer, public :: VBFoffsh_run=-1
 !=====================================================
 
 
@@ -131,6 +120,9 @@ logical, public :: UseUnformattedRead = .false.  !Set this to true if the regula
 logical, public :: HbbDecays =.false.                 ! default to false so H in V* > VH (Process = 51) does not decay to bbbar
 
 logical, public :: H_DK =.false.                 ! default to false so H in V* > VH (Process = 50) does not decay to bbbar
+
+!leave this one as a parameter, no reason to ever turn it off
+logical, public, parameter :: importExternal_LHEinit = .true.
 !=====================================================
 
 ! new VH
@@ -151,32 +143,28 @@ character(len=2), public :: VH_PC = "lo"                ! VH partonic channel an
 !=====================================================
 !cuts - should be set on the command line
 real(8), public :: pTjetcut = -1d0*GeV                        ! jet min pt, default is set in main (0 in VH, 15 GeV otherwise)
-real(8), public :: etajetcut = -1d0                           ! jet max |eta|, default is set in main (4 in offshell VBF, infinity elsewhere)
-real(8), public :: detajetcut = -1d0                          ! min difference in eta between jets (default 2 in VBF offshell, 0 elsewhere)
+real(8), public :: etajet_max = 999d0                         ! jet max eta
 real(8), public :: Rjet = -1d0                                ! jet deltaR, anti-kt algorithm, default is set in main (0 in VH, 0.3 otherwise)
 real(8), public :: mJJcut = 0d0*GeV                           ! minimum mJJ for VBF, HJJ, bbH, VH
 real(8), public :: m4l_minmax(1:2) = (/ -1d0,-1d0 /)*GeV      ! min and max for m_4l in off-shell VBF production;   default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
 logical, public :: includeGammaStar = .false.                 ! include offshell photons?
 logical, public :: includeVprime = .false.
-real(8), public :: MPhotonCutoff = -1d0*GeV                          ! minimum |mass_ll| for offshell photons when includeGammaStar = .true. or in VBF bkg
-real(8), public :: pTlepcut = -1d0*GeV
-real(8), public :: etalepcut = -1d0
-logical, public :: JetsOppositeEta = .true.
+real(8), public :: MPhotonCutoff = 4d0*GeV                    ! minimum |mass| for offshell photons when includeGammaStar = .true.
+real(8), public :: pTlepton_min = 0d0*GeV
+real(8), public :: etalepton_max = 999d0
 !=====================================================
 
 !=====================================================
 !constants
-real(8), public            :: M_Top   = 173.2d0   *GeV      ! top quark mass
+real(8), public            :: M_Top   = 1.7320000000000000d0      ! top quark mass
 real(8), public            :: Ga_Top  = 2.0d0     *GeV      ! top quark width
-real(8), public            :: M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-2011)
-real(8), public            :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-2011)
-real(8), public            :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
+real(8), public            :: M_Z     = 0.91187600000000002d0      ! Z boson mass (PDG-2011)
+real(8), public            :: Ga_Z    = 2.4952000000000002d-002      ! Z boson width(PDG-2011)
+real(8), public            :: M_W     = 0.80398999999999998d0      ! W boson mass (PDG-2011)
 real(8), public            :: Ga_W    = 2.085d0   *GeV      ! W boson width(PDG-2011)
-real(8), public            :: M_Reso  = 125.0d0   *GeV      ! X resonance mass (spin 0, spin 1, spin 2)     (can be overwritten by command line argument)
+real(8), public            :: M_Reso  =  1.2500000000000000d0      ! X resonance mass (spin 0, spin 1, spin 2)     (can be overwritten by command line argument)
 real(8), public            :: Ga_Reso = 0.00407d0 *GeV      ! X resonance width
 real(8), public            :: HiggsDecayLengthMM = 0d0      ! Higgs decay length in [mm]
-real(8), public            :: M_Reso2 = -1d0      *GeV      ! second resonance mass (spin 0 in off-shell VBF)     (can be overwritten by command line argument)
-real(8), public            :: Ga_Reso2= 0d0       *GeV      ! second resonance width
 
 real(8), public            :: m_bot = 4.75d0       *GeV     ! bottom quark mass
 real(8), public            :: m_charm = 1.275d0    *GeV     ! charm quark mass
@@ -186,7 +174,7 @@ real(8), public            :: m_tau = 1.7768d0     *GeV     ! tau mass
 real(8), public            :: Ga_tau =2.267d-12    *GeV     ! tau width
 
 real(8), public            :: Gf = 1.16639d-5/GeV**2        ! Fermi constant
-real(8), public            :: alpha_QED = 1d0/128d0         ! el.magn. coupling
+real(8), public            :: alpha_QED = 7.8125000000000000d-003         ! el.magn. coupling
 real(8), public            :: vev ! = 1.0d0/sqrt(Gf*sqrt(2.0d0))
 real(8), public            :: gwsq ! = 4.0d0 * M_W**2/vev**2  ! weak constant squared
 real(dp), public           :: esq ! = 4.0d0 * pi * alpha_QED  ! Fundamental charge
@@ -194,7 +182,7 @@ real(dp), public           :: esq ! = 4.0d0 * pi * alpha_QED  ! Fundamental char
 real(8), public            :: xw = 0.23119d0                ! sin**2(Theta_Weinberg) (PDG-2008)
 real(8), public            :: sitW ! = dsqrt(xw)            ! sin(Theta_Weinberg) (PDG-2008)
 real(8), public            :: twosc ! = sqrt(4.0_dp*xw*(1.0_dp-xw))
-real(8), public, parameter :: LHC_Energy=13000d0  *GeV      ! LHC hadronic center of mass energy
+real(8), public, parameter :: LHC_Energy=14000d0  *GeV      ! LHC hadronic center of mass energy
 real(8), public, parameter :: TEV_Energy=1960d0  *GeV       ! Tevatron hadronic center of mass energy
 real(8), public, parameter :: ILC_Energy=250d0  *GeV        ! Linear collider center of mass energy
 !command line: epPolarization, emPolarization
@@ -288,11 +276,9 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
 !=====================================================
 !resonance couplings
 
-! Lambda scale enters in two places
-! overall scale for x-section and in power suppressed
-! operators/formfactors (former r).
-real(8), public, parameter :: Lambda  = 1000d0    *GeV
-real(8), public, parameter :: Lambda2 = 1000d0    *GeV      ! for second resonance
+real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling enters in two places
+                                                            ! overall scale for x-section and in power suppressed
+                                                            ! operators/formfactors (former r).
 
 !--------------------!
 !-----! Spin-0 !-----!
@@ -1050,6 +1036,12 @@ integer, public :: ijPartons(1:2)=0
 !=====================================================
 
 
+interface ReadCommandLineArgument
+    module procedure ReadCommandLineArgument_logical, ReadCommandLineArgument_integer, ReadCommandLineArgument_real8,&
+                     ReadCommandLineArgument_complex8, ReadCommandLineArgument_string
+end interface
+
+
 CONTAINS
 
 
@@ -1066,7 +1058,7 @@ logical :: forceZZcoupl
 logical :: computeQsqCompundCoupl
 
    if(present(tryWWcoupl)) then
-      forceZZcoupl = (.not.tryWWcoupl .or. .not.distinguish_HWWcouplings .or. (index.gt.4 .and. index.lt.12))
+      forceZZcoupl = (.not.tryWWcoupl .or. .not.distinguish_HWWcouplings .or. index.gt.4)
    else
       forceZZcoupl = .true.
    endif
@@ -1081,7 +1073,7 @@ logical :: computeQsqCompundCoupl
       if(cz_q2sq.ne.0) sWminus_signed=abs(sWminus)*dble(sign(1,cz_q2sq))
       if(cz_q12sq.ne.0) sWW_signed=abs(sWW)*dble(sign(1,cz_q12sq))
       if(cz_q1sq.ne.0 .or. cz_q2sq.ne.0 .or. cz_q12sq.ne.0) computeQsqCompundCoupl=.true.
-      if(index.eq.1) then ! ZZ 1-4
+      if(index.eq.1) then
          vvcoupl = (/ ghz1, ghz1_prime, ghz1_prime2, ghz1_prime3, ghz1_prime4, ghz1_prime5, ghz1_prime6, ghz1_prime7 /)
          lambda_v = Lambda_z1
          lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
@@ -1125,54 +1117,6 @@ logical :: computeQsqCompundCoupl
          vvcoupl(1) = ghgsgs4
          lambda_v = 1d0 ! Not present
          lambda_v120 = (/ Lambda_z41, Lambda_z42, Lambda_z40 /)
-      elseif(index.eq.12) then ! ZpZ 1-4
-         vvcoupl = (/ ghzzp1, ghzzp1_prime, ghzzp1_prime2, ghzzp1_prime3, ghzzp1_prime4, ghzzp1_prime5, ghzzp1_prime6, ghzzp1_prime7 /)
-         lambda_v = Lambda_z1
-         lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
-      elseif(index.eq.13) then
-         vvcoupl = (/ ghzzp2, ghzzp2_prime, ghzzp2_prime2, ghzzp2_prime3, ghzzp2_prime4, ghzzp2_prime5, ghzzp2_prime6, ghzzp2_prime7 /)
-         lambda_v = Lambda_z2
-         lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
-      elseif(index.eq.14) then
-         vvcoupl = (/ ghzzp3, ghzzp3_prime, ghzzp3_prime2, ghzzp3_prime3, ghzzp3_prime4, ghzzp3_prime5, ghzzp3_prime6, ghzzp3_prime7 /)
-         lambda_v = Lambda_z3
-         lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
-      elseif(index.eq.15) then
-         vvcoupl = (/ ghzzp4, ghzzp4_prime, ghzzp4_prime2, ghzzp4_prime3, ghzzp4_prime4, ghzzp4_prime5, ghzzp4_prime6, ghzzp4_prime7 /)
-         lambda_v = Lambda_z4
-         lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
-      elseif(index.eq.16) then ! ZpZp 1-4
-         vvcoupl = (/ ghzpzp1, ghzpzp1_prime, ghzpzp1_prime2, ghzpzp1_prime3, ghzpzp1_prime4, ghzpzp1_prime5, ghzpzp1_prime6, ghzpzp1_prime7 /)
-         lambda_v = Lambda_z1
-         lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
-      elseif(index.eq.17) then
-         vvcoupl = (/ ghzpzp2, ghzpzp2_prime, ghzpzp2_prime2, ghzpzp2_prime3, ghzpzp2_prime4, ghzpzp2_prime5, ghzpzp2_prime6, ghzpzp2_prime7 /)
-         lambda_v = Lambda_z2
-         lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
-      elseif(index.eq.18) then
-         vvcoupl = (/ ghzpzp3, ghzpzp3_prime, ghzpzp3_prime2, ghzpzp3_prime3, ghzpzp3_prime4, ghzpzp3_prime5, ghzpzp3_prime6, ghzpzp3_prime7 /)
-         lambda_v = Lambda_z3
-         lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
-      elseif(index.eq.19) then
-         vvcoupl = (/ ghzpzp4, ghzpzp4_prime, ghzpzp4_prime2, ghzpzp4_prime3, ghzpzp4_prime4, ghzpzp4_prime5, ghzpzp4_prime6, ghzpzp4_prime7 /)
-         lambda_v = Lambda_z4
-         lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
-      elseif(index.eq.20) then ! Zpgs 1
-         vvcoupl(3) = ghzpgs1_prime2
-         lambda_v = Lambda_zgs1
-         lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
-      elseif(index.eq.21) then ! Zpgs 2-4
-         vvcoupl(1) = ghzpgs2
-         lambda_v = 1d0 ! Not present
-         lambda_v120 = (/ Lambda_z21, Lambda_z22, Lambda_z20 /)
-      elseif(index.eq.22) then
-         vvcoupl(1) = ghzpgs3
-         lambda_v = 1d0 ! Not present
-         lambda_v120 = (/ Lambda_z31, Lambda_z32, Lambda_z30 /)
-      elseif(index.eq.23) then
-         vvcoupl(1) = ghzpgs4
-         lambda_v = 1d0 ! Not present
-         lambda_v120 = (/ Lambda_z41, Lambda_z42, Lambda_z40 /)
       endif
    else
       if(cw_q1sq.ne.0) sWplus_signed=abs(sWplus)*dble(sign(1,cw_q1sq))
@@ -1195,38 +1139,6 @@ logical :: computeQsqCompundCoupl
          vvcoupl = (/ ghw4, ghw4_prime, ghw4_prime2, ghw4_prime3, ghw4_prime4, ghw4_prime5, ghw4_prime6, ghw4_prime7 /)
          lambda_v = Lambda_w4
          lambda_v120 = (/ Lambda_w41, Lambda_w42, Lambda_w40 /)
-      elseif(index.eq.12) then
-         vvcoupl = (/ ghwwp1, ghwwp1_prime, ghwwp1_prime2, ghwwp1_prime3, ghwwp1_prime4, ghwwp1_prime5, ghwwp1_prime6, ghwwp1_prime7 /)
-         lambda_v = Lambda_w1
-         lambda_v120 = (/ Lambda_w11, Lambda_w12, Lambda_w10 /)
-      elseif(index.eq.13) then
-         vvcoupl = (/ ghwwp2, ghwwp2_prime, ghwwp2_prime2, ghwwp2_prime3, ghwwp2_prime4, ghwwp2_prime5, ghwwp2_prime6, ghwwp2_prime7 /)
-         lambda_v = Lambda_w2
-         lambda_v120 = (/ Lambda_w11, Lambda_w12, Lambda_w10 /)
-      elseif(index.eq.14) then
-         vvcoupl = (/ ghwwp3, ghwwp3_prime, ghwwp3_prime2, ghwwp3_prime3, ghwwp3_prime4, ghwwp3_prime5, ghwwp3_prime6, ghwwp3_prime7 /)
-         lambda_v = Lambda_w3
-         lambda_v120 = (/ Lambda_w11, Lambda_w12, Lambda_w10 /)
-      elseif(index.eq.15) then
-         vvcoupl = (/ ghwwp4, ghwwp4_prime, ghwwp4_prime2, ghwwp4_prime3, ghwwp4_prime4, ghwwp4_prime5, ghwwp4_prime6, ghwwp4_prime7 /)
-         lambda_v = Lambda_w4
-         lambda_v120 = (/ Lambda_w11, Lambda_w12, Lambda_w10 /)
-      elseif(index.eq.16) then
-         vvcoupl = (/ ghwpwp1, ghwpwp1_prime, ghwpwp1_prime2, ghwpwp1_prime3, ghwpwp1_prime4, ghwpwp1_prime5, ghwpwp1_prime6, ghwpwp1_prime7 /)
-         lambda_v = Lambda_w1
-         lambda_v120 = (/ Lambda_w11, Lambda_w12, Lambda_w10 /)
-      elseif(index.eq.17) then
-         vvcoupl = (/ ghwpwp2, ghwpwp2_prime, ghwpwp2_prime2, ghwpwp2_prime3, ghwpwp2_prime4, ghwpwp2_prime5, ghwpwp2_prime6, ghwpwp2_prime7 /)
-         lambda_v = Lambda_w2
-         lambda_v120 = (/ Lambda_w11, Lambda_w12, Lambda_w10 /)
-      elseif(index.eq.18) then
-         vvcoupl = (/ ghwpwp3, ghwpwp3_prime, ghwpwp3_prime2, ghwpwp3_prime3, ghwpwp3_prime4, ghwpwp3_prime5, ghwpwp3_prime6, ghwpwp3_prime7 /)
-         lambda_v = Lambda_w3
-         lambda_v120 = (/ Lambda_w11, Lambda_w12, Lambda_w10 /)
-      elseif(index.eq.19) then
-         vvcoupl = (/ ghwpwp4, ghwpwp4_prime, ghwpwp4_prime2, ghwpwp4_prime3, ghwpwp4_prime4, ghwpwp4_prime5, ghwpwp4_prime6, ghwpwp4_prime7 /)
-         lambda_v = Lambda_w4
-         lambda_v120 = (/ Lambda_w11, Lambda_w12, Lambda_w10 /)
       endif
    endif
 
@@ -1260,7 +1172,6 @@ logical :: computeQsqCompundCoupl
 
 return
 end function
-
 
 function VpffCoupling(jhuid, hel, useWp)
 integer, intent(in) :: jhuid
@@ -1390,6 +1301,7 @@ integer :: absid
    endif
 
 end function
+
 function VpffCoupling_PDG(pdgid, hel, useWp)
 integer, intent(in) :: pdgid
 integer, intent(in) :: hel
@@ -1483,6 +1395,7 @@ else
   CKMbare= 1d0
 endif
 
+return
 END FUNCTION
 
 FUNCTION CKM(id1in,id2in)
@@ -1490,6 +1403,7 @@ implicit none
 real(8) :: CKM
 integer :: id1in, id2in
   CKM=CKMbare(id1in, id2in)*sqrt(ScaleFactor(id1in,id2in))
+return
 END FUNCTION
 
 ! for VH use
@@ -1504,7 +1418,7 @@ id2 = abs(id2in)
 
   if(id1.ne.id2)then
     print*,"Not a valid Z to fermion pair vertex!",id1in,id2in
-    stop 1
+    stop
   !Zll
   else if(id1.eq.convertLHE(ElM_).or.id1.eq.convertLHE(MuM_).or.id1.eq.convertLHE(TaM_))then
     if((id1in*h1).gt.0d0)then
@@ -1532,11 +1446,11 @@ id2 = abs(id2in)
       ZFFbare = aL_neu
     else
       print*,"Noright-handed neutrino here!",id1in,h1
-      stop 1
+      stop
     endif
   else
     print*,"Not a valid Z to fermion pair vertex!",id1in,id2in
-    stop 1
+    stop
   endif
 
 return
@@ -1562,7 +1476,7 @@ id2 = abs(id2in)
 
   if(id1.ne.id2)then
     print*,"Not a valid Z to fermion pair vertex!",id1in,id2in
-    stop 1
+    stop
   !photon ll
   else if(id1.eq.convertLHE(ElM_).or.id1.eq.convertLHE(MuM_).or.id1.eq.convertLHE(TaM_))then
     if((id1in*h1).gt.0d0)then
@@ -1590,7 +1504,7 @@ id2 = abs(id2in)
     print*,"Warning, gamma > nu nu~ gives 0.",id1in,id2in
   else
     print*,"Not a valid photon to fermion pair vertex!",id1in,id2in
-    stop 1
+    stop
   endif
 
 return
@@ -1599,7 +1513,7 @@ END FUNCTION
 ! for VH use
 
 
-FUNCTION convertLHEreverse(Part) ! PDG/PDF->JHU
+FUNCTION convertLHEreverse(Part)
 implicit none
 integer :: convertLHEreverse
 integer :: Part
@@ -1678,7 +1592,7 @@ integer :: Part
       convertLHEreverse = Wmpr_
   else
       print *, "MYLHE format not implemented for ",Part
-      stop 1
+      stop
   endif
 
 
@@ -1686,7 +1600,7 @@ END FUNCTION
 
 
 
-FUNCTION convertLHE(Part) ! JHU->PDG/PDF
+FUNCTION convertLHE(Part)
 implicit none
 integer :: convertLHE
 integer :: Part
@@ -1768,13 +1682,13 @@ integer :: Part
       convertLHE = Not_a_particle_
   else
       print *, "LHE format not implemented for ",Part
-      stop 1
+      stop
   endif
 
 END FUNCTION
 
 
-FUNCTION convertToPartIndex(Part) ! JHU->PDF
+FUNCTION convertToPartIndex(Part)
 implicit none
 integer :: convertToPartIndex
 integer :: Part
@@ -1804,13 +1718,13 @@ integer :: Part
       convertToPartIndex = pdfABot_
   else
       print *, "Unsuccessful conversion to a parton ME array index from ",Part
-      stop 1
+      stop
   endif
 
 END FUNCTION
 
 
-FUNCTION convertFromPartIndex(Part) ! PDF->JHU
+FUNCTION convertFromPartIndex(Part)
 implicit none
 integer :: convertFromPartIndex
 integer :: Part
@@ -1844,7 +1758,7 @@ integer :: Part
       convertFromPartIndex = ATop_
   else
       print *, "Unsuccessful conversion to a parton id from the ME array index ",Part
-      stop 1
+      stop
   endif
 
 END FUNCTION
@@ -1909,6 +1823,8 @@ integer :: Part
 
 END subroutine SetDecayWidth
 
+
+
 FUNCTION getMass(Part)
 implicit none
 real(8) :: getMass
@@ -1957,10 +1873,11 @@ integer :: Part
       getMass = 0d0
   else
      print *, "Error in getMass",Part
-     stop 1
+     stop
   endif
 
 END FUNCTION
+
 
 FUNCTION getDecayWidth(Part)
 implicit none
@@ -1984,53 +1901,6 @@ integer :: Part
       getDecayWidth = Ga_tau
   endif
 
-END FUNCTION
-
-
-subroutine SetHiggsMass(jH,mass)
-implicit none
-real(8) :: mass
-integer :: jH
-   if (jH .eq. 1) then
-      M_Reso=mass
-   elseif (jH .eq.2) then
-      M_Reso2=mass
-   endif
-END subroutine
-
-subroutine SetHiggsDecayWidth(jH,width)
-implicit none
-real(8) :: width
-integer :: jH
-   if (jH .eq. 1) then
-      Ga_Reso=width
-   elseif (jH .eq.2) then
-      Ga_Reso2=width
-   endif
-END subroutine
-
-FUNCTION GetHiggsMass(jH)
-implicit none
-real(8) :: getHiggsMass
-integer :: jH
-   getHiggsMass=0d0
-   if (jH .eq. 1) then
-      getHiggsMass = M_Reso
-   elseif (jH .eq.2) then
-      getHiggsMass = M_Reso2
-   endif
-END FUNCTION
-
-FUNCTION GetHiggsDecayWidth(jH)
-implicit none
-real(8) :: getHiggsDecayWidth
-integer :: jH
-   getHiggsDecayWidth=0d0
-   if (jH .eq. 1) then
-      getHiggsDecayWidth = Ga_Reso
-   elseif (jH .eq.2) then
-      getHiggsDecayWidth = Ga_Reso2
-   endif
 END FUNCTION
 
 
@@ -2110,11 +1980,16 @@ integer :: Part
       getParticle = "Hig"
   else
      print *, "Error in getParticle",Part
-     stop 1
+     stop
   endif
 
 
 END FUNCTION
+
+
+
+
+
 
 
 FUNCTION getLHEParticle(PartLHE)
@@ -2223,44 +2098,19 @@ integer :: PartType
    IsLHEUpTypeQuark = ( abs(PartType).eq.2 .or. abs(PartType).eq.4 .or. abs(PartType).eq.6 )
 END FUNCTION
 
-FUNCTION IsUpTypeLightQuark(PartType)
-implicit none
-logical :: IsUpTypeLightQuark
-integer :: PartType
-   IsUpTypeLightQuark = ( abs(PartType).eq.abs(Up_) .or. abs(PartType).eq.abs(Chm_))
-END FUNCTION
-FUNCTION IsLHEUpTypeLightQuark(PartType)
-implicit none
-logical :: IsLHEUpTypeLightQuark
-integer :: PartType
-   IsLHEUpTypeLightQuark = ( abs(PartType).eq.2 .or. abs(PartType).eq.4 )
-END FUNCTION
-
 FUNCTION IsAQuark(PartType)
 implicit none
 logical :: IsAQuark
 integer :: PartType
    IsAQuark=IsUpTypeQuark(PartType) .or. IsDownTypeQuark(PartType)
 END FUNCTION
-FUNCTION IsALHEQuark(PartType)
+FUNCTION IsLHEAQuark(PartType)
 implicit none
-logical :: IsALHEQuark
+logical :: IsLHEAQuark
 integer :: PartType
-   IsALHEQuark=IsLHEUpTypeQuark(PartType) .or. IsLHEDownTypeQuark(PartType)
+   IsLHEAQuark=IsLHEUpTypeQuark(PartType) .or. IsLHEDownTypeQuark(PartType)
 END FUNCTION
 
-FUNCTION IsALightQuark(PartType)
-implicit none
-logical :: IsALightQuark
-integer :: PartType
-   IsALightQuark=IsUpTypeLightQuark(PartType) .or. IsDownTypeQuark(PartType)
-END FUNCTION
-FUNCTION IsALHELightQuark(PartType)
-implicit none
-logical :: IsALHELightQuark
-integer :: PartType
-   IsALHELightQuark=IsLHEUpTypeLightQuark(PartType) .or. IsLHEDownTypeQuark(PartType)
-END FUNCTION
 
 
 FUNCTION IsANeutrino(PartType)
@@ -2287,36 +2137,6 @@ implicit none
 logical :: IsALHELepton
 integer :: PartType
   IsALHELepton = ( abs(PartType).eq.11 .or. abs(PartType).eq.13 .or. abs(PartType).eq.15 )
-END FUNCTION
-
-
-FUNCTION IsAGluon(PartType)
-implicit none
-logical :: IsAGluon
-integer :: PartType
-  IsAGluon = (abs(PartType).eq.Glu_)
-END FUNCTION
-
-FUNCTION IsALHEGluon(PartType)
-implicit none
-logical :: IsALHEGluon
-integer :: PartType
-  IsALHEGluon = (abs(PartType).eq.convertLHE(Glu_))
-END FUNCTION
-
-
-FUNCTION IsAJet(PartType)
-implicit none
-logical :: IsAJet
-integer :: PartType
-  IsAJet = (IsALightQuark(PartType) .or. IsAGluon(PartType))
-END FUNCTION
-
-FUNCTION IsALHEJet(PartType)
-implicit none
-logical :: IsALHEJet
-integer :: PartType
-  IsALHEJet = (IsALHELightQuark(PartType) .or. IsALHEGluon(PartType))
 END FUNCTION
 
 
@@ -2443,7 +2263,7 @@ integer :: Part
       SU2flip = sign(1,Part)*TaP_
   else
       print *, "Error: Invalid flavor in SU2flip ",Part
-      stop 1
+      stop
   endif
 
 END FUNCTION
@@ -2511,7 +2331,7 @@ integer :: Part
       ChargeFlip = +Part
   else
       print *, "Error: Invalid flavor in ChargeFlip"
-      stop 1
+      stop
   endif
 
 END FUNCTION
@@ -2600,7 +2420,7 @@ implicit none
    ! Calculate fundamental couplings
    vev = 1.0d0/sqrt(Gf*sqrt(2.0d0))
    gwsq = 4.0d0 * M_W**2/vev**2
-   sitW = sqrt(xw)
+   sitW = 0.48082221246527285d0
    twosc = sqrt(4d0*xw*(1d0-xw))
 
    esq = 4.0_dp*pi*alpha_QED
@@ -2629,8 +2449,8 @@ implicit none
 
    ! Normalizations used in VH and VBF
    couplWffsq = gwsq/2.0_dp
-   couplZffsq = gwsq/4.0_dp/(1.0_dp-xw)
-   !couplZffsq = alpha_QED*4d0*pi/xw/4.0_dp/(1.0_dp-xw)
+   !couplZffsq = gwsq/4.0_dp/(1.0_dp-xw)
+   couplZffsq = alpha_QED*4d0*pi/xw/4.0_dp/(1.0_dp-xw)
    couplAZff = -gwsq*sitW/2.0_dp/sqrt(1.0_dp-xw)
    couplAffsq = gwsq*xw
 
@@ -2641,6 +2461,166 @@ subroutine ComputeQCDVariables()
 implicit none
    gs = sqrt(alphas*4.0_dp*pi)
 end subroutine ComputeQCDVariables
+
+
+
+!ReadCommandLineArgument is overloaded.  Pass the type needed as "dest"
+!success is set to true if the argument passed matches argumentname, otherwise it's left alone
+!same for success2 and success3 (optional, can be used for other things, see main.F90)
+!SetLastArgument (optional) is set to true if the argument matches, otherwise it's set to false
+!for examples of all of them see main.F90
+
+subroutine ReadCommandLineArgument_logical(argument, argumentname, success, dest, SetLastArgument, success2, success3)
+implicit none
+character(len=*) :: argument, argumentname
+logical, intent(inout) :: dest
+logical, intent(inout) :: success
+integer :: length
+logical, optional, intent(inout) :: SetLastArgument, success2, success3
+integer :: temp_int
+character(len=*), parameter :: numbers = "0123456789"
+
+    if (present(SetLastArgument)) SetLastArgument=.false.
+
+    length=len(trim(argumentname))
+
+    if( trim(argument).eq.trim(argumentname) ) then
+        dest=.true.
+        success=.true.
+        if (present(SetLastArgument)) SetLastArgument=.true.
+        if (present(success2)) success2=.true.
+        if (present(success3)) success3=.true.
+    elseif( trim(argument).eq."No"//trim(argumentname) ) then
+        dest=.false.
+        success=.true.
+        if (present(SetLastArgument)) SetLastArgument=.true.
+        if (present(success2)) success2=.true.
+        if (present(success3)) success3=.true.
+    elseif( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
+        if( Index(numbers, argument(length+2:length+2)) .ne. 0 ) then
+            read(argument(length+2:len(argument)), *) temp_int
+            dest = (temp_int.ne.0)
+            success=.true.
+            if (present(SetLastArgument)) SetLastArgument=.true.
+            if (present(success2)) success2=.true.
+            if (present(success3)) success3=.true.
+        else
+            read(argument(length+2:len(argument)), *) dest
+            success=.true.
+            if (present(SetLastArgument)) SetLastArgument=.true.
+            if (present(success2)) success2=.true.
+            if (present(success3)) success3=.true.
+        endif
+    endif
+
+end subroutine ReadCommandLineArgument_logical
+
+
+subroutine ReadCommandLineArgument_integer(argument, argumentname, success, dest, SetLastArgument, success2, success3)
+implicit none
+character(len=*) :: argument, argumentname
+integer, intent(inout) :: dest
+logical, intent(inout) :: success
+logical, optional, intent(inout) :: SetLastArgument, success2, success3
+integer :: length
+
+    if (present(SetLastArgument)) SetLastArgument=.false.
+
+    length=len(trim(argumentname))
+
+    if( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
+        read(argument(length+2:len(argument)), *) dest
+        success=.true.
+        if (present(SetLastArgument)) SetLastArgument=.true.
+        if (present(success2)) success2=.true.
+        if (present(success3)) success3=.true.
+    endif
+
+end subroutine ReadCommandLineArgument_integer
+
+
+subroutine ReadCommandLineArgument_real8(argument, argumentname, success, dest, SetLastArgument, success2, success3)
+implicit none
+character(len=*) :: argument, argumentname
+real(8), intent(inout) :: dest
+logical, intent(inout) :: success
+logical, optional, intent(inout) :: SetLastArgument, success2, success3
+integer :: length
+
+    if (present(SetLastArgument)) SetLastArgument=.false.
+
+    length=len(trim(argumentname))
+
+    if( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
+        read(argument(length+2:len(argument)), *) dest
+        success=.true.
+        if (present(SetLastArgument)) SetLastArgument=.true.
+        if (present(success2)) success2=.true.
+        if (present(success3)) success3=.true.
+    endif
+
+end subroutine ReadCommandLineArgument_real8
+
+
+subroutine ReadCommandLineArgument_complex8(argument, argumentname, success, dest, SetLastArgument, success2, success3)
+implicit none
+character(len=*) :: argument, argumentname
+complex(8), intent(inout) :: dest
+real(8) :: re, im
+logical, intent(inout) :: success
+logical, optional, intent(inout) :: SetLastArgument, success2, success3
+integer :: length
+
+    if (present(SetLastArgument)) SetLastArgument=.false.
+
+    length=len(trim(argumentname))
+
+    if( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
+        if( Index(argument(length+2:len(trim(argument))),",").eq.0 &
+       .and. Index(argument(length+2:len(trim(argument)))," ").eq.0 ) then
+            print *, "Argument ", argumentname, " is complex."
+            print *, "Example syntax for complex arguments:"
+            print *, "      ", argumentname, "=1,2"
+            print *, "   or ", argumentname, "=1.0d0,2.0d0"
+            print *, "for 1+2i"
+            stop 1
+        endif
+        read(argument(length+2:len(argument)), *) re, im
+        dest = dcmplx(re, im)
+        success=.true.
+        if (present(SetLastArgument)) SetLastArgument=.true.
+        if (present(success2)) success2=.true.
+        if (present(success3)) success3=.true.
+    endif
+
+end subroutine ReadCommandLineArgument_complex8
+
+
+subroutine ReadCommandLineArgument_string(argument, argumentname, success, dest, SetLastArgument, success2, success3)
+implicit none
+character(len=*) :: argument, argumentname
+character(len=*), intent(inout) :: dest
+logical, intent(inout) :: success
+logical, optional, intent(inout) :: SetLastArgument, success2, success3
+integer :: length
+
+    if (present(SetLastArgument)) SetLastArgument=.false.
+
+    length=len(trim(argumentname))
+
+    if( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
+        if( len(dest).lt.len(trim(argument))-(length+1) ) then
+            print "(A,A,A,I4,A)", "Argument ", argument, " is too long!  Maximum allowed length is ", len(dest), " characters."
+            stop 1
+        endif
+        dest = argument(length+2:len(argument))
+        success=.true.
+        if (present(SetLastArgument)) SetLastArgument=.true.
+        if (present(success2)) success2=.true.
+        if (present(success3)) success3=.true.
+    endif
+
+end subroutine ReadCommandLineArgument_string
 
 
 !========================================================================
@@ -2787,7 +2767,7 @@ end subroutine ComputeQCDVariables
 
       if (st .lt. 1D-15) then
          cphi=1.0d0
-         sphi=0d0
+         sphi=0.0d0
       else
          cphi= px/pv/st
          sphi= py/pv/st
@@ -2820,7 +2800,7 @@ end subroutine ComputeQCDVariables
          pol_mass(4)= p0/m/pv*pz
       else
          print *,"wrong helicity setting in pol_mass"
-         stop 1
+         stop
       endif
 
    end function pol_mass
@@ -3041,29 +3021,40 @@ subroutine spinoru(p,za,zb,s)
 
 
 
-!========================================================================
+SUBROUTINE getHiggsDecayLength(ctau)
+!use ModParameters
+implicit none
+real(8) :: x,xp,xpp,Len0,propa,ctau,ctau0
+integer :: loop
+
+     ctau  = 0d0
+     ctau0 = HiggsDecayLengthMM
+     if( ctau0.lt.1d-16 ) RETURN
+
+     do loop=1,4000000!  4Mio. tries otherwise return zero
+          call random_number(x)
+          xp = 10*x*ctau0             ! scan between 0..10*ctau0
+
+          propa = dexp( -xp/(ctau0) ) ! the max of propa is 1.0
+          call random_number(xpp)
+          if( xpp.lt.propa ) then!   accept
+                ctau = xp
+                RETURN
+          endif
+     enddo
+
+RETURN
+END SUBROUTINE
+
+
+
+
+
+
+
+
 
 !========================================================================
-! Common initialization functions that may be called multiple times if needed
-! Check arXiv:1604.06792 for the parameters
-subroutine InitCOLLIER(Nmax, Rmax)
-#if useCollier==1
-use COLLIER
-implicit none
-integer, intent(in) :: Nmax, Rmax
-integer :: supNmax, supRmax
-   supNmax = max(Nmax, Collier_maxNLoopProps)
-   supRmax = max(Rmax, Collier_maxRank)
-   if ((supNmax .gt. Collier_maxNLoopProps) .or. (supRmax .gt. Collier_maxRank)) then
-      call Init_cll(supNmax,supRmax,'')
-      call setMode_cll(1)
-   endif
-#else
-implicit none
-integer, intent(in) :: Nmax, Rmax
-   return
-#endif
-end subroutine
 
 
 

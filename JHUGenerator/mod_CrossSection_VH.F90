@@ -64,6 +64,11 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
 ! for tests!!!!!!!!!!!!!!
 
   EvalWeighted_VH=0d0
+  me2lo=0d0
+  me2gg=0d0
+  me2sub=0d0
+  me2sup=0d0
+  me2gq=0d0
   EvalCounter = EvalCounter+1
 
 ! initialization and decaying mode related
@@ -337,7 +342,7 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
     
   else
     print *, "invalid final states"
-    stop 1
+    stop
     
   endif
 
@@ -357,7 +362,7 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
        VH_PC.ne."qg".and. &! "qg" or "gq" ( = qg + gq)
        VH_PC.ne."nl")then  !"nl" ( = full oneloop = q qbar @LO + NLO + gg + gq)
       print*,"invalid VH_PC ", VH_PC
-      stop 1
+      stop
     endif
 
 ! begin event
@@ -366,7 +371,7 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
       (Collider.eq.0                  .and.VH_PC.ne."ee"))then
     print*,"e+ e- collisions with Collider=0 only."
     print*,"VH_PC =",VH_PC," Collider =", Collider
-    stop 1
+    stop
   endif
 
 !if e+ e- collider
@@ -380,7 +385,7 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
     EvalWeighted_VH=0d0
     id(1:2)=(/convertLHE(ElP_),convertLHE(ElM_)/)
     call amp_VH_LO(Mom(:,1:9),mass(3:5,:),helicity(1:9),id(1:9),amp_dummy)
-    EvalWeighted_VH = dble(amp_dummy*dconjg(amp_dummy)) *PreFac *PostFac
+    me2lo = dble(amp_dummy*dconjg(amp_dummy)) *PreFac *PostFac
 
 !if pp/ppbar collider
   elseif(Collider.eq.1.or.Collider.eq.2)then
@@ -772,7 +777,7 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
     if(VH_PC.eq."gg".or.VH_PC.eq."bo".or.VH_PC.eq."tr")then
       if(DecayMode1.eq.4.or.DecayMode1.eq.5.or.DecayMode1.eq.6.or.DecayMode1.eq.10.or.DecayMode1.eq.11)then
         print*,"DecayMode1 = ",DecayMode1," which is a W decay, not compatible with gg"
-        stop 1
+        stop
       endif
       id(1:2)=(/convertLHE(Glu_),convertLHE(Glu_)/)
       call amp_VH_gg(Mom(:,1:9),mass(3:5,1:2),helicity,id(1:9),amp_dummy)
@@ -1127,10 +1132,9 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
       enddo
       enddo
     endif
-pause
 
       !summing event weights
-    EvalWeighted_VH = me2lo + me2sub + me2sup + me2gg + me2gq
+    !EvalWeighted_VH = me2lo + me2sub + me2sup + me2gg + me2gq
     !print*,EvalWeighted_VH, me2lo , me2sub , me2sup , me2gg , me2gq
     !print*,"==================="
 !    if( VH_PC.eq."nl" )then
@@ -1146,8 +1150,7 @@ pause
 !      return
 !    endif
   endif
-
-  if(EvalWeighted_VH.lt.1d-12)return
+  !if(EvalWeighted_VH.lt.1d-12)return
 
   !JHUGen requires final state fermions being massive
   !Z/W > f f~
@@ -1168,8 +1171,10 @@ pause
 !  if(Collider.eq.1.or.Collider.eq.2)then
 !    call boost2Lab(eta1,eta2,10,Mom)
 !  endif
+  EvalWeighted_VH = me2lo + me2sub + me2sup + me2gg + me2gq
+  
   do NHisto = 1,NumHistograms
-    call intoHisto(NHisto,NBin(NHisto),(me2lo+me2gg+me2sup+me2gq)*VgsWgt)
+    call intoHisto(NHisto,NBin(NHisto),(me2lo+me2gg+me2sub+me2sup+me2gq)*VgsWgt)
     !me2sub was filled on the run.
   enddo
 
@@ -1507,7 +1512,7 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
     
   else
     print *, "invalid final states"
-    stop 1
+    stop
     
   endif
 
@@ -1518,7 +1523,7 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
 
   if(VH_PC.ne."ee".and.VH_PC.ne."qq".and.VH_PC.ne."lo".and.VH_PC.ne."tr".and.VH_PC.ne."bo".and.VH_PC.ne."gg")then
     print*,"VH @NLO in development"
-    stop 1
+    stop
   endif
 
 
@@ -1526,7 +1531,7 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
       (Collider.eq.0                  .and.VH_PC.ne."ee"))then
     print*,"e+ e- collisions with Collider=0 only."
     print*,"VH_PC = ",VH_PC," Collider = ", Collider
-    stop 1
+    stop
   endif
 
 !if e+ e- collider
@@ -1559,9 +1564,9 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
     call EvalPhasespace_VH(yRnd(6:13),Ehat,Mom(:,1:9),id(6:9),PSWgt,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
     Mom_save=Mom
     !boost from center of mass frame to lab frame
-    if(Collider.eq.1.or.Collider.eq.2)then
+    !if(Collider.eq.1.or.Collider.eq.2)then
       call boost2Lab(eta1,eta2,9,Mom)
-    endif
+    !endif
 
     !Kinematics and cuts
     call Kinematics_VH(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
@@ -1590,7 +1595,12 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
   EvalCounter = EvalCounter+1
   
   IF( GENEVT ) THEN
-  
+!do i = -5,5
+!do j = -5,5
+!print*,i,j,csmax(i,j)
+!enddo
+!enddo
+!pause
     sumtot = 0d0
     do i = -5,5
     do j = -5,5
@@ -1627,12 +1637,12 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
 
       else
         print*,"invalid parton combination ",ifound,jfound,"for VH_PC=", VH_PC
-        stop 1
+        stop
       endif
 
     elseif(VH_PC.eq."lo".or.VH_PC.eq."qq")then
       !Z/A or W
-      if( (ifound.eq.-jfound) .or. CouplToLHEWp((/ifound,jfound/)) .or. CouplToLHEWm((/ifound,jfound/)) )then
+      if( ((ifound.eq.-jfound).and.ifound.ne.0) .or. CouplToLHEWp((/ifound,jfound/)) .or. CouplToLHEWm((/ifound,jfound/)) )then
         id2=id
         !if W-, reverse sign of 3,4,6,7
         if( CouplToLHEWm((/ifound,jfound/)) )then
@@ -1641,20 +1651,23 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
           id2(6)=-id2(6)
           id2(7)=-id2(7)
         endif
-        helicity(6)=sign(1d0,-dble(id2(6)))
-        helicity(7)=-helicity(6)
+        !if W, decay to left current only.
+        if( CouplToLHEWp((/ifound,jfound/)) .or. CouplToLHEWm((/ifound,jfound/)) )then
+          helicity(6)=sign(1d0,-dble(id2(6)))
+          helicity(7)=-helicity(6)
+        endif
         call amp_VH_LO(Mom(:,1:9),mass(3:5,:),helicity(1:9),id2(1:9),amp_dummy)
-        me2lo = dble(amp_dummy*dconjg(amp_dummy)) *pdf(LHA2M_PDF(ifound),1)*pdf(LHA2M_PDF(jfound),2)
+        me2lo = dble(amp_dummy*dconjg(amp_dummy))*pdf(LHA2M_PDF(ifound),1)*pdf(LHA2M_PDF(jfound),2)
         EvalUnweighted_VH = me2lo *PreFac *PostFac * QuarkColAvg**2 * 3d0
         !summing 3 colors in intial qq, no factor from spins because they are casted randomly, not summed.
       else
         print*,"invalid parton combination ",ifound,jfound,"for VH_PC=", VH_PC
-        stop 1
+        stop
       endif
 
     else
       print*,"invalid parton combination or in development",ifound,jfound,"for VH_PC=", VH_PC
-      stop 1
+      stop
     endif
 
 
@@ -1711,27 +1724,32 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
 
       id(1:2)=(/convertLHE(ElP_),convertLHE(ElM_)/)
       call amp_VH_LO(Mom(:,1:9),mass(3:5,:),helicity(1:9),id(1:9),amp_dummy)
-      EvalUnweighted_VH = dble(amp_dummy*dconjg(amp_dummy)) *PreFac *PostFac
+      me2lo = dble(amp_dummy*dconjg(amp_dummy)) *PreFac *PostFac
+      RES(0,0) = me2lo
+      EvalUnweighted_VH = EvalUnweighted_VH + me2lo
       !update max weight
       if (EvalUnweighted_VH.gt.csmax(0,0)) then
-        csmax(0,0) = EvalUnweighted_VH
+        csmax(0,0) = me2lo
       endif
 
-    else!hadron collisions
-    
+    else
+
       do i=-5,5 !partonic channels
       do j=-5,5 !0 = glu, otherwise PDG code. NOT JHUGen code.
-  
+
         !gg
         me2gg=0d0
         if((VH_PC.eq."gg".or.VH_PC.eq."bo".or.VH_PC.eq."tr").and.i.eq.0.and.j.eq.0)then
           call amp_VH_gg(Mom(:,1:9),mass(3:5,:),helicity,id(1:9),amp_dummy)
-          me2gg = dble(amp_dummy*dconjg(amp_dummy)) *pdf(0,1)*pdf(0,2) *PreFac *PostFac *GluonColAvg**2 *8d0
+          me2gg = dble(amp_dummy*dconjg(amp_dummy)) *pdf(0,1)*pdf(0,2)
+          me2gg = me2gg *PreFac *PostFac *GluonColAvg**2 *8d0
+          RES(0,0) = me2gg
+          EvalUnWeighted_VH=EvalUnWeighted_VH+me2gg
           !update max weight
-          if (me2gg.gt.csmax(i,j)) then
-            csmax(i,j) = me2gg
+          if (me2gg.gt.csmax(0,0)) then
+            csmax(0,0) = me2gg
           endif
-        endif
+        endif!gg
 
         !lo/qq
         me2lo=0d0
@@ -1743,51 +1761,48 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
             me2lo = dble(amp_dummy*dconjg(amp_dummy)) *pdf(LHA2M_PDF(i),1)*pdf(LHA2M_PDF(j),2)
             me2lo = me2lo *PreFac *PostFac * QuarkColAvg**2 * 3d0
             !summing 3 colors in intial qq, no factor from spins because they are casted randomly, not summed.
-    
+            RES(i,j) = me2lo
+            EvalUnWeighted_VH=EvalUnWeighted_VH+me2lo
+            !update max weight
+            if (me2lo.gt.csmax(i,j)) then
+              csmax(i,j) = me2lo
+            endif
+
           !W
           elseif( IsAWDecay(DecayMode1) .and. ( CouplToLHEWp((/i,j/)).or.CouplToLHEWm((/i,j/)) ) )then
-  
-    
             id2=id
             id2(1:2) = (/i,j/)
-            !W+
-            if( CouplToLHEWp(id2(1:2)) )then
-              helicity(6)=sign(1d0,-dble(id2(6)))
-              helicity(7)=-helicity(6)
             !W-
-            elseif( CouplToLHEWm(id2(1:2)) )then
+            if( CouplToLHEWm(id2(1:2)) )then
               id2(3)=-id2(3)
               id2(4)=-id2(4)
               id2(6)=-id2(6)
               id2(7)=-id2(7)
-              helicity(6)=sign(1d0,-dble(id2(6)))
-              helicity(7)=-helicity(6)
-            else
-              print *, "invalid initial states for WH @LO. id(1:2) =", id2(1:2)
-              stop 1
             endif
-    
+            helicity(6)=sign(1d0,-dble(id2(6)))
+            helicity(7)=-helicity(6)
+
             call amp_VH_LO(Mom(:,1:9),mass(3:5,:),helicity(1:9),id2(1:9),amp_dummy)
             me2lo = dble(amp_dummy*dconjg(amp_dummy))*pdf(LHA2M_PDF(i),1)*pdf(LHA2M_PDF(j),2)
             me2lo = me2lo *PreFac *PostFac *QuarkColAvg**2 *3d0
             !summing 3 colors in intial qq, no factor from spins because they are casted randomly, not summed.
-    
-          endif!W
-  
-          !update max weight
-          if (me2lo.gt.csmax(i,j)) then
-            csmax(i,j) = me2lo
+            RES(i,j) = me2lo
+            EvalUnWeighted_VH=EvalUnWeighted_VH+me2lo
+            !update max weight
+            if (me2lo.gt.csmax(i,j)) then
+              csmax(i,j) = me2lo
+            endif
+      
           endif
-  
+
         endif!lo/qq
 
-        !summing event weights
-        EvalUnWeighted_VH = me2lo + me2gg
-    
       enddo
-      enddo!partonic channels
+      enddo!parton channels
 
     endif!hadron collisions
+
+
 
   ENDIF! GENEVT
 
