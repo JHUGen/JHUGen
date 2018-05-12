@@ -2227,7 +2227,7 @@ implicit none
 logical, optional :: useAonshell
 logical :: applyPSCut
 integer :: NumPart,NBin(:),id(:)
-real(8) :: m_jj,y_j1,y_j2,dphi_jj, m_ll, pt_V, pt_H, pt1, pt2, deltaR, m_Vstar, costheta1, costheta2, phistar1, phi
+real(8) :: m_jj,y_j1,y_j2,dphi_jj, m_ll, pt_V, pt_H, pt1, pt2, deltaR, m_Vstar, m_inv_H, costheta1, costheta2, phistar1, phi
 double precision MomBoost(1:4), MomFerm(1:4), inv_mass(1:9), MomLeptX(1:4,1:4), ScatteringAxis(1:4), MomReso(1:4), MomZ(1:4)
 double precision MomLeptPlane1(2:4), MomLeptPlane2(2:4), dummy(2:4), signPhi,EHat
 double precision, intent(in) :: MomExt(1:4,1:9)! 1:in 2:in 3:V* 4:V 5:H 6,7: q(Z)q(Z) 8,9: q(h)q(H)
@@ -2242,6 +2242,7 @@ logical :: hasAonshell
      m_jj = get_MInv(MomExt(1:4,5))
      m_ll = get_MInv(MomExt(1:4,4))
      m_Vstar = get_MInv(MomExt(1:4,3))
+     m_inv_H = get_MInv(MomExt(1:4,5))
 
      pt_H = get_PT(MomExt(1:4,5))
      pt_V = get_PT(MomExt(1:4,4))
@@ -2395,7 +2396,7 @@ logical :: hasAonshell
             MomLeptX(1:4,3) = MomExt(1:4,7)
             MomLeptX(1:4,4) = MomExt(1:4,6)
          endif
-         
+
          call boost(MomLeptX(1:4,1),MomBoost(1:4),m_inv_H)! boost all fermions into the resonance frame
          call boost(MomLeptX(1:4,2),MomBoost(1:4),m_inv_H)
          call boost(MomLeptX(1:4,3),MomBoost(1:4),m_inv_H)
