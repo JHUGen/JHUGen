@@ -5474,7 +5474,7 @@ character :: arg*(500)
             write(TheUnit,"(4X,A,F8.2)") "|Deltaeta| >= ", detajetcut
             if (JetsOppositeEta) write(TheUnit,"(5X,A,F8.2)") "eta1*eta2 <= ", 0d0
         endif
-        if( Process.eq.50 .or. Process.eq.60 .or. Process.eq.61 .or. (Process.ge.66 .and. Process.le.69) .or. Process.eq.80 .or. Process.eq.90) then
+        if( Process.eq.50 .or. Process.eq.51 .or. Process.eq.60 .or. Process.eq.61 .or. (Process.ge.66 .and. Process.le.69) .or. Process.eq.80 .or. Process.eq.90) then
             write(TheUnit,"(8X,A,F8.2)") "DeltaR >= ", Rjet
             write(TheUnit,"(11X,A,F8.2,A)") "mJJ >= ", mJJcut/GeV, " GeV"
         endif
