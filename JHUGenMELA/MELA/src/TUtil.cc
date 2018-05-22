@@ -1533,7 +1533,7 @@ bool TUtil::MCFM_chooser(
 
   }
   else if (
-    ndau>=4
+    (ndau>=4 || ndau==2)
     &&
     production == TVar::JJQCD
     &&
@@ -1884,6 +1884,9 @@ bool TUtil::MCFM_SetupParticleCouplings(
   //bool hasZZ4fInterf = isZZ && abs(pId[0])==abs(pId[2]) && abs(pId[1])==abs(pId[3]) && !PDGHelpers::isAnUnknownJet(pId[0]) && !PDGHelpers::isAnUnknownJet(pId[3]);
   bool isZJJ = false;
   if (ndau>=4) isZJJ = PDGHelpers::isAZBoson(mela_event.intermediateVid.at(0)); // No check on whether daughters 2 and 3 are jets. Notice both isZZ and isZJJ could be true
+  else if (ndau==2 && process == TVar::bkgZJets){ // Check whether the two daughters can create a Z
+    isZJJ = PDGHelpers::isAZBoson(PDGHelpers::getCoupledVertex(mela_event.intermediateVid.at(0), mela_event.intermediateVid.at(1)));
+  }
   bool isZG = (ndau>=3 && PDGHelpers::isAZBoson(mela_event.intermediateVid.at(0)) && PDGHelpers::isAPhoton(mela_event.intermediateVid.at(1)));
   bool isGG = (ndau>=2 && PDGHelpers::isAPhoton(mela_event.intermediateVid.at(0)) && PDGHelpers::isAPhoton(mela_event.intermediateVid.at(1)));
   bool hasZ1 = (isZZ || isZG || isZJJ);
@@ -2691,8 +2694,16 @@ bool TUtil::MCFM_SetupParticleCouplings(
 
   } // End check WW, ZZ, ZG etc.
 
-  int* ordering;
-  if (ndau<=3){
+  int* ordering=nullptr;
+  if (ndau<=2){
+    if (production == TVar::ZZINDEPENDENT || production == TVar::ZZQQB){
+      if (process == TVar::bkgZGamma){ ordering = pZOrder; if (!hasZ1 || !isZG) result = false; }
+    }
+    else if (production == TVar::JJQCD){
+      if (process == TVar::bkgZJets){ ordering = pZOrder; if (!hasZ1 || !isZJJ) result = false; }
+    }
+  }
+  else if (ndau<=3){
     if (production == TVar::ZZINDEPENDENT || production == TVar::ZZQQB){
       if (process == TVar::bkgZGamma){ ordering = pZOrder; if (!hasZ1 || !isZG) result = false; }
     }
@@ -2774,8 +2785,8 @@ bool TUtil::MCFM_SetupParticleCouplings(
 
   }
 
-  if (partOrder!=0) { for (unsigned int ip=0; ip<ndau; ip++) partOrder->push_back(ordering[ip]); }
-  if (apartOrder!=0 && pApartOrder!=0) { for (unsigned int ip=0; ip<napart; ip++) apartOrder->push_back(pApartOrder[ip]); }
+  if (partOrder && ordering) { for (unsigned int ip=0; ip<ndau; ip++) partOrder->push_back(ordering[ip]); }
+  if (apartOrder && pApartOrder) { for (unsigned int ip=0; ip<napart; ip++) apartOrder->push_back(pApartOrder[ip]); }
   for (int ip=0; ip<mxpart; ip++) sprintf((plabel_.plabel)[ip], strplabel[ip].Data());
 
   if (verbosity>=TVar::DEBUG){
@@ -2793,12 +2804,12 @@ bool TUtil::MCFM_SetupParticleCouplings(
 
     MELAout << "\tplabels:\n";
     for (int ip=0; ip<mxpart; ip++) MELAout << "\t[" << ip << "]=" << (plabel_.plabel)[ip] << endl;
-    if (partOrder!=0){
-      if (partOrder->size()>0) MELAout << "\tpartOrder[" << partOrder->size() << "]:\n";
+    if (partOrder){
+      if (!partOrder->empty()) MELAout << "\tpartOrder[" << partOrder->size() << "]:\n";
       for (unsigned int ip=0; ip<partOrder->size(); ip++) MELAout << "\t[" << ip << "] -> " << partOrder->at(ip) << endl;
     }
-    if (apartOrder!=0){
-      if (apartOrder->size()>0) MELAout << "\tapartOrder[" << apartOrder->size() << "]:\n";
+    if (apartOrder){
+      if (!apartOrder->empty()) MELAout << "\tapartOrder[" << apartOrder->size() << "]:\n";
       for (unsigned int ip=0; ip<apartOrder->size(); ip++) MELAout << "\t[" << ip << "] -> " << apartOrder->at(ip) << endl;
     }
   }
@@ -2807,8 +2818,8 @@ bool TUtil::MCFM_SetupParticleCouplings(
   delete[] pWOrder;
   delete[] pZOrder;
   delete[] pOrder;
-  if (pApartOrder!=0) delete[] pApartOrder;
-  if (pApartId!=0) delete[] pApartId;
+  if (pApartOrder) delete[] pApartOrder;
+  if (pApartId) delete[] pApartId;
   return result;
 }
 TString TUtil::GetMCFMParticleLabel(const int& pid, bool useQJ, bool useExtendedConventions){
@@ -3598,7 +3609,8 @@ double TUtil::SumMatrixElementPDF(
     || production==TVar::Had_WH_TU || production==TVar::Had_ZH_TU
     || production==TVar::JJVBF_TU || production==TVar::JJEW_TU || production==TVar::JJEWQCD_TU
     || ((process==TVar::bkgZZ || process==TVar::bkgWW || process==TVar::bkgWWZZ) && (production==TVar::JJQCD || production==TVar::JJQCD_S || production==TVar::JJQCD_TU))
-    ){ // Use asociated jets in the pT=0 frame boost
+    || (process == TVar::bkgZJets && production==TVar::JJQCD && RcdME->melaCand->getDecayMode()==TVar::CandidateDecay_ff)
+    ){ // Use associated jets in the pT=0 frame boost
     partIncCode=TVar::kUseAssociated_Jets;
     nRequested_AssociatedJets = 2;
     if (verbosity>=TVar::DEBUG) MELAout << "TUtil::SumMatrixElementPDF: Requesting " << nRequested_AssociatedJets << " jets" << endl;

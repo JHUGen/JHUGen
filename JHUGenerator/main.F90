@@ -345,6 +345,7 @@ logical :: SetCKM,SetCKMub,SetCKMcb,SetCKMtd
 logical :: SetpTjetcut, Setetajetcut, Setdetajetcut, SetdeltaRcut
 logical :: SetpTlepcut, Setetalepcut, SetMPhotonCutoff
 logical :: SetColliderEnergy
+logical :: SetCSmaxFile, SetVBFoffsh_run
 integer :: i
 type(SaveValues) :: tosave, oldsavevalues
 
@@ -416,6 +417,9 @@ type(SaveValues) :: tosave, oldsavevalues
 
    SetColliderEnergy=.false.
 
+   SetCSmaxFile=.false.
+   SetVBFoffsh_run = .false.
+
    DataFile="./data/output"
 
    tosave = SaveValuesConstructor()
@@ -450,14 +454,15 @@ type(SaveValues) :: tosave, oldsavevalues
 #endif
     call ReadCommandLineArgument(arg, "MReso", success, M_Reso, multiply=GeV, tosave=tosave)
     call ReadCommandLineArgument(arg, "GaReso", success, Ga_Reso, multiply=GeV, tosave=tosave)
-    call ReadCommandLineArgument(arg, "MReso2", success, M_Reso2, multiply=GeV, tosave=tosave)     !undocumented temporarily
-    call ReadCommandLineArgument(arg, "GaReso2", success, Ga_Reso2, multiply=GeV, tosave=tosave)   !undocumented temporarily
+    call ReadCommandLineArgument(arg, "MReso2", success, M_Reso2, multiply=GeV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "GaReso2", success, Ga_Reso2, multiply=GeV, tosave=tosave)
     call ReadCommandLineArgument(arg, "ctauReso", success, HiggsDecayLengthMM, tosave=tosave)
     call ReadCommandLineArgument(arg, "VegasNc0", success, VegasNc0)
     call ReadCommandLineArgument(arg, "VegasNc1", success, VegasNc1)
     call ReadCommandLineArgument(arg, "VegasNc2", success, VegasNc2)
     call ReadCommandLineArgument(arg, "PChannel", success, PChannel, tosave=tosave)
     call ReadCommandLineArgument(arg, "DataFile", success, DataFile)
+    call ReadCommandLineArgument(arg, "CSmaxFile", success, CSmaxFile, success2=SetCSmaxFile)
     call ReadCommandLineArgument(arg, "Process", success, Process, tosave=tosave)
     call ReadCommandLineArgument(arg, "DecayMode1", success, DecayMode1, tosave=tosave)
     call ReadCommandLineArgument(arg, "DecayMode2", success, DecayMode2, tosave=tosave)
@@ -505,7 +510,7 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "ChannelRatio", success, channels_ratio_fix, success2=fix_channels_ratio, tosave=tosave)
     call ReadCommandLineArgument(arg, "UnformattedRead", success, UseUnformattedRead)
     call ReadCommandLineArgument(arg, "WriteWeightedLHE", success, WriteWeightedLHE)
-    call ReadCommandLineArgument(arg, "VBFoffsh_run", success, VBFoffsh_run)
+    call ReadCommandLineArgument(arg, "VBFoffsh_run", success, VBFoffsh_run, success2=setVBFoffsh_run)
 
     !anomalous couplings
     !If any anomalous couplings are set, the default ones have to be set explicitly to keep them on or turn them off
@@ -1051,16 +1056,16 @@ type(SaveValues) :: tosave, oldsavevalues
 
     !cuts
     call ReadCommandLineArgument(arg, "pTjetcut", success, pTjetcut, multiply=GeV, success2=SetpTjetcut, tosave=tosave)
-    call ReadCommandLineArgument(arg, "etajetcut", success, etajetcut, success2=Setetajetcut, tosave=tosave) !undocumented temporarily
-    call ReadCommandLineArgument(arg, "detajetcut", success, detajetcut, success2=Setdetajetcut, tosave=tosave)!undocumented temporarily
+    call ReadCommandLineArgument(arg, "etajetcut", success, etajetcut, success2=Setetajetcut, tosave=tosave)
+    call ReadCommandLineArgument(arg, "detajetcut", success, detajetcut, success2=Setdetajetcut, tosave=tosave)
     call ReadCommandLineArgument(arg, "deltaRcut", success, Rjet, success2=SetdeltaRcut, tosave=tosave)
     call ReadCommandLineArgument(arg, "mJJcut", success, mJJcut, multiply=GeV, tosave=tosave)
-    call ReadCommandLineArgument(arg, "m4l_min", success, m4l_minmax(1), multiply=GeV, tosave=tosave)!undocumented temporarily
-    call ReadCommandLineArgument(arg, "m4l_max", success, m4l_minmax(2), multiply=GeV, tosave=tosave)!undocumented temporarily
+    call ReadCommandLineArgument(arg, "m4l_min", success, m4l_minmax(1), multiply=GeV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "m4l_max", success, m4l_minmax(2), multiply=GeV, tosave=tosave)
     call ReadCommandLineArgument(arg, "MPhotonCutoff", success, MPhotonCutoff, multiply=GeV, success2=SetMPhotonCutoff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "pTlepcut", success, pTlepcut, multiply=GeV, success2=SetpTlepcut, tosave=tosave)!undocumented temporarily
-    call ReadCommandLineArgument(arg, "etalepcut", success, etalepcut, success2=Setetalepcut, tosave=tosave)!undocumented temporarily
-    call ReadCommandLineArgument(arg, "JetsOppositeEta", success, JetsOppositeEta, tosave=tosave)!undocumented temporarily
+    call ReadCommandLineArgument(arg, "pTlepcut", success, pTlepcut, multiply=GeV, success2=SetpTlepcut, tosave=tosave)
+    call ReadCommandLineArgument(arg, "etalepcut", success, etalepcut, success2=Setetalepcut, tosave=tosave)
+    call ReadCommandLineArgument(arg, "JetsOppositeEta", success, JetsOppositeEta, tosave=tosave)
 
     if( .not.success ) then
         call Error("Unknown command line argument: " // trim(arg))
@@ -1074,11 +1079,11 @@ type(SaveValues) :: tosave, oldsavevalues
     !Command line argument processing
     !================================
 
+    !output file
+
     i = len(trim(DataFile))
     if( DataFile(i-3:i).eq.".lhe" ) then
-        !print *, DataFile
         DataFile = DataFile(1:i-4)
-        !print *, DataFile
     endif
     call system('mkdir -p ./data')! -p is suppressing error messages if directory already exists
 
@@ -1089,11 +1094,31 @@ type(SaveValues) :: tosave, oldsavevalues
     if( VBFoffsh_run.eq.5 ) DataFile = trim(DataFile)//"5"
     if( VBFoffsh_run.eq.0 ) DataFile = trim(DataFile)//"0"    
     
+    if( SetCSmaxFile ) then
+      i = len(trim(CSmaxFile))
+      if( CSmaxFile(i-3:i).eq.".lhe" ) then
+          CSmaxFile = CSmaxFile(1:i-4)
+      endif
+      if( VBFoffsh_run.eq.1 ) CSmaxFile = trim(CSmaxFile)//"1"
+      if( VBFoffsh_run.eq.2 ) CSmaxFile = trim(CSmaxFile)//"2"
+      if( VBFoffsh_run.eq.3 ) CSmaxFile = trim(CSmaxFile)//"3"
+      if( VBFoffsh_run.eq.4 ) CSmaxFile = trim(CSmaxFile)//"4"
+      if( VBFoffsh_run.eq.5 ) CSmaxFile = trim(CSmaxFile)//"5"
+      if( VBFoffsh_run.eq.0 ) CSmaxFile = trim(CSmaxFile)//"0"
+    else
+      CSmaxFile = DataFile
+    endif
+
     if (ReadCSmax) then
-      call oldsavevalues%ReadFromFile(trim(DataFile)//"_commandlineinfo.txt")
+      call oldsavevalues%ReadFromFile(trim(CSmaxFile)//"_commandlineinfo.txt")
       call CompareSaveValues(tosave, oldsavevalues)
     else
-      call tosave%WriteToFile(trim(DataFile)//"_commandlineinfo.txt")
+      call tosave%WriteToFile(trim(CSmaxFile)//"_commandlineinfo.txt")
+    endif
+
+    !VBF offshell
+    if( .not. (Process.ge.66 .and. Process.le.69) .and. SetVBFoffsh_run ) then
+      call Error("VBFoffsh_run is only for VBF offshell")
     endif
 
     !PChannel
@@ -2198,11 +2223,11 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
             PChannel = PChannel_aux
         enddo
 
-        open(unit=io_CSmaxFile,file=trim(DataFile)//'_CSmax.bin',form='unformatted',status='replace')
+        open(unit=io_CSmaxFile,file=trim(CSmaxFile)//'_CSmax.bin',form='unformatted',status='replace')
         WRITE(io_CSmaxFile) CSMAX
         close(io_CSmaxFile)
     else
-        open(unit=io_CSmaxFile,file=trim(DataFile)//'_CSmax.bin',form='unformatted')
+        open(unit=io_CSmaxFile,file=trim(CSmaxFile)//'_CSmax.bin',form='unformatted')
         READ(io_CSmaxFile) CSMAX
         close(io_CSmaxFile)
     endif
@@ -2416,7 +2441,7 @@ real(8) :: CrossSec2_in(1:5,1:164),CrossSecMax2_in(1:5,164)
     PChannel_aux = PChannel
 
 
-    outgridfile=trim(DataFile)//'.grid'
+    outgridfile=trim(CSmaxFile)//'.grid'
     ingridfile=trim(outgridfile)
 
 
@@ -2511,8 +2536,8 @@ IF( .NOT. (Process.ge.66 .and. Process.le.69) ) THEN! special treatment for offs
     if( ReadCSmax ) then
         readin=.true.
         writeout=.false.
-        ingridfile = trim(DataFile)//'_step2.grid'
-        open(unit=io_TmpFile,file=trim(DataFile)//'_gridinfo.txt',form='formatted',status='old')
+        ingridfile = trim(CSmaxFile)//'_step2.grid'
+        open(unit=io_TmpFile,file=trim(CSmaxFile)//'_gridinfo.txt',form='formatted',status='old')
         read(io_TmpFile,fmt=*) calls1
         read(io_TmpFile,fmt=*) CrossSec
         read(io_TmpFile,fmt=*) CrossSecMax
@@ -2534,7 +2559,7 @@ IF( .NOT. (Process.ge.66 .and. Process.le.69) ) THEN! special treatment for offs
 
         itmx = 2
         writeout=.true.
-        outgridfile = trim(DataFile)//'_step2.grid'
+        outgridfile = trim(CSmaxFile)//'_step2.grid'
         if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
 !         if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2) ! adjust to LHE format
 !         if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
@@ -2569,7 +2594,7 @@ IF( .NOT. (Process.ge.66 .and. Process.le.69) ) THEN! special treatment for offs
         call vegas_get_calls(calls1)
         CrossSec(:,:) = CrossSec(:,:)/dble(itmx)
 
-        open(unit=io_TmpFile,file=trim(DataFile)//'_gridinfo.txt',form='formatted',status='replace')
+        open(unit=io_TmpFile,file=trim(CSmaxFile)//'_gridinfo.txt',form='formatted',status='replace')
         write(io_TmpFile,fmt=*) calls1
         write(io_TmpFile,fmt=*) CrossSec
         write(io_TmpFile,fmt=*) CrossSecMax
@@ -2710,42 +2735,42 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
     warmup = .true.
     
     if( ReadCSmax ) then
-        i=len(trim(DataFile))
-        open(unit=io_TmpFile,file=trim(DataFile(1:i-1))//'1_gridinfo.txt',form='formatted',status='old',iostat=ios)
+        i=len(trim(CSmaxFile))
+        open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'1_gridinfo.txt',form='formatted',status='old',iostat=ios)
         read(io_TmpFile,fmt=*) calls1_in(1)
         read(io_TmpFile,fmt=*) CrossSec2_in(1,:)
         read(io_TmpFile,fmt=*) CrossSecMax2_in(1,:)
         read(io_TmpFile,fmt=*) VG_Result_in(1)
         read(io_TmpFile,fmt=*) VG_Error_in(1)
         close(unit=io_TmpFile)
-        if( ios.eq.0 ) print *, "read ",trim(DataFile(1:i-1))//'1_gridinfo.txt'
+        if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'1_gridinfo.txt'
 
-        open(unit=io_TmpFile,file=trim(DataFile(1:i-1))//'2_gridinfo.txt',form='formatted',status='old',iostat=ios)
+        open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'2_gridinfo.txt',form='formatted',status='old',iostat=ios)
         read(io_TmpFile,fmt=*) calls1_in(2)
         read(io_TmpFile,fmt=*) CrossSec2_in(2,:)
         read(io_TmpFile,fmt=*) CrossSecMax2_in(2,:)
         read(io_TmpFile,fmt=*) VG_Result_in(2)
         read(io_TmpFile,fmt=*) VG_Error_in(2)
         close(unit=io_TmpFile)
-        if( ios.eq.0 ) print *, "read ",trim(DataFile(1:i-1))//'2_gridinfo.txt'
+        if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'2_gridinfo.txt'
 
-        open(unit=io_TmpFile,file=trim(DataFile(1:i-1))//'3_gridinfo.txt',form='formatted',status='old',iostat=ios)
+        open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'3_gridinfo.txt',form='formatted',status='old',iostat=ios)
         read(io_TmpFile,fmt=*) calls1_in(3)
         read(io_TmpFile,fmt=*) CrossSec2_in(3,:)
         read(io_TmpFile,fmt=*) CrossSecMax2_in(3,:)
         read(io_TmpFile,fmt=*) VG_Result_in(3)
         read(io_TmpFile,fmt=*) VG_Error_in(3)
         close(unit=io_TmpFile)
-        if( ios.eq.0 ) print *, "read ",trim(DataFile(1:i-1))//'3_gridinfo.txt'
+        if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'3_gridinfo.txt'
 
-        open(unit=io_TmpFile,file=trim(DataFile(1:i-1))//'4_gridinfo.txt',form='formatted',status='old',iostat=ios)
+        open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'4_gridinfo.txt',form='formatted',status='old',iostat=ios)
         read(io_TmpFile,fmt=*) calls1_in(4)
         read(io_TmpFile,fmt=*) CrossSec2_in(4,:)
         read(io_TmpFile,fmt=*) CrossSecMax2_in(4,:)
         read(io_TmpFile,fmt=*) VG_Result_in(4)
         read(io_TmpFile,fmt=*) VG_Error_in(4)
         close(unit=io_TmpFile)
-        if( ios.eq.0 ) print *, "read ",trim(DataFile(1:i-1))//'4_gridinfo.txt'
+        if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'4_gridinfo.txt'
 
         open(unit=io_TmpFile,file=trim(DataFile(1:i-1))//'5_gridinfo.txt',form='formatted',status='old',iostat=ios)
         read(io_TmpFile,fmt=*) calls1_in(5)
@@ -2789,7 +2814,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 
         itmx = 2
         writeout=.true.
-        outgridfile = trim(DataFile)//'_step2.grid'
+        outgridfile = trim(CSmaxFile)//'_step2.grid'
         if( Process.ge.66 .and. Process.le.69 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
 
 
@@ -2805,7 +2830,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         call vegas_get_calls(calls1)
         CrossSec2(:) = CrossSec2(:)/dble(itmx)
 
-        open(unit=io_TmpFile,file=trim(DataFile)//'_gridinfo.txt',form='formatted',status='replace')
+        open(unit=io_TmpFile,file=trim(CSmaxFile)//'_gridinfo.txt',form='formatted',status='replace')
         write(io_TmpFile,fmt=*) calls1
         write(io_TmpFile,fmt=*) CrossSec2
         write(io_TmpFile,fmt=*) CrossSecMax2
@@ -2894,7 +2919,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 !          call ReOrder(NumPartonicChannels,SortedHash,ijSel(104:,2))
 
     endif
-    ingridfile = trim(DataFile)//'_step2.grid'
+    ingridfile = trim(CSmaxFile)//'_step2.grid'
 
 
 !     print *, "New sorted hash for VBFoffsh_run=",VBFoffsh_run
@@ -3016,11 +3041,11 @@ else! not beta version
                 VG(:,:) = VG(:,:) + RES(:,:)
                 PChannel = PChannel_aux
         enddo
-        open(unit=io_CSmaxFile,file=trim(DataFile)//'_CSmax.bin',form='unformatted',status='replace')
+        open(unit=io_CSmaxFile,file=trim(CSmaxFile)//'_CSmax.bin',form='unformatted',status='replace')
         WRITE(io_CSmaxFile) CSMAX,VG
         close(io_CSmaxFile)
     else
-        open(unit=io_CSmaxFile,file=trim(DataFile)//'_CSmax.bin',form='unformatted')
+        open(unit=io_CSmaxFile,file=trim(CSmaxFile)//'_CSmax.bin',form='unformatted')
         READ(io_CSmaxFile) CSMAX,VG
         close(io_CSmaxFile)
     endif
@@ -5934,7 +5959,9 @@ implicit none
         print *, "   ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,"
         print *, "                      250 GeV for e+e-"
         print *, "   Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH,"
-        print *, "                      60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=ttH, 90=bbH,"
+        print *, "                      60=weakVBF, 61=pp->Hjj, 62=pp->Hj,"
+        print *, "                      66=VVHVV offshell, 67=VVVVbkg, 68=VVHVV+VVVV,"
+        print *, "                      69=QCD JJVV bkg, 80=ttH, 90=bbH,"
         print *, "                      110=t+H t channel, 111=tbar+H t channel,"
         print *, "                      112=t+H s channel, 113=tbar+H s channel"
         print *, "                      114=t/tbar+H t/s channels"
@@ -5970,12 +5997,16 @@ implicit none
         print *, "                      stable; if it is 1, they decay to Wnu, with the W's decaying"
         print *, "                      according to DecayModes1,2."
         print *, "   HbbDK:             For VH production, decay H->bb"
+        print *, "   VBFoffsh_run:      For VBF offshell production, set this to a number from 1-4"
+        print *, "                      for each of the 4 jobs.  See manual for more details."
         print *, " Resonance parameters:"
         print *, "   MReso:             resonance mass in GeV (default=125.00)"
         print *, "   GaReso:            resonance width in GeV (default=0.00407)"
         print *, "   ctauReso:          resonance decay length in mm (default=0)"
         print *, "   OffshellX:         Whether to allow resonance (X) to go offshell"
         print *, "                      in processes 0, 1 or 2"
+        print *, "   MReso2:            2nd resonance mass in GeV in offshell VBF"
+        print *, "   GaReso2:           2nd resonance width in GeV in offshell VBF"
         print *, " EW coupling parameters:"
         print *, "   Vud:               CKM element for W-ud couplings"
         print *, "   Vus:               CKM element for W-us couplings"
@@ -5991,6 +6022,13 @@ implicit none
         print *, "   deltaRcut:         Minimum deltaR for jets (default: 0.3)"
         print *, "   mJJcut:            Minimum dijet mass in GeV (default: 0)"
         print *, "   MPhotonCutoff:     Minimum mass for offshell photons in GeV, when included (default: 4)"
+        print *, "   etajetcut:         Maximum |eta| for jets in offshell VBF (default: 4)"
+        print *, "   detajetcut:        Minimum deltaeta between jets in offshell VBF (default: 2)"
+        print *, "   JetsOppositeEta:   Require sgn(eta) to be opposite for the two jets in offshell VBF"
+        print *, "                      (default: true)"
+        print *, "   pTlepcut:          Minimum pT for leptons in offshell VBF, in GeV (default: 3)"
+        print *, "   etalepcut:         Maximum |eta| for leptons in offshell VBF (default: 2.7)"
+        print *, "   m4l_min, m4l_max:  Minimum and maximum four-lepton mass in offshell VBF"
         print *, " Renormalization and factorization scales:"
         print *, "   FacScheme:         PDF factorization scale scheme"
         print *, "   MuFacMultiplier:   Multiplier for the factorization scale chosen by FacScheme"
@@ -6022,6 +6060,9 @@ implicit none
         print *, "   VegasNc1:          number of evaluations for accept-reject sampling"
         print *, "   VegasNc2:          number of events for accept-reject sampling"
         print *, "   ReadCSmax:         Read the results of the grid generation step from a file"
+        print *, "   CSmaxFile:         File to use for reading (if ReadCSmax is set) or writing (otherwise)"
+        print *, "                      the results of the grid generation step.  Depending on the process,"
+        print *, "                      suffixes are appended to this base name. (default: DataFile without .lhe)"
         print *, "   Seed:              Random seed for event generation"
         print *, " I/O options:"
         print *, "   Unweighted:        0=weighted events, 1=unweighted events"
