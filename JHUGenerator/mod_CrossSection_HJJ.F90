@@ -39,8 +39,11 @@ include 'vegas_common.f'
 include 'maxwt.f'
 EvalWeighted_HJJ_fulldecay = 0d0
 
+ 
 
    call getRef_MCFM_qqVVqq_Hash(ijSel) ! ijSel is in JHU convention
+   
+   
    if( VBFoffsh_run.eq.1 ) then
       NumPartonicChannels= 2
       iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
@@ -54,15 +57,19 @@ EvalWeighted_HJJ_fulldecay = 0d0
       iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
       iPartChannel= iPartChannel+9  ! runs from 10..40   
    elseif( VBFoffsh_run.eq.4 ) then
-      NumPartonicChannels= 124
+      NumPartonicChannels= 63
       iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-      iPartChannel= iPartChannel+40  ! runs from 41..164   
+      iPartChannel= iPartChannel+40  ! runs from 41..103
+   elseif( VBFoffsh_run.eq.5 ) then
+      NumPartonicChannels= 61
+      iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+      iPartChannel= iPartChannel+103  ! runs from 104..164   
    else
       NumPartonicChannels= 164
       iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
       iPartChannel= iPartChannel  ! runs from 1..164   
    endif
-   
+    
   
    PartChannelAvg = NumPartonicChannels
    iPart_sel = convertToPartIndex(ijSel(iPartChannel,1))! convert to LHA convention
@@ -109,7 +116,6 @@ EvalWeighted_HJJ_fulldecay = 0d0
 
 
    call Kinematics_HVBF_fulldecay(MomExt,applyPSCut,NBin)
-   DebugCounter(9) = DebugCounter(9) + 1
    if( applyPSCut .or. PSWgt.lt.1d-33 ) then
       return
    endif
@@ -117,7 +123,6 @@ EvalWeighted_HJJ_fulldecay = 0d0
 !       EvalWeighted_HJJ_fulldecay=PSWgt *sHatJacobi  * ( MomExt(1:4,3).dot.MomExt(1:4,7) ) * ( MomExt(1:4,4).dot.MomExt(1:4,10) ) * ( MomExt(1:4,8).dot.MomExt(1:4,9) ) * ( MomExt(1:4,7).dot.MomExt(1:4,10) ) / EHat**8
 !       return
    
-   DebugCounter(10) = DebugCounter(10) + 1
    call SetRunningScales( (/MomExt(1:4,5)+MomExt(1:4,6),MomExt(1:4,3),MomExt(1:4,4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) )
    call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
@@ -158,6 +163,8 @@ EvalWeighted_HJJ_fulldecay = 0d0
 
    EvalWeighted_HJJ_fulldecay = msq_MCFM(iPart_sel,jPart_sel) * pdf(LHA2M_pdf(iPart_sel),1)*pdf(LHA2M_pdf(jPart_sel),2)
    VegasWeighted_HJJ_fulldecay = EvalWeighted_HJJ_fulldecay * VgsWgt
+
+
 
    if( unweighted ) then
 
