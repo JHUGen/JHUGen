@@ -10,20 +10,20 @@ using namespace std;
 
 
 MELAHXSWidth::MELAHXSWidth(std::string fileLoc, std::string strAppend) :
-xmhW(0),
-sigW(0),
-graphW(0),
-gsW(0)
+  xmhW(nullptr),
+  sigW(nullptr),
+  graphW(nullptr),
+  gsW(nullptr)
 {
   fileName = fileLoc + "/HiggsTotalWidth_" + strAppend + ".txt";
   build();
 }
 MELAHXSWidth::MELAHXSWidth(const MELAHXSWidth& other) :
-fileName(other.fileName),
-xmhW(0),
-sigW(0),
-graphW(0),
-gsW(0)
+  fileName(other.fileName),
+  xmhW(nullptr),
+  sigW(nullptr),
+  graphW(nullptr),
+  gsW(nullptr)
 {
   build();
 }
@@ -39,11 +39,11 @@ void MELAHXSWidth::build(){
     }
   }
   file.close();
-  int indexW = (int)mass_BR.size();
-  if (indexW>0){
+  const unsigned int indexW = mass_BR.size();
+  if (indexW>1){
     xmhW = new double[indexW];
     sigW = new double[indexW];
-    for (int ix=0; ix<indexW; ix++){
+    for (unsigned int ix=0; ix<indexW; ix++){
       xmhW[ix] = mass_BR.at(ix);
       sigW[ix] = BR.at(ix);
     }
@@ -57,16 +57,16 @@ void MELAHXSWidth::build(){
 
 
 MELAHXSWidth::~MELAHXSWidth(){
-  if (gsW!=0) delete gsW; gsW=0;
-  if (graphW!=0) delete graphW; graphW=0;
-  if (xmhW!=0) delete[] xmhW; xmhW=0;
-  if (sigW!=0) delete[] sigW; sigW=0;
+  delete gsW; gsW=nullptr;
+  delete graphW; graphW=nullptr;
+  delete[] xmhW; xmhW=nullptr;
+  delete[] sigW; sigW=nullptr;
 }
 
 double MELAHXSWidth::HiggsWidth(double mH) const{
   double result = 0;
-  if (gsW!=0){
-    int indexW = (int)mass_BR.size();
+  const unsigned int indexW = mass_BR.size();
+  if (gsW){
     if (mH<xmhW[indexW-1]) result = (double)gsW->Eval(mH);
     else{
       double cB = (sigW[indexW-1]-sigW[indexW-2])/(pow(xmhW[indexW-1], 3)-pow(xmhW[indexW-2], 3));
