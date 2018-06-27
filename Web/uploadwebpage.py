@@ -191,7 +191,7 @@ Download_template = """
     Download:<br>
     Latest version: {latest}
     <br>
-    Compiled MCFM libraries to interface with MELA that work for a good variety of software releases: <a href="MCFM-precompiled/slc5_amd64_gcc462/libmcfm_7p0.so">libmcfm_7p0.so</a><br>
+    Compiled MCFM libraries to interface with MELA that work for a good variety of software releases: <a href="MCFM-precompiled/v2/libmcfm_705.so">libmcfm_705.so</a><br>
     (See JHUGenMELA/ggZZ_MCFM/README for further information)
     <br>
     <br>
