@@ -378,7 +378,7 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
   if(Collider.eq.0.and.VH_PC.eq."ee")then  
     call EvalPhasespace_VH(yRnd(6:13),ILC_Energy,Mom(:,1:9),id(6:9),PSWgt,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
     Mom_save(1:4,1:9)=Mom(1:4,1:9)
-    call Kinematics_VH(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+    call kinematics_VH(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
     if( applyPSCut .or. PSWgt.eq.zero ) return    
     FluxFac = 1d0/(2d0*ILC_Energy**2)
     PreFac = fbGeV2 * FluxFac * PSWgt
@@ -410,14 +410,8 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
       Mom(:,10)=0d0 ! no QCD particle emitted
       Mom_save(:,1:9)=Mom(:,1:9)
       !boost from center of mass frame to lab frame
-      call boost2Lab(eta1,eta2,10,Mom)
-!print*,"=========="
-!print*,eta1,eta2
-!print*,eta1*yRnd(17),eta2*yRnd(17)
-      !Kinematics and cuts
-      call Kinematics_VH(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
-      if( applyPSCut .or. PSWgt.eq.zero )return
-      !Set running scales
+!      call boost2Lab(eta1,eta2,10,Mom)
+!Set running scales
       if( IsAZDecay(DecayMode1) .or. IsAWDecay(DecayMode1) )then
         call SetRunningScales( (/ Mom(1:4,5),Mom(1:4,6),Mom(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
       elseif( IsAPhoton(DecayMode1) )then
@@ -425,6 +419,11 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
       endif
       ! do not forget to set scales in command lines
       call EvalAlphaS()
+      !Kinematics and cuts
+      call kinematics_VH(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+call boost2Lab(eta1,eta2,10,Mom)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      if( applyPSCut .or. PSWgt.eq.zero )return
+      
       call setPDFs(eta1,eta2,pdf)
       if(VH_PC.eq."sp".or.VH_PC.eq."gq".or.VH_PC.eq."qg".or.VH_PC.eq."nl")then
         Ehat_ren = Ehat * dsqrt(yRnd(17))
@@ -439,7 +438,7 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
         eta2_ren(2) = yRnd(17)*eta2
         do i_PDF_ren=1,2
           call boost2Lab(eta1_ren(i_PDF_ren),eta2_ren(i_PDF_ren),9,p_PDF_ren(:,:,i_PDF_ren))
-          call Kinematics_VH(id,p_PDF_ren(:,:,i_PDF_ren),NBin,applyPSCut_ren(i_PDF_ren),HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+          call kinematics_VH(id,p_PDF_ren(:,:,i_PDF_ren),NBin,applyPSCut_ren(i_PDF_ren),HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
           !Set running scales
           if( IsAZDecay(DecayMode1) .or. IsAWDecay(DecayMode1) )then
             call SetRunningScales( (/ p_PDF_ren(1:4,5,i_PDF_ren),p_PDF_ren(1:4,6,i_PDF_ren),p_PDF_ren(1:4,7,i_PDF_ren) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
@@ -497,7 +496,7 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
       !boost from center of mass frame to lab frame
       call boost2Lab(eta1,eta2,10,Mom_real)
       !Kinematics and cuts
-      call Kinematics_VH(id,Mom_real,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+      call kinematics_VH(id,Mom_real,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
       if( applyPSCut .or. PSWgt_real.eq.zero )return
 !if(Get_PT(Mom_real(:,10)).le.20d0*GeV)return !jet pt cut such that real contribution .is finite
       !Set running scales
@@ -617,68 +616,93 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
 !
 !vev=2.4621845810181631d0
 !
-!MomExt1t(:,1) = (/  1.4612636158434757d0  ,        0.0000000000000000d0,        0.0000000000000000d0     ,   1.4612636158434757d0     /)
-!MomExt1t(:,2) = (/  1.4612636158434757d0  ,        0.0000000000000000d0,        0.0000000000000000d0     ,  -1.4612636158434757d0     /)
-!MomExt1t(:,3) = (/  2.9225272316869515d0  ,        0.0000000000000000d0,        0.0000000000000000d0     ,   0.0000000000000000d0     /)
-!MomExt1t(:,4) = (/  1.3351579764951791d0  ,       0.23912248810916401d0,      -0.49887803363686017d0     , -0.80695867029432466d0     /)
-!MomExt1t(:,5) = (/  1.5873692551917724d0  ,      -0.23912248810916401d0,       0.49887803363686017d0     ,  0.80695867029432466d0     /)
-!MomExt1t(:,6) = (/ 0.32428361334240258d0  ,      -0.30847990233180261d0,       -4.0824295707895482d-002  ,  -9.1287395733039817d-002  /)
-!MomExt1t(:,7) = (/  1.0108743631527766d0  ,       0.54760239044096659d0,      -0.45805373792896470d0     , -0.71567127456128488d0     /)
-!MomExt1t(:,8) = (/  0.0000000000000000d0  ,        0.0000000000000000d0,        0.0000000000000000d0     ,   0.0000000000000000d0     /)
-!MomExt1t(:,9) = (/  0.0000000000000000d0  ,        0.0000000000000000d0,        0.0000000000000000d0     ,   0.0000000000000000d0     /)
-!! ======================
-!MomExt2t(:,1) = (/   1.4993889013229147d0,        0.0000000000000000d0     ,   0.0000000000000000d0,        1.4993889013229147d0     /)
-!MomExt2t(:,2) = (/   1.4993889013229147d0,        0.0000000000000000d0     ,   0.0000000000000000d0,       -1.4993889013229147d0     /)
-!MomExt2t(:,3) = (/   2.9987778026458294d0,        0.0000000000000000d0     ,   0.0000000000000000d0,        0.0000000000000000d0     /)
-!MomExt2t(:,4) = (/   1.3795905093925491d0,       0.37240043559138541d0     , -0.90237656049098836d0,      -0.32603979708109893d0     /)
-!MomExt2t(:,5) = (/   1.6191872932532803d0,      -0.37240043559138541d0     ,  0.90237656049098836d0,       0.32603979708109893d0     /)
-!MomExt2t(:,6) = (/  0.69987628038380456d0,       0.41499286401781232d0     , -0.51432374828037830d0,       0.23038839513522705d0     /)
-!MomExt2t(:,7) = (/  0.67971422900874456d0,       -4.2592428426426909d-002  , -0.38805281221061005d0,      -0.55642819221632600d0     /)
-!MomExt2t(:,8) = (/   0.0000000000000000d0,        0.0000000000000000d0     ,   0.0000000000000000d0,        0.0000000000000000d0     /)
-!MomExt2t(:,9) = (/   0.0000000000000000d0,        0.0000000000000000d0     ,   0.0000000000000000d0,        0.0000000000000000d0     /)
-!! ======================
-!MomExt3t(:,1) = (/   4.9249999999999998d0,        0.0000000000000000d0,        0.0000000000000000d0,        4.9249999999999998d0 /)
-!MomExt3t(:,2) = (/   4.9249999999999998d0,        0.0000000000000000d0,        0.0000000000000000d0,       -4.9249999999999998d0 /)
-!MomExt3t(:,3) = (/   9.8499999999999996d0,        0.0000000000000000d0,        0.0000000000000000d0,        0.0000000000000000d0 /)
-!MomExt3t(:,4) = (/   4.8874276696732233d0,       -1.6191114510912707d0,       -4.2507436371871847d0,       -1.5408701352102065d0 /)
-!MomExt3t(:,5) = (/   4.9625723303267764d0,        1.6191114510912707d0,        4.2507436371871847d0,        1.5408701352102065d0 /)
-!MomExt3t(:,6) = (/   3.7143691570810575d0,       -1.4939929156902811d0,       -3.0908500572228248d0,       -1.4181570176493015d0 /)
-!MomExt3t(:,7) = (/   1.1730585125921660d0,      -0.12511853540098977d0,       -1.1598935799643604d0,      -0.12271311756090503d0 /)
-!MomExt3t(:,8) = (/   0.0000000000000000d0,        0.0000000000000000d0,        0.0000000000000000d0,        0.0000000000000000d0 /)
-!MomExt3t(:,9) = (/   0.0000000000000000d0,        0.0000000000000000d0,        0.0000000000000000d0,        0.0000000000000000d0 /)
-
-
-!!id(1:2)=(/convertLHE(up_),convertLHE(Aup_)/)
-!id(1:2)=(/convertLHE(dn_),convertLHE(Adn_)/)
+!MomExt1(:,1) = (/  1.4612636158434757d0  ,        0.0000000000000000d0,        0.0000000000000000d0     ,   1.4612636158434757d0     /)
+!MomExt1(:,2) = (/  1.4612636158434757d0  ,        0.0000000000000000d0,        0.0000000000000000d0     ,  -1.4612636158434757d0     /)
+!MomExt1(:,3) = (/  2.9225272316869515d0  ,        0.0000000000000000d0,        0.0000000000000000d0     ,   0.0000000000000000d0     /)
+!MomExt1(:,4) = (/  1.3351579764951791d0  ,       0.23912248810916401d0,      -0.49887803363686017d0     , -0.80695867029432466d0     /)
+!MomExt1(:,5) = (/  1.5873692551917724d0  ,      -0.23912248810916401d0,       0.49887803363686017d0     ,  0.80695867029432466d0     /)
+!MomExt1(:,6) = (/ 0.32428361334240258d0  ,      -0.30847990233180261d0,       -4.0824295707895482d-002  ,  -9.1287395733039817d-002  /)
+!MomExt1(:,7) = (/  1.0108743631527766d0  ,       0.54760239044096659d0,      -0.45805373792896470d0     , -0.71567127456128488d0     /)
+!MomExt1(:,8) = (/  0.0000000000000000d0  ,        0.0000000000000000d0,        0.0000000000000000d0     ,   0.0000000000000000d0     /)
+!MomExt1(:,9) = (/  0.0000000000000000d0  ,        0.0000000000000000d0,        0.0000000000000000d0     ,   0.0000000000000000d0     /)
+!MomExt1(:,10) = (/  0.0000000000000000d0  ,        0.0000000000000000d0,        0.0000000000000000d0     ,   0.0000000000000000d0     /)
+!! =====================
+!MomExt2(:,1) = (/   1.4993889013229147d0,        0.0000000000000000d0     ,   0.0000000000000000d0,        1.4993889013229147d0     /)
+!MomExt2(:,2) = (/   1.4993889013229147d0,        0.0000000000000000d0     ,   0.0000000000000000d0,       -1.4993889013229147d0     /)
+!MomExt2(:,3) = (/   2.9987778026458294d0,        0.0000000000000000d0     ,   0.0000000000000000d0,        0.0000000000000000d0     /)
+!MomExt2(:,4) = (/   1.3795905093925491d0,       0.37240043559138541d0     , -0.90237656049098836d0,      -0.32603979708109893d0     /)
+!MomExt2(:,5) = (/   1.6191872932532803d0,      -0.37240043559138541d0     ,  0.90237656049098836d0,       0.32603979708109893d0     /)
+!MomExt2(:,6) = (/  0.69987628038380456d0,       0.41499286401781232d0     , -0.51432374828037830d0,       0.23038839513522705d0     /)
+!MomExt2(:,7) = (/  0.67971422900874456d0,       -4.2592428426426909d-002  , -0.38805281221061005d0,      -0.55642819221632600d0     /)
+!MomExt2(:,8) = (/   0.0000000000000000d0,        0.0000000000000000d0     ,   0.0000000000000000d0,        0.0000000000000000d0     /)
+!MomExt2(:,9) = (/   0.0000000000000000d0,        0.0000000000000000d0     ,   0.0000000000000000d0,        0.0000000000000000d0     /)
+!MomExt2(:,10) = (/  0.0000000000000000d0  ,        0.0000000000000000d0,        0.0000000000000000d0     ,   0.0000000000000000d0     /)
+!! =====================
+!MomExt3(:,1) = (/   4.9249999999999998d0,        0.0000000000000000d0,        0.0000000000000000d0,        4.9249999999999998d0 /)
+!MomExt3(:,2) = (/   4.9249999999999998d0,        0.0000000000000000d0,        0.0000000000000000d0,       -4.9249999999999998d0 /)
+!MomExt3(:,3) = (/   9.8499999999999996d0,        0.0000000000000000d0,        0.0000000000000000d0,        0.0000000000000000d0 /)
+!MomExt3(:,4) = (/   4.8874276696732233d0,       -1.6191114510912707d0,       -4.2507436371871847d0,       -1.5408701352102065d0 /)
+!MomExt3(:,5) = (/   4.9625723303267764d0,        1.6191114510912707d0,        4.2507436371871847d0,        1.5408701352102065d0 /)
+!MomExt3(:,6) = (/   3.7143691570810575d0,       -1.4939929156902811d0,       -3.0908500572228248d0,       -1.4181570176493015d0 /)
+!MomExt3(:,7) = (/   1.1730585125921660d0,      -0.12511853540098977d0,       -1.1598935799643604d0,      -0.12271311756090503d0 /)
+!MomExt3(:,8) = (/   0.0000000000000000d0,        0.0000000000000000d0,        0.0000000000000000d0,        0.0000000000000000d0 /)
+!MomExt3(:,9) = (/   0.0000000000000000d0,        0.0000000000000000d0,        0.0000000000000000d0,        0.0000000000000000d0 /)
+!MomExt3(:,10) = (/  0.0000000000000000d0  ,        0.0000000000000000d0,        0.0000000000000000d0     ,   0.0000000000000000d0     /)
 !
+!
+!id(1:9)=(/1,-1,23,23,25,convertLHE(ElM_),convertLHE(ElP_),convertLHE(Not_a_particle_),convertLHE(Not_a_particle_)/)
+!
+!call kinematics_VH(id,MomExt1,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+!call kinematics_VH(id,MomExt2,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+!call kinematics_VH(id,MomExt3,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+!
+!Mom(:,1:9)=MomExt1(:,1:9)
+!me2lo=0d0
+!call SetRunningScales( (/ Mom(1:4,5),Mom(1:4,6),Mom(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
+!call EvalAlphaS()
+!do l=0,1
+!do p=0,1
+!!print*,"helicities",(l*2-1),(p*2-1)
+!call amp_VH_LO(Mom(:,1:9),mass(3:5,:),(/dble(l*2-1),-dble(l*2-1),helicity(3:5),dble(p*2-1),-dble(p*2-1),helicity(8:9)/),id(1:9),amp_dummy)
+!!me2lo = me2lo + dble(amp_dummy*dconjg(amp_dummy))
+!print*,"MomExt1",l,p,dble(amp_dummy*dconjg(amp_dummy))
+!!print*,"MomExt1 amptd = ",amp_dummy,id,helicity,alphas
+!enddo
+!enddo
+!!me2lo = me2lo * aveqq * 3d0
+!!print*,"MomExt1 me2qq = ",me2lo
+!
+!Mom(:,1:9)=MomExt2(:,1:9)
+!me2lo=0d0
+!call SetRunningScales( (/ Mom(1:4,5),Mom(1:4,6),Mom(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
+!call EvalAlphaS()
+!do l=0,1
+!do p=0,1
+!!print*,"helicities",(l*2-1),(p*2-1)
+!call amp_VH_LO(Mom(:,1:9),mass(3:5,:),(/dble(l*2-1),-dble(l*2-1),helicity(3:5),dble(p*2-1),-dble(p*2-1),helicity(8:9)/),id(1:9),amp_dummy)
+!!me2lo = me2lo + dble(amp_dummy*dconjg(amp_dummy))
+!print*,"MomExt2",l,p,dble(amp_dummy*dconjg(amp_dummy))
+!!print*,"MomExt1 amptd = ",amp_dummy
+!enddo
+!enddo
+!
+!Mom(:,1:9)=MomExt3(:,1:9)
+!me2lo=0d0
+!call SetRunningScales( (/ Mom(1:4,5),Mom(1:4,6),Mom(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
+!call EvalAlphaS()
+!do l=0,1
+!do p=0,1
+!!print*,"helicities",(l*2-1),(p*2-1)
+!call amp_VH_LO(Mom(:,1:9),mass(3:5,:),(/dble(l*2-1),-dble(l*2-1),helicity(3:5),dble(p*2-1),-dble(p*2-1),helicity(8:9)/),id(1:9),amp_dummy)
+!!me2lo = me2lo + dble(amp_dummy*dconjg(amp_dummy))
+!print*,"MomExt3",l,p,dble(amp_dummy*dconjg(amp_dummy))
+!!print*,"MomExt1 amptd = ",amp_dummy
+!enddo
+!enddo
+!
+!pause
 !print*,"========================="
-!Mom=MomExt1
-!me2lo=0d0
-!call SetRunningScales( (/ Mom(1:4,5),Mom(1:4,6),Mom(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
-!call EvalAlphaS()
-!do l=0,1
-!do p=0,1
-!!print*,"helicities",(l*2-1),(p*2-1)
-!call amp_VH_LO(Mom(:,1:9),mass(3:5,:),(/dble(l*2-1),-dble(l*2-1),helicity(3:5),dble(p*2-1),-dble(p*2-1),helicity(8:9)/),id(1:9),amp_dummy)
-!me2lo = me2lo + dble(amp_dummy*dconjg(amp_dummy))
-!!print*,"MomExt1 amptd = ",amp_dummy
-!enddo
-!enddo
-!me2lo = me2lo * aveqq * 3d0
-!print*,"MomExt1 me2qq = ",me2lo
-!
-!Mom=MomExt2
-!me2lo=0d0
-!call SetRunningScales( (/ Mom(1:4,5),Mom(1:4,6),Mom(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
-!call EvalAlphaS()
-!do l=0,1
-!do p=0,1
-!!print*,"helicities",(l*2-1),(p*2-1)
-!call amp_VH_LO(Mom(:,1:9),mass(3:5,:),(/dble(l*2-1),-dble(l*2-1),helicity(3:5),dble(p*2-1),-dble(p*2-1),helicity(8:9)/),id(1:9),amp_dummy)
-!me2lo = me2lo + dble(amp_dummy*dconjg(amp_dummy))
-!!print*,"MomExt1 amptd = ",amp_dummy
-!enddo
-!enddo
+
 !me2lo = me2lo * aveqq * 3d0
 !print*,"MomExt2 me2qq = ",me2lo
 !
@@ -894,7 +918,7 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
           me2real = me2real *pdf_real(LHA2M_PDF(i),1)*pdf_real(LHA2M_PDF(j),2) *PreFac_real *PostFac *aveqq *3d0 !I think I understand now.
           me2real = me2real * Cf * (4d0 * pi * alphas_real)! gs^2
 
-          call Kinematics_VH(id,Mom_real,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+          call kinematics_VH(id,Mom_real,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
           do NHisto = 1,NumHistograms
             call intoHisto(NHisto,NBin(NHisto),me2real*VgsWgt)
           enddo
@@ -912,7 +936,7 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
             dip(i_dipole) = me2_dummy * (-1d0) / (2d0*Mom_real(:,i_dipole).dot.Mom_real(:,10)) * (-1d0) & !-1 for color (arXiv:0709.2881 EQ. 5.136)
                                       * split_qiqi(alphas_dip(i_dipole),Mom_real(:,1),Mom_real(:,2),Mom_real(:,10))
 
-            call Kinematics_VH(id,ptilde(:,:,i_dipole),NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+            call kinematics_VH(id,ptilde(:,:,i_dipole),NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
             do NHisto = 1,NumHistograms
               call intoHisto(NHisto,NBin(NHisto),-dip(i_dipole)*VgsWgt)
             enddo
@@ -992,7 +1016,7 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
           me2real = me2real *pdf_real(LHA2M_PDF(i),1)*pdf_real(LHA2M_PDF(j),2) *PreFac_real *PostFac *aveqq *Cf *3d0 !I think I understand now.
           me2real = me2real * (4d0 * pi * alphas_real)! gs^2
 
-          !call Kinematics_VH(id,Mom_real,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+          !call kinematics_VH(id,Mom_real,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
           do NHisto = 1,NumHistograms
             call intoHisto(NHisto,NBin(NHisto),me2real*VgsWgt)
           enddo
@@ -1010,7 +1034,7 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
             dip(i_dipole) = me2_dummy * (-1d0) / (2d0*Mom_real(:,i_dipole).dot.Mom_real(:,10)) * (-1d0) & !-1 for color (arXiv:0709.2881 EQ. 5.136)
                                       * split_qiqi(alphas_dip(i_dipole),Mom_real(:,1),Mom_real(:,2),Mom_real(:,10))
 
-            call Kinematics_VH(id,ptilde(:,:,i_dipole),NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+            call kinematics_VH(id,ptilde(:,:,i_dipole),NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
             do NHisto = 1,NumHistograms
               call intoHisto(NHisto,NBin(NHisto),-dip(i_dipole)*VgsWgt)
             enddo
@@ -1047,7 +1071,7 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
           me2_virture_finite = me2_dummy * fac_ZH_virtual(Ehat)
           me2_virture_finite = me2_virture_finite*pdf(LHA2M_PDF(i),1)*pdf(LHA2M_PDF(j),2) * PreFac * PostFac * aveqq * 3d0
 
-          call Kinematics_VH(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+          call kinematics_VH(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
           do NHisto = 1,NumHistograms
             call intoHisto(NHisto,NBin(NHisto),me2_virture_finite*VgsWgt)
           enddo
@@ -1538,7 +1562,7 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
   if(Collider.eq.0.and.VH_PC.eq."ee")then
     call EvalPhasespace_VH(yRnd(6:13),ILC_Energy,Mom(:,1:9),id(6:9),PSWgt,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
     Mom_save=Mom
-    call Kinematics_VH(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+    call kinematics_VH(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
     if( applyPSCut .or. PSWgt.eq.zero ) return    
 
     FluxFac = 1d0/(2d0*ILC_Energy**2)
@@ -1569,7 +1593,7 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
     !endif
 
     !Kinematics and cuts
-    call Kinematics_VH(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+    call kinematics_VH(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
     !p~ will have their own runs of the fuction
 
     if( applyPSCut .or. PSWgt.eq.zero ) return
@@ -1680,7 +1704,7 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
       AlertCounter = AlertCounter + 1
       Res = 0d0
     elseif( EvalUnWeighted_VH .gt. yRnd(22)*CS_max ) then
-      call Kinematics_VH(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+      call kinematics_VH(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
       do NHisto=1,NumHistograms
         call intoHisto(NHisto,NBin(NHisto),1d0)  ! CS_Max is the integration volume
       enddo

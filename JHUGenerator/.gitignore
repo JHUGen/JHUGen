@@ -1,21 +1,9 @@
 JHUGen
-# for cygwin
+#for cygwin
 JHUGen.exe
-
-#JHUGen output
-*.lhe
-*.dat
-*.log
-*.grid
-*_CSmax.bin
-*_commandlineinfo.txt
-*_gridinfo.txt
-*_collierfiles
-PMZZdistribution.out
-
-#downloaded pdf
+CSmax.bin
+data
+vegas_*.grid
 NNPDF30_lo_as_0130.LHgrid
-
-# MCFM links
-*.DAT
-br.sm*
+*.log
+PMZZdistribution.out
