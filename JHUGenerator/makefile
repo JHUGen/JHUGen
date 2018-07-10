@@ -30,7 +30,7 @@ UseLHAPDF=Yes
 MyLHADir = ${LHAPDF_DATA_PATH}/../../lib/
 
 #link MCFM libraries from MELA
-linkMELA = No
+linkMELA = Yes
 
 
 ifeq ($(UseLHAPDF),Yes)
