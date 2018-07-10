@@ -2,51 +2,66 @@ Here = $(PWD)
 Makefile=makefile
 ModuleDir = $(Here)/modules
 ObjectDir = $(Here)/objects
-JHUGenMELADir = ../JHUGenMELA
-MCFMDir = $(JHUGenMELADir)
+MELADir = $(Here)/../JHUGenMELA/MELA
+#MELADir = $(Here)/../../Ulascan/JHUGen/JHUGenMELA/MELA
+MELAFortranDir = $(MELADir)/fortran
+MELADataDir = $(MELADir)/data
+MELALibDir = $(MELADataDir)/slc6_amd64_gcc530
+MCFMLib = mcfm_705 # libmcfm_705.so
 PDFDir = $(Here)/pdfs
 VegasDir = $(Here)/vegas
-#FFDir  = $(Here)/ff
-#QLDir  = $(Here)/ql
-COLLIERDir = $(Here)/COLLIER
-COLLIERModuleDir = $(Here)/COLLIER/modules
+CollierDir = $(Here)/../lib/COLLIER-1.1/
 
 # compiler options, Comp='ifort' or 'gfort'
 Opt  = Yes
 Comp = gfort
 
 # link pdfs via LHA library ('Yes' or 'No')
-UseLHAPDF=Yes
+UseLHAPDF=No
 # remember to export
 #          LD_LIBRARY_PATH=/.../LHAPDF-x.y.z/lib/:${LD_LIBRARY_PATH}
 #          LHAPDF_DATA_PATH=/.../LHAPDF-x.y.z/share/LHAPDF/:${LHAPDF_DATA_PATH}
 
-#LD_LIBRARY_PATH = /usr/local/lib/:${LD_LIBRARY_PATH}
-#LHAPDF_DATA_PATH = /usr/local/share/LHAPDF/:${LHAPDF_DATA_PATH}
-
 # directory which contains libLHAPDF.a, libLHAPDF.la, libLHAPDF.so
 # this one in terms of the environment variable should work in most cases
-#MyLHADir = /usr/local/lib
-MyLHADir = ${LHAPDF_DATA_PATH}/../../lib/
+MyLHADir=${LHAPDF_DATA_PATH}/../../lib/
 
 #link MCFM libraries from MELA
+# remember to export
+#          LD_LIBRARY_PATH=/.../MELA/data/$SCRAM_ARCH/:${LD_LIBRARY_PATH}
 linkMELA = Yes
 
 
 ifeq ($(UseLHAPDF),Yes)
-   LHAPDFflags = -L$(MyLHADir) -lLHAPDF -DuseLHAPDF=1
+   LHAPDFflags = -L$(MyLHADir) -lLHAPDF -I$(MyLHADir)/../include -DuseLHAPDF=1 -lstdc++
 else
    LHAPDFflags = -DuseLHAPDF=0
 endif
 
-#QCDLoopflags = -L$(QLDir) -lqcdloop -L$(FFDir) -lff
 
-COLLIERflags = -L$(COLLIERDir) -lcollier
+#include Collier Loop Integral Library
+linkCollierLib = No
 
 ifeq ($(linkMELA),Yes)
-   MELAflags = -DlinkMELA=1
+   linkCollierLib = Yes
+   CollierLibflags = -DuseCollier=1 -I$(MELADir)/COLLIER -lcollier
 else
-   MELAflags = -DlinkMELA=0
+   ifeq ($(linkCollierLib),Yes)
+      CollierLibflags = -DuseCollier=1 -L$(CollierDir) -I$(CollierDir)/modules -lcollier
+   else
+      CollierLibflags = -DuseCollier=0
+   endif
+endif
+
+
+MELAflags = -DlinkMELA=0
+
+ifeq ($(linkMELA),Yes)
+ ifeq ($(Comp),gfort)
+    MELAflags = -DlinkMELA=1 -L$(MELALibDir) -l$(MCFMLib)
+ else
+    linkMELA = No
+ endif
 endif
 
 ifeq ($(Comp),gfort)
@@ -56,8 +71,7 @@ ifeq ($(Comp),gfort)
  else
     OptOpts  = -O0 -fcheck=all
  endif
-# fcomp = gfortran $(OptOpts) -ffree-line-length-none -I$(VegasDir) -I$(ModuleDir) -J$(ModuleDir) $(COLLIERflags) $(LHAPDFflags) $(QCDLoopflags) $(MELAflags) -Dcompiler=2
- fcomp = gfortran $(OptOpts) -ffree-line-length-none -I$(VegasDir) -I$(ModuleDir) -J$(ModuleDir) $(COLLIERflags) $(LHAPDFflags) $(MELAflags) -Dcompiler=2
+ fcomp = gfortran $(OptOpts) -ffree-line-length-none -I$(VegasDir) -I$(ModuleDir) -J$(ModuleDir) $(LHAPDFflags) $(MELAflags) $(CollierLibflags) -Dcompiler=2
 endif
 
 
@@ -68,8 +82,7 @@ ifeq ($(Comp),ifort)
  else
     OptOpts  = -O0 -implicitnone -check bounds -check pointer -warn interfaces -ftrapuv  -diag-disable remark -debug extended -g -traceback -fpe0 -check uninit
  endif
- #fcomp = ifort -fpp $(OptOpts) -module $(ModuleDir) -I$(VegasDir) -Dcompiler=1 $(LHAPDFflags) $(QCDLoopflags) $(COLLIERflags) $(MELAflags)
- fcomp = ifort -fpp $(OptOpts) -module $(ModuleDir) -I$(VegasDir) -Dcompiler=1 $(LHAPDFflags) $(COLLIERflags) $(MELAflags)
+ fcomp = ifort -fpp $(OptOpts) -module $(ModuleDir) -I$(VegasDir) -Dcompiler=1 $(LHAPDFflags) $(MELAflags) $(CollierLibflags)
 endif
 
 
