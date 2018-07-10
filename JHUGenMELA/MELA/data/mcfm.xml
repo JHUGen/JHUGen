@@ -1,0 +1,8 @@
+<tool name="mcfm" version="XXX">
+  <lib name="mcfm"/>
+   <client>
+    <environment name="MCFM_BASE" default="/afs/cern.ch/user/u/usarica/mcfm/MCFM/"/>
+    <environment name="LIBDIR" default="$MCFM_BASE"/>
+  </client>
+  <runtime name="PATH" value="$MCFM_BASE" type="path"/>
+</tool>
