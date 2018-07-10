@@ -9,6 +9,7 @@ MELA/data/*/*.pcm
 MELA/data/*/*.LHgrid
 
 MELA/src/*.o
+MELA/src/*.so
 MELA/src/*.d
 MELA/src/*.cxx
 
