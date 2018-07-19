@@ -1587,8 +1587,14 @@ type(SaveValues) :: tosave, oldsavevalues
     endif
 
     ! VBF
-    if( distinguish_HWWcouplings .and. Process.ne.60 .and. Process.ne.66 ) then
+    if( distinguish_HWWcouplings .and. Process.ne.60 .and. Process.ne.66 .and. Process.ne.68 ) then
         call Error("The separate HWW couplings are only used for VBF.  For H->WW decay or WH production, please set ghz* instead.")
+    endif
+
+    !Special for offshell VBF - default ghz1 is 1 to match the MCFM convention
+    if( .not.Setghz1 .and. Process.ge.66 .and. Process.le.68 ) then
+        !note this implies .not. SetAnomalousSpin0VV because of earlier errors
+        ghz1=(1d0,0d0)
     endif
 
 
