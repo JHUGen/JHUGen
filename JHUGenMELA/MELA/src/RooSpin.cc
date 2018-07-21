@@ -1,6 +1,7 @@
 #include "RooSpin.h"
 
 using namespace std;
+using namespace MELAStreamHelpers;
 
 
 void AnaMelaHelpers::multiplyComplexNumbers(std::vector<Double_t> reals, std::vector<Double_t> imags, Double_t& resRe, Double_t& resIm){
@@ -33,14 +34,15 @@ void AnaMelaHelpers::multiplyComplexNumbers(std::vector<Double_t> reals, std::ve
 }
 
 RooSpin::RooSpin() : RooAbsPdf(),
-GeVunit(1e-2)
+verbosity(TVar::ERROR)
 {}
 
 RooSpin::RooSpin(
   const char* name, const char* title,
   modelMeasurables _measurables,
   modelParameters _parameters,
-  RooSpin::VdecayType _Vdecay1, RooSpin::VdecayType _Vdecay2
+  RooSpin::VdecayType _Vdecay1, RooSpin::VdecayType _Vdecay2,
+  TVar::VerbosityLevel verbosity_
 ) : RooAbsPdf(name, title),
 
 h1("h1", "h1", this),
@@ -74,7 +76,7 @@ gVprimeff_decay2_right("gVprimeff_decay2_right", "gVprimeff_decay2_right", this,
 Vdecay1(_Vdecay1), Vdecay2(_Vdecay2),
 intCodeStart(1),
 
-GeVunit(1e-2)
+verbosity(verbosity_)
 {
   setProxies(_measurables);
 }
@@ -112,7 +114,7 @@ RooSpin::RooSpin(const RooSpin& other, const char* name) :
   Vdecay1(other.Vdecay1), Vdecay2(other.Vdecay2),
   intCodeStart(other.intCodeStart),
 
-  GeVunit(other.GeVunit)
+  verbosity(other.verbosity)
 {}
 
 void RooSpin::alwaysIntegrate(Int_t code){
@@ -129,6 +131,7 @@ void RooSpin::alwaysIntegrate(Int_t code){
 }
 
 void RooSpin::calculatePropagator(Double_t& propRe, Double_t& propIm, Double_t mass, Int_t propType)const{
+  if (verbosity>=TVar::DEBUG) MELAout << "RooSpin::calculatePropagator: Calling propagator with type " << propType << " and mass " << mass << endl;
   // prop = -i / ((m**2-mV**2) + i*mV*GaV) = - ( mV*GaV + i*(m**2-mV**2) ) / ((m**2-mV**2)**2 + (mV*GaV)**2)
   if (propType==0){ // Photon
     propRe = 0.;
@@ -149,6 +152,7 @@ void RooSpin::calculatePropagator(Double_t& propRe, Double_t& propIm, Double_t m
       propRe = (mass==mV ? 1. : 0.);
       propIm = 0.;
     }
+    if (verbosity>=TVar::DEBUG) MELAout << "RooSpin::calculatePropagator: mV / gamV = " << mV << " / " << gamV << endl;
   }
   else if (propType==2){ // Higgs prop = i / ((m**2-mX**2) + i*mX*GaX) = - ( mX*GaX + i*(m**2-mX**2) ) / ((m**2-mX**2)**2 + (mX*GaX)**2)
     if (gamX>0.){
@@ -181,11 +185,13 @@ void RooSpin::calculatePropagator(Double_t& propRe, Double_t& propIm, Double_t m
       propRe = 0;
       propIm = 0;
     }
+    if (verbosity>=TVar::DEBUG) MELAout << "RooSpin::calculatePropagator: mV / gamV = " << mV << " / " << gamV << endl;
   }
   else{
     propRe = 1.;
     propIm = 0.;
   }
+  if (verbosity>=TVar::DEBUG) MELAout << "RooSpin::calculatePropagator: Final propagator = " << propRe << ", " << propIm << endl;
 }
 void RooSpin::calculateVffGVGA(Double_t& gV, Double_t& gA, RooSpin::VdecayType Vdecay, bool isGamma)const{
   const Double_t atomicT3 = 0.5;
@@ -286,6 +292,7 @@ void RooSpin::calculateVffGVGA(Double_t& gV, Double_t& gA, RooSpin::VdecayType V
     gV = 1;
     gA = 0;
   }
+  if (verbosity>=TVar::DEBUG) MELAout << "RooSpin::calculateVffGVGA( " << gV << " , " << gA << " , " << Vdecay << " , " << isGamma << " )" << endl;
 }
 void RooSpin::calculateVffR1R2(Double_t& R1Val, Double_t& R2Val, bool isGammaV1, bool isGammaV2)const{
   R1Val=0; R2Val=0;
@@ -330,6 +337,8 @@ void RooSpin::calculateVprimeffGVGA(Double_t& gV, Double_t& gA, int whichVprime/
 
   gV=(gL+gR)/2.*overallFactor;
   gA=(gL-gR)/2.*overallFactor;
+
+  if (verbosity>=TVar::DEBUG) MELAout << "RooSpin::calculateVprimeffGVGA( " << gV << " , " << gA << " , " << whichVprime << " )" << endl;
 }
 void RooSpin::calculateVprimeffR1R2(Double_t& R1Val, Double_t& R2Val) const{
   R1Val=0; R2Val=0;
@@ -363,6 +372,8 @@ Double_t RooSpin::calculateAmplitudeScale(int VGammaVpmode1, int VGammaVpmode2)c
   Double_t ampScale = sqrt((pow(gV1, 2) + pow(gA1, 2))*(pow(gV2, 2) + pow(gA2, 2)));
   return ampScale;
 }
+
+void RooSpin::setVerbosity(TVar::VerbosityLevel verbosity_){ this->verbosity=verbosity_; }
 
 void RooSpin::setProxies(modelMeasurables _measurables){
   setProxy(h1, (RooAbsReal*) _measurables.h1);

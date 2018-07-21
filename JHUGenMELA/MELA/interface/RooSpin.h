@@ -14,9 +14,7 @@
 #include "Riostream.h" 
 #include "TMath.h"
 #include "TCouplingsBase.hh"
-
-using namespace TMath;
-using namespace std;
+#include "MELAStreamHelpers.hh"
 
 
 namespace AnaMelaHelpers{
@@ -84,7 +82,8 @@ public:
     const char* name, const char* title,
     modelMeasurables _measurables,
     modelParameters _parameters,
-    RooSpin::VdecayType _Vdecay1=RooSpin::kVdecayType_Zll, RooSpin::VdecayType _Vdecay2=RooSpin::kVdecayType_Zll
+    RooSpin::VdecayType _Vdecay1=RooSpin::kVdecayType_Zll, RooSpin::VdecayType _Vdecay2=RooSpin::kVdecayType_Zll,
+    TVar::VerbosityLevel verbosity_=TVar::ERROR
     );
   RooSpin(const RooSpin& other, const char* name=0);
   inline virtual ~RooSpin(){}
@@ -95,6 +94,7 @@ public:
   virtual Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName=0) const = 0;
   virtual Double_t analyticalIntegral(Int_t code, const char* rangeName=0) const = 0;
 
+  void setVerbosity(TVar::VerbosityLevel verbosity_);
   virtual void setDecayModes(RooSpin::VdecayType Vdecay1_, RooSpin::VdecayType Vdecay2_){ Vdecay1=Vdecay1_; Vdecay2=Vdecay2_; }
   virtual void getMVGamV(Double_t* mV=0, Double_t* gamV=0) const;
   virtual void getMVprimeGamVprime(Double_t* mV=0, Double_t* gamV=0) const;
@@ -136,7 +136,9 @@ protected:
   RooSpin::VdecayType Vdecay2;
 
   Int_t intCodeStart;
-  const Double_t GeVunit;
+  TVar::VerbosityLevel verbosity;
+
+  static constexpr Double_t GeVunit=1e-2;
 
   virtual void calculatePropagator(Double_t& propRe, Double_t& propIm, Double_t mass, Int_t propType=1) const;
   virtual void calculateVffGVGA(Double_t& gV, Double_t& gA, RooSpin::VdecayType Vdecay, bool isGamma=false) const;

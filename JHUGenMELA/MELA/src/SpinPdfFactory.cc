@@ -1,6 +1,10 @@
 #include "SpinPdfFactory.h"
 
 
+using namespace std;
+using namespace MELAStreamHelpers;
+
+
 SpinPdfFactory::SpinPdfFactory(RooSpin::modelMeasurables measurables_, RooSpin::VdecayType V1decay_, RooSpin::VdecayType V2decay_, Bool_t OnshellH_) :
 V1decay(V1decay_),
 V2decay(V2decay_),
@@ -36,10 +40,10 @@ void SpinPdfFactory::resetHiggsMassWidth(Double_t mXval, Double_t gamXval){
     if (dynamic_cast<RooRealVar*>(parameters.mX)!=0){ ((RooRealVar*)parameters.mX)->removeMin(); ((RooRealVar*)parameters.mX)->removeMax(); ((RooRealVar*)parameters.mX)->setConstant(false); ((RooRealVar*)parameters.mX)->setVal(mXval); ((RooRealVar*)parameters.mX)->setRange(mXval, mXval); ((RooRealVar*)parameters.mX)->setConstant(true); }
     if (dynamic_cast<RooRealVar*>(parameters.gamX)!=0){ ((RooRealVar*)parameters.gamX)->removeMin(); ((RooRealVar*)parameters.gamX)->removeMax(); ((RooRealVar*)parameters.gamX)->setConstant(false); ((RooRealVar*)parameters.gamX)->setVal(gamXval); ((RooRealVar*)parameters.gamX)->setRange(gamXval, gamXval); ((RooRealVar*)parameters.gamX)->setConstant(true); }
   }
-  else cerr << "SpinPdfFactory::resetHiggsMassWidth: Higgs mass is already determined by the virtuality with zero width. Cannot set Higgs mass or width" << endl;
+  else MELAerr << "SpinPdfFactory::resetHiggsMassWidth: Higgs mass is already determined by the virtuality with zero width. Cannot set Higgs mass or width" << endl;
 }
 void SpinPdfFactory::initVdecayParams(){
-  if ((((int)V1decay)>0 && ((int)V2decay)<0) || (((int)V1decay)<0 && ((int)V2decay)>0)) cerr << "SpinPdfFactory::initVdecayParams: V1 and V2 decays are inconsistent!" << endl;
+  if ((((int)V1decay)>0 && ((int)V2decay)<0) || (((int)V1decay)<0 && ((int)V2decay)>0)) MELAerr << "SpinPdfFactory::initVdecayParams: V1 and V2 decays are inconsistent!" << endl;
 
   const Double_t GfVal = 1.16639e-5;
   const Double_t vevVal = 1./sqrt(GfVal*sqrt(2.));
@@ -108,7 +112,7 @@ void SpinPdfFactory::getMVprimeGamVprime(Double_t* mV, Double_t* gamV)const{
   }
 }
 void SpinPdfFactory::resetVdecay(RooSpin::VdecayType V1decay_, RooSpin::VdecayType V2decay_){
-  if ((((int)V1decay)>0 && ((int)V2decay)<0) || (((int)V1decay)<0 && ((int)V2decay)>0)) cerr << "SpinPdfFactory::resetVdecay: V1 and V2 decays are inconsistent!" << endl;
+  if ((((int)V1decay)>0 && ((int)V2decay)<0) || (((int)V1decay)<0 && ((int)V2decay)>0)) MELAerr << "SpinPdfFactory::resetVdecay: V1 and V2 decays are inconsistent!" << endl;
 
   V1decay=V1decay_;
   V2decay=V2decay_;
@@ -165,3 +169,5 @@ void SpinPdfFactory::makeParamsConst(bool yesNo){
   ((RooRealVar*) parameters.gVprimeff_decay2_left)->setConstant(yesNo);
   ((RooRealVar*) parameters.gVprimeff_decay2_right)->setConstant(yesNo);
 }
+
+void SpinPdfFactory::setVerbosity(TVar::VerbosityLevel verbosity){ PDF_base->setVerbosity(verbosity); }

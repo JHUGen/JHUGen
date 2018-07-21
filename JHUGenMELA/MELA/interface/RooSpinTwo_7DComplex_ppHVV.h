@@ -7,14 +7,15 @@
 class RooSpinTwo_7DComplex_ppHVV : public RooSpinTwo {
 public:
 
-  RooSpinTwo_7DComplex_ppHVV(){}
+  RooSpinTwo_7DComplex_ppHVV();
   RooSpinTwo_7DComplex_ppHVV(
     const char *name, const char *title,
     modelMeasurables _measurables,
     modelParameters _parameters,
     modelCouplings _couplings,
-    RooSpin::VdecayType _Vdecay1=RooSpin::kVdecayType_Zll, RooSpin::VdecayType _Vdecay2=RooSpin::kVdecayType_Zll
-    );
+    RooSpin::VdecayType _Vdecay1=RooSpin::kVdecayType_Zll, RooSpin::VdecayType _Vdecay2=RooSpin::kVdecayType_Zll,
+    TVar::VerbosityLevel verbosity_=TVar::ERROR
+  );
   RooSpinTwo_7DComplex_ppHVV(const RooSpinTwo_7DComplex_ppHVV& other, const char* name=0);
   virtual TObject* clone(const char* newname) const { return new RooSpinTwo_7DComplex_ppHVV(*this, newname); }
   inline virtual ~RooSpinTwo_7DComplex_ppHVV(){}
