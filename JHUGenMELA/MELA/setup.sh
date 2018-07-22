@@ -28,7 +28,7 @@ elif [[ "$#" -ge 1 ]] && [[ "$1" == *"clean"* ]]; then
 else
     COLLIER/setup.sh "$@"
     tcsh data/retrieve.csh $DATA_LIB_DIR mcfm_705
-    bash downloadNNPDF.sh
+    ./downloadNNPDF.sh
     pushd $MELADIR"/fortran/"
     make all
     if mv libjhugenmela.so "../data/"$DATA_LIB_DIR"/"; then
