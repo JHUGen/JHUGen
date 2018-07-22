@@ -1,6 +1,10 @@
 #include "TensorPdfFactory.h"
 
 
+using namespace std;
+using namespace MELAStreamHelpers;
+
+
 TensorPdfFactory::TensorPdfFactory(RooSpin::modelMeasurables measurables_, RooSpin::VdecayType V1decay_, RooSpin::VdecayType V2decay_, Bool_t OnshellH_) :
 SpinPdfFactory(measurables_, V1decay_, V2decay_, OnshellH_)
 {
@@ -50,14 +54,14 @@ void TensorPdfFactory::destroyGVals(){
 }
 
 void TensorPdfFactory::addHypothesis(int ig, double initval, double iphase){
-  if (ig>=(int)SIZE_GVV || ig<0) cerr << "Invalid g" << ig << endl;
+  if (ig>=(int)SIZE_GVV || ig<0) MELAerr << "Invalid g" << ig << endl;
   else{
     ((RooRealVar*)couplings.bList[ig][0])->setVal(initval*cos(iphase));
     ((RooRealVar*)couplings.bList[ig][1])->setVal(initval*sin(iphase));
   }
 }
 void TensorPdfFactory::setTensorPolarization(int ig, double initval){
-  if (ig>2 || ig<=0) cerr << "Cannot set f_spinz" << ig << ". Please st f_spinz1 or f_spinz2 only." << endl;
+  if (ig>2 || ig<=0) MELAerr << "Cannot set f_spinz" << ig << ". Please st f_spinz1 or f_spinz2 only." << endl;
   else{
     if (ig==1) ((RooRealVar*)couplings.f_spinz1)->setVal(initval);
     else ((RooRealVar*)couplings.f_spinz2)->setVal(initval);

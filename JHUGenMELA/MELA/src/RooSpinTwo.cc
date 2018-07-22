@@ -1,46 +1,50 @@
 #include "RooSpinTwo.h"
 
 using namespace std;
+using namespace MELAStreamHelpers;
 
 
+RooSpinTwo::RooSpinTwo() : RooSpin(){}
 RooSpinTwo::RooSpinTwo(
   const char* name, const char* title,
   modelMeasurables _measurables,
   modelParameters _parameters,
   modelCouplings _couplings,
-  RooSpin::VdecayType _Vdecay1, RooSpin::VdecayType _Vdecay2
-  ) : RooSpin(
+  RooSpin::VdecayType _Vdecay1, RooSpin::VdecayType _Vdecay2,
+  TVar::VerbosityLevel verbosity_
+) : RooSpin(
   name, title,
   _measurables, _parameters,
-  _Vdecay1, _Vdecay2
-  ),
+  _Vdecay1, _Vdecay2,
+  verbosity_
+),
 
-  b1Val("b1Val", "b1Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_1][0])),
-  b2Val("b2Val", "b2Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_2][0])),
-  b3Val("b3Val", "b3Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_3][0])),
-  b4Val("b4Val", "b4Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_4][0])),
-  b5Val("b5Val", "b5Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_5][0])),
-  b6Val("b6Val", "b6Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_6][0])),
-  b7Val("b7Val", "b7Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_7][0])),
-  b8Val("b8Val", "b8Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_8][0])),
-  b9Val("b9Val", "b9Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_9][0])),
-  b10Val("b10Val", "b10Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_10][0])),
+b1Val("b1Val", "b1Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_1][0])),
+b2Val("b2Val", "b2Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_2][0])),
+b3Val("b3Val", "b3Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_3][0])),
+b4Val("b4Val", "b4Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_4][0])),
+b5Val("b5Val", "b5Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_5][0])),
+b6Val("b6Val", "b6Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_6][0])),
+b7Val("b7Val", "b7Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_7][0])),
+b8Val("b8Val", "b8Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_8][0])),
+b9Val("b9Val", "b9Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_9][0])),
+b10Val("b10Val", "b10Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_10][0])),
 
-  b1ValIm("b1ValIm", "b1ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_1][1])),
-  b2ValIm("b2ValIm", "b2ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_2][1])),
-  b3ValIm("b3ValIm", "b3ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_3][1])),
-  b4ValIm("b4ValIm", "b4ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_4][1])),
-  b5ValIm("b5ValIm", "b5ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_5][1])),
-  b6ValIm("b6ValIm", "b6ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_6][1])),
-  b7ValIm("b7ValIm", "b7ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_7][1])),
-  b8ValIm("b8ValIm", "b8ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_8][1])),
-  b9ValIm("b9ValIm", "b9ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_9][1])),
-  b10ValIm("b10ValIm", "b10ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_10][1])),
+b1ValIm("b1ValIm", "b1ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_1][1])),
+b2ValIm("b2ValIm", "b2ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_2][1])),
+b3ValIm("b3ValIm", "b3ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_3][1])),
+b4ValIm("b4ValIm", "b4ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_4][1])),
+b5ValIm("b5ValIm", "b5ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_5][1])),
+b6ValIm("b6ValIm", "b6ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_6][1])),
+b7ValIm("b7ValIm", "b7ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_7][1])),
+b8ValIm("b8ValIm", "b8ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_8][1])),
+b9ValIm("b9ValIm", "b9ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_9][1])),
+b10ValIm("b10ValIm", "b10ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_10][1])),
 
-  Lambda("Lambda", "Lambda", this, (RooAbsReal&)*(_couplings.Lambda)),
+Lambda("Lambda", "Lambda", this, (RooAbsReal&)*(_couplings.Lambda)),
 
-  f_spinz1("f_spinz1", "f_spinz1", this, (RooAbsReal&)*(_couplings.f_spinz1)),
-  f_spinz2("f_spinz2", "f_spinz2", this, (RooAbsReal&)*(_couplings.f_spinz2))
+f_spinz1("f_spinz1", "f_spinz1", this, (RooAbsReal&)*(_couplings.f_spinz1)),
+f_spinz2("f_spinz2", "f_spinz2", this, (RooAbsReal&)*(_couplings.f_spinz2))
 {}
 
 RooSpinTwo::RooSpinTwo(const RooSpinTwo& other, const char* name) :
@@ -464,32 +468,32 @@ void RooSpinTwo::calculateAmplitudes(
     AmpRe==0 && AmpIm==0
     )
     ){
-    std::cerr << "Some of the amplitudes are NaN or all are 0:" << endl;
-    std::cerr << "A00Re=" << A00Re << ", A00Im=" << A00Im << endl;
-    std::cerr << "AppRe=" << AppRe << ", AppIm=" << AppIm << endl;
-    std::cerr << "AmmRe=" << AmmRe << ", AmmIm=" << AmmIm << endl;
-    std::cerr << "A0pRe=" << A0pRe << ", A0pIm=" << A0pIm << endl;
-    std::cerr << "A0mRe=" << A0mRe << ", A0mIm=" << A0mIm << endl;
-    std::cerr << "Ap0Re=" << Ap0Re << ", Ap0Im=" << Ap0Im << endl;
-    std::cerr << "Am0Re=" << Am0Re << ", Am0Im=" << Am0Im << endl;
-    std::cerr << "ApmRe=" << ApmRe << ", ApmIm=" << ApmIm << endl;
-    std::cerr << "AmpRe=" << AmpRe << ", AmpIm=" << AmpIm << endl;
+    MELAerr << "Some of the amplitudes are NaN or all are 0:" << endl;
+    MELAerr << "A00Re=" << A00Re << ", A00Im=" << A00Im << endl;
+    MELAerr << "AppRe=" << AppRe << ", AppIm=" << AppIm << endl;
+    MELAerr << "AmmRe=" << AmmRe << ", AmmIm=" << AmmIm << endl;
+    MELAerr << "A0pRe=" << A0pRe << ", A0pIm=" << A0pIm << endl;
+    MELAerr << "A0mRe=" << A0mRe << ", A0mIm=" << A0mIm << endl;
+    MELAerr << "Ap0Re=" << Ap0Re << ", Ap0Im=" << Ap0Im << endl;
+    MELAerr << "Am0Re=" << Am0Re << ", Am0Im=" << Am0Im << endl;
+    MELAerr << "ApmRe=" << ApmRe << ", ApmIm=" << ApmIm << endl;
+    MELAerr << "AmpRe=" << AmpRe << ", AmpIm=" << AmpIm << endl;
 
-    std::cerr << "Possible causes are" << endl;
-    std::cerr << "m12=" << m12 << endl;
-    std::cerr << "m1=" << m1_ << endl;
-    std::cerr << "m2=" << m2_ << endl;
-    std::cerr << "x=" << x << endl;
-    std::cerr << "xxp=" << xxp << endl;
+    MELAerr << "Possible causes are" << endl;
+    MELAerr << "m12=" << m12 << endl;
+    MELAerr << "m1=" << m1_ << endl;
+    MELAerr << "m2=" << m2_ << endl;
+    MELAerr << "x=" << x << endl;
+    MELAerr << "xxp=" << xxp << endl;
 
-    std::cerr << "c1 = (" << c1Re << ", " << c1Im << ")" << endl;
-    std::cerr << "c2 = (" << c2Re << ", " << c2Im << ")" << endl;
-    std::cerr << "c3 = (" << c3Re << ", " << c3Im << ")" << endl;
-    std::cerr << "c41 = (" << c41Re << ", " << c41Im << ")" << endl;
-    std::cerr << "c42 = (" << c42Re << ", " << c42Im << ")" << endl;
-    std::cerr << "c5 = (" << c5Re << ", " << c5Im << ")" << endl;
-    std::cerr << "c6 = (" << c6Re << ", " << c6Im << ")" << endl;
-    std::cerr << "c7 = (" << c7Re << ", " << c7Im << ")" << endl;
+    MELAerr << "c1 = (" << c1Re << ", " << c1Im << ")" << endl;
+    MELAerr << "c2 = (" << c2Re << ", " << c2Im << ")" << endl;
+    MELAerr << "c3 = (" << c3Re << ", " << c3Im << ")" << endl;
+    MELAerr << "c41 = (" << c41Re << ", " << c41Im << ")" << endl;
+    MELAerr << "c42 = (" << c42Re << ", " << c42Im << ")" << endl;
+    MELAerr << "c5 = (" << c5Re << ", " << c5Im << ")" << endl;
+    MELAerr << "c6 = (" << c6Re << ", " << c6Im << ")" << endl;
+    MELAerr << "c7 = (" << c7Re << ", " << c7Im << ")" << endl;
   }
 
   return;

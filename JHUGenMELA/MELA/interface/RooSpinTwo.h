@@ -4,7 +4,7 @@
 #include "RooSpin.h"
 
 
-class RooSpinTwo : public RooSpin {
+class RooSpinTwo : public RooSpin{
 public:
 
   struct modelCouplings{
@@ -15,14 +15,15 @@ public:
     // There is no equivalent to graviton_qq_left/right yet!
   };
 
-  RooSpinTwo(){};
+  RooSpinTwo();
   RooSpinTwo(
     const char* name, const char* title,
     modelMeasurables _measurables,
     modelParameters _parameters,
     modelCouplings _couplings,
-    RooSpin::VdecayType _Vdecay1=RooSpin::kVdecayType_Zll, RooSpin::VdecayType _Vdecay2=RooSpin::kVdecayType_Zll
-    );
+    RooSpin::VdecayType _Vdecay1=RooSpin::kVdecayType_Zll, RooSpin::VdecayType _Vdecay2=RooSpin::kVdecayType_Zll,
+    TVar::VerbosityLevel verbosity_=TVar::ERROR
+  );
 
   RooSpinTwo(const RooSpinTwo& other, const char* name=0);
   virtual TObject* clone(const char* newname) const = 0;
@@ -34,27 +35,27 @@ public:
 
 protected:
 
-  RooRealProxy  b1Val;
-  RooRealProxy  b2Val;
-  RooRealProxy  b3Val;
-  RooRealProxy  b4Val;
-  RooRealProxy  b5Val;
-  RooRealProxy  b6Val;
-  RooRealProxy  b7Val;
-  RooRealProxy  b8Val;
-  RooRealProxy  b9Val;
-  RooRealProxy  b10Val;
+  RooRealProxy b1Val;
+  RooRealProxy b2Val;
+  RooRealProxy b3Val;
+  RooRealProxy b4Val;
+  RooRealProxy b5Val;
+  RooRealProxy b6Val;
+  RooRealProxy b7Val;
+  RooRealProxy b8Val;
+  RooRealProxy b9Val;
+  RooRealProxy b10Val;
 
-  RooRealProxy  b1ValIm;
-  RooRealProxy  b2ValIm;
-  RooRealProxy  b3ValIm;
-  RooRealProxy  b4ValIm;
-  RooRealProxy  b5ValIm;
-  RooRealProxy  b6ValIm;
-  RooRealProxy  b7ValIm;
-  RooRealProxy  b8ValIm;
-  RooRealProxy  b9ValIm;
-  RooRealProxy  b10ValIm;
+  RooRealProxy b1ValIm;
+  RooRealProxy b2ValIm;
+  RooRealProxy b3ValIm;
+  RooRealProxy b4ValIm;
+  RooRealProxy b5ValIm;
+  RooRealProxy b6ValIm;
+  RooRealProxy b7ValIm;
+  RooRealProxy b8ValIm;
+  RooRealProxy b9ValIm;
+  RooRealProxy b10ValIm;
 
   RooRealProxy Lambda;
 

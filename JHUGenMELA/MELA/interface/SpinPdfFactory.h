@@ -31,6 +31,8 @@ public:
 
   static void setVariableValue(RooRealVar* var, Double_t val);
 
+  void setVerbosity(TVar::VerbosityLevel verbosity);
+
 protected:
 
   RooSpin::VdecayType V1decay;

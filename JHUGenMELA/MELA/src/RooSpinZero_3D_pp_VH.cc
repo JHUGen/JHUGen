@@ -1,28 +1,31 @@
 #include "RooSpinZero_3D_pp_VH.h"
 
 
+RooSpinZero_3D_pp_VH::RooSpinZero_3D_pp_VH() : RooSpinZero(){}
 RooSpinZero_3D_pp_VH::RooSpinZero_3D_pp_VH(
   const char *name, const char *title,
   modelMeasurables _measurables,
   modelParameters _parameters,
   modelCouplings _couplings,
   Double_t _sqrts,
-  RooSpin::VdecayType _Vdecay1, RooSpin::VdecayType _Vdecay2
-  ) : RooSpinZero(
+  RooSpin::VdecayType _Vdecay1, RooSpin::VdecayType _Vdecay2,
+  TVar::VerbosityLevel verbosity_
+) : RooSpinZero(
   name, title,
   _measurables,
   _parameters,
   _couplings,
-  _Vdecay1, _Vdecay2
-  ),
-  sqrts(_sqrts)
+  _Vdecay1, _Vdecay2,
+  verbosity_
+),
+sqrts(_sqrts)
 {}
 
 
 RooSpinZero_3D_pp_VH::RooSpinZero_3D_pp_VH(
   const RooSpinZero_3D_pp_VH& other, const char* name
-  ) : RooSpinZero(other, name),
-  sqrts(other.sqrts)
+) : RooSpinZero(other, name),
+sqrts(other.sqrts)
 {}
 
 

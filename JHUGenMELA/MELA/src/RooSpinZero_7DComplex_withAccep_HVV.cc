@@ -1,94 +1,101 @@
 #include "RooSpinZero_7DComplex_withAccep_HVV.h"
 
 
+using namespace std;
+using namespace MELAStreamHelpers;
+
+
+RooSpinZero_7DComplex_withAccep_HVV::RooSpinZero_7DComplex_withAccep_HVV() : RooSpinZero(){}
 RooSpinZero_7DComplex_withAccep_HVV::RooSpinZero_7DComplex_withAccep_HVV(
   const char *name, const char *title,
   modelMeasurables _measurables,
   modelParameters _parameters,
   modelCouplings _couplings,
   accepParameters _accepParams,
-  RooSpin::VdecayType _Vdecay1, RooSpin::VdecayType _Vdecay2
-  ) : RooSpinZero(
+  RooSpin::VdecayType _Vdecay1, RooSpin::VdecayType _Vdecay2,
+  TVar::VerbosityLevel verbosity_
+) : RooSpinZero(
   name, title,
   _measurables,
   _parameters,
   _couplings,
-  _Vdecay1, _Vdecay2
-  ),
-  aPhi("aPhi", "aPhi", this, (RooAbsReal&)*(_accepParams.aPhi)),
-  bPhi("bPhi", "bPhi", this, (RooAbsReal&)*(_accepParams.bPhi)),
-  cPhi("cPhi", "cPhi", this, (RooAbsReal&)*(_accepParams.cPhi)),
-  dPhi("dPhi", "dPhi", this, (RooAbsReal&)*(_accepParams.dPhi)),
-  ePhi("ePhi", "ePhi", this, (RooAbsReal&)*(_accepParams.ePhi)),
-  aPhi1("aPhi1", "aPhi1", this, (RooAbsReal&)*(_accepParams.aPhi1)),
-  bPhi1("bPhi1", "bPhi1", this, (RooAbsReal&)*(_accepParams.bPhi1)),
-  cPhi1("cPhi1", "cPhi1", this, (RooAbsReal&)*(_accepParams.cPhi1)),
-  dPhi1("dPhi1", "dPhi1", this, (RooAbsReal&)*(_accepParams.dPhi1)),
-  ePhi1("ePhi1", "ePhi1", this, (RooAbsReal&)*(_accepParams.ePhi1)),
-  aH1("aH1", "aH1", this, (RooAbsReal&)*(_accepParams.aH1)),
-  bH1("bH1", "bH1", this, (RooAbsReal&)*(_accepParams.bH1)),
-  cH1("cH1", "cH1", this, (RooAbsReal&)*(_accepParams.cH1)),
-  dH1("dH1", "dH1", this, (RooAbsReal&)*(_accepParams.dH1)),
-  eH1("eH1", "eH1", this, (RooAbsReal&)*(_accepParams.eH1)),
-  aH2("aH2", "aH2", this, (RooAbsReal&)*(_accepParams.aH2)),
-  bH2("bH2", "bH2", this, (RooAbsReal&)*(_accepParams.bH2)),
-  cH2("cH2", "cH2", this, (RooAbsReal&)*(_accepParams.cH2)),
-  dH2("dH2", "dH2", this, (RooAbsReal&)*(_accepParams.dH2)),
-  eH2("eH2", "eH2", this, (RooAbsReal&)*(_accepParams.eH2)),
-  aHs("aHs", "aHs", this, (RooAbsReal&)*(_accepParams.aHs)),
-  bHs("bHs", "bHs", this, (RooAbsReal&)*(_accepParams.bHs)),
-  cHs("cHs", "cHs", this, (RooAbsReal&)*(_accepParams.cHs)),
-  dHs("dHs", "dHs", this, (RooAbsReal&)*(_accepParams.dHs)),
-  eHs("eHs", "eHs", this, (RooAbsReal&)*(_accepParams.eHs)),
-  aM1("aM1", "aM1", this, (RooAbsReal&)*(_accepParams.aM1)),
-  bM1("bM1", "bM1", this, (RooAbsReal&)*(_accepParams.bM1)),
-  cM1("cM1", "cM1", this, (RooAbsReal&)*(_accepParams.cM1)),
-  dM1("dM1", "dM1", this, (RooAbsReal&)*(_accepParams.dM1)),
-  aM2("aM2", "aM2", this, (RooAbsReal&)*(_accepParams.aM2)),
-  bM2("bM2", "bM2", this, (RooAbsReal&)*(_accepParams.bM2)),
-  cM2("cM2", "cM2", this, (RooAbsReal&)*(_accepParams.cM2)),
-  dM2("dM2", "dM2", this, (RooAbsReal&)*(_accepParams.dM2)),
-  ZZ4fOrdering(true)
+  _Vdecay1, _Vdecay2,
+  verbosity_
+),
+aPhi("aPhi", "aPhi", this, (RooAbsReal&)*(_accepParams.aPhi)),
+bPhi("bPhi", "bPhi", this, (RooAbsReal&)*(_accepParams.bPhi)),
+cPhi("cPhi", "cPhi", this, (RooAbsReal&)*(_accepParams.cPhi)),
+dPhi("dPhi", "dPhi", this, (RooAbsReal&)*(_accepParams.dPhi)),
+ePhi("ePhi", "ePhi", this, (RooAbsReal&)*(_accepParams.ePhi)),
+aPhi1("aPhi1", "aPhi1", this, (RooAbsReal&)*(_accepParams.aPhi1)),
+bPhi1("bPhi1", "bPhi1", this, (RooAbsReal&)*(_accepParams.bPhi1)),
+cPhi1("cPhi1", "cPhi1", this, (RooAbsReal&)*(_accepParams.cPhi1)),
+dPhi1("dPhi1", "dPhi1", this, (RooAbsReal&)*(_accepParams.dPhi1)),
+ePhi1("ePhi1", "ePhi1", this, (RooAbsReal&)*(_accepParams.ePhi1)),
+aH1("aH1", "aH1", this, (RooAbsReal&)*(_accepParams.aH1)),
+bH1("bH1", "bH1", this, (RooAbsReal&)*(_accepParams.bH1)),
+cH1("cH1", "cH1", this, (RooAbsReal&)*(_accepParams.cH1)),
+dH1("dH1", "dH1", this, (RooAbsReal&)*(_accepParams.dH1)),
+eH1("eH1", "eH1", this, (RooAbsReal&)*(_accepParams.eH1)),
+aH2("aH2", "aH2", this, (RooAbsReal&)*(_accepParams.aH2)),
+bH2("bH2", "bH2", this, (RooAbsReal&)*(_accepParams.bH2)),
+cH2("cH2", "cH2", this, (RooAbsReal&)*(_accepParams.cH2)),
+dH2("dH2", "dH2", this, (RooAbsReal&)*(_accepParams.dH2)),
+eH2("eH2", "eH2", this, (RooAbsReal&)*(_accepParams.eH2)),
+aHs("aHs", "aHs", this, (RooAbsReal&)*(_accepParams.aHs)),
+bHs("bHs", "bHs", this, (RooAbsReal&)*(_accepParams.bHs)),
+cHs("cHs", "cHs", this, (RooAbsReal&)*(_accepParams.cHs)),
+dHs("dHs", "dHs", this, (RooAbsReal&)*(_accepParams.dHs)),
+eHs("eHs", "eHs", this, (RooAbsReal&)*(_accepParams.eHs)),
+aM1("aM1", "aM1", this, (RooAbsReal&)*(_accepParams.aM1)),
+bM1("bM1", "bM1", this, (RooAbsReal&)*(_accepParams.bM1)),
+cM1("cM1", "cM1", this, (RooAbsReal&)*(_accepParams.cM1)),
+dM1("dM1", "dM1", this, (RooAbsReal&)*(_accepParams.dM1)),
+aM2("aM2", "aM2", this, (RooAbsReal&)*(_accepParams.aM2)),
+bM2("bM2", "bM2", this, (RooAbsReal&)*(_accepParams.bM2)),
+cM2("cM2", "cM2", this, (RooAbsReal&)*(_accepParams.cM2)),
+dM2("dM2", "dM2", this, (RooAbsReal&)*(_accepParams.dM2)),
+ZZ4fOrdering(true)
 {}
 
 
 RooSpinZero_7DComplex_withAccep_HVV::RooSpinZero_7DComplex_withAccep_HVV(
   const RooSpinZero_7DComplex_withAccep_HVV& other, const char* name
-  ) : RooSpinZero(other, name),
-  aPhi("aPhi", this, other.aPhi),
-  bPhi("bPhi", this, other.bPhi),
-  cPhi("cPhi", this, other.cPhi),
-  dPhi("dPhi", this, other.dPhi),
-  ePhi("ePhi", this, other.ePhi),
-  aPhi1("aPhi1", this, other.aPhi1),
-  bPhi1("bPhi1", this, other.bPhi1),
-  cPhi1("cPhi1", this, other.cPhi1),
-  dPhi1("dPhi1", this, other.dPhi1),
-  ePhi1("ePhi1", this, other.ePhi1),
-  aH1("aH1", this, other.aH1),
-  bH1("bH1", this, other.bH1),
-  cH1("cH1", this, other.cH1),
-  dH1("dH1", this, other.dH1),
-  eH1("eH1", this, other.eH1),
-  aH2("aH2", this, other.aH2),
-  bH2("bH2", this, other.bH2),
-  cH2("cH2", this, other.cH2),
-  dH2("dH2", this, other.dH2),
-  eH2("eH2", this, other.eH2),
-  aHs("aHs", this, other.aHs),
-  bHs("bHs", this, other.bHs),
-  cHs("cHs", this, other.cHs),
-  dHs("dHs", this, other.dHs),
-  eHs("eHs", this, other.eHs),
-  aM1("aM1", this, other.aM1),
-  bM1("bM1", this, other.bM1),
-  cM1("cM1", this, other.cM1),
-  dM1("dM1", this, other.dM1),
-  aM2("aM2", this, other.aM2),
-  bM2("bM2", this, other.bM2),
-  cM2("cM2", this, other.cM2),
-  dM2("dM2", this, other.dM2),
-  ZZ4fOrdering(other.ZZ4fOrdering)
+) : RooSpinZero(other, name),
+aPhi("aPhi", this, other.aPhi),
+bPhi("bPhi", this, other.bPhi),
+cPhi("cPhi", this, other.cPhi),
+dPhi("dPhi", this, other.dPhi),
+ePhi("ePhi", this, other.ePhi),
+aPhi1("aPhi1", this, other.aPhi1),
+bPhi1("bPhi1", this, other.bPhi1),
+cPhi1("cPhi1", this, other.cPhi1),
+dPhi1("dPhi1", this, other.dPhi1),
+ePhi1("ePhi1", this, other.ePhi1),
+aH1("aH1", this, other.aH1),
+bH1("bH1", this, other.bH1),
+cH1("cH1", this, other.cH1),
+dH1("dH1", this, other.dH1),
+eH1("eH1", this, other.eH1),
+aH2("aH2", this, other.aH2),
+bH2("bH2", this, other.bH2),
+cH2("cH2", this, other.cH2),
+dH2("dH2", this, other.dH2),
+eH2("eH2", this, other.eH2),
+aHs("aHs", this, other.aHs),
+bHs("bHs", this, other.bHs),
+cHs("cHs", this, other.cHs),
+dHs("dHs", this, other.dHs),
+eHs("eHs", this, other.eHs),
+aM1("aM1", this, other.aM1),
+bM1("bM1", this, other.bM1),
+cM1("cM1", this, other.cM1),
+dM1("dM1", this, other.dM1),
+aM2("aM2", this, other.aM2),
+bM2("bM2", this, other.bM2),
+cM2("cM2", this, other.cM2),
+dM2("dM2", this, other.dM2),
+ZZ4fOrdering(other.ZZ4fOrdering)
 {}
 
 void RooSpinZero_7DComplex_withAccep_HVV::evaluatePolarizationTerms(
@@ -247,6 +254,16 @@ void RooSpinZero_7DComplex_withAccep_HVV::evaluatePolarizationTerms(
     if (A00mmterm!=0) A00mmterm *= common_fac;
     if (Appmmterm!=0) Appmmterm *= common_fac;
   }
+
+  if (verbosity>=TVar::DEBUG){
+    MELAout << "RooSpinZero_7DComplex_withAccep_HVV::evaluatePolarizationTerms( " << code << " , " << VGammaVpmode1 << " , " << VGammaVpmode2 << " ):" << endl;
+    MELAout << "\t- |A00|**2 = " << A00term << endl;
+    MELAout << "\t- |A++|**2 = " << Appterm << endl;
+    MELAout << "\t- |A--|**2 = " << Ammterm << endl;
+    MELAout << "\t- |A00||A++| = " << A00ppterm << endl;
+    MELAout << "\t- |A00||A--| = " << A00mmterm << endl;
+    MELAout << "\t- |A++||A--| = " << Appmmterm << endl;
+  }
 }
 
 Double_t RooSpinZero_7DComplex_withAccep_HVV::evaluate() const{
@@ -303,7 +320,7 @@ Double_t RooSpinZero_7DComplex_withAccep_HVV::evaluate() const{
     *(1+aM2*m2_+bM2*m2_*m2_+cM2*m2_*m2_*m2_+dM2*m2_*m2_*m2_*m2_);
 
   if (!(value==value)){
-    cout << "Evaluate NaN=" << value << " at "
+    MELAout << "Evaluate NaN=" << value << " at "
       << "h1=" << h1 << '\t'
       << "h2=" << h2 << '\t'
       << "hs=" << hs << '\t'
@@ -313,7 +330,7 @@ Double_t RooSpinZero_7DComplex_withAccep_HVV::evaluate() const{
       << "m2=" << m2 << '\t'
       << "m12=" << m12 << '\t'
       << endl;
-    cout << "Possible sources:\n"
+    MELAout << "Possible sources:\n"
       << "betaVal=" << betaVal << '\t'
       << "term1Coeff=" << term1Coeff << '\t'
       << "term2Coeff=" << term2Coeff
@@ -383,7 +400,7 @@ Double_t RooSpinZero_7DComplex_withAccep_HVV::analyticalIntegral(Int_t code, con
     *(1+aM2*m2_+bM2*m2_*m2_+cM2*m2_*m2_*m2_+dM2*m2_*m2_*m2_*m2_);
 
   if (!(value==value)){
-    cout << "Integral NaN=" << value << " at "
+    MELAout << "Integral NaN=" << value << " at "
       << "h1=" << h1 << '\t'
       << "h2=" << h2 << '\t'
       << "hs=" << hs << '\t'
@@ -393,7 +410,7 @@ Double_t RooSpinZero_7DComplex_withAccep_HVV::analyticalIntegral(Int_t code, con
       << "m2=" << m2 << '\t'
       << "m12=" << m12 << '\t'
       << endl;
-    cout << "Possible sources:\n"
+    MELAout << "Possible sources:\n"
       << "betaVal=" << betaVal << '\t'
       << "term1Coeff=" << term1Coeff << '\t'
       << "term2Coeff=" << term2Coeff
