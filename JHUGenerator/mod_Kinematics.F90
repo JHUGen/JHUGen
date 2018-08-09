@@ -17,7 +17,7 @@ end type
 integer,public :: it_sav
 type(Histogram),allocatable :: Histo(:)
 
-public :: massfrun
+!public :: massfrun
 
 contains
 
