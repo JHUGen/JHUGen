@@ -1,7 +1,7 @@
 !--YaofuZhou-----------------------------------------
 module ModHH
   use ModParameters
-  use ModKinematics
+!  use ModKinematics
   use ModMisc
   use ModVHaux
 #if useCollier==1
