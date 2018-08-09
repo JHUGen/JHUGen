@@ -420,7 +420,7 @@ end subroutine EvalAmp_VHiggs
              current2=0d0
              currentVp2 = 0d0
              print *, "invalid final state", id(6:7), helicity(6:7)
-             stop 1
+             stop
            endif
          endif
       else
@@ -483,7 +483,7 @@ end subroutine EvalAmp_VHiggs
          else
            current2=0d0
            print *, "invalid final state", id(6:7), helicity(6:7)
-           stop 1
+           stop
          endif
       endif
 

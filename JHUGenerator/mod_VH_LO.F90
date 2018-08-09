@@ -3,7 +3,7 @@ module ModVHLO
   use ModParameters
   use ModMisc
   use ModVHaux
-!  use ModKinematics
+  use ModKinematics
   implicit none
   
   public :: amp_VH_LO

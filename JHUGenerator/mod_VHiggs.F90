@@ -270,12 +270,9 @@ end subroutine EvalAmp_VHiggs
             else if((abs(id(1)).eq.1).or.(abs(id(1)).eq.3).or.(abs(id(1)).eq.5))then
               if((id(1)*helicity(1)).gt.0d0)then
                 current1=(0.5d0*T3dR - QdR*sitW**2) *Vcurrent1 -(0.5d0*T3dR)*Acurrent1
-!print*,current1,"R J1"
               else
                 current1=(0.5d0*T3dL - QdL*sitW**2) *Vcurrent1 -(0.5d0*T3dL)*Acurrent1
-!print*,current1,"L J1"
               endif
-!print*,current1,"J1"
               current1=current1*gFFZ
             else
               current1=0d0
@@ -387,13 +384,10 @@ end subroutine EvalAmp_VHiggs
            if((abs(id(6)).eq.11).or.(abs(id(6)).eq.13))then
              if((id(6)*helicity(6)).gt.0d0)then
                current2=(0.5d0*T3lR - QlR*sitW**2) *Vcurrent2 -(0.5d0*T3lR)*Acurrent2
-!print*,current2,"R J2"
              else
                current2=(0.5d0*T3lL - QlL*sitW**2) *Vcurrent2 -(0.5d0*T3lL)*Acurrent2
-!print*,current2,"L J2"
              endif
              current2=current2*gFFZ*dsqrt(scale_alpha_Z_ll)
-!print*,current2,"J2"
            !tau+ tau- Z vertex for final state
            else if((abs(id(6)).eq.15))then
              if((id(6)*helicity(6)).gt.0d0)then

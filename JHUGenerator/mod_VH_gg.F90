@@ -1,9 +1,10 @@
 !--YaofuZhou-----------------------------------------
 module ModVHgg
   use ModParameters
-!  use ModKinematics
+  use ModKinematics
   use ModMisc
   use ModVHaux
+#if useCollier==1
   use ModffbHBox7_8mmm
   use ModffbHBox7_8ppm
   use ModffbHBox7_8mmp
@@ -55,6 +56,7 @@ module ModVHgg
   use ModffbH5Box11_12pmp
 
   use Collier
+#endif
   implicit none
   
   public :: amp_VH_gg
@@ -83,6 +85,7 @@ subroutine amp_VH_gg(Mom,mass,helicity,id,amp)
   real(8) :: sprod(4,4)
   complex(8) :: Spaa(4,4), Spbb(4,4)
 
+#if useCollier==1
 ! SM couplings for fermion currents
   gFFZ = ci*dsqrt(couplZffsq) ! = i * sqrt[ gwsq/4d0/(1.0_dp-xw) ]
   gZAFF = ci*couplAZff ! = (loop > Z) * (A > ff) (minus from A > ff included)
@@ -227,6 +230,13 @@ subroutine amp_VH_gg(Mom,mass,helicity,id,amp)
 
 
   return
+#else
+print *, "Need to link COLLIER for this process."
+print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+print *, "specified in the makefile."
+stop 1
+#endif
 END subroutine amp_VH_gg
 
 ! gg > ZH
@@ -238,6 +248,7 @@ subroutine ggTriffbHa1(Spaa,Spbb,sprod,helicity,Tri)
   complex(8) C0, qli3
   complex(8) Tri
 
+#if useCollier==1
   Tri=0d0
 
   if(helicity(1)*helicity(2).lt.0d0)then
@@ -266,6 +277,13 @@ subroutine ggTriffbHa1(Spaa,Spbb,sprod,helicity,Tri)
   Tri = ci * 8d0 * Tri * C0 * m_top**2 ! i = -1 (fermion loop) i^3 (3 fermion propagators)
 
   return
+#else
+print *, "Need to link COLLIER for this process."
+print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+print *, "specified in the makefile."
+stop 1
+#endif
 END subroutine ggTriffbHa1
 
 subroutine ggTriffbHa2(Spaa,Spbb,sprod,helicity,Tri)
@@ -276,6 +294,7 @@ subroutine ggTriffbHa2(Spaa,Spbb,sprod,helicity,Tri)
   complex(8) C0, qli3
   complex(8) Tri
 
+#if useCollier==1
   Tri=0d0
 
   if(helicity(1)*helicity(2).lt.0d0)then
@@ -318,6 +337,13 @@ subroutine ggTriffbHa2(Spaa,Spbb,sprod,helicity,Tri)
   Tri = ci * 4d0 * Tri * C0 * m_top**2! i = -1 (fermion loop) i^3 (3 fermion propagators)
 
   return
+#else
+print *, "Need to link COLLIER for this process."
+print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+print *, "specified in the makefile."
+stop 1
+#endif
 END subroutine ggTriffbHa2
 
 subroutine ggTriAHa1(Spaa,Spbb,sprod,helicity,Tri)
@@ -328,6 +354,7 @@ subroutine ggTriAHa1(Spaa,Spbb,sprod,helicity,Tri)
   complex(8) C0, qli3
   complex(8) Tri
 
+#if useCollier==1
   Tri=0d0
 
   if(helicity(1)*helicity(2).lt.0d0)then
@@ -353,6 +380,13 @@ subroutine ggTriAHa1(Spaa,Spbb,sprod,helicity,Tri)
   Tri = 0d0
 
   return
+#else
+print *, "Need to link COLLIER for this process."
+print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+print *, "specified in the makefile."
+stop 1
+#endif
 END subroutine ggTriAHa1
 
 subroutine ggTriAHa2(Spaa,Spbb,sprod,helicity,Tri)
@@ -363,6 +397,7 @@ subroutine ggTriAHa2(Spaa,Spbb,sprod,helicity,Tri)
   complex(8) C0, qli3
   complex(8) Tri
 
+#if useCollier==1
   Tri=0d0
 
   if(helicity(1)*helicity(2).lt.0d0)then
@@ -388,6 +423,13 @@ subroutine ggTriAHa2(Spaa,Spbb,sprod,helicity,Tri)
   Tri = 0d0
 
   return
+#else
+print *, "Need to link COLLIER for this process."
+print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+print *, "specified in the makefile."
+stop 1
+#endif
 END subroutine ggTriAHa2
 
 subroutine ggBoxffbH(Mom,Spaa,Spbb,sprod,helicity,Box)
@@ -398,6 +440,7 @@ subroutine ggBoxffbH(Mom,Spaa,Spbb,sprod,helicity,Box)
   real(8), intent(in) :: helicity(9)
   complex(8) Box, Box7_8, Box9_10, Box11_12
 
+#if useCollier==1
   Box = 0d0
 
   if(helicity(1).gt.0d0.and.helicity(2).lt.0d0)then
@@ -447,6 +490,13 @@ subroutine ggBoxffbH(Mom,Spaa,Spbb,sprod,helicity,Box)
   Box = -Box!reason not identified but it makes the box-triangle interference correct...
 
   return
+#else
+print *, "Need to link COLLIER for this process."
+print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+print *, "specified in the makefile."
+stop 1
+#endif
   END subroutine ggBoxffbH
 
 
@@ -459,6 +509,7 @@ subroutine ggBoxffbH5(Mom,Spaa,Spbb,sprod,helicity,Box)
   real(8), intent(in) :: helicity(9)
   complex(8) Box, Box7_8, Box9_10, Box11_12
 
+#if useCollier==1
   Box = 0d0
 
   if(helicity(1).gt.0d0.and.helicity(2).lt.0d0)then
@@ -508,6 +559,13 @@ subroutine ggBoxffbH5(Mom,Spaa,Spbb,sprod,helicity,Box)
   Box = -Box!reason not identified but it makes the box-triangle interference correct...
 
   return
+#else
+print *, "Need to link COLLIER for this process."
+print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+print *, "specified in the makefile."
+stop 1
+#endif
   END subroutine ggBoxffbH5
 
 

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 #Inputs are down at the bottom.  No need to change anything above that unless there's a bug
 
 import argparse
@@ -14,12 +15,14 @@ WebGeneratordir = os.path.join(Webdir, "Generator")
 if not os.path.isdir(WebGeneratordir):
      raise OSerror("You should run this from the Web directory")
 
-def uploadwebpage(dryrun=False):
+def uploadwebpage(dryrun=False, no_mcfm=False):
     if dryrun:
         JHED = password = ""
     else:
         JHED = raw_input("Enter your JHED ID: ")
         password = getpass("Enter your JHED password: ")
+    if no_mcfm:
+        dontupload.append("MCFM-precompiled")
     with cd("Generator"):
         create_Download(*versions)
     repmap = {
@@ -88,7 +91,7 @@ def getuploadfiles(dir):
     return result
 
 class Version(object):
-    def __init__(self, version, gitcommit=None, tarballname=None, manualname=None, manualcommit=None, melacommit=None):
+    def __init__(self, version, gitcommit=None, tarballname=None, manualname=None, manualcommit=None, melacommit=None, visible=True):
         self.version = version
         if gitcommit is None: gitcommit = version
         if tarballname is None: tarballname = "JHUGenerator.{}.tar.gz".format(self.version)
@@ -99,6 +102,7 @@ class Version(object):
         self.manualname = manualname
         self.manualcommit = manualcommit
         self.melacommit = melacommit
+        self.visible = visible
 
     def getlink(self):
         return link_template.format(tarballname=self.tarballname)
@@ -140,6 +144,8 @@ class Version(object):
             check_call(["mv", self.tarballname, WebGeneratordir])
 
 def create_Download(mostrecentversion, *olderversions):
+    if not mostrecentversion.visible:
+        raise ValueError("The most recent version has to be visible")
     if not os.path.exists(os.path.join(Webdir, "Manual.pdf")):
         mostrecentversion.createtarball(force=True)
         check_call(["cp", os.path.join(gitdir, mostrecentversion.manualname), os.path.join(Webdir, "Manual.pdf")])
@@ -147,16 +153,18 @@ def create_Download(mostrecentversion, *olderversions):
         version.createtarball()
     Download = Download_template.format(
                                         latest = mostrecentversion.getlink(),
-                                        older = "\n    ".join(v.getlink() for v in [mostrecentversion] + list(olderversions)),
+                                        older = "\n    ".join(v.getlink() for v in [mostrecentversion] + list(olderversions) if v.visible),
                                         reallyold = "\n    ".join(v.getlink() for v in reallyold),
                                        )
     with open(os.path.join(WebGeneratordir, "Download.html"), "w") as f:
         f.write(Download)
 
     #download MCFM libraries
-    libmcfmfilename = os.path.join(WebGeneratordir, "libmcfm_7p0.so")
-    if not os.path.exists(libmcfmfilename):
-        check_call(["wget", "-O", libmcfmfilename, "https://github.com/JHUGen/JHUGen-backup/raw/081536e660a6712d73721eb2f7dfaded1333525f/JHUGenMELA/ggZZ_MCFM/libmcfm_7p0.so"])
+    if not os.path.exists("MCFM-precompiled"):
+        check_call(["git", "clone", "git@github.com:JHUGen/MCFM-precompiled"])
+    with cd("MCFM-precompiled"):
+        check_call(["git", "fetch"])
+        check_call(["git", "checkout", MCFMprecompiledcommit])
 
 @contextmanager
 def cd(newdir):
@@ -183,7 +191,7 @@ Download_template = """
     Download:<br>
     Latest version: {latest}
     <br>
-    Compiled MCFM libraries to interface with MELA that work for a good variety of software releases: <a href="libmcfm_7p0.so">libmcfm_7p0.so</a><br>
+    Compiled MCFM libraries to interface with MELA that work for a good variety of software releases: <a href="MCFM-precompiled/slc5_amd64_gcc462/libmcfm_7p0.so">libmcfm_7p0.so</a><br>
     (See JHUGenMELA/ggZZ_MCFM/README for further information)
     <br>
     <br>
@@ -214,6 +222,11 @@ Download_template = """
 #   - melacommit, name of the commit to checkout for the JHUGenMELA folder.  Default is the same
 #       as the generator
 versions = (
+            Version("v7.1.4", manualcommit="e58a25479c1a16b73b657a0a6f660a27be9cd130"),
+            Version("v7.1.2"),
+            Version("v7.1.0", visible=False),
+            Version("v7.0.11", visible=False),
+            Version("v7.0.9", manualcommit="c14848e401c115e9e3f201bf7388cc750e4b09f3", melacommit="ebdb109745949008e16851674bb832c59ecc43a3", visible=False),
             Version("v7.0.2", melacommit="v6.9.8"),
             Version("v7.0.0", gitcommit="v7.0.0.beta1", manualcommit="18221e3", melacommit="v6.9.8"),
             Version("v6.9.8", manualcommit="971ad57"),
@@ -250,12 +263,15 @@ storefolders = ["JHUGenerator", "JHUGenMELA", "AnalyticMELA", "graviton", "gravi
 dontupload = [
               "uploadwebpage.py",
               ".gitignore",
+              ".git",
              ]
+MCFMprecompiledcommit = "5c2d6b85a4ec0a5c7fb58caf6116b7b084266b84"
 #end of inputs
 ########################################################################################
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-n", "--dry-run", help="create all the tarballs but don't actually upload", action="store_true", dest="dryrun")
+    parser.add_argument("--no-mcfm", help="don't re-upload MCFM libraries", action="store_true")
     args = parser.parse_args()
-    uploadwebpage(dryrun=args.dryrun)
+    uploadwebpage(dryrun=args.dryrun, no_mcfm=args.no_mcfm)

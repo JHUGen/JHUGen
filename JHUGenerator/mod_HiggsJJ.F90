@@ -7,7 +7,6 @@ module modHiggsJJ
   public :: EvalAmp_WBFH_UnSymm_SA,EvalAmp_WBFH_UnSymm_SA_Select,EvalAmp_WBFH_UnSymm_SA_Select_exact
   public :: EvalAmp_SBFH_UnSymm_SA,EvalAmp_SBFH_UnSymm_SA_Select,EvalAmp_SBFH_UnSymm_SA_Select_exact
   !public :: wrapHVV
-  public :: get_VBFchannelHash,get_VBFchannelHash_nosplit,get_HJJchannelHash,get_HJJchannelHash_nosplit,get_GENchannelHash
 
   !-- general definitions, to be merged with Markus final structure
    real(dp), public, parameter :: tag1 = 1.0_dp
@@ -16,514 +15,6 @@ module modHiggsJJ
 
 
  CONTAINS
-
-
-
-
-  subroutine get_VBFchannelHash(ijSel)
-  implicit none
-  integer, intent(out) :: ijSel(1:121,1:3)
-  integer,parameter :: zz=1, ww=0
-
-
-      ijSel(  1,1:3) = (/ 2, 1, zz/)
-      ijSel(  2,1:3) = (/ 2, 1, ww/)
-      ijSel(  3,1:3) = (/ 2,-2, zz/)
-      ijSel(  4,1:3) = (/ 2,-2, ww/)
-      ijSel(  5,1:3) = (/ 3, 2, zz/)
-      ijSel(  6,1:3) = (/ 3, 2, ww/)
-      ijSel(  7,1:3) = (/ 1,-1, zz/)
-      ijSel(  8,1:3) = (/ 1,-1, ww/)
-      ijSel(  9,1:3) = (/ 2,-4, zz/)
-      ijSel( 10,1:3) = (/ 2,-4, ww/)
-      ijSel( 11,1:3) = (/ 1,-3, zz/)
-      ijSel( 12,1:3) = (/ 1,-3, ww/)
-      ijSel( 13,1:3) = (/ 4, 1, zz/)
-      ijSel( 14,1:3) = (/ 4, 1, ww/)
-      ijSel( 15,1:3) = (/ 2, 2, zz/)
-      ijSel( 16,1:3) = (/-1,-2, zz/)
-      ijSel( 17,1:3) = (/-1,-2, ww/)
-      ijSel( 18,1:3) = (/ 2,-1, zz/)
-      ijSel( 19,1:3) = (/ 1, 1, zz/)
-      ijSel( 20,1:3) = (/ 3,-1, zz/)
-      ijSel( 21,1:3) = (/ 3,-1, ww/)
-      ijSel( 22,1:3) = (/ 2,-3, zz/)
-      ijSel( 23,1:3) = (/-2,-3, zz/)
-      ijSel( 24,1:3) = (/-2,-3, ww/)
-      ijSel( 25,1:3) = (/-1,-4, zz/)
-      ijSel( 26,1:3) = (/-1,-4, ww/)
-      ijSel( 27,1:3) = (/ 3,-3, zz/)
-      ijSel( 28,1:3) = (/ 3,-3, ww/)
-      ijSel( 29,1:3) = (/ 1,-2, zz/)
-      ijSel( 30,1:3) = (/ 3, 1, zz/)
-      ijSel( 31,1:3) = (/ 4,-2, zz/)
-      ijSel( 32,1:3) = (/ 4,-2, ww/)
-      ijSel( 33,1:3) = (/ 4, 2, zz/)
-      ijSel( 34,1:3) = (/ 5, 2, zz/)
-      ijSel( 35,1:3) = (/ 2,-5, zz/)
-      ijSel( 36,1:3) = (/-3,-4, zz/)
-      ijSel( 37,1:3) = (/-3,-4, ww/)
-      ijSel( 38,1:3) = (/ 4, 3, zz/)
-      ijSel( 39,1:3) = (/ 4, 3, ww/)
-      ijSel( 40,1:3) = (/ 1,-4, zz/)
-      ijSel( 41,1:3) = (/ 5, 1, zz/)
-      ijSel( 42,1:3) = (/ 1,-5, zz/)
-      ijSel( 43,1:3) = (/ 4,-4, zz/)
-      ijSel( 44,1:3) = (/ 4,-4, ww/)
-      ijSel( 45,1:3) = (/-1,-3, zz/)
-      ijSel( 46,1:3) = (/-1,-1, zz/)
-      ijSel( 47,1:3) = (/ 3,-2, zz/)
-      ijSel( 48,1:3) = (/ 4,-1, zz/)
-      ijSel( 49,1:3) = (/-1,-5, zz/)
-      ijSel( 50,1:3) = (/ 5,-1, zz/)
-      ijSel( 51,1:3) = (/-2,-2, zz/)
-      ijSel( 52,1:3) = (/-2,-4, zz/)
-      ijSel( 53,1:3) = (/ 3, 3, zz/)
-      ijSel( 54,1:3) = (/-3,-3, zz/)
-      ijSel( 55,1:3) = (/ 3,-4, zz/)
-      ijSel( 56,1:3) = (/ 4,-3, zz/)
-      ijSel( 57,1:3) = (/ 5,-2, zz/)
-      ijSel( 58,1:3) = (/-2,-5, zz/)
-      ijSel( 59,1:3) = (/ 5, 3, zz/)
-      ijSel( 60,1:3) = (/ 3,-5, zz/)
-      ijSel( 61,1:3) = (/-3,-5, zz/)
-      ijSel( 62,1:3) = (/ 5,-3, zz/)
-      ijSel( 63,1:3) = (/-4,-5, zz/)
-      ijSel( 64,1:3) = (/ 5, 4, zz/)
-      ijSel( 65,1:3) = (/ 4,-5, zz/)
-      ijSel( 66,1:3) = (/ 5,-4, zz/)
-      ijSel( 67,1:3) = (/ 5,-5, zz/)
-      ijSel( 68,1:3) = (/ 4, 4, zz/)
-      ijSel( 69,1:3) = (/-4,-4, zz/)
-      ijSel( 70,1:3) = (/-5,-5, zz/)
-      ijSel( 71,1:3) = (/ 5, 5, zz/)
-
-      ijSel( 72:,:)  = 0
-      ijSel( 72:,3)  = -1
-
-
-  return
-  end subroutine
-
-
- subroutine get_VBFchannelHash_nosplit(ijSel,nijchannels)
-  implicit none
-  integer, intent(out) :: ijSel(1:121,1:3)
-  integer, intent(out) :: nijchannels
-  integer,parameter :: zzww=2, zz=1, ww=0
-
-      ! u-d
-      ijSel(  1,1:3) = (/ pdfUp_,pdfDn_,zzww/)
-      ijSel(  2,1:3) = (/ pdfUp_,pdfStr_,zzww/)
-      ijSel(  3,1:3) = (/ pdfUp_,pdfBot_,zzww/)
-      ijSel(  4,1:3) = (/ pdfChm_,pdfDn_,zzww/)
-      ijSel(  5,1:3) = (/ pdfChm_,pdfStr_,zzww/)
-      ijSel(  6,1:3) = (/ pdfChm_,pdfBot_,zzww/)
-
-	  ! ub-db
-      ijSel(  7,1:3) = (/ pdfAUp_,pdfADn_,zzww/)
-      ijSel(  8,1:3) = (/ pdfAUp_,pdfAStr_,zzww/)
-      ijSel(  9,1:3) = (/ pdfAUp_,pdfABot_,zzww/)
-      ijSel( 10,1:3) = (/ pdfAChm_,pdfADn_,zzww/)
-      ijSel( 11,1:3) = (/ pdfAChm_,pdfAStr_,zzww/)
-      ijSel( 12,1:3) = (/ pdfAChm_,pdfABot_,zzww/)
-
-      ! u-ub
-      ijSel( 13,1:3) = (/ pdfUp_,pdfAUp_,ww/)
-      ijSel( 14,1:3) = (/ pdfUp_,pdfAUp_,zz/)
-      ijSel( 15,1:3) = (/ pdfUp_,pdfAChm_,ww/)
-      ijSel( 16,1:3) = (/ pdfUp_,pdfAChm_,zz/)
-      ijSel( 17,1:3) = (/ pdfChm_,pdfAUp_,ww/)
-      ijSel( 18,1:3) = (/ pdfChm_,pdfAUp_,zz/)
-      ijSel( 19,1:3) = (/ pdfChm_,pdfAChm_,ww/)
-      ijSel( 20,1:3) = (/ pdfChm_,pdfAChm_,zz/)
-
-      ! d-db
-      ijSel( 21,1:3) = (/ pdfDn_,pdfADn_,ww/)
-      ijSel( 22,1:3) = (/ pdfDn_,pdfADn_,zz/)
-      ijSel( 23,1:3) = (/ pdfDn_,pdfAStr_,ww/)
-      ijSel( 24,1:3) = (/ pdfDn_,pdfAStr_,zz/)
-      ijSel( 25,1:3) = (/ pdfDn_,pdfABot_,ww/)
-      ijSel( 26,1:3) = (/ pdfDn_,pdfABot_,zz/)
-      ijSel( 27,1:3) = (/ pdfStr_,pdfADn_,ww/)
-      ijSel( 28,1:3) = (/ pdfStr_,pdfADn_,zz/)
-      ijSel( 29,1:3) = (/ pdfStr_,pdfAStr_,ww/)
-      ijSel( 30,1:3) = (/ pdfStr_,pdfAStr_,zz/)
-      ijSel( 31,1:3) = (/ pdfStr_,pdfABot_,ww/)
-      ijSel( 32,1:3) = (/ pdfStr_,pdfABot_,zz/)
-
-      ! b-db
-	  ! Some of these will be inefficient
-      ijSel( 33,1:3) = (/ pdfBot_,pdfADn_,ww/)
-      ijSel( 34,1:3) = (/ pdfBot_,pdfADn_,zz/)
-      ijSel( 35,1:3) = (/ pdfBot_,pdfAStr_,ww/)
-      ijSel( 36,1:3) = (/ pdfBot_,pdfAStr_,zz/)
-      ijSel( 37,1:3) = (/ pdfBot_,pdfABot_,ww/)
-      ijSel( 38,1:3) = (/ pdfBot_,pdfABot_,zz/)
-
-      ! u-u
-      ijSel( 39,1:3) = (/ pdfUp_,pdfUp_,zz/)
-      ijSel( 40,1:3) = (/ pdfUp_,pdfChm_,zz/)
-      ijSel( 41,1:3) = (/ pdfChm_,pdfChm_,zz/)
-
-      ! d-d
-      ijSel( 42,1:3) = (/ pdfDn_,pdfDn_,zz/)
-      ijSel( 43,1:3) = (/ pdfDn_,pdfStr_,zz/)
-      ijSel( 44,1:3) = (/ pdfDn_,pdfBot_,zz/)
-      ijSel( 45,1:3) = (/ pdfStr_,pdfStr_,zz/)
-      ijSel( 46,1:3) = (/ pdfStr_,pdfBot_,zz/)
-      ijSel( 47,1:3) = (/ pdfBot_,pdfBot_,zz/)
-
-      ! u-db
-	   ijSel( 48,1:3) = (/ pdfUp_,pdfADn_,zz/)
-      ijSel( 49,1:3) = (/ pdfUp_,pdfAStr_,zz/)
-      ijSel( 50,1:3) = (/ pdfUp_,pdfABot_,zz/)
-      ijSel( 51,1:3) = (/ pdfChm_,pdfADn_,zz/)
-      ijSel( 52,1:3) = (/ pdfChm_,pdfAStr_,zz/)
-      ijSel( 53,1:3) = (/ pdfChm_,pdfABot_,zz/)
-
-      ! d-ub
-      ijSel( 54,1:3) = (/ pdfDn_,pdfAUp_,zz/)
-      ijSel( 55,1:3) = (/ pdfDn_,pdfAChm_,zz/)
-      ijSel( 56,1:3) = (/ pdfStr_,pdfAUp_,zz/)
-      ijSel( 57,1:3) = (/ pdfStr_,pdfAChm_,zz/)
-      ijSel( 58,1:3) = (/ pdfBot_,pdfAUp_,zz/)
-      ijSel( 59,1:3) = (/ pdfBot_,pdfAChm_,zz/)
-
-	  ! ub-ub
-      ijSel( 60,1:3) = (/ pdfAUp_,pdfAUp_,zz/)
-      ijSel( 61,1:3) = (/ pdfAUp_,pdfAChm_,zz/)
-      ijSel( 62,1:3) = (/ pdfAChm_,pdfAChm_,zz/)
-
-      ! db-db
-      ijSel( 63,1:3) = (/ pdfADn_,pdfADn_,zz/)
-      ijSel( 64,1:3) = (/ pdfADn_,pdfAStr_,zz/)
-      ijSel( 65,1:3) = (/ pdfADn_,pdfABot_,zz/)
-
-      ijSel( 66,1:3) = (/ pdfAStr_,pdfAStr_,zz/)
-      ijSel( 67,1:3) = (/ pdfAStr_,pdfABot_,zz/)
-      ijSel( 68,1:3) = (/ pdfABot_,pdfABot_,zz/)
-
-      nijchannels = 68
-
-      ijSel( nijchannels+1:,:)  = 0
-      ijSel( nijchannels+1:,3)  = -1
-
-  return
-  end subroutine
-
-
-
-  subroutine get_HJJchannelHash(ijSel)
-  implicit none
-  integer, intent(out) :: ijSel(1:121,1:3)
-
-      ijSel(  1,1:3) = (/ 0, 0, 1/)
-      ijSel(  2,1:3) = (/ 0, 0, 2/)
-      ijSel(  3,1:3) = (/ 2, 0, 1/)
-      ijSel(  4,1:3) = (/ 1, 0, 1/)
-      ijSel(  5,1:3) = (/ 0,-1, 1/)
-      ijSel(  6,1:3) = (/ 0,-2, 1/)
-      ijSel(  7,1:3) = (/ 3, 0, 1/)
-      ijSel(  8,1:3) = (/ 0,-3, 1/)
-      ijSel(  9,1:3) = (/ 4, 0, 1/)
-      ijSel( 10,1:3) = (/ 0,-4, 1/)
-      ijSel( 11,1:3) = (/ 5, 0, 1/)
-      ijSel( 12,1:3) = (/ 0,-5, 1/)
-      ijSel( 13,1:3) = (/ 2, 2, 1/)
-      ijSel( 14,1:3) = (/ 2, 1, 1/)
-      ijSel( 15,1:3) = (/ 2,-2, 1/)
-      ijSel( 16,1:3) = (/ 2,-2, 2/)
-      ijSel( 17,1:3) = (/ 2,-2, 3/)
-      ijSel( 18,1:3) = (/ 1,-1, 1/)
-      ijSel( 19,1:3) = (/ 1,-1, 2/)
-      ijSel( 20,1:3) = (/ 1,-1, 3/)
-      ijSel( 21,1:3) = (/ 2,-1, 1/)
-      ijSel( 22,1:3) = (/ 1, 1, 1/)
-      ijSel( 23,1:3) = (/ 3, 2, 1/)
-      ijSel( 24,1:3) = (/ 2,-3, 1/)
-      ijSel( 25,1:3) = (/ 4, 2, 1/)
-      ijSel( 26,1:3) = (/ 1,-2, 1/)
-      ijSel( 27,1:3) = (/ 2,-4, 1/)
-      ijSel( 28,1:3) = (/ 1,-3, 1/)
-      ijSel( 29,1:3) = (/ 2,-5, 1/)
-      ijSel( 30,1:3) = (/ 3, 1, 1/)
-      ijSel( 31,1:3) = (/ 5, 2, 1/)
-      ijSel( 32,1:3) = (/ 4, 1, 1/)
-      ijSel( 33,1:3) = (/ 1,-4, 1/)
-      ijSel( 34,1:3) = (/ 5, 1, 1/)
-      ijSel( 35,1:3) = (/ 1,-5, 1/)
-      ijSel( 36,1:3) = (/-1,-2, 1/)
-      ijSel( 37,1:3) = (/ 3,-1, 1/)
-      ijSel( 38,1:3) = (/ 3,-3, 1/)
-      ijSel( 39,1:3) = (/ 3,-3, 2/)
-      ijSel( 40,1:3) = (/ 3,-3, 3/)
-      ijSel( 41,1:3) = (/-2,-3, 1/)
-      ijSel( 42,1:3) = (/-1,-3, 1/)
-      ijSel( 43,1:3) = (/ 3,-2, 1/)
-      ijSel( 44,1:3) = (/-1,-1, 1/)
-      ijSel( 45,1:3) = (/ 4,-1, 1/)
-      ijSel( 46,1:3) = (/-2,-2, 1/)
-      ijSel( 47,1:3) = (/-1,-4, 1/)
-      ijSel( 48,1:3) = (/ 4,-2, 1/)
-      ijSel( 49,1:3) = (/-2,-4, 1/)
-      ijSel( 50,1:3) = (/ 5,-1, 1/)
-      ijSel( 51,1:3) = (/-1,-5, 1/)
-      ijSel( 52,1:3) = (/ 4,-4, 1/)
-      ijSel( 53,1:3) = (/ 4,-4, 2/)
-      ijSel( 54,1:3) = (/ 4,-4, 3/)
-      ijSel( 55,1:3) = (/ 4,-3, 1/)
-      ijSel( 56,1:3) = (/ 4, 3, 1/)
-      ijSel( 57,1:3) = (/ 3,-4, 1/)
-      ijSel( 58,1:3) = (/-2,-5, 1/)
-      ijSel( 59,1:3) = (/-3,-4, 1/)
-      ijSel( 60,1:3) = (/ 5,-2, 1/)
-      ijSel( 61,1:3) = (/ 3, 3, 1/)
-      ijSel( 62,1:3) = (/-3,-3, 1/)
-      ijSel( 63,1:3) = (/ 5, 3, 1/)
-      ijSel( 64,1:3) = (/ 3,-5, 1/)
-      ijSel( 65,1:3) = (/ 5,-3, 1/)
-      ijSel( 66,1:3) = (/-3,-5, 1/)
-      ijSel( 67,1:3) = (/ 5, 4, 1/)
-      ijSel( 68,1:3) = (/ 5,-4, 1/)
-      ijSel( 69,1:3) = (/-4,-5, 1/)
-      ijSel( 70,1:3) = (/ 4,-5, 1/)
-      ijSel( 71,1:3) = (/ 5,-5, 1/)
-      ijSel( 72,1:3) = (/ 5,-5, 2/)
-      ijSel( 73,1:3) = (/ 5,-5, 3/)
-      ijSel( 74,1:3) = (/-4,-4, 1/)
-      ijSel( 75,1:3) = (/ 4, 4, 1/)
-      ijSel( 76,1:3) = (/-5,-5, 1/)
-      ijSel( 77,1:3) = (/ 5, 5, 1/)
-
-      ijSel( 78:,:) = 0
-      ijSel( 78:,3) = -1
-
-  return
-  end subroutine
-
-
-  subroutine get_HJJchannelHash_nosplit(ijSel,nijchannels)
-  implicit none
-  integer, intent(out) :: ijSel(1:121,1:3)
-  integer, intent(out) :: nijchannels
-
-      ijSel(  1,1:3) = (/ 0, 0, 1/)
-      ijSel(  2,1:3) = (/ 0, 0, 2/)
-      ijSel(  3,1:3) = (/ 2, 0, 1/)
-      ijSel(  4,1:3) = (/ 1, 0, 1/)
-      ijSel(  5,1:3) = (/ 0,-1, 1/)
-      ijSel(  6,1:3) = (/ 0,-2, 1/)
-      ijSel(  7,1:3) = (/ 3, 0, 1/)
-      ijSel(  8,1:3) = (/ 0,-3, 1/)
-      ijSel(  9,1:3) = (/ 4, 0, 1/)
-      ijSel( 10,1:3) = (/ 0,-4, 1/)
-      ijSel( 11,1:3) = (/ 5, 0, 1/)
-      ijSel( 12,1:3) = (/ 0,-5, 1/)
-      ijSel( 13,1:3) = (/ 2, 2, 1/)
-      ijSel( 14,1:3) = (/ 2, 1, 1/)
-      ijSel( 15,1:3) = (/ 2,-2, 1/)
-      ijSel( 16,1:3) = (/ 2,-2, 2/)
-      ijSel( 17,1:3) = (/ 2,-2, 3/)
-      ijSel( 18,1:3) = (/ 1,-1, 1/)
-      ijSel( 19,1:3) = (/ 1,-1, 2/)
-      ijSel( 20,1:3) = (/ 1,-1, 3/)
-      ijSel( 21,1:3) = (/ 2,-1, 1/)
-      ijSel( 22,1:3) = (/ 1, 1, 1/)
-      ijSel( 23,1:3) = (/ 3, 2, 1/)
-      ijSel( 24,1:3) = (/ 2,-3, 1/)
-      ijSel( 25,1:3) = (/ 4, 2, 1/)
-      ijSel( 26,1:3) = (/ 1,-2, 1/)
-      ijSel( 27,1:3) = (/ 2,-4, 1/)
-      ijSel( 28,1:3) = (/ 1,-3, 1/)
-      ijSel( 29,1:3) = (/ 2,-5, 1/)
-      ijSel( 30,1:3) = (/ 3, 1, 1/)
-      ijSel( 31,1:3) = (/ 5, 2, 1/)
-      ijSel( 32,1:3) = (/ 4, 1, 1/)
-      ijSel( 33,1:3) = (/ 1,-4, 1/)
-      ijSel( 34,1:3) = (/ 5, 1, 1/)
-      ijSel( 35,1:3) = (/ 1,-5, 1/)
-      ijSel( 36,1:3) = (/-1,-2, 1/)
-      ijSel( 37,1:3) = (/ 3,-1, 1/)
-      ijSel( 38,1:3) = (/ 3,-3, 1/)
-      ijSel( 39,1:3) = (/ 3,-3, 2/)
-      ijSel( 40,1:3) = (/ 3,-3, 3/)
-      ijSel( 41,1:3) = (/-2,-3, 1/)
-      ijSel( 42,1:3) = (/-1,-3, 1/)
-      ijSel( 43,1:3) = (/ 3,-2, 1/)
-      ijSel( 44,1:3) = (/-1,-1, 1/)
-      ijSel( 45,1:3) = (/ 4,-1, 1/)
-      ijSel( 46,1:3) = (/-2,-2, 1/)
-      ijSel( 47,1:3) = (/-1,-4, 1/)
-      ijSel( 48,1:3) = (/ 4,-2, 1/)
-      ijSel( 49,1:3) = (/-2,-4, 1/)
-      ijSel( 50,1:3) = (/ 5,-1, 1/)
-      ijSel( 51,1:3) = (/-1,-5, 1/)
-      ijSel( 52,1:3) = (/ 4,-4, 1/)
-      ijSel( 53,1:3) = (/ 4,-4, 2/)
-      ijSel( 54,1:3) = (/ 4,-4, 3/)
-      ijSel( 55,1:3) = (/ 4,-3, 1/)
-      ijSel( 56,1:3) = (/ 4, 3, 1/)
-      ijSel( 57,1:3) = (/ 3,-4, 1/)
-      ijSel( 58,1:3) = (/-2,-5, 1/)
-      ijSel( 59,1:3) = (/-3,-4, 1/)
-      ijSel( 60,1:3) = (/ 5,-2, 1/)
-      ijSel( 61,1:3) = (/ 3, 3, 1/)
-      ijSel( 62,1:3) = (/-3,-3, 1/)
-      ijSel( 63,1:3) = (/ 5, 3, 1/)
-      ijSel( 64,1:3) = (/ 3,-5, 1/)
-      ijSel( 65,1:3) = (/ 5,-3, 1/)
-      ijSel( 66,1:3) = (/-3,-5, 1/)
-      ijSel( 67,1:3) = (/ 5, 4, 1/)
-      ijSel( 68,1:3) = (/ 5,-4, 1/)
-      ijSel( 69,1:3) = (/-4,-5, 1/)
-      ijSel( 70,1:3) = (/ 4,-5, 1/)
-      ijSel( 71,1:3) = (/ 5,-5, 1/)
-      ijSel( 72,1:3) = (/ 5,-5, 2/)
-      ijSel( 73,1:3) = (/ 5,-5, 3/)
-      ijSel( 74,1:3) = (/-4,-4, 1/)
-      ijSel( 75,1:3) = (/ 4, 4, 1/)
-      ijSel( 76,1:3) = (/-5,-5, 1/)
-      ijSel( 77,1:3) = (/ 5, 5, 1/)
-
-      nijchannels=77
-
-      ijSel( nijchannels+1:,:) = 0
-      ijSel( nijchannels+1:,3) = -1
-
-  return
-  end subroutine
-
-
-  subroutine get_GENchannelHash(ijSel)
-  implicit none
-  integer, intent(out) :: ijSel(1:121,1:3)
-
-      ijSel(  1,1:3) = (/-5,-5, 1/)
-      ijSel(  2,1:3) = (/-5,-4, 1/)
-      ijSel(  3,1:3) = (/-5,-3, 1/)
-      ijSel(  4,1:3) = (/-5,-2, 1/)
-      ijSel(  5,1:3) = (/-5,-1, 1/)
-      ijSel(  6,1:3) = (/-5, 0, 1/)
-      ijSel(  7,1:3) = (/-5, 1, 1/)
-      ijSel(  8,1:3) = (/-5, 2, 1/)
-      ijSel(  9,1:3) = (/-5, 3, 1/)
-      ijSel( 10,1:3) = (/-5, 4, 1/)
-      ijSel( 11,1:3) = (/-5, 5, 1/)
-      ijSel( 12,1:3) = (/-4,-5, 1/)
-      ijSel( 13,1:3) = (/-4,-4, 1/)
-      ijSel( 14,1:3) = (/-4,-3, 1/)
-      ijSel( 15,1:3) = (/-4,-2, 1/)
-      ijSel( 16,1:3) = (/-4,-1, 1/)
-      ijSel( 17,1:3) = (/-4, 0, 1/)
-      ijSel( 18,1:3) = (/-4, 1, 1/)
-      ijSel( 19,1:3) = (/-4, 2, 1/)
-      ijSel( 20,1:3) = (/-4, 3, 1/)
-      ijSel( 21,1:3) = (/-4, 4, 1/)
-      ijSel( 22,1:3) = (/-4, 5, 1/)
-      ijSel( 23,1:3) = (/-3,-5, 1/)
-      ijSel( 24,1:3) = (/-3,-4, 1/)
-      ijSel( 25,1:3) = (/-3,-3, 1/)
-      ijSel( 26,1:3) = (/-3,-2, 1/)
-      ijSel( 27,1:3) = (/-3,-1, 1/)
-      ijSel( 28,1:3) = (/-3, 0, 1/)
-      ijSel( 29,1:3) = (/-3, 1, 1/)
-      ijSel( 30,1:3) = (/-3, 2, 1/)
-      ijSel( 31,1:3) = (/-3, 3, 1/)
-      ijSel( 32,1:3) = (/-3, 4, 1/)
-      ijSel( 33,1:3) = (/-3, 5, 1/)
-      ijSel( 34,1:3) = (/-2,-5, 1/)
-      ijSel( 35,1:3) = (/-2,-4, 1/)
-      ijSel( 36,1:3) = (/-2,-3, 1/)
-      ijSel( 37,1:3) = (/-2,-2, 1/)
-      ijSel( 38,1:3) = (/-2,-1, 1/)
-      ijSel( 39,1:3) = (/-2, 0, 1/)
-      ijSel( 40,1:3) = (/-2, 1, 1/)
-      ijSel( 41,1:3) = (/-2, 2, 1/)
-      ijSel( 42,1:3) = (/-2, 3, 1/)
-      ijSel( 43,1:3) = (/-2, 4, 1/)
-      ijSel( 44,1:3) = (/-2, 5, 1/)
-      ijSel( 45,1:3) = (/-1,-5, 1/)
-      ijSel( 46,1:3) = (/-1,-4, 1/)
-      ijSel( 47,1:3) = (/-1,-3, 1/)
-      ijSel( 48,1:3) = (/-1,-2, 1/)
-      ijSel( 49,1:3) = (/-1,-1, 1/)
-      ijSel( 50,1:3) = (/-1, 0, 1/)
-      ijSel( 51,1:3) = (/-1, 1, 1/)
-      ijSel( 52,1:3) = (/-1, 2, 1/)
-      ijSel( 53,1:3) = (/-1, 3, 1/)
-      ijSel( 54,1:3) = (/-1, 4, 1/)
-      ijSel( 55,1:3) = (/-1, 5, 1/)
-      ijSel( 56,1:3) = (/ 0,-5, 1/)
-      ijSel( 57,1:3) = (/ 0,-4, 1/)
-      ijSel( 58,1:3) = (/ 0,-3, 1/)
-      ijSel( 59,1:3) = (/ 0,-2, 1/)
-      ijSel( 60,1:3) = (/ 0,-1, 1/)
-      ijSel( 61,1:3) = (/ 0, 0, 1/)
-      ijSel( 62,1:3) = (/ 0, 1, 1/)
-      ijSel( 63,1:3) = (/ 0, 2, 1/)
-      ijSel( 64,1:3) = (/ 0, 3, 1/)
-      ijSel( 65,1:3) = (/ 0, 4, 1/)
-      ijSel( 66,1:3) = (/ 0, 5, 1/)
-      ijSel( 67,1:3) = (/ 1,-5, 1/)
-      ijSel( 68,1:3) = (/ 1,-4, 1/)
-      ijSel( 69,1:3) = (/ 1,-3, 1/)
-      ijSel( 70,1:3) = (/ 1,-2, 1/)
-      ijSel( 71,1:3) = (/ 1,-1, 1/)
-      ijSel( 72,1:3) = (/ 1, 0, 1/)
-      ijSel( 73,1:3) = (/ 1, 1, 1/)
-      ijSel( 74,1:3) = (/ 1, 2, 1/)
-      ijSel( 75,1:3) = (/ 1, 3, 1/)
-      ijSel( 76,1:3) = (/ 1, 4, 1/)
-      ijSel( 77,1:3) = (/ 1, 5, 1/)
-      ijSel( 78,1:3) = (/ 2,-5, 1/)
-      ijSel( 79,1:3) = (/ 2,-4, 1/)
-      ijSel( 80,1:3) = (/ 2,-3, 1/)
-      ijSel( 81,1:3) = (/ 2,-2, 1/)
-      ijSel( 82,1:3) = (/ 2,-1, 1/)
-      ijSel( 83,1:3) = (/ 2, 0, 1/)
-      ijSel( 84,1:3) = (/ 2, 1, 1/)
-      ijSel( 85,1:3) = (/ 2, 2, 1/)
-      ijSel( 86,1:3) = (/ 2, 3, 1/)
-      ijSel( 87,1:3) = (/ 2, 4, 1/)
-      ijSel( 88,1:3) = (/ 2, 5, 1/)
-      ijSel( 89,1:3) = (/ 3,-5, 1/)
-      ijSel( 90,1:3) = (/ 3,-4, 1/)
-      ijSel( 91,1:3) = (/ 3,-3, 1/)
-      ijSel( 92,1:3) = (/ 3,-2, 1/)
-      ijSel( 93,1:3) = (/ 3,-1, 1/)
-      ijSel( 94,1:3) = (/ 3, 0, 1/)
-      ijSel( 95,1:3) = (/ 3, 1, 1/)
-      ijSel( 96,1:3) = (/ 3, 2, 1/)
-      ijSel( 97,1:3) = (/ 3, 3, 1/)
-      ijSel( 98,1:3) = (/ 3, 4, 1/)
-      ijSel( 99,1:3) = (/ 3, 5, 1/)
-      ijSel(100,1:3) = (/ 4,-5, 1/)
-      ijSel(101,1:3) = (/ 4,-4, 1/)
-      ijSel(102,1:3) = (/ 4,-3, 1/)
-      ijSel(103,1:3) = (/ 4,-2, 1/)
-      ijSel(104,1:3) = (/ 4,-1, 1/)
-      ijSel(105,1:3) = (/ 4, 0, 1/)
-      ijSel(106,1:3) = (/ 4, 1, 1/)
-      ijSel(107,1:3) = (/ 4, 2, 1/)
-      ijSel(108,1:3) = (/ 4, 3, 1/)
-      ijSel(109,1:3) = (/ 4, 4, 1/)
-      ijSel(110,1:3) = (/ 4, 5, 1/)
-      ijSel(111,1:3) = (/ 5,-5, 1/)
-      ijSel(112,1:3) = (/ 5,-4, 1/)
-      ijSel(113,1:3) = (/ 5,-3, 1/)
-      ijSel(114,1:3) = (/ 5,-2, 1/)
-      ijSel(115,1:3) = (/ 5,-1, 1/)
-      ijSel(116,1:3) = (/ 5, 0, 1/)
-      ijSel(117,1:3) = (/ 5, 1, 1/)
-      ijSel(118,1:3) = (/ 5, 2, 1/)
-      ijSel(119,1:3) = (/ 5, 3, 1/)
-      ijSel(120,1:3) = (/ 5, 4, 1/)
-      ijSel(121,1:3) = (/ 5, 5, 1/)
-
-  return
-  end subroutine
-
 
 
 
@@ -1060,18 +551,59 @@ module modHiggsJJ
     amp_z = A0_VV_4f(4,1,3,2,za,zb,sprod,m_z,ga_z)
     amp_z_b = -A0_VV_4f(3,1,4,2,za,zb,sprod,m_z,ga_z)
 
+! !     adding contract terms
+!     iprop12 = sprod(4,1) - mv**2 + ci * mv * ga_v
+!     iprop34 = sprod(3,2) - mv**2 + ci * mv * ga_v
+!
+!     amp_z(-1,-1) = amp_z(-1,-1) + amp_z(-1,-1)*iprop12/(aL_QUp*couplz)*ehz_L_U  &
+!                                 + amp_z(-1,-1)*iprop34/(aL_QUp*couplz)*ehz_L_U  &
+!                                 + amp_z(-1,-1)*iprop12/(aL_QUp*couplz)*ehz_L_U  &
+!                                               *iprop34/(aL_QUp*couplz)*ehz_L_U
+!
+!     amp_z(+1,-1) = amp_z(+1,-1) + amp_z(+1,-1)*iprop12/(aR_QUp*couplz)*ehz_R_U  &
+!                                 + amp_z(+1,-1)*iprop34/(aL_QUp*couplz)*ehz_L_U  &
+!                                 + amp_z(+1,-1)*iprop12/(aR_QUp*couplz)*ehz_R_U  &
+!                                               *iprop34/(aL_QUp*couplz)*ehz_L_U
+!
+!     amp_z(-1,+1) = amp_z(-1,+1) + amp_z(-1,+1)*iprop12/(aL_QUp*couplz)*ehz_L_U  &
+!                                 + amp_z(-1,+1)*iprop34/(aR_QUp*couplz)*ehz_R_U  &
+!                                 + amp_z(-1,+1)*iprop12/(aL_QUp*couplz)*ehz_L_U  &
+!                                               *iprop34/(aR_QUp*couplz)*ehz_R_U
+!
+!     amp_z(+1,+1) = amp_z(+1,+1) + amp_z(+1,+1)*iprop12/(aR_QUp*couplz)*ehz_R_U  &
+!                                 + amp_z(+1,+1)*iprop34/(aR_QUp*couplz)*ehz_R_U  &
+!                                 + amp_z(+1,+1)*iprop12/(aR_QUp*couplz)*ehz_R_U  &
+!                                               *iprop34/(aR_QUp*couplz)*ehz_R_U
+
+
+!     Lu = aL_QUp + iprop12/couplz*ehz_L_U
+!     Ru = aR_QUp + iprop12/couplz*ehz_R_U
+!     amp_z(-1,-1) = amp_z(-1,-1)*Lu*Lu
+!     amp_z(-1,+1) = amp_z(-1,+1)*Lu*Ru
+!     amp_z(+1,-1) = amp_z(+1,-1)*Ru*Lu
+!     amp_z(+1,+1) = amp_z(+1,+1)*Ru*Ru
+!
+!     amp_z_b(-1,-1) = amp_z_b(-1,-1)*Lu*Lu
+!     amp_z_b(-1,+1) = amp_z_b(-1,+1)*Lu*Ru
+!     amp_z_b(+1,-1) = amp_z_b(+1,-1)*Ru*Lu
+!     amp_z_b(+1,+1) = amp_z_b(+1,+1)*Ru*Ru
+
     restmp = ((abs(amp_z(-1,-1))**2+abs(amp_z_b(-1,-1))**2) * Lu**2 + &
          (abs(amp_z(-1,+1))**2+abs(amp_z_b(-1,+1))**2) * Lu * Ru + &
          (abs(amp_z(+1,-1))**2+abs(amp_z_b(+1,-1))**2) * Lu * Ru + &
          (abs(amp_z(+1,+1))**2+abs(amp_z_b(+1,+1))**2) * Ru**2) * xn**2
 
     restmp = restmp + (two * real(amp_z(-1,-1)*conjg(amp_z_b(-1,-1)),kind=dp) * Lu**2 + &
-            two * real(amp_z(+1,+1)*conjg(amp_z_b(+1,+1)),kind=dp) * Ru**2) * xn
+                       two * real(amp_z(+1,+1)*conjg(amp_z_b(+1,+1)),kind=dp) * Ru**2) * xn
 
     restmp = restmp * SymmFac * aveqq * couplz**2
 
     res(pdfUp_,pdfUp_) = restmp
     res(pdfChm_,pdfChm_) = restmp
+
+
+
+
 
     !-- qq->qq, down
     restmp = ((abs(amp_z(-1,-1))**2+abs(amp_z_b(-1,-1))**2) * Ld**2 + &
@@ -1125,13 +657,13 @@ module modHiggsJJ
     j2 = 2
     do iflip = 1, 2
        !-- ud -> ud
-       amp_z = A0_VV_4f(4,j2,3,j1,za,zb,sprod,m_z,ga_z)
+       amp_z =  A0_VV_4f(4,j2,3,j1,za,zb,sprod,m_z,ga_z)
        amp_w = -A0_VV_4f(4,j1,3,j2,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.)
 
        restmp = ((abs(amp_z(-1,-1))**2) * Ld * Lu + &
-            (abs(amp_z(-1,+1))**2) * Ld * Ru + &
-            (abs(amp_z(+1,-1))**2) * Rd * Lu + &
-            (abs(amp_z(+1,+1))**2) * Rd * Ru) * couplz**2 * xn**2
+                 (abs(amp_z(-1,+1))**2) * Ld * Ru + &
+                 (abs(amp_z(+1,-1))**2) * Rd * Lu + &
+                 (abs(amp_z(+1,+1))**2) * Rd * Ru) * couplz**2 * xn**2
 
        restmp = restmp + abs(amp_w(-1,-1))**2 * couplw**2 * xn**2
 
@@ -1381,8 +913,8 @@ module modHiggsJJ
     !-- qq->qq, up
     if( (iSel.eq.pdfUp_ .and. jSel.eq.pdfUp_) .or. (iSel.eq.pdfChm_ .and. jSel.eq.pdfChm_) ) then
 
-       amp_z = A0_ZZ_4f(4,1,3,2,za,zb,sprod,1,1)
-       amp_z_b = -A0_ZZ_4f(3,1,4,2,za,zb,sprod,1,1)
+       amp_z = A0_ZZ_4f(4,1,3,2,za,zb,sprod,iSel,jSel)
+       amp_z_b = -A0_ZZ_4f(3,1,4,2,za,zb,sprod,iSel,jSel)
 
        restmp = ((abs(amp_z(-1,-1))**2+abs(amp_z_b(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2+abs(amp_z_b(-1,+1))**2) + &
@@ -1405,8 +937,8 @@ module modHiggsJJ
 
    !-- qq->qq, down
     if( (iSel.eq.pdfDn_ .and. jSel.eq.pdfDn_) .or. (iSel.eq.pdfStr_ .and. jSel.eq.pdfStr_) .or. (iSel.eq.pdfBot_ .and. jSel.eq.pdfBot_) ) then
-       amp_z = A0_ZZ_4f(4,1,3,2,za,zb,sprod,2,2)
-       amp_z_b = -A0_ZZ_4f(3,1,4,2,za,zb,sprod,2,2)
+       amp_z = A0_ZZ_4f(4,1,3,2,za,zb,sprod,iSel,jSel)
+       amp_z_b = -A0_ZZ_4f(3,1,4,2,za,zb,sprod,iSel,jSel)
 
        restmp = ((abs(amp_z(-1,-1))**2+abs(amp_z_b(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2+abs(amp_z_b(-1,+1))**2) + &
@@ -1429,8 +961,8 @@ module modHiggsJJ
 
     !-- qbqb->qbqb, aup
     if( (iSel.eq.pdfAUp_ .and. jSel.eq.pdfAUp_) .or. (iSel.eq.pdfAChm_ .and. jSel.eq.pdfAChm_) ) then
-       amp_z = A0_ZZ_4f(1,4,2,3,za,zb,sprod,1,1)
-       amp_z_b = -A0_ZZ_4f(1,3,2,4,za,zb,sprod,1,1)
+       amp_z = A0_ZZ_4f(1,4,2,3,za,zb,sprod,iSel,jSel)
+       amp_z_b = -A0_ZZ_4f(1,3,2,4,za,zb,sprod,iSel,jSel)
 
        restmp = ((abs(amp_z(-1,-1))**2+abs(amp_z_b(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2+abs(amp_z_b(-1,+1))**2) + &
@@ -1452,8 +984,8 @@ module modHiggsJJ
 
     !-- qbqb->qbqb, adn
     if( (iSel.eq.pdfADn_ .and. jSel.eq.pdfADn_) .or. (iSel.eq.pdfAStr_ .and. jSel.eq.pdfAStr_) .or. (iSel.eq.pdfABot_ .and. jSel.eq.pdfABot_) ) then
-       amp_z = A0_ZZ_4f(1,4,2,3,za,zb,sprod,2,2)
-       amp_z_b = -A0_ZZ_4f(1,3,2,4,za,zb,sprod,2,2)
+       amp_z = A0_ZZ_4f(1,4,2,3,za,zb,sprod,iSel,jSel)
+       amp_z_b = -A0_ZZ_4f(1,3,2,4,za,zb,sprod,iSel,jSel)
        restmp = ((abs(amp_z(-1,-1))**2+abs(amp_z_b(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2+abs(amp_z_b(-1,+1))**2) + &
             (abs(amp_z(+1,-1))**2+abs(amp_z_b(+1,-1))**2) + &
@@ -1482,16 +1014,26 @@ module modHiggsJJ
 
     !-- ud -> ud
     if( (iSel.eq.pdfUp_ .and. jSel.eq.pdfDn_) .or. (iSel.eq.pdfChm_ .and. jSel.eq.pdfStr_) ) then
-       amp_z = A0_ZZ_4f(4,j2,3,j1,za,zb,sprod,2,1)
-       amp_w = -A0_WW_4f(4,j1,3,j2,za,zb,sprod,useWWcoupl=.true.,Wpm_flip=.true.)
+       amp_z = A0_ZZ_4f(4,j2,3,j1,za,zb,sprod,jSel,iSel)
+       amp_w = -A0_WW_4f(4,j1,3,j2,za,zb,sprod,iSel,jSel,useWWcoupl=.true.,Wpm_flip=.true.)
        if( zz_fusion ) then
           restmp = ((abs(amp_z(-1,-1))**2) + &
                (abs(amp_z(-1,+1))**2) + &
                (abs(amp_z(+1,-1))**2) + &
                (abs(amp_z(+1,+1))**2)) * xn**2
        else
-          restmp = abs(amp_w(-1,-1))**2 * xn**2
-          restmp = restmp + two * real(amp_z(-1,-1)*conjg(amp_w(-1,-1)),kind=dp) * xn
+          restmp= ( &
+                   abs(amp_w(-1,-1))**2 + &
+                   abs(amp_w(-1,+1))**2 + &
+                   abs(amp_w(+1,-1))**2 + &
+                   abs(amp_w(+1,+1))**2   &
+                  ) * xn**2
+          restmp = restmp + two * ( &
+             real(amp_z(-1,-1)*conjg(amp_w(-1,-1)),kind=dp) + &
+             real(amp_z(-1,+1)*conjg(amp_w(-1,+1)),kind=dp) + &
+             real(amp_z(+1,-1)*conjg(amp_w(+1,-1)),kind=dp) + &
+             real(amp_z(+1,+1)*conjg(amp_w(+1,+1)),kind=dp)   &
+             ) * xn
 
        endif
 
@@ -1509,8 +1051,8 @@ module modHiggsJJ
 
     !-- ubdb -> ubdb
     if( (iSel.eq.pdfAUp_ .and. jSel.eq.pdfADn_) .or. (iSel.eq.pdfAChm_ .and. jSel.eq.pdfAStr_) ) then
-       amp_z = A0_ZZ_4f(j2,4,j1,3,za,zb,sprod,2,1)
-       amp_w = -A0_WW_4f(j1,4,j2,3,za,zb,sprod,useWWcoupl=.true.,Wpm_flip=.false.)
+       amp_z = A0_ZZ_4f(j2,4,j1,3,za,zb,sprod,jSel,iSel)
+       amp_w = -A0_WW_4f(j1,4,j2,3,za,zb,sprod,iSel,jSel,useWWcoupl=.true.,Wpm_flip=.false.)
 
        if( zz_fusion ) then
           restmp = ((abs(amp_z(-1,-1))**2) + &
@@ -1518,8 +1060,18 @@ module modHiggsJJ
                (abs(amp_z(+1,-1))**2) + &
                (abs(amp_z(+1,+1))**2)) * xn**2
        else
-          restmp = abs(amp_w(-1,-1))**2 * xn**2
-          restmp = restmp + two * real(amp_z(-1,-1)*conjg(amp_w(-1,-1)),kind=dp) * xn
+          restmp= ( &
+                   abs(amp_w(-1,-1))**2 + &
+                   abs(amp_w(-1,+1))**2 + &
+                   abs(amp_w(+1,-1))**2 + &
+                   abs(amp_w(+1,+1))**2   &
+                  ) * xn**2
+          restmp = restmp + two * ( &
+             real(amp_z(-1,-1)*conjg(amp_w(-1,-1)),kind=dp) + &
+             real(amp_z(-1,+1)*conjg(amp_w(-1,+1)),kind=dp) + &
+             real(amp_z(+1,-1)*conjg(amp_w(+1,-1)),kind=dp) + &
+             real(amp_z(+1,+1)*conjg(amp_w(+1,+1)),kind=dp)   &
+             ) * xn
 
        endif
 
@@ -1542,16 +1094,26 @@ module modHiggsJJ
 
     !-- ud -> ud
     if( (iSel.eq.pdfDn_ .and. jSel.eq.pdfUp_) .or. (iSel.eq.pdfStr_ .and. jSel.eq.pdfChm_) ) then
-       amp_z = A0_ZZ_4f(4,j2,3,j1,za,zb,sprod,2,1)
-       amp_w = -A0_WW_4f(4,j1,3,j2,za,zb,sprod,useWWcoupl=.true.,Wpm_flip=.true.)
+       amp_z = A0_ZZ_4f(4,j2,3,j1,za,zb,sprod,iSel,jSel)
+       amp_w = -A0_WW_4f(4,j1,3,j2,za,zb,sprod,jSel,iSel,useWWcoupl=.true.,Wpm_flip=.true.)
        if( zz_fusion ) then
           restmp = ((abs(amp_z(-1,-1))**2) + &
                (abs(amp_z(-1,+1))**2) + &
                (abs(amp_z(+1,-1))**2) + &
                (abs(amp_z(+1,+1))**2)) * xn**2
        else
-          restmp = abs(amp_w(-1,-1))**2 * xn**2
-          restmp = restmp + two * real(amp_z(-1,-1)*conjg(amp_w(-1,-1)),kind=dp) * xn
+          restmp= ( &
+                   abs(amp_w(-1,-1))**2 + &
+                   abs(amp_w(-1,+1))**2 + &
+                   abs(amp_w(+1,-1))**2 + &
+                   abs(amp_w(+1,+1))**2   &
+                  ) * xn**2
+          restmp = restmp + two * ( &
+             real(amp_z(-1,-1)*conjg(amp_w(-1,-1)),kind=dp) + &
+             real(amp_z(-1,+1)*conjg(amp_w(-1,+1)),kind=dp) + &
+             real(amp_z(+1,-1)*conjg(amp_w(+1,-1)),kind=dp) + &
+             real(amp_z(+1,+1)*conjg(amp_w(+1,+1)),kind=dp)   &
+             ) * xn
 
        endif
 
@@ -1569,8 +1131,8 @@ module modHiggsJJ
 
     !-- ubdb -> ubdb
     if( (iSel.eq.pdfADn_ .and. jSel.eq.pdfAUp_) .or. (iSel.eq.pdfAStr_ .and. jSel.eq.pdfAChm_) ) then
-       amp_z = A0_ZZ_4f(j2,4,j1,3,za,zb,sprod,2,1)
-       amp_w = -A0_WW_4f(j1,4,j2,3,za,zb,sprod,useWWcoupl=.true.,Wpm_flip=.false.)
+       amp_z = A0_ZZ_4f(j2,4,j1,3,za,zb,sprod,iSel,jSel)
+       amp_w = -A0_WW_4f(j1,4,j2,3,za,zb,sprod,jSel,iSel,useWWcoupl=.true.,Wpm_flip=.false.)
 
        if( zz_fusion ) then
           restmp = ((abs(amp_z(-1,-1))**2) + &
@@ -1578,8 +1140,18 @@ module modHiggsJJ
                (abs(amp_z(+1,-1))**2) + &
                (abs(amp_z(+1,+1))**2)) * xn**2
        else
-          restmp= abs(amp_w(-1,-1))**2 * xn**2
-          restmp = restmp + two * real(amp_z(-1,-1)*conjg(amp_w(-1,-1)),kind=dp) * xn
+          restmp= ( &
+                   abs(amp_w(-1,-1))**2 + &
+                   abs(amp_w(-1,+1))**2 + &
+                   abs(amp_w(+1,-1))**2 + &
+                   abs(amp_w(+1,+1))**2   &
+                  ) * xn**2
+          restmp = restmp + two * ( &
+             real(amp_z(-1,-1)*conjg(amp_w(-1,-1)),kind=dp) + &
+             real(amp_z(-1,+1)*conjg(amp_w(-1,+1)),kind=dp) + &
+             real(amp_z(+1,-1)*conjg(amp_w(+1,-1)),kind=dp) + &
+             real(amp_z(+1,+1)*conjg(amp_w(+1,+1)),kind=dp)   &
+             ) * xn
        endif
 
        restmp = restmp * aveqq
@@ -1605,14 +1177,19 @@ module modHiggsJJ
     if( (iSel.eq.pdfUp_ .and. jSel.eq.pdfAUp_) .or. (iSel.eq.pdfChm_ .and. jSel.eq.pdfAChm_) .or. (iSel.eq.pdfUp_ .and. jSel.eq.pdfAChm_) .or. (iSel.eq.pdfChm_ .and. jSel.eq.pdfAUp_) ) then
 
        if( zz_fusion ) then
-          amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,1,1)
+          amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,iSel,jSel)
           restmp = ((abs(amp_z(-1,-1))**2) + &
                (abs(amp_z(-1,+1))**2) + &
                (abs(amp_z(+1,-1))**2) + &
                (abs(amp_z(+1,+1))**2)) * SpinAvg * tag1
        else
-          amp_w = A0_WW_4f(4,j1,j2,3,za,zb,sprod,useWWcoupl=.true.,Wpm_flip=.true.)
-          restmp = abs(amp_w(-1,-1))**2 * SpinAvg * tag2
+          amp_w = A0_WW_4f(4,j1,j2,3,za,zb,sprod,iSel,jSel,useWWcoupl=.true.,Wpm_flip=.true.)
+          restmp= ( &
+                  abs(amp_w(-1,-1))**2 + &
+                  abs(amp_w(-1,+1))**2 + &
+                  abs(amp_w(+1,-1))**2 + &
+                  abs(amp_w(+1,+1))**2   &
+                  ) * SpinAvg * tag2
        endif
 
        pdfindex = flip(iflip,pdfUp_,pdfAUp_)
@@ -1634,7 +1211,7 @@ module modHiggsJJ
     !--udb -> udb
     if( (iSel.eq.pdfUp_ .and. jSel.eq.pdfADn_) .or. (iSel.eq.pdfChm_ .and. jSel.eq.pdfAStr_) .or. (iSel.eq.pdfUp_ .and. jSel.eq.pdfAStr_) .or. &
          (iSel.eq.pdfChm_ .and. jSel.eq.pdfADn_) .or. (iSel.eq.pdfUp_ .and. jSel.eq.pdfABot_) .or. (iSel.eq.pdfChm_ .and. jSel.eq.pdfABot_) ) then
-       amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,1,2)
+       amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,iSel,jSel)
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
             (abs(amp_z(+1,-1))**2) + &
@@ -1666,7 +1243,7 @@ module modHiggsJJ
     !--dub -> dub
     if( (iSel.eq.pdfDn_ .and. jSel.eq.pdfAUp_) .or. (iSel.eq.pdfStr_ .and. jSel.eq.pdfAChm_)  .or. (iSel.eq.pdfDn_ .and. jSel.eq.pdfAChm_)  .or. &
          (iSel.eq.pdfStr_ .and. jSel.eq.pdfAUp_)  .or. (iSel.eq.pdfBot_ .and. jSel.eq.pdfAUp_)  .or. (iSel.eq.pdfBot_ .and. jSel.eq.pdfAChm_) ) then
-       amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,2,1)
+       amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,iSel,jSel)
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
             (abs(amp_z(+1,-1))**2) + &
@@ -1698,7 +1275,7 @@ module modHiggsJJ
     !--ddb -> uub/ddb
     if( (iSel.eq.pdfBot_ .and. jSel.eq.pdfABot_) .or. (iSel.eq.pdfDn_ .and. jSel.eq.pdfABot_) .or. (iSel.eq.pdfStr_ .and. jSel.eq.pdfABot_) .or.&
          (iSel.eq.pdfBot_ .and. jSel.eq.pdfADn_) .or. (iSel.eq.pdfBot_ .and. jSel.eq.pdfAStr_) ) then
-       amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,2,2)
+       amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,iSel,jSel)
 
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
@@ -1727,14 +1304,19 @@ module modHiggsJJ
 
     if( (iSel.eq.pdfDn_ .and. jSel.eq.pdfADn_) .or. (iSel.eq.pdfStr_ .and. jSel.eq.pdfAStr_)  .or. (iSel.eq.pdfDn_ .and. jSel.eq.pdfAStr_)  .or. (iSel.eq.pdfStr_ .and. jSel.eq.pdfADn_) ) then
        if( zz_fusion ) then
-          amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,2,2)
+          amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,iSel,jSel)
           restmp = ((abs(amp_z(-1,-1))**2) + &
                (abs(amp_z(-1,+1))**2) + &
                (abs(amp_z(+1,-1))**2) + &
                (abs(amp_z(+1,+1))**2)) * SpinAvg * tag1
        else
-          amp_w = A0_WW_4f(4,j1,j2,3,za,zb,sprod,useWWcoupl=.true.,Wpm_flip=.false.)
-          restmp = abs(amp_w(-1,-1))**2 * SpinAvg * tag2
+          amp_w = A0_WW_4f(4,j1,j2,3,za,zb,sprod,iSel,jSel,useWWcoupl=.true.,Wpm_flip=.false.)
+          restmp= ( &
+                  abs(amp_w(-1,-1))**2 + &
+                  abs(amp_w(-1,+1))**2 + &
+                  abs(amp_w(+1,-1))**2 + &
+                  abs(amp_w(+1,+1))**2   &
+                  ) * SpinAvg * tag2
        endif
 
        pdfindex = flip(iflip,pdfDn_,pdfADn_)
@@ -1756,7 +1338,7 @@ module modHiggsJJ
     if( (iSel.eq.pdfUp_ .and. jSel.eq.pdfChm_)  ) then
 
        !-- non-symmetric qq processes
-       amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,1,1)
+       amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,iSel,jSel)
        !--uc -> uc
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
@@ -1775,7 +1357,7 @@ module modHiggsJJ
     !--us -> us/cd
     if( (iSel.eq.pdfUp_ .and. jSel.eq.pdfBot_) .or. (iSel.eq.pdfChm_ .and. jSel.eq.pdfBot_) ) then
 
-       amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,1,2)
+       amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,iSel,jSel)
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
             (abs(amp_z(+1,-1))**2) + &
@@ -1795,15 +1377,19 @@ module modHiggsJJ
     if( (iSel.eq.pdfUp_ .and. jSel.eq.pdfStr_) .or. (iSel.eq.pdfChm_ .and. jSel.eq.pdfDn_) ) then
 
        if( zz_fusion ) then
-          amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,1,2)
+          amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,iSel,jSel)
           restmp = ((abs(amp_z(-1,-1))**2) + &
                (abs(amp_z(-1,+1))**2) + &
                (abs(amp_z(+1,-1))**2) + &
                (abs(amp_z(+1,+1))**2)) * SpinAvg * tag1
        else
-          amp_w = A0_WW_4f(3,j2,4,j1,za,zb,sprod,useWWcoupl=.true.,Wpm_flip=.false.)
-          !          amp_w = A0_VV_4f(3,j1,4,j2,za,zb,sprod,useWWcoupl=.true.)! MARKUS
-          restmp = abs(amp_w(-1,-1))**2 * SpinAvg * tag2
+          amp_w = A0_WW_4f(3,j2,4,j1,za,zb,sprod,jSel,iSel,useWWcoupl=.true.,Wpm_flip=.false.)
+          restmp= ( &
+                  abs(amp_w(-1,-1))**2 + &
+                  abs(amp_w(-1,+1))**2 + &
+                  abs(amp_w(+1,-1))**2 + &
+                  abs(amp_w(+1,+1))**2   &
+                  ) * SpinAvg * tag2
        endif
 
        pdfindex = flip(iflip,pdfUp_,pdfStr_)
@@ -1819,7 +1405,7 @@ module modHiggsJJ
     !--ds -> ds
     if( (iSel.eq.pdfDn_ .and. jSel.eq.pdfStr_) .or. (iSel.eq.pdfDn_ .and. jSel.eq.pdfBot_) .or. (iSel.eq.pdfStr_ .and. jSel.eq.pdfBot_) ) then
 
-       amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,2,2)
+       amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,iSel,jSel)
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
             (abs(amp_z(+1,-1))**2) + &
@@ -1841,7 +1427,7 @@ module modHiggsJJ
 
     !-- qbqb processes
     if( (iSel.eq.pdfAUp_ .and. jSel.eq.pdfAChm_) ) then
-       amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,1,1)
+       amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,iSel,jSel)
        !--ubcb -> ubcb
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
@@ -1859,7 +1445,7 @@ module modHiggsJJ
 
     !--ubsb -> ubsb//cbdb
     if( (iSel.eq.pdfAUp_ .and. jSel.eq.pdfABot_) .or. (iSel.eq.pdfAChm_ .and. jSel.eq.pdfABot_) ) then
-       amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,1,2)
+       amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,iSel,jSel)
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
             (abs(amp_z(+1,-1))**2) + &
@@ -1879,14 +1465,19 @@ module modHiggsJJ
     if( (iSel.eq.pdfAUp_ .and. jSel.eq.pdfAStr_) .or. (iSel.eq.pdfAChm_ .and. jSel.eq.pdfADn_) ) then
 
        if( zz_fusion ) then
-          amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,1,2)
+          amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,iSel,jSel)
           restmp = ((abs(amp_z(-1,-1))**2) + &
                (abs(amp_z(-1,+1))**2) + &
                (abs(amp_z(+1,-1))**2) + &
                (abs(amp_z(+1,+1))**2)) * SpinAvg * tag1
        else
-          amp_w = A0_WW_4f(j1,4,j2,3,za,zb,sprod,useWWcoupl=.true.,Wpm_flip=.false.)
-          restmp= abs(amp_w(-1,-1))**2 * SpinAvg * tag2
+          amp_w = A0_WW_4f(j1,4,j2,3,za,zb,sprod,iSel,jSel,useWWcoupl=.true.,Wpm_flip=.false.)
+          restmp= ( &
+                  abs(amp_w(-1,-1))**2 + &
+                  abs(amp_w(-1,+1))**2 + &
+                  abs(amp_w(+1,-1))**2 + &
+                  abs(amp_w(+1,+1))**2   &
+                  ) * SpinAvg * tag2
        endif
 
        pdfindex = flip(iflip,pdfAUp_,pdfAStr_)
@@ -1903,7 +1494,7 @@ module modHiggsJJ
     !--dbsb -> dbsb
     if( (iSel.eq.pdfADn_ .and. jSel.eq.pdfAStr_) .or. (iSel.eq.pdfADn_ .and. jSel.eq.pdfABot_) .or. (iSel.eq.pdfAStr_ .and. jSel.eq.pdfABot_) ) then
 
-       amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,2,2)
+       amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,iSel,jSel)
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
             (abs(amp_z(+1,-1))**2) + &
@@ -1934,14 +1525,19 @@ module modHiggsJJ
     if( (jSel.eq.pdfUp_ .and. iSel.eq.pdfAUp_) .or. (jSel.eq.pdfChm_ .and. iSel.eq.pdfAChm_) .or. (jSel.eq.pdfUp_ .and. iSel.eq.pdfAChm_) .or. (jSel.eq.pdfChm_ .and. iSel.eq.pdfAUp_) ) then
 
        if( zz_fusion ) then
-          amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,1,1)
+          amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,jSel,iSel)
           restmp = ((abs(amp_z(-1,-1))**2) + &
                (abs(amp_z(-1,+1))**2) + &
                (abs(amp_z(+1,-1))**2) + &
                (abs(amp_z(+1,+1))**2)) * SpinAvg * tag1
        else
-          amp_w = A0_WW_4f(4,j1,j2,3,za,zb,sprod,useWWcoupl=.true.,Wpm_flip=.true.)
-          restmp= abs(amp_w(-1,-1))**2 * SpinAvg * tag2
+          amp_w = A0_WW_4f(4,j1,j2,3,za,zb,sprod,jSel,iSel,useWWcoupl=.true.,Wpm_flip=.true.)
+          restmp= ( &
+                  abs(amp_w(-1,-1))**2 + &
+                  abs(amp_w(-1,+1))**2 + &
+                  abs(amp_w(+1,-1))**2 + &
+                  abs(amp_w(+1,+1))**2   &
+                  ) * SpinAvg * tag2
        endif
 
        pdfindex = flip(iflip,pdfUp_,pdfAUp_)
@@ -1964,7 +1560,7 @@ module modHiggsJJ
     !--udb -> udb
     if( (jSel.eq.pdfUp_ .and. iSel.eq.pdfADn_) .or. (jSel.eq.pdfChm_ .and. iSel.eq.pdfAStr_) .or. (jSel.eq.pdfUp_ .and. iSel.eq.pdfAStr_) .or. &
          (jSel.eq.pdfChm_ .and. iSel.eq.pdfADn_) .or. (jSel.eq.pdfUp_ .and. iSel.eq.pdfABot_) .or. (jSel.eq.pdfChm_ .and. iSel.eq.pdfABot_) ) then
-       amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,1,2)
+       amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,jSel,iSel)
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
             (abs(amp_z(+1,-1))**2) + &
@@ -1997,7 +1593,7 @@ module modHiggsJJ
     !--dub -> dub
     if( (jSel.eq.pdfDn_ .and. iSel.eq.pdfAUp_) .or. (jSel.eq.pdfStr_ .and. iSel.eq.pdfAChm_)  .or. (jSel.eq.pdfDn_ .and. iSel.eq.pdfAChm_)  .or. &
          (jSel.eq.pdfStr_ .and. iSel.eq.pdfAUp_)  .or. (jSel.eq.pdfBot_ .and. iSel.eq.pdfAUp_)  .or. (jSel.eq.pdfBot_ .and. iSel.eq.pdfAChm_) ) then
-       amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,2,1)
+       amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,jSel,iSel)
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
             (abs(amp_z(+1,-1))**2) + &
@@ -2030,7 +1626,7 @@ module modHiggsJJ
     !--ddb -> uub/ddb
     if( (jSel.eq.pdfBot_ .and. iSel.eq.pdfABot_) .or. (jSel.eq.pdfDn_ .and. iSel.eq.pdfABot_) .or. (jSel.eq.pdfStr_ .and. iSel.eq.pdfABot_) .or.&
          (jSel.eq.pdfBot_ .and. iSel.eq.pdfADn_) .or. (jSel.eq.pdfBot_ .and. iSel.eq.pdfAStr_) ) then
-       amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,2,2)
+       amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,jSel,iSel)
 
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
@@ -2062,14 +1658,19 @@ module modHiggsJJ
 
     if( (jSel.eq.pdfDn_ .and. iSel.eq.pdfADn_) .or. (jSel.eq.pdfStr_ .and. iSel.eq.pdfAStr_)  .or. (jSel.eq.pdfDn_ .and. iSel.eq.pdfAStr_)  .or. (jSel.eq.pdfStr_ .and. iSel.eq.pdfADn_) ) then
        if( zz_fusion ) then
-          amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,2,2)
+          amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,jSel,iSel)
           restmp = ((abs(amp_z(-1,-1))**2) + &
                (abs(amp_z(-1,+1))**2) + &
                (abs(amp_z(+1,-1))**2) + &
                (abs(amp_z(+1,+1))**2)) * SpinAvg * tag1
        else
-          amp_w = A0_WW_4f(4,j1,j2,3,za,zb,sprod,useWWcoupl=.true.,Wpm_flip=.false.)
-          restmp= abs(amp_w(-1,-1))**2 * SpinAvg * tag2
+          amp_w = A0_WW_4f(4,j1,j2,3,za,zb,sprod,jSel,iSel,useWWcoupl=.true.,Wpm_flip=.false.)
+          restmp= ( &
+                  abs(amp_w(-1,-1))**2 + &
+                  abs(amp_w(-1,+1))**2 + &
+                  abs(amp_w(+1,-1))**2 + &
+                  abs(amp_w(+1,+1))**2   &
+                  ) * SpinAvg * tag2
        endif
 
        pdfindex = flip(iflip,pdfDn_,pdfADn_)
@@ -2091,7 +1692,7 @@ module modHiggsJJ
     if( (jSel.eq.pdfUp_ .and. iSel.eq.pdfChm_) ) then
 
        !-- non-symmetric qq processes
-       amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,1,1)
+       amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,jSel,iSel)
        !--uc -> uc
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
@@ -2109,7 +1710,7 @@ module modHiggsJJ
     !--us -> us/cd
     if( (jSel.eq.pdfUp_ .and. iSel.eq.pdfBot_) .or. (jSel.eq.pdfChm_ .and. iSel.eq.pdfBot_) ) then
 
-       amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,1,2)
+       amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,jSel,iSel)
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
             (abs(amp_z(+1,-1))**2) + &
@@ -2129,15 +1730,19 @@ module modHiggsJJ
     if( (jSel.eq.pdfUp_ .and. iSel.eq.pdfStr_) .or. (jSel.eq.pdfChm_ .and. iSel.eq.pdfDn_) ) then
 
        if( zz_fusion ) then
-          amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,1,2)
+          amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,jSel,iSel)
           restmp = ((abs(amp_z(-1,-1))**2) + &
                (abs(amp_z(-1,+1))**2) + &
                (abs(amp_z(+1,-1))**2) + &
                (abs(amp_z(+1,+1))**2)) * SpinAvg * tag1
        else
-          amp_w = A0_WW_4f(3,j2,4,j1,za,zb,sprod,useWWcoupl=.true.,Wpm_flip=.false.)
-          !          amp_w = A0_VV_4f(3,j1,4,j2,za,zb,sprod,useWWcoupl=.true.)! MARKUS
-          restmp= abs(amp_w(-1,-1))**2 * SpinAvg * tag2
+          amp_w = A0_WW_4f(3,j2,4,j1,za,zb,sprod,iSel,jSel,useWWcoupl=.true.,Wpm_flip=.false.)
+          restmp= ( &
+                  abs(amp_w(-1,-1))**2 + &
+                  abs(amp_w(-1,+1))**2 + &
+                  abs(amp_w(+1,-1))**2 + &
+                  abs(amp_w(+1,+1))**2   &
+                  ) * SpinAvg * tag2
        endif
 
        pdfindex = flip(iflip,pdfUp_,pdfStr_)
@@ -2153,7 +1758,7 @@ module modHiggsJJ
     !--ds -> ds
     if( (jSel.eq.pdfDn_ .and. iSel.eq.pdfStr_) .or. (jSel.eq.pdfDn_ .and. iSel.eq.pdfBot_) .or. (jSel.eq.pdfStr_ .and. iSel.eq.pdfBot_) ) then
 
-       amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,2,2)
+       amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,jSel,iSel)
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
             (abs(amp_z(+1,-1))**2) + &
@@ -2175,7 +1780,7 @@ module modHiggsJJ
 
     !-- qbqb processes
     if( (jSel.eq.pdfAUp_ .and. iSel.eq.pdfAChm_) ) then
-       amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,1,1)
+       amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,jSel,iSel)
        !--ubcb -> ubcb
        restmp = ((abs(amp_z(-1,-1))**2)+ &
             (abs(amp_z(-1,+1))**2) + &
@@ -2193,7 +1798,7 @@ module modHiggsJJ
 
     !--ubsb -> ubsb//cbdb
     if( (jSel.eq.pdfAUp_ .and. iSel.eq.pdfABot_) .or. (jSel.eq.pdfAChm_ .and. iSel.eq.pdfABot_) ) then
-       amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,1,2)
+       amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,jSel,iSel)
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
             (abs(amp_z(+1,-1))**2) + &
@@ -2213,14 +1818,19 @@ module modHiggsJJ
 
     if( (jSel.eq.pdfAUp_ .and. iSel.eq.pdfAStr_) .or. (jSel.eq.pdfAChm_ .and. iSel.eq.pdfADn_) ) then
        if( zz_fusion ) then
-          amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,1,2)
+          amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,jSel,iSel)
           restmp = ((abs(amp_z(-1,-1))**2) + &
                (abs(amp_z(-1,+1))**2) + &
                (abs(amp_z(+1,-1))**2) + &
                (abs(amp_z(+1,+1))**2)) * SpinAvg * tag1
        else
-          amp_w = A0_WW_4f(j1,4,j2,3,za,zb,sprod,useWWcoupl=.true.,Wpm_flip=.false.)
-          restmp= abs(amp_w(-1,-1))**2 * SpinAvg * tag2
+          amp_w = A0_WW_4f(j1,4,j2,3,za,zb,sprod,jSel,iSel,useWWcoupl=.true.,Wpm_flip=.false.)
+          restmp= ( &
+                  abs(amp_w(-1,-1))**2 + &
+                  abs(amp_w(-1,+1))**2 + &
+                  abs(amp_w(+1,-1))**2 + &
+                  abs(amp_w(+1,+1))**2   &
+                  ) * SpinAvg * tag2
        endif
 
        pdfindex = flip(iflip,pdfAUp_,pdfAStr_)
@@ -2236,7 +1846,7 @@ module modHiggsJJ
     !--dbsb -> dbsb
     if( (jSel.eq.pdfADn_ .and. iSel.eq.pdfAStr_) .or. (jSel.eq.pdfADn_ .and. iSel.eq.pdfABot_) .or. (jSel.eq.pdfAStr_ .and. iSel.eq.pdfABot_) ) then
 
-       amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,2,2)
+       amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,jSel,iSel)
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
             (abs(amp_z(+1,-1))**2) + &
@@ -2288,6 +1898,8 @@ module modHiggsJJ
     kfactor_w=1.0_dp
     restmp=0.0_dp
 
+    line_i=0
+    line_j=0
     jz1 = 1
     jz2 = 2
     jw1 = jz1
@@ -2354,27 +1966,17 @@ module modHiggsJJ
        if(WW_fusion) call swapi(jw2,kw2)
     endif
 
-    if(ZZ_fusion) then
-       if (abs(iSel).eq.pdfUp_ .or. abs(iSel).eq.pdfChm_) then ! u-current couplings
-          line_i = 1
-       else ! d-current couplings
-          line_i = 2
-       endif
-       if (abs(jSel).eq.pdfUp_ .or. abs(jSel).eq.pdfChm_) then ! u-current couplings
-          line_j = 1
-       else ! d-current couplings
-          line_j = 2
-       endif
-    endif
+    line_i = iSel
+    line_j = jSel
 
     if(WW_fusion) then
        if (iSel.eq.pdfUp_ .or. iSel.eq.pdfChm_ .or. iSel.eq.pdfADn_ .or. iSel.eq.pdfAStr_ .or. iSel.eq.pdfABot_) then ! W+ should be passed as the second set of partons
           call swapi(jw1,jw2)
           call swapi(kw1,kw2)
+          call swapi(line_i,line_j)
           if(ZZ_fusion) then ! If also ZZ fusion, swap it as well
              call swapi(jz1,jz2)
              call swapi(kz1,kz2)
-             call swapi(line_i,line_j)
           endif
        endif
     endif
@@ -2412,9 +2014,23 @@ module modHiggsJJ
     endif
 
     if(WW_fusion) then
-       amp_w = -A0_WW_4f(kw1,jw1,kw2,jw2,za,zb,sprod,useWWcoupl=.true.)
-       restmp = restmp + abs(amp_w(-1,-1))**2 * xn**2 * kfactor_w**2 * abs(ckm_wfactor)**2
-       if(ZZ_fusion) restmp = restmp + two * real(amp_w(-1,-1)*ckm_wfactor*conjg(amp_z(-1,-1)),kind=dp) * xn * kfactor_z * kfactor_w
+       amp_w = -A0_WW_4f(kw1,jw1,kw2,jw2,za,zb,sprod,line_i,line_j,useWWcoupl=.true.)
+       restmp = restmp + &
+                (        &
+                abs(amp_w(-1,-1))**2 + &
+                abs(amp_w(-1,+1))**2 + &
+                abs(amp_w(+1,-1))**2 + &
+                abs(amp_w(+1,+1))**2   &
+                ) * xn**2 * kfactor_w**2 * abs(ckm_wfactor)**2
+       if(ZZ_fusion) then
+          restmp = restmp + &
+                   two * (  &
+                   real(amp_w(-1,-1)*ckm_wfactor*conjg(amp_z(-1,-1)),kind=dp) + &
+                   real(amp_w(-1,+1)*ckm_wfactor*conjg(amp_z(-1,+1)),kind=dp) + &
+                   real(amp_w(+1,-1)*ckm_wfactor*conjg(amp_z(+1,-1)),kind=dp) + &
+                   real(amp_w(+1,+1)*ckm_wfactor*conjg(amp_z(+1,+1)),kind=dp)   &
+                   ) * xn * kfactor_z * kfactor_w
+       endif
     endif
 
     restmp = restmp * aveqq
@@ -2737,37 +2353,45 @@ module modHiggsJJ
 
   end function A0_VV_4f
 
-  !--           line = 1/2 --> up/down couplings included
-  function A0_ZZ_4f(j1,j2,j3,j4,za,zb,sprod,line1,line2)
+  !--           line = 1/2 --> down/up couplings included
+  function A0_ZZ_4f(j1,j2,j3,j4,za,zb,sprod,iSel,jSel)
     use modMisc
     implicit none
-    real(dp), dimension(2) :: Lz
-    real(dp), dimension(2) :: Rz
-    real(dp), parameter, dimension(2) :: La = (/QuL,QdL/)
-    real(dp), parameter, dimension(2) :: Ra = (/QuR,QdR/)
+    real(dp), dimension(5) :: Lz,Rz,LCT,RCT
+    real(dp), parameter, dimension(5) :: La = (/QdL,QuL,QdL,QuL,QdL/)
+    real(dp), parameter, dimension(5) :: Ra = (/QdR,QuR,QdR,QuR,QdR/)
     complex(dp) :: A0_ZZ_4f(-1:1,-1:1)
-    integer :: j1,j2,j3,j4,line1,line2
+    integer :: j1,j2,j3,j4,iSel,jSel,line1,line2
     complex(dp) :: za(4,4),zb(4,4)
     real(dp) :: sprod(4,4)
     real(dp) :: mhsq,q1q2,kcoupl,q12sq,q34sq
     complex(dp) :: a1_zz,a2_zz,a3_zz,struc_zz(3)
     complex(dp) :: a1_aa,a2_aa,a3_aa,a1_az,a2_az,a3_az,a1_za,a2_za,a3_za
+    complex(dp) :: a1_zzp,a2_zzp,a3_zzp,struc_zzp(3)
+    complex(dp) :: a1_zpz,a2_zpz,a3_zpz,struc_zpz(3)
+    complex(dp) :: a1_zpzp,a2_zpzp,a3_zpzp,struc_zpzp(3)
     complex(dp) :: struc_aa(3),struc_az(3),struc_za(3)
     complex(dp) :: helcoup(1:3,-1:1,-1:1)
     complex(dp) :: zab2
-    complex(dp) :: iprop12,iprop34
+    complex(dp) :: iprop12,iprop34, zpprop12,zpprop34
     complex(dp) :: vvcoupl_prime_zz(4),vvcoupl_prime_az(4),vvcoupl_prime_za(4),vvcoupl_prime_aa(2:4)
+    complex(dp) :: vvcoupl_prime_zzp(4),vvcoupl_prime_zpz(4),vvcoupl_prime_zpzp(4)
     integer :: vv_it
     integer :: i,j,k,l
 
     zab2(j1,j2,j3,j4) = za(j1,j2)*zb(j2,j4) + za(j1,j3)*zb(j3,j4)
 
-
-    Lz = (/aL_Qup,aL_Qdn/)
-    Rz = (/aR_Qup,aR_Qdn/)
-
-
     A0_ZZ_4f = czero
+    helcoup(:,:,:)=czero
+
+    Lz = (/aL_Qdn,aL_Qup,aL_Qdn,aL_Qup,aL_Qdn/)
+    Rz = (/aR_Qdn,aR_Qup,aR_Qdn,aR_Qup,aR_Qdn/)
+
+    if( abs(iSel).eq.pdfTop_ .or. abs(jSel).eq.pdfTop_ ) return
+    if( abs(iSel).eq.pdfGlu_ .or. abs(jSel).eq.pdfGlu_ ) return
+
+    line1=abs(iSel)
+    line2=abs(jSel)
 
     q1q2 = (sprod(j1,j3)+sprod(j1,j4)+sprod(j2,j3)+sprod(j2,j4))/two
     mhsq = two * q1q2 + sprod(j1,j2) + sprod(j3,j4)
@@ -2800,7 +2424,6 @@ module modHiggsJJ
           vvcoupl_prime_az(vv_it) = HVVSpinZeroDynamicCoupling(vv_it+4,0d0,q12sq,mhsq)
           vvcoupl_prime_za(vv_it) = HVVSpinZeroDynamicCoupling(vv_it+4,0d0,q34sq,mhsq)
        enddo
-
        do vv_it=1,3
           vvcoupl_prime_aa(vv_it+1) = HVVSpinZeroDynamicCoupling(vv_it+8,q12sq,q34sq,mhsq)
        enddo
@@ -2832,8 +2455,6 @@ module modHiggsJJ
        struc_za(3) = two * ci * a3_za
        struc_za(:) = struc_za(:) * couplAZff
 
-       !--
-
        helcoup(1:3,-1,-1) = struc_zz(1:3) * Lz(line1) * Lz(line2)/iprop12/iprop34 + &
                             struc_aa(1:3) * La(line1) * La(line2)/q12sq  /q34sq   + &
                             struc_az(1:3) * La(line1) * Lz(line2)/q12sq  /iprop34 + &
@@ -2863,6 +2484,77 @@ module modHiggsJJ
 
     endif
 
+    if ( includeVprime ) then
+
+       LCT = (/ezp_Dn_left,ezp_Up_left,ezp_Str_left,ezp_Chm_left,ezp_Bot_left/)
+       RCT = (/ezp_Dn_right,ezp_Up_right,ezp_Str_right,ezp_Chm_right,ezp_Bot_right/)
+
+       do vv_it=1,4
+          vvcoupl_prime_zzp(vv_it) = HVVSpinZeroDynamicCoupling(11+vv_it,q12sq,q34sq,mhsq)
+          vvcoupl_prime_zpz(vv_it) = HVVSpinZeroDynamicCoupling(11+vv_it,q34sq,q12sq,mhsq)
+          vvcoupl_prime_zpzp(vv_it) = HVVSpinZeroDynamicCoupling(15+vv_it,q12sq,q34sq,mhsq)
+       enddo
+
+       if (M_Zprime.gt.0d0) then
+          zpprop12 = q12sq - M_Zprime**2 + ci * M_Zprime * Ga_Zprime
+          zpprop34 = q34sq - M_Zprime**2 + ci * M_Zprime * Ga_Zprime
+       elseif (M_Zprime.eq.0d0) then
+          zpprop12 = q12sq
+          zpprop34 = q34sq
+       else
+          zpprop12 = M_Z**2
+          zpprop34 = M_Z**2
+       endif
+
+
+       a1_zzp = vvcoupl_prime_zzp(1) * M_Z**2/mhsq + vvcoupl_prime_zzp(2) * two * q1q2/mhsq + vvcoupl_prime_zzp(3) * kcoupl * q1q2/mhsq
+       a2_zzp = -two * vvcoupl_prime_zzp(2) - kcoupl * vvcoupl_prime_zzp(3)
+       a3_zzp = -two * vvcoupl_prime_zzp(4)
+       a1_zpz = vvcoupl_prime_zpz(1) * M_Z**2/mhsq + vvcoupl_prime_zpz(2) * two * q1q2/mhsq + vvcoupl_prime_zpz(3) * kcoupl * q1q2/mhsq
+       a2_zpz = -two * vvcoupl_prime_zpz(2) - kcoupl * vvcoupl_prime_zpz(3)
+       a3_zpz = -two * vvcoupl_prime_zpz(4)
+       a1_zpzp = vvcoupl_prime_zpzp(1) * M_Z**2/mhsq + vvcoupl_prime_zpzp(2) * two * q1q2/mhsq + vvcoupl_prime_zpzp(3) * kcoupl * q1q2/mhsq
+       a2_zpzp = -two * vvcoupl_prime_zpzp(2) - kcoupl * vvcoupl_prime_zpzp(3)
+       a3_zpzp = -two * vvcoupl_prime_zpzp(4)
+
+       struc_zzp(1) = two * (a1_zzp * mhsq - ci * a3_zzp * q1q2)
+       struc_zzp(2) = (a2_zzp + ci * a3_zzp)
+       struc_zzp(3) = two * ci * a3_zzp
+       struc_zpz(1) = two * (a1_zpz * mhsq - ci * a3_zpz * q1q2)
+       struc_zpz(2) = (a2_zpz + ci * a3_zpz)
+       struc_zpz(3) = two * ci * a3_zpz
+       struc_zpzp(1) = two * (a1_zpzp * mhsq - ci * a3_zpzp * q1q2)
+       struc_zpzp(2) = (a2_zpzp + ci * a3_zpzp)
+       struc_zpzp(3) = two * ci * a3_zpzp
+
+       struc_zzp(:) = struc_zzp(:) * couplZffsq
+       struc_zpz(:) = struc_zpz(:) * couplZffsq
+       struc_zpzp(:) = struc_zpzp(:) * couplZffsq
+
+       helcoup(1:3,-1,-1) = helcoup(1:3,-1,-1) + &
+                            struc_zpzp(1:3) * LCT(line1) * LCT(line2)/zpprop12  /zpprop34   + &
+                            struc_zpz(1:3) * LCT(line1) * Lz(line2)/zpprop12  /iprop34 + &
+                            struc_zzp(1:3) * Lz(line1) * LCT(line2)/iprop12/zpprop34
+
+       helcoup(1:3,-1,+1) = helcoup(1:3,-1,+1) + &
+                            struc_zpzp(1:3) * LCT(line1) * RCT(line2)/zpprop12  /zpprop34   + &
+                            struc_zpz(1:3) * LCT(line1) * Rz(line2)/zpprop12  /iprop34 + &
+                            struc_zzp(1:3) * Lz(line1) * RCT(line2)/iprop12/zpprop34
+
+       helcoup(1:3,+1,-1) = helcoup(1:3,+1,-1) + &
+                            struc_zpzp(1:3) * RCT(line1) * LCT(line2)/zpprop12  /zpprop34   + &
+                            struc_zpz(1:3) * RCT(line1) * Lz(line2)/zpprop12  /iprop34 + &
+                            struc_zzp(1:3) * Rz(line1) * LCT(line2)/iprop12/zpprop34
+
+       helcoup(1:3,+1,+1) = helcoup(1:3,+1,+1) + &
+                            struc_zpzp(1:3) * RCT(line1) * RCT(line2)/zpprop12  /zpprop34   + &
+                            struc_zpz(1:3) * RCT(line1) * Rz(line2)/zpprop12  /iprop34 + &
+                            struc_zzp(1:3) * Rz(line1) * RCT(line2)/iprop12/zpprop34
+
+    endif
+
+
+
     A0_ZZ_4f(-1,-1) = za(j1,j3)*zb(j4,j2) * helcoup(1,-1,-1) + &
          zab2(j1,j3,j4,j2)*zab2(j3,j1,j2,j4) * helcoup(2,-1,-1) + &
          za(j1,j2)*za(j3,j4)*zb(j4,j2)**2 * helcoup(3,-1,-1)
@@ -2885,25 +2577,40 @@ module modHiggsJJ
 
   end function A0_ZZ_4f
 
-  function A0_WW_4f(j1,j2,j3,j4,za,zb,sprod,useWWcoupl,Wpm_flip)
+  function A0_WW_4f(j1,j2,j3,j4,za,zb,sprod,iSel,jSel,useWWcoupl,Wpm_flip)
   use modMisc
   implicit none
     complex(dp) :: A0_WW_4f(-1:1,-1:1)
-    integer :: j1,j2,j3,j4
+    integer :: j1,j2,j3,j4,iSel,jSel,line1,line2
     complex(dp) :: za(4,4), zb(4,4)
     logical,optional :: useWWcoupl,Wpm_flip
     real(dp) :: sprod(4,4),q2Wplus,q2Wminus
     real(dp) :: mhsq, q1q2, kcoupl
-    complex(dp) :: a1, a2, a3, struc1, struc2, struc3
+    complex(dp) :: vvcoupl_prime_ww(4)
+    complex(dp) :: a1_ww, a2_ww, a3_ww, struc_ww(1:3)
+    complex(dp) :: vvcoupl_prime_wwp(4)
+    complex(dp) :: a1_wwp, a2_wwp, a3_wwp, struc_wwp(1:3)
+    complex(dp) :: vvcoupl_prime_wpw(4)
+    complex(dp) :: a1_wpw, a2_wpw, a3_wpw, struc_wpw(1:3)
+    complex(dp) :: vvcoupl_prime_wpwp(4)
+    complex(dp) :: a1_wpwp, a2_wpwp, a3_wpwp, struc_wpwp(1:3)
     complex(dp) :: zab2
-    complex(dp) :: iprop12, iprop34
-    complex(dp) :: vvcoupl_prime(4)
+    complex(dp) :: iprop12, iprop34, wpprop12, wpprop34
+    complex(dp) :: helcoup(1:3,-1:1,-1:1)
+    real(dp), dimension(5) :: LCT,RCT
     integer :: vv_it
     integer :: i,j,k,l
 
     zab2(j1,j2,j3,j4) = za(j1,j2)*zb(j2,j4) + za(j1,j3)*zb(j3,j4)
 
     A0_WW_4f = czero
+    helcoup(:,:,:)=czero
+
+    if( abs(iSel).eq.pdfTop_ .or. abs(jSel).eq.pdfTop_ ) return
+    if( abs(iSel).eq.pdfGlu_ .or. abs(jSel).eq.pdfGlu_ ) return
+
+    line1=abs(iSel)
+    line2=abs(jSel)
 
     q1q2 = (sprod(j1,j3)+sprod(j1,j4)+sprod(j2,j3)+sprod(j2,j4))/two
     mhsq = two * q1q2 + sprod(j1,j2) + sprod(j3,j4)
@@ -2913,36 +2620,130 @@ module modHiggsJJ
     q2Wplus  = sprod(j1,j2)
     q2Wminus = sprod(j3,j4)
     if( present(Wpm_flip) ) then
-       if( Wpm_flip ) call swapr(q2Wplus,q2Wminus)
+       if( Wpm_flip ) then
+          call swap(q2Wplus,q2Wminus)
+          call swap(line1,line2)
+       endif
     endif
     if( .not.present(useWWcoupl) ) then
        do vv_it=1,4
-          vvcoupl_prime(vv_it) = HVVSpinZeroDynamicCoupling(vv_it,q2Wplus,q2Wminus,mhsq)
+          vvcoupl_prime_ww(vv_it) = HVVSpinZeroDynamicCoupling(vv_it,q2Wplus,q2Wminus,mhsq)
        enddo
     else
        do vv_it=1,4
-          vvcoupl_prime(vv_it) = HVVSpinZeroDynamicCoupling(vv_it,q2Wplus,q2Wminus,mhsq,tryWWcoupl=useWWcoupl)
+          vvcoupl_prime_ww(vv_it) = HVVSpinZeroDynamicCoupling(vv_it,q2Wplus,q2Wminus,mhsq,tryWWcoupl=useWWcoupl)
        enddo
     endif
 
-
-    a1 = vvcoupl_prime(1) * M_W**2/mhsq + vvcoupl_prime(2) * two * q1q2/mhsq + vvcoupl_prime(3) * kcoupl * q1q2/mhsq
-    a2 = -two * vvcoupl_prime(2) - kcoupl * vvcoupl_prime(3)
-    a3 = -two * vvcoupl_prime(4)
-
-    struc1 = two * (a1 * mhsq - ci * a3 * q1q2)
-    struc2 = a2 + ci * a3
-    struc3 = two * ci * a3
-
-
-    A0_WW_4f(-1,-1) = za(j1,j3)*zb(j4,j2) * struc1 + &
-         zab2(j1,j3,j4,j2)*zab2(j3,j1,j2,j4) * struc2 + &
-         za(j1,j2)*za(j3,j4)*zb(j4,j2)**2 * struc3
-
+    ! SM contribution
     iprop12 = sprod(j1,j2) - M_W**2 + ci * M_W * Ga_W
     iprop34 = sprod(j3,j4) - M_W**2 + ci * M_W * Ga_W
 
-    A0_WW_4f = A0_WW_4f/vev /iprop12/iprop34 * couplWffsq
+    a1_ww = vvcoupl_prime_ww(1) * M_W**2/mhsq + vvcoupl_prime_ww(2) * two * q1q2/mhsq + vvcoupl_prime_ww(3) * kcoupl * q1q2/mhsq
+    a2_ww = -two * vvcoupl_prime_ww(2) - kcoupl * vvcoupl_prime_ww(3)
+    a3_ww = -two * vvcoupl_prime_ww(4)
+
+    struc_ww(1) = two * (a1_ww * mhsq - ci * a3_ww * q1q2)
+    struc_ww(2) = a2_ww + ci * a3_ww
+    struc_ww(3) = two * ci * a3_ww
+    struc_ww(:) = struc_ww(:) * couplWffsq
+
+    helcoup(1:3,-1,-1) = struc_ww(1:3)/iprop12/iprop34
+
+    if ( includeVprime ) then
+
+       LCT = (/ewp_Up_left,ewp_Up_left,ewp_Chm_left,ewp_Chm_left,ewp_Top_left/)
+       RCT = (/ewp_Up_right,ewp_Up_right,ewp_Chm_right,ewp_Chm_right,ewp_Top_right/)
+       ! Adjust couplings convention
+       LCT(:) = LCT(:)/bL
+       RCT(:) = RCT(:)/bL
+
+       do vv_it=1,4
+          vvcoupl_prime_wwp(vv_it) = HVVSpinZeroDynamicCoupling(11+vv_it,q2Wplus,q2Wminus,mhsq,tryWWcoupl=useWWcoupl)
+          vvcoupl_prime_wpw(vv_it) = HVVSpinZeroDynamicCoupling(11+vv_it,q2Wminus,q2Wplus,mhsq,tryWWcoupl=useWWcoupl)
+          vvcoupl_prime_wpwp(vv_it) = HVVSpinZeroDynamicCoupling(15+vv_it,q2Wplus,q2Wminus,mhsq,tryWWcoupl=useWWcoupl)
+       enddo
+
+
+       if (M_Wprime.gt.0d0) then
+          wpprop12 = q2Wplus - M_Wprime**2 + ci * M_Wprime * Ga_Wprime
+          wpprop34 = q2Wminus - M_Wprime**2 + ci * M_Wprime * Ga_Wprime
+       elseif (M_Wprime.eq.0d0) then
+          wpprop12 = q2Wplus
+          wpprop34 = q2Wminus
+       else
+          wpprop12 = M_W**2
+          wpprop34 = M_W**2
+       endif
+
+
+       a1_wwp = vvcoupl_prime_wwp(1) * M_W**2/mhsq + vvcoupl_prime_wwp(2) * two * q1q2/mhsq + vvcoupl_prime_wwp(3) * kcoupl * q1q2/mhsq
+       a2_wwp = -two * vvcoupl_prime_wwp(2) - kcoupl * vvcoupl_prime_wwp(3)
+       a3_wwp = -two * vvcoupl_prime_wwp(4)
+       a1_wpw = vvcoupl_prime_wpw(1) * M_W**2/mhsq + vvcoupl_prime_wpw(2) * two * q1q2/mhsq + vvcoupl_prime_wpw(3) * kcoupl * q1q2/mhsq
+       a2_wpw = -two * vvcoupl_prime_wpw(2) - kcoupl * vvcoupl_prime_wpw(3)
+       a3_wpw = -two * vvcoupl_prime_wpw(4)
+       a1_wpwp = vvcoupl_prime_wpwp(1) * M_W**2/mhsq + vvcoupl_prime_wpwp(2) * two * q1q2/mhsq + vvcoupl_prime_wpwp(3) * kcoupl * q1q2/mhsq
+       a2_wpwp = -two * vvcoupl_prime_wpwp(2) - kcoupl * vvcoupl_prime_wpwp(3)
+       a3_wpwp = -two * vvcoupl_prime_wpwp(4)
+
+       struc_wwp(1) = two * (a1_wwp * mhsq - ci * a3_wwp * q1q2)
+       struc_wwp(2) = (a2_wwp + ci * a3_wwp)
+       struc_wwp(3) = two * ci * a3_wwp
+       struc_wpw(1) = two * (a1_wpw * mhsq - ci * a3_wpw * q1q2)
+       struc_wpw(2) = (a2_wpw + ci * a3_wpw)
+       struc_wpw(3) = two * ci * a3_wpw
+       struc_wpwp(1) = two * (a1_wpwp * mhsq - ci * a3_wpwp * q1q2)
+       struc_wpwp(2) = (a2_wpwp + ci * a3_wpwp)
+       struc_wpwp(3) = two * ci * a3_wpwp
+
+       struc_wwp(:) = struc_wwp(:) * couplWffsq
+       struc_wpw(:) = struc_wpw(:) * couplWffsq
+       struc_wpwp(:) = struc_wpwp(:) * couplWffsq
+
+       helcoup(1:3,-1,-1) = helcoup(1:3,-1,-1) + &
+                            struc_wpwp(1:3) * LCT(line1) * LCT(line2)/wpprop12/wpprop34 + &
+                            struc_wpw(1:3)  * LCT(line1)             /wpprop12/iprop34  + &
+                            struc_wwp(1:3)  *              LCT(line2)/iprop12/wpprop34
+
+       helcoup(1:3,-1,+1) = helcoup(1:3,-1,+1) + &
+                            struc_wpwp(1:3) * LCT(line1) * RCT(line2)/wpprop12/wpprop34 + &
+                            struc_wpw(1:3)  * LCT(line1)             /wpprop12/iprop34  + &
+                            struc_wwp(1:3)               * RCT(line2)/iprop12/wpprop34
+
+       helcoup(1:3,+1,-1) = helcoup(1:3,+1,-1) + &
+                            struc_wpwp(1:3) * RCT(line1) * LCT(line2)/wpprop12/wpprop34 + &
+                            struc_wpw(1:3)  * RCT(line1)             /wpprop12/iprop34  + &
+                            struc_wwp(1:3)               * LCT(line2)/iprop12/wpprop34
+
+       helcoup(1:3,+1,+1) = helcoup(1:3,+1,+1) + &
+                            struc_wpwp(1:3) * RCT(line1) * RCT(line2)/wpprop12/wpprop34 + &
+                            struc_wpw(1:3)  * RCT(line1)             /wpprop12/iprop34  + &
+                            struc_wwp(1:3)               * RCT(line2)/iprop12/wpprop34
+
+    endif
+
+
+    A0_WW_4f(-1,-1) = za(j1,j3)*zb(j4,j2) * helcoup(1,-1,-1) + &
+         zab2(j1,j3,j4,j2)*zab2(j3,j1,j2,j4) * helcoup(2,-1,-1) + &
+         za(j1,j2)*za(j3,j4)*zb(j4,j2)**2 * helcoup(3,-1,-1)
+
+    if ( includeVprime ) then
+       A0_WW_4f(-1,+1) = za(j1,j4)*zb(j3,j2) * helcoup(1,-1,+1) + &
+            zab2(j1,j3,j4,j2)*zab2(j4,j1,j2,j3) * helcoup(2,-1,+1) + &
+            za(j1,j2)*za(j4,j3)*zb(j3,j2)**2 * helcoup(3,-1,+1)
+
+       A0_WW_4f(+1,-1) = za(j2,j3)*zb(j4,j1) * helcoup(1,+1,-1) + &
+            zab2(j2,j3,j4,j1)*zab2(j3,j1,j2,j4) * helcoup(2,+1,-1) + &
+            za(j2,j1)*za(j3,j4)*zb(j4,j1)**2 * helcoup(3,+1,-1)
+
+       A0_WW_4f(+1,+1) = za(j2,j4)*zb(j3,j1) * helcoup(1,+1,+1) + &
+            zab2(j2,j3,j4,j1)*zab2(j4,j1,j2,j3) * helcoup(2,+1,+1) + &
+            za(j2,j1)*za(j4,j3)*zb(j3,j1)**2 * helcoup(3,+1,+1)
+    endif
+
+    A0_WW_4f = A0_WW_4f/vev
+
 
     return
 
