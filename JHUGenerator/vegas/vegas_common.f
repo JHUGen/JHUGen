@@ -2,7 +2,7 @@
       parameter(mxdim=30)
       integer ndim,ncall,itmx,nprn
       double precision xl(mxdim),xu(mxdim),acc
-      double precision xi(250,mxdim),si,si2,swgt,schi
+      double precision xi(50,mxdim),si,si2,swgt,schi
       integer ndo,it,idum
       logical readin,writeout,stopvegas
       character*(72) ingridfile,outgridfile

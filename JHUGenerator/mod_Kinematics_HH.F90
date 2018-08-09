@@ -9,7 +9,6 @@ contains
 
 
 SUBROUTINE WriteOutEvent_HH(id,helicity,Mom,EventWeight)
-  use ModKinematics
   use ModParameters
   use ModMisc
   implicit none

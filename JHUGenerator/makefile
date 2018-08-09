@@ -103,7 +103,6 @@ MainDep = mod_CrossSection.F90 \
           mod_CrossSection_VH.F90 \
           mod_CrossSection_HH.F90 \
           mod_PMZZ.F90 \
-          mod_CommandLine.F90 \
           main.F90
 
 # main objects
@@ -115,19 +114,17 @@ MainObj = $(ObjectDir)/mod_CrossSection.o \
           $(ObjectDir)/mod_CrossSection_VH.o \
           $(ObjectDir)/mod_CrossSection_HH.o \
           $(ObjectDir)/mod_PMZZ.o \
-          $(ObjectDir)/mod_CommandLine.o \
           $(ObjectDir)/main.o
 
-AuxDep = mod_Parameters.F90 \
-         mod_Misc.F90 \
+AuxDep = mod_Misc.F90 \
+         mod_Parameters.F90 \
          mod_VH_aux.F90 \
-         mod_Phasespace.F90 \
-         mod_Kinematics.F90 \
-         mod_Kinematics_VH.F90 \
-         mod_Kinematics_HH.F90 \
-         mod_HashCollection.F90
+         mod_Phasespace.F90
 
-ifeq ($(linkCollierLib),Yes)
+KimDep = mod_Kinematics.F90 \
+         mod_Kinematics_VH.F90 \
+         mod_Kinematics_HH.F90
+
 ggVHAmpDep = \
          gg_VH_Boxes/mod_ffbH_Box7_8_mmm.F90 \
          gg_VH_Boxes/mod_ffbH_Box7_8_ppm.F90 \
@@ -232,6 +229,33 @@ ggHH5AmpDep = \
          gg_HH5_Boxes/mod_gg_box_HH5_6_pm.F90 \
          gg_HH5_Boxes/mod_gg_box_HH5_6_pp.F90
 
+# amplitude dependencies
+AmpDep = mod_TopDecay.F90 \
+         mod_Graviton.F90 \
+         mod_Higgs.F90 \
+         mod_Zprime.F90 \
+         mod_VHiggs.F90 \
+         mod_HiggsJJ.F90 \
+         mod_HiggsJ.F90 \
+         mod_VH_LO.F90 \
+         mod_VH_gg.F90 \
+         mod_VH_real.F90 \
+         mod_VH_virtual.F90 \
+         mod_VH_qg.F90 \
+         mod_VH_dipole.F90 \
+         mod_HH.F90 \
+         mod_TTBHiggs.F90 \
+         mod_THiggs.F90
+
+AuxObj =  $(ObjectDir)/mod_Misc.o \
+          $(ObjectDir)/mod_Parameters.o \
+          $(ObjectDir)/mod_VH_aux.o \
+          $(ObjectDir)/mod_Phasespace.o
+
+KimObj = $(ObjectDir)/mod_Kinematics.o \
+          $(ObjectDir)/mod_Kinematics_VH.o\
+          $(ObjectDir)/mod_Kinematics_HH.o
+
 ggVHAmpObj = \
           $(ObjectDir)/mod_ffbH_Box7_8_mmm.o \
           $(ObjectDir)/mod_ffbH_Box7_8_ppm.o \
@@ -335,51 +359,8 @@ ggHH5AmpObj = \
           $(ObjectDir)/mod_gg_box_HH5_6_mp.o \
           $(ObjectDir)/mod_gg_box_HH5_6_pm.o \
           $(ObjectDir)/mod_gg_box_HH5_6_pp.o
-else
-ggVHAmpDep = 
-ggVH5AmpDep = 
-ggHHAmpDep = 
-ggHH5AmpDep = 
-ggVHAmpObj = 
-ggVH5AmpObj = 
-ggHHAmpObj = 
-ggHH5AmpObj = 
-endif
 
-# amplitude dependencies
-AmpDep = mod_Parameters.F90 \
-         mod_Misc.F90 \
-         mod_TopDecay.F90 \
-         mod_Graviton.F90 \
-         mod_Higgs.F90 \
-         mod_Zprime.F90 \
-         mod_VHiggs.F90 \
-         mod_HiggsJJ.F90 \
-         mod_HiggsJ.F90 \
-         mod_VH_LO.F90 \
-         mod_VH_gg.F90 \
-         mod_VH_real.F90 \
-         mod_VH_virtual.F90 \
-         mod_VH_qg.F90 \
-         mod_VH_dipole.F90 \
-         mod_HH.F90 \
-         mod_TTBHiggs.F90 \
-         mod_THiggs.F90
-
-AuxObj =  $(ObjectDir)/mod_HashCollection.o \
-          $(ObjectDir)/mod_Parameters.o \
-          $(ObjectDir)/mod_Misc.o \
-          $(ObjectDir)/mod_VH_aux.o \
-          $(ObjectDir)/mod_Phasespace.o \
-          $(ObjectDir)/mod_Kinematics.o \
-          $(ObjectDir)/mod_Kinematics_VH.o\
-          $(ObjectDir)/mod_Kinematics_HH.o
-ifeq ($(linkMELA),Yes)
-    AuxDep += mod_MCFMWrapper.F90
-    AuxObj += $(ObjectDir)/mod_MCFMWrapper.o
-endif
-
-
+# amplitude objects
 AmpObj =  $(ObjectDir)/mod_TopDecay.o \
           $(ObjectDir)/mod_Graviton.o \
           $(ObjectDir)/mod_Higgs.o \
@@ -409,31 +390,34 @@ PDFObj   = $(ObjectDir)/Cteq61Pdf.o \
            $(ObjectDir)/mstwpdf.o \
            $(ObjectDir)/NNPDFDriver.o
 
-PSGenC = genps.c \
-         boost.c
-
-PSGenDep = $(PSGenC) \
-           genps.h \
-           boost.h
+PSGenDep = genps.c \
+           boost.c
 
 PSGenObj = $(ObjectDir)/genps.o \
            $(ObjectDir)/boost.o
+
+JHUGenMELA =
 
 CPSDep = ./CPS/CALLING_cpHTO.f
 
 CPSObj = $(ObjectDir)/CALLING_cpHTO.o
 
-LHAPDFInterfaceC = LHAPDFversion.cc
-
-LHAPDFInterfaceDep = $(LHAPDFInterfaceC) \
-                     LHAPDFversion.h
-
-ifeq ($(UseLHAPDF),Yes)
-LHAPDFInterfaceObj = $(ObjectDir)/LHAPDFversion.o
+ifeq ($(linkMELA),Yes)
+  MCFM_Obj = $(MCFMDir)/anomamp.o \
+             $(MCFMDir)/cdotpr.o \
+             $(MCFMDir)/jtwo3456.o \
+             $(MCFMDir)/jtwo.o \
+             $(MCFMDir)/jzero.o \
+             $(MCFMDir)/qq_ZZqq.o \
+             $(MCFMDir)/setupzprops.o \
+             $(MCFMDir)/spinorcurr.o \
+             $(MCFMDir)/WWZZ.o \
+             $(MCFMDir)/ZZHZZamp.o \
+             $(MCFMDir)/ZZSingleres.o \
+             $(MCFMDir)/jone.o
 else
-LHAPDFInterfaceObj =
+  MCFM_Obj =
 endif
-
 
 # MadGraphDep = h_emepemep.f \
 #               h_emepemep_noint.f \
@@ -451,54 +435,46 @@ MadGraphObj = $(ObjectDir)/gg_ttbh.o \
 
 
 
-JHUGenerator: $(CPSObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(AuxObj) $(ggVHAmpObj) $(LHAPDFInterfaceObj) $(ggVH5AmpObj) $(ggHHAmpObj) $(ggHH5AmpObj) $(AmpObj) $(MainObj)
+#JHUGenerator: ffdir qldir colliermodules $(CPSObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(AmpObj) $(ggVHAmpObj) $(MainObj)
+JHUGenerator: colliermodules $(CPSObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(AuxObj) $(ggVHAmpObj) $(ggVH5AmpObj) $(ggHHAmpObj) $(ggHH5AmpObj) $(AmpObj) $(KimObj) $(MainObj)
 	@echo " linking"
 ifeq ($(UseLHAPDF),Yes)
-	echo " -> interfaced with LHAPDF"
+	echo " interfaced with LHAPDF"
 else
-	echo " -> using internal PDF sets"
+	echo " using internal PDF sets"
 endif
-	@echo " executable file "$(Exec)" is compiled with "$(Comp)
+	@echo " executable file is "$(Exec) "compiled with "$(Comp)
 	@echo " "
-	$(fcomp) -o $(Exec) $(MainObj) $(PSGenObj) $(AuxObj) $(AmpObj) $(ggVHAmpObj) $(LHAPDFInterfaceObj) $(ggVH5AmpObj) $(ggHHAmpObj) $(ggHH5AmpObj) $(VegasObj) $(PDFObj) $(CPSObj) $(MCFM_Obj) $(LHAPDFflags)
+	$(fcomp) -o $(Exec) $(MainObj) $(PSGenObj) $(AuxObj) $(ggVHAmpObj) $(ggVH5AmpObj) $(ggHHAmpObj) $(ggHH5AmpObj) $(AmpObj) $(KimObj) $(VegasObj) $(PDFObj) $(CPSObj) $(MCFM_Obj) $(LHAPDFflags) $(QCDLoopflags)
 
 $(AuxObj): $(AuxDep) $(Makefile)
 	@echo " compiling misc. and aux. tools"
 	$(fcomp) -c $(AuxDep)
 	mv *.o $(ObjectDir)
-ifeq ($(linkMELA),Yes)
-	echo " -> interfaced with JHUGenMELA and MCFM"
-	ln -sf $(MELADataDir)/input.DAT ./
-	ln -sf $(MELADataDir)/process.DAT ./
-	ln -sf $(MELADataDir)/hto_output.dat ./
-	ln -sf $(MELADataDir)/ffwarn.dat ./
-	ln -sf $(MELADataDir)/ffperm5.dat ./
-	ln -sf $(MELADataDir)/fferr.dat ./
-	ln -sf $(MELADataDir)/dm_parameters.DAT ./
-	ln -sf $(MELADataDir)/br.sm1 ./
-	ln -sf $(MELADataDir)/br.sm2 ./
-endif
-	$(fcomp) -c $(AuxDep)
-	mv *.o $(ObjectDir)
 
-$(ggVHAmpObj): $(ggVHAmpDep) $(AuxObj) $(Makefile)
+$(ggVHAmpObj): $(ggVHAmpDep) $(Makefile)
 	@echo " compiling ggVH box amplitudes"
 	$(fcomp) -c $(ggVHAmpDep)
 	mv *.o $(ObjectDir)
 
-$(ggVH5AmpObj): $(ggVH5AmpDep) $(AuxObj) $(Makefile)
+$(ggVH5AmpObj): $(ggVH5AmpDep) $(Makefile)
 	@echo " compiling ggVH5 box amplitudes"
 	$(fcomp) -c $(ggVH5AmpDep)
 	mv *.o $(ObjectDir)
 
-$(ggHHAmpObj): $(ggHHAmpDep) $(AuxObj) $(Makefile)
+$(ggHHAmpObj): $(ggHHAmpDep) $(Makefile)
 	@echo " compiling ggHH box amplitudes"
 	$(fcomp) -c $(ggHHAmpDep)
 	mv *.o $(ObjectDir)
 
-$(ggHH5AmpObj): $(ggHH5AmpDep) $(AuxObj) $(Makefile)
+$(ggHH5AmpObj): $(ggHH5AmpDep) $(Makefile)
 	@echo " compiling ggHH5 box amplitudes"
 	$(fcomp) -c $(ggHH5AmpDep)
+	mv *.o $(ObjectDir)
+
+$(KimObj): $(KimDep) $(Makefile)
+	@echo " compiling Kinematics dependencies"
+	$(fcomp) -c $(KimDep)
 	mv *.o $(ObjectDir)
 
 $(AmpObj): $(AmpDep) mod_Misc.F90 mod_Parameters.F90 $(Makefile)
@@ -526,36 +502,41 @@ $(CPSObj): $(CPSDep) $(Makefile)
 	$(fcomp) -c $(CPSDep)
 	mv *.o $(ObjectDir)
 
-$(PSGenObj): $(PSGenDep) $(Makefile)
+	
+$(PSGenObj): $(PSGenDep)
 	@echo " compiling phase space generator"
-	$(ccomp) -c $(PSGenC)
+	$(ccomp) -c $(PSGenDep)
 	mv *.o $(ObjectDir)
 
-ifeq ($(UseLHAPDF),Yes)
-$(LHAPDFInterfaceObj) : $(LHAPDFInterfaceDep) $(Makefile)
-	@echo " compiling LHAPDF interface"
-	$(ccomp) $(LHAPDFflags) -c $(LHAPDFInterfaceC)
-	mv *.o $(ObjectDir)
-endif
 
 # $(MadGraphObj): $(MadGraphDep)
 # 	@echo " compiling MG files"
 # 	$(fcomp) -O0 -c $(MadGraphDep) -I/home/schulze/lib/HELAS-3.0/
 # 	mv *.o $(ObjectDir)
 
+#ffdir:
+#	@echo " compiling QCDLoop directory ff"
+##	FC=$(CompFullName) overrides FC specified in that makefile
+##	http://stackoverflow.com/questions/2826029/passing-additional-variables-from-command-line-to-make#comment51986622_2826178
+#	(cd $(FFDir); $(MAKE) FC=$(CompFullName); ranlib libff.a)
+#
+#
+#qldir:
+#	@echo " compiling QCDLoop directory ql"
+##	FC=$(CompFullName) overrides FC specified in that makefile
+##	http://stackoverflow.com/questions/2826029/passing-additional-variables-from-command-line-to-make#comment51986622_2826178
+#	(cd $(QLDir); $(MAKE) FC=$(CompFullName))
+	
+colliermodules:
+	@echo " moving Collier .mod to modules directory"
+	(cp $(COLLIERModuleDir)/*.mod $(ModuleDir)/)
+
+#COLLIERDir:
+#	@echo " linking Collier static library libcollier.a"
+#	(cd $(COLLIERDir); ranlib libcollier.a)
+
 clean:
 	@echo " deleting executable, object and module files"
-ifeq ($(linkMELA),Yes)
-	rm -f input.DAT
-	rm -f process.DAT
-	rm -f hto_output.dat
-	rm -f ffwarn.dat
-	rm -f ffperm5.dat
-	rm -f fferr.dat
-	rm -f dm_parameters.DAT
-	rm -f br.sm1
-	rm -f br.sm2
-endif
 	rm -f objects/*.o
 	rm -f objects/*.a
 	rm -f ff/*.o
