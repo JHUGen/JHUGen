@@ -114,10 +114,13 @@ subroutine amp_VH_LO(Mom,mass,helicity,id,amp)
 
 ! amplitudes w/o HVV or VFF couplings to calculate
   if(id(6).ne.convertLHE(Pho_))then !Z/W/A decays
-    if(id(1).gt.0d0)then!q q~
+    if( id(1).gt.0 .and. id(2).lt.0 )then!q q~
       call spinoru2(4,(/Mom(1:4,1),Mom(1:4,2),Mom(1:4,6),Mom(1:4,7)/),Spaa,Spbb,sprod)
-    else!q~ q
+    elseif( id(1).lt.0 .and. id(2).gt.0 )then!q~ q
       call spinoru2(4,(/Mom(1:4,2),Mom(1:4,1),Mom(1:4,6),Mom(1:4,7)/),Spaa,Spbb,sprod)
+    else
+      print*,"no qq / q~q~ initiated processes for VH"
+      return
     endif
     if(gVVS1(1).ne.0d0.or.gVVS1(2).ne.0d0.or.gVVS1(3).ne.0d0.or.gVVS1(4).ne.0d0.or.gVVS1(5).ne.0d0)then
       call qqbffbHa1(Spaa,Spbb,sprod,id,helicity,qqffbHa1)
@@ -129,10 +132,13 @@ subroutine amp_VH_LO(Mom,mass,helicity,id,amp)
       call qqbffbHg4(Spaa,Spbb,sprod,id,helicity,qqffbHg4)
     endif
   else ! A is final state
-    if(id(1).gt.0d0)then!q q~
+    if( id(1).gt.0 .and. id(2).lt.0 )then!q q~
       call spinoru2(4,(/Mom(1:4,1),Mom(1:4,2),Mom(1:4,2),Mom(1:4,4)/),Spaa,Spbb,sprod)!reference momentum to be set!!!!!!!!!!!!!!!
-    else!q~ q
+    elseif( id(1).lt.0 .and. id(2).gt.0 )then!q~ q
       call spinoru2(4,(/Mom(1:4,2),Mom(1:4,1),Mom(1:4,2),Mom(1:4,4)/),Spaa,Spbb,sprod)!reference momentum to be set!!!!!!!!!!!!!!!
+    else
+      print*,"no qq / q~q~ initiated processes for AH"
+      return
     endif
     if(gVVS1(3).ne.0d0.or.gVVS1(4).ne.0d0)then
       call qqbAHa1(Spaa,Spbb,sprod,id,helicity,qqAHa1)
@@ -153,8 +159,9 @@ subroutine amp_VH_LO(Mom,mass,helicity,id,amp)
     else
       qqWW=0d0
     endif
+    PROP3 = PROPAGATOR(q3_q3,mass(3,1),mass(3,2))
     PROP4 = PROPAGATOR(q4_q4,mass(4,1),mass(4,2))
-    amp = qqWW * PROP4
+    amp = qqWW * PROP3 * PROP4
 
   else ! Z or A
   ! HVV vertex
@@ -166,7 +173,12 @@ subroutine amp_VH_LO(Mom,mass,helicity,id,amp)
       if(qqZZ.ne.0d0)then
         PROP3 = PROPAGATOR(q3_q3,mass(3,1),mass(3,2))
         PROP4 = PROPAGATOR(q4_q4,mass(4,1),mass(4,2))
-        qqZZ=qqZZ*ZFFbare(id(1),id(2),helicity(1),helicity(2))*ZFF(id(6),id(7),helicity(6),helicity(7))
+        !if(id(1).gt.0)then
+          qqZZ=qqZZ*ZFFbare(id(1),id(2),helicity(1),helicity(2))
+        !else
+          !qqZZ=qqZZ*ZFFbare(id(2),id(1),helicity(2),helicity(1))
+        !endif
+        qqZZ=qqZZ*ZFF(id(6),id(7),helicity(6),helicity(7))
         qqZZ=qqZZ*PROP3*PROP4*gFFZ**2
       endif
       if(qqZA.ne.0d0)then
@@ -250,19 +262,94 @@ subroutine qqbffbHa1(Spaa,Spbb,sprod,id,helicity,qqffbHa1)
   real(8), intent(in) :: helicity(9)
   complex(8), intent(out) :: qqffbHa1
 
-  if(id(1)*helicity(1).lt.0d0)then!J1 is left
+  !if(id(1)*helicity(1).lt.0d0)then!J1 is left
+!  if(dble(id(1))*dble(id(2))*helicity(1)*helicity(2).lt.0d0)then
+!    qqffbHa1 = 0d0
+!  elseif((id(1).gt.0 .and. helicity(1).lt.0d0 .and. id(2).lt.0 .and. helicity(2).gt.0d0) .or. &
+!         (id(2).gt.0 .and. helicity(2).gt.0d0 .and. id(1).lt.0 .and. helicity(1).lt.0d0) )then!J1 is left
+!    if(id(6)*helicity(6).lt.0d0)then!J2 is left
+!      qqffbHa1 = - 2d0*Spaa(2,3)*Spbb(1,4)!LL
+!    else!J2 is right
+!      qqffbHa1 = - 2d0*Spaa(2,4)*Spbb(1,3)!LR
+!    endif
+!  elseif((id(2).gt.0 .and. helicity(2).lt.0d0 .and. id(1).lt.0 .and. helicity(1).gt.0d0) .or. &
+!         (id(1).gt.0 .and. helicity(1).gt.0d0 .and. id(2).lt.0 .and. helicity(2).lt.0d0) )then!J1 is right
+!    if(id(6)*helicity(6).lt.0d0)then!J2 is left
+!      qqffbHa1 = - 2d0*Spaa(1,3)*Spbb(2,4)!RL
+!    else!J2 is right
+!      qqffbHa1 = - 2d0*Spaa(1,4)*Spbb(2,3)!RR
+!    endif
+!  endif
+
+  if(    id(1)*helicity(1).lt.0d0 .and. id(2)*helicity(2).lt.0d0)then!J1 is left
     if(id(6)*helicity(6).lt.0d0)then!J2 is left
       qqffbHa1 = - 2d0*Spaa(2,3)*Spbb(1,4)!LL
     else!J2 is right
       qqffbHa1 = - 2d0*Spaa(2,4)*Spbb(1,3)!LR
     endif
-  else!J1 is right
+  elseif(id(1)*helicity(1).gt.0d0 .and. id(2)*helicity(2).gt.0d0)then!J1 is right
     if(id(6)*helicity(6).lt.0d0)then!J2 is left
       qqffbHa1 = - 2d0*Spaa(1,3)*Spbb(2,4)!RL
     else!J2 is right
       qqffbHa1 = - 2d0*Spaa(1,4)*Spbb(2,3)!RR
     endif
+  else
+    qqffbHa1 = 0d0
   endif
+
+!  if(    (id(1).gt.0 .and. helicity(1).lt.0d0 .and. id(2).lt.0 .and. helicity(2).gt.0d0) .or. &
+!         (id(2).gt.0 .and. helicity(2).gt.0d0 .and. id(1).lt.0 .and. helicity(1).lt.0d0) )then!J1 is left
+!    if(id(6)*helicity(6).lt.0d0)then!J2 is left
+!      qqffbHa1 = - 2d0*Spaa(2,3)*Spbb(1,4)!LL
+!    else!J2 is right
+!      qqffbHa1 = - 2d0*Spaa(2,4)*Spbb(1,3)!LR
+!    endif
+!  elseif((id(2).gt.0 .and. helicity(2).lt.0d0 .and. id(1).lt.0 .and. helicity(1).gt.0d0) .or. &
+!         (id(1).gt.0 .and. helicity(1).gt.0d0 .and. id(2).lt.0 .and. helicity(2).lt.0d0) )then!J1 is right
+!    if(id(6)*helicity(6).lt.0d0)then!J2 is left
+!      qqffbHa1 = - 2d0*Spaa(1,3)*Spbb(2,4)!RL
+!    else!J2 is right
+!      qqffbHa1 = - 2d0*Spaa(1,4)*Spbb(2,3)!RR
+!    endif
+!  else
+!    qqffbHa1 = 0d0
+!  endif
+
+  !qqffbHa1=1d0
+
+!  if(id(1).gt.0 .and. id(2).lt.0)then
+!    if( helicity(1).lt.0d0 .and. helicity(2).gt.0d0 )then!J1 is left
+!      if(id(6)*helicity(6).lt.0d0)then!J2 is left
+!        qqffbHa1 = - 2d0*Spaa(2,3)*Spbb(1,4)!LL
+!      else!J2 is right
+!        qqffbHa1 = - 2d0*Spaa(2,4)*Spbb(1,3)!LR
+!      endif
+!    elseif( helicity(1).gt.0d0 .and. helicity(2).lt.0d0 )then!J1 is right
+!      if(id(6)*helicity(6).lt.0d0)then!J2 is left
+!        qqffbHa1 = - 2d0*Spaa(1,3)*Spbb(2,4)!RL
+!      else!J2 is right
+!        qqffbHa1 = - 2d0*Spaa(1,4)*Spbb(2,3)!RR
+!      endif
+!    else
+!      qqffbHa1 = 0d0
+!    endif
+!  elseif(id(1).lt.0 .and. id(2).gt.0)then
+!    if( helicity(1).lt.0d0 .and. helicity(2).gt.0d0 )then!J1 is left
+!      if(id(6)*helicity(6).lt.0d0)then!J2 is left
+!        qqffbHa1 = - 2d0*Spaa(1,3)*Spbb(2,4)!LL
+!      else!J2 is right
+!        qqffbHa1 = - 2d0*Spaa(2,3)*Spbb(1,4)!LR
+!      endif
+!    elseif( helicity(1).gt.0d0 .and. helicity(2).lt.0d0 )then!J1 is right
+!      if(id(6)*helicity(6).lt.0d0)then!J2 is left
+!        qqffbHa1 = - 2d0*Spaa(1,4)*Spbb(2,3)!RL
+!      else!J2 is right
+!        qqffbHa1 = - 2d0*Spaa(2,4)*Spbb(1,3)!RR
+!      endif
+!    else
+!      qqffbHa1 = 0d0
+!    endif
+!  endif
 
   return
 end subroutine qqbffbHa1
@@ -277,7 +364,7 @@ subroutine qqbffbHa2(Spaa,Spbb,sprod,id,helicity,qqffbHa2)
   real(8), intent(in) :: helicity(9)
   complex(8), intent(out) :: qqffbHa2
 
-  if(id(1)*helicity(1).lt.0d0)then!J1 is left
+  if(    id(1)*helicity(1).lt.0d0 .and. id(2)*helicity(2).lt.0d0)then!J1 is left
     if(id(6)*helicity(6).lt.0d0)then!J2 is left
       qqffbHa2 = - Spaa(1,3)*Spaa(2,3)*Spbb(1,3)*Spbb(1,4) &
                  - Spaa(1,3)*Spaa(2,4)*Spbb(1,4)**2 &
@@ -289,7 +376,7 @@ subroutine qqbffbHa2(Spaa,Spbb,sprod,id,helicity,qqffbHa2)
                  - Spaa(2,3)*Spaa(2,4)*Spbb(1,3)*Spbb(2,3) &
                  - Spaa(2,4)**2*Spbb(1,4)*Spbb(2,3) !LR
     endif
-  else!J1 is right
+  elseif(id(1)*helicity(1).gt.0d0 .and. id(2)*helicity(2).gt.0d0)then!J1 is right
     if(id(6)*helicity(6).lt.0d0)then!J2 is left
       qqffbHa2 = - Spaa(1,3)**2*Spbb(1,4)*Spbb(2,3) &
                  - Spaa(1,3)*Spaa(1,4)*Spbb(1,4)*Spbb(2,4) &
@@ -301,6 +388,8 @@ subroutine qqbffbHa2(Spaa,Spbb,sprod,id,helicity,qqffbHa2)
                  - Spaa(1,4)**2*Spbb(1,3)*Spbb(2,4) &
                  - Spaa(1,4)*Spaa(2,4)*Spbb(2,3)*Spbb(2,4)!RR
     endif
+  else
+    qqffbHa2 = 0d0
   endif
 
   return
@@ -315,7 +404,7 @@ subroutine qqbffbHg4(Spaa,Spbb,sprod,id,helicity,qqffbHg4)
   real(8), intent(in) :: helicity(9)
   complex(8), intent(out) :: qqffbHg4
 
-  if(id(1)*helicity(1).lt.0d0)then!J1 is left
+  if(    id(1)*helicity(1).lt.0d0 .and. id(2)*helicity(2).lt.0d0)then!J1 is left
     if(id(6)*helicity(6).lt.0d0)then!J2 is left
       qqffbHg4 = - Spaa(1,3)*Spaa(2,4)*Spbb(1,4)**2 &
                  + Spaa(1,4)*Spaa(2,3)*Spbb(1,4)**2 &
@@ -327,7 +416,7 @@ subroutine qqbffbHg4(Spaa,Spbb,sprod,id,helicity,qqffbHg4)
                  - Spaa(2,4)**2*Spbb(1,3)*Spbb(2,4) &
                  + Spaa(2,4)**2*Spbb(1,4)*Spbb(2,3)!LR
     endif
-  else!J1 is right
+  elseif(id(1)*helicity(1).gt.0d0 .and. id(2)*helicity(2).gt.0d0)then!J1 is right
     if(id(6)*helicity(6).lt.0d0)then!J2 is left
       qqffbHg4 =   Spaa(1,2)*Spaa(3,4)*Spbb(2,4)**2 &
                  - Spaa(1,3)**2*Spbb(1,2)*Spbb(3,4)!RL
@@ -337,6 +426,8 @@ subroutine qqbffbHg4(Spaa,Spbb,sprod,id,helicity,qqffbHg4)
                  - Spaa(1,4)**2*Spbb(1,4)*Spbb(2,3) &
                  + Spaa(1,4)*Spaa(2,3)*Spbb(2,3)**2!RR
     endif
+  else
+    qqffbHg4 =0d0
   endif
 
   return
