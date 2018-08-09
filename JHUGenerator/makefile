@@ -122,10 +122,11 @@ AuxDep = mod_Parameters.F90 \
          mod_Misc.F90 \
          mod_VH_aux.F90 \
          mod_Phasespace.F90 \
-         mod_Kinematics.F90 \
-         mod_Kinematics_VH.F90 \
-         mod_Kinematics_HH.F90 \
          mod_HashCollection.F90
+
+KimDep = mod_Kinematics.F90 \
+         mod_Kinematics_VH.F90 \
+         mod_Kinematics_HH.F90
 
 ifeq ($(linkCollierLib),Yes)
 ggVHAmpDep = \
@@ -347,9 +348,7 @@ ggHH5AmpObj =
 endif
 
 # amplitude dependencies
-AmpDep = mod_Parameters.F90 \
-         mod_Misc.F90 \
-         mod_TopDecay.F90 \
+AmpDep = mod_TopDecay.F90 \
          mod_Graviton.F90 \
          mod_Higgs.F90 \
          mod_Zprime.F90 \
@@ -370,10 +369,12 @@ AuxObj =  $(ObjectDir)/mod_HashCollection.o \
           $(ObjectDir)/mod_Parameters.o \
           $(ObjectDir)/mod_Misc.o \
           $(ObjectDir)/mod_VH_aux.o \
-          $(ObjectDir)/mod_Phasespace.o \
-          $(ObjectDir)/mod_Kinematics.o \
+          $(ObjectDir)/mod_Phasespace.o
+
+KimObj = $(ObjectDir)/mod_Kinematics.o \
           $(ObjectDir)/mod_Kinematics_VH.o\
           $(ObjectDir)/mod_Kinematics_HH.o
+
 ifeq ($(linkMELA),Yes)
     AuxDep += mod_MCFMWrapper.F90
     AuxObj += $(ObjectDir)/mod_MCFMWrapper.o
@@ -451,7 +452,7 @@ MadGraphObj = $(ObjectDir)/gg_ttbh.o \
 
 
 
-JHUGenerator: $(CPSObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(AuxObj) $(ggVHAmpObj) $(LHAPDFInterfaceObj) $(ggVH5AmpObj) $(ggHHAmpObj) $(ggHH5AmpObj) $(AmpObj) $(MainObj)
+JHUGenerator: $(CPSObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(AuxObj) $(ggVHAmpObj) $(LHAPDFInterfaceObj) $(ggVH5AmpObj) $(ggHHAmpObj) $(ggHH5AmpObj) $(AmpObj) $(KimObj) $(MainObj)
 	@echo " linking"
 ifeq ($(UseLHAPDF),Yes)
 	echo " -> interfaced with LHAPDF"
@@ -460,7 +461,7 @@ else
 endif
 	@echo " executable file "$(Exec)" is compiled with "$(Comp)
 	@echo " "
-	$(fcomp) -o $(Exec) $(MainObj) $(PSGenObj) $(AuxObj) $(AmpObj) $(ggVHAmpObj) $(LHAPDFInterfaceObj) $(ggVH5AmpObj) $(ggHHAmpObj) $(ggHH5AmpObj) $(VegasObj) $(PDFObj) $(CPSObj) $(MCFM_Obj) $(LHAPDFflags)
+	$(fcomp) -o $(Exec) $(MainObj) $(PSGenObj) $(AuxObj) $(AmpObj) $(KimObj) $(ggVHAmpObj) $(LHAPDFInterfaceObj) $(ggVH5AmpObj) $(ggHHAmpObj) $(ggHH5AmpObj) $(VegasObj) $(PDFObj) $(CPSObj) $(MCFM_Obj) $(LHAPDFflags)
 
 $(AuxObj): $(AuxDep) $(Makefile)
 	@echo " compiling misc. and aux. tools"
@@ -499,6 +500,11 @@ $(ggHHAmpObj): $(ggHHAmpDep) $(AuxObj) $(Makefile)
 $(ggHH5AmpObj): $(ggHH5AmpDep) $(AuxObj) $(Makefile)
 	@echo " compiling ggHH5 box amplitudes"
 	$(fcomp) -c $(ggHH5AmpDep)
+	mv *.o $(ObjectDir)
+
+$(KimObj): $(KimDep) $(Makefile)
+	@echo " compiling Kinematics dependencies"
+	$(fcomp) -c $(KimDep)
 	mv *.o $(ObjectDir)
 
 $(AmpObj): $(AmpDep) mod_Misc.F90 mod_Parameters.F90 $(Makefile)

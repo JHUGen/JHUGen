@@ -3,7 +3,7 @@ module ModVHLO
   use ModParameters
   use ModMisc
   use ModVHaux
-  use ModKinematics
+!  use ModKinematics
   implicit none
   
   public :: amp_VH_LO
@@ -429,6 +429,8 @@ subroutine qqbffbHg4(Spaa,Spbb,sprod,id,helicity,qqffbHg4)
   else
     qqffbHg4 =0d0
   endif
+
+  qqffbHg4 = qqffbHg4 * ci!so that it is in phase with Process=50
 
   return
 end subroutine qqbffbHg4

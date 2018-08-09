@@ -1064,6 +1064,10 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "mJJcut", success, mJJcut, multiply=GeV, tosave=tosave)
     call ReadCommandLineArgument(arg, "m4l_min", success, m4l_minmax(1), multiply=GeV, tosave=tosave)
     call ReadCommandLineArgument(arg, "m4l_max", success, m4l_minmax(2), multiply=GeV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "m2l_min", success, m2l_minmax(1), multiply=GeV, tosave=tosave)   !undocumented, for internal testing
+    call ReadCommandLineArgument(arg, "m2l_max", success, m2l_minmax(2), multiply=GeV, tosave=tosave)   !undocumented, for internal testing
+    call ReadCommandLineArgument(arg, "mVH_min", success, mVH_minmax(1), multiply=GeV, tosave=tosave)   !undocumented, for internal testing
+    call ReadCommandLineArgument(arg, "mVH_max", success, mVH_minmax(2), multiply=GeV, tosave=tosave)   !undocumented, for internal testing
     call ReadCommandLineArgument(arg, "MPhotonCutoff", success, MPhotonCutoff, multiply=GeV, success2=SetMPhotonCutoff, tosave=tosave)
     call ReadCommandLineArgument(arg, "pTlepcut", success, pTlepcut, multiply=GeV, success2=SetpTlepcut, tosave=tosave)
     call ReadCommandLineArgument(arg, "etalepcut", success, etalepcut, success2=Setetalepcut, tosave=tosave)

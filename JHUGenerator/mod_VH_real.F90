@@ -1,7 +1,7 @@
 !--YaofuZhou-----------------------------------------
 module ModVHreal
   use ModParameters
-  use ModKinematics
+!  use ModKinematics
   use ModMisc
   use ModVHaux
   implicit none
@@ -233,7 +233,7 @@ subroutine qqbffbHa1(Spaa,Spbb,sprod,id,helicity,qqffbHa1)
   real(8), intent(in) :: helicity(10)
   complex(8), intent(out) :: qqffbHa1
 
-  if(id(1)*helicity(1).lt.0d0)then!J1 is left
+  if(id(1)*helicity(1).lt.0d0 .and. id(2)*helicity(2).lt.0d0)then!J1 is left
     if(id(6)*helicity(6).lt.0d0)then!J2 is left
       if(helicity(10).lt.0d0)then
         qqffbHa1 = 4d0/dsqrt(2d0)/(Spbb(1,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(2,3)*Spaa(2,5)*Spbb( &
@@ -255,7 +255,7 @@ subroutine qqbffbHa1(Spaa,Spbb,sprod,id,helicity,qqffbHa1)
                    Spaa(1,2)*Spaa(2,4)*Spbb(1,3)*Spbb(2,5)!RL+
       endif
     endif
-  else!J1 is right
+  elseif(id(1)*helicity(1).gt.0d0 .and. id(2)*helicity(2).gt.0d0)then!J1 is right
     if(id(6)*helicity(6).lt.0d0)then!J2 is left
       if(helicity(10).lt.0d0)then
         qqffbHa1 = - 4d0/(dsqrt(2d0))/(Spbb(1,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,5)*Spaa(3,5)* &
@@ -277,6 +277,8 @@ subroutine qqbffbHa1(Spaa,Spbb,sprod,id,helicity,qqffbHa1)
                    )*Spaa(1,5)*Spbb(2,5)*Spbb(3,5)!RR+
       endif
     endif
+  else
+    qqffbHa1 = 0d0
   endif
 
   qqffbHa1 = -qqffbHa1!fix the minus sign in propagator in FORM

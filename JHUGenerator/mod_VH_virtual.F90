@@ -14,14 +14,11 @@ private :: theta_step
 contains
 
 real(8) function fac_ZH_virtual(s12)
-#if useCollier==1
   use Collier
-#endif
   implicit none
   real(8), intent(in) :: s12
   complex(8) :: B0_0, B0_s12, C0
 
-#if useCollier==1
   call SetMuUV2_cll(Mu_Ren**2)
   call SetMuIR2_cll(Mu_Ren**2)
 
@@ -53,13 +50,6 @@ if(isNan(fac_ZH_virtual))then
 print*,B0_0, B0_s12, C0, s12
 pause
 endif
-#else
-print *, "Need to link COLLIER for this process."
-print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
-print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
-print *, "specified in the makefile."
-stop 1
-#endif
 
   return
 END function fac_ZH_virtual
