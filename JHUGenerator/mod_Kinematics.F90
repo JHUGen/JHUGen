@@ -2500,23 +2500,22 @@ integer :: i!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       if(.not.hasAonshell) then
 
 !costheta2 - Z2 decay angle
+         MomZ(1:4) = MomExt(1:4,3)
          MomBoost(1)   = +MomExt(1,4)
          MomBoost(2:4) = -MomExt(2:4,4)
-!print*, "MomBoost",MomBoost
-!print*, "MomExt6",MomExt(1:4,6)
+
          if(id(6).gt.0) then
-            MomFerm(1:4)  = MomExt(1:4,6)
+            MomFerm1(1:4)  = MomExt(1:4,6)
+            MomFerm2(1:4)  = MomExt(1:4,7)
          else
-            MomFerm(1:4)  = MomExt(1:4,7)
+            MomFerm1(1:4)  = MomExt(1:4,7)
+            MomFerm2(1:4)  = MomExt(1:4,6)
          endif
-!print*, "MomFerm",MomFerm
-         call boost(MomFerm(1:4),MomBoost(1:4),inv_mass(4))! boost fermion from Z2 into Z2 rest frame
-         costheta2 = Get_CosAlpha( MomFerm(1:4),MomExt(1:4,4) )
-!print*, "inv_mass4",inv_mass(4)
-!print*, "MomBoost",MomBoost
-!print*, "MomExt6",MomExt(1:4,6)
-!print*, "MomFerm",MomFerm
-!print*, costheta2
+
+         call boost(MomFerm1(1:4),MomBoost(1:4),m_inv_V)! boost fermion from Z2 into Z2 rest frame
+         call boost(MomZ(1:4),MomBoost(1:4),m_inv_V)
+         costheta2 = Get_CosAlpha( MomFerm1(1:4),MomZ(1:4) )
+
 !phi
          MomReso(1:4)  = -MomExt(1:4,5)
          MomBoost(1)   = +MomReso(1)
@@ -2675,12 +2674,10 @@ MomBoostCOM(2:4) = -MomExt(2:4,3)
 
 
 !costheta2 - Z2 decay angle
-         MomZ(1:4) = MomExt(1:4,4)
-!print*,MomZ(1:4)
+         MomZ(1:4) = MomExt(1:4,3)
          MomBoost(1)   = +MomExt(1,4)
          MomBoost(2:4) = -MomExt(2:4,4)
-!print*, "MomBoost",MomBoost
-!print*, "MomExt6",MomExt(1:4,6)
+         
          if(id(6).gt.0) then
             MomFerm1(1:4)  = MomExt(1:4,6)
             MomFerm2(1:4)  = MomExt(1:4,7)
@@ -2689,12 +2686,8 @@ MomBoostCOM(2:4) = -MomExt(2:4,3)
             MomFerm2(1:4)  = MomExt(1:4,6)
          endif
 
-         MomZ(1:4)=MomFerm1(1:4)+MomFerm2(1:4)
-!print*,MomZ(1:4)
          call boost(MomFerm1(1:4),MomBoost(1:4),m_inv_V)! boost fermion from Z2 into Z2 rest frame
-         call boost(MomFerm2(1:4),MomBoost(1:4),m_inv_V)! boost fermion from Z2 into Z2 rest frame
-!         call boost(MomFerm(1:4),MomBoostCOM(1:4),m_Vstar)
-!         call boost(MomZ(1:4),MomBoostCOM(1:4),m_Vstar)
+         call boost(MomZ(1:4),MomBoost(1:4),m_inv_V)
          costheta2 = Get_CosAlpha( MomFerm1(1:4),MomZ(1:4) )
 
 
