@@ -2367,6 +2367,7 @@ integer :: i!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
      m_ll = get_MInv(MomExt(1:4,4))
      m_Vstar = get_MInv(MomExt(1:4,3))
      m_inv_H = get_MInv(MomExt(1:4,5))
+     m_inv_V = m_ll
 
      pt_H = get_PT(MomExt(1:4,5))
      pt_V = get_PT(MomExt(1:4,4))
