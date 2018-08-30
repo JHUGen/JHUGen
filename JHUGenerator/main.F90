@@ -1395,7 +1395,7 @@ type(SaveValues) :: tosave, oldsavevalues
       endif
     endif
     if(.not.Setm2l_max)then
-      if(Prcecss.eq.51)then
+      if(Process.eq.51)then
          m2l_minmax(2) = infinity()
       else
          m2l_minmax(2) = infinity()
