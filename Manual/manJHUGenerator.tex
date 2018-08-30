@@ -116,8 +116,6 @@ Examples of running the generator.  The number of events is determined using \te
 		./JHUGen Collider=1 Process=51 VH_PC=gg HbbDK=1 DecayMode1=0 VegasNc2=100000 \\
 		DataFile=ggZH2lbb ghz1=0,0 ghz2=1,0
 		\end{verbatim}
-		(\texttt{DecayMode1=7}, i.e. $gg \to \gamma H$ not yet implemented for $gg \to ZH$.)
-		\item $qq$-initiated processes at next-to-leading order, including $gq$-initiated processes are in the development.
 	\end{itemize}
 	\item VBF:
 	\begin{itemize}
@@ -221,15 +219,16 @@ This is the list of command line configurables (also defined in the \verb|README
                        according to DecayModes1,2.
     HbbDK:             For VH production, decay H->bb
     VH_PC:             VH partonic channel and mode selection
-                       ee = lo = e- e+ @LO
-                       qq = lo = q qbar @LO
-                       gg = triangles + boxes of gg
+                       ee = lo = e- e+ @LO (beta)
+                       qq = lo = q qbar @LO (beta)
+                       gg = triangles + boxes of gg (set as default)
                        tr = triangles of gg
                        bo = boxes of gg
-                       sb = for NLO development
-                       sp = for NLO development
-                       qg = gq = qg + gq
-                       nl = full oneloop = q qbar @LO + NLO + gg + gq
+                       in = interference = 2*dble(box*dconjg(triangle)) of gg
+                       sb = for NLO development (in development)
+                       sp = for NLO development (in development)
+                       qg = gq = qg + gq (in development)
+                       nl = full oneloop = q qbar @LO + NLO + gg + gq (indevelopment)
                        VH_PC overrides Pchannel,
                        but Pchannel applies to VH_PC = nl,
                        where 0 = gg, 1 = qq, and 2 = both + gq
@@ -330,6 +329,10 @@ This is the list of command line configurables (also defined in the \verb|README
 \item \verb|ChannelRatio|: In the case when \verb|PChannel=2| for a spin-2 resonance, this parameter determines an approximate fraction of the events that should come from $q\bar{q}$.  This is equivalent to appropriately scaling the $Xq\bar{q}$ couplings with respect to the $Xgg$ ones, but can be done without advance knowledge of the relative cross sections.
 \item \verb|PDFSet|, \verb|LHAPDF|, \verb|LHAPDFMem|: To use LHAPDF, this functionality must be enabled in the makefile and the relevant environment variables must be set.  See the instructions in Sec.~\ref{sec:LHAPDF}.  Otherwise \verb|PDFSet| gives the choice between a more limited number of PDF sets.
 \end{itemize}
+
+\paragraph{New VH}
+
+Process 51 is a new implementation of VH with matrix elements expressed with the spinor-helicity formalism, including LO $q \bar q \to V \to VH$ (currently in beta), one-loop induced LO $gg \to ZH$, and $q \bar q \to V \to VH$ at NLO (currently in development). The initial state, order of calculation, and diagrams (triangle, box, both, or the interference term between the two, for gg) is set by the parameter \texttt{VH\_PC}, with its options listed above. $\gamma H$, i.e. \texttt{DecayMode1=7}, not yet implemented for \texttt{Process=51}.
 
 \paragraph{Offshell VBF}
 

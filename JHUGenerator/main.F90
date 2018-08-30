@@ -293,6 +293,7 @@ SUBROUTINE SetJHUGenDefaults()
    TauDecays=-1
    HbbDecays = .false.
    H_DK = .false.
+   VH_PC="gg"
    Unweighted =.true.
    MuFacMultiplier = 1d0
    MuRenMultiplier = 1d0
@@ -1064,10 +1065,10 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "mJJcut", success, mJJcut, multiply=GeV, tosave=tosave)
     call ReadCommandLineArgument(arg, "m4l_min", success, m4l_minmax(1), multiply=GeV, tosave=tosave)
     call ReadCommandLineArgument(arg, "m4l_max", success, m4l_minmax(2), multiply=GeV, tosave=tosave)
-    call ReadCommandLineArgument(arg, "m2l_min", success, m2l_minmax(1), multiply=GeV, tosave=tosave)   !undocumented, for internal testing
-    call ReadCommandLineArgument(arg, "m2l_max", success, m2l_minmax(2), multiply=GeV, tosave=tosave)   !undocumented, for internal testing
-    call ReadCommandLineArgument(arg, "mVH_min", success, mVH_minmax(1), multiply=GeV, tosave=tosave)   !undocumented, for internal testing
-    call ReadCommandLineArgument(arg, "mVH_max", success, mVH_minmax(2), multiply=GeV, tosave=tosave)   !undocumented, for internal testing
+    call ReadCommandLineArgument(arg, "m2l_min", success, m2l_minmax(1), multiply=GeV, success2=Setm2l_min, tosave=tosave)
+    call ReadCommandLineArgument(arg, "m2l_max", success, m2l_minmax(2), multiply=GeV, success2=Setm2l_max, tosave=tosave)
+    call ReadCommandLineArgument(arg, "mVH_min", success, mVH_minmax(1), multiply=GeV, success2=SetmVH_min, tosave=tosave)
+    call ReadCommandLineArgument(arg, "mVH_max", success, mVH_minmax(2), multiply=GeV, success2=SetmVH_max, tosave=tosave)
     call ReadCommandLineArgument(arg, "MPhotonCutoff", success, MPhotonCutoff, multiply=GeV, success2=SetMPhotonCutoff, tosave=tosave)
     call ReadCommandLineArgument(arg, "pTlepcut", success, pTlepcut, multiply=GeV, success2=SetpTlepcut, tosave=tosave)
     call ReadCommandLineArgument(arg, "etalepcut", success, etalepcut, success2=Setetalepcut, tosave=tosave)
@@ -1335,7 +1336,7 @@ type(SaveValues) :: tosave, oldsavevalues
 
     !cut checks
     if(.not.SetpTjetcut) then
-        if(Process.eq.50) then
+        if(Process.eq.50 .or. Process.eq.51) then
             pTjetcut = 0d0*GeV
         else
             pTjetcut = 15d0*GeV
@@ -1356,7 +1357,7 @@ type(SaveValues) :: tosave, oldsavevalues
         endif
     endif
     if(.not.SetdeltaRcut) then
-        if(Process.eq.50) then
+        if(Process.eq.50 .eq. Process.eq.51) then
             Rjet = 0d0
         else
             Rjet = 0.3d0
@@ -1384,6 +1385,34 @@ type(SaveValues) :: tosave, oldsavevalues
         else
             MPhotonCutoff = 0d0
         endif
+    endif
+    if(.not.m2l_min)then
+      if(Proecss.eq.51)then
+         m2l_min = 0d0 * GeV
+      else
+         m2l_min = 0d0 * GeV
+      endif
+    endif
+    if(.not.m2l_max)then
+      if(Proecss.eq.51)then
+         m2l_max = infinity()
+      else
+         m2l_max = infinity()
+      endif
+    endif
+    if(.not.mVH_min)then
+      if(Proecss.eq.51)then
+         mVH_min = 0d0 * GeV
+      else
+         mVH_min = 0d0 * GeV
+      endif
+    endif
+    if(.not.mVH_max)then
+      if(Proecss.eq.51)then
+         mVH_max = infinity()
+      else
+         mVH_max = infinity()
+      endif
     endif
     if((Process.eq.60 .or. Process.eq.66 .or. Process.eq.67 .or. Process.eq.68 .or. Process.eq.69) .and. includeGammaStar .and. pTjetcut.le.0d0) then
        print *, " Process=",Process," with offshell photons requires a non-zero pT cut. Current setting cut ",pTjetcut/GeV," GeV is not allowed."
