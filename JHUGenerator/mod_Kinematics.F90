@@ -2639,7 +2639,7 @@ MomBoostCOM(2:4) = -MomExt(2:4,3)
         endif
      enddo
 
-     if(IsLHEAQuark(id(6)))then
+     if(IsALHEQuark(id(6)))then
         do i=6,7
             if(get_PT(MomExt(:,i)).lt.pTjetcut)applyPSCut=.true.
             if(etajetcut.ge.0d0)then
