@@ -2,7 +2,7 @@ env: &env
   docker:
     - image: cmssw/cmssw:CMSSW_9_3_2
       environment:
-        PATH: "/home/cmsbld/dos2unix-7.4.0/:/home/cmsbld/githack/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        PATH: "/home/cmsbld/dos2unix-7.4.0/:/home/cmsbld/githack/:/home/cmsbld/CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
         LIBRARY_PATH: "/home/cmsbld/boost_1_61_0/stage/lib"
         CPATH: "/home/cmsbld/boost_1_61_0"
         LD_LIBRARY_PATH: "/home/cmsbld/JHUGen/JHUGenMELA/MELA/data/slc6_amd64_gcc530"
@@ -386,11 +386,11 @@ jobs:
           command: |
             if $DOPLOTS; then
               cd ../.circleci
-              root -b -q '../JHUGenMELA/MELA/test/loadMELA.C angularDistributions_spin0_HVV.cc+("$LHEDIR/SM.root", "ZZ4l", "ghv1=1,0", "$LHEDIR/SM/")'
-              root -b -q '../JHUGenMELA/MELA/test/loadMELA.C angularDistributions_spin0_HVV.cc+("$LHEDIR/PS.root", "ZZ4l", "ghv4=1,0", "$LHEDIR/PS/")'
-              #root -b -q '../JHUGenMELA/MELA/test/loadMELA.C angularDistributions_spin0_HVV.cc+("$LHEDIR/fa30.5.root", "ZZ4l", "ghv1=1,0;ghv4=2.55052,0", "$LHEDIR/fa30.5/")'
-              #root -b -q '../JHUGenMELA/MELA/test/loadMELA.C angularDistributions_spin0_HVV.cc+("$LHEDIR/fa30.5i.root", "ZZ4l", "ghv1=1,0;ghv4=0,2.55052", "$LHEDIR/fa30.5i/")'
-              root -b -q '../JHUGenMELA/MELA/test/loadMELA.C angularDistributions_spin0_HVV.cc+("$LHEDIR/a2.root", "ZZ4l", "ghv2=1,0", "$LHEDIR/a2/")'
+              root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/SM.root", "ghv1=1,0", "ZZ4l", "$LHEDIR/SM/")'
+              root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/PS.root", "ghv4=1,0", "ZZ4l", "$LHEDIR/PS/")'
+              #root -b -q '../JHUGenMELA/MELA/test/loadMELA.C angularDistributions_spin0_HVV.cc+("$LHEDIR/fa30.5.root", "ghv1=1,0;ghv4=2.55052,0", "ZZ4l", "$LHEDIR/fa30.5/")'
+              #root -b -q '../JHUGenMELA/MELA/test/loadMELA.C angularDistributions_spin0_HVV.cc+("$LHEDIR/fa30.5i.root", "ghv1=1,0;ghv4=0,2.55052", "ZZ4l", "$LHEDIR/fa30.5i/")'
+              root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/a2.root", "ghv2=1,0", "ZZ4l", "$LHEDIR/a2/")'
             fi
       - store_artifacts:
           path: ~/artifacts/ggH
