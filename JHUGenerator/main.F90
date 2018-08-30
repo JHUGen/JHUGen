@@ -346,6 +346,7 @@ logical :: SetCKM,SetCKMub,SetCKMcb,SetCKMtd
 logical :: SetpTjetcut, Setetajetcut, Setdetajetcut, SetdeltaRcut
 logical :: SetpTlepcut, Setetalepcut, SetMPhotonCutoff
 logical :: SetColliderEnergy
+logical :: Setm2l_min,Setm2l_max,SetmVH_min,SetmVH_max
 logical :: SetCSmaxFile, SetVBFoffsh_run
 integer :: i
 type(SaveValues) :: tosave, oldsavevalues
