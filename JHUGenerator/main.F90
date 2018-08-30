@@ -1388,28 +1388,28 @@ type(SaveValues) :: tosave, oldsavevalues
         endif
     endif
     if(.not.m2l_min)then
-      if(Proecss.eq.51)then
+      if(Process.eq.51)then
          m2l_min = 0d0 * GeV
       else
          m2l_min = 0d0 * GeV
       endif
     endif
     if(.not.m2l_max)then
-      if(Proecss.eq.51)then
+      if(Process.eq.51)then
          m2l_max = infinity()
       else
          m2l_max = infinity()
       endif
     endif
     if(.not.mVH_min)then
-      if(Proecss.eq.51)then
+      if(Process.eq.51)then
          mVH_min = 0d0 * GeV
       else
          mVH_min = 0d0 * GeV
       endif
     endif
     if(.not.mVH_max)then
-      if(Proecss.eq.51)then
+      if(Process.eq.51)then
          mVH_max = infinity()
       else
          mVH_max = infinity()
