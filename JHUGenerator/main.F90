@@ -1358,7 +1358,7 @@ type(SaveValues) :: tosave, oldsavevalues
         endif
     endif
     if(.not.SetdeltaRcut) then
-        if(Process.eq.50 .eq. Process.eq.51) then
+        if(Process.eq.50 .or. Process.eq.51) then
             Rjet = 0d0
         else
             Rjet = 0.3d0
