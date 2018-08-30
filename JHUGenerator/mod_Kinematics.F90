@@ -2620,35 +2620,35 @@ MomBoostCOM(2:4) = -MomExt(2:4,3)
 
      if(pt_H.lt.pTHcut)applyPSCut=.true.
 
-!     if(HDecays)then
-!        do i=8,9
-!            if(get_PT(MomExt(:,i)).lt.pTjetcut)applyPSCut=.true.
-!            if(dabs(get_eta(MomExt(:,i))).gt.etajetcut)applyPSCut=.true.
-!        enddo
-!        if(m_jj.lt.mJJcut)applyPSCut=.true.
-!        if(deltaR.lt.Rjet)applyPSCut=.true.
-!     else
-!        if(dabs(m_jj-M_Reso).gt.10d0*Ga_Reso)applyPSCut=.true.
-!     endif
-!
-!     do i=6,7
-!        if(IsALHELepton(id(i)))then
-!            if(get_PT(MomExt(:,i)).lt.pTlepcut)applyPSCut=.true.
-!            !if(get_PT(MomExt(:,i)).lt.5d0*GeV)applyPSCut=.true.
-!            if(dabs(get_eta(MomExt(:,i))).gt.etalepcut)applyPSCut=.true.
-!        endif
-!    enddo
-!
-!    if(IsLHEAQuark(id(6)))then
-!        do i=6,7
-!            if(get_PT(MomExt(:,i)).lt.pTjetcut)applyPSCut=.true.
-!            if(etajetcut.ge.0d0)then
-!                if(dabs(get_eta(MomExt(:,i))).gt.etajetcut)applyPSCut=.true.
-!            endif
-!        enddo
-!        if(m_ll.lt.mJJcut)applyPSCut=.true.
-!        if(get_R(MomExt(1:4,6), MomExt(1:4,7)).lt.Rjet)applyPSCut=.true.
-!     endif
+     if(HDecays)then
+        do i=8,9
+            if(get_PT(MomExt(:,i)).lt.pTjetcut)applyPSCut=.true.
+            if(dabs(get_eta(MomExt(:,i))).gt.etajetcut)applyPSCut=.true.
+        enddo
+        if(m_jj.lt.mJJcut)applyPSCut=.true.
+        if(deltaR.lt.Rjet)applyPSCut=.true.
+     else
+        if(dabs(m_jj-M_Reso).gt.10d0*Ga_Reso)applyPSCut=.true.
+     endif
+
+     do i=6,7
+        if(IsALHELepton(id(i)))then
+            if(get_PT(MomExt(:,i)).lt.pTlepcut)applyPSCut=.true.
+            !if(get_PT(MomExt(:,i)).lt.5d0*GeV)applyPSCut=.true.
+            if(dabs(get_eta(MomExt(:,i))).gt.etalepcut)applyPSCut=.true.
+        endif
+     enddo
+
+     if(IsLHEAQuark(id(6)))then
+        do i=6,7
+            if(get_PT(MomExt(:,i)).lt.pTjetcut)applyPSCut=.true.
+            if(etajetcut.ge.0d0)then
+                if(dabs(get_eta(MomExt(:,i))).gt.etajetcut)applyPSCut=.true.
+            endif
+        enddo
+        if(m_ll.lt.mJJcut)applyPSCut=.true.
+        if(get_R(MomExt(1:4,6), MomExt(1:4,7)).lt.Rjet)applyPSCut=.true.
+     endif
 
      if(m_ll.lt.m2l_minmax(1))applyPSCut=.true.
      if(m_ll.gt.m2l_minmax(2))applyPSCut=.true.
