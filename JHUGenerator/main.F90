@@ -1387,28 +1387,28 @@ type(SaveValues) :: tosave, oldsavevalues
             MPhotonCutoff = 0d0
         endif
     endif
-    if(.not.m2l_min)then
+    if(.not.Setm2l_min)then
       if(Process.eq.51)then
          m2l_min = 0d0 * GeV
       else
          m2l_min = 0d0 * GeV
       endif
     endif
-    if(.not.m2l_max)then
+    if(.not.Setm2l_max)then
       if(Process.eq.51)then
          m2l_max = infinity()
       else
          m2l_max = infinity()
       endif
     endif
-    if(.not.mVH_min)then
+    if(.not.SetmVH_min)then
       if(Process.eq.51)then
          mVH_min = 0d0 * GeV
       else
          mVH_min = 0d0 * GeV
       endif
     endif
-    if(.not.mVH_max)then
+    if(.not.SetmVH_max)then
       if(Process.eq.51)then
          mVH_max = infinity()
       else
