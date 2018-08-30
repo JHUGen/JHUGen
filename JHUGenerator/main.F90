@@ -1389,30 +1389,30 @@ type(SaveValues) :: tosave, oldsavevalues
     endif
     if(.not.Setm2l_min)then
       if(Process.eq.51)then
-         m2l_min = 0d0 * GeV
+         m2l_minmax(1) = 0d0 * GeV
       else
-         m2l_min = 0d0 * GeV
+         m2l_minmax(1) = 0d0 * GeV
       endif
     endif
     if(.not.Setm2l_max)then
-      if(Process.eq.51)then
-         m2l_max = infinity()
+      if(Prcecss.eq.51)then
+         m2l_minmax(2) = infinity()
       else
-         m2l_max = infinity()
+         m2l_minmax(2) = infinity()
       endif
     endif
     if(.not.SetmVH_min)then
       if(Process.eq.51)then
-         mVH_min = 0d0 * GeV
+         mVH_minmax(1) = 0d0 * GeV
       else
-         mVH_min = 0d0 * GeV
+         mVH_minmax(1) = 0d0 * GeV
       endif
     endif
     if(.not.SetmVH_max)then
       if(Process.eq.51)then
-         mVH_max = infinity()
+         mVH_minmax(2) = infinity()
       else
-         mVH_max = infinity()
+         mVH_minmax(2) = infinity()
       endif
     endif
     if((Process.eq.60 .or. Process.eq.66 .or. Process.eq.67 .or. Process.eq.68 .or. Process.eq.69) .and. includeGammaStar .and. pTjetcut.le.0d0) then
