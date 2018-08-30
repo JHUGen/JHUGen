@@ -336,43 +336,65 @@ jobs:
           key: v1_analyzer
           paths: ~/CMSJHU_AnalysisMacros/
 
-      - run: '! [ -f reference_check/reference_failed_ggH ]'
+      - run: echo "export LHEDIR=$HOME/artifacts/ggH" >> $BASH_ENV
+      - run: mkdir -p $LHEDIR/
       - run:
-          command: echo "export LHEDIR=$HOME/artifacts/ggH" >> $BASH_ENV
-          when: on_fail
-      - run:
-          command: mkdir -p $LHEDIR/
-          when: on_fail
+         name: "check if plots are needed"
+         command: |
+           cd ..
+           if [ -f reference_check/reference_failed_ggH ]; then
+             DOPLOTS=true
+           elif [ -z "$CIRCLE_COMPARE_URL" ]  #first build on the branch
+             DOPLOTS=true
+           else
+             DOPLOTS=false
+             #from https://discuss.circleci.com/t/does-circleci-2-0-work-with-monorepos/10378/8
+             COMMIT_RANGE=$(echo $CIRCLE_COMPARE_URL | sed 's:^.*/compare/::g')
+             echo "Commit range: " $COMMIT_RANGE
+             git diff $COMMIT_RANGE --name-status
+             echo
+             for a in .circleci/angularDistributions_spin0_HVV.cc ScalarPdfFactory_HVV RooSpinZero_7DComplex_withAccep_HVV; do
+               if git diff $COMMIT_RANGE --name-status | grep $a; then
+                 DOPLOTS=true
+                 echo "^^^^ changed --> doing plots"
+               fi
+             done
+           fi
+           echo "export DOPLOTS=$DOPLOTS" >> $BASH_ENV
       - run:
           name: generate
-          when: on_fail
           command: |
-            ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/SM
-            ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/PS ghz1=0,0 ghz4=1,0
-            #./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/fa30.5 ghz1=1,0 ghz4=2.55052,0
-            #./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/fa30.5i ghz1=1,0 ghz4=0,2.55052
-            ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/a2 ghz1=0,0 ghz2=1,0
+            if $DOPLOTS; then
+              ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/SM
+              ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/PS ghz1=0,0 ghz4=1,0
+              #./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/fa30.5 ghz1=1,0 ghz4=2.55052,0
+              #./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/fa30.5i ghz1=1,0 ghz4=0,2.55052
+              ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/a2 ghz1=0,0 ghz2=1,0
+            fi
       - run:
           name: analyzer
-          when: on_fail
           command: |
-            analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SM.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 SM.lhe
-            analyzer fileLevel=0 outdir=$LHEDIR/ outfile=PS.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 PS.lhe
-            #analyzer fileLevel=0 outdir=$LHEDIR/ outfile=fa30.5.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 fa30.5.lhe
-            #analyzer fileLevel=0 outdir=$LHEDIR/ outfile=fa30.5i.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 fa30.5i.lhe
-            analyzer fileLevel=0 outdir=$LHEDIR/ outfile=a2.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 a2.lhe
+            if $DOPLOTS; then
+              analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SM.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 SM.lhe
+              analyzer fileLevel=0 outdir=$LHEDIR/ outfile=PS.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 PS.lhe
+              #analyzer fileLevel=0 outdir=$LHEDIR/ outfile=fa30.5.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 fa30.5.lhe
+              #analyzer fileLevel=0 outdir=$LHEDIR/ outfile=fa30.5i.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 fa30.5i.lhe
+              analyzer fileLevel=0 outdir=$LHEDIR/ outfile=a2.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 a2.lhe
+            fi
       - run:
           name: plots
-          when: on_fail
           command: |
-            cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits
-            echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$LHEDIR/SM.root", "$LHEDIR/SM/", 1, 0, 0, 0, 0)' | root -b
-            echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$LHEDIR/PS.root", "$LHEDIR/PS/", 0, 0, 0, 1, 0)' | root -b
-            echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$LHEDIR/a2.root", "$LHEDIR/a2/", 0, 1, 0, 0, 0)' | root -b
-            #echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$LHEDIR/fa30.5.root", "$LHEDIR/fa30.5/", 1, 2.55052, 0, 0, 0)' | root -b
-            #echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$LHEDIR/fa30.5i.root", "$LHEDIR/fa30.5i/", 1, 0, 2.55052, 0, 0)' | root -b
+            if $DOPLOTS; then
+              cd ../.circleci
+              root -b -q '../JHUGenMELA/MELA/test/loadMELA.C angularDistributions_spin0_HVV.cc+("$LHEDIR/SM.root", "ZZ4l", "ghv1=1,0", "$LHEDIR/SM/")'
+              root -b -q '../JHUGenMELA/MELA/test/loadMELA.C angularDistributions_spin0_HVV.cc+("$LHEDIR/PS.root", "ZZ4l", "ghv4=1,0", "$LHEDIR/PS/")'
+              #root -b -q '../JHUGenMELA/MELA/test/loadMELA.C angularDistributions_spin0_HVV.cc+("$LHEDIR/fa30.5.root", "ZZ4l", "ghv1=1,0;ghv4=2.55052,0", "$LHEDIR/fa30.5/")'
+              #root -b -q '../JHUGenMELA/MELA/test/loadMELA.C angularDistributions_spin0_HVV.cc+("$LHEDIR/fa30.5i.root", "ZZ4l", "ghv1=1,0;ghv4=0,2.55052", "$LHEDIR/fa30.5i/")'
+              root -b -q '../JHUGenMELA/MELA/test/loadMELA.C angularDistributions_spin0_HVV.cc+("$LHEDIR/a2.root", "ZZ4l", "ghv2=1,0", "$LHEDIR/a2/")'
+            fi
       - store_artifacts:
           path: ~/artifacts/ggH
+      - run: '! [ -f reference_check/reference_failed_ggH ]'
 
   plots_VBF:
     <<: *env
