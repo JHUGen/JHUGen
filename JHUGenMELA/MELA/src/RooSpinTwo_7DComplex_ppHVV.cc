@@ -1,27 +1,34 @@
 #include "RooSpinTwo_7DComplex_ppHVV.h"
 
 
+using namespace std;
+using namespace MELAStreamHelpers;
+
+
+RooSpinTwo_7DComplex_ppHVV::RooSpinTwo_7DComplex_ppHVV() : RooSpinTwo(){}
 RooSpinTwo_7DComplex_ppHVV::RooSpinTwo_7DComplex_ppHVV(
   const char *name, const char *title,
   modelMeasurables _measurables,
   modelParameters _parameters,
   modelCouplings _couplings,
-  RooSpin::VdecayType _Vdecay1, RooSpin::VdecayType _Vdecay2
-  ) : RooSpinTwo(
+  RooSpin::VdecayType _Vdecay1, RooSpin::VdecayType _Vdecay2,
+  TVar::VerbosityLevel verbosity_
+) : RooSpinTwo(
   name, title,
   _measurables,
   _parameters,
   _couplings,
-  _Vdecay1, _Vdecay2
-  ),
-  ZZ4fOrdering(true)
+  _Vdecay1, _Vdecay2,
+  verbosity_
+),
+ZZ4fOrdering(true)
 {}
 
 
 RooSpinTwo_7DComplex_ppHVV::RooSpinTwo_7DComplex_ppHVV(
   const RooSpinTwo_7DComplex_ppHVV& other, const char* name
-  ) : RooSpinTwo(other, name),
-  ZZ4fOrdering(other.ZZ4fOrdering)
+) : RooSpinTwo(other, name),
+ZZ4fOrdering(other.ZZ4fOrdering)
 {}
 
 
@@ -313,9 +320,9 @@ Double_t RooSpinTwo_7DComplex_ppHVV::evaluate() const{
   for (unsigned int s=0; s<Axxyyterm.size(); s++) value += Axxyyterm.at(s);
   value *= term1Coeff*term2Coeff*betaVal;
 
-  if (!(value==value)) cout << "Evaluate NaN=" << value << endl;
+  if (!(value==value)) MELAout << "Evaluate NaN=" << value << endl;
   if (value<=0){
-    cout << "Evaluated value<=0: " << value << endl;
+    MELAout << "Evaluated value<=0: " << value << endl;
     value=epsilon;
   }
   return value;
@@ -361,7 +368,7 @@ Double_t RooSpinTwo_7DComplex_ppHVV::analyticalIntegral(Int_t code, const char* 
   value *= term1Coeff*term2Coeff*betaVal;
 
   if (!(value==value)){
-    cout << "Integral NaN=" << value << " at "
+    MELAout << "Integral NaN=" << value << " at "
       << "h1=" << h1 << '\t'
       << "h2=" << h2 << '\t'
       << "hs=" << hs << '\t'
@@ -371,14 +378,14 @@ Double_t RooSpinTwo_7DComplex_ppHVV::analyticalIntegral(Int_t code, const char* 
       << "m2=" << m2_ << '\t'
       << "m12=" << m12 << '\t'
       << endl;
-    cout << "Possible sources:\n"
+    MELAout << "Possible sources:\n"
       << "betaVal=" << betaVal << '\t'
       << "term1Coeff=" << term1Coeff << '\t'
       << "term2Coeff=" << term2Coeff << '\t'
       << endl;
   }
   if (value<=0){
-    cout << "Evaluated integral<=0: " << value << endl;
+    MELAout << "Evaluated integral<=0: " << value << endl;
     value=epsilon;
   }
   return value;

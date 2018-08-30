@@ -270,9 +270,11 @@ void Mela::setProcess(TVar::Process myModel, TVar::MatrixElement myME, TVar::Pro
 }
 void Mela::setVerbosity(TVar::VerbosityLevel verbosity_){
   myVerbosity_=verbosity_;
-  if (ZZME!=0) ZZME->set_Verbosity(myVerbosity_);
-  if (super!=0) super->SetVerbosity((myVerbosity_>=TVar::DEBUG));
-  if (superDijet!=0) superDijet->SetVerbosity(myVerbosity_);
+  if (ZZME) ZZME->set_Verbosity(myVerbosity_);
+  if (super) super->SetVerbosity((myVerbosity_>=TVar::DEBUG));
+  if (superDijet) superDijet->SetVerbosity(myVerbosity_);
+  if (ggSpin0Model) ggSpin0Model->setVerbosity(myVerbosity_);
+  if (spin2Model) spin2Model->setVerbosity(myVerbosity_);
 }
 TVar::VerbosityLevel Mela::getVerbosity(){ return myVerbosity_; }
 // Should be called per-event

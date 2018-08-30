@@ -7,14 +7,15 @@
 class RooSpinZero_5D_VH : public RooSpinZero {
 public:
 
-  RooSpinZero_5D_VH(){}
+  RooSpinZero_5D_VH();
   RooSpinZero_5D_VH(
     const char *name, const char *title,
     modelMeasurables _measurables,
     modelParameters _parameters,
     modelCouplings _couplings,
-    RooSpin::VdecayType _Vdecay1=RooSpin::kVdecayType_Zll, RooSpin::VdecayType _Vdecay2=RooSpin::kVdecayType_Zll
-    );
+    RooSpin::VdecayType _Vdecay1=RooSpin::kVdecayType_Zll, RooSpin::VdecayType _Vdecay2=RooSpin::kVdecayType_Zll,
+    TVar::VerbosityLevel verbosity_=TVar::ERROR
+  );
 
   RooSpinZero_5D_VH(const RooSpinZero_5D_VH& other, const char* name=0);
   virtual TObject* clone(const char* newname) const { return new RooSpinZero_5D_VH(*this, newname); }

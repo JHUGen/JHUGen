@@ -11,15 +11,16 @@ public:
 
   Double_t sqrts;
 
-  RooSpinZero_3D_pp_VH(){}
+  RooSpinZero_3D_pp_VH();
   RooSpinZero_3D_pp_VH(
     const char *name, const char *title,
     modelMeasurables _measurables,
     modelParameters _parameters,
     modelCouplings _couplings,
     Double_t _sqrts,
-    RooSpin::VdecayType _Vdecay1=RooSpin::kVdecayType_Zll, RooSpin::VdecayType _Vdecay2=RooSpin::kVdecayType_Zll
-    );
+    RooSpin::VdecayType _Vdecay1=RooSpin::kVdecayType_Zll, RooSpin::VdecayType _Vdecay2=RooSpin::kVdecayType_Zll,
+    TVar::VerbosityLevel verbosity_=TVar::ERROR
+  );
 
   RooSpinZero_3D_pp_VH(const RooSpinZero_3D_pp_VH& other, const char* name=0);
   virtual TObject* clone(const char* newname) const { return new RooSpinZero_3D_pp_VH(*this, newname); }

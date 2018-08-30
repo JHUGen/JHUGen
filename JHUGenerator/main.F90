@@ -1100,8 +1100,9 @@ type(SaveValues) :: tosave, oldsavevalues
     if( VBFoffsh_run.eq.2 ) DataFile = trim(DataFile)//"2"
     if( VBFoffsh_run.eq.3 ) DataFile = trim(DataFile)//"3"
     if( VBFoffsh_run.eq.4 ) DataFile = trim(DataFile)//"4"
-    if( VBFoffsh_run.eq.0 ) DataFile = trim(DataFile)//"0"
-
+    if( VBFoffsh_run.eq.5 ) DataFile = trim(DataFile)//"5"
+    if( VBFoffsh_run.eq.0 ) DataFile = trim(DataFile)//"0"    
+    
     if( SetCSmaxFile ) then
       i = len(trim(CSmaxFile))
       if( CSmaxFile(i-3:i).eq.".lhe" ) then
@@ -1111,6 +1112,7 @@ type(SaveValues) :: tosave, oldsavevalues
       if( VBFoffsh_run.eq.2 ) CSmaxFile = trim(CSmaxFile)//"2"
       if( VBFoffsh_run.eq.3 ) CSmaxFile = trim(CSmaxFile)//"3"
       if( VBFoffsh_run.eq.4 ) CSmaxFile = trim(CSmaxFile)//"4"
+      if( VBFoffsh_run.eq.5 ) CSmaxFile = trim(CSmaxFile)//"5"
       if( VBFoffsh_run.eq.0 ) CSmaxFile = trim(CSmaxFile)//"0"
     else
       CSmaxFile = DataFile
@@ -1677,8 +1679,14 @@ type(SaveValues) :: tosave, oldsavevalues
     endif
 
     ! VBF
-    if( distinguish_HWWcouplings .and. Process.ne.60 .and. Process.ne.66 ) then
+    if( distinguish_HWWcouplings .and. Process.ne.60 .and. Process.ne.66 .and. Process.ne.68 ) then
         call Error("The separate HWW couplings are only used for VBF.  For H->WW decay or WH production, please set ghz* instead.")
+    endif
+
+    !Special for offshell VBF - default ghz1 is 1 to match the MCFM convention
+    if( .not.Setghz1 .and. Process.ge.66 .and. Process.le.68 ) then
+        !note this implies .not. SetAnomalousSpin0VV because of earlier errors
+        ghz1=(1d0,0d0)
     endif
 
 
@@ -2570,11 +2578,11 @@ integer :: i, i1, j1,PChannel_aux, PChannel_aux1,NHisto
 integer, pointer :: ijSel(:,:)
 include 'csmaxvalue.f'
 integer :: flav1,flav2,StatusPercent,MissingEvents,MaxEvts,imax
-integer :: VegasSeed,PreviousSum,ios
+integer :: VegasSeed,PreviousSum,ios,NumPartonicChannels
 character :: ProcessStr*(3)
 logical :: UseBetaVersion=.false.
-real(8) :: VG_Result_in(1:4),VG_Error_in(1:4),calls1_in(1:4),calls2_in(1:4)
-real(8) :: CrossSec2_in(1:4,1:164),CrossSecMax2_in(1:4,164)
+real(8) :: VG_Result_in(1:5),VG_Error_in(1:5),calls1_in(1:5),calls2_in(1:5)
+real(8) :: CrossSec2_in(1:5,1:164),CrossSecMax2_in(1:5,164)
 
 
     VG_Result = -13d0
@@ -2897,7 +2905,7 @@ IF( .NOT. (Process.ge.66 .and. Process.le.69) ) THEN! special treatment for offs
 ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell VBF
 
 
-    if( VBFoffsh_run.ne.0 .and. VBFoffsh_run.ne.1 .and. VBFoffsh_run.ne.2 .and. VBFoffsh_run.ne.3 .and. VBFoffsh_run.ne.4 ) call Error("Please specify VBFoffsh_run")
+    if( VBFoffsh_run.ne.0 .and. VBFoffsh_run.ne.1 .and. VBFoffsh_run.ne.2 .and. VBFoffsh_run.ne.3 .and. VBFoffsh_run.ne.4 .and. VBFoffsh_run.ne.5 ) call Error("Please specify VBFoffsh_run")
     print *, "VBFoffsh_run = ",VBFoffsh_run
 
     write(io_stdout,"(2X,A)")  "Scanning the integrand"
@@ -2941,7 +2949,16 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         close(unit=io_TmpFile)
         if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'4_gridinfo.txt'
 
-        if( calls1_in(1).ne.calls1_in(2) .or. calls1_in(1).ne.calls1_in(3) .or. calls1_in(2).ne.calls1_in(3) .or. calls1_in(1).ne.calls1_in(4) ) call Error("Mismatch in calls1")
+        open(unit=io_TmpFile,file=trim(DataFile(1:i-1))//'5_gridinfo.txt',form='formatted',status='old',iostat=ios)
+        read(io_TmpFile,fmt=*) calls1_in(5)
+        read(io_TmpFile,fmt=*) CrossSec2_in(5,:)
+        read(io_TmpFile,fmt=*) CrossSecMax2_in(5,:)
+        read(io_TmpFile,fmt=*) VG_Result_in(5)
+        read(io_TmpFile,fmt=*) VG_Error_in(5)
+        close(unit=io_TmpFile)
+        if( ios.eq.0 ) print *, "read ",trim(DataFile(1:i-1))//'5_gridinfo.txt'
+
+        if( calls1_in(1).ne.calls1_in(2) .or. calls1_in(1).ne.calls1_in(3) .or. calls1_in(2).ne.calls1_in(3) .or. calls1_in(1).ne.calls1_in(4) .or. calls1_in(1).ne.calls1_in(5) ) call Error("Mismatch in calls1")
         calls1 = calls1_in(1)
 
         CrossSec2(:) = -1d0        
@@ -2950,8 +2967,9 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
             if( CrossSec2_in(2,i).ne.0d0 .and. CrossSec2(i).eq.-1d0 ) CrossSec2(i) = CrossSec2_in(2,i)
             if( CrossSec2_in(3,i).ne.0d0 .and. CrossSec2(i).eq.-1d0 ) CrossSec2(i) = CrossSec2_in(3,i)
             if( CrossSec2_in(4,i).ne.0d0 .and. CrossSec2(i).eq.-1d0 ) CrossSec2(i) = CrossSec2_in(4,i)
+            if( CrossSec2_in(5,i).ne.0d0 .and. CrossSec2(i).eq.-1d0 ) CrossSec2(i) = CrossSec2_in(5,i)
             if( CrossSec2(i).lt.0d0 ) then
-                print *, "WARNING: CrossSec2(i) has not been filled",i,CrossSec2_in(1:4,i)
+                print *, "WARNING: CrossSec2(i) has not been filled",i,CrossSec2_in(1:5,i)
                 CrossSec2(i) = 0d0
             endif
         enddo        
@@ -2961,8 +2979,8 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
             CrossSecMax2(i) = CrossSecMax2_in( max(1,VBFoffsh_run),i)
         enddo        
 
-        VG_Result = VG_Result_in(1)+VG_Result_in(2)+VG_Result_in(3)+VG_Result_in(4)
-        VG_Error  = dsqrt(VG_Error_in(1)**2+VG_Error_in(2)**2+VG_Error_in(3)**2+VG_Error_in(4)**2)
+        VG_Result = VG_Result_in(1)+VG_Result_in(2)+VG_Result_in(3)+VG_Result_in(4)+VG_Result_in(5)
+        VG_Error  = dsqrt(VG_Error_in(1)**2+VG_Error_in(2)**2+VG_Error_in(3)**2+VG_Error_in(4)**2+VG_Error_in(5)**2)
 
     else
         itmx = 10
@@ -3003,8 +3021,6 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
     call InitOutput(VG_Result, VG_Error)
 
     RequEvents2(:) = 0
-    
-    
     call HouseOfRepresentatives2(CrossSec2, RequEvents2, VegasNc2)
 
     call getRef_MCFM_qqVVqq_Hash(ijSel)
@@ -3012,31 +3028,84 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
     do i=1,Hash_MCFM_qqVVqq_Size
          i1 = convertToPartIndex(ijSel(i,1))
          j1 = convertToPartIndex(ijSel(i,2))
-         if( RequEvents2(i).ne.0 ) write(*,"(I4,I4,I4,F18.8,I10,I10)") i, i1,j1,CrossSec2(i)/VG_Result,RequEvents2(i)         
+         if( RequEvents2(i).ne.0 ) write(*,"(I4,I4,I4,F18.8,I10,I10)") i, i1,j1,CrossSec2(i),RequEvents2(i)         
     enddo
+    
+    
     write(io_stdout,"(2X,A,F18.3,I10)") "Sum        partonic xsec:",sum(CrossSec2(:))/VG_Result,sum(RequEvents2(:))
 
 
     if( .not. ReadCSmax ) then! For ReadCSmax=.false. the program ends here
-       if( VBFoffsh_run.ne.1 .and. VBFoffsh_run.ne.2 .and. VBFoffsh_run.ne.3 .and. VBFoffsh_run.ne.4 ) print *, "WARNING: These are not the final number of events because the total cross section needs to be assembled from VBFoffsh_run=1,2,3,4"
+       if( VBFoffsh_run.eq.1 .or. VBFoffsh_run.eq.2 .or. VBFoffsh_run.eq.3 .or. VBFoffsh_run.eq.4 .or. VBFoffsh_run.eq.5 ) print *, "WARNING: These are not the final number of events because the total cross section needs to be assembled from VBFoffsh_run=1,2,3,4,5"
        RETURN
     endif
 
 
     if( VBFoffsh_run.eq.1 ) then ! removing the requested events for the wrong VBFoffsh_run
          RequEvents2(3:164) = 0
+
+         NumPartonicChannels = 2
+!          call BubleSort(NumPartonicChannels,RequEvents2(1:),SortedHash)   
+!          call ReOrder(NumPartonicChannels,SortedHash,CrossSec2(1:))
+!          call ReOrder(NumPartonicChannels,SortedHash,CrossSecMax2(1:))
+!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(1:,1))
+!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(1:,2))
+
     elseif( VBFoffsh_run.eq.2 ) then 
          RequEvents2(1:2) = 0
          RequEvents2(10:164) = 0
+
+         NumPartonicChannels = 7
+!          call BubleSort(NumPartonicChannels,RequEvents2(3:),SortedHash)   
+!          call ReOrder(NumPartonicChannels,SortedHash,CrossSec2(3:))
+!          call ReOrder(NumPartonicChannels,SortedHash,CrossSecMax2(3:))
+!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(3:,1))
+!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(3:,2))
+
     elseif( VBFoffsh_run.eq.3 ) then
          RequEvents2(1:9) = 0
-         RequEvents2(41:164) = 0         
+         RequEvents2(41:164) = 0 
+  
+         NumPartonicChannels = 31
+!          call BubleSort(NumPartonicChannels,RequEvents2(10:),SortedHash)   
+!          call ReOrder(NumPartonicChannels,SortedHash,CrossSec2(10:))
+!          call ReOrder(NumPartonicChannels,SortedHash,CrossSecMax2(10:))
+!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(10:,1))
+!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(10:,2))
+
+      
     elseif( VBFoffsh_run.eq.4 ) then
          RequEvents2(1:40) = 0
+         RequEvents2(104:164) = 0
+   
+         NumPartonicChannels = 63
+!          call BubleSort(NumPartonicChannels,RequEvents2(41:),SortedHash)   
+!          call ReOrder(NumPartonicChannels,SortedHash,CrossSec2(41:))
+!          call ReOrder(NumPartonicChannels,SortedHash,CrossSecMax2(41:))
+!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(41:,1))
+!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(41:,2))
+
+    elseif( VBFoffsh_run.eq.5 ) then
+         RequEvents2(1:103) = 0
+  
+         NumPartonicChannels = 61
+!          call BubleSort(NumPartonicChannels,RequEvents2(104:),SortedHash)   
+!          call ReOrder(NumPartonicChannels,SortedHash,CrossSec2(104:))
+!          call ReOrder(NumPartonicChannels,SortedHash,CrossSecMax2(104:))
+!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(104:,1))
+!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(104:,2))
+
     endif
     ingridfile = trim(CSmaxFile)//'_step2.grid'
 
 
+!     print *, "New sorted hash for VBFoffsh_run=",VBFoffsh_run
+!     do i=1,Hash_MCFM_qqVVqq_Size
+!          i1 = convertToPartIndex(ijSel(i,1))
+!          j1 = convertToPartIndex(ijSel(i,2))
+!          if( RequEvents2(i).ne.0 ) write(*,"(I4,I4,I4,I4,F18.8,I10,I10)") i,SortedHash(i), i1,j1,CrossSec2(i)/VG_Result,RequEvents2(i)
+! !         write(*,"(I4,I4,I4,I4,F18.8,I10,I10)") i, SortedHash(i), i1,j1,CrossSec2(i)/VG_Result,RequEvents2(i)
+!     enddo  
 
 
 !--------------------------------------------------------------------
@@ -3107,6 +3176,8 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 
 
 
+    
+    
 
 ENDIF
 
@@ -6299,8 +6370,8 @@ implicit none
         print *, "                      VH_PC overrides Pchannel,"
         print *, "                      but Pchannel applies to VH_PC = nl,"
         print *, "                      where 0 = gg, 1 = qq, and 2 = both + gq"
-        print *, "   VBFoffsh_run:      For VBF offshell production, set this to a number from 1-4"
-        print *, "                      for each of the 4 jobs.  See manual for more details."
+        print *, "   VBFoffsh_run:      For VBF offshell production, set this to a number from 1-5"
+        print *, "                      for each of the 5 jobs.  See manual for more details."
         print *, " Resonance parameters:"
         print *, "   MReso:             resonance mass in GeV (default=125.00)"
         print *, "   GaReso:            resonance width in GeV (default=0.00407)"

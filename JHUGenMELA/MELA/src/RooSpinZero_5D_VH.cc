@@ -1,25 +1,28 @@
 #include "RooSpinZero_5D_VH.h"
 
 
+RooSpinZero_5D_VH::RooSpinZero_5D_VH() : RooSpinZero(){}
 RooSpinZero_5D_VH::RooSpinZero_5D_VH(
   const char *name, const char *title,
   modelMeasurables _measurables,
   modelParameters _parameters,
   modelCouplings _couplings,
-  RooSpin::VdecayType _Vdecay1, RooSpin::VdecayType _Vdecay2
-  ) : RooSpinZero(
+  RooSpin::VdecayType _Vdecay1, RooSpin::VdecayType _Vdecay2,
+  TVar::VerbosityLevel verbosity_
+) : RooSpinZero(
   name, title,
   _measurables,
   _parameters,
   _couplings,
-  _Vdecay1, _Vdecay2
-  )
+  _Vdecay1, _Vdecay2,
+  verbosity_
+)
 {}
 
 
 RooSpinZero_5D_VH::RooSpinZero_5D_VH(
   const RooSpinZero_5D_VH& other, const char* name
-  ) : RooSpinZero(other, name)
+) : RooSpinZero(other, name)
 {}
 
 void RooSpinZero_5D_VH::evaluatePolarizationTerms(

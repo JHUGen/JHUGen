@@ -39,14 +39,15 @@ public:
     RooAbsReal* gvpvp1List[1][2];
   };
 
-  RooSpinZero(){};
+  RooSpinZero();
   RooSpinZero(
     const char* name, const char* title,
     modelMeasurables _measurables,
     modelParameters _parameters,
     modelCouplings _couplings,
-    RooSpin::VdecayType _Vdecay1=RooSpin::kVdecayType_Zll, RooSpin::VdecayType _Vdecay2=RooSpin::kVdecayType_Zll
-    );
+    RooSpin::VdecayType _Vdecay1=RooSpin::kVdecayType_Zll, RooSpin::VdecayType _Vdecay2=RooSpin::kVdecayType_Zll,
+    TVar::VerbosityLevel verbosity_=TVar::ERROR
+  );
 
   RooSpinZero(const RooSpinZero& other, const char* name=0);
   virtual TObject* clone(const char* newname) const = 0;

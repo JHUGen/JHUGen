@@ -2,11 +2,14 @@
 #Inputs are down at the bottom.  No need to change anything above that unless there's a bug
 
 import argparse
-from contextlib import contextmanager
+from contextlib import closing, contextmanager
 from getpass import getpass
 import os
+import re
+import shutil
 from subprocess import check_call
 import tempfile
+import urllib2
 
 gitdir = None
 
@@ -15,29 +18,38 @@ WebGeneratordir = os.path.join(Webdir, "Generator")
 if not os.path.isdir(WebGeneratordir):
      raise OSerror("You should run this from the Web directory")
 
-def uploadwebpage(dryrun=False, no_mcfm=False):
+def uploadwebpage(dontupload=[], dontuploadifexists=[], dryrun=False, dont_overwrite_mcfm=False, dont_overwrite_tarballs=False, edit_cadaverrc=False):
+    dontupload = ListOfRegexes(dontupload)
+    dontuploadifexists = ListOfRegexes(dontuploadifexists)
+
     if dryrun:
         JHED = password = ""
     else:
         JHED = raw_input("Enter your JHED ID: ")
         password = getpass("Enter your JHED password: ")
-    if no_mcfm:
-        dontupload.append("MCFM-precompiled")
+    if dont_overwrite_mcfm:
+        dontuploadifexists.append("MCFM-precompiled")
+    if dont_overwrite_tarballs:
+        dontuploadifexists.append("[.]tar[.]gz$")
+        dontuploadifexists.append("[.]tgz$")
     with cd("Generator"):
         create_Download(*versions)
     repmap = {
               "JHED": JHED,
               "password": password,
               "machine": "https://webdav.johnshopkins.edu/",
-              "uploadfiles": getuploadfiles("."),
+              "uploadfiles": getuploadfiles(".", dontupload=dontupload, dontuploadifexists=dontuploadifexists),
              }
     if dryrun:
         print "Would open cadaver, then run:"
         print
         print CadaverRC(**repmap)
     else:
-        with NetRC(**repmap), CadaverRC(**repmap):
-            check_call(["cadaver"])
+        with CadaverRC(**repmap) as crc:
+            if edit_cadaverrc:
+                raw_input("You can now edit "+crc.filename+".  When you're done press enter.")
+            with NetRC(**repmap):
+                check_call(["cadaver"])
 
 
 class RC(object):
@@ -50,6 +62,7 @@ class RC(object):
         if os.path.exists(self.filename): raise OSError(self.filename+" already exists!")
         with open(self.filename, "w") as f:
             f.write(self.template.format(**self.repmap))
+        return self
     def __str__(self):
         return self.template.format(**self.repmap)
 
@@ -78,16 +91,32 @@ class CadaverRC(RC):
     filename = os.path.expanduser("~/.cadaverrc")
     template = cadaverrctemplate
 
-def getuploadfiles(dir):
+def existsonwebsite(filename):
+    #https://stackoverflow.com/a/16778473/5228524
+    try:
+        with closing(urllib2.urlopen(os.path.join(websitebase, filename))) as f:
+            return True
+    except urllib2.HTTPError:
+        return False
+
+class ListOfRegexes(list):
+    def __contains__(self, other):
+        return any(re.search(_, other) for _ in self)
+
+def getuploadfiles(dir, dontupload, dontuploadifexists):
     files = os.listdir(dir)
     result = ""
     for f in files:
-        if f in dontupload:
+        if os.path.join(dir, f) in dontupload:
             continue
         if os.path.isfile(os.path.join(dir, f)):
+            if os.path.join(dir, f) in dontuploadifexists and existsonwebsite(os.path.join(dir, f)): continue
             result += "put "+os.path.join(dir, f)+"\n"
         if os.path.isdir(os.path.join(dir, f)):
-            result += "mkdir {}\ncd {}\n{}cd ..\n".format(f, f, getuploadfiles(os.path.join(dir, f)))
+            result += "mkdir {0}\ncd {0}\n{1}cd ..\n".format(
+                f,
+                getuploadfiles(os.path.join(dir, f), dontupload=dontupload, dontuploadifexists=dontuploadifexists)
+            )
     return result
 
 class Version(object):
@@ -164,7 +193,11 @@ def create_Download(mostrecentversion, *olderversions):
         check_call(["git", "clone", "git@github.com:JHUGen/MCFM-precompiled"])
     with cd("MCFM-precompiled"):
         check_call(["git", "fetch"])
+        if os.path.exists("../NNPDF30_lo_as_0130.LHgrid.tgz"):
+            shutil.move("../NNPDF30_lo_as_0130.LHgrid.tgz", ".")
         check_call(["git", "checkout", MCFMprecompiledcommit])
+        shutil.move("NNPDF30_lo_as_0130.LHgrid.tgz", "..")
+        
 
 @contextmanager
 def cd(newdir):
@@ -191,7 +224,7 @@ Download_template = """
     Download:<br>
     Latest version: {latest}
     <br>
-    Compiled MCFM libraries to interface with MELA that work for a good variety of software releases: <a href="MCFM-precompiled/slc5_amd64_gcc462/libmcfm_7p0.so">libmcfm_7p0.so</a><br>
+    Compiled MCFM libraries to interface with MELA that work for a good variety of software releases: <a href="MCFM-precompiled/v2/libmcfm_705.so">libmcfm_705.so</a><br>
     (See JHUGenMELA/ggZZ_MCFM/README for further information)
     <br>
     <br>
@@ -261,17 +294,20 @@ storefolders = ["JHUGenerator", "JHUGenMELA", "AnalyticMELA", "graviton", "gravi
 
 #files in this directory that should not be uploaded to the spin page
 dontupload = [
-              "uploadwebpage.py",
-              ".gitignore",
-              ".git",
+              "uploadwebpage[.]py$",
+              "[.]gitignore$",
+              "[.]git$",
              ]
-MCFMprecompiledcommit = "5c2d6b85a4ec0a5c7fb58caf6116b7b084266b84"
+MCFMprecompiledcommit = "46a2987319695e802914b45141b7acebf8108b5d"
+websitebase = "http://spin.pha.jhu.edu"
 #end of inputs
 ########################################################################################
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-n", "--dry-run", help="create all the tarballs but don't actually upload", action="store_true", dest="dryrun")
-    parser.add_argument("--no-mcfm", help="don't re-upload MCFM libraries", action="store_true")
+    parser.add_argument("--dont-overwrite-mcfm", help="don't re-upload MCFM libraries that already exist", action="store_true")
+    parser.add_argument("--dont-overwrite-tarballs", help="don't re-upload JHUGen tarballs that already exist", action="store_true")
+    parser.add_argument("--edit-cadaverrc", help="if you want to edit the .cadaverrc before actually uploading", action="store_true")
     args = parser.parse_args()
-    uploadwebpage(dryrun=args.dryrun, no_mcfm=args.no_mcfm)
+    uploadwebpage(dontupload=dontupload, **args.__dict__)

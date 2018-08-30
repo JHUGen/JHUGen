@@ -1885,7 +1885,11 @@ bool TUtil::MCFM_SetupParticleCouplings(
   bool isZJJ = false;
   if (ndau>=4) isZJJ = PDGHelpers::isAZBoson(mela_event.intermediateVid.at(0)); // No check on whether daughters 2 and 3 are jets. Notice both isZZ and isZJJ could be true
   else if (ndau==2 && process == TVar::bkgZJets){ // Check whether the two daughters can create a Z
-    isZJJ = PDGHelpers::isAZBoson(PDGHelpers::getCoupledVertex(mela_event.intermediateVid.at(0), mela_event.intermediateVid.at(1)));
+    isZJJ = (
+      PDGHelpers::isAZBoson(PDGHelpers::getCoupledVertex(mela_event.intermediateVid.at(0), mela_event.intermediateVid.at(1)))
+      ||
+      ((PDGHelpers::isAnUnknownJet(mela_event.intermediateVid.at(0)) || PDGHelpers::isAQuark(mela_event.intermediateVid.at(0))) && (PDGHelpers::isAnUnknownJet(mela_event.intermediateVid.at(1)) || PDGHelpers::isAQuark(mela_event.intermediateVid.at(1))))
+      );
   }
   bool isZG = (ndau>=3 && PDGHelpers::isAZBoson(mela_event.intermediateVid.at(0)) && PDGHelpers::isAPhoton(mela_event.intermediateVid.at(1)));
   bool isGG = (ndau>=2 && PDGHelpers::isAPhoton(mela_event.intermediateVid.at(0)) && PDGHelpers::isAPhoton(mela_event.intermediateVid.at(1)));
@@ -1894,7 +1898,7 @@ bool TUtil::MCFM_SetupParticleCouplings(
   bool hasW1 = isWW;
   bool hasW2 = isWW;
   if (verbosity>=TVar::DEBUG){
-    MELAout << "TUtil::MCFM_SetupParticleCouplings(" << TVar::ProductionName(production) << ", " << TVar::ProcessName(process) << "):\nInitial configuration is ";
+    MELAout << "TUtil::MCFM_SetupParticleCouplings(" << TVar::ProductionName(production) << ", " << TVar::ProcessName(process) << "):\nInitial configuration ";
     vector<TString> strcfgs;
     if (isGG) strcfgs.push_back(TString("GG"));
     if (isZG) strcfgs.push_back(TString("ZG"));
@@ -1902,6 +1906,7 @@ bool TUtil::MCFM_SetupParticleCouplings(
     if (isZJJ) strcfgs.push_back(TString("ZJJ"));
     if (isWW) strcfgs.push_back(TString("WW"));
     if (!strcfgs.empty()){
+      MELAout << "is ";
       for (unsigned int istr=0; istr<strcfgs.size(); istr++){
         if (istr==0) MELAout << strcfgs.at(istr);
         else MELAout << ", " << strcfgs.at(istr);

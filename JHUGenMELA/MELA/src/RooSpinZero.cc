@@ -1,18 +1,23 @@
 #include "RooSpinZero.h"
 
+
 using namespace std;
+using namespace MELAStreamHelpers;
 
 
+RooSpinZero::RooSpinZero() : RooSpin(){}
 RooSpinZero::RooSpinZero(
   const char* name, const char* title,
   modelMeasurables _measurables,
   modelParameters _parameters,
   modelCouplings _couplings,
-  RooSpin::VdecayType _Vdecay1, RooSpin::VdecayType _Vdecay2
-  ) : RooSpin(
+  RooSpin::VdecayType _Vdecay1, RooSpin::VdecayType _Vdecay2,
+  TVar::VerbosityLevel verbosity_
+) : RooSpin(
   name, title,
   _measurables, _parameters,
-  _Vdecay1, _Vdecay2
+  _Vdecay1, _Vdecay2,
+  verbosity_
   ),
 
   g1Val("g1Val", "g1Val", this, (RooAbsReal&)*(_couplings.g1List[0][0])),
@@ -441,11 +446,11 @@ void RooSpinZero::calculateAi(
     g4_dynIm = ggsgs4ValIm;
   }
   /*
-  cout << "g1: " << g1_dyn << " " << g1_dynIm << '\t';
-  cout << "g2: " << g2_dyn << " " << g2_dynIm << '\t';
-  cout << "g3: " << g3_dyn << " " << g3_dynIm << '\t';
-  cout << "g4: " << g4_dyn << " " << g4_dynIm << '\t';
-  cout << endl;
+  MELAout << "g1: " << g1_dyn << " " << g1_dynIm << '\t';
+  MELAout << "g2: " << g2_dyn << " " << g2_dynIm << '\t';
+  MELAout << "g3: " << g3_dyn << " " << g3_dynIm << '\t';
+  MELAout << "g4: " << g4_dyn << " " << g4_dynIm << '\t';
+  MELAout << endl;
   */
 
   Double_t kappa = s/pow(Lambda, 2);
@@ -455,11 +460,26 @@ void RooSpinZero::calculateAi(
   a3Im = -2.*g4_dynIm*pow(m12, 2);
   a2Im = -(2.*g2_dynIm + g3_dynIm*kappa)*pow(m12, 2);
   a1Im = g1_dynIm*pow(mV, 2) - a2Im*s/pow(m12, 2);
+
+  if (verbosity>=TVar::DEBUG){
+    MELAout << "RooSpinZero::calculateAi( "
+      << a1Re << " , " << a1Im << " , " << a2Re << " , " << a2Im << " , " << a3Re << " , " << a3Im << " , " << VGammaVpmode1 << " , " << VGammaVpmode2
+      << " ):\n"
+      << "\t- Input:\n"
+      << "\t- mV, m1, m2, m12, s = " << mV << " , " << m1 << " , " << m2 << " , " << m12 << " , " << s << '\n'
+      << "\t- g1_dyn = (" << g1_dyn << " , " << g1_dynIm << ")" << '\n'
+      << "\t- g2_dyn = (" << g2_dyn << " , " << g2_dynIm << ")" << '\n'
+      << "\t- g3_dyn = (" << g3_dyn << " , " << g3_dynIm << ")" << '\n'
+      << "\t- g4_dyn = (" << g4_dyn << " , " << g4_dynIm << ")"
+      << endl;
+  }
 }
 void RooSpinZero::calculateAmplitudes(
   Double_t& A00Re, Double_t& A00Im, Double_t& AppRe, Double_t& AppIm, Double_t& AmmRe, Double_t& AmmIm,
   int VGammaVpmode1, int VGammaVpmode2
 )const{
+  if (verbosity>=TVar::DEBUG) MELAout << "Begin RooSpinZero::calculateAmplitudes( " << VGammaVpmode1 << " , " << VGammaVpmode2 << " )" << endl;
+
   Double_t m1_=m1; if (Vdecay1==RooSpin::kVdecayType_GammaOnshell) m1_=0;
   Double_t m2_=m2; if (Vdecay2==RooSpin::kVdecayType_GammaOnshell) m2_=0;
 
@@ -512,15 +532,24 @@ void RooSpinZero::calculateAmplitudes(
   if (Vdecay1!=RooSpin::kVdecayType_GammaOnshell) eta1p2 *= eta1;
   if (Vdecay2!=RooSpin::kVdecayType_GammaOnshell) eta1p2 *= eta2;
 
+  // etas = s/m12**2
   Double_t etas = (1. - pow(eta1, 2) - pow(eta2, 2))/2.;
   if (pow(eta1+eta2, 2)>1.) etas = -etas;
+  // x = (s/(m1*m2))**2 - 1 = (etas**2 - (eta1*eta2)**2)/(eta1*eta2)**2
   Double_t etasp = pow(etas, 2) - pow(eta1*eta2, 2); // Notice how eta1p2 is not used. The second set of multiplications below is the reason to it!
   if (etasp<0) etasp=0;
 
+  if (verbosity>=TVar::DEBUG) MELAout << "RooSpinZero::calculateAmplitudes:\n"
+    << "\t- eta1, eta2, eta1p2, etasp = "
+    << eta1 << " , " << eta2 << " , " << eta1p2 << " , " << etasp << '\n'
+    << "\t- ampScale, prop1, prop2 = "
+    << ampScale << " , " << propV1Re << "," << propV1Im << " , " << propV2Re << "," << propV2Im
+    << endl;
+
   Double_t A00Re_tmp=0, A00Im_tmp=0, AppRe_tmp=0, AppIm_tmp=0, AmmRe_tmp=0, AmmIm_tmp=0;
   if (Vdecay1!=RooSpin::kVdecayType_GammaOnshell && Vdecay2!=RooSpin::kVdecayType_GammaOnshell){
-    A00Re_tmp = -(a1Re*etas + a2Re*etasp)*ampScale;
-    A00Im_tmp = -(a1Im*etas + a2Im*etasp)*ampScale;
+    A00Re_tmp = -2.*(a1Re*etas + a2Re*etasp)*ampScale;
+    A00Im_tmp = -2.*(a1Im*etas + a2Im*etasp)*ampScale;
   }
   AppRe_tmp = (a1Re - a3Im*sqrt(etasp))*ampScale;
   AppIm_tmp = (a1Im + a3Re*sqrt(etasp))*ampScale;
@@ -531,17 +560,23 @@ void RooSpinZero::calculateAmplitudes(
   AppIm_tmp *= eta1p2;
   AmmRe_tmp *= eta1p2;
   AmmIm_tmp *= eta1p2;
-  
+
+  if (verbosity>=TVar::DEBUG) MELAout << "RooSpinZero::calculateAmplitudes:\n"
+    << "\t- A00 factor = " << A00Re_tmp << " , " << A00Im_tmp << '\n'
+    << "\t- A++ factor = " << AppRe_tmp << " , " << AppIm_tmp << '\n'
+    << "\t- A-- factor = " << AmmRe_tmp << " , " << AmmIm_tmp
+    << endl;
+
   // A_old = ARe_old+i*AIm_old => A_new = ARe_new + i*AIm_new = A_old*propV1*propV2
   std::vector<Double_t> A00_reals, A00_imags; A00_reals.push_back(A00Re_tmp); A00_imags.push_back(A00Im_tmp); A00_reals.push_back(propV1Re); A00_imags.push_back(propV1Im); A00_reals.push_back(propV2Re); A00_imags.push_back(propV2Im); A00_reals.push_back(propHRe); A00_imags.push_back(propHIm); AnaMelaHelpers::multiplyComplexNumbers(A00_reals, A00_imags, A00Re, A00Im);
   std::vector<Double_t> App_reals, App_imags; App_reals.push_back(AppRe_tmp); App_imags.push_back(AppIm_tmp); App_reals.push_back(propV1Re); App_imags.push_back(propV1Im); App_reals.push_back(propV2Re); App_imags.push_back(propV2Im); App_reals.push_back(propHRe); App_imags.push_back(propHIm); AnaMelaHelpers::multiplyComplexNumbers(App_reals, App_imags, AppRe, AppIm);
   std::vector<Double_t> Amm_reals, Amm_imags; Amm_reals.push_back(AmmRe_tmp); Amm_imags.push_back(AmmIm_tmp); Amm_reals.push_back(propV1Re); Amm_imags.push_back(propV1Im); Amm_reals.push_back(propV2Re); Amm_imags.push_back(propV2Im); Amm_reals.push_back(propHRe); Amm_imags.push_back(propHIm); AnaMelaHelpers::multiplyComplexNumbers(Amm_reals, Amm_imags, AmmRe, AmmIm);
 
   if (!(A00Re==A00Re) || !(AppRe==AppRe) || !(AmmRe==AmmRe) || !(A00Im==A00Im) || !(AppIm==AppIm) || !(AmmIm==AmmIm)){
-    cout << "A00 = " << A00Re << ", " << A00Im << endl;
-    cout << "App = " << AppRe << ", " << AppIm << endl;
-    cout << "Amm = " << AmmRe << ", " << AmmIm << endl;
-    cout << eta1 << '\t' << eta2 << '\t' << etas << '\t' << etasp << '\t' << eta1p2 << endl;
+    MELAout << "A00 = " << A00Re << ", " << A00Im << endl;
+    MELAout << "A++ = " << AppRe << ", " << AppIm << endl;
+    MELAout << "A-- = " << AmmRe << ", " << AmmIm << endl;
+    MELAout << eta1 << '\t' << eta2 << '\t' << etas << '\t' << etasp << '\t' << eta1p2 << endl;
   }
 }
 

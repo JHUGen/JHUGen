@@ -141,6 +141,7 @@ character(len=2), public :: VH_PC = "lo"                ! VH partonic channel an
                                                             ! "lo" ( = q qbar @LO)
                                                             ! "tr" ( = triangles of gg)
                                                             ! "bo" ( = boxes of gg)
+                                                            ! "in" ( = interference = 2*dble(box*dconjg(triangle)) of gg)
                                                             ! "qg" or "gq" ( = qg + gq)
                                                             ! "nl" ( = full oneloop = q qbar @LO + NLO + gg + gq)
                                                             ! "sb" ( = real - dipoles, for development only)
