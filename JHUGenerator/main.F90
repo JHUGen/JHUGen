@@ -1074,7 +1074,7 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "pTlepcut", success, pTlepcut, multiply=GeV, success2=SetpTlepcut, tosave=tosave)
     call ReadCommandLineArgument(arg, "etalepcut", success, etalepcut, success2=Setetalepcut, tosave=tosave)
     call ReadCommandLineArgument(arg, "JetsOppositeEta", success, JetsOppositeEta, tosave=tosave)
-    call ReadCommandLineArgument(arg, "pTHcut", success, pTHcut, success2=Setetalepcut, tosave=tosave)
+    call ReadCommandLineArgument(arg, "pTHcut", success, pTHcut, success2=SetpTHcut, tosave=tosave)
 
     if( .not.success ) then
         call Error("Unknown command line argument: " // trim(arg))
@@ -1413,6 +1413,13 @@ type(SaveValues) :: tosave, oldsavevalues
          mVH_minmax(2) = infinity()
       else
          mVH_minmax(2) = infinity()
+      endif
+    endif
+    if(.not.SetpTHcut)then
+      if(Process.eq.51)then
+         pTHcut = 0d0 * GeV
+      else
+         pTHcut = 0d0 * GeV
       endif
     endif
     if((Process.eq.60 .or. Process.eq.66 .or. Process.eq.67 .or. Process.eq.68 .or. Process.eq.69) .and. includeGammaStar .and. pTjetcut.le.0d0) then

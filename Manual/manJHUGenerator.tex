@@ -265,6 +265,10 @@ This is the list of command line configurables (also defined in the \verb|README
     etalepcut:         Maximum |eta| for leptons in offshell VBF (default: 2.7)
     m4l_min, m4l_max:  Minimum and maximum four-lepton mass in offshell VBF
   Renormalization and factorization scales:
+   m2l_min:    Minimum invariant mass of V (onshell) in new VH (\texttt{Process=51}) (default: 0)
+   m2l_max:   Maximum invariant mass of V (onshell) in newVH (\texttt{Process=51}) (default: infinity)
+   mVH_min:   Minimum invariant mass of VH in new VH (\texttt{Process=51}) (default: 0)
+   mVH_max:   Maximum invariant mass of VH in new VH (\texttt{Process=51}) (default: infinity)
     FacScheme:         PDF factorization scale scheme
     MuFacMultiplier:   Multiplier for the factorization scale chosen by FacScheme
     RenScheme:         QCD renormalization scale scheme
@@ -368,6 +372,7 @@ It is also possible to reuse the output of the first step to run more jobs in th
 \begin{itemize}
 \item \verb|pTjetcut|, \verb|deltaRcut|, \verb|mJJcut| All three cuts are used in processes 60 (VBF), 61 ($H+jj$), 90 ($bbH$), and also 80 ($ttH$) if \verb|m_Top| is set to be light ($<10 \text{GeV}$).  In addition, \verb|pTjetcut| is used in process 62 ($H+j$) and also processes 110--113 ($t/\bar{t}+H$) if \verb|m_Top| is light.
 \item \verb|MPhotonCutoff| If the decay is to $ZZ$ and any of the couplings to photons (\verb|ghzgsX| or \verb|ghgsgsX|) is set, the $\gamma^*$ contribution will be included along with the $Z$'s.  Similarly, if the decay is to $Z\gamma$ and any of the \verb|ghgsgsX| couplings are set, the $\gamma\gamma^*$ contribution will be included as well.  In this case, a lower cut on the photon invariant mass has to be placed in order to avoid the collinear singularity.  This can be set using MPhotonCutoff.
+\item \verb|pTjetcut|, \verb|etajetcut|, \verb|detajetcut|, \verb|deltaRcut|, \verb|mJJcut|, \verb|m4l_min|, \verb|m4l_max|, \verb|m2l_min|, \verb|m2l_max|, \verb|mVH_min|, \verb|mVH_max|, \verb|pTlepcut|, \verb|etalepcut|, and \verb|pTHcut| are available for Process 51. The default values are set such that there is no cuts.
 \end{itemize}
 \subsubsection{Renormalization and factorization scales}
 \begin{itemize}
