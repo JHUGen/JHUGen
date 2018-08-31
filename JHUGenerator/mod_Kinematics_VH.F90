@@ -32,7 +32,9 @@ character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE
 
 
 MomDummy = MomExt/GeV
-MassDummy = Get_MInv(MomDummy)
+do i=1,9
+  MassDummy(i) = Get_MInv(MomDummy(:,i))
+enddo
 
 IDPRUP=Process
 SCALUP=Mu_Fact/GeV
