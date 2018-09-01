@@ -2,7 +2,7 @@ MODULE ModKinematics
 implicit none
 save
 
-public :: GetBWPropagator,ReweightBWPropagator,SetRunningScales,setPDFs,EvalAlphaS
+public :: GetBWPropagator,ReweightBWPropagator,SetRunningScales,setPDFs!,EvalAlphaS
 
 CONTAINS
 
