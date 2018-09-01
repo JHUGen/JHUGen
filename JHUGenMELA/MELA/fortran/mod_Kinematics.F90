@@ -1493,52 +1493,52 @@ double precision Q,xsave,qsave,Ctq6Pdf,D,U
 RETURN
 END SUBROUTINE
 
-! QCD scale from MCFM
-! Implementation into JHUGen by Ulascan Sarica, Dec. 2015
-subroutine EvalAlphaS()
-   use ModParameters
-   IMPLICIT NONE
-#if useLHAPDF==1
-!--- This is simply a wrapper to the LHAPDF implementation of the running coupling alphas, in the style of the native MCFM routine
-   DOUBLE PRECISION alphasPDF
-   REAL(DP) :: Q
-      Q = Mu_Ren/GeV
-      alphas=alphasPDF(Q)
-#else
-!     Evaluation of strong coupling constant alphas
-!     Original Author: R.K. Ellis
-!     q -- Scale at which alpha_s is to be evaluated
-!     alphas_mz -- ModParameters value of alpha_s at the mass of the Z-boson
-!     nloops_pdf -- ModParameters value of the number of loops (1,2, or 3) at which the beta function is evaluated to determine running.
-!     If you somehow need a more complete implementation, check everything at or before commit 28472c5bfee128dde458fd4929b4d3ece9519ab8
-   INTEGER, PARAMETER :: NF6=6
-   INTEGER, PARAMETER :: NF5=5
-   INTEGER, PARAMETER :: NF4=4
-   INTEGER, PARAMETER :: NF3=3
-   INTEGER, PARAMETER :: NF2=2
-   INTEGER, PARAMETER :: NF1=1
-
-      IF (Mu_Ren .LE. 0d0) THEN
-         WRITE(6,*) 'ModKinematics::EvalAlphaS: Mu_Ren .le. 0, Mu_Ren (GeV) = ',(Mu_Ren*GeV)
-         stop
-      ENDIF
-      IF (nQflavors_pdf .NE. NF5) THEN
-         WRITE(6,*) 'ModKinematics::EvalAlphaS: nQflavors_pdf invalid, nQflavors_pdf = ',nQflavors_pdf
-         WRITE(6,*) 'ModKinematics::EvalAlphaS: Check 28472c5bfee128dde458fd4929b4d3ece9519ab8'
-         stop
-      ENDIF
-      IF (nloops_pdf .NE. 1) THEN
-         WRITE(6,*) 'ModKinematics::EvalAlphaS: nloops_pdf invalid, nloops_pdf = ',nloops_pdf
-         WRITE(6,*) 'ModKinematics::EvalAlphaS: Check 28472c5bfee128dde458fd4929b4d3ece9519ab8'
-         stop
-      ENDIF
-
-      alphas=alphas_mz/(1.0_dp+alphas_mz*B0_PDF(NF5)*2.0_dp*dlog((Mu_Ren/zmass_pdf)))
-#endif
-      ! Calculate the derived couplings
-      call ComputeQCDVariables()
-   RETURN
-end subroutine EvalAlphaS
+!! QCD scale from MCFM
+!! Implementation into JHUGen by Ulascan Sarica, Dec. 2015
+!subroutine EvalAlphaS()
+!   use ModParameters
+!   IMPLICIT NONE
+!#if useLHAPDF==1
+!!--- This is simply a wrapper to the LHAPDF implementation of the running coupling alphas, in the style of the native MCFM routine
+!   DOUBLE PRECISION alphasPDF
+!   REAL(DP) :: Q
+!      Q = Mu_Ren/GeV
+!      alphas=alphasPDF(Q)
+!#else
+!!     Evaluation of strong coupling constant alphas
+!!     Original Author: R.K. Ellis
+!!     q -- Scale at which alpha_s is to be evaluated
+!!     alphas_mz -- ModParameters value of alpha_s at the mass of the Z-boson
+!!     nloops_pdf -- ModParameters value of the number of loops (1,2, or 3) at which the beta function is evaluated to determine running.
+!!     If you somehow need a more complete implementation, check everything at or before commit 28472c5bfee128dde458fd4929b4d3ece9519ab8
+!   INTEGER, PARAMETER :: NF6=6
+!   INTEGER, PARAMETER :: NF5=5
+!   INTEGER, PARAMETER :: NF4=4
+!   INTEGER, PARAMETER :: NF3=3
+!   INTEGER, PARAMETER :: NF2=2
+!   INTEGER, PARAMETER :: NF1=1
+!
+!      IF (Mu_Ren .LE. 0d0) THEN
+!         WRITE(6,*) 'ModKinematics::EvalAlphaS: Mu_Ren .le. 0, Mu_Ren (GeV) = ',(Mu_Ren*GeV)
+!         stop
+!      ENDIF
+!      IF (nQflavors_pdf .NE. NF5) THEN
+!         WRITE(6,*) 'ModKinematics::EvalAlphaS: nQflavors_pdf invalid, nQflavors_pdf = ',nQflavors_pdf
+!         WRITE(6,*) 'ModKinematics::EvalAlphaS: Check 28472c5bfee128dde458fd4929b4d3ece9519ab8'
+!         stop
+!      ENDIF
+!      IF (nloops_pdf .NE. 1) THEN
+!         WRITE(6,*) 'ModKinematics::EvalAlphaS: nloops_pdf invalid, nloops_pdf = ',nloops_pdf
+!         WRITE(6,*) 'ModKinematics::EvalAlphaS: Check 28472c5bfee128dde458fd4929b4d3ece9519ab8'
+!         stop
+!      ENDIF
+!
+!      alphas=alphas_mz/(1.0_dp+alphas_mz*B0_PDF(NF5)*2.0_dp*dlog((Mu_Ren/zmass_pdf)))
+!#endif
+!      ! Calculate the derived couplings
+!      call ComputeQCDVariables()
+!   RETURN
+!end subroutine EvalAlphaS
 
 
 
