@@ -2648,12 +2648,6 @@ end subroutine ComputeQCDVariables
 
 
 
-
-
-
-
-
-
 ! QCD scale from MCFM
 ! Implementation into JHUGen by Ulascan Sarica, Dec. 2015
 subroutine EvalAlphaS()
@@ -2786,6 +2780,7 @@ end subroutine EvalAlphaS
 
       return
       end function massfrun
+
 
 
 
