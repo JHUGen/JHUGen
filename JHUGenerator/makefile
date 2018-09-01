@@ -105,6 +105,10 @@ MainDep = mod_CrossSection.F90 \
           mod_CommandLine.F90 \
           main.F90
 
+ifeq ($(linkCollierLib),Yes)
+		 MainDep += mod_CrossSection_HH.F90
+endif
+
 # main objects
 MainObj = $(ObjectDir)/mod_CrossSection.o \
           $(ObjectDir)/mod_CrossSection_HJJ.o \
@@ -115,6 +119,10 @@ MainObj = $(ObjectDir)/mod_CrossSection.o \
           $(ObjectDir)/mod_PMZZ.o \
           $(ObjectDir)/mod_CommandLine.o \
           $(ObjectDir)/main.o
+
+ifeq ($(linkCollierLib),Yes)
+		 MainObj += $(ObjectDir)/mod_CrossSection_HH.o
+endif
 
 AuxDep = mod_Parameters.F90 \
          mod_Misc.F90 \
@@ -389,7 +397,6 @@ AmpObj =  $(ObjectDir)/mod_TopDecay.o \
           $(ObjectDir)/mod_THiggs.o
 
 ifeq ($(linkCollierLib),Yes)
-		 MainDep += mod_CrossSection_HH.F90
 		 KimDep += mod_Kinematics_HH.F90
 		 AmpDep += mod_VH_virtual.F90
          AmpDep += mod_VH_gg.F90
@@ -397,7 +404,6 @@ ifeq ($(linkCollierLib),Yes)
          AmpObj += $(ObjectDir)/mod_VH_gg.o
          AmpObj += $(ObjectDir)/mod_VH_virtual.o
          AmpObj += $(ObjectDir)/mod_HH.o
-		 MainObj += $(ObjectDir)/mod_CrossSection_HH.o
 		 KimObj += $(ObjectDir)/mod_Kinematics_HH.o
 endif    
 
