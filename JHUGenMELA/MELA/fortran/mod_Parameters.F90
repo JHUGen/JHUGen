@@ -141,6 +141,7 @@ character(len=2), public :: VH_PC = "lo"                ! VH partonic channel an
                                                             ! "lo" ( = q qbar @LO)
                                                             ! "tr" ( = triangles of gg)
                                                             ! "bo" ( = boxes of gg)
+                                                            ! "in" ( = interference = 2*dble(box*dconjg(triangle)) of gg)
                                                             ! "qg" or "gq" ( = qg + gq)
                                                             ! "nl" ( = full oneloop = q qbar @LO + NLO + gg + gq)
                                                             ! "sb" ( = real - dipoles, for development only)
@@ -156,11 +157,14 @@ real(8), public :: detajetcut = -1d0                          ! min difference i
 real(8), public :: Rjet = -1d0                                ! jet deltaR, anti-kt algorithm, default is set in main (0 in VH, 0.3 otherwise)
 real(8), public :: mJJcut = 0d0*GeV                           ! minimum mJJ for VBF, HJJ, bbH, VH
 real(8), public :: m4l_minmax(1:2) = (/ -1d0,-1d0 /)*GeV      ! min and max for m_4l in off-shell VBF production;   default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
+real(8), public :: m2l_minmax(1:2) = (/ 0d0,14000d0 /)*GeV   ! min and max for m_V in VH production;
+real(8), public :: mVH_minmax(1:2) = (/ 0d0,14000d0 /)*GeV      ! min and max for m_VH in VH production;
 logical, public :: includeGammaStar = .false.                 ! include offshell photons?
 logical, public :: includeVprime = .false.
 real(8), public :: MPhotonCutoff = -1d0*GeV                          ! minimum |mass_ll| for offshell photons when includeGammaStar = .true. or in VBF bkg
 real(8), public :: pTlepcut = -1d0*GeV
-real(8), public :: etalepcut = -1d0
+real(8), public :: etalepcut = 999d0
+real(8), public :: pTHcut = 0d0*GeV
 logical, public :: JetsOppositeEta = .true.
 !=====================================================
 
@@ -2641,6 +2645,148 @@ subroutine ComputeQCDVariables()
 implicit none
    gs = sqrt(alphas*4.0_dp*pi)
 end subroutine ComputeQCDVariables
+
+
+
+! QCD scale from MCFM
+! Implementation into JHUGen by Ulascan Sarica, Dec. 2015
+subroutine EvalAlphaS()
+!   use ModParameters
+   IMPLICIT NONE
+#if useLHAPDF==1
+!--- This is simply a wrapper to the LHAPDF implementation of the running coupling alphas, in the style of the native MCFM routine
+   DOUBLE PRECISION alphasPDF
+   REAL(DP) :: Q
+      Q = Mu_Ren/GeV
+      alphas=alphasPDF(Q)
+#else
+!     Evaluation of strong coupling constant alphas
+!     Original Author: R.K. Ellis
+!     q -- Scale at which alpha_s is to be evaluated
+!     alphas_mz -- ModParameters value of alpha_s at the mass of the Z-boson
+!     nloops_pdf -- ModParameters value of the number of loops (1,2, or 3) at which the beta function is evaluated to determine running.
+!     If you somehow need a more complete implementation, check everything at or before commit 28472c5bfee128dde458fd4929b4d3ece9519ab8
+   INTEGER, PARAMETER :: NF6=6
+   INTEGER, PARAMETER :: NF5=5
+   INTEGER, PARAMETER :: NF4=4
+   INTEGER, PARAMETER :: NF3=3
+   INTEGER, PARAMETER :: NF2=2
+   INTEGER, PARAMETER :: NF1=1
+
+      IF (Mu_Ren .LE. 0d0) THEN
+         WRITE(6,*) 'ModKinematics::EvalAlphaS: Mu_Ren .le. 0, Mu_Ren (GeV) = ',(Mu_Ren*GeV)
+         stop
+      ENDIF
+      IF (nQflavors_pdf .NE. NF5) THEN
+         WRITE(6,*) 'ModKinematics::EvalAlphaS: nQflavors_pdf invalid, nQflavors_pdf = ',nQflavors_pdf
+         WRITE(6,*) 'ModKinematics::EvalAlphaS: Check 28472c5bfee128dde458fd4929b4d3ece9519ab8'
+         stop
+      ENDIF
+      IF (nloops_pdf .NE. 1) THEN
+         WRITE(6,*) 'ModKinematics::EvalAlphaS: nloops_pdf invalid, nloops_pdf = ',nloops_pdf
+         WRITE(6,*) 'ModKinematics::EvalAlphaS: Check 28472c5bfee128dde458fd4929b4d3ece9519ab8'
+         stop
+      ENDIF
+
+      alphas=alphas_mz/(1.0_dp+alphas_mz*B0_PDF(NF5)*2.0_dp*dlog((Mu_Ren/zmass_pdf)))
+#endif
+      ! Calculate the derived couplings
+      call ComputeQCDVariables()
+   RETURN
+end subroutine EvalAlphaS
+
+
+
+!-----------------------------------------------------------------------------
+!
+      real(8) function massfrun(mf,scale)
+!
+!-----------------------------------------------------------------------------
+!
+!       This function returns the 'nloop' value of a MSbar fermion mass
+!       at a given scale.
+!
+!       INPUT: mf    = MSbar mass of fermion at MSbar fermion mass scale 
+!              scale = scale at which the running mass is evaluated
+!              asmz  = AS(MZ) : this is passed to alphas(scale,asmz,2)
+!              nloop = # of loops in the evolutionC       
+!
+!       COMMON BLOCKS: COMMON/QMASS/CMASS,BMASS,TMASS
+!                      contains the MS-bar masses of the heavy quarks.
+!
+!       EXTERNAL:      double precision alphas(scale,asmz,2)
+!                      
+!-----------------------------------------------------------------------------
+!
+!      use ModParameters
+      implicit none
+!
+!     ARGUMENTS
+!
+      real(8), intent(in) :: mf, scale
+      real(8) scale_temp_ren
+      !integer , intent(in) :: nloop
+!
+!     LOCAL
+!
+      real(8)  beta0, beta1,gamma0,gamma1
+      real(8)  as,asmf,l2
+      integer  nfrun
+
+      scale_temp_ren=Mu_Ren
+!
+!     EXTERNAL
+!
+!      double precision  alphas
+!      external          alphas
+!
+!     COMMON
+!
+!      real *8      cmass,bmass,tmass
+!      COMMON/QMASS/CMASS,BMASS,TMASS
+!
+!     CONSTANTS
+!
+!      double precision  One, Two, Three, Pi
+      !parameter( One = 1d0, Two = 2d0, Three = 3d0 )
+      !parameter( Pi = 3.14159265358979323846d0) 
+
+      if ( mf.gt.m_top ) then
+         nfrun = 6
+      else
+         nfrun = 5
+      end if
+
+      beta0 = ( 11d0 - 2d0/3d0 *nfrun )/4d0
+      !beta1 = ( 102d0  - 38d0/3d0*nf )/16d0
+      gamma0= 1d0
+      !gamma1= ( 202d0/3d0  - 20d0/9d0*nf )/16d0
+      !A1    = -beta1*gamma0/beta0**2+gamma1/beta0
+      Mu_Ren=scale
+      call EvalAlphaS()
+      as=alphas
+
+      Mu_Ren=mf
+      call EvalAlphaS()
+      asmf=alphas
+      !l2    = (1d0+A1*as/Pi)/(one+A1*asmf/Pi)
+      
+      massfrun = mf * (as/asmf)**(gamma0/beta0)
+
+      !if(nloop.eq.2) massfrun=massfrun*l2
+
+      Mu_Ren=scale_temp_ren
+      call EvalAlphaS()
+
+      return
+      end function massfrun
+
+
+
+
+
+
+
 
 
 !========================================================================

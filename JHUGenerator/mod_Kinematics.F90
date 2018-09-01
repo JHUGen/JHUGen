@@ -2579,7 +2579,9 @@ SUBROUTINE Kinematics_VH(id,MomExt,NBin,applyPSCut,HDecays,PhoOnshell)
 use ModMisc
 use ModParameters
 use ModVHLO
+#if useCollier==1
 use ModVHgg
+#endif
 implicit none
 
 real(8) :: helicity(1:9)

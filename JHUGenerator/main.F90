@@ -1953,9 +1953,9 @@ use ModParameters
 use ModMisc
 use ModCrossSection
 use ModCrossSection_VH
-use ModCrossSection_HH
 use ModTTBHiggs
 #if useCollier==1
+use ModCrossSection_HH
 use Collier
 #endif
 implicit none
@@ -2064,6 +2064,12 @@ include "vegas_common.f"
          call InitCacheSystem_cll(1,4)
          call InitEvent_cll
          call setMode_cll(1)!1. use COLI branch; 2. use DD branch; 3. use both branches and compare.
+#else
+print *, "Need to link COLLIER for this process."
+print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+print *, "specified in the makefile."
+stop 1
 #endif
 ! if Collier is used
          NDim = 19
@@ -2096,6 +2102,12 @@ include "vegas_common.f"
          call InitCacheSystem_cll(1,4)
          call InitEvent_cll
          call setMode_cll(1)!1. use COLI branch; 2. use DD branch; 3. use both branches and compare.
+#else
+print *, "Need to link COLLIER for this process."
+print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+print *, "specified in the makefile."
+stop 1
 #endif
 ! if Collier is used
          NDim = 15
@@ -2235,7 +2247,9 @@ end subroutine
 SUBROUTINE StartVegas(VG_Result,VG_Error)
 use ModCrossSection
 use ModCrossSection_VH
+#if useCollier==1
 use ModCrossSection_HH
+#endif
 use ModCrossSection_HJJ
 use ModCrossSection_TTBH
 use ModCrossSection_BBBH
@@ -2293,8 +2307,16 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
       call vegas(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.51) then
       call vegas(EvalWeighted_VH,VG_Result,VG_Error,VG_Chi2)
+#if useCollier==1
     elseif (Process.eq.52) then
       call vegas(EvalWeighted_HH,VG_Result,VG_Error,VG_Chi2)
+#else
+print *, "Need to link COLLIER for this process."
+print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+print *, "specified in the makefile."
+stop 1
+#endif
     elseif (Process.eq.80) then
       call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.90) then
@@ -2327,8 +2349,16 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
       call vegas1(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.51) then
       call vegas1(EvalWeighted_VH,VG_Result,VG_Error,VG_Chi2)
+#if useCollier==1
     elseif (Process.eq.52) then
       call vegas1(EvalWeighted_HH,VG_Result,VG_Error,VG_Chi2)
+#else
+print *, "Need to link COLLIER for this process."
+print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+print *, "specified in the makefile."
+stop 1
+#endif
     elseif (Process.eq.80) then
       call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.90) then
@@ -2369,10 +2399,18 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                 RES = 0d0
                 dum = EvalUnWeighted_VH(yRnd,.false.,RES)
                 VG = VG + RES
+#if useCollier==1
             elseif (Process.eq.52) then
                 RES = 0d0
                 dum = EvalUnWeighted_HH(yRnd,.false.,RES)
                 VG = VG + RES
+#else
+print *, "Need to link COLLIER for this process."
+print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+print *, "specified in the makefile."
+stop 1
+#endif
             else
                 if (PChannel_aux.eq.0.or.PChannel_aux.eq.2) then
                     PChannel= 0
@@ -2443,8 +2481,16 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                       dum = EvalUnWeighted_VHiggs(yRnd,.true.,RES)! RES is a dummy here
             elseif (Process.eq.51) then
                       dum = EvalUnWeighted_VH(yRnd,.true.,RES)! RES is a dummy here
+#if useCollier==1
             elseif (Process.eq.52) then
                       dum = EvalUnWeighted_HH(yRnd,.true.,RES)! RES is a dummy here
+#else
+print *, "Need to link COLLIER for this process."
+print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+print *, "specified in the makefile."
+stop 1
+#endif
             else
                 dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
             endif
@@ -2463,8 +2509,16 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                   dum = EvalUnWeighted_VHiggs(yRnd,.true.,RES)! RES is a dummy here
               elseif (Process.eq.51) then
                   dum = EvalUnWeighted_VH(yRnd,.true.,RES)! RES is a dummy here
+#if useCollier==1
               elseif (Process.eq.52) then
                   dum = EvalUnWeighted_HH(yRnd,.true.,RES)! RES is a dummy here
+#else
+print *, "Need to link COLLIER for this process."
+print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+print *, "specified in the makefile."
+stop 1
+#endif
               else
                   dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
               endif
@@ -2558,7 +2612,9 @@ END SUBROUTINE
 SUBROUTINE StartVegas_NEW(VG_Result,VG_Error)
 use ModCrossSection
 use ModCrossSection_VH
+#if useCollier==1
 use ModCrossSection_HH
+#endif
 use ModCrossSection_BBBH
 use ModCrossSection_HJJ
 use ModCrossSection_TH
@@ -6358,15 +6414,16 @@ implicit none
         print *, "                      according to DecayModes1,2."
         print *, "   HbbDK:             For VH production, decay H->bb"
         print *, "   VH_PC:             VH partonic channel and mode selection"
-        print *, "                      ee = lo = e- e+ @LO"
-        print *, "                      qq = lo = q qbar @LO"
-        print *, "                      gg = triangles + boxes of gg"
+        print *, "                      ee = lo = e- e+ @LO (beta)"
+        print *, "                      qq = lo = q qbar @LO (beta)"
+        print *, "                      gg = triangles + boxes of gg (set as default)"
         print *, "                      tr = triangles of gg"
         print *, "                      bo = boxes of gg"
-        print *, "                      sb = for NLO development"
-        print *, "                      sp = for NLO development"
-        print *, "                      qg = gq = qg + gq"
-        print *, "                      nl = full oneloop = q qbar @LO + NLO + gg + gq"
+        print *, "                      in = interference = 2*dble(box*dconjg(triangle)) of gg"
+        print *, "                      sb = for NLO development (in development)"
+        print *, "                      sp = for NLO development (in development)"
+        print *, "                      qg = gq = qg + gq (in development)"
+        print *, "                      nl = full oneloop = q qbar @LO + NLO + gg + gq (indevelopment)"
         print *, "                      VH_PC overrides Pchannel,"
         print *, "                      but Pchannel applies to VH_PC = nl,"
         print *, "                      where 0 = gg, 1 = qq, and 2 = both + gq"

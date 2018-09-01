@@ -29,7 +29,7 @@ MyLHADir=${LHAPDF_DATA_PATH}/../../lib/
 #link MCFM libraries from MELA
 # remember to export
 #          LD_LIBRARY_PATH=/.../MELA/data/$SCRAM_ARCH/:${LD_LIBRARY_PATH}
-linkMELA = Yes
+linkMELA = No
 
 
 ifeq ($(UseLHAPDF),Yes)
@@ -101,7 +101,6 @@ MainDep = mod_CrossSection.F90 \
           mod_CrossSection_BBBH.F90 \
           mod_CrossSection_TH.F90 \
           mod_CrossSection_VH.F90 \
-          mod_CrossSection_HH.F90 \
           mod_PMZZ.F90 \
           mod_CommandLine.F90 \
           main.F90
@@ -113,7 +112,6 @@ MainObj = $(ObjectDir)/mod_CrossSection.o \
           $(ObjectDir)/mod_CrossSection_BBBH.o \
           $(ObjectDir)/mod_CrossSection_TH.o \
           $(ObjectDir)/mod_CrossSection_VH.o \
-          $(ObjectDir)/mod_CrossSection_HH.o \
           $(ObjectDir)/mod_PMZZ.o \
           $(ObjectDir)/mod_CommandLine.o \
           $(ObjectDir)/main.o
@@ -125,8 +123,7 @@ AuxDep = mod_Parameters.F90 \
          mod_HashCollection.F90
 
 KimDep = mod_Kinematics.F90 \
-         mod_Kinematics_VH.F90 \
-         mod_Kinematics_HH.F90
+         mod_Kinematics_VH.F90
 
 ifeq ($(linkCollierLib),Yes)
 ggVHAmpDep = \
@@ -356,12 +353,9 @@ AmpDep = mod_TopDecay.F90 \
          mod_HiggsJJ.F90 \
          mod_HiggsJ.F90 \
          mod_VH_LO.F90 \
-         mod_VH_gg.F90 \
          mod_VH_real.F90 \
-         mod_VH_virtual.F90 \
          mod_VH_qg.F90 \
          mod_VH_dipole.F90 \
-         mod_HH.F90 \
          mod_TTBHiggs.F90 \
          mod_THiggs.F90
 
@@ -372,8 +366,7 @@ AuxObj =  $(ObjectDir)/mod_HashCollection.o \
           $(ObjectDir)/mod_Phasespace.o
 
 KimObj = $(ObjectDir)/mod_Kinematics.o \
-          $(ObjectDir)/mod_Kinematics_VH.o\
-          $(ObjectDir)/mod_Kinematics_HH.o
+          $(ObjectDir)/mod_Kinematics_VH.o
 
 ifeq ($(linkMELA),Yes)
     AuxDep += mod_MCFMWrapper.F90
@@ -389,15 +382,24 @@ AmpObj =  $(ObjectDir)/mod_TopDecay.o \
           $(ObjectDir)/mod_HiggsJJ.o \
           $(ObjectDir)/mod_HiggsJ.o \
           $(ObjectDir)/mod_VH_LO.o \
-          $(ObjectDir)/mod_VH_gg.o \
           $(ObjectDir)/mod_VH_real.o \
-          $(ObjectDir)/mod_VH_virtual.o \
           $(ObjectDir)/mod_VH_qg.o \
           $(ObjectDir)/mod_VH_dipole.o \
-          $(ObjectDir)/mod_HH.o \
           $(ObjectDir)/mod_TTBHiggs.o \
           $(ObjectDir)/mod_THiggs.o
-    
+
+ifeq ($(linkCollierLib),Yes)
+		 MainDep += mod_CrossSection_HH.F90
+		 KimDep += mod_Kinematics_HH.F90
+		 AmpDep += mod_VH_virtual.F90
+         AmpDep += mod_VH_gg.F90
+         AmpDep += mod_HH.F90
+         AmpObj += $(ObjectDir)/mod_VH_gg.o
+         AmpObj += $(ObjectDir)/mod_VH_virtual.o
+         AmpObj += $(ObjectDir)/mod_HH.o
+		 MainObj += $(ObjectDir)/mod_CrossSection_HH.o
+		 KimObj += $(ObjectDir)/mod_Kinematics_HH.o
+endif    
 
 VegasDep = $(VegasDir)/vegas.f
 VegasObj = $(ObjectDir)/vegas.o

@@ -17,9 +17,11 @@ Function EvalWeighted_VH(yRnd,VgsWgt)
   use ModMisc
   use ModVHLO
   use ModVHreal
-  use ModVHvirtual
   use ModVHdipole
+#if useCollier==1  
   use ModVHgg
+  use ModVHvirtual
+#endif
   use ModVHqg
   use ModPhasespace
 #if compiler==1
@@ -515,6 +517,7 @@ call boost2Lab(eta1,eta2,10,Mom)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     !gg
     me2gg=0d0
     if(VH_PC.eq."gg".or.VH_PC.eq."bo".or.VH_PC.eq."tr".or.VH_PC.eq."in")then
+#if useCollier==1
       if(DecayMode1.eq.4.or.DecayMode1.eq.5.or.DecayMode1.eq.6.or.DecayMode1.eq.10.or.DecayMode1.eq.11)then
         print*,"DecayMode1 = ",DecayMode1," which is a W decay, not compatible with gg"
         stop
@@ -533,7 +536,7 @@ call boost2Lab(eta1,eta2,10,Mom)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !me2_dummy=me2_dummy/8d0
 !!print*,"me2_dummy = ",me2_dummy*pdf(0,1)*pdf(0,2)*PreFac
 !me2gg = me2_dummy *pdf(0,1)*pdf(0,2) *PreFac *PostFac *GluonColAvg**2 *8d0
-!===================This section average helicities, which results the same==========================
+!===================This section average helicities, which results the same========================== 
       if(VH_PC.ne."in")then
         call amp_VH_gg(Mom(:,1:9),mass(3:5,1:2),helicity,id(1:9),VH_PC,amp_dummy)
 !print*, dble(amp_dummy*dconjg(amp_dummy)),"xssssss"
@@ -544,7 +547,15 @@ call boost2Lab(eta1,eta2,10,Mom)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         me2gg = 2d0*dble(amp_tri*dconjg(amp_box)) *pdf(0,1)*pdf(0,2) *PreFac *PostFac *GluonColAvg**2 *8d0
       endif
       !8 = summing delta(a,b)*delta(a,b)
+#else
+print *, "Need to link COLLIER for this process."
+print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+print *, "specified in the makefile."
+stop 1
+#endif
     endif
+
 
     !lo/qq
     me2lo=0d0
@@ -743,8 +754,15 @@ call boost2Lab(eta1,eta2,10,Mom)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             me2_dummy = me2_dummy + dble(amp_dummy*dconjg(amp_dummy))
           enddo
           enddo
-
+#if useCollier==1
           me2_virture_finite = me2_dummy * fac_ZH_virtual(Ehat)
+#else
+print *, "Need to link COLLIER for this process."
+print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+print *, "specified in the makefile."
+stop 1
+#endif
           me2_virture_finite = me2_virture_finite*pdf(LHA2M_PDF(i),1)*pdf(LHA2M_PDF(j),2) * PreFac * PostFac * aveqq * 3d0
 
           call kinematics_VH(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
@@ -769,9 +787,15 @@ call boost2Lab(eta1,eta2,10,Mom)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 me2_dummy_dummy = me2_dummy_dummy + dble(amp_dummy_dummy*dconjg(amp_dummy_dummy))
               enddo
               enddo
-
+#if useCollier==1
               me2_PDF_ren(i_PDF_ren) = IPK_ZH(Mu_Fact_ren(i_PDF_ren),alphas_ren(i_PDF_ren),me2_dummy,me2_dummy_dummy,shat,shat_ren,pdf(LHA2M_PDF(i),1:2),pdf_ren(LHA2M_PDF(i),1:2,i_PDF_ren),PreFac,PreFac_ren,yRnd(17))
-
+#else
+print *, "Need to link COLLIER for this process."
+print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+print *, "specified in the makefile."
+stop 1
+#endif
               me2_PDF_ren(i_PDF_ren) = me2_PDF_ren(i_PDF_ren) * PostFac * aveqq * 3d0
 
               do NHisto = 1,NumHistograms
@@ -857,7 +881,10 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
   use ModVHLO
   use ModVHreal
   use ModVHdipole
+#if useCollier==1
   use ModVHgg
+  use ModVHvirtual
+#endif
   use ModVHqg
   use ModPhasespace
 #if compiler==1
@@ -1289,10 +1316,17 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
         EvalUnweighted_VH = dble(amp_dummy*dconjg(amp_dummy)) *PreFac *PostFac
 
       elseif(VH_PC.eq."tr".or.VH_PC.eq."bo".or.VH_PC.eq."gg".or.VH_PC.eq."in")then!gg
+#if useCollier==1
         id(1:2)=(/convertLHE(Glu_),convertLHE(Glu_)/)
         call amp_VH_gg(Mom(:,1:9),mass(3:5,:),helicity,id(1:9),VH_PC,amp_dummy)
         EvalUnweighted_VH = dble(amp_dummy*dconjg(amp_dummy)) *pdf(0,1)*pdf(0,2) *PreFac *PostFac *GluonColAvg**2 *8d0
-
+#else
+print *, "Need to link COLLIER for this process."
+print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+print *, "specified in the makefile."
+stop 1
+#endif
       else
         print*,"invalid parton combination ",ifound,jfound,"for VH_PC=", VH_PC
         stop
@@ -1398,6 +1432,7 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
         !gg
         me2gg=0d0
         if((VH_PC.eq."gg".or.VH_PC.eq."bo".or.VH_PC.eq."tr".or.VH_PC.eq."in").and.i.eq.0.and.j.eq.0)then
+#if useCollier==1
           call amp_VH_gg(Mom(:,1:9),mass(3:5,:),helicity,id(1:9),VH_PC,amp_dummy)
           me2gg = dble(amp_dummy*dconjg(amp_dummy)) *pdf(0,1)*pdf(0,2)
           me2gg = me2gg *PreFac *PostFac *GluonColAvg**2 *8d0
@@ -1407,6 +1442,13 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
           if (me2gg.gt.csmax(0,0)) then
             csmax(0,0) = me2gg
           endif
+#else
+print *, "Need to link COLLIER for this process."
+print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+print *, "specified in the makefile."
+stop 1
+#endif
         endif!gg
 
         !lo/qq
