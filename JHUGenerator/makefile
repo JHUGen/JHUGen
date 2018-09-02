@@ -29,8 +29,7 @@ MyLHADir=${LHAPDF_DATA_PATH}/../../lib/
 #link MCFM libraries from MELA
 # remember to export
 #          LD_LIBRARY_PATH=/.../MELA/data/$SCRAM_ARCH/:${LD_LIBRARY_PATH}
-linkMELA = Yes
-
+linkMELA = No
 
 ifeq ($(UseLHAPDF),Yes)
    LHAPDFflags = -L$(MyLHADir) -lLHAPDF -I$(MyLHADir)/../include -DuseLHAPDF=1 -lstdc++
@@ -107,7 +106,6 @@ MainDep = mod_CrossSection.F90 \
 
 ifeq ($(linkCollierLib),Yes)
 		 MainDep += mod_CrossSection_HH.F90
-	@echo $(linkCollierLib) " = Yes"
 endif
 
 # main objects
@@ -123,7 +121,6 @@ MainObj = $(ObjectDir)/mod_CrossSection.o \
 
 ifeq ($(linkCollierLib),Yes)
 		 MainObj += $(ObjectDir)/mod_CrossSection_HH.o
-	@echo $(linkCollierLib) " = Yes"
 endif
 
 AuxDep = mod_Parameters.F90 \
@@ -343,7 +340,6 @@ ggHH5AmpObj = \
           $(ObjectDir)/mod_gg_box_HH5_6_mp.o \
           $(ObjectDir)/mod_gg_box_HH5_6_pm.o \
           $(ObjectDir)/mod_gg_box_HH5_6_pp.o
-	@echo $(linkCollierLib) " = Yes"
 else
 ggVHAmpDep = 
 ggVH5AmpDep = 
@@ -408,7 +404,6 @@ ifeq ($(linkCollierLib),Yes)
          AmpObj += $(ObjectDir)/mod_VH_virtual.o
          AmpObj += $(ObjectDir)/mod_HH.o
 		 KimObj += $(ObjectDir)/mod_Kinematics_HH.o
-	@echo $(linkCollierLib) " = Yes"
 endif    
 
 VegasDep = $(VegasDir)/vegas.f
@@ -465,6 +460,8 @@ MadGraphObj = $(ObjectDir)/gg_ttbh.o \
 
 
 JHUGenerator: $(CPSObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(AuxObj) $(ggVHAmpObj) $(LHAPDFInterfaceObj) $(ggVH5AmpObj) $(ggHHAmpObj) $(ggHH5AmpObj) $(AmpObj) $(KimObj) $(MainObj)
+	@echo " linkMELA = "$(linkMELA)
+	@echo " linkCollierLib = "$(linkCollierLib)
 	@echo " linking"
 ifeq ($(UseLHAPDF),Yes)
 	echo " -> interfaced with LHAPDF"
