@@ -107,7 +107,7 @@ MainDep = mod_CrossSection.F90 \
 
 ifeq ($(linkCollierLib),Yes)
 		 MainDep += mod_CrossSection_HH.F90
-echo $(linkCollierLib) " = Yes"
+	@echo $(linkCollierLib) " = Yes"
 endif
 
 # main objects
@@ -123,7 +123,7 @@ MainObj = $(ObjectDir)/mod_CrossSection.o \
 
 ifeq ($(linkCollierLib),Yes)
 		 MainObj += $(ObjectDir)/mod_CrossSection_HH.o
-echo $(linkCollierLib) " = Yes"
+	@echo $(linkCollierLib) " = Yes"
 endif
 
 AuxDep = mod_Parameters.F90 \
@@ -343,7 +343,7 @@ ggHH5AmpObj = \
           $(ObjectDir)/mod_gg_box_HH5_6_mp.o \
           $(ObjectDir)/mod_gg_box_HH5_6_pm.o \
           $(ObjectDir)/mod_gg_box_HH5_6_pp.o
-echo $(linkCollierLib) " = Yes"
+	@echo $(linkCollierLib) " = Yes"
 else
 ggVHAmpDep = 
 ggVH5AmpDep = 
@@ -408,7 +408,7 @@ ifeq ($(linkCollierLib),Yes)
          AmpObj += $(ObjectDir)/mod_VH_virtual.o
          AmpObj += $(ObjectDir)/mod_HH.o
 		 KimObj += $(ObjectDir)/mod_Kinematics_HH.o
-echo $(linkCollierLib) " = Yes"
+	@echo $(linkCollierLib) " = Yes"
 endif    
 
 VegasDep = $(VegasDir)/vegas.f
