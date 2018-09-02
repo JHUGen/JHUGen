@@ -109,6 +109,18 @@ ifeq ($(linkCollierLib),Yes)
 endif
 
 # main objects
+ifeq ($(linkCollierLib),Yes)
+MainObj = $(ObjectDir)/mod_CrossSection.o \
+          $(ObjectDir)/mod_CrossSection_HJJ.o \
+          $(ObjectDir)/mod_CrossSection_TTBH.o \
+          $(ObjectDir)/mod_CrossSection_BBBH.o \
+          $(ObjectDir)/mod_CrossSection_TH.o \
+          $(ObjectDir)/mod_CrossSection_VH.o \
+          $(ObjectDir)/mod_CrossSection_HH.o\
+          $(ObjectDir)/mod_PMZZ.o \
+          $(ObjectDir)/mod_CommandLine.o \
+          $(ObjectDir)/main.o
+else
 MainObj = $(ObjectDir)/mod_CrossSection.o \
           $(ObjectDir)/mod_CrossSection_HJJ.o \
           $(ObjectDir)/mod_CrossSection_TTBH.o \
@@ -118,9 +130,6 @@ MainObj = $(ObjectDir)/mod_CrossSection.o \
           $(ObjectDir)/mod_PMZZ.o \
           $(ObjectDir)/mod_CommandLine.o \
           $(ObjectDir)/main.o
-
-ifeq ($(linkCollierLib),Yes)
-		 MainObj += $(ObjectDir)/mod_CrossSection_HH.o
 endif
 
 AuxDep = mod_Parameters.F90 \
