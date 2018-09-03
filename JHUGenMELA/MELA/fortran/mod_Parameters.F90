@@ -206,7 +206,7 @@ real(8), public            :: POL_A = 0d0                   ! e+ polarization. 0
 real(8), public            :: POL_B = 0d0                   ! e- polarization. 0: no polarization, 100: helicity = 1, -100: helicity = -1
 
 ! PDF and QCD scale variables, set in main::InitPDFNonConstVals if not a parameter
-integer, public, parameter :: nQflavors_pdf = 5    ! Number of flavors enforced to the PDF, used in ModKinematics::EvalAlphaS()
+integer, public, parameter :: nQflavors_pdf = 5    ! Number of flavors enforced to the PDF, used in ModParameters::EvalAlphaS()
 integer, public, parameter :: nloops_pdf = 1       ! alpha_s order
 real(8), public            :: zmass_pdf            ! Z mass used in pdf toward the QCD scale, reset later in main per PDF if needed
 real(8), public            :: Mu_Fact              ! pdf factorization scale (set to M_Reso in main.F90)
@@ -2674,17 +2674,17 @@ subroutine EvalAlphaS()
    INTEGER, PARAMETER :: NF1=1
 
       IF (Mu_Ren .LE. 0d0) THEN
-         WRITE(6,*) 'ModKinematics::EvalAlphaS: Mu_Ren .le. 0, Mu_Ren (GeV) = ',(Mu_Ren*GeV)
+         WRITE(6,*) 'ModParameters::EvalAlphaS: Mu_Ren .le. 0, Mu_Ren (GeV) = ',(Mu_Ren*GeV)
          stop
       ENDIF
       IF (nQflavors_pdf .NE. NF5) THEN
-         WRITE(6,*) 'ModKinematics::EvalAlphaS: nQflavors_pdf invalid, nQflavors_pdf = ',nQflavors_pdf
-         WRITE(6,*) 'ModKinematics::EvalAlphaS: Check 28472c5bfee128dde458fd4929b4d3ece9519ab8'
+         WRITE(6,*) 'ModParameters::EvalAlphaS: nQflavors_pdf invalid, nQflavors_pdf = ',nQflavors_pdf
+         WRITE(6,*) 'ModParameters::EvalAlphaS: Check 28472c5bfee128dde458fd4929b4d3ece9519ab8'
          stop
       ENDIF
       IF (nloops_pdf .NE. 1) THEN
-         WRITE(6,*) 'ModKinematics::EvalAlphaS: nloops_pdf invalid, nloops_pdf = ',nloops_pdf
-         WRITE(6,*) 'ModKinematics::EvalAlphaS: Check 28472c5bfee128dde458fd4929b4d3ece9519ab8'
+         WRITE(6,*) 'ModParameters::EvalAlphaS: nloops_pdf invalid, nloops_pdf = ',nloops_pdf
+         WRITE(6,*) 'ModParameters::EvalAlphaS: Check 28472c5bfee128dde458fd4929b4d3ece9519ab8'
          stop
       ENDIF
 
