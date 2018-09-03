@@ -94,6 +94,18 @@ Exec = ./JHUGen
 
 
 # main dependencies
+ifeq ($(linkCollierLib),Yes)
+MainDep = mod_CrossSection.F90 \
+          mod_CrossSection_HJJ.F90 \
+          mod_CrossSection_TTBH.F90 \
+          mod_CrossSection_BBBH.F90 \
+          mod_CrossSection_TH.F90 \
+          mod_CrossSection_VH.F90 \
+          mod_CrossSection_HH.F90\
+          mod_PMZZ.F90 \
+          mod_CommandLine.F90 \
+          main.F90
+else
 MainDep = mod_CrossSection.F90 \
           mod_CrossSection_HJJ.F90 \
           mod_CrossSection_TTBH.F90 \
@@ -103,9 +115,6 @@ MainDep = mod_CrossSection.F90 \
           mod_PMZZ.F90 \
           mod_CommandLine.F90 \
           main.F90
-
-ifeq ($(linkCollierLib),Yes)
-		 MainDep += mod_CrossSection_HH.F90
 endif
 
 # main objects
@@ -138,8 +147,14 @@ AuxDep = mod_Parameters.F90 \
          mod_Phasespace.F90 \
          mod_HashCollection.F90
 
+ifeq ($(linkCollierLib),Yes)
+KimDep = mod_Kinematics.F90 \
+         mod_Kinematics_VH.F90\
+         mod_Kinematics_HH.F90
+else
 KimDep = mod_Kinematics.F90 \
          mod_Kinematics_VH.F90
+endif
 
 ifeq ($(linkCollierLib),Yes)
 ggVHAmpDep = \
@@ -361,6 +376,24 @@ ggHH5AmpObj =
 endif
 
 # amplitude dependencies
+ifeq ($(linkCollierLib),Yes)
+AmpDep = mod_TopDecay.F90 \
+         mod_Graviton.F90 \
+         mod_Higgs.F90 \
+         mod_Zprime.F90 \
+         mod_VHiggs.F90 \
+         mod_HiggsJJ.F90 \
+         mod_HiggsJ.F90 \
+         mod_VH_LO.F90 \
+         mod_VH_real.F90 \
+         mod_VH_qg.F90 \
+         mod_VH_dipole.F90 \
+         mod_VH_virtual.F90 \
+		 mod_VH_gg.F90 \
+		 mod_HH.F90 \
+		 mod_TTBHiggs.F90 \
+         mod_THiggs.F90
+else
 AmpDep = mod_TopDecay.F90 \
          mod_Graviton.F90 \
          mod_Higgs.F90 \
@@ -374,6 +407,7 @@ AmpDep = mod_TopDecay.F90 \
          mod_VH_dipole.F90 \
          mod_TTBHiggs.F90 \
          mod_THiggs.F90
+endif
 
 AuxObj =  $(ObjectDir)/mod_HashCollection.o \
           $(ObjectDir)/mod_Parameters.o \
@@ -381,15 +415,38 @@ AuxObj =  $(ObjectDir)/mod_HashCollection.o \
           $(ObjectDir)/mod_VH_aux.o \
           $(ObjectDir)/mod_Phasespace.o
 
+ifeq ($(linkCollierLib),Yes)
+KimObj = $(ObjectDir)/mod_Kinematics.o \
+          $(ObjectDir)/mod_Kinematics_VH.o\
+          $(ObjectDir)/mod_Kinematics_HH.o
+else
 KimObj = $(ObjectDir)/mod_Kinematics.o \
           $(ObjectDir)/mod_Kinematics_VH.o
+endif
 
 ifeq ($(linkMELA),Yes)
     AuxDep += mod_MCFMWrapper.F90
     AuxObj += $(ObjectDir)/mod_MCFMWrapper.o
 endif
 
-
+ifeq ($(linkCollierLib),Yes)
+AmpObj =  $(ObjectDir)/mod_TopDecay.o \
+          $(ObjectDir)/mod_Graviton.o \
+          $(ObjectDir)/mod_Higgs.o \
+          $(ObjectDir)/mod_Zprime.o \
+          $(ObjectDir)/mod_VHiggs.o \
+          $(ObjectDir)/mod_HiggsJJ.o \
+          $(ObjectDir)/mod_HiggsJ.o \
+          $(ObjectDir)/mod_VH_LO.o \
+          $(ObjectDir)/mod_VH_real.o \
+          $(ObjectDir)/mod_VH_qg.o \
+          $(ObjectDir)/mod_VH_dipole.o \
+          $(ObjectDir)/mod_VH_gg.o \
+		  $(ObjectDir)/mod_VH_virtual.o \
+		  $(ObjectDir)/mod_HH.o \
+          $(ObjectDir)/mod_TTBHiggs.o \
+          $(ObjectDir)/mod_THiggs.o
+else
 AmpObj =  $(ObjectDir)/mod_TopDecay.o \
           $(ObjectDir)/mod_Graviton.o \
           $(ObjectDir)/mod_Higgs.o \
@@ -403,17 +460,7 @@ AmpObj =  $(ObjectDir)/mod_TopDecay.o \
           $(ObjectDir)/mod_VH_dipole.o \
           $(ObjectDir)/mod_TTBHiggs.o \
           $(ObjectDir)/mod_THiggs.o
-
-ifeq ($(linkCollierLib),Yes)
-		 KimDep += mod_Kinematics_HH.F90
-		 AmpDep += mod_VH_virtual.F90
-         AmpDep += mod_VH_gg.F90
-         AmpDep += mod_HH.F90
-         AmpObj += $(ObjectDir)/mod_VH_gg.o
-         AmpObj += $(ObjectDir)/mod_VH_virtual.o
-         AmpObj += $(ObjectDir)/mod_HH.o
-		 KimObj += $(ObjectDir)/mod_Kinematics_HH.o
-endif    
+endif
 
 VegasDep = $(VegasDir)/vegas.f
 VegasObj = $(ObjectDir)/vegas.o
