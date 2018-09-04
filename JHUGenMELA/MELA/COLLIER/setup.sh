@@ -35,7 +35,7 @@ if [[ $# > 0 ]] && [[ "$1" == *"clean"* ]];then
 else
 
   if ! [ -f "../data/$SCRAM_ARCH/$libname" ]; then
-    wget $tarweb
+    wget --no-check-certificate $tarweb
     mkdir $tmpdir
     tar -xvzf $tarname -C $tmpdir
     rm $tarname
