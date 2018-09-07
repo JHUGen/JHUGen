@@ -12,7 +12,7 @@ cd $scriptdir
 pkgname="collier-1.2"
 pkgdir="COLLIER-1.2"
 tarname=$pkgname".tar.gz"
-tarweb="https://www.hepforge.org/archive/collier/"$tarname
+tarweb="https://collier.hepforge.org/downloads/"$tarname
 libname="libcollier.so"
 tmpdir="colliertmp"
 
