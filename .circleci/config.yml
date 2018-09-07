@@ -257,7 +257,7 @@ jobs:
       - run: ./JHUGen Collider=0 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/ee_gammaH_bb DecayMode1=7 HbbDK ghz1=0,0 ghgsgs2=1,0 epPolarization=100 emPolarization=-100
       - run: ./JHUGen PDFSet=2 Collider=1 Process=51 VH_PC=gg HbbDK=1 DecayMode1=0 ghz1=0.0,0.0 ghz2=1.0,0.0 Unweighted=1 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/gg_ZH_llbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0
       - run: ./JHUGen Collider=0 Process=51 VH_PC=ee HbbDK=1 DecayMode1=0 ghz1=0.0,0.0 ghz2=1.0,0.0 ghz4=0.0,1.0 Unweighted=1 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/ee_ZH_llbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0
-      - run: ./JHUGen PDFSet=2 Collider=1 Process=52 Unweighted=1 VegasNc1=100000 VegasNc2=1000000 DataFile=$LHEDIR/gg_HH_bbbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0 Interf=0 Seed=1
+      #- run: ./JHUGen PDFSet=2 Collider=1 Process=52 Unweighted=1 VegasNc1=100000 VegasNc2=1000000 DataFile=$LHEDIR/gg_HH_bbbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0 Interf=0 Seed=1
       #H+J
       - run: ./JHUGen PDFSet=3 Process=62 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/HJ
       #ttH, bbH, tH
