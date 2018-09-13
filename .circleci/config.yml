@@ -344,7 +344,7 @@ jobs:
            cd ..
            if [ -f reference_check/reference_failed_ggH ]; then
              DOPLOTS=true
-           elif [ -z "$CIRCLE_COMPARE_URL" ]  #first build on the branch
+           elif [ -z "$CIRCLE_COMPARE_URL" ]; then  #first build on the branch
              DOPLOTS=true
            else
              DOPLOTS=false
