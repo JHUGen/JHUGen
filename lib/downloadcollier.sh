@@ -8,9 +8,9 @@ if [ $# -ge 1 ]; then
 fi
 
 cd $(dirname $0)
-wget http://www.hepforge.org/archive/collier/collier-1.1.tar.gz
-tar -xvzf collier-1.1.tar.gz
-rm collier-1.1.tar.gz
-cd COLLIER-1.1/build
+wget http://www.hepforge.org/archive/collier/collier-1.2.tar.gz
+tar -xvzf collier-1.2.tar.gz
+rm collier-1.2.tar.gz
+cd COLLIER-1.2/build
 cmake -DCMAKE_Fortran_COMPILER=$compiler ..
 make
