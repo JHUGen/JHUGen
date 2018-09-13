@@ -10,7 +10,7 @@ MELALibDir = $(MELADataDir)/slc6_amd64_gcc530
 MCFMLib = mcfm_705 # libmcfm_705.so
 PDFDir = $(Here)/pdfs
 VegasDir = $(Here)/vegas
-CollierDir = $(Here)/../lib/COLLIER-1.1/
+CollierDir = $(Here)/../lib/COLLIER-1.2/
 
 # compiler options, Comp='ifort' or 'gfort'
 Opt  = Yes
@@ -46,7 +46,14 @@ ifeq ($(linkMELA),Yes)
    CollierLibflags = -DuseCollier=1 -I$(MELADir)/COLLIER -lcollier
 else
    ifeq ($(linkCollierLib),Yes)
-      CollierLibflags = -DuseCollier=1 -L$(CollierDir) -I$(CollierDir)/modules -lcollier
+      CollierLibName = $(shell \
+         if uname | grep -i -q cygwin; then \
+            echo cygcollier; \
+         else \
+            echo collier; \
+         fi \
+      )
+      CollierLibflags = -DuseCollier=1 -L$(CollierDir) -I$(CollierDir)/modules -l$(CollierLibName)
    else
       CollierLibflags = -DuseCollier=0
    endif
