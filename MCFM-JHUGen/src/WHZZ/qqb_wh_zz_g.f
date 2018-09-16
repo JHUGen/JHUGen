@@ -13,7 +13,7 @@ c                           |    --> e^-(p3)+nubar(p4)
 c                           |
 c                           ---> Z(e^-(p5),e^+(p6)) Z(mu^-(p7),mu^+(p8))
 c   for the moment --- radiation only from initial line
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'ckm.f'
       include 'sprods_com.f'
@@ -70,12 +70,12 @@ c      write(6,*) 'gqWHq',gqWHq
       enddo
       enddo
       return
-      
+
       end
 
 
       double precision function radi_zz(j1,j2,j3,j4,j5,j6,j7,j8,j9)
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'qcdcouple.f'
       include 'ewcouple.f'
@@ -94,7 +94,7 @@ c      write(6,*) 'gqWHq',gqWHq
 c---calculate the 2 W propagators
       prop=       ((s123-wmass**2)**2+(wmass*wwidth)**2)
       prop=prop*((s(j8,j9)-wmass**2)**2+(wmass*wwidth)**2)
-      
+
       fac=2d0*cf*xn*gsq*gwsq**3*wmass**2/prop
 
       hdecay=gwsq**3*zmass**2*4d0*xw**2/(one-xw)*
@@ -104,12 +104,12 @@ c---calculate the 2 W propagators
       hdecay=hdecay/((s(j6,j7)-zmass**2)**2+(zmass*zwidth)**2)
       hdecay=hdecay/((s4567-hmass**2)**2+(hmass*hwidth)**2)
       fac=fac*hdecay
-c-old 
+c-old
 c      radi_zz=s12/s13/s23
 c     & *(2d0*s(j1,j9)*s(j2,j8)+s(j1,j9)*s(j3,j8)+s(j2,j8)*s(j3,j9))
 c     & +(s(j1,j9)*s(j2,j8)+s(j2,j8)*s(j3,j9)-s(j1,j8)*s(j1,j9))/s13
 c     & +(s(j1,j9)*s(j2,j8)+s(j1,j9)*s(j3,j8)-s(j2,j8)*s(j2,j9))/s23
-c        
+c
 
       radi_zz=
      & (s(j1,j9)*((s12+s13)*(s(j2,j8)+s(j3,j8))-s23*s(j1,j8))

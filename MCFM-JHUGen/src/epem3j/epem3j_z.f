@@ -34,6 +34,6 @@ c--- Tr terms go in (1,0)
       Q1(q,q,g,is)=ason4pi*ca*(0.5d0*ff_gg(z,xl45,is)
      &                        +0.5d0*ff_gg(z,xl35,is))
       enddo
-      
+
       return
       end

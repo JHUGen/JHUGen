@@ -33,18 +33,18 @@ c--- initialize
       enddo
       enddo
 
-c--- implement shortcuts for checking                  
+c--- implement shortcuts for checking
       if (noglue) then
-        msq_qg=0d0              
-        msq_qbarg=0d0              
-        msq_gq=0d0              
-        msq_gqbar=0d0              
-      else      
+        msq_qg=0d0
+        msq_qbarg=0d0
+        msq_gq=0d0
+        msq_gqbar=0d0
+      else
          if (ggonly) then
-            msq_qg=0d0              
-            msq_qbarg=0d0              
-            msq_gq=0d0              
-            msq_gqbar=0d0  
+            msq_qg=0d0
+            msq_qbarg=0d0
+            msq_gq=0d0
+            msq_gqbar=0d0
          else
 c set mass of quark and antiquark according to nwz
             if (nwz .eq. +1) then
@@ -69,7 +69,7 @@ c--- the gg matrix element
             msq_gg_b=0d0
             msq_gg_intf=0d0
          else
-c--- msq_gg_a and msq_gg_b are the two contributing gluon 
+c--- msq_gg_a and msq_gg_b are the two contributing gluon
 c--- configurations. msq_gg_intf is the interference term
 c--- between the two configurations
             call interdk_gg(p,msq_gg_a,msq_gg_b,msq_gg_intf)

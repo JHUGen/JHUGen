@@ -19,7 +19,7 @@ C     in order to facilitate easy calculation of both lepton helicities
       double precision s146,s134,s234,s1347,s2347,mton2mwsq,ampsq
       double precision s346,s3467,theta,cprop,ampsq16,ampsq25
       double complex prW,prt,iza,izb,Amp(2,2,2,2),nr(2,2,2)
-      double complex zab2,zab3,zab4 
+      double complex zab2,zab3,zab4
       double complex facuLl,facuRl,facdLl,iprZ
       double complex prWs16,prWs167,prWs1346,prWs13467,
      & prts126,prts1267,prts12346
@@ -129,12 +129,12 @@ c--- lepton helicity, top spin, gluon helicity, color
       Amp(j,1,1,t16) = Amp(j,1,1,t16) + izb(p1,p7)*izb(p6,p7)*prWs167*
      & prWs13467*s34**(-1)*facdLl * (  - za(k5,p3)*zb(p1,p3)*zb(p2,p4)*
      &    zab2(p3,p6,p7,p1) - za(k5,p3)*zb(p1,p4)*zb(p2,p4)*zab2(p4,p6,
-     &    p7,p1) - zb(p1,p2)*zab2(k5,p6,p7,p1)*zab3(p3,p1,p6,p7,p4) + 
+     &    p7,p1) - zb(p1,p2)*zab2(k5,p6,p7,p1)*zab3(p3,p1,p6,p7,p4) +
      &    zb(p1,p4)*zab2(p3,p6,p7,p1)*zab3(k5,p1,p6,p7,p2) )
       Amp(j,1,1,t16) = Amp(j,1,1,t16) + izb(p1,p7)*izb(p6,p7)*prWs167*
      & prWs13467*s34**(-1)*facuLl * ( za(k5,p3)*zb(p1,p3)*zb(p2,p4)*
      &    zab2(p3,p6,p7,p1) + za(k5,p3)*zb(p1,p4)*zb(p2,p4)*zab2(p4,p6,
-     &    p7,p1) + zb(p1,p2)*zab2(k5,p6,p7,p1)*zab3(p3,p1,p6,p7,p4) - 
+     &    p7,p1) + zb(p1,p2)*zab2(k5,p6,p7,p1)*zab3(p3,p1,p6,p7,p4) -
      &    zb(p1,p4)*zab2(p3,p6,p7,p1)*zab3(k5,p1,p6,p7,p2) )
       Amp(j,1,1,t16) = Amp(j,1,1,t16) + izb(p1,p7)*izb(p6,p7)*izb(k5,p3
      & )*mt*mton2mwsq*prWs167*prWs13467*facdLl * (  - zb(p1,p4)*zb(p2,
@@ -588,7 +588,7 @@ c--- lepton helicity, top spin, gluon helicity, color
      & prts12346*s34**(-1)*facdLl * (  - za(p6,k5)*zb(p1,p2)*zb(p7,k5)*
      &    zab2(p3,p1,p6,p4) + za(p6,p3)*zb(p1,p2)*zb(p1,p4)*zab4(p1,p2,
      &    p3,p4,p6,p7) - za(p6,p3)*zb(p1,p4)*zb(p2,p6)*zab4(p6,p1,p2,p3
-     &    ,p4,p7) + za(p6,p3)*zb(p1,p4)*zb(p7,k5)*zab2(k5,p1,p6,p2) - 
+     &    ,p4,p7) + za(p6,p3)*zb(p1,p4)*zb(p7,k5)*zab2(k5,p1,p6,p2) -
      &    za(p6,p3)*zb(p1,p4)*zb(p7,k5)*zab4(k5,p1,p3,p4,p6,p2) + za(k5
      &    ,p3)*zb(p2,p4)*zb(p7,k5)*zab2(p6,p3,p4,p1) + zb(p1,p2)*zab2(
      &    p3,p1,p6,p4)*zab4(p6,p1,p2,p3,p4,p7) + zb(p2,p4)*zab2(p6,p3,
@@ -597,7 +597,7 @@ c--- lepton helicity, top spin, gluon helicity, color
      & prts12346*s34**(-1)*facuLl * ( za(p6,k5)*zb(p1,p2)*zb(p7,k5)*
      &    zab2(p3,p1,p6,p4) - za(p6,p3)*zb(p1,p2)*zb(p1,p4)*zab4(p1,p2,
      &    p3,p4,p6,p7) + za(p6,p3)*zb(p1,p4)*zb(p2,p6)*zab4(p6,p1,p2,p3
-     &    ,p4,p7) - za(p6,p3)*zb(p1,p4)*zb(p7,k5)*zab2(k5,p1,p6,p2) + 
+     &    ,p4,p7) - za(p6,p3)*zb(p1,p4)*zb(p7,k5)*zab2(k5,p1,p6,p2) +
      &    za(p6,p3)*zb(p1,p4)*zb(p7,k5)*zab4(k5,p1,p3,p4,p6,p2) - za(k5
      &    ,p3)*zb(p2,p4)*zb(p7,k5)*zab2(p6,p3,p4,p1) - zb(p1,p2)*zab2(
      &    p3,p1,p6,p4)*zab4(p6,p1,p2,p3,p4,p7) - zb(p2,p4)*zab2(p6,p3,

@@ -5,7 +5,7 @@
 *                                                                      *
 *     This is merely a wrapper routine to qqb_w(m/p)2jet_g             *
 ************************************************************************
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'nwz.f'
       double precision p(mxpart,4),msq(-nf:nf,-nf:nf)
@@ -21,4 +21,4 @@
       endif
       return
       end
-      
+

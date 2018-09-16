@@ -1,9 +1,9 @@
       subroutine interdk_gg(pp,me12,me21,intf)
 c--- Wrapper for the gluon-gluon initiated reals for t-channel
-c--- single top with massive b-quark. Includes both gluon 
+c--- single top with massive b-quark. Includes both gluon
 c--- permutations.
 c--- By R. Frederix, July 16, 2008.
-c---    added decay: J. Campbell, May 2011 
+c---    added decay: J. Campbell, May 2011
       implicit none
       include 'constants.f'
       include 'zprods_decl.f'
@@ -20,8 +20,8 @@ c---    added decay: J. Campbell, May 2011
 
 c color matrix:
 c      integer CF(2,2)
-c      DATA (CF(i,1  ),i=1  ,2  ) /     16,    2/    
-c      DATA (CF(i,2  ),i=1  ,2  ) /      2,   16/    
+c      DATA (CF(i,1  ),i=1  ,2  ) /     16,    2/
+c      DATA (CF(i,2  ),i=1  ,2  ) /      2,   16/
 
 
 
@@ -96,12 +96,12 @@ c gluon attached to w current
      &    -(pp(3,1)+pp(4,1)+pp(5,1))**2
      &    -(pp(3,2)+pp(4,2)+pp(5,2))**2
      &    -(pp(3,3)+pp(4,3)+pp(5,3))**2
-     
+
 c--- now dress up with appropriate factors to include the top quark decay
       fac=gwsq*dsqrt(2d0*dot(pp,i3,5))
      &    /dsqrt((2d0*dot(pp,3,4)-wmass**2)**2+(wmass*wwidth)**2)
      &    /dsqrt((s345-mt**2)**2+(mt*twidth)**2)
-     
+
       do i=1,2
       do j=1,2
       do k=1,2
@@ -126,7 +126,7 @@ c--- now dress up with appropriate factors to include the top quark decay
       enddo
       enddo
       enddo
-      
+
 
 c----------------------------------------
 c Square and sum all helicity amplitudes:
@@ -171,7 +171,7 @@ c--- ensure array pp is not contaminated upon return
       pp(t1,k)=zip
       pp(b1,k)=zip
       enddo
-      
+
       return
       end
 

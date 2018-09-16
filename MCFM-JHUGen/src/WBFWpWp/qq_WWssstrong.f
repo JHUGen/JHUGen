@@ -37,10 +37,10 @@ c--- with the t-channel exchange of a gluon.
 
 c--- This calculation uses the complex-mass scheme (c.f. arXiv:hep-ph/0605312)
 c--- and the following lines set up the appropriate masses and sin^2(theta_w)
-      cwmass2=dcmplx(wmass**2,-wmass*wwidth)
-      czmass2=dcmplx(zmass**2,-zmass*zwidth)
-      cxw=cone-cwmass2/czmass2
-      
+      cwmass2=dcmplx(wmass**2,0d0)
+      czmass2=dcmplx(zmass**2,0d0)
+      cxw=dcmplx(xw,0d0)
+
 c--- this is the MCFM ordering in process.DAT
       i3=3
       i4=4
@@ -62,6 +62,9 @@ c--- set identity of quark line based on nwz
       amp(:,:,:)=czip
       ampa(:,:,:)=czip
       ampb(:,:,:)=czip
+
+C---call plabel/pdgid conversion
+      call convertPLabelsToPDGIds()
 
 C---setup spinors and spinorvector products
       call spinorcurr(8,p,za,zb,zab,zba)
@@ -88,16 +91,16 @@ c--- Z/photon currents, 'A' diagrams: contribution from jtwodiagsWpWp
       call jonewstrong(j7(j),i5,i6,j1(j),za,zb,zab,j7_56_1g)
       call jonewstrong(j8(j),i5,i6,j1(j),za,zb,zab,j8_56_1g)
       call jonewstrong(j7(j),i3,i4,j2(j),za,zb,zab,j7_34_2g)
-      
-C-----setup for (uqcq_uqcq) 
+
+C-----setup for (uqcq_uqcq)
       amp(uqcq_uqcq,1,1)=
      & +cdotpr(j7_34_1g(iq,:),j8_56_2g(iq,:))/s7341
      & +cdotpr(j7_56_1g(iq,:),j8_34_2g(iq,:))/s8342
       temp(2,4)=temp(2,4)+esq**4*gsq**2*Colorfac*spinavge
      &   *dble(amp(uqcq_uqcq,1,1)
      & *dconjg(amp(uqcq_uqcq,1,1)))
-      
-C-----setup for (uquq_uquq) 
+
+C-----setup for (uquq_uquq)
 c-------- ampa
       ampa(uquq_uquq,1,1)=amp(uqcq_uqcq,1,1)
 
@@ -148,7 +151,7 @@ c--- qbar-q
       msq(-1,4)=temp(2,4)
       msq(-3,2)=temp(2,4)
       msq(-1,2)=temp(2,2) ! d~u -> u~d
-      
+
 c--- q-qbar
       elseif (j.eq.6) then
       msq(2,-1)=temp(2,2) ! ud~ -> u~d
@@ -166,7 +169,7 @@ c--- qbar-q extra pieces
       msq(-3,4)=msq(-1,2)
 
       endif
-      
+
       enddo
 
 c--- above assignments assume W+W-; re-assign for W-W-
@@ -198,4 +201,4 @@ c--- above assignments assume W+W-; re-assign for W-W-
    79 format(' *  sin^2(theta_w)   (',f11.5,',',f11.5,')      *')
 
       end
-      
+

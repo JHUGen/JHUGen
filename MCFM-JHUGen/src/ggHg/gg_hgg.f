@@ -2,7 +2,7 @@
       implicit none
 c---Matrix element squared averaged over initial colors and spins
 c
-c     g(-p1)+g(-p2) -->  H(p3)+g(p_iglue1=5)+g(p_iglue2=6) 
+c     g(-p1)+g(-p2) -->  H(p3)+g(p_iglue1=5)+g(p_iglue2=6)
 
       include 'constants.f'
       include 'masses.f'
@@ -28,7 +28,7 @@ c     .                     ,Hgggg_1652,Hgggg_1562,Hgggg_1526
       double precision Hqaqa_a,Hqaqa_b,Hqaqa_i
       double precision Haqaq_a,Haqaq_b,Haqaq_i
       double precision Hqaaq_a,Hqaaq_b,Hqaaq_i
-      double precision 
+      double precision
      . Hqrqr,Hqqqq,
      . Habab,Haaaa,
      . Hqarb,Hqaqa,Hqbqb,
@@ -40,7 +40,7 @@ c     .                     ,Hgggg_1652,Hgggg_1562,Hgggg_1526
 
 
 C---fill spinor products up to maximum number
-      call spinoru(iglue2,p,za,zb)  
+      call spinoru(iglue2,p,za,zb)
 
       s34=(p(3,4)+p(4,4))**2
      & -(p(3,1)+p(4,1))**2-(p(3,2)+p(4,2))**2-(p(3,3)+p(4,3))**2
@@ -77,9 +77,9 @@ c---   note: symmetric in first two arguments, but not the ab, ba terms
       call HQAggLO(iglue1,2,1,iglue2,Hgaag,Hgaag_ab,Hgaag_ba,Hgaag_sym)
 
       call HQAggLO(iglue2,iglue1,1,2,Hggqa,Hggqa_ab,Hggqa_ba,Hggqa_sym)
-      
+
 c--- four quark terms
-      call HqarbLO(1,2,iglue1,iglue2,Hqrqr)      
+      call HqarbLO(1,2,iglue1,iglue2,Hqrqr)
       call HqaqaLO(1,2,iglue1,iglue2,Hqqqq,Hqqqq_a,Hqqqq_b,Hqqqq_i)
 
 C---four anti-quark terms
@@ -95,7 +95,7 @@ C-qqb
 
 C-qbq
       Haqbr=Hqarb
-      
+
       Haqaq=Hqaqa
       Haqaq_a=Hqaqa_a
       Haqaq_b=Hqaqa_b
@@ -107,7 +107,7 @@ C-qbq
       msq(j,k)=0d0
       msq_struc(:,j,k)=0d0
 
-      if ((j.gt.0).and.(k.gt.0)) then 
+      if ((j.gt.0).and.(k.gt.0)) then
         if (j.eq.k) then
           msq(j,k)=0.5d0*aveqq*fac*Hqqqq
           msq_struc(iqq_a,j,k)=0.5d0*aveqq*fac*Hqqqq_a
@@ -120,8 +120,8 @@ C-qbq
           msq_struc(iqq_i,j,k)=0d0
         endif
       endif
-      
-      if ((j.lt.0).and.(k.lt.0)) then 
+
+      if ((j.lt.0).and.(k.lt.0)) then
         if (j.eq.k) then
           msq(j,k)=0.5d0*aveqq*fac*Haaaa
         else
@@ -174,7 +174,7 @@ C-qbq
         msq_struc(igg_ba,j,0)=aveqg*fac*Hqgqg_ba
         msq_struc(igg_sym,j,0)=aveqg*fac*Hqgqg_sym
       endif
-      
+
       if ((j.lt.0).and.(k.eq.0)) then
         msq(j,0)=aveqg*fac*Hagag
         msq_struc(igg_ab,j,0)=aveqg*fac*Hagag_ab
@@ -205,7 +205,7 @@ C-qbq
         msq_struc(igggg_b,0,0)=avegg*fac*0.5d0*Hgggg_1625
         msq_struc(igggg_c,0,0)=avegg*fac*0.5d0*Hgggg_1265
       endif
-      
+
       enddo
       enddo
 
@@ -214,8 +214,8 @@ c--- artificially store it in msq_struc(iqr,0,0), which is not
 c--- used for anything else
       call H4qi(1,iglue1,iglue2,2,Hqaaq,Hqaaq_a,Hqaaq_b,Hqaaq_i)
       msq_struc(iqr,0,0)=aveqq*fac*Hqaaq
-      
+
       return
       end
 
- 
+

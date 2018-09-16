@@ -22,7 +22,7 @@
 
 c--- this result is in the MS-bar scheme
       scheme='dred'
-      
+
 * Virtual matrix elements are simply lowest order multiplied by factor
 * Need to check this for pisq (cf. qqb_w_v.f) and I think there should
 * be an additional +ason2pi*cf*(1+1) from DRED compared to MSBAR
@@ -32,13 +32,13 @@ c--- this result is in the MS-bar scheme
       facv=ason2pi*cf*(
      . -4d0*EPINV*EPINV2-(6d0-2d0*(xl15+xl26))*EPINV
      . +3d0*(xl15+xl26)-(xl15**2+xl26**2)-14d0)
-      
+
       do j=-nf,nf
       do k=-nf,nf
         msqv(j,k)=facv*msq0(j,k)
       enddo
       enddo
 
-      
+
       return
       end

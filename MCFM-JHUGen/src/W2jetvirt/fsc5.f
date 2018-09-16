@@ -1,12 +1,12 @@
-      double complex function Fsc5(j1,j2,j3,j4,j5,j6,za,zb) 
+      double complex function Fsc5(j1,j2,j3,j4,j5,j6,za,zb)
       implicit none
       include 'constants.f'
       include 'zprods_decl.f'
       include 'sprods_com.f'
       integer j1,j2,j3,j4,j5,j6
       double complex L0,L1,Lsm1_2me,Lnrat,Ls1
-      double precision t  
-      Fsc5= 
+      double precision t
+      Fsc5=
      .(Lsm1_2me(t(j1,j2,j3),t(j2,j3,j4),s(j2,j3),s(j5,j6))*za(j1,j3)*za(
      .j1,j5)**2*
      .za(j3,j4))/(za(j1,j2)*za(j1,j4)**3*za(j2,j3)*za(j5,j6))-

@@ -14,12 +14,12 @@ c
 c--- all momenta are incoming
 c--- Extended to include charm quark production via the variable "flav"
 
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'ptilde.f'
       include 'qqgg.f'
       include 'heavyflav.f'
-     
+
       integer n16_2,n17_2,n15_2,n26_1,
      & n27_1,n25_1,n57_6,n67_5,
      & n17_5,n57_1,n17_6,n67_1,n27_6,n67_2,n27_5,n57_2
@@ -34,9 +34,9 @@ c--- Extended to include charm quark production via the variable "flav"
       integer j,k
 c --- remember: nd will count the dipoles
       integer nd,isub
-c--- slightly obtuse notation, to simplify declaration lines      
+c--- slightly obtuse notation, to simplify declaration lines
       double precision p(mxpart,4),msq(maxd,fn:nf,fn:nf)
-      double precision 
+      double precision
      & msq17_2(fn:nf,fn:nf),msq27_1(fn:nf,fn:nf),
      & msq15_2(fn:nf,fn:nf),msq25_1(fn:nf,fn:nf),
      & msq16_2(fn:nf,fn:nf),msq26_1(fn:nf,fn:nf),
@@ -60,7 +60,7 @@ c--- slightly obtuse notation, to simplify declaration lines
      & m27_5(0:2,fn:nf,fn:nf),
      & m27_6(0:2,fn:nf,fn:nf),
      & mqq(0:2,fn:nf,fn:nf)
-      
+
       integer,parameter::jj(-nf:nf)=(/-1,-2,-1,-2,-1,0,1,2,1,2,1/)
       integer,parameter::kk(-nf:nf)=(/-1,-2,-1,-2,-1,0,1,2,1,2,1/)
 
@@ -75,13 +75,13 @@ c--- slightly obtuse notation, to simplify declaration lines
 
 c-- initialize the matrix elements to zero
       do j=-nf,nf
-      do k=-nf,nf      
+      do k=-nf,nf
       do nd=1,ndmax
         msq(nd,j,k)=0d0
       enddo
       enddo
       enddo
-            
+
 c--- calculate all the dipoles
 c--- the dipole number relates the matrix elements to the transformed
 c--- momenta, used in realint to perform cuts and clustering
@@ -89,69 +89,69 @@ c--- momenta, used in realint to perform cuts and clustering
 c--- NEW ATTEMPT - mqq plays the role of a dummy variable here
       call dips(n16_2,p,1,6,2,sub16_2,dsubv,msq16_2,dummyv,
      . qqb_wbjet,donothing_gvec)
-      call storedip_mass(m16_2,mqq) 
+      call storedip_mass(m16_2,mqq)
       call dips(n17_2,p,1,7,2,sub17_2,dsubv,msq17_2,dummyv,
      . qqb_wbjet,donothing_gvec)
-      call storedip_mass(m17_2,mqq) 
+      call storedip_mass(m17_2,mqq)
       call dips(n15_2,p,1,5,2,sub15_2,dsubv,msq15_2,dummyv,
      . qqb_wbjet,donothing_gvec)
-      call storedip_mass(m15_2,mqq) 
+      call storedip_mass(m15_2,mqq)
       call dips(n26_1,p,2,6,1,sub26_1,dsubv,msq26_1,dummyv,
      . qqb_wbjet,donothing_gvec)
-      call storedip_mass(m26_1,mqq) 
+      call storedip_mass(m26_1,mqq)
       call dips(n27_1,p,2,7,1,sub27_1,dsubv,msq27_1,dummyv,
      . qqb_wbjet,donothing_gvec)
-      call storedip_mass(m27_1,mqq) 
+      call storedip_mass(m27_1,mqq)
       call dips(n25_1,p,2,5,1,sub25_1,dsubv,msq25_1,dummyv,
      . qqb_wbjet,donothing_gvec)
-      call storedip_mass(m25_1,mqq) 
+      call storedip_mass(m25_1,mqq)
 
       if (isub .eq. 1) then
       call dips(n57_6,p,5,7,6,sub57_6,dsubv,msq57_6,dummyv,
      . qqb_wbjet,donothing_gvec)
-      call storedip_mass(m57_6,mqq) 
+      call storedip_mass(m57_6,mqq)
       call dips(n67_5,p,6,7,5,sub67_5,dsubv,msq67_5,dummyv,
      . qqb_wbjet,donothing_gvec)
-      call storedip_mass(m67_5,mqq) 
+      call storedip_mass(m67_5,mqq)
 
       call dips(n17_5,p,1,7,5,sub17_5,dsubv,msq17_5,dummyv,
      . qqb_wbjet,donothing_gvec)
-      call storedip_mass(m17_5,mqq) 
+      call storedip_mass(m17_5,mqq)
       call dips(n57_1,p,5,7,1,sub57_1,dsubv,dummy,dummyv,
      . qqb_wbjet,donothing_gvec)
 
       call dips(n17_6,p,1,7,6,sub17_6,dsubv,msq17_6,dummyv,
      . qqb_wbjet,donothing_gvec)
-      call storedip_mass(m17_6,mqq) 
+      call storedip_mass(m17_6,mqq)
       call dips(n67_1,p,6,7,1,sub67_1,dsubv,dummy,dummyv,
      . qqb_wbjet,donothing_gvec)
 
       call dips(n27_6,p,2,7,6,sub27_6,dsubv,msq27_6,dummyv,
      . qqb_wbjet,donothing_gvec)
-      call storedip_mass(m27_6,mqq) 
+      call storedip_mass(m27_6,mqq)
       call dips(n67_2,p,6,7,2,sub67_2,dsubv,dummy,dummyv,
      . qqb_wbjet,donothing_gvec)
 
       call dips(n27_5,p,2,7,5,sub27_5,dsubv,msq27_5,dummyv,
      . qqb_wbjet,donothing_gvec)
-      call storedip_mass(m27_5,mqq) 
+      call storedip_mass(m27_5,mqq)
       call dips(n57_2,p,5,7,2,sub57_2,dsubv,dummy,dummyv,
      . qqb_wbjet,donothing_gvec)
-      endif      
+      endif
 
 c--- fill the dipole contributions
       do j=-nf,nf
       do k=-nf,nf
-      
+
       if ((abs(j) .ne. flav) .and. (abs(k) .ne. flav)) goto 97
       if ((abs(j) .eq. flav) .and. (abs(k) .eq. flav)) goto 97
 c--- so that either abs(j) or abs(k) = flav (but not both).
 
 c--- contributions with 1 b-quark
-      if (isub .eq. 1) then      
-      
+      if (isub .eq. 1) then
+
 c--- Note that each term must be examined individually to decide
-c--- whether the leading colour term is proportional to (1) or (2)      
+c--- whether the leading colour term is proportional to (1) or (2)
       if ((j .gt. 0) .and. (k.gt.0)) then
       if (j .eq. +flav) then
 c---QQ - process bu -> bd
@@ -295,7 +295,7 @@ c---QbarQbar - process db -> bu (obtained from above by switching p1 and p2)
      . *((xn+1d0/xn)*m27_1(0,j,k)+two*(m27_1(2,j,k)+m27_1(1,j,k))/xn)
       endif
       elseif ((j .gt. 0) .and. (k.lt.0)) then
-        if (j .eq. flav) then 
+        if (j .eq. flav) then
 c--- QQbar - process bu -> bd (obtained from bu -> bd by switching
 c---                               p2 and p6)
         msq(n57_6,j,k)=msq(n57_6,j,k)
@@ -367,7 +367,7 @@ c---                               p2 and p5)
      . *((xn-two/xn)*m27_1(1,j,k)-m27_1(0,j,k)/xn-m27_1(2,j,k)/xn)
         endif
       elseif ((j .lt. 0) .and. (k.gt.0)) then
-        if (j .eq. -flav) then 
+        if (j .eq. -flav) then
 c--- QbarQ - process bu -> bd (obtained from QQbar process ub -> bd
 c---                               by switching p1 and p2)
       msq(n57_6,j,k)=msq(n57_6,j,k)
@@ -463,7 +463,7 @@ C-- G-Qbar
         else
         endif
         endif
-      elseif (k.eq.0) then 
+      elseif (k.eq.0) then
 c-- Q-G
         if     (j .gt. 0) then
         if ( j .eq. +flav) then
@@ -508,7 +508,7 @@ C-- G-Qbar
         msq(n15_2,j,k)=msq(n15_2,j,k)+sub15_2(qg)*(aveqg/aveqq)*(
      .    +(xn-one/xn)*msq15_2(+flav,k))
         endif
-      elseif (k.eq.0) then 
+      elseif (k.eq.0) then
 c-- Q-G
         if     (jj(j) .eq. 1) then
         msq(n26_1,j,k)=msq(n26_1,j,k)+sub26_1(qg)*(aveqg/aveqq)*(
@@ -527,7 +527,7 @@ C-- Qbar-G
 
       enddo
       enddo
-      
+
       return
       end
 

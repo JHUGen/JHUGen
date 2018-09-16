@@ -34,7 +34,7 @@ c--- below are the same ones as in qg_tbq_z.f, with p replaced by k
       k(4,nu)=p(6,nu)
       k(5,nu)=p(7,nu)
       enddo
-                
+
       Q34sq=0d0
       metric=1d0
       do nu=4,1,-1
@@ -50,7 +50,7 @@ CDTS (5.45,5.77)
 CDTS (5.5)
       mbar34a=mt/dsqrt(Q34sq)
       mbar34b=mb/dsqrt(Q34sq)
-      
+
       xl15=dlog(-2d0*dot(k,1,5)/renscale_L**2)
       xl25=dlog(-2d0*dot(k,2,5)/renscale_L**2)
       xl13=dlog(-2d0*dot(k,1,3)/renscale_H**2)
@@ -77,7 +77,7 @@ c--- dipole contributions
 
       do is=1,3
 
-c--- implement shortcut for checking                  
+c--- implement shortcut for checking
       if ((ggonly .eqv. .false.) .and. (noglue .eqv. .false.)) then
 c--- counterterms for extra gluon emission
       Q1(q,q,g,is)=ason4pi_L*two*cf*(if_qq(z,xl15,is)+fi_qq(z,xl15,is))
@@ -100,23 +100,23 @@ c--- counterterms for extra gluon emission
       Q2(a,a,g,is)=Q2(q,q,g,is)
       Q1(g,g,a,is)=Q1(g,g,q,is)
       endif
-      
+
 c--- counterterms for the splitting g->qq~ on the light quark line
       Q1(q,g,g,is)=ason4pi_L*2d0*tr*if_qg(z,xl15,is)
       Q2(q,g,g,is)=ason4pi_L*2d0*tr*if_qg(z,xl25,is)
-      
+
       tempgq1=ason4pi_H*two*cf*if_gq(z,xl15h,is)
       tempgq2=ason4pi_H*two*cf*if_gq(z,xl25h,is)
 c--- counterterms for the splitting q->gq on the heavy quark line
-      Q2(g,q,q,is)=tempgq2     
-      Q2(g,a,q,is)=tempgq2   
-      Q2(g,q,a,is)=tempgq2   
-      Q2(g,a,a,is)=tempgq2   
-      Q1(g,q,q,is)=tempgq1      
-      Q1(g,a,q,is)=tempgq1   
-      Q1(g,q,a,is)=tempgq1   
-      Q1(g,a,a,is)=tempgq1   
-            
+      Q2(g,q,q,is)=tempgq2
+      Q2(g,a,q,is)=tempgq2
+      Q2(g,q,a,is)=tempgq2
+      Q2(g,a,a,is)=tempgq2
+      Q1(g,q,q,is)=tempgq1
+      Q1(g,a,q,is)=tempgq1
+      Q1(g,q,a,is)=tempgq1
+      Q1(g,a,a,is)=tempgq1
+
       enddo
 
       return

@@ -5,7 +5,7 @@ c                           |    |
 c                           |    --> fermion(p3)+antifermion(p4)
 c                           |
 c                           ---> b(p5)+bb(p6)
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'ptilde.f'
       include 'qqgg.f'
@@ -33,7 +33,7 @@ c---- entries are left as dummies
       msq(nd,j,k)=0d0
       enddo
 
-      if((j .ne. 0 .and. k .ne. 0 .and. j.ne.-k) 
+      if((j .ne. 0 .and. k .ne. 0 .and. j.ne.-k)
      .  .or. (j .eq. 0 .and. k .eq. 0)) goto 19
 
       if     (((j .gt. 0) .and. (k .lt. 0))
@@ -56,7 +56,7 @@ c---- entries are left as dummies
       enddo
       enddo
 
-      return      
+      return
       end
 
 

@@ -12,7 +12,7 @@ c---final,final--i1 is the emitter
       parameter(wt0=1d0/eight/pisq)
 
 c----final-final case
-      
+
 c      call writeout(p)
       phi=twopi*phit
 

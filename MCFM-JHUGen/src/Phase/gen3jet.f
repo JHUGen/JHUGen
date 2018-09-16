@@ -18,18 +18,18 @@ C---p1+p2 --> p3+p4+p5
       double precision ptjetmin,etajetmin,etajetmax
       save ptjetmin,etajetmin,etajetmax
 !$omp threadprivate(ptjetmin,etajetmin,etajetmax)
-      
+
       if (first .or. reset) then
         first=.false.
         reset=.false.
         call read_jetcuts(ptjetmin,etajetmin,etajetmax)
       endif
-      
-      do j=6,mxpart     
-      do nu=1,4     
+
+      do j=6,mxpart
+      do nu=1,4
       p(j,nu)=0d0
-      enddo     
-      enddo     
+      enddo
+      enddo
 
       phi=2d0*pi*r(1)
       cphi=dcos(phi)
@@ -40,26 +40,26 @@ C---p1+p2 --> p3+p4+p5
       xjac=sqrts**2
       ymax=10d0
       ymin=-10d0
-      Deltay=ymax-ymin    
+      Deltay=ymax-ymin
       y3=ymin+Deltay*r(3)
       y4=ymin+Deltay*r(4)
       y5=ymin+Deltay*r(5)
- 
+
 c--- debug: try to get collinear 4 and 5
 c      y5=y4-r(5)*1d-6
-            
+
 c--- debug: try to get collinear 2 and 5
 c      y5=-8d0-r(5)*1d-6
-            
+
 c--- debug: try to get collinear 1 and 5
 c      y5=+8d0+r(5)*1d-6
-            
+
 c--- debug: try to get collinear 2 and 4
 c      y4=-8d0-r(4)*1d-6
-            
+
 c--- debug: try to get collinear 1 and 4
 c      y4=+8d0+r(4)*1d-6
-            
+
       xjac=xjac*Deltay**3
 
       rtson2=0.5d0*sqrts
@@ -73,13 +73,13 @@ c--- this is the new method
       hmin=1d0/dsqrt(1d0+(ptjetmin/rtson2)**2)
       hmax=rtson2/ptjetmin
       delh=hmax-hmin
-      h=hmin+r(6)*delh        
+      h=hmin+r(6)*delh
       xt4=dsqrt(1d0/h**2-(ptjetmin/rtson2)**2)
       xjac=xjac*(delh/h**3)
-      h=hmin+r(7)*delh        
+      h=hmin+r(7)*delh
       xt5=dsqrt(1d0/h**2-(ptjetmin/rtson2)**2)
       xjac=xjac*(delh/h**3)
-      
+
 
       pt4=rtson2*xt4
       pt5=rtson2*xt5
@@ -99,19 +99,19 @@ c--- this is the new method
       xx(1)=half*(+xt3*exp(+y3)+xt4*exp(+y4)+xt5*exp(+y5))
       xx(2)=half*(+xt3*exp(-y3)+xt4*exp(-y4)+xt5*exp(-y5))
 
-      if   ((xx(1) .gt. 1d0) 
+      if   ((xx(1) .gt. 1d0)
      & .or. (xx(2) .gt. 1d0)
      & .or. (xx(1) .lt. xmin)
      & .or. (xx(2) .lt. xmin)) then
-c      write(6,*) 'problems with xx(1),xx(2) in gen3',xx(1),xx(2)  
-      return 1 
+c      write(6,*) 'problems with xx(1),xx(2) in gen3',xx(1),xx(2)
+      return 1
       endif
-          
+
       p(1,4)=-0.5d0*xx(1)*sqrts
       p(1,1)=0d0
       p(1,2)=0d0
       p(1,3)=-0.5d0*xx(1)*sqrts
-      
+
       p(2,4)=-0.5d0*xx(2)*sqrts
       p(2,1)=0d0
       p(2,2)=0d0

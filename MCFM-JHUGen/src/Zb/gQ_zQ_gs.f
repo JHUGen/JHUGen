@@ -10,16 +10,16 @@
 *    isub=1 : particle 6 is a gluon or light quark                     *
 *    isub=2 : particle 6 is also a heavy quark                         *
 ************************************************************************
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'ptilde.f'
       include 'qqgg.f'
       include 'heavyflav.f'
       integer j,k,nd,isub
 c --- remember: nd will count the dipoles
-      
+
       double precision p(mxpart,4),msq(maxd,-nf:nf,-nf:nf)
-      double precision 
+      double precision
      & msq15_2(-nf:nf,-nf:nf),msq25_1(-nf:nf,-nf:nf),
      & msq16_2(-nf:nf,-nf:nf),msq26_1(-nf:nf,-nf:nf),
      & msq15_6(-nf:nf,-nf:nf),msq26_5(-nf:nf,-nf:nf),
@@ -69,16 +69,16 @@ c--- sub... and sub...v and msqv
      . gQ_zQ,qqb_z_gvec)
 
       do j=-nf,nf
-      do k=-nf,nf      
+      do k=-nf,nf
       do nd=1,ndmax
         msq(nd,j,k)=0d0
       enddo
       enddo
       enddo
 
-c--- subtraction terms for 2-quark, 2-gluon pieces      
+c--- subtraction terms for 2-quark, 2-gluon pieces
       do j=-flav,flav,flav
-      do k=-flav,flav,flav      
+      do k=-flav,flav,flav
       if ((j .ne. 0) .and. (k .ne. 0) .and. (j.ne.-k)) goto 19
 
       if     ((k .eq. 0).and.(j.ne.0).and.(isub.eq.1)) then
@@ -89,7 +89,7 @@ c--- q-g and qb-g cases
       msq(5,j,k)=-(msq16_5(j,k)*sub16_5(qq)+msq16_5(j,k)*sub56_1(qq))/xn
       msq(6,j,k)=xn*(msq26_5(j,k)*sub26_5(gg)+msq26_5v(j,k)*sub26_5v
      .              +msq26_5(j,k)*sub56_2(qq))
- 
+
       elseif ((j .eq. 0).and.(k.ne.0).and.(isub.eq.1)) then
 c--- g-q and g-qb cases
       msq(1,j,k)=2d0*tr*msq15_2(-k,k)*sub15_2(qg)
@@ -120,9 +120,9 @@ c--- Hence 25 split multiplies g(p1)+q(p25)-->Z+q(p6)
 
 c--- subtraction terms for 4-quark pieces
       do j=-nf,nf
-      do k=-nf,nf      
+      do k=-nf,nf
 
-      if (((j .gt. 0).and.(k .gt. 0)) .or. 
+      if (((j .gt. 0).and.(k .gt. 0)) .or.
      .    ((j .lt. 0).and.(k .lt. 0))) then
 c--- q-q or qb-qb
         if ((abs(j) .ne. flav) .and. (abs(k) .ne. flav)) goto 20
@@ -158,7 +158,7 @@ c     .      *(msq15_2(0,k)*sub15_2(gq)+msq15_2v(0,k)*sub15_2v)
 c          msq(4,j,k)=msq(4,j,k)+(xn-1d0/xn)
 c     .      *(msq26_1(j,0)*sub26_1(gq)+msq26_1v(j,0)*sub26_1v)
           endif
-        else 
+        else
           if ((j .ne. flav) .and. (k .ne. -flav)) goto 20
           if (isub .eq. 2) goto 20
           if (k .eq. -flav) then
@@ -181,7 +181,7 @@ c     .      *(msq15_2(0,k)*sub15_2(gq)+msq15_2v(0,k)*sub15_2v)
 c          msq(4,j,k)=msq(4,j,k)+(xn-1d0/xn)
 c     .      *(msq26_1(j,0)*sub26_1(gq)+msq26_1v(j,0)*sub26_1v)
           endif
-        else 
+        else
           if ((j .ne. -flav) .and. (k .ne. flav)) goto 20
           if (isub .eq. 2) goto 20
           if (j .eq. -flav) then
@@ -190,7 +190,7 @@ c     .      *(msq26_1(j,0)*sub26_1(gq)+msq26_1v(j,0)*sub26_1v)
           else
             msq(3,j,k)=msq(3,j,k)+(xn-1d0/xn)
      .        *(msq16_2(0,k)*sub16_2(gq)+msq16_2v(0,k)*sub16_2v)
-          endif          
+          endif
         endif
 
       endif
@@ -201,4 +201,4 @@ c     .      *(msq26_1(j,0)*sub26_1(gq)+msq26_1v(j,0)*sub26_1v)
 
       return
       end
-      
+

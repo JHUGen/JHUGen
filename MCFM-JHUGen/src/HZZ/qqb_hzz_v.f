@@ -9,7 +9,7 @@
       double precision msq(-nf:nf,-nf:nf),msqv(-nf:nf,-nf:nf),
      . p(mxpart,4),dot,xl12
       integer j,k
-      
+
       do j=-nf,nf
       do k=-nf,nf
       msqv(j,k)=0d0
@@ -20,7 +20,7 @@
 
       xl12=log(two*dot(p,1,2)/musq)
       scheme='dred'
-c--sum of virtual diagram in DRED and UV counterterm including 
+c--sum of virtual diagram in DRED and UV counterterm including
 C--term required to bring into the MSbar scheme
 
       msqv(0,0)=ason2pi*xn*2d0*(
@@ -29,4 +29,4 @@ C--term required to bring into the MSbar scheme
 
       return
       end
-     
+

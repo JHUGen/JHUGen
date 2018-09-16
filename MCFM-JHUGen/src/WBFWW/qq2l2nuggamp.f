@@ -3,6 +3,7 @@
       implicit none
       include 'constants.f'
       include 'cmplxmass.f'
+      include 'masses.f'
       include 'zprods_decl.f'
       include 'sprods_com.f'
       include 'ewcharge.f'
@@ -36,14 +37,14 @@ C-----end statement functions
       p1=i1
       p2=i2
       s3456=t4(i3,i4,i5,i6)
-      propz3456=s3456-czmass2
+      propz3456=s3456-dcmplx(zmass**2,-zmass*zwidth)
       propa3456=s3456
       ratxw=sqrt((cone-cxw)/cxw)
       do jdu=1,2
-      coupel(jdu,1)=Q(jdu)*qe/propa3456+L(jdu)*le/propz3456
-      coupel(jdu,2)=Q(jdu)*qe/propa3456+R(jdu)*le/propz3456
-      coupnu(jdu,1)=L(jdu)*ln/propz3456
-      coupnu(jdu,2)=R(jdu)*ln/propz3456
+      coupel(jdu,1)=Q(jdu)*q1/propa3456+L(jdu)*l1/propz3456
+      coupel(jdu,2)=Q(jdu)*q1/propa3456+R(jdu)*l1/propz3456
+      coupnu(jdu,1)=Q(jdu)*q2/propa3456+L(jdu)*l2/propz3456
+      coupnu(jdu,2)=Q(jdu)*q2/propa3456+R(jdu)*l2/propz3456
       coupw(jdu,1)=ratxw*L(jdu)/propz3456+Q(jdu)/propa3456
       coupw(jdu,2)=ratxw*R(jdu)/propz3456+Q(jdu)/propa3456
       enddo
@@ -62,8 +63,8 @@ C-----end statement functions
       p8=i8
       s34=s(p3,p4)
       s56=s(p5,p6)
-      propw34=s34-cwmass2
-      propw56=s56-cwmass2
+      propw34=s34-dcmplx(wmass**2,-wmass*wwidth)
+      propw56=s56-dcmplx(wmass**2,-wmass*wwidth)
       s278=t3(p2,p7,p8)
       s178=t3(p1,p7,p8)
       s156=t3(p1,p5,p6)
@@ -1327,8 +1328,8 @@ C-----end statement functions
       p8=i8
       s34=s(p3,p4)
       s56=s(p5,p6)
-      propw34=s34-cwmass2
-      propw56=s56-cwmass2
+      propw34=s34-dcmplx(wmass**2,-wmass*wwidth)
+      propw56=s56-dcmplx(wmass**2,-wmass*wwidth)
       s278=t3(p2,p7,p8)
       s178=t3(p1,p7,p8)
       s156=t3(p1,p5,p6)
@@ -1382,7 +1383,7 @@ C-----end statement functions
      &    )*izb(p7,p8)*zba3(p1,p2,p7,p8,p3)*sign - 2.D0*za(p2,p8)*zb(p1
      &    ,p6)*zab2(p3,p5,p6,p4)*izb(p1,p7)*izb(p7,p8)*zba3(p1,p2,p7,p8
      &    ,p5)*sign + za(p3,p5)*zb(p1,p3)*zb(p4,p6)*zba2(p1,p2,p7,p8)*
-     &    izb(p2,p7)*izb(p1,p7)*izb(p1,p8)*zba3(p1,p2,p7,p8,p3)*sign + 
+     &    izb(p2,p7)*izb(p1,p7)*izb(p1,p8)*zba3(p1,p2,p7,p8,p3)*sign +
      &    za(p3,p5)*zb(p1,p4)*zb(p4,p6)*zba2(p1,p2,p7,p8)*izb(p2,p7)*
      &    izb(p1,p7)*izb(p1,p8)*zba3(p1,p2,p7,p8,p4)*sign - za(p3,p5)*
      &    zb(p1,p5)*zb(p4,p6)*zba2(p1,p2,p7,p8)*izb(p2,p7)*izb(p1,p7)*
@@ -1612,7 +1613,7 @@ C-----end statement functions
      &    p4,p6)*zab2(p8,p2,p7,p4)*izb(p1,p7)*izb(p7,p8)*sign - za(p1,
      &    p4)*za(p3,p5)*zb(p2,p1)**2*zb(p4,p6)*zab2(p8,p2,p7,p4)*izb(p2
      &    ,p7)*izb(p1,p7)*izb(p1,p8)*sign + za(p1,p4)*za(p3,p5)*zb(p2,
-     &    p1)*zb(p4,p6)*zab2(p7,p2,p8,p4)*izb(p1,p8)*izb(p7,p8)*sign + 
+     &    p1)*zb(p4,p6)*zab2(p7,p2,p8,p4)*izb(p1,p8)*izb(p7,p8)*sign +
      &    za(p1,p4)*za(p3,p5)*zb(p2,p1)*zb(p4,p6)*zab2(p8,p2,p7,p4)*
      &    izb(p1,p7)*izb(p7,p8)*sign )
       adr78(jdu,2,1,1) = adr78(jdu,2,1,1) + coupw(jdu,2)*propw34**(-1)*
@@ -1628,7 +1629,7 @@ C-----end statement functions
      &    p6,p4)*zab2(p8,p2,p7,p6)*izb(p1,p7)*izb(p7,p8)*sign + za(p1,
      &    p6)*za(p3,p5)*zb(p2,p1)**2*zb(p4,p6)*zab2(p8,p2,p7,p6)*izb(p2
      &    ,p7)*izb(p1,p7)*izb(p1,p8)*sign - za(p1,p6)*za(p3,p5)*zb(p2,
-     &    p1)*zb(p4,p6)*zab2(p7,p2,p8,p6)*izb(p1,p8)*izb(p7,p8)*sign - 
+     &    p1)*zb(p4,p6)*zab2(p7,p2,p8,p6)*izb(p1,p8)*izb(p7,p8)*sign -
      &    za(p1,p6)*za(p3,p5)*zb(p2,p1)*zb(p4,p6)*zab2(p8,p2,p7,p6)*
      &    izb(p1,p7)*izb(p7,p8)*sign )
       adr78(jdu,2,1,1) = adr78(jdu,2,1,1) + coupw(jdu,2)*propw34**(-1)*
@@ -1730,7 +1731,7 @@ C-----end statement functions
      &    ,p3,p4,p6)*iza(p2,p7)*iza(p2,p8)*iza(p1,p8)*sign + 2.D0*za(p2
      &    ,p1)**2*zb(p2,p6)*zab2(p3,p5,p6,p4)*zab2(p5,p1,p8,p7)*iza(p2,
      &    p7)*iza(p2,p8)*iza(p1,p8)*sign + za(p2,p1)*za(p3,p5)*zb(p2,p3
-     &    )*zb(p4,p6)*zab2(p3,p1,p7,p8)*iza(p2,p7)*iza(p7,p8)*sign + 
+     &    )*zb(p4,p6)*zab2(p3,p1,p7,p8)*iza(p2,p7)*iza(p7,p8)*sign +
      &    za(p2,p1)*za(p3,p5)*zb(p2,p3)*zb(p4,p6)*zab2(p3,p1,p8,p7)*
      &    iza(p2,p8)*iza(p7,p8)*sign + za(p2,p1)*za(p3,p5)*zb(p2,p4)*
      &    zb(p4,p6)*zab2(p4,p1,p7,p8)*iza(p2,p7)*iza(p7,p8)*sign )
@@ -1777,7 +1778,7 @@ C-----end statement functions
      &    zab2(p2,p7,p8,p6)*zab2(p3,p5,p6,p4)*iza(p2,p7)*iza(p2,p8)*
      &    sign - za(p1,p6)*za(p3,p5)*zb(p2,p7)*zb(p4,p6)*zab2(p2,p7,p8,
      &    p6)*iza(p2,p8)*iza(p7,p8)*sign - za(p1,p6)*za(p3,p5)*zb(p2,p8
-     &    )*zb(p4,p6)*zab2(p2,p7,p8,p6)*iza(p2,p7)*iza(p7,p8)*sign - 
+     &    )*zb(p4,p6)*zab2(p2,p7,p8,p6)*iza(p2,p7)*iza(p7,p8)*sign -
      &    za(p1,p6)*za(p3,p5)*zb(p4,p6)*zb(p7,p8)*zab2(p2,p7,p8,p6)*
      &    iza(p2,p7)*iza(p2,p8)*sign )
       adr78(jdu,2,2,2) = adr78(jdu,2,2,2) + coupw(jdu,2)*propw34**(-1)*
@@ -1785,7 +1786,7 @@ C-----end statement functions
      &    p3,p7)*zb(p4,p6)*iza(p2,p7)*iza(p2,p8)*iza(p1,p8)*sign - 2.D0
      &    *za(p2,p1)*za(p1,p3)*zb(p4,p7)*zab2(p5,p3,p4,p6)*iza(p2,p7)*
      &    iza(p2,p8)*iza(p1,p8)*sign - za(p2,p1)*za(p1,p4)*za(p3,p5)*
-     &    zb(p4,p6)*zb(p4,p7)*iza(p2,p7)*iza(p2,p8)*iza(p1,p8)*sign + 
+     &    zb(p4,p6)*zb(p4,p7)*iza(p2,p7)*iza(p2,p8)*iza(p1,p8)*sign +
      &    za(p2,p1)*za(p1,p5)*za(p3,p5)*zb(p4,p6)*zb(p5,p7)*iza(p2,p7)*
      &    iza(p2,p8)*iza(p1,p8)*sign + 2.D0*za(p2,p1)*za(p1,p5)*zb(p6,
      &    p7)*zab2(p3,p5,p6,p4)*iza(p2,p7)*iza(p2,p8)*iza(p1,p8)*sign
@@ -1834,7 +1835,7 @@ C-----end statement functions
      &    )*izb(p7,p8)*zba3(p1,p2,p7,p8,p3)*sign - 2.D0*za(p2,p8)*zb(p1
      &    ,p6)*zab2(p3,p5,p6,p4)*izb(p1,p7)*izb(p7,p8)*zba3(p1,p2,p7,p8
      &    ,p5)*sign + za(p3,p5)*zb(p1,p3)*zb(p4,p6)*zba2(p1,p2,p7,p8)*
-     &    izb(p2,p7)*izb(p1,p7)*izb(p1,p8)*zba3(p1,p2,p7,p8,p3)*sign + 
+     &    izb(p2,p7)*izb(p1,p7)*izb(p1,p8)*zba3(p1,p2,p7,p8,p3)*sign +
      &    za(p3,p5)*zb(p1,p4)*zb(p4,p6)*zba2(p1,p2,p7,p8)*izb(p2,p7)*
      &    izb(p1,p7)*izb(p1,p8)*zba3(p1,p2,p7,p8,p4)*sign - za(p3,p5)*
      &    zb(p1,p5)*zb(p4,p6)*zba2(p1,p2,p7,p8)*izb(p2,p7)*izb(p1,p7)*
@@ -2064,7 +2065,7 @@ C-----end statement functions
      &    p4,p6)*zab2(p8,p2,p7,p4)*izb(p1,p7)*izb(p7,p8)*sign - za(p1,
      &    p4)*za(p3,p5)*zb(p2,p1)**2*zb(p4,p6)*zab2(p8,p2,p7,p4)*izb(p2
      &    ,p7)*izb(p1,p7)*izb(p1,p8)*sign + za(p1,p4)*za(p3,p5)*zb(p2,
-     &    p1)*zb(p4,p6)*zab2(p7,p2,p8,p4)*izb(p1,p8)*izb(p7,p8)*sign + 
+     &    p1)*zb(p4,p6)*zab2(p7,p2,p8,p4)*izb(p1,p8)*izb(p7,p8)*sign +
      &    za(p1,p4)*za(p3,p5)*zb(p2,p1)*zb(p4,p6)*zab2(p8,p2,p7,p4)*
      &    izb(p1,p7)*izb(p7,p8)*sign )
       adr87(jdu,2,1,1) = adr87(jdu,2,1,1) + coupw(jdu,2)*propw34**(-1)*
@@ -2080,7 +2081,7 @@ C-----end statement functions
      &    p6,p4)*zab2(p8,p2,p7,p6)*izb(p1,p7)*izb(p7,p8)*sign + za(p1,
      &    p6)*za(p3,p5)*zb(p2,p1)**2*zb(p4,p6)*zab2(p8,p2,p7,p6)*izb(p2
      &    ,p7)*izb(p1,p7)*izb(p1,p8)*sign - za(p1,p6)*za(p3,p5)*zb(p2,
-     &    p1)*zb(p4,p6)*zab2(p7,p2,p8,p6)*izb(p1,p8)*izb(p7,p8)*sign - 
+     &    p1)*zb(p4,p6)*zab2(p7,p2,p8,p6)*izb(p1,p8)*izb(p7,p8)*sign -
      &    za(p1,p6)*za(p3,p5)*zb(p2,p1)*zb(p4,p6)*zab2(p8,p2,p7,p6)*
      &    izb(p1,p7)*izb(p7,p8)*sign )
       adr87(jdu,2,1,1) = adr87(jdu,2,1,1) + coupw(jdu,2)*propw34**(-1)*
@@ -2182,7 +2183,7 @@ C-----end statement functions
      &    ,p3,p4,p6)*iza(p2,p7)*iza(p2,p8)*iza(p1,p8)*sign + 2.D0*za(p2
      &    ,p1)**2*zb(p2,p6)*zab2(p3,p5,p6,p4)*zab2(p5,p1,p8,p7)*iza(p2,
      &    p7)*iza(p2,p8)*iza(p1,p8)*sign + za(p2,p1)*za(p3,p5)*zb(p2,p3
-     &    )*zb(p4,p6)*zab2(p3,p1,p7,p8)*iza(p2,p7)*iza(p7,p8)*sign + 
+     &    )*zb(p4,p6)*zab2(p3,p1,p7,p8)*iza(p2,p7)*iza(p7,p8)*sign +
      &    za(p2,p1)*za(p3,p5)*zb(p2,p3)*zb(p4,p6)*zab2(p3,p1,p8,p7)*
      &    iza(p2,p8)*iza(p7,p8)*sign + za(p2,p1)*za(p3,p5)*zb(p2,p4)*
      &    zb(p4,p6)*zab2(p4,p1,p7,p8)*iza(p2,p7)*iza(p7,p8)*sign )
@@ -2229,7 +2230,7 @@ C-----end statement functions
      &    zab2(p2,p7,p8,p6)*zab2(p3,p5,p6,p4)*iza(p2,p7)*iza(p2,p8)*
      &    sign - za(p1,p6)*za(p3,p5)*zb(p2,p7)*zb(p4,p6)*zab2(p2,p7,p8,
      &    p6)*iza(p2,p8)*iza(p7,p8)*sign - za(p1,p6)*za(p3,p5)*zb(p2,p8
-     &    )*zb(p4,p6)*zab2(p2,p7,p8,p6)*iza(p2,p7)*iza(p7,p8)*sign - 
+     &    )*zb(p4,p6)*zab2(p2,p7,p8,p6)*iza(p2,p7)*iza(p7,p8)*sign -
      &    za(p1,p6)*za(p3,p5)*zb(p4,p6)*zb(p7,p8)*zab2(p2,p7,p8,p6)*
      &    iza(p2,p7)*iza(p2,p8)*sign )
       adr87(jdu,2,2,2) = adr87(jdu,2,2,2) + coupw(jdu,2)*propw34**(-1)*
@@ -2237,7 +2238,7 @@ C-----end statement functions
      &    p3,p7)*zb(p4,p6)*iza(p2,p7)*iza(p2,p8)*iza(p1,p8)*sign - 2.D0
      &    *za(p2,p1)*za(p1,p3)*zb(p4,p7)*zab2(p5,p3,p4,p6)*iza(p2,p7)*
      &    iza(p2,p8)*iza(p1,p8)*sign - za(p2,p1)*za(p1,p4)*za(p3,p5)*
-     &    zb(p4,p6)*zb(p4,p7)*iza(p2,p7)*iza(p2,p8)*iza(p1,p8)*sign + 
+     &    zb(p4,p6)*zb(p4,p7)*iza(p2,p7)*iza(p2,p8)*iza(p1,p8)*sign +
      &    za(p2,p1)*za(p1,p5)*za(p3,p5)*zb(p4,p6)*zb(p5,p7)*iza(p2,p7)*
      &    iza(p2,p8)*iza(p1,p8)*sign + 2.D0*za(p2,p1)*za(p1,p5)*zb(p6,
      &    p7)*zab2(p3,p5,p6,p4)*iza(p2,p7)*iza(p2,p8)*iza(p1,p8)*sign

@@ -15,4 +15,4 @@ c--- so we can reuse the same indices to save memory
       parameter(igggg_a=1,igggg_b=2,igggg_c=3)
 c--- One extra parameter needed for non-identical quark pieces
       parameter(iqr=7)
-      
+

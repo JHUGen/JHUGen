@@ -2,6 +2,7 @@
       implicit none
       include 'constants.f'
       include 'cmplxmass.f'
+      include 'masses.f'
       include 'ewcharge.f'
       include 'zcouple.f'
       include 'sprods_com.f'
@@ -20,7 +21,7 @@ C---The one Z-current multiplied by i
 C---order of indices Lorentz,jdu up or down,
 C---quark-line helicity,lepton-line helicity
 C---order of indices gmZ(jdu,h2,h34)
-C---process 2 
+C---process 2
 c              2-----<-----------1          2--------<---------1
 c                 o         (                    (        o
 c                 o         )                    )        o
@@ -33,19 +34,19 @@ c--- j1l represents current corresponding to non-resonant diagrams
 c--- such as the one below:
 c              2-----<-----------1
 c                        (
-c                        ) 
+c                        )
 c                        (
 c                    3--<----4
-c                      o 
-c                      o 
-c                      o 
+c                      o
+c                      o
+c                      o
 c                     \mu
 c
 
 c--begin statement functions
       zab2(i1,i2,i3,i4)=za(i1,i2)*zb(i2,i4)+za(i1,i3)*zb(i3,i4)
 c--end statement functions
-      
+
 C---setting up couplings dependent on whether we are doing 34-line or 56-line
       if (n3+n4 == 7) then
       xl=l1
@@ -62,9 +63,9 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
 
       s34=s(n3,n4)
       s12=s(n1,n2)
-      propz34=dcmplx(s34)-czmass2
-      propz12=dcmplx(s12)-czmass2
-      propw12=dcmplx(s12)-cwmass2
+      propz34=dcmplx(s34)-dcmplx(zmass**2,-zmass*zwidth)
+      propz12=dcmplx(s12)-dcmplx(zmass**2,-zmass*zwidth)
+      propw12=dcmplx(s12)-dcmplx(wmass**2,-wmass*wwidth)
 
       do jdu=1,2
       gmZ(jdu,1,1)=(dcmplx(Q(jdu)*xq/s34)+dcmplx(L(jdu)*xl)/propz34)
@@ -81,13 +82,13 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
       if (jdu .eq. 1) then
       WWgmZ(jdu,1,1)=-(dcmplx(xq/s34)+dcmplx(xl)*rxw/propz34)
       WWgmZ(jdu,1,2)=-(dcmplx(xq/s34)+dcmplx(xr)*rxw/propz34)
-      WWgmZ(jdu,2,1)=-(dcmplx(xq/s34)+dcmplx(xl)*rxw/propz34) 
+      WWgmZ(jdu,2,1)=-(dcmplx(xq/s34)+dcmplx(xl)*rxw/propz34)
       WWgmZ(jdu,2,2)=-(dcmplx(xq/s34)+dcmplx(xr)*rxw/propz34)
       endif
       if (jdu .eq. 2) then
       WWgmZ(jdu,1,1)=(dcmplx(xq/s34)+dcmplx(xl)*rxw/propz34)
       WWgmZ(jdu,1,2)=(dcmplx(xq/s34)+dcmplx(xr)*rxw/propz34)
-      WWgmZ(jdu,2,1)=(dcmplx(xq/s34)+dcmplx(xl)*rxw/propz34) 
+      WWgmZ(jdu,2,1)=(dcmplx(xq/s34)+dcmplx(xl)*rxw/propz34)
       WWgmZ(jdu,2,2)=(dcmplx(xq/s34)+dcmplx(xr)*rxw/propz34)
       endif
       enddo
@@ -95,7 +96,7 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
       i1=n1
       i2=n2
       do h34=1,2
-         if (h34.eq.1) then 
+         if (h34.eq.1) then
             i3=n3
             i4=n4
          elseif (h34.eq.2) then
@@ -162,12 +163,12 @@ C----non-resonant e-e+ production by exchanged Z/gamma-line.
      & *gmZ12(jdu,2,h34)/s123*2d0
      & +(zab(i3,:,i2)*za(i2,i1)+zab(i3,:,i4)*za(i4,i1))*zb(i2,i4)
      & *gmZ12(jdu,2,h34)/s124*2d0
-     
+
 c--- to get opposite helicity, 3<->4 swap needs additional minus sign
       if (h34 .eq. 2) then
         j1l(:,jdu,:,h34)=-j1l(:,jdu,:,h34)
       endif
-      
+
       enddo
       enddo
 
@@ -177,13 +178,13 @@ c--- construct Z and photon currents
       jz(:,jdu,1,2)=L(jdu)*j1(:,jdu,1,2)+xr*j1l(:,jdu,1,2)
       jz(:,jdu,2,1)=R(jdu)*j1(:,jdu,2,1)+xl*j1l(:,jdu,2,1)
       jz(:,jdu,2,2)=R(jdu)*j1(:,jdu,2,2)+xr*j1l(:,jdu,2,2)
-      
+
       jg(:,jdu,1,1)=Q(jdu)*j1(:,jdu,1,1)+xq*j1l(:,jdu,1,1)
       jg(:,jdu,1,2)=Q(jdu)*j1(:,jdu,1,2)+xq*j1l(:,jdu,1,2)
       jg(:,jdu,2,1)=Q(jdu)*j1(:,jdu,2,1)+xq*j1l(:,jdu,2,1)
       jg(:,jdu,2,2)=Q(jdu)*j1(:,jdu,2,2)+xq*j1l(:,jdu,2,2)
       enddo
-      
-      
+
+
       return
       end

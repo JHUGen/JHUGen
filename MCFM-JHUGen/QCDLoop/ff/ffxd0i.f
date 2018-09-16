@@ -28,7 +28,7 @@
 *		ier		(integer)				*
 *	calls:	ffxc0							*
 *									*
-***#]*comment:*********************************************************** 
+***#]*comment:***********************************************************
 *  #[ declarations:
 	implicit none
 *
@@ -63,7 +63,7 @@
 *
 *  #] declarations:
 !$omp threadprivate(itest,iinx,/ffcut/)
- 
+
 *  #[ check input:
 	if ( ltest ) then
 	    if ( xpip(3).ne.0 .or. xpip(4).ne.0 .or. xpip(7).ne.0 )
@@ -73,7 +73,7 @@
 	    call ffxhck(xpip,dpipjp,10,ier0)
 	    if ( ier0 .ne. 0 ) print *,'ffx2ir: error: input wrong'
 	endif
-*  #] check input: 
+*  #] check input:
 *  #[ work 3:
 	if ( itest .eq. 3 ) then
 	if ( lwrite ) then
@@ -123,7 +123,7 @@
 	cs2 = +cc0/DBLE(dpipjp(9,2))
 	ier1 = max(ier1,ier0)
 	ier = ier + ier1
-*  #] work 3: 
+*  #] work 3:
 *  #[ work 4:
 	elseif ( itest .eq. 4 ) then
 	if ( lwrite ) then
@@ -173,17 +173,17 @@
 	cs2 = +cc0/DBLE(dpipjp(10,1))
 	ier1 = max(ier1,ier0)
 	ier = ier + ier1
-*  #] work 4: 
+*  #] work 4:
 *  #[ error:
 	else
 	print *,'ffx2ir: error: itest should be either 3 or 4!',itest
 	endif
-*  #] error: 
+*  #] error:
 *  #[ print:
 	if ( lwrite ) then
 	    print *,'   cs1 = ',cs1
 	    print *,'   cs2 = ',cs2
 	endif
-*  #] print: 
-*###] ffx2ir: 
+*  #] print:
+*###] ffx2ir:
 	end

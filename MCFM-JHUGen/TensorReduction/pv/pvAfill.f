@@ -42,9 +42,9 @@ c      write(6,*) 'm1sq=',m1sq
       do Np=N+1,N+Naa
       do ep=-2,0
       Av(Np,ep)=czip
-      enddo 
-      enddo 
-      
+      enddo
+      enddo
+
       return
 
       else
@@ -52,14 +52,14 @@ c      write(6,*) 'm1sq=',m1sq
       do ep=-2,0
       Av(aa0+N,ep)=trI1(m1sq,musq,ep)
       enddo
-      
+
 C Id,A00(m1?)=m1^2*A0(m1)/D;
       do ep=-2,0
         Av(aa00+N,ep)=czip
           do j=0,ep+2
           Av(aa00+N,ep)=Av(aa00+N,ep)+m1sq*Av(aa0+N,ep-j)*id(j)
           enddo
-      enddo 
+      enddo
 C Id,A0000(m1?)=m1^2*A00(m1)/[D+2];
       do ep=-2,0
       Av(aa0000+N,ep)=czip
@@ -69,5 +69,5 @@ C Id,A0000(m1?)=m1^2*A00(m1)/[D+2];
       enddo
       endif
 
-      return 
+      return
       end

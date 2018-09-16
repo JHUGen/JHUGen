@@ -34,7 +34,7 @@ c--- initialize
       msq(j,k)=0d0
       enddo
       enddo
-      
+
       gsq_H=fourpi*as_H
       fac=aveqq*2d0*xn**2*Cf*gsq_H*gwsq**2
 
@@ -55,12 +55,12 @@ c--- propagator for qg and qbarg amplitudes
 c--- note: in principle we could need a width here, if the top quark
 c---       is far off-shell; for simplicity, we do not include it.
       Wprop12=1d0/(2d0*dot(p,1,2)-wmass**2)
-      
+
       call bornwrap(p,1,5,i3,i4,2,mq,ma,amps_qqbar)
 c--- Note: qbq matrix elements are later excluded by PDF choice anyway
 c      call bornwrap(p,2,5,i3,i4,1,mq,ma,amps_qbarq)
 
-c--- now square up amplitudes and add propagators      
+c--- now square up amplitudes and add propagators
       msq_qqbar=0d0
 c      msq_qbarq=0d0
       do hg=1,2
@@ -88,6 +88,6 @@ c          msq(j,k)=fac*Vsq(j,k)*msq_qbarq
 c        endif
 c      enddo
 c      enddo
-      
+
       return
       end

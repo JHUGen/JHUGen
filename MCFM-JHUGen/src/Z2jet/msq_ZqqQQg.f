@@ -15,14 +15,14 @@
      . Mz(2,2,2),Mxx(2,2,2),Mxy(2,2,2)
       double precision x,y,z
       parameter(x=xn/cf,y=half/cf,z=0.25d0*(xn**2-two)/xn/cf**2)
-      double complex 
+      double complex
      .               mb1_1234(2,2,2,2,2,2),mb2_1234(2,2,2,2,2,2),
      .               mb1_3412(2,2,2,2,2,2),mb2_3412(2,2,2,2,2,2),
      .               mb1_3214(2,2,2,2,2,2),mb2_3214(2,2,2,2,2,2),
      .               mb1_1432(2,2,2,2,2,2),mb2_1432(2,2,2,2,2,2)
-      
 
-C---set everything to zero 
+
+C---set everything to zero
 
       do f1=1,2
       MI(f1)=zip
@@ -131,7 +131,7 @@ C---corresponding to f1,f3,hq,Qh,hg,lh
       Mz(j,f1,f3)=F(j,f1,f3)+G(j,f1,f3)
       Mxx(j,f1,f3)=0.25d0*(2d0*C(j,f1,f3)+E(j,f1,f3))
       Mxy(j,f1,f3)=-0.5d0*(F(j,f1,f3)+D(j,f1,f3))
-      enddo      
+      enddo
       MN(f1,f3)=CF**3*xn*(M0(1,f1,f3)+x*Mx(1,f1,f3)+y*My(1,f1,f3)
      . +z*Mz(1,f1,f3)+x**2*Mxx(1,f1,f3)+x*y*Mxy(1,f1,f3))
       if ((f1.eq.f3)) MI(f1)=
@@ -140,6 +140,6 @@ C---corresponding to f1,f3,hq,Qh,hg,lh
       enddo
       enddo
 
-      return 
+      return
       end
 

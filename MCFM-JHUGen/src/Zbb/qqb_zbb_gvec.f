@@ -39,20 +39,20 @@ C in is the label of the contracted line
       enddo
 
       call spinoru(6,p,za,zb)
-C   zab=<i-|k|j-> zba=<i+|k|j+> where k is an arbitrary 4-vector 
-c---Conventions of Bern, Dixon, Kosower, Weinzierl, 
+C   zab=<i-|k|j-> zba=<i+|k|j+> where k is an arbitrary 4-vector
+c---Conventions of Bern, Dixon, Kosower, Weinzierl,
 c---ie, za(i,j)*zb(j,i)=s(i,j)
       call spinork(6,p,zab,zba,n)
 
 
-C---exclude the photon pole, 4*mbsq choosen as a scale approx above upsilon 
+C---exclude the photon pole, 4*mbsq choosen as a scale approx above upsilon
 c      if (s(3,4) .lt. 4d0*mbsq) return
 
       do pq=1,2
       do pl=1,2
       ggqqb(pq,pl) =0d0
-      enddo      
-      enddo      
+      enddo
+      enddo
 
 c      write(6,*) 'in in qqb_zbb_gvec',in
 
@@ -77,12 +77,12 @@ c---  the colour structures should be interchanged too
 
       prop=s(3,4)/dcmplx((s(3,4)-zmass**2),zmass*zwidth)
       fac=v*xn/four*(esq*gsq)**2*two
-      
+
       do pq=1,2
       do pl=1,2
       ggqqb(pq,pl) =avegg*fac*ggqqb(pq,pl)
-      enddo      
-      enddo      
+      enddo
+      enddo
       do j=-nflav,nflav
       do k=-nflav,nflav
       if     ((j .eq. 0) .and. (k .eq. 0)) then
@@ -110,8 +110,8 @@ c---  the colour structures should be interchanged too
       implicit none
 C-----Apart from overall factors returns the matrix element squared
 C-----msq dependent on the helicities pq and pl of the quark and
-C-----lepton lines for 
-C-----q(-p1)+qbar(-p2)-->l(p3)+al(p4)+g(p5)+g(p6) where 
+C-----lepton lines for
+C-----q(-p1)+qbar(-p2)-->l(p3)+al(p4)+g(p5)+g(p6) where
 C-----where gluon 6 has been contracted with the vector n
 Cargument 1-4 represent (i1) incoming quark line
 C                       (i2) incoming quark line
@@ -133,7 +133,7 @@ C                       (i6) outgoing gluon line contracted with n
       call checkndotp(p,n,i6)
 
       call subqcdn(i1,i2,i3,i4,i5,i6,nDp5,za,zb,zab,zba,qcdabn,qcdban)
-            
+
 C--first argument is gluon line
 C--second argument is polarization of i5 line pq
 C--third argument is polarization of lepton line pl

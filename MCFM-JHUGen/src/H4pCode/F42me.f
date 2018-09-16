@@ -20,7 +20,7 @@ c      enddo
 c--- NOTE: checked on 8/30/09 that this agrees with the expression above
       F42me=2d0*(F31m(s)+F31m(t)-F31m(psq)-F31m(qsq)
      .          +F42meF(psq,qsq,s,t))
-     
+
       return
       end
 

@@ -59,7 +59,7 @@ c--- variables for statistics reporting
       irecur2=0
       irecur3=0
       irecur4=0
-      icall=0      
+      icall=0
 c--- print out flags for recursion
 c      write(6,*) 'pvCfill recursion flags:'
 c      write(6,*) '  doGsing  ',doGsing
@@ -68,7 +68,7 @@ c      write(6,*) '  doPsing  ',doPsing
 c      write(6,*) '  doPFsing ',doPFsing
       endif
 
-c--- statistics accounting and reporting      
+c--- statistics accounting and reporting
       icall=icall+1
       if (pvverbose) then
       if (mod(icall,100000) .eq. 0) then
@@ -81,7 +81,7 @@ c--- statistics accounting and reporting
       endif
       endif
    77 format(' Cfill ',i9,': ',5(f6.2,'% : '))
-      
+
       B12=pvBcache(p1,m1s,m2s)
       B23=pvBcache(p2,m2s,m3s)
       B13=pvBcache(p1p2,m1s,m3s)
@@ -109,7 +109,7 @@ c      Y(2,2) = dcmplx(2d0*m2s)
 c      Y(2,3) = dcmplx(m2s + m3s - p2)
 c      Y(3,2) = Y(2,3)
 c      Y(3,3) = dcmplx(2d0*m3s)
-      
+
 c      if (pvverbose) write(6,*) 'Check triangle Ysing'
 c      Ysing=pvGramsing(Y,3)
 
@@ -120,24 +120,24 @@ c      do k=j,2
 c      if (abs(G(j,k)) .gt. Gmax) Gmax=abs(G(j,k))
 c      enddo
 c      enddo
-      
+
 c      if (pvverbose) write(6,*) 'Gmax=',Gmax
 c      Psing=.false.
 c--- criterion for small momenta recursion
 c      if (Gmax .lt. weenumber) Psing=.true.
-      
+
 c-- find maximum of f1 and f2
 c      fmax=max(abs(f1),abs(f2))
-      
+
 c      if (pvverbose) write(6,*) 'fmax=',fmax
 c      Fsing=.false.
 c--- criterion for small momenta and small f(k) recursion
 c      if (fmax .lt. weenumber) Fsing=.true.
-      
+
 c      write(6,*) 'Gsing,Ysing,Psing,Fsing',Gsing,Ysing,Psing,Fsing
-      
+
       exceptional=.false.
-      
+
       if     (doPFsing) then
 c--- for small momenta and small f(k)
         if (pvverbose) then
@@ -183,8 +183,8 @@ c------ otherwise, we're done
         return
       endif
       elseif (doGsing) then
-c--- for small Gram only 
-        if (pvverbose) then  
+c--- for small Gram only
+        if (pvverbose) then
           write(6,*) 'USING TRIANGLE SMALL G RECURSION'
       endif
         call Cfill_recur (p1,p2,p1p2,m1s,m2s,m3s,N)
@@ -206,7 +206,7 @@ c     &   q2save(1),q2save(2),q2save(3),q2save(4),
 c     &   m1s,m2s,m3s
 c        write(98,'(6(f21.15))') p1,p2,p1p2,m1s,m2s,m3s
 
-c--- initialize integrals      
+c--- initialize integrals
       do ep=-2,0
       do j=1,Ncc
       Cv(N+j,ep)=dcmplx(1d5,-1d5)
@@ -251,7 +251,7 @@ c'B'Id,Bsum0(P?,K?,m1?,m2?)=MM(B0,P,K,m1,m2)+MM(B1,P,K,m1,m2);
 c      write(66,*) 'ox',cc1,ep,Cv(N+cc1,ep)
 c      write(66,*) 'ox',cc2,ep,Cv(N+cc2,ep)
       enddo
-      
+
 C---two index form factors
       do ep=-2,0
       Cv(N+cc00,ep)=czip
@@ -272,7 +272,7 @@ C---two index form factors
       Cv(N+cc12,ep)=in(2,ep)
 c      write(66,*) 'ox',cc11,ep,Cv(N+cc11,ep)
 c      write(66,*) 'ox',cc12,ep,Cv(N+cc12,ep)
-      
+
       in(1,ep)=f1*Cv(N+cc2,ep)-Bv(bb1+B23,ep)+Bv(bb1+B13,ep)
       in(2,ep)=f2*Cv(N+cc2,ep)-Bv(bb1+B23,ep)-2d0*Cv(N+cc00,ep)
       enddo
@@ -283,7 +283,7 @@ c      write(66,*) 'ox',cc12,ep,Cv(N+cc12,ep)
 c      write(66,*) 'ox',cc12,ep,Cv(N+cc12,ep)
 c      write(66,*) 'ox',cc22,ep,Cv(N+cc22,ep)
       enddo
-       
+
 c      if ((maxcindex .eq. 2) .and. (pvRespectmaxcindex)) return
 
 C---three index form factors
@@ -303,7 +303,7 @@ C---three index form factors
 
       do ep=-2,0
       bsum(ep)=bsum(ep)+b1sum(ep)
-C--- bsum is now equal to 
+C--- bsum is now equal to
 c--- Bv(bb1+B23,ep)+2*Bv(bb1+B23,ep)+Bv(bb11+B23,ep)
       in(1,ep)=f1*Cv(N+cc11,ep)-bsum(ep)-4d0*Cv(N+cc001,ep)
       in(2,ep)=f2*Cv(N+cc11,ep)-bsum(ep)+Bv(bb11+B12,ep)
@@ -372,7 +372,7 @@ c      write(66,*) 'ox',cc0022,ep,Cv(N+cc0022,ep)
 
       do ep=-2,0
       bsum(ep)=bsum(ep)+b1sum(ep)+b11sum(ep)
-C--- bsum is now equal to 
+C--- bsum is now equal to
 c--- Bv(bb1+B23,ep)+3*Bv(bb1+B23,ep)+3*Bv(bb11+B23,ep)+Bv(bb111+B23,ep)
 
       in(1,ep)=f1*Cv(N+cc111,ep)+bsum(ep)-6d0*Cv(N+cc0011,ep)
@@ -414,7 +414,7 @@ c      write(66,*) 'ox',cc2222,ep,Cv(N+cc2222,ep)
       do ep=-2,0
       Cv(N+cc1122,ep)=in(1,ep)
       Cv(N+cc1222,ep)=half*(Cv(N+cc1222,ep)+in(2,ep))
-      enddo 
+      enddo
 
 c      if ((maxcindex .eq. 4) .and. (pvRespectmaxcindex)) return
 
@@ -474,7 +474,7 @@ C Cv(pppp
       Cv(N+cc11112,ep)=in(2,ep)
 c      write(66,*) 'ox',cc11111,ep,Cv(N+cc11111,ep)
 c      write(66,*) 'ox',cc11112,ep,Cv(N+cc11112,ep)
-     
+
 C Cv(pppk
       in(1,ep) = f1*Cv(N+cc1112,ep)-6.D0*Cv(N+cc00112,ep)+ Bv(bb1+B23,
      & ep)+3.D0*Bv(bb11+B23,ep)+3.D0*Bv(bb111+B23,ep)+Bv(
@@ -489,7 +489,7 @@ C Cv(pppk
       Cv(N+cc11122,ep)=in(2,ep)
 c      write(66,*) 'ox',cc11112,ep,Cv(N+cc11112,ep)
 c      write(66,*) 'ox',cc11122,ep,Cv(N+cc11122,ep)
-     
+
 C Cv(pkkk
       in(1,ep) = f1*Cv(N+cc1222,ep)-2.D0*Cv(N+cc00222,ep)+Bv(bb111+
      & B23,ep)+Bv(bb1111+B23,ep)
@@ -504,7 +504,7 @@ C Cv(pkkk
       Cv(N+cc12222,ep)=in(2,ep)
 c      write(66,*) 'ox',cc11222,ep,Cv(N+cc11222,ep)
 c      write(66,*) 'ox',cc12222,ep,Cv(N+cc12222,ep)
-     
+
 C Cv(kkkk
       in(1,ep) = f1*Cv(N+cc2222,ep)+Bv(bb1111+B13,ep)-Bv(bb1111+B23,ep)
       in(2,ep) = f2*Cv(N+cc2222,ep)-8.D0*Cv(N+cc00222,ep)
@@ -560,7 +560,7 @@ C---six index form factors
       Cv(N+cc001122,ep)=Cv(N+cc001122,ep)+idp2(j)*(
      &  +m1s*Cv(N+cc1122,epmj)
      &  -half*(f1*Cv(N+cc11122,epmj)+f2*Cv(N+cc11222,epmj)
-     &  -B11sum(epmj)-B111sum(epmj))) 
+     &  -B11sum(epmj)-B111sum(epmj)))
       Cv(N+cc001222,ep)=Cv(N+cc001222,ep)+idp2(j)*(
      &  +m1s*Cv(N+cc1222,epmj)
      &  -half*(f1*Cv(N+cc11222,epmj)+f2*Cv(N+cc12222,epmj)
@@ -586,7 +586,7 @@ c      write(66,*) 'ox',cc001222,ep,Cv(N+cc001222,ep)
 c      write(66,*) 'ox',cc002222,ep,Cv(N+cc002222,ep)
 
       enddo
-      
+
 C    (Cv(N+cc000011,Cv(N+cc000012,zzzzp)
       do ep=-2,0
       in(1,ep)=
@@ -605,7 +605,7 @@ C    (Cv(N+cc000011,Cv(N+cc000012,zzzzp)
       Cv(N+cc000012,ep)=in(2,ep)
 c      write(66,*) 'ox',cc000011,ep,Cv(N+cc000011,ep)
 c      write(66,*) 'ox',cc000012,ep,Cv(N+cc000012,ep)
-     
+
 C    (Cv(N+cc000012,Cv(N+cc000022,zzzzk)
       in(1,ep)=
      .   + f1*Cv(N+cc00002,ep)
@@ -638,7 +638,7 @@ C    (Cv(N+cc001111,Cv(N+cc001112,zzppp)
       Cv(N+cc001112,ep)=in(2,ep)
 c      write(66,*) 'ox',cc001111,ep,Cv(N+cc001111,ep)
 c      write(66,*) 'ox',cc001112,ep,Cv(N+cc001112,ep)
-     
+
 C    (Cv(N+cc001112,Cv(N+cc001122,zzppk)
       in(1,ep)=
      .   + f1*Cv(N+cc00112,ep)-4*Cv(N+cc000012,ep)
@@ -655,7 +655,7 @@ C    (Cv(N+cc001112,Cv(N+cc001122,zzppk)
       Cv(N+cc001122,ep)=in(2,ep)
 c      write(66,*) 'ox',cc001112,ep,Cv(N+cc001112,ep)
 c      write(66,*) 'ox',cc001122,ep,Cv(N+cc001122,ep)
-     
+
 C    (Cv(N+cc001122,Cv(N+cc001222,zzpkk)
       in(1,ep)=
      .   + f1*Cv(N+cc00122,ep)-2*Cv(N+cc000022,ep)
@@ -672,7 +672,7 @@ C    (Cv(N+cc001122,Cv(N+cc001222,zzpkk)
       Cv(N+cc001222,ep)=in(2,ep)
 c      write(66,*) 'ox',cc001122,ep,Cv(N+cc001122,ep)
 c      write(66,*) 'ox',cc001222,ep,Cv(N+cc001222,ep)
-     
+
 C    (Cv(N+cc001222,Cv(N+cc002222,zzkkk)
       in(1,ep)=
      .   + f1*Cv(N+cc00222,ep)
@@ -689,7 +689,7 @@ C    (Cv(N+cc001222,Cv(N+cc002222,zzkkk)
       Cv(N+cc002222,ep)=in(2,ep)
 c      write(66,*) 'ox',cc001222,ep,Cv(N+cc001222,ep)
 c      write(66,*) 'ox',cc002222,ep,Cv(N+cc002222,ep)
-     
+
 
 
 C    (Cv(N+cc111111,Cv(N+cc111112,ppppp)
@@ -708,7 +708,7 @@ C    (Cv(N+cc111111,Cv(N+cc111112,ppppp)
       Cv(N+cc111112,ep)=in(2,ep)
 c      write(66,*) 'ox',cc111111,ep,Cv(N+cc111111,ep)
 c      write(66,*) 'ox',cc111112,ep,Cv(N+cc111112,ep)
-     
+
 C    (Cv(N+cc111112,Cv(N+cc111122,ppppk)
       in(1,ep)=
      .    +f1*Cv(N+cc11112,ep)-8*Cv(N+cc001112,ep)
@@ -725,7 +725,7 @@ C    (Cv(N+cc111112,Cv(N+cc111122,ppppk)
       Cv(N+cc111122,ep)=in(2,ep)
 c      write(66,*) 'ox',cc111112,ep,Cv(N+cc111112,ep)
 c      write(66,*) 'ox',cc111122,ep,Cv(N+cc111122,ep)
-     
+
 C    (Cv(N+cc111122,Cv(N+cc111222,pppkk)
       in(1,ep)=
      .   + f1*Cv(N+cc11122,ep)-6*Cv(N+cc001122,ep)
@@ -741,7 +741,7 @@ C    (Cv(N+cc111122,Cv(N+cc111222,pppkk)
       Cv(N+cc111222,ep)=in(2,ep)
 c      write(66,*) 'ox',cc111122,ep,Cv(N+cc111122,ep)
 c      write(66,*) 'ox',cc111222,ep,Cv(N+cc111222,ep)
-     
+
 C    (Cv(N+cc111222,Cv(N+cc112222,ppkkk)
       in(1,ep)=
      .   + f1*Cv(N+cc11222,ep)-4*Cv(N+cc001222,ep)
@@ -772,12 +772,12 @@ C    (Cv(N+cc112222,Cv(N+cc122222,pkkkk)
       Cv(N+cc122222,ep)=in(2,ep)
 c      write(66,*) 'ox',cc112222,ep,Cv(N+cc112222,ep)
 c      write(66,*) 'ox',cc122222,ep,Cv(N+cc122222,ep)
-     
+
 C    (Cv(N+cc122222,Cv(N+cc222222,kkkkk)
       in(1,ep)=
      .   + f1*Cv(N+cc22222,ep)
      .   + Bv(bb11111+B13,ep)-Bv(bb11111+B23,ep)
- 
+
       in(2,ep)=
      .   + f2*Cv(N+cc22222,ep)-10* Cv(N+cc002222,ep)
      .   - Bv(bb11111+B23,ep)
@@ -789,7 +789,7 @@ C    (Cv(N+cc122222,Cv(N+cc222222,kkkkk)
 c      write(66,*) 'ox',cc122222,ep,Cv(N+cc122222,ep)
 c      write(66,*) 'ox',cc222222,ep,Cv(N+cc222222,ep)
 
-      enddo    
+      enddo
 
 c      if ((maxcindex .eq. 6) .and. (pvRespectmaxcindex)) return
 
@@ -920,7 +920,7 @@ c      write(66,*) 'zx',cc0012222,ep,Cv(N+cc0012222,ep)
 c      write(66,*) 'zx',cc0022222,ep,Cv(N+cc0022222,ep)
 
       enddo
-      
+
 
 C   Cv(N+cc0000001,Cv(N+cc0000002,zzzzzz)
       do ep=-2,0
@@ -1157,7 +1157,7 @@ C   Cv(N+cc1111111,Cv(N+cc1111112,pppppp)
 c      write(66,*) 'nx',cc1111111,ep,Cv(N+cc1111111,ep)
 c      write(66,*) 'nx',cc1111112,ep,Cv(N+cc1111112,ep)
 
-      
+
 C   Cv(N+cc1111112,Cv(N+cc1111122,pppppk)
       in(1,ep)=
      &  + b1sum(ep)
@@ -1221,7 +1221,7 @@ C   Cv(N+cc1111222,Cv(N+cc1112222,pppkkk)
      &  - 6*Cv(N+cc0011122,ep)
       enddo
 
- 
+
       call pvBackSubst(G,2,perm, in)
 
       do ep=-2,0
@@ -1290,8 +1290,8 @@ c      write(66,*) 'nx',cc2222222,ep,Cv(N+cc2222222,ep)
       enddo
 
 
-c--- to check recursion identities      
+c--- to check recursion identities
 c      call Cfill_alt(p1,p2,p1p2,m1s,m2s,m3s,N)
-       
+
       return
       end

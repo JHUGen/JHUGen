@@ -1,4 +1,4 @@
-      double complex function atreepm(j1,j2,j3,j4,j5,j6,za,zb) 
+      double complex function atreepm(j1,j2,j3,j4,j5,j6,za,zb)
       implicit none
 c---Atreepm is the amplitude for
 c---q-(-p4)+Q-(-p2)+l-(-p5) ---> q+(p1)+Q+(p3)+l+(p6)
@@ -19,4 +19,4 @@ c-----Note all tree amplitudes divided by im wrt to BDK paper
       return
       end
 
- 
+

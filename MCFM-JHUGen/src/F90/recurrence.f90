@@ -11,7 +11,7 @@
     use spinfns
     implicit none
     public :: fWW_bffbf
- 
+
    contains
 
 
@@ -70,7 +70,7 @@
 !          sp4 = spb2(sp4, k4)!+sp4*mass
 !
 !          e2 = g_fbf(edumm, kdumm, sp(:,2), p(:,2), fl2, sp(:,3),p(:,3),fl3,0,0,&
-!               &giarray,qiarray(2:3),pol_int) 
+!               &giarray,qiarray(2:3),pol_int)
 !          k2 = p(:,2)+p(:,3)
 !          k2sq = sc(k2,k2)
 !
@@ -83,10 +83,10 @@
 !             tmp = czero
 !          endif
 !
-!          if (abs(k2sq) > propcut) then 
+!          if (abs(k2sq) > propcut) then
 !             tmp = -ci/k2sq*tmp
-!          else 
-!             tmp = czero 
+!          else
+!             tmp = czero
 !          endif
 !
 !          res = res+tmp   !  sw = 1, #1
@@ -96,7 +96,7 @@
 !          if (fl0.eq.'top') flaux = 'bot'
 !          if (fl0.eq.'bot') flaux = 'top'
 !          sp4 = fW_bffbf(edumm,kdumm,sp,p,fll,flaux,eW(:,2), kW(:,2),&
-!               &ng1,ng2,ng3,1,giarray,qiarray,WWid(2),pol_int)    
+!               &ng1,ng2,ng3,1,giarray,qiarray,WWid(2),pol_int)
 !
 !          k4 = p(:,1)+p(:,2)+p(:,3)+kW(:,2)
 !          sp4 = spb2(sp4,k4) !+ mass*sp4
@@ -105,9 +105,9 @@
 !
 !          tmp = vbqW(sp4,eW(:,1))
 !
-!          if (abs(k4sq) > propcut) then 
+!          if (abs(k4sq) > propcut) then
 !             tmp = ci/k4sq*tmp
-!          else 
+!          else
 !             tmp = czero
 !          endif
 !
@@ -125,7 +125,7 @@
 
              sp4 = fW(edumm,kdumm, sp(:,1),p(:,1), fl1,fl0, eW(:,2),&
                   &kW(:,2),0,giarray,qiarray(1:1),WWid(2), pol_int)
-             k4 = p(:,1)+kW(:,2)          
+             k4 = p(:,1)+kW(:,2)
              k4sq = sc(k4,k4)
 
              sp4 = spb2(sp4, k4)!+mass*sp4
@@ -138,16 +138,16 @@
 
              tmp = vqg(sp4,e2)
 
-             if (abs(k2sq) > propcut) then 
+             if (abs(k2sq) > propcut) then
                 tmp = -ci/k2sq*tmp
-             else 
-                tmp = czero 
+             else
+                tmp = czero
              endif
 
-             if (abs(k4sq) > propcut) then 
-                tmp = ci/k4sq*tmp 
-             else 
-                tmp = czero 
+             if (abs(k4sq) > propcut) then
+                tmp = ci/k4sq*tmp
+             else
+                tmp = czero
              endif
 
              res = res + tmp  ! sw =2, #1
@@ -155,11 +155,11 @@
 
 
 
-             ! ---- for W below gluon line          
+             ! ---- for W below gluon line
 
              sp4 = fW_bffbf(edumm,kdumm,sp,p,fll,flaux,eW(:,1), kW(:,1),&
                   &ng1,ng2,ng3,3,&
-                  &giarray,qiarray,WWid(1),pol_int)    
+                  &giarray,qiarray,WWid(1),pol_int)
 
              k4 = p(:,1)+p(:,2)+p(:,3)+kW(:,1)
 
@@ -169,9 +169,9 @@
              tmp = vbqW(sp4,eW(:,2))
 
 
-             if (abs(k4sq) > propcut) then 
+             if (abs(k4sq) > propcut) then
                 tmp = ci/k4sq*tmp
-             else 
+             else
                 tmp = czero
              endif
 
@@ -181,7 +181,7 @@
 
              sp4 = fW_bffbf(edumm,kdumm,sp,p,fll,flaux,eW(:,1), kW(:,1),&
                   &ng1,ng2,ng3,sw,&
-                  &giarray,qiarray,WWid(1),pol_int)    
+                  &giarray,qiarray,WWid(1),pol_int)
 
              k4 = p(:,1)+p(:,2)+p(:,3)+kW(:,1)
 
@@ -190,9 +190,9 @@
 
              tmp = vbqW(sp4,eW(:,2))
 
-             if (abs(k4sq) > propcut) then 
+             if (abs(k4sq) > propcut) then
                 tmp = ci/k4sq*tmp
-             else 
+             else
                 tmp = czero
              endif
 
@@ -203,7 +203,7 @@
        endif
 
 !       if (sw ==3) then
-!          e2 = gWW_fbf(edumm, kdumm, sp(:,2),p(:,2),fl2,sp(:,3),p(:,3),fl3,& 
+!          e2 = gWW_fbf(edumm, kdumm, sp(:,2),p(:,2),fl2,sp(:,3),p(:,3),fl3,&
 !               &eW,kW,0,0,giarray,qiarray(2:3),WWid,pol_int)
 !
 !          k2 = p(:,2)+p(:,3)+kW(:,1)+kW(:,2)
@@ -212,10 +212,10 @@
 !          tmp = vqg(sp(:,1),e2)
 !
 !
-!          if (abs(k2sq) > propcut.and.fl0==fl1) then 
+!          if (abs(k2sq) > propcut.and.fl0==fl1) then
 !             tmp = -ci/k2sq*tmp
-!          else 
-!             tmp = czero 
+!          else
+!             tmp = czero
 !             !write(*,*) 'set to zero'
 !             !write(*,*) fl0
 !          endif
@@ -224,13 +224,13 @@
 !       endif
 !
 !       ! This case is used for A3.
-!       if (sw==4) then 
+!       if (sw==4) then
 !
 !          eW(:,1) = eWin(:,2)
 !          eW(:,2) = eWin(:,1)
 !          kW(:,1) = kWin(:,2)
 !          kW(:,2) = kWin(:,1)
-!!!$          
+!!!$
 !          spnew(:,1) = sp(:,3)
 !          spnew(:,2) = sp(:,2)
 !          spnew(:,3) = sp(:,1)

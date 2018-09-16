@@ -6,7 +6,7 @@ c                           |    --> nu(p3)+e^+(p4)
 c                           |
 c                           ---> b(p5)+bb(p6)
 c   positively charged W only
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'ptilde.f'
       include 'qqgg.f'
@@ -59,7 +59,7 @@ c---- entries are left as dummies
       enddo
       enddo
 
-      return      
+      return
       end
 
 

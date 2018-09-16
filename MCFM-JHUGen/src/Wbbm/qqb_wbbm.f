@@ -1,6 +1,6 @@
       subroutine qqb_wbbm(p,msq)
 c--- Note: optimization in the "sumsq" function by RKE, April 2009.
-c---  Matrix elements squared 
+c---  Matrix elements squared
 c     q(-p1)+qb(-p2) --> nu(p3)+e^+(p4)+b(p5)+bb(p6)
 c---  averaged(summed) over initial(final) colours and spins
       implicit none

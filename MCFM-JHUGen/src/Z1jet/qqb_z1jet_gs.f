@@ -9,16 +9,16 @@ c                           |                                          *
 c                            -->l(p3)+a(p4)                            *
 ************************************************************************
 
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'ptilde.f'
       include 'nflav.f'
       include 'qqgg.f'
       integer j,k,nd
 c --- remember: nd will count the dipoles
-      
+
       double precision p(mxpart,4),msq(maxd,-nf:nf,-nf:nf)
-      double precision 
+      double precision
      & msq15_2(-nf:nf,-nf:nf),msq25_1(-nf:nf,-nf:nf),
      & msq16_2(-nf:nf,-nf:nf),msq26_1(-nf:nf,-nf:nf),
      & msq15_6(-nf:nf,-nf:nf),msq26_5(-nf:nf,-nf:nf),
@@ -66,20 +66,20 @@ c--- sub... and sub...v and msqv
      . qqb_z1jet,qqb_z_gvec)
 
       do j=-nf,nf
-      do k=-nf,nf      
+      do k=-nf,nf
       do nd=1,ndmax
         msq(nd,j,k)=0d0
       enddo
       enddo
       enddo
-      
+
 c--- Gflag subtraction pieces
       do j=-nf,nf
       do k=-nf,nf
-      
+
       if ((j .ne. 0) .and. (k .ne. 0) .and. (j.ne.-k)) goto 19
 
-c--- do only q-qb and qb-q cases      
+c--- do only q-qb and qb-q cases
       if (  ((j .gt. 0).and.(k .lt. 0))
      . .or. ((j .lt. 0).and.(k .gt. 0))) then
 C-----half=statistical factor
@@ -105,7 +105,7 @@ c--- q-g and qb-g cases
       msq(5,j,k)=-(msq16_5(j,k)*sub16_5(qq)+msq16_5(j,k)*sub56_1(qq))/xn
       msq(6,j,k)=xn*(msq26_5(j,k)*sub26_5(gg)+msq26_5v(j,k)*sub26_5v
      .              +msq26_5(j,k)*sub56_2(qq))
- 
+
       elseif ((j .eq. 0).and.(k.ne.0)) then
 c--- g-q and g-qb cases
       msq(1,j,k)=2d0*tr*msq15_2(-k,k)*sub15_2(qg)
@@ -136,9 +136,9 @@ c---Hence 25 split multiplies g(p1)+q(p25)-->Z+q(p6)
 
 c--- Qflag subtraction pieces
       do j=-nf,nf
-      do k=-nf,nf      
+      do k=-nf,nf
 
-      if (((j .gt. 0).and.(k .gt. 0)) .or. 
+      if (((j .gt. 0).and.(k .gt. 0)) .or.
      .    ((j .lt. 0).and.(k .lt. 0))) then
 c--q-q or qb-qb
       if (j.eq.k) then
@@ -165,7 +165,7 @@ c q-qbar
      .  *(msq26_1(j,0)*sub26_1(gq)+msq26_1v(j,0)*sub26_1v)
       msq(6,j,k)=msq(6,j,k)+2d0*tr*dfloat(nflav)
      .  *(msq26_5(j,k)*sub56_2(gq)-msq56_2v(j,k)*sub56_2v)
-      else 
+      else
       msq(1,j,k)=msq(1,j,k)+(xn-1d0/xn)
      .  *(msq15_2(0,k)*sub15_2(gq)+msq15_2v(0,k)*sub15_2v)
       msq(4,j,k)=msq(4,j,k)+(xn-1d0/xn)
@@ -180,7 +180,7 @@ c--qbar-q
      .  *(msq16_2(0,k)*sub16_2(gq)+msq16_2v(0,k)*sub16_2v)
       msq(6,j,k)=msq(6,j,k)+2d0*tr*dfloat(nflav)
      . *(msq26_5(j,k)*sub56_2(gq)-msq56_2v(j,k)*sub56_2v)
-      else 
+      else
       msq(2,j,k)=msq(2,j,k)+(xn-1d0/xn)
      .  *(msq25_1(j,0)*sub25_1(gq)+msq25_1v(j,0)*sub25_1v)
       msq(3,j,k)=msq(3,j,k)+(xn-1d0/xn)
@@ -195,4 +195,4 @@ c--qbar-q
 
       return
       end
-      
+

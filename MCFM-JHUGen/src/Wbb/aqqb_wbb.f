@@ -1,6 +1,6 @@
       double complex function aqqb_wbb(i1,i2,i5,i6,i3,i4)
       implicit none
-C---This is the amplitude for 
+C---This is the amplitude for
 C---q_L(p1)+q_L(p6) --> q_L(p2)+q_L(p5)+W(l(p3)+antilepton(p4))
 c---with no couplings included
       include 'constants.f'
@@ -17,5 +17,5 @@ C---'prods.f' includes both the declaration and the common for s and za,zb
       aqqb_wbb=
      & +za(i3,i2)*zb(i6,i1)*t2(i4,i2,i3,i5)/(prop*s234)
      & +za(i5,i2)*zb(i4,i1)*t2(i6,i2,i5,i3)/(prop*s256)
-      return 
+      return
       end

@@ -10,7 +10,7 @@ c---- hg=-1  with s(mu) as gauge vector
 c for nwz=+1
 c     f(-p1)+f(-p2)--> W^+(n(p3)+e^+(p4)) + Qbar(p5)
 c For nwz=-1
-c     f(-p1)+f(-p2)--> W^-(e^-(p3)+nbar(p4))+ Q(p5) 
+c     f(-p1)+f(-p2)--> W^-(e^-(p3)+nbar(p4))+ Q(p5)
 c----
       include 'constants.f'
       include 'epinv.f'
@@ -92,13 +92,13 @@ c----
      &    0*taucg**(-2)*taugs**2*qsq*mQ*cf*apm4*ffcg3 - 1.D0/2.D0*
      &    taucg**(-1)*taugs*tcg*mQ*xn*apm1*fL6m3 + taucg**(-1)*taugs*
      &    qsq*mQ*xn**(-1)*apm4*ffcg3 - 2.D0*taucg**(-1)*taugs*mQ*cf*qcs
-     &    *apm1 + 3.D0*taucg**(-1)*taugs*mQ*cf*qcs*apm4*ffcg3 + 
+     &    *apm1 + 3.D0*taucg**(-1)*taugs*mQ*cf*qcs*apm4*ffcg3 +
      &    taucg**(-1)*taugs*mQ*cf*apm3*ffcg3 + taucg**(-1)*taugs*mQ**3*
      &    cf*apm5 + taucg**(-1)*taugs**2*mQ*cf*apm1 - taucg**(-1)*
      &    taugs**2*mQ*cf*apm4*ffcg1 - 3.D0/2.D0*taucg**(-1)*taugs**2*mQ
      &    *cf*apm5 - 1.D0/2.D0*taucg**(-1)*taugs**3*mQ**(-1)*cf*apm5*
      &    fq2m2
-      spm = spm - 1.D0/2.D0*taucg**(-1)*qsq*mQ*xn**(-1)*apm3*fL6m2 - 
+      spm = spm - 1.D0/2.D0*taucg**(-1)*qsq*mQ*xn**(-1)*apm3*fL6m2 -
      &    taucg**(-1)*xlog*mQ*b0*apm2 + 3.D0/2.D0*taucg**(-1)*mQ*epin*
      &    cf*apm2 + taucg**(-1)*mQ*epin*b0*apm2 - 1.D0/2.D0*taucg**(-1)
      &    *mQ*epin*xn**(-1)*apm2 + 1.D0/2.D0*taucg**(-1)*mQ*epin*xn*
@@ -117,14 +117,14 @@ c----
       spm = spm - taugs**2*mQ**(-1)*cf*apm5*fq2m2 - ddilog(msq**(-1)*
      &    tcs)*taucg**(-1)*mQ*xn**(-1)*apm2 + ddilog(msq**(-1)*tcg)*
      &    taucg**(-1)*mQ*xn*apm2 + lnrat( - taucs,msq)*taucs*
-     &    taucg**(-1)*taugs*tcs**(-1)*mQ**3*xn**(-1)*apm4 + lnrat( - 
-     &    taucs,msq)*taucs*taucg**(-1)*mQ*xn**(-1)*qcs*apm4 + lnrat( - 
-     &    taucs,msq)*taucs*taucg**(-1)*mQ*xn**(-1)*apm3 + lnrat( - 
+     &    taucg**(-1)*taugs*tcs**(-1)*mQ**3*xn**(-1)*apm4 + lnrat( -
+     &    taucs,msq)*taucs*taucg**(-1)*mQ*xn**(-1)*qcs*apm4 + lnrat( -
+     &    taucs,msq)*taucs*taucg**(-1)*mQ*xn**(-1)*apm3 + lnrat( -
      &    taucs,msq)*taucs**2*taucg**(-1)*tcs**(-1)*qsq*mQ*xn**(-1)*
      &    apm1 - lnrat( - taucs,msq)*taucs**2*tcs**(-1)*mQ*xn**(-1)*
      &    apm4 + lnrat( - taucs,msq)*taucg**(-1)*mQ*epin*xn**(-1)*apm2
-     &     + lnrat( - taucs,msq)*tcs**(-1)*mQ*xn**(-1)*cgs1*apm3 - 
-     &    lnrat( - taucs,msq)*tcs**(-1)*mQ**3*xn**(-1)*cgs1*apm4 - 
+     &     + lnrat( - taucs,msq)*tcs**(-1)*mQ*xn**(-1)*cgs1*apm3 -
+     &    lnrat( - taucs,msq)*tcs**(-1)*mQ**3*xn**(-1)*cgs1*apm4 -
      &    lnrat( - taucs,msq)**2*taucg**(-1)*mQ*xn**(-1)*apm2 - 2.D0*
      &    lnrat( - taucg,msq)*taucg**(-1)*taugs*tcg**(-1)*mQ*cf*qcg*
      &    apm3 - 4.D0*lnrat( - taucg,msq)*taucg**(-1)*taugs*mQ*cf*apm3
@@ -135,7 +135,7 @@ c----
      &    epin*xn*apm2 - lnrat( - taucg,msq)*taucg*tcg**(-1)*mQ*cf*qcg*
      &    apm1 - lnrat( - taucg,msq)*taugs*tcg**(-1)*qsq*mQ*xn**(-1)*
      &    apm4 + 2.D0*lnrat( - taucg,msq)*taugs*tcg**(-1)*mQ**3*cf*apm4
-     &     + 3.D0*lnrat( - taucg,msq)*taugs*mQ*cf*apm1 + 2.D0*lnrat( - 
+     &     + 3.D0*lnrat( - taucg,msq)*taugs*mQ*cf*apm1 + 2.D0*lnrat( -
      &    taucg,msq)*taugs**2*tcg**(-1)*mQ*cf*apm4 - lnrat( - taucg,msq
      &    )*tcg**(-1)*mQ*cf*qcs*apm3 - 2.D0*lnrat( - taucg,msq)*
      &    tcg**(-1)*mQ**3*cf*cgs1*apm1 - 2.D0*lnrat( - taucg,msq)*
@@ -151,25 +151,25 @@ c----
      &    *apm5 - lnrat( - taugs,msq)*taucg**(-1)*taugs*mQ*xn**(-1)*qcs
      &    *apm1 - lnrat( - taugs,msq)*taucg**(-1)*taugs*mQ*xn**(-1)*qcs
      &    *apm5 + lnrat( - taugs,msq)*taucg**(-1)*taugs*mQ*xn**(-1)*qcg
-     &    *apm1 + lnrat( - taugs,msq)*taucg**(-1)*taugs*mQ*xn*apm3 - 
+     &    *apm1 + lnrat( - taugs,msq)*taucg**(-1)*taugs*mQ*xn*apm3 -
      &    lnrat( - taugs,msq)*taucg**(-1)*taugs*mQ**3*cf*apm1 - lnrat(
      &     - taugs,msq)*taucg**(-1)*mQ*epin*xn*apm2 - 1.D0/2.D0*lnrat(
      &     - taugs,msq)*taugs*mQ**(-1)*xn**(-1)*cgs1*apm5 - 2.D0*lnrat(
      &     - taugs,msq)*taugs*mQ*cf*apm1 - 2.D0*lnrat( - taugs,msq)*
      &    taugs*mQ*cf*apm5 + 1.D0/2.D0*lnrat( - taugs,msq)**2*
      &    taucg**(-1)*mQ*xn*apm2 + 2.D0*lnrat( - qsqhat,msq)*taucs*
-     &    taucg**(-2)*taugs*qsq**(-1)*mQ*qsqhat*cf*apm3 - lnrat( - 
+     &    taucg**(-2)*taugs*qsq**(-1)*mQ*qsqhat*cf*apm3 - lnrat( -
      &    qsqhat,msq)*taucs*taucg**(-2)*taugs**2*qsq**(-1)*mQ*qsqhat*cf
      &    *apm4 - 1.D0/2.D0*lnrat( - qsqhat,msq)*taucs*taucg**(-1)*
      &    taugs*qsq**(-1)*mQ*qsqhat*cf*apm1
       spm = spm - 5.D0/2.D0*lnrat( - qsqhat,msq)*taucs*taucg**(-1)*
      & taugs*qsq**(-1)*mQ*qsqhat*cf*apm4 - lnrat( - qsqhat,msq)*taucs*
-     &    taucg**(-1)*tcs*qsq**(-1)*mQ*qsqhat*xn**(-1)*apm1 + lnrat( - 
-     &    qsqhat,msq)*taucs*taucg**(-1)*qsq**(-1)*mQ*qsqhat*cf*apm3 - 
+     &    taucg**(-1)*tcs*qsq**(-1)*mQ*qsqhat*xn**(-1)*apm1 + lnrat( -
+     &    qsqhat,msq)*taucs*taucg**(-1)*qsq**(-1)*mQ*qsqhat*cf*apm3 -
      &    lnrat( - qsqhat,msq)*taucs*taucg**(-1)*qsq**(-1)*mQ*qsqhat*xn
      &    *qcs*apm1 + 2.D0*lnrat( - qsqhat,msq)*taucs*taucg**(-1)*
      &    qsq**(-1)*mQ**3*qsqhat*cf*apm1 - lnrat( - qsqhat,msq)*taucs*
-     &    taucg*qsq**(-1)*mQ**(-1)*qsqhat*cf*apm4 + 3.D0/2.D0*lnrat( - 
+     &    taucg*qsq**(-1)*mQ**(-1)*qsqhat*cf*apm4 + 3.D0/2.D0*lnrat( -
      &    qsqhat,msq)*taucs*qsq**(-1)*mQ*qsqhat*cf*apm1 - 3.D0/2.D0*
      &    lnrat( - qsqhat,msq)*taucs*qsq**(-1)*mQ*qsqhat*cf*apm4 + 1.D0/
      &    2.D0*lnrat( - qsqhat,msq)*taucs**2*taucg**(-1)*taugs*
@@ -191,7 +191,7 @@ c----
      &    taucg**(-1)*taugs*tcs*tcg*qsq**(-1)*mQ**(-1)*qsqhat*xn**(-1)*
      &    apm1 + 3.D0*lnrat( - qsqhat,msq)*taucg**(-1)*taugs*qsq**(-1)*
      &    mQ*qsqhat*cf*apm3 - 2.D0*lnrat( - qsqhat,msq)*taucg**(-1)*
-     &    taugs*qsq**(-1)*mQ**3*qsqhat*cf*apm4 - 1.D0/2.D0*lnrat( - 
+     &    taugs*qsq**(-1)*mQ**3*qsqhat*cf*apm4 - 1.D0/2.D0*lnrat( -
      &    qsqhat,msq)*taucg**(-1)*taugs*mQ*qsqhat*xn*apm1 - 2.D0*lnrat(
      &     - qsqhat,msq)*taucg**(-1)*taugs**2*qsq**(-1)*mQ*qsqhat*cf*
      &    apm4
@@ -214,11 +214,11 @@ c----
       spm = spm + C0fa2m(tcs,qsq,msq)*taucs**(-1)*taucg**(-2)*taugs*
      & mQ**5*xn**(-1)*qcs**2*apm4 + C0fa2m(tcs,qsq,msq)*taucs**(-1)*
      &    taucg**(-1)*mQ*xn**(-1)*qcs**2*cgs1*apm3 + C0fa2m(tcs,qsq,msq
-     &    )*taucs**(-1)*taucg**(-1)*mQ**3*xn**(-1)*qcs*cgs1*apm3 + 
+     &    )*taucs**(-1)*taucg**(-1)*mQ**3*xn**(-1)*qcs*cgs1*apm3 +
      &    C0fa2m(tcs,qsq,msq)*taucs*taucg**(-1)*tcg*mQ*xn**(-1)*qcs*
      &    apm1 + C0fa2m(tcs,qsq,msq)*taucg**(-1)*mQ**3*xn**(-1)*qcs*
      &    cgs1*apm1 + C0fa2m(tcs,qsq,msq)*taucg**(-1)*mQ**3*xn**(-1)*
-     &    qcs*apm3 - 36.D0*ffc002*taucs*taucg**(-1)*taugs*mQ*cf*apm5 - 
+     &    qcs*apm3 - 36.D0*ffc002*taucs*taucg**(-1)*taugs*mQ*cf*apm5 -
      &    18.D0*ffc002*taucs*taucg**(-1)*mQ*cf*qgs*apm5 + 18.D0*ffc002*
      &    taucs**2*taucg**(-1)*mQ**(-1)*cf*qgs*apm5 + 36.D0*ffc002*
      &    taucs**2*taucg**(-1)*mQ*cf*apm5 - 6.D0*ffc002*taucs**3*
@@ -251,18 +251,18 @@ c----
      &    taugs**2*mQ**5*xn*apm1 + fI3me*taucg**(-1)*taugs*mQ*xn*cgs1*
      &    apm3 + fI3me*taugs*mQ*xn*cgs1*apm4
 
-      
+
       lopm =-mQ/taucg*za(ig,ie)*zb(is,in)*zb(is,ic)/zb(ig,is)
-      
+
 c--- include finite counterterm to go from DR to MSbar scheme
 c--- alphas(DR) = alphas(MSbar) * (1+ (Nc / 6) * alphas(MSbar) / (2*pi))
       spm=spm + lopm * xn/6d0
-      
+
 c--- include finite counterterm due to FDH scheme
 c--- gw = gw * ( 1 - 2*cf * alphas(MSbar) / (2*pi))
       spm=spm - lopm * cf * 2d0
-      
+
       virt_pm=spm
-      
+
       return
       end

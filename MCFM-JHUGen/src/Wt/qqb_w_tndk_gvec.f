@@ -19,7 +19,7 @@ c---in label of gluon which is contracted with n
       integer j,k,in
       double precision msq(-nf:nf,-nf:nf),p(mxpart,4)
       double precision wcjetn,p1p2(-1:1,-1:1),n(4)
-     
+
       double precision FAC
 
       do j=-nf,nf
@@ -59,6 +59,6 @@ c---in label of gluon which is contracted with n
 
       enddo
       enddo
-      
+
       return
       end

@@ -44,7 +44,7 @@
      &    zb(i2,i5)*zb(i4,i3) - 1/(za(i1,i3))/(za(i2,i3))/(zb(i1,i5))*
      &    za(i1,i2)*za(i1,i7)*zb(i2,i4)*zb(i2,i5) - 1/(za(i1,i3))/(zb(
      &    i1,i2))/(zb(i1,i5))*za(i1,i7)*zb(i2,i3)*zb(i2,i4)*zb(i2,i5)
-     &     + 1/(za(i2,i3))/(zb(i1,i5))*za(i1,i7)*zb(i2,i4)*zb(i5,i3) + 
+     &     + 1/(za(i2,i3))/(zb(i1,i5))*za(i1,i7)*zb(i2,i4)*zb(i5,i3) +
      &    1/(za(i2,i3))/(zb(i1,i5))*za(i1,i7)*zb(i2,i5)*zb(i4,i3) )
       ttbgggmpp = ttbgggmpp + mtsq*s1345**(-1)*s6789**(-1) * (  - 1/(
      &    za(i1,i2))/(za(i1,i3))/(zb(i1,i5))*za(i1,i4)*za(i1,i5)*za(i1,

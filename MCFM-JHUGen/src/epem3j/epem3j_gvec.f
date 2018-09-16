@@ -1,8 +1,8 @@
       subroutine epem3j_gvec(p,n,in,msq)
       implicit none
 c--- simple modification of qqb_w1jet_gs.f: permuted 1 and 4, 2 and 3
-c--- to switch leptons with quarks and added a factor of Nc      
-      
+c--- to switch leptons with quarks and added a factor of Nc
+
 c----Matrix element for W production
 C----averaged over initial colours and spins
 c    contracted with the vector v(mu)
@@ -25,7 +25,7 @@ c---in label of gluon which is contracted with n
       fac=2d0*gsq*V*xn*gwsq**2
       call dotem(5,p,s)
 
-      if (in .eq. 5) then     
+      if (in .eq. 5) then
         p1p2=+aveqq*fac*w1jetn(4,3,2,1,5,p,n)
       else
         write(6,*) 'Error in epem3j_gvec.f: in = ',in
@@ -36,4 +36,4 @@ c---in label of gluon which is contracted with n
 
       return
       end
- 
+

@@ -1,4 +1,4 @@
-      double complex function fzip(s12,s34,s56) 
+      double complex function fzip(s12,s34,s56)
       implicit none
       double complex I3m,lnrat
       double precision s12,s34,s56,Del12,Del34,Del56,Del3
@@ -9,7 +9,7 @@ C     Eqn. (B15).
       Del34=s34-s12-s56
       Del56=s56-s12-s34
       Del3=s12*Del12+s34*Del34+s56*Del56
-       
+
 
       fzip=Dcmplx((3d0*s34*Del34/Del3**2-1d0/Del3)*s12*s56)
      . *I3m(s12,s34,s56)

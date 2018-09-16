@@ -4,7 +4,7 @@ c---Matrix element squared averaged over initial colors and spins
 c     q(-p1)+qbar(-p2) --> Gamma^* +g(p5) +g(p6)
 c                          |
 c                          --> l(p3)+a(p4)
-c                            
+c
 c--all momenta incoming
       implicit none
       include 'constants.f'
@@ -33,14 +33,14 @@ c      call subqcd(i2,i1,i4,i3,i6,i5,za,zb,qcd2RR)
 c      call subqcd(i2,i1,i3,i4,i5,i6,za,zb,qcd1RL)
 c      call subqcd(i2,i1,i3,i4,i6,i5,za,zb,qcd2RL)
 
-            
+
       do j=1,2
       do k=1,2
       qedLL(pol(j),pol(k))=qcd1LL(pol(j),pol(k))+qcd2LL(pol(k),pol(j))
       qedLR(pol(j),pol(k))=qcd1LR(pol(j),pol(k))+qcd2LR(pol(k),pol(j))
 c      qedRL(pol(j),pol(k))=qcd1RL(pol(j),pol(k))+qcd2RL(pol(k),pol(j))
 c      qedRR(pol(j),pol(k))=qcd1RR(pol(j),pol(k))+qcd2RR(pol(k),pol(j))
-      enddo                   
+      enddo
       enddo
 
       do pq=1,1
@@ -48,8 +48,8 @@ c      qedRR(pol(j),pol(k))=qcd1RR(pol(j),pol(k))+qcd2RR(pol(k),pol(j))
       msq1(pq,pl)=0d0
       msq2(pq,pl)=0d0
       msqq(pq,pl)=0d0
-      enddo                   
-      enddo                   
+      enddo
+      enddo
 
 C---sum over gluon polarizations
       do j=1,2
@@ -70,8 +70,8 @@ c      msq1(2,2)=msq1(2,2)+abs(qcd1RR(pol(j),pol(k)))**2
 c      msq2(2,2)=msq2(2,2)+abs(qcd2RR(pol(j),pol(k)))**2
 c      msqq(2,2)=msqq(2,2)+abs(qedRR(pol(j),pol(k)))**2
 
-      enddo                   
-      enddo                   
+      enddo
+      enddo
 
 
       msq1(2,2)=msq1(1,1)
@@ -89,7 +89,7 @@ c      msqq(2,2)=msqq(2,2)+abs(qedRR(pol(j),pol(k)))**2
       mmsq_cs(1,pq,pl)=msq1(pq,pl)
       mmsq_cs(2,pq,pl)=msq2(pq,pl)
       msq(pq,pl)=mmsq_cs(2,pq,pl)+mmsq_cs(1,pq,pl)+mmsq_cs(0,pq,pl)
-      enddo                   
-      enddo                   
+      enddo
+      enddo
       return
       end

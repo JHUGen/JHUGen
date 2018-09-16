@@ -30,13 +30,13 @@ C---choose auxiliary vector
       mtsq=mt**2
       mwsq=wmass**2
       p2Dp5=0.5d0*(s25-mtsq)
-      
+
       if (nwz .eq. +1) then
       call spinoru(7,q,za,zb)
       elseif (nwz .eq. -1) then
       call spinoru(7,q,zb,za)
       endif
-      
+
 
 c--- Implementation of Baur-Zeppenfeld treatment of Z width
       cprop=dcmplx(1d0/dsqrt((s34-zmass**2)**2+(zmass*zwidth)**2))

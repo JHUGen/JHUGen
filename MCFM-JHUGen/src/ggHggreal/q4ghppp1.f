@@ -43,7 +43,7 @@ C Eq B9
      . +s(p1,p2)*za(p2,p4)**2*zb(p2,p5)*zb(p3,p4)
      . +za(p1,p2)*za(p3,p4)*zb(p1,p3)*zb(p3,p5)*(s(p2,p5)-s(p1,p5))
      . -s(p1,p5)*za(p2,p5)*za(p3,p4)*zb(p3,p5)**2)
-      
+
       q4ghppp1=q4ghppp1+1d0/(za(p1,p5)*s(p3,p4)*t125)
      . *(za(p2,p4)*zb(p4,p3)*(zab(p4,p1,p5)+zab(p4,p2,p5))
      . +za(p4,p3)*zb(p3,p5)*(zab(p2,p1,p3)+zab(p2,p5,p3)))
@@ -65,7 +65,7 @@ C Eq B9
      . -1d0/(s(p1,p2)*s(p3,p4)*s5h)*(-za(p1,p2)*zb(p1,p5)**2
      . *(+zab(p4,p1,p3)+zab(p4,p2,p3))
      . +zb(p1,p5)*zb(p3,p5)
-     . *(-zaba(p2,p1,p3,p4)+zaba(p2,p3,p1,p4)) 
+     . *(-zaba(p2,p1,p3,p4)+zaba(p2,p3,p1,p4))
      . +za(p2,p4)*zb(p1,p5)*zb(p3,p5)
      . *(s(p1,p4)+s(p2,p3)+s(p2,p4))
      . +za(p3,p4)*zb(p3,p5)**2*(+zab(p2,p3,p1)+zab(p2,p4,p1)))

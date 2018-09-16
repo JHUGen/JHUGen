@@ -19,7 +19,7 @@ c---in label of gluon which is contracted with n
       integer j,k,in
       double precision msq(-nf:nf,-nf:nf),p(mxpart,4)
       double precision w1jetn,p1p2(-1:1,-1:1),n(4)
-     
+
       double precision FAC
 
       do j=-nf,nf
@@ -43,7 +43,7 @@ c---in label of gluon which is contracted with n
       elseif (in .eq. 2) then
       p1p2(+1,0)=-aveqg*fac*w1jetn(1,5,3,4,2,p,n)
       p1p2(-1,0)=-aveqg*fac*w1jetn(5,1,3,4,2,p,n)
-      elseif (in .eq. 5) then     
+      elseif (in .eq. 5) then
       p1p2(1,-1)=+aveqq*fac*w1jetn(1,2,3,4,5,p,n)
       p1p2(-1,1)=+aveqq*fac*w1jetn(2,1,3,4,5,p,n)
       endif
@@ -73,10 +73,10 @@ c---in label of gluon which is contracted with n
 
       return
       end
- 
+
 
       double precision function w1jetn(j1,j2,j3,j4,j5,p,n)
-      implicit none 
+      implicit none
 C---calculates the amplitude squared for the process
 c   q(p1)+qbar(p2) --> W(l(p3)+a(p4)+g(p5)
 c   contracted with the vector n(mu)

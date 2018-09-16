@@ -7,7 +7,7 @@
 *     for the process                                                  *
 *                                                                      *
 *     q(-p1) +qbar(-p2)=nu(p3)+e+(p4)+b(p5)+bbar(p6)+e-(p7)+nubar(p8)  *
-*     +g(p9) radiated from top in decay                                * 
+*     +g(p9) radiated from top in decay                                *
 *                                                                      *
 *     Top is kept strictly on-shell although all spin correlations     *
 *     are retained.                                                    *
@@ -68,7 +68,7 @@ c--- q-qbar amplitudes
       enddo
       enddo
       enddo
-      
+
 c--- gg amplitudes
       mqed(:,:,:,:)=mab(:,:,:,:)+mba(:,:,:,:)
       gg=0d0
@@ -83,7 +83,7 @@ c--- gg amplitudes
       enddo
       enddo
       enddo
-       
+
 C---fill qb-q, gg and q-qb elements
       do j=-nf,nf
       if ((j .lt. 0) .or. (j .gt. 0)) then

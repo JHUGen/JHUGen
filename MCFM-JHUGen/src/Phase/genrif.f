@@ -12,7 +12,7 @@ c----i1 is an initial state vector.
       parameter(wt0=1d0/eight/pisq)
 
 c------initial final
- 
+
       phi=twopi*phit
       omxmin=one-xmin
 
@@ -42,8 +42,8 @@ c---sudakov in terms of original variables
       p(i1,j)=p(i1,j)/x
       p(i2,j)=p(i2,j)-p(i7,j)+omx*p(i1,j)
       enddo
- 
-c---we have now finished generating momenta and can return      
+
+c---we have now finished generating momenta and can return
       return
       end
 

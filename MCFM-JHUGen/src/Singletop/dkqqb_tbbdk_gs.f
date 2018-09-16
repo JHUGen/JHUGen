@@ -41,12 +41,12 @@
       incldip(1)=.true.
 
       call wtransform_generic(p,3,4,5,7,q,pbDpg,ptDpg,ptDpb)
-      
+
       pwsq=2d0*(q(3,4)*q(4,4)-q(3,1)*q(4,1)-q(3,2)*q(4,2)-q(3,3)*q(4,3))
 
 c--- form of subtraction depends on whether b-quark in decay is massless or not
       if (abs(dot(p,5,5)) .lt. 1d-6) then
-c----- massless case      
+c----- massless case
         omz=ptDpg/(ptDpb+ptDpg-pbDpg)
         z=1d0-omz
         xr=dsqrt(pwsq/mt**2)
@@ -58,20 +58,20 @@ c----- massless case
         endif
         fac=gsq*cf*(1d0/pbDpg*(2d0/omz-1d0-z)-(mt/ptDpg)**2)
       else
-c----- massive case    
-c-----  (no alpha-dependence at present)  
+c----- massive case
+c-----  (no alpha-dependence at present)
         fac=gsq*cf*((mt**2+mb**2-pwsq)/(ptDpg*pbDpg)
      &             -(mt/ptDpg)**2-(mb/pbDpg)**2)
       endif
-      
-      call qqb_tbbdk(q,msq) 
+
+      call qqb_tbbdk(q,msq)
 
       do j=-nf,nf
       do k=-nf,nf
       msqc(1,j,k)=fac*msq(j,k)
       enddo
       enddo
-      
+
       return
       end
 

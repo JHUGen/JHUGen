@@ -43,7 +43,7 @@ c--- choice of gauge vector
       amp(2,2,2,1)= + prop26**(-1)*prop58**(-1) * (  -1d0/(za(p2,b2))/(
      &    za(p8,b8))*za(p3,k5)*za(p7,p8)*za(b8,k5)*zb(p2,k6)*zb(p4,p8)*
      &    zb(p8,k5)*za26b(b2,p1) +1d0/(za(p2,b2))/(za(p8,b8))*za(p3,k5)*
-     &    za(b8,k5)*zb(p2,k6)*zb(p8,k5)*za345b(p7,p4)*za26b(b2,p1) + 
+     &    za(b8,k5)*zb(p2,k6)*zb(p8,k5)*za345b(p7,p4)*za26b(b2,p1) +
      &   1d0/(za(p2,b2))/(za(p8,b8))/(zb(p3,k5))*za(p3,b8)*za(p7,p8)*zb(
      &    p2,k6)*zb(p3,p8)*zb(p4,p8)*za26b(b2,p1)*mbdk**2 -1d0/(za(p2,b2
      &    ))/(za(p8,b8))/(zb(p3,k5))*za(p3,b8)*zb(p2,k6)*zb(p3,p8)*
@@ -51,7 +51,7 @@ c--- choice of gauge vector
       amp(2,2,2,1) = amp(2,2,2,1) + prop26**(-1)*invtwoptDp8 * (1d0/(za(
      &    p2,b2))/(za(p8,b8))*za(p3,k5)*zb(p2,k6)*za345b(p7,p8)*za345b(
      &    b8,p4)*za26b(b2,p1) )
-      amp(2,2,2,1) = amp(2,2,2,1) + prop167**(-1)*prop58**(-1) * (  - 
+      amp(2,2,2,1) = amp(2,2,2,1) + prop167**(-1)*prop58**(-1) * (  -
      &   1d0/(za(p2,b2))/(za(p8,b8))*za(p3,k5)*za(b2,p8)*za(b8,k5)*zb(p1
      &    ,k6)*zb(p4,p8)*zb(p8,k5)*za167b(p7,p2) +1d0/(za(p2,b2))/(za(p8
      &    ,b8))*za(p3,k5)*za(b8,k5)*zb(p1,k6)*zb(p8,k5)*za167b(p7,p2)*
@@ -71,10 +71,10 @@ c--- choice of gauge vector
      &    ,p2)*zb(p3,p8)*zb(p4,p8)*mbdk**2 -1d0/(za(p2,b2))/(za(p8,b8))
      &    /(za(k6,e6))/(zb(p3,k5))*za(p3,b8)*za(b2,e6)*zb(p1,p2)*zb(p3,
      &    p8)*za345b(p7,p4)*mbdk**2 )
-      amp(2,2,2,1) = amp(2,2,2,1) + mb**2*prop26**(-1)*invtwoptDp8 * ( 
+      amp(2,2,2,1) = amp(2,2,2,1) + mb**2*prop26**(-1)*invtwoptDp8 * (
      &   1d0/(za(p2,b2))/(za(p8,b8))/(za(k6,e6))*za(p3,k5)*za(b2,e6)*zb(
      &    p1,p2)*za345b(p7,p8)*za345b(b8,p4) )
-      amp(2,2,2,1) = amp(2,2,2,1) + mt**2*prop26**(-1)*invtwoptDp8 * ( 
+      amp(2,2,2,1) = amp(2,2,2,1) + mt**2*prop26**(-1)*invtwoptDp8 * (
      &     -1d0/(za(p2,b2))/(za(p8,b8))*za(p3,k5)*za(p7,b8)*zb(p2,k6)*
      &    zb(p4,p8)*za26b(b2,p1) )
       amp(2,2,2,1) = amp(2,2,2,1) + mt**2*prop167**(-1)*prop58**(-1)
@@ -125,7 +125,7 @@ c--- choice of gauge vector
      &    za(p2,b2))*za(p3,k5)*za(p7,p8)*zb(p2,k6)*za345b(p8,p4)*za26b(
      &    b2,p1) -1d0/(za(p2,b2))/(zb(p8,b8))*za(p3,k5)*zb(p2,k6)*
      &    za345b(p7,b8)*za345b(p8,p4)*za26b(b2,p1) )
-      amp(2,2,1,1) = amp(2,2,1,1) + prop167**(-1)*prop58**(-1) * (  - 
+      amp(2,2,1,1) = amp(2,2,1,1) + prop167**(-1)*prop58**(-1) * (  -
      &   1d0/(za(p2,b2))*za(p3,p8)*za(b2,p8)*za(p8,k5)*zb(p1,k6)*zb(p4,
      &    p8)*za167b(p7,p2) +1d0/(za(p2,b2))*za(p3,p8)*za(p8,k5)*zb(p1,
      &    k6)*za167b(p7,p2)*za345b(b2,p4) -1d0/(za(p2,b2))/(zb(p3,k5))/(
@@ -136,7 +136,7 @@ c--- choice of gauge vector
      &    ,k5)*zb(p1,k6)*zb(p4,p8)*zb(b8,k5)*za167b(p7,p2) -1d0/(za(p2,
      &    b2))/(zb(p8,b8))*za(p3,k5)*za(p8,k5)*zb(p1,k6)*zb(b8,k5)*
      &    za167b(p7,p2)*za345b(b2,p4) )
-      amp(2,2,1,1) = amp(2,2,1,1) + prop167**(-1)*invtwoptDp8 * (  - 
+      amp(2,2,1,1) = amp(2,2,1,1) + prop167**(-1)*invtwoptDp8 * (  -
      &   1d0/(za(p2,b2))*za(p3,k5)*za(b2,p8)*zb(p1,k6)*za167b(p7,p2)*
      &    za345b(p8,p4) -1d0/(za(p2,b2))/(zb(p8,b8))*za(p3,k5)*zb(p1,k6)
      &    *za167b(p7,p2)*za345b(b2,b8)*za345b(p8,p4) )
@@ -152,12 +152,12 @@ c--- choice of gauge vector
      &    )*zb(p1,p2)*zb(p4,p8)*zb(b8,k5) -1d0/(za(p2,b2))/(za(k6,e6))/(
      &    zb(p8,b8))*za(p3,k5)*za(b2,e6)*za(p8,k5)*zb(p1,p2)*zb(b8,k5)*
      &    za345b(p7,p4) )
-      amp(2,2,1,1) = amp(2,2,1,1) + mb**2*prop26**(-1)*invtwoptDp8 * ( 
+      amp(2,2,1,1) = amp(2,2,1,1) + mb**2*prop26**(-1)*invtwoptDp8 * (
      &     -1d0/(za(p2,b2))/(za(k6,e6))*za(p3,k5)*za(b2,e6)*za(p7,p8)*
      &    zb(p1,p2)*za345b(p8,p4) -1d0/(za(p2,b2))/(za(k6,e6))/(zb(p8,b8
      &    ))*za(p3,k5)*za(b2,e6)*zb(p1,p2)*za345b(p7,b8)*za345b(p8,p4)
      &     )
-      amp(2,2,1,1) = amp(2,2,1,1) + mt**2*prop26**(-1)*invtwoptDp8 * ( 
+      amp(2,2,1,1) = amp(2,2,1,1) + mt**2*prop26**(-1)*invtwoptDp8 * (
      &   1d0/(za(p2,b2))/(zb(p8,b8))*za(p3,k5)*za(p7,p8)*zb(p2,k6)*zb(p4
      &    ,b8)*za26b(b2,p1) )
       amp(2,2,1,1) = amp(2,2,1,1) + mt**2*prop167**(-1)*prop58**(-1)
@@ -197,7 +197,7 @@ c--- choice of gauge vector
      &    p8)*za(p3,b8)*zb(p1,k6)*zb(p3,p8)*zb(p4,p8)*za167b(p7,b2)*
      &    mbdk**2 +1d0/(za(p8,b8))/(zb(p2,b2))/(zb(p3,k5))*za(p3,b8)*zb(
      &    p1,k6)*zb(p3,p8)*za167b(p7,b2)*za345b(p2,p4)*mbdk**2 )
-      amp(2,1,2,1) = amp(2,1,2,1) + prop167**(-1)*invtwoptDp8 * (  - 
+      amp(2,1,2,1) = amp(2,1,2,1) + prop167**(-1)*invtwoptDp8 * (  -
      &   1d0/(za(p8,b8))/(zb(p2,b2))*za(p3,k5)*zb(p1,k6)*za167b(p7,b2)*
      &    za345b(p2,p8)*za345b(b8,p4) )
       amp(2,1,2,1) = amp(2,1,2,1) + mb**2*prop26**(-1)*prop58**(-1)
@@ -209,10 +209,10 @@ c--- choice of gauge vector
      &    b2)*zb(p3,p8)*zb(p4,p8)*mbdk**2 +1d0/(za(p8,b8))/(za(k6,e6))/(
      &    zb(p2,b2))/(zb(p3,k5))*za(p2,e6)*za(p3,b8)*zb(p1,b2)*zb(p3,p8
      &    )*za345b(p7,p4)*mbdk**2 )
-      amp(2,1,2,1) = amp(2,1,2,1) + mb**2*prop26**(-1)*invtwoptDp8 * ( 
+      amp(2,1,2,1) = amp(2,1,2,1) + mb**2*prop26**(-1)*invtwoptDp8 * (
      &     -1d0/(za(p8,b8))/(za(k6,e6))/(zb(p2,b2))*za(p2,e6)*za(p3,k5)*
      &    zb(p1,b2)*za345b(p7,p8)*za345b(b8,p4) )
-      amp(2,1,2,1) = amp(2,1,2,1) + mt**2*prop26**(-1)*invtwoptDp8 * ( 
+      amp(2,1,2,1) = amp(2,1,2,1) + mt**2*prop26**(-1)*invtwoptDp8 * (
      &   1d0/(za(p8,b8))/(zb(p2,b2))*za(p3,k5)*za(p7,b8)*zb(p4,p8)*zb(b2
      &    ,k6)*za26b(p2,p1) )
       amp(2,1,2,1) = amp(2,1,2,1) + mt**2*prop167**(-1)*prop58**(-1)
@@ -235,7 +235,7 @@ c--- choice of gauge vector
      &    zb(p2,b2))*za(p3,p8)**2*za(p7,p8)*zb(p4,p8)*zb(b2,k6)*za26b(
      &    p2,p1)*mbdk +1d0/(za(p3,k5))/(zb(p2,b2))*za(p3,p8)**2*zb(b2,k6
      &    )*za345b(p7,p4)*za26b(p2,p1)*mbdk )
-      amp(2,1,1,2) = amp(2,1,1,2) + prop167**(-1)*prop58**(-1) * (  - 
+      amp(2,1,1,2) = amp(2,1,1,2) + prop167**(-1)*prop58**(-1) * (  -
      &   1d0/(za(p3,k5))/(zb(p2,b2))*za(p2,p8)*za(p3,p8)**2*zb(p1,k6)*
      &    zb(p4,p8)*za167b(p7,b2)*mbdk +1d0/(za(p3,k5))/(zb(p2,b2))*za(
      &    p3,p8)**2*zb(p1,k6)*za167b(p7,b2)*za345b(p2,p4)*mbdk )
@@ -249,7 +249,7 @@ c--- choice of gauge vector
      &    k6)*zb(p4,b2)*mbdk )
 
       amp(2,1,1,1)= + prop26**(-1)*prop58**(-1) * (1d0/(zb(p2,b2))*za(p3
-     &    ,p8)*za(p7,p8)*za(p8,k5)*zb(p4,p8)*zb(b2,k6)*za26b(p2,p1) - 
+     &    ,p8)*za(p7,p8)*za(p8,k5)*zb(p4,p8)*zb(b2,k6)*za26b(p2,p1) -
      &   1d0/(zb(p2,b2))*za(p3,p8)*za(p8,k5)*zb(b2,k6)*za345b(p7,p4)*
      &    za26b(p2,p1) +1d0/(zb(p2,b2))/(zb(p3,k5))/(zb(p8,b8))*za(p3,p8
      &    )*za(p7,p8)*zb(p3,b8)*zb(p4,p8)*zb(b2,k6)*za26b(p2,p1)*
@@ -290,11 +290,11 @@ c--- choice of gauge vector
      &    )*zb(p1,b2)*zb(p4,p8)*zb(b8,k5) +1d0/(za(k6,e6))/(zb(p2,b2))/(
      &    zb(p8,b8))*za(p2,e6)*za(p3,k5)*za(p8,k5)*zb(p1,b2)*zb(b8,k5)*
      &    za345b(p7,p4) )
-      amp(2,1,1,1) = amp(2,1,1,1) + mb**2*prop26**(-1)*invtwoptDp8 * ( 
+      amp(2,1,1,1) = amp(2,1,1,1) + mb**2*prop26**(-1)*invtwoptDp8 * (
      &   1d0/(za(k6,e6))/(zb(p2,b2))*za(p2,e6)*za(p3,k5)*za(p7,p8)*zb(p1
      &    ,b2)*za345b(p8,p4) +1d0/(za(k6,e6))/(zb(p2,b2))/(zb(p8,b8))*
      &    za(p2,e6)*za(p3,k5)*zb(p1,b2)*za345b(p7,b8)*za345b(p8,p4) )
-      amp(2,1,1,1) = amp(2,1,1,1) + mt**2*prop26**(-1)*invtwoptDp8 * ( 
+      amp(2,1,1,1) = amp(2,1,1,1) + mt**2*prop26**(-1)*invtwoptDp8 * (
      &     -1d0/(zb(p2,b2))/(zb(p8,b8))*za(p3,k5)*za(p7,p8)*zb(p4,b8)*
      &    zb(b2,k6)*za26b(p2,p1) )
       amp(2,1,1,1) = amp(2,1,1,1) + mt**2*prop167**(-1)*prop58**(-1)
@@ -330,12 +330,12 @@ c--- choice of gauge vector
      &    za(p3,k5)*za(p7,p8)*za(b8,k5)*zb(p2,e6)*zb(p4,p8)*zb(p8,k5)*
      &    za26b(b2,p1) -1d0/(za(p2,b2))/(za(p8,b8))/(zb(k6,e6))*za(p3,k5
      &    )*za(b8,k5)*zb(p2,e6)*zb(p8,k5)*za345b(p7,p4)*za26b(b2,p1) )
-      amp(1,2,2,1) = amp(1,2,2,1) + mb*prop26**(-1)*invtwoptDp8 * (  - 
+      amp(1,2,2,1) = amp(1,2,2,1) + mb*prop26**(-1)*invtwoptDp8 * (  -
      &   1d0/(za(p2,b2))/(za(p8,b8))*za(p3,k5)*za(b2,k6)*zb(p1,p2)*
      &    za345b(p7,p8)*za345b(b8,p4) -1d0/(za(p2,b2))/(za(p8,b8))/(zb(
      &    k6,e6))*za(p3,k5)*zb(p2,e6)*za345b(p7,p8)*za345b(b8,p4)*
      &    za26b(b2,p1) )
-      amp(1,2,2,1) = amp(1,2,2,1) + mb*prop167**(-1)*prop58**(-1) * ( 
+      amp(1,2,2,1) = amp(1,2,2,1) + mb*prop167**(-1)*prop58**(-1) * (
      &     -1d0/(za(p2,b2))/(za(p8,b8))/(zb(p3,k5))/(zb(k6,e6))*za(p3,b8
      &    )*za(b2,p8)*zb(p1,e6)*zb(p3,p8)*zb(p4,p8)*za167b(p7,p2)*
      &    mbdk**2 +1d0/(za(p2,b2))/(za(p8,b8))/(zb(p3,k5))/(zb(k6,e6))*
@@ -344,7 +344,7 @@ c--- choice of gauge vector
      &    b2,p8)*za(b8,k5)*zb(p1,e6)*zb(p4,p8)*zb(p8,k5)*za167b(p7,p2)
      &     -1d0/(za(p2,b2))/(za(p8,b8))/(zb(k6,e6))*za(p3,k5)*za(b8,k5)*
      &    zb(p1,e6)*zb(p8,k5)*za167b(p7,p2)*za345b(b2,p4) )
-      amp(1,2,2,1) = amp(1,2,2,1) + mb*prop167**(-1)*invtwoptDp8 * ( 
+      amp(1,2,2,1) = amp(1,2,2,1) + mb*prop167**(-1)*invtwoptDp8 * (
      &     -1d0/(za(p2,b2))/(za(p8,b8))/(zb(k6,e6))*za(p3,k5)*zb(p1,e6)*
      &    za167b(p7,p2)*za345b(b2,p8)*za345b(b8,p4) )
       amp(1,2,2,1) = amp(1,2,2,1) + mt**2*mb*prop26**(-1)*invtwoptDp8
@@ -372,7 +372,7 @@ c--- choice of gauge vector
      &    k6,e6))*za(p3,p8)**2*za(p7,p8)*zb(p2,e6)*zb(p4,p8)*za26b(b2,
      &    p1)*mbdk +1d0/(za(p2,b2))/(za(p3,k5))/(zb(k6,e6))*za(p3,p8)**2
      &    *zb(p2,e6)*za345b(p7,p4)*za26b(b2,p1)*mbdk )
-      amp(1,2,1,2) = amp(1,2,1,2) + mb*prop167**(-1)*prop58**(-1) * ( 
+      amp(1,2,1,2) = amp(1,2,1,2) + mb*prop167**(-1)*prop58**(-1) * (
      &     -1d0/(za(p2,b2))/(za(p3,k5))/(zb(k6,e6))*za(p3,p8)**2*za(b2,
      &    p8)*zb(p1,e6)*zb(p4,p8)*za167b(p7,p2)*mbdk +1d0/(za(p2,b2))/(
      &    za(p3,k5))/(zb(k6,e6))*za(p3,p8)**2*zb(p1,e6)*za167b(p7,p2)*
@@ -397,7 +397,7 @@ c--- choice of gauge vector
      &    b2,k6)*za(p8,k5)*zb(p1,p2)*zb(b8,k5)*za345b(p7,p4) -1d0/(za(p2
      &    ,b2))/(zb(p8,b8))/(zb(k6,e6))*za(p3,k5)*za(p7,p8)*za(p8,k5)*
      &    zb(p2,e6)*zb(p4,p8)*zb(b8,k5)*za26b(b2,p1) )
-      amp(1,2,1,1) = amp(1,2,1,1) + mb*prop26**(-1)*prop58**(-1) * ( 
+      amp(1,2,1,1) = amp(1,2,1,1) + mb*prop26**(-1)*prop58**(-1) * (
      &   1d0/(za(p2,b2))/(zb(p8,b8))/(zb(k6,e6))*za(p3,k5)*za(p8,k5)*zb(
      &    p2,e6)*zb(b8,k5)*za345b(p7,p4)*za26b(b2,p1) +1d0/(za(p2,b2))/(
      &    zb(k6,e6))*za(p3,p8)*za(p7,p8)*za(p8,k5)*zb(p2,e6)*zb(p4,p8)*
@@ -410,11 +410,11 @@ c--- choice of gauge vector
      &    k6,e6))*za(p3,k5)*zb(p2,e6)*za345b(p7,b8)*za345b(p8,p4)*
      &    za26b(b2,p1) +1d0/(za(p2,b2))/(zb(k6,e6))*za(p3,k5)*za(p7,p8)*
      &    zb(p2,e6)*za345b(p8,p4)*za26b(b2,p1) )
-      amp(1,2,1,1) = amp(1,2,1,1) + mb*prop167**(-1)*prop58**(-1) * ( 
+      amp(1,2,1,1) = amp(1,2,1,1) + mb*prop167**(-1)*prop58**(-1) * (
      &   1d0/(za(p2,b2))/(zb(p3,k5))/(zb(p8,b8))/(zb(k6,e6))*za(p3,p8)*
      &    za(b2,p8)*zb(p1,e6)*zb(p3,b8)*zb(p4,p8)*za167b(p7,p2)*mbdk**2
      &     -1d0/(za(p2,b2))/(zb(p3,k5))/(zb(p8,b8))/(zb(k6,e6))*za(p3,p8
-     &    )*zb(p1,e6)*zb(p3,b8)*za167b(p7,p2)*za345b(b2,p4)*mbdk**2 - 
+     &    )*zb(p1,e6)*zb(p3,b8)*za167b(p7,p2)*za345b(b2,p4)*mbdk**2 -
      &   1d0/(za(p2,b2))/(zb(p8,b8))/(zb(k6,e6))*za(p3,k5)*za(b2,p8)*za(
      &    p8,k5)*zb(p1,e6)*zb(p4,p8)*zb(b8,k5)*za167b(p7,p2) +1d0/(za(p2
      &    ,b2))/(zb(p8,b8))/(zb(k6,e6))*za(p3,k5)*za(p8,k5)*zb(p1,e6)*
@@ -422,7 +422,7 @@ c--- choice of gauge vector
      &    e6))*za(p3,p8)*za(b2,p8)*za(p8,k5)*zb(p1,e6)*zb(p4,p8)*
      &    za167b(p7,p2) -1d0/(za(p2,b2))/(zb(k6,e6))*za(p3,p8)*za(p8,k5)
      &    *zb(p1,e6)*za167b(p7,p2)*za345b(b2,p4) )
-      amp(1,2,1,1) = amp(1,2,1,1) + mb*prop167**(-1)*invtwoptDp8 * ( 
+      amp(1,2,1,1) = amp(1,2,1,1) + mb*prop167**(-1)*invtwoptDp8 * (
      &   1d0/(za(p2,b2))/(zb(p8,b8))/(zb(k6,e6))*za(p3,k5)*zb(p1,e6)*
      &    za167b(p7,p2)*za345b(b2,b8)*za345b(p8,p4) +1d0/(za(p2,b2))/(
      &    zb(k6,e6))*za(p3,k5)*za(b2,p8)*zb(p1,e6)*za167b(p7,p2)*
@@ -466,16 +466,16 @@ c--- choice of gauge vector
      &    p7,p8)*za345b(b8,p4) +1d0/(za(p8,b8))/(zb(p2,b2))/(zb(k6,e6))*
      &    za(p3,k5)*zb(b2,e6)*za345b(p7,p8)*za345b(b8,p4)*za26b(p2,p1)
      &     )
-      amp(1,1,2,1) = amp(1,1,2,1) + mb*prop167**(-1)*prop58**(-1) * ( 
+      amp(1,1,2,1) = amp(1,1,2,1) + mb*prop167**(-1)*prop58**(-1) * (
      &   1d0/(za(p8,b8))/(zb(p2,b2))/(zb(p3,k5))/(zb(k6,e6))*za(p2,p8)*
      &    za(p3,b8)*zb(p1,e6)*zb(p3,p8)*zb(p4,p8)*za167b(p7,b2)*mbdk**2
      &     -1d0/(za(p8,b8))/(zb(p2,b2))/(zb(p3,k5))/(zb(k6,e6))*za(p3,b8
-     &    )*zb(p1,e6)*zb(p3,p8)*za167b(p7,b2)*za345b(p2,p4)*mbdk**2 - 
+     &    )*zb(p1,e6)*zb(p3,p8)*za167b(p7,b2)*za345b(p2,p4)*mbdk**2 -
      &   1d0/(za(p8,b8))/(zb(p2,b2))/(zb(k6,e6))*za(p2,p8)*za(p3,k5)*za(
      &    b8,k5)*zb(p1,e6)*zb(p4,p8)*zb(p8,k5)*za167b(p7,b2) +1d0/(za(p8
      &    ,b8))/(zb(p2,b2))/(zb(k6,e6))*za(p3,k5)*za(b8,k5)*zb(p1,e6)*
      &    zb(p8,k5)*za167b(p7,b2)*za345b(p2,p4) )
-      amp(1,1,2,1) = amp(1,1,2,1) + mb*prop167**(-1)*invtwoptDp8 * ( 
+      amp(1,1,2,1) = amp(1,1,2,1) + mb*prop167**(-1)*invtwoptDp8 * (
      &   1d0/(za(p8,b8))/(zb(p2,b2))/(zb(k6,e6))*za(p3,k5)*zb(p1,e6)*
      &    za167b(p7,b2)*za345b(p2,p8)*za345b(b8,p4) )
       amp(1,1,2,1) = amp(1,1,2,1) + mt**2*mb*prop26**(-1)*invtwoptDp8
@@ -503,7 +503,7 @@ c--- choice of gauge vector
      &    k6,e6))*za(p3,p8)**2*za(p7,p8)*zb(p4,p8)*zb(b2,e6)*za26b(p2,
      &    p1)*mbdk -1d0/(za(p3,k5))/(zb(p2,b2))/(zb(k6,e6))*za(p3,p8)**2
      &    *zb(b2,e6)*za345b(p7,p4)*za26b(p2,p1)*mbdk )
-      amp(1,1,1,2) = amp(1,1,1,2) + mb*prop167**(-1)*prop58**(-1) * ( 
+      amp(1,1,1,2) = amp(1,1,1,2) + mb*prop167**(-1)*prop58**(-1) * (
      &   1d0/(za(p3,k5))/(zb(p2,b2))/(zb(k6,e6))*za(p2,p8)*za(p3,p8)**2*
      &    zb(p1,e6)*zb(p4,p8)*za167b(p7,b2)*mbdk -1d0/(za(p3,k5))/(zb(p2
      &    ,b2))/(zb(k6,e6))*za(p3,p8)**2*zb(p1,e6)*za167b(p7,b2)*
@@ -528,20 +528,20 @@ c--- choice of gauge vector
      &    p3,k5)*za(p8,k5)*zb(p1,b2)*zb(b8,k5)*za345b(p7,p4) +1d0/(zb(p2
      &    ,b2))/(zb(p8,b8))/(zb(k6,e6))*za(p3,k5)*za(p7,p8)*za(p8,k5)*
      &    zb(p4,p8)*zb(b2,e6)*zb(b8,k5)*za26b(p2,p1) )
-      amp(1,1,1,1) = amp(1,1,1,1) + mb*prop26**(-1)*prop58**(-1) * ( 
+      amp(1,1,1,1) = amp(1,1,1,1) + mb*prop26**(-1)*prop58**(-1) * (
      &     -1d0/(zb(p2,b2))/(zb(p8,b8))/(zb(k6,e6))*za(p3,k5)*za(p8,k5)*
      &    zb(b2,e6)*zb(b8,k5)*za345b(p7,p4)*za26b(p2,p1) -1d0/(zb(p2,b2)
      &    )/(zb(k6,e6))*za(p3,p8)*za(p7,p8)*za(p8,k5)*zb(p4,p8)*zb(b2,
      &    e6)*za26b(p2,p1) +1d0/(zb(p2,b2))/(zb(k6,e6))*za(p3,p8)*za(p8,
      &    k5)*zb(b2,e6)*za345b(p7,p4)*za26b(p2,p1) )
-      amp(1,1,1,1) = amp(1,1,1,1) + mb*prop26**(-1)*invtwoptDp8 * (  - 
+      amp(1,1,1,1) = amp(1,1,1,1) + mb*prop26**(-1)*invtwoptDp8 * (  -
      &   1d0/(zb(p2,b2))*za(p2,k6)*za(p3,k5)*za(p7,p8)*zb(p1,b2)*za345b(
      &    p8,p4) -1d0/(zb(p2,b2))/(zb(p8,b8))*za(p2,k6)*za(p3,k5)*zb(p1,
      &    b2)*za345b(p7,b8)*za345b(p8,p4) -1d0/(zb(p2,b2))/(zb(p8,b8))/(
      &    zb(k6,e6))*za(p3,k5)*zb(b2,e6)*za345b(p7,b8)*za345b(p8,p4)*
      &    za26b(p2,p1) -1d0/(zb(p2,b2))/(zb(k6,e6))*za(p3,k5)*za(p7,p8)*
      &    zb(b2,e6)*za345b(p8,p4)*za26b(p2,p1) )
-      amp(1,1,1,1) = amp(1,1,1,1) + mb*prop167**(-1)*prop58**(-1) * ( 
+      amp(1,1,1,1) = amp(1,1,1,1) + mb*prop167**(-1)*prop58**(-1) * (
      &     -1d0/(zb(p2,b2))/(zb(p3,k5))/(zb(p8,b8))/(zb(k6,e6))*za(p2,p8
      &    )*za(p3,p8)*zb(p1,e6)*zb(p3,b8)*zb(p4,p8)*za167b(p7,b2)*
      &    mbdk**2 +1d0/(zb(p2,b2))/(zb(p3,k5))/(zb(p8,b8))/(zb(k6,e6))*
@@ -553,7 +553,7 @@ c--- choice of gauge vector
      &    ))/(zb(k6,e6))*za(p2,p8)*za(p3,p8)*za(p8,k5)*zb(p1,e6)*zb(p4,
      &    p8)*za167b(p7,b2) +1d0/(zb(p2,b2))/(zb(k6,e6))*za(p3,p8)*za(p8
      &    ,k5)*zb(p1,e6)*za167b(p7,b2)*za345b(p2,p4) )
-      amp(1,1,1,1) = amp(1,1,1,1) + mb*prop167**(-1)*invtwoptDp8 * ( 
+      amp(1,1,1,1) = amp(1,1,1,1) + mb*prop167**(-1)*invtwoptDp8 * (
      &     -1d0/(zb(p2,b2))/(zb(p8,b8))/(zb(k6,e6))*za(p3,k5)*zb(p1,e6)*
      &    za167b(p7,b2)*za345b(p2,b8)*za345b(p8,p4) -1d0/(zb(p2,b2))/(
      &    zb(k6,e6))*za(p2,p8)*za(p3,k5)*zb(p1,e6)*za167b(p7,b2)*

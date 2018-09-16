@@ -21,7 +21,7 @@ C     Author:R.K.Ellis, February 2013
 C     statement functions
       s4(p1,p2,p3,p4)=s(p1,p2)+s(p1,p3)+s(p1,p4)
      &               +s(p2,p3)+s(p2,p4)+s(p3,p4)
-C     end statement functions 
+C     end statement functions
 
 C     First index of d123 etc is helicity of Z (56) decay line
 C     Second index of d123 etc is helicity of (78) bbar-line
@@ -66,7 +66,7 @@ C*************
       d13(:,:)=0
       d13s(:,:)=0
 
-      if (nwz .eq. 1) then 
+      if (nwz .eq. 1) then
       d123s(1,1)=-TWZbbab(p1,p7,p3,p4,p5,p6,p2,p8)
       d123s(2,1)=-TWZbbab(p1,p7,p3,p4,p6,p5,p2,p8)
       d123s(1,2)=-TWZbbab(p1,p7,p3,p4,p5,p6,p8,p2)
@@ -102,7 +102,7 @@ C*************
       d13s(1,1)=-TWZbbnr2(p1,p7,p5,p6,p3,p4,p2,p8)
       d13s(1,2)=-TWZbbnr2(p1,p7,p5,p6,p3,p4,p8,p2)
 
-      elseif (nwz .eq. -1) then 
+      elseif (nwz .eq. -1) then
 
       d123s(1,1)=-TWZbbab(p8,p2,p3,p4,p5,p6,p7,p1)
       d123s(2,1)=-TWZbbab(p8,p2,p3,p4,p6,p5,p7,p1)

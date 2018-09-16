@@ -17,7 +17,7 @@ C     only enters through k5 and e5 in wave function
       prW(s16)=cone/dcmplx(s16-wmass**2,0d0)
       prt(s16)=cone/dcmplx(s16-mt**2,0d0*mt*twidth)
       izb(p1,p2)=cone/zb(p1,p2)
-   
+
       mw=wmass
 C-----since 1,2,3,4,6 are unchanged in demassification we may calculate
 C-----if we only use these vectors.
@@ -42,7 +42,7 @@ c      omal=1d0-al
       Ampw=cWWH*Ampw
       Amp=Ampw(1)+Ampf(1)+Ampt(1)
 c      enddo
-   
+
       ubhtdsqdk=cdabs(Amp*mdecay)**2
       return
       end

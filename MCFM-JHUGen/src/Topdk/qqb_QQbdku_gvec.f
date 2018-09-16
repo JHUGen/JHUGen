@@ -36,7 +36,7 @@ C----set all elements to zero
       enddo
 
       nDp1=n(4)*p(in,4)-n(1)*p(in,1)-n(2)*p(in,2)-n(3)*p(in,3)
-      if (abs(nDp1).gt.1d-3*abs(p(1,4))) then 
+      if (abs(nDp1).gt.1d-3*abs(p(1,4))) then
          write(*,*) 'Error for in=:',in
          write(*,*) 'cutoff',1d-3*abs(p(1,4))
          write(6,*) 'qqb_QQbdk_gvec:nDp1',nDp1
@@ -71,4 +71,4 @@ C----set all elements to zero
 
       return
       end
-      
+

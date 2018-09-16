@@ -42,8 +42,8 @@ C in is the label of the contracted line
       enddo
 
       call spinoru(6,p,za,zb)
-C   zab=<i-|k|j-> zba=<i+|k|j+> where k is an arbitrary 4-vector 
-c---Conventions of Bern, Dixon, Kosower, Weinzierl, 
+C   zab=<i-|k|j-> zba=<i+|k|j+> where k is an arbitrary 4-vector
+c---Conventions of Bern, Dixon, Kosower, Weinzierl,
 c---ie, za(i,j)*zb(j,i)=s(i,j)
       call spinork(6,p,zab,zba,n)
 
@@ -57,9 +57,9 @@ c---ie, za(i,j)*zb(j,i)=s(i,j)
       gqbZqbg_cs(icol,pq,pl)=0d0
       qbgZqbg_cs(icol,pq,pl)=0d0
       ggZqbq_cs(icol,pq,pl) =0d0
-      enddo      
-      enddo      
-      enddo      
+      enddo
+      enddo
+      enddo
 
       if (in .eq. 1) then
 Cargument 1-4 represent (1) incoming quark line
@@ -115,7 +115,7 @@ c---  the colour structures should be interchanged too
           call z2jetsqn(5,2,1,6,p,n,za,zb,zab,zba,gqbZqbg)
           call storezcsv(gqbZqbg_cs)
       endif
-      
+
       prop=s(3,4)/dcmplx((s(3,4)-zmass**2),zmass*zwidth)
       fac=v*xn/four*(esq*gsq)**2*two
 
@@ -129,9 +129,9 @@ c---  the colour structures should be interchanged too
       gqbZqbg_cs(icol,pq,pl)=aveqg*fac*gqbZqbg_cs(icol,pq,pl)
       qbgZqbg_cs(icol,pq,pl)=aveqg*fac*qbgZqbg_cs(icol,pq,pl)
       ggZqbq_cs(icol,pq,pl) =avegg*fac*ggZqbq_cs(icol,pq,pl)
-      enddo      
-      enddo      
-      enddo      
+      enddo
+      enddo
+      enddo
 
       if (Gflag) then
       do j=-nf,nf
@@ -209,7 +209,7 @@ c---  the colour structures should be interchanged too
 
       return
       end
-      
+
 
       subroutine storezcsv(p1p2)
 c-- this routine transfers the information on the colour structure
@@ -218,7 +218,7 @@ c-- for the Z2jet_gvec matrix elements into elements of p1p2
       include 'mmsqv_cs.f'
       integer icol,pq,pl
       double precision p1p2(0:2,2,2)
-      
+
       do pq=1,2
       do pl=1,2
       do icol=0,2
@@ -226,7 +226,7 @@ c-- for the Z2jet_gvec matrix elements into elements of p1p2
       enddo
       enddo
       enddo
-      
+
       return
       end
-      
+

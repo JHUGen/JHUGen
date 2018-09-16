@@ -11,7 +11,7 @@ C---- (These are twiddle functions, c.f.arXiv:1101.5947[hep-ph],Eq.(91))
       include 'qdef.f'
       double precision s23
       integer e1,p2,p3,e4
- 
+
       s23=s(p2,p3)
       BSYA1fggpppp=
      & -2d0*mt*(za(e1,e4)*zab(p2,q1,p2)-za(p2,e1)*za(p3,e4)*zb(p2,p3))

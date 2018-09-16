@@ -6,7 +6,7 @@ C     NEW VERSIONS !!!! JANUARY 1990  (AS DESCRIBED IN          C
 C     "PARTON DISTRIBUTIONS ... " P.N. HARRIMAN, A.D. MARTIN,   C
 C     R.G. ROBERTS AND W.J. STIRLING PREPRINT DTP-90-04 )       C
 C                                                               C
-C         ********* DEBUGGED APRIL 1990********                 C 
+C         ********* DEBUGGED APRIL 1990********                 C
 C                                                               C
 C         ****** NOW DOWN TO X=10^-5 **********                 C
 C                                                               C
@@ -45,7 +45,7 @@ C***************************************************************C
       RETURN
       END
 C
-      SUBROUTINE STRC27(X,SCALE,UPV,DNV,SEA,STR,CHM,BOT,GLU) 
+      SUBROUTINE STRC27(X,SCALE,UPV,DNV,SEA,STR,CHM,BOT,GLU)
 
 C :::::::::::: HARRIMAN MARTIN ROBERTS STIRLING (E) sea=ubar=dbar=2sbar at Q0**2
 
@@ -130,7 +130,7 @@ C 1=UV 2=DV 3=GLUE 4=(UBAR+DBAR)/2 5=CBAR 7=BBAR 6=SBAR
       RETURN
       END
 
-      SUBROUTINE STRC28(X,SCALE,UPV,DNV,SEA,STR,CHM,BOT,GLU) 
+      SUBROUTINE STRC28(X,SCALE,UPV,DNV,SEA,STR,CHM,BOT,GLU)
 
 C :::::::::::: HARRIMAN MARTIN ROBERTS STIRLING (B) sea=ubar=dbar=2sbar at Q0**2
 

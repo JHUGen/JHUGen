@@ -40,11 +40,11 @@ C in is the label of the contracted line
       enddo
 
       call spinoru(6,p,za,zb)
-C   zab=<i-|k|j-> zba=<i+|k|j+> where k is an arbitrary 4-vector 
-c---Conventions of Bern, Dixon, Kosower, Weinzierl, 
+C   zab=<i-|k|j-> zba=<i+|k|j+> where k is an arbitrary 4-vector
+c---Conventions of Bern, Dixon, Kosower, Weinzierl,
 c---ie, za(i,j)*zb(j,i)=s(i,j)
       call spinork(6,p,zab,zba,n)
-      
+
       do icol=0,2
       do pq=1,2
       do pl=1,2
@@ -53,9 +53,9 @@ c---ie, za(i,j)*zb(j,i)=s(i,j)
       gqbZqbg_cs(icol,pq,pl)=0d0
       qbgZqbg_cs(icol,pq,pl)=0d0
       ggZqbq_cs(icol,pq,pl) =0d0
-      enddo      
-      enddo      
-      enddo      
+      enddo
+      enddo
+      enddo
 
       if (in .eq. 1) then
 Cargument 1-4 represent (1) incoming quark line
@@ -94,7 +94,7 @@ C                       (4) outgoing gluon line contracted with n
           call z2jetsqn(5,2,1,6,p,n,za,zb,zab,zba,gqbZqbg)
           call storezcsv(gqbZqbg_cs)
       endif
-      
+
       prop=s(3,4)/dcmplx((s(3,4)-zmass**2),zmass*zwidth)
       fac=v*xn/four*(esq*gsq)**2*two
 
@@ -106,9 +106,9 @@ C                       (4) outgoing gluon line contracted with n
       gqbZqbg_cs(icol,pq,pl)=aveqg*fac*gqbZqbg_cs(icol,pq,pl)
       qbgZqbg_cs(icol,pq,pl)=aveqg*fac*qbgZqbg_cs(icol,pq,pl)
       ggZqbq_cs(icol,pq,pl) =avegg*fac*ggZqbq_cs(icol,pq,pl)
-      enddo      
-      enddo      
-      enddo      
+      enddo
+      enddo
+      enddo
 
       do j=-nflav,nflav,nflav
       do k=-nflav,nflav,nflav

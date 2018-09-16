@@ -1,7 +1,7 @@
       subroutine epem3j_v(p,msq)
       implicit none
 c--- simple modification of qqb_w_g.f: permuted 1 and 4, 2 and 3
-c--- to switch leptons with quarks and added a factor of Nc      
+c--- to switch leptons with quarks and added a factor of Nc
 
 c----Matrix element for W + jet production
 c----in order alpha_s^2
@@ -37,9 +37,9 @@ c--calculate spinor and dot-products (using BDK type notation)
 
 c--- calculate lowest order
       call epem3j(p,msq0)
-      
+
 c--- UV counterterm contains the finite renormalization to arrive
-c--- at MS bar scheme.      
+c--- at MS bar scheme.
 c      subuv=ason2pi*ca*(epinv*(11d0-4d0*tr*dble(nflav)/ca)-1d0)/6d0
       subuv_lc=ason2pi*ca*(epinv*11d0-1d0)/6d0
       subuv_tr=ason2pi*ca*(epinv*(-4d0*tr*dble(nflav)/ca))/6d0
@@ -51,7 +51,7 @@ c--- calculate propagator
       fac=2d0*cf*xnsq*xn*gwsq**2*gsq*prop
 
       call virt5colsep(iqqbg,za,zb,qqbWg_lc,qqbWg_slc)
-      
+
 c--- leading colour (Ca) goes in (0,0)
 c--- subleading colour (2*Cf-Ca) goes in (0,1)
 c--- Tr terms go in (1,0)
@@ -67,7 +67,7 @@ c--- this is a copy of the routine virt5.f, but changed from a function
 c---  to a subroutine and modified to extract different colour pieces
       subroutine virt5colsep(ip,za,zb,virt5lc,virt5slc)
       implicit none
-************************************************************************ 
+************************************************************************
 *     Author: R.K. Ellis                                               *
 *     July, 1999.                                                      *
 *   Given za and zb calculate the                                      *
@@ -75,7 +75,7 @@ c---  to a subroutine and modified to extract different colour pieces
 *   0--> qb_R(1)+q_L(2)+l_L(3)+a_R(4)+g_L/R(5)                         *
 *   at one loop with the corresponding lowest order amplitude          *
 *   summed over the polarizations of the emitted gluon                 *
-*   Virtual terms are in units of 
+*   Virtual terms are in units of
 *   (as/4/pi) (4 pi)^ep Gamma(1+ep)*Gamma(1-ep)^2/Gamma(1-2*ep)
 ************************************************************************
       include 'constants.f'
@@ -113,15 +113,15 @@ c---  different colour pieces separately
       integer j1,j2,j3,j4,j5
       double complex A51,A52,A5NLOm_lc,A5NLOm_slc,A5LOm
 
-* As originally written, the functions A51, A52 correspond to 
+* As originally written, the functions A51, A52 correspond to
 * 0 --> q_R(1)+qb_L(3)+g_R(2)+ebar_L(4)+e_R(5)
 * with all RH couplings
-* However we want it in our 
-* standard form 
+* However we want it in our
+* standard form
 *       0--> qb_R(1)+q_L(2)++e_L(3)+ebar_R(4)+g_L(5)
-* with all LH couplings 
+* with all LH couplings
 
-* so we have made the changes 
+* so we have made the changes
 *
 *                    'q+g+qb-'   (A51)
 *                   (1 ---> 2)

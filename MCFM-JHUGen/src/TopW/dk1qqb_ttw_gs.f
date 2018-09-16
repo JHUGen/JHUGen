@@ -25,7 +25,7 @@
       integer j,k
 
       ndmax=1
-      
+
       do j=-nf,nf
       do k=-nf,nf
         msqc(1,j,k)=0d0
@@ -40,7 +40,7 @@ c--- special dipole for radiation in top decay
 
 c--- form of subtraction depends on whether b-quark in decay is massless or not
       if (mb .lt. 1d-6) then
-c----- massless case      
+c----- massless case
         omz=ptDpg/(ptDpb+ptDpg-pbDpg)
         z=1d0-omz
         xr=dsqrt(pwsq/mt**2)
@@ -52,20 +52,20 @@ c----- massless case
         endif
         fac=gsq*cf*(1d0/pbDpg*(2d0/omz-1d0-z)-(mt/ptDpg)**2)
       else
-c----- massive case    
-c-----  (no alpha-dependence at present)  
+c----- massive case
+c-----  (no alpha-dependence at present)
         fac=gsq*cf*((mt**2+mb**2-pwsq)/(ptDpg*pbDpg)
      &             -(mt/ptDpg)**2-(mb/pbDpg)**2)
-      endif      
-      
-      call qqb_ttw(q,msq) 
+      endif
+
+      call qqb_ttw(q,msq)
 
       do j=-nf,nf
       do k=-nf,nf
       msqc(1,j,k)=fac*msq(j,k)
       enddo
       enddo
-                        
+
       return
       end
 

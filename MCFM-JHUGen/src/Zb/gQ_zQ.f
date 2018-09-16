@@ -20,7 +20,7 @@
       integer j,k,hq,hl
       double precision msq(-nf:nf,-nf:nf),p(mxpart,4),fac
       double complex prop
-      double precision 
+      double precision
      . AqgZq2(2,2), AqbgZqb2(2,2),AgqbZqb2(2,2),AgqZq2(2,2)
       integer,parameter::swap(2)=(/2,1/)
 
@@ -29,10 +29,10 @@
       msq(j,k)=0d0
       enddo
       enddo
-      
+
       call dotem(5,p,s)
       call spinoru(5,p,za,zb)
-      
+
       prop=s(3,4)/Dcmplx((s(3,4)-zmass**2),zmass*zwidth)
       fac=4d0*V*esq**2*gsq
 
@@ -44,7 +44,7 @@
         AqbgZqb2(hq,hl)=AqgZq2(hq,swap(hl))
         AgqbZqb2(hq,hl)=AgqZq2(hq,swap(hl))
       enddo
-      enddo 
+      enddo
 
       do j=-flav,flav,flav
       do k=-flav,flav,flav
@@ -80,6 +80,6 @@
  20   continue
       enddo
       enddo
-      
+
       return
       end

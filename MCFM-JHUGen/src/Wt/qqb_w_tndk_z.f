@@ -26,7 +26,7 @@
 CDTS (5.45,5.77)
       mbar15=mass2/dsqrt(-2d0*dot(p,1,5))
       mbar25=mass2/dsqrt(-2d0*dot(p,2,5))
-     
+
 c--- sum over regular and plus terms
       do is=1,3
 c--- (q,g)
@@ -61,7 +61,7 @@ c      if (runstring(1:3) .eq. 'sub') then
       Q2(a,g,g,is)=Q1(q,g,g,is)
 c      endif
       endif
- 
+
 c--- these are terms coming from the diagrams which are
 c--- a 4-quark contribution, with (q,q~)->g in the initial state
       Q2(g,q,a,is)=ason4pi*2d0*cf*ii_mgq(z,xl12,mbar12,is)
@@ -73,8 +73,8 @@ c--- a 4-quark contribution, with (q,q~)->g in the initial state
       Q1(g,a,q,is)=Q2(g,q,a,is)
       Q1(g,a,a,is)=Q2(g,q,a,is)
       Q1(g,q,q,is)=Q2(g,q,a,is)
-      
+
       enddo
-      
+
       return
       end

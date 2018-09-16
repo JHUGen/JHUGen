@@ -10,8 +10,8 @@ C     xpi(9-10) = s12,s23
 C     xpi(11) = +xpi(5)+xpi(6)+xpi(7)+xpi(8)-xpi(9)-xpi(10)
 C     xpi(12) = -xpi(5)+xpi(6)-xpi(7)+xpi(8)+xpi(9)+xpi(10)
 C     xpi(13) = +xpi(5)-xpi(6)+xpi(7)-xpi(8)+xpi(9)+xpi(10)
-c      y13=abs(m1+m3s-s12)       
-c      y24=abs(m2+m4s-s23)       
+c      y13=abs(m1+m3s-s12)
+c      y24=abs(m2+m4s-s23)
       y13=xpi(1)+xpi(3)-xpi(9)
       y24=xpi(2)+xpi(4)-xpi(10)
       if (qlzero(y13) .or. qlzero(y24)) then

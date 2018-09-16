@@ -5,7 +5,7 @@
 *     Ocotber 2011.                                                    *
 *     Virtual matrix elements squared for the process                  *
 *                                                                      *
-*     q(-p1) +qbar(-p2)=bbar(p6)+e-(p7)+nubar(p8)+nu(p3)+e+(p4)+b(p5)  * 
+*     q(-p1) +qbar(-p2)=bbar(p6)+e-(p7)+nubar(p8)+nu(p3)+e+(p4)+b(p5)  *
 ************************************************************************
 c--- Computed using the helicity amplitudes from:Badger,Sattler,Yundin
 c--- arXiv:1101.5947[hep-ph]
@@ -65,8 +65,8 @@ C----Include factor for hadronic decays of W
 C-----setup top and anti-top momenta and calculate integral functions
       do nu=1,4
       q(1,nu)=p(3,nu)+p(4,nu)+p(5,nu)
-      q(2,nu)=p(1,nu)    
-      q(3,nu)=p(2,nu)    
+      q(2,nu)=p(1,nu)
+      q(3,nu)=p(2,nu)
       q(4,nu)=p(6,nu)+p(7,nu)+p(8,nu)
       enddo
       call integralfill(q)
@@ -75,11 +75,11 @@ C-----setup top and anti-top momenta and calculate integral functions
 C-----make top and topb massless wrt e+(4) and e-(7) momentum
       c1=mt**2/(s34+s45)
       c4=mt**2/(s67+s78)
-      
+
       do nu=1,4
       q(1,nu)=q(1,nu)-c1*p(4,nu)
-      q(2,nu)=p(1,nu)    
-      q(3,nu)=p(2,nu)    
+      q(2,nu)=p(1,nu)
+      q(3,nu)=p(2,nu)
       q(4,nu)=q(4,nu)-c4*p(7,nu)
       q(e1,nu)=p(4,nu)
       q(e4,nu)=p(7,nu)
@@ -94,7 +94,7 @@ C-----make top and topb massless wrt e+(4) and e-(7) momentum
       enddo
       enddo
 
-C---currently s(1,2) and s(1,3) are given as s(1f,2) and s(1f,3)      
+C---currently s(1,2) and s(1,3) are given as s(1f,2) and s(1f,3)
 C---but we want the full s(1,2) and s(1,3)
 
       s(1,2)=dble(zab(2,q1,2))
@@ -149,12 +149,12 @@ c--- renormalization
      & -Cf*(3d0*(epinv+log(musq/mt**2))+5d0))
       resqqb1=resqqb1+ren*resqqb0
       resqbq1=resqbq1+ren*resqqb0
-     
+
       ren=(
      & +2d0*((nlf/3d0-11d0/6d0*xn)*epinv+xn/6d0)
      & -(xn**2-1d0)/2d0/xn*(3d0*(epinv+log(musq/mt**2))+5d0))
       resgg1=resgg1+ren*resgg0
-      
+
 C----set all elements to zero
       do j=-nf,nf
       do k=-nf,nf
@@ -175,6 +175,6 @@ c          msq(j,j)=avegg*resgg0
 c          msq(j,-j)=aveqq*resqqb0
       endif
       enddo
-      
+
       return
       end

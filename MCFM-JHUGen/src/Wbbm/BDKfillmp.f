@@ -29,7 +29,7 @@ c      write(6,*) 'BDKFill:musq',musq
       B0p3(e)=qlI2(mqsq,zip,mqsq,musq,e)
       enddo
       p2Dp3=0.5d0*(s(k2,k3)-2d0*mqsq)
-    
+
 C---Contribution of Final vertex function (massless case)
 c       ASLmp(-2)=ASLmp(-2)-lo
 c      ASLmp(-1)=ASLmp(-1)-(1.5d0+xl23)*lo
@@ -46,9 +46,9 @@ C   (-2*p2.p3*C0(p2,p3,m,0,m)-3/2*B0(p23,m,m)+2*B0(p3,0,m)-1/2)
       ASLmp(-2)=VV(-2)*lo
       ASLmp(-1)=VV(-1)*lo
       ASLmp(0)=VV(0)*lo+BDK1211mp(k3,k2,k1,k4,k5,k6,zb,za)
-       
+
       end
- 
- 
- 
+
+
+
 

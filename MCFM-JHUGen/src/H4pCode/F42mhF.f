@@ -19,7 +19,7 @@ c     . +qsq*qlI3(0d0,0d0,qsq,0d0,0d0,0d0,musq,0)/2d0
 
 c--- NOTE: checked on 8/30/09 that Lsm1_2mht == (expression above)
       F42mhF=Lsm1_2mht(s,t,psq,qsq)
-      
+
       return
       end
 

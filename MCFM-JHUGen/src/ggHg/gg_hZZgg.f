@@ -2,8 +2,8 @@
       implicit none
 c---Matrix element squared averaged over initial colors and spins
 c
-c     g(-p1)+g(-p2)-->H -->  Z(mu^-(p5)+mu^+(p6)) 
-c                          + Z (e^-(p3)+e^+(p4))+g(p_i5=7)+g(p_i6=8) 
+c     g(-p1)+g(-p2)-->H -->  Z(mu^-(p5)+mu^+(p6))
+c                          + Z (e^-(p3)+e^+(p4))+g(p_i5=7)+g(p_i6=8)
 c
 
       include 'constants.f'
@@ -30,7 +30,7 @@ c     .                     ,Hgggg_1652,Hgggg_1562,Hgggg_1526
       double precision Hqaqa_a,Hqaqa_b,Hqaqa_i
       double precision Haqaq_a,Haqaq_b,Haqaq_i
       double precision Hqaaq_a,Hqaaq_b,Hqaaq_i
-      double precision 
+      double precision
      . Hqrqr,Hqqqq,
      . Habab,Haaaa,
      . Hqarb,Hqaqa,Hqbqb,
@@ -41,7 +41,7 @@ c     .                     ,Hgggg_1652,Hgggg_1562,Hgggg_1526
 
 
 C---fill spinor products up to maximum number
-      call spinoru(i6,p,za,zb)  
+      call spinoru(i6,p,za,zb)
 
 C   Deal with Higgs decay to b-bbar
       s3456=s(3,4)+s(3,5)+s(3,6)+s(4,5)+s(4,6)+s(5,6)
@@ -52,13 +52,13 @@ C   Deal with Higgs decay to b-bbar
       hdecay=hdecay/((s(3,4)-zmass**2)**2+(zmass*zwidth)**2)
       hdecay=hdecay/((s(5,6)-zmass**2)**2+(zmass*zwidth)**2)
       hdecay=hdecay/((s3456-hmass**2)**2+(hmass*hwidth)**2)
-      
+
       Asq=(as/(3d0*pi))**2/vevsq
       fac=gsq**2*Asq*hdecay
 
 C--four gluon terms
       call h4g(1,2,i5,i6,Hgggg,Hgggg_1256,Hgggg_1265,Hgggg_1625)
-      
+
 C--two quark two gluon terms
       call hqqggdfm(1,2,i5,i6,Hqagg,Hqagg_ab,Hqagg_ba,Hqagg_sym)
       call hqqggdfm(2,1,i5,i6,Haqgg,Haqgg_ab,Haqgg_ba,Haqgg_sym)
@@ -76,7 +76,7 @@ C====symmetric in first two arguments
 c      Hgaag=Hgqqg
 
       call hqqggdfm(i6,i5,1,2,Hggqa,Hggqa_ab,Hggqa_ba,Hggqa_sym)
-      
+
 C---four quark terms
       call H4qn(1,2,i5,i6,Hqrqr)
       call H4qi(1,2,i5,i6,Hqqqq,Hqqqq_a,Hqqqq_b,Hqqqq_i)
@@ -94,7 +94,7 @@ c      write(6,*) 'Hqaqa',Hqaqa_a,Hqaqa_b,Hqaqa_i
 c      write(6,*) 'Hqbqb',Hqbqb
 C-qbq
       Haqbr=Hqarb
-      
+
       Haqaq=Hqaqa
       Haqaq_a=Hqaqa_a
       Haqaq_b=Hqaqa_b
@@ -106,7 +106,7 @@ C-qbq
       msq(j,k)=0d0
       msq_struc(iqr,j,k)=0d0
 
-      if ((j.gt.0).and.(k.gt.0)) then 
+      if ((j.gt.0).and.(k.gt.0)) then
         if (j.eq.k) then
           msq(j,k)=0.5d0*aveqq*fac*Hqqqq
           msq_struc(iqq_a,j,k)=0.5d0*aveqq*fac*Hqqqq_a
@@ -119,8 +119,8 @@ C-qbq
           msq_struc(iqq_i,j,k)=0d0
         endif
       endif
-      
-      if ((j.lt.0).and.(k.lt.0)) then 
+
+      if ((j.lt.0).and.(k.lt.0)) then
         if (j.eq.k) then
           msq(j,k)=0.5d0*aveqq*fac*Haaaa
         else
@@ -173,7 +173,7 @@ C-qbq
         msq_struc(igg_ba,j,0)=aveqg*fac*Hqgqg_ba
         msq_struc(igg_sym,j,0)=aveqg*fac*Hqgqg_sym
       endif
-      
+
       if ((j.lt.0).and.(k.eq.0)) then
         msq(j,0)=aveqg*fac*Hagag
         msq_struc(igg_ab,j,0)=aveqg*fac*Hagag_ab
@@ -204,7 +204,7 @@ C-qbq
         msq_struc(igggg_b,0,0)=avegg*fac*0.5d0*Hgggg_1625
         msq_struc(igggg_c,0,0)=avegg*fac*0.5d0*Hgggg_1265
       endif
-      
+
       enddo
       enddo
 
@@ -213,8 +213,8 @@ c--- artificially store it in msq_struc(iqr,0,0), which is not
 c--- used for anything else
       call H4qi(1,i5,i6,2,Hqaaq,Hqaaq_a,Hqaaq_b,Hqaaq_i)
       msq_struc(iqr,0,0)=aveqq*fac*Hqaaq
-      
+
       return
       end
 
- 
+

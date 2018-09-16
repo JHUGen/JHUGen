@@ -40,7 +40,7 @@ c--   calculate propagators
       mhsq=ss+tt+uu
 
       msq(0,0)=
-     . avegg*fac*V*xn*(mhsq**4+ss**4+tt**4+uu**4)/(ss*tt*uu) 
+     . avegg*fac*V*xn*(mhsq**4+ss**4+tt**4+uu**4)/(ss*tt*uu)
       msq(1,-1)=+aveqq*fac*V/2d0*(tt**2+uu**2)/ss
       msq(0,+1)=-aveqg*fac*V/2d0*(ss**2+tt**2)/uu
       msq(+1,0)=-aveqg*fac*V/2d0*(ss**2+uu**2)/tt
@@ -56,6 +56,6 @@ c--   calculate propagators
       endif
       enddo
       enddo
-      
+
       return
       end

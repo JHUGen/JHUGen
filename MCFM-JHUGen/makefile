@@ -61,13 +61,13 @@ F90 = gfortran
 # Define CompileForMELA to compile for MELA libraries
 DoCompileForMELA = YES
 ifeq ($(DoCompileForMELA),YES)
-  FFLAGS 	= -fno-automatic -fno-f2c $(OMPFLAG) -O0 -fPIC -g -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
+  FFLAGS 	= -fno-automatic -fno-f2c $(OMPFLAG) -O2 -fPIC -g -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
   #FFLAGS 	= -fno-automatic -fno-f2c -cpp -DCompileForMELA $(OMPFLAG) -O0 -fPIC -g -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
   #FFLAGS 	=  -fno-f2c $(OMPFLAG) -O2 -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
   F90FLAGS = -fno-automatic -fno-f2c -DCompileForMELA $(OMPFLAG) -O2 -fPIC -g -I$(INCPATH) -I$(OBJNAME) -J$(OBJNAME)
   #F90FLAGS = -fno-f2c $(OMPFLAG) -I$(INCPATH) -I$(OBJNAME) -J$(OBJNAME)
 else
-  FFLAGS 	= -fno-automatic -fno-f2c $(OMPFLAG) -O0 -fPIC -g -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
+  FFLAGS 	= -fno-automatic -fno-f2c $(OMPFLAG) -O2 -fPIC -g -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
   #FFLAGS 	= -fno-automatic -fno-f2c -cpp $(OMPFLAG) -O0 -fPIC -g -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
   #FFLAGS 	=  -fno-f2c $(OMPFLAG) -O2 -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
   F90FLAGS = -fno-automatic -fno-f2c $(OMPFLAG) -O2 -fPIC -g -I$(INCPATH) -I$(OBJNAME) -J$(OBJNAME)
@@ -130,14 +130,19 @@ DIRS	=	$(MCFMHOME):\
                 $(SOURCEDIR)/DM/PS_DM:$(SOURCEDIR)/Trigam:  \
                 $(SOURCEDIR)/VV:$(SOURCEDIR)/Fourgam:  \
                 $(SOURCEDIR)/Trigam/Mad:  \
-		$(SOURCEDIR)/pwgplots:$(SOURCEDIR)/Multichan:$(SOURCEDIR)/TopH/Store/Mad\
-		$(SOURCEDIR)/UTools:$(SOURCEDIR)/WBFZZ\
+		$(SOURCEDIR)/pwgplots:$(SOURCEDIR)/Multichan:$(SOURCEDIR)/TopH/Store/Mad:\
+		$(SOURCEDIR)/UTools:$(SOURCEDIR)/WBFZZ:\
                 $(SOURCEDIR)/WBFWW:$(SOURCEDIR)/WBFWpWp:$(SOURCEDIR)/WBFWZ
 
 # -----------------------------------------------------------------------------
 # Specify the object files. 
 
 WBFFILES = \
+testWBFVVApartComb.o \
+getVVZZamps.o \
+getVVWWamps.o \
+getQQZZQQstrongamps.o \
+getQQWWQQstrongamps.o \
 getvbfpoint.o \
 comparevbf.o \
 qq_WZqqstrong.o \
@@ -812,6 +817,7 @@ count_parts.o \
 coupling.o \
 coupling2.o \
 couplz.o \
+couplzajk.o \
 dclaus.o \
 determinefilenames.o \
 dipoles.o \
@@ -887,6 +893,9 @@ writeinput.o \
 writeout.o \
 dips_mass.o \
 zeromsq.o \
+addtempmsqtomsq.o \
+convertPLabelToPDGId.o \
+ParticleIdFunctions.o \
 HVVSpinZeroDynamicCouplings.o \
 anomhvvamps.o
 

@@ -2,6 +2,7 @@
       implicit none
       include 'constants.f'
       include 'cmplxmass.f'
+      include 'masses.f'
       include 'zprods_decl.f'
       include 'sprods_com.f'
       include 'ewcharge.f'
@@ -39,9 +40,9 @@ C-----end statement functions
       twop34Dp1278=s56-s3456-s34
       twop56Dp1278=s34-s3456-s56
 
-      propw34=s34-cwmass2
-      propz56=s56-czmass2
-      propw3456=s3456-cwmass2
+      propw34=s34-dcmplx(wmass**2,-wmass*wwidth)
+      propz56=s56-dcmplx(zmass**2,-zmass*zwidth)
+      propw3456=s3456-dcmplx(wmass**2,-wmass*wwidth)
 
       q3=qn
       l3=ln
@@ -67,7 +68,7 @@ C-----end statement functions
       do jdu2=1,2
       amp(jdu2,1,1)= + cwmass2**(-1)*cxw**(-1)*propW34**(-1)*
      & propW3456**(-1)*s28**(-1)*s128**(-1) * ( za(p1,p8)*za(p5,p3)**2*
-     &    zb(p1,p2)*zb(p6,p3)*zb(p4,p5)*zab2(p7,p5,p6,p1)*s345**(-1) + 
+     &    zb(p1,p2)*zb(p6,p3)*zb(p4,p5)*zab2(p7,p5,p6,p1)*s345**(-1) +
      &    za(p1,p8)*za(p5,p3)**2*zb(p1,p2)*zb(p6,p3)*zb(p4,p5)*zab2(p7,
      &    p3,p4,p1)*s345**(-1) - za(p1,p8)*za(p5,p3)*za(p3,p5)*zb(p1,p2
      &    )*zb(p5,p6)*zb(p4,p3)*zab2(p7,p5,p6,p1)*s345**(-1) - za(p1,p8
@@ -90,7 +91,7 @@ C-----end statement functions
       amp(jdu2,1,1) = amp(jdu2,1,1) + cwmass2**(-1)*cxw**(-1)*
      & propW34**(-1)*propW3456**(-1)*s28**(-1) * ( za(p7,p8)*za(p5,p3)
      &    **2*zb(p1,p2)*zb(p6,p3)*zb(p4,p5)*s345**(-1) - za(p7,p8)*za(
-     &    p5,p3)*za(p3,p5)*zb(p1,p2)*zb(p5,p6)*zb(p4,p3)*s345**(-1) + 
+     &    p5,p3)*za(p3,p5)*zb(p1,p2)*zb(p5,p6)*zb(p4,p3)*s345**(-1) +
      &    za(p7,p8)*za(p5,p3)*zb(p1,p2)*zb(p6,p4)*zba2(p4,p3,p5,p4)*
      &    s345**(-1) )
       amp(jdu2,1,1) = amp(jdu2,1,1) + cxw**(-1)*propW34**(-1)*
@@ -343,7 +344,7 @@ C-----end statement functions
      &    *za(p7,p8)*zb(p1,p4)*zba2(p5,p3,p4,p6)*zba2(p2,p7,p8,p3) )
       amp(jdu2,2,1)= + cwmass2**(-1)*cxw**(-1)*propW34**(-1)*
      & propW3456**(-1)*s28**(-1)*s128**(-1) * ( za(p1,p2)*za(p5,p3)**2*
-     &    zb(p1,p8)*zb(p6,p3)*zb(p4,p5)*zab2(p7,p5,p6,p1)*s345**(-1) + 
+     &    zb(p1,p8)*zb(p6,p3)*zb(p4,p5)*zab2(p7,p5,p6,p1)*s345**(-1) +
      &    za(p1,p2)*za(p5,p3)**2*zb(p1,p8)*zb(p6,p3)*zb(p4,p5)*zab2(p7,
      &    p3,p4,p1)*s345**(-1) - za(p1,p2)*za(p5,p3)*za(p3,p5)*zb(p1,p8
      &    )*zb(p5,p6)*zb(p4,p3)*zab2(p7,p5,p6,p1)*s345**(-1) - za(p1,p2
@@ -366,7 +367,7 @@ C-----end statement functions
       amp(jdu2,2,1) = amp(jdu2,2,1) + cwmass2**(-1)*cxw**(-1)*
      & propW34**(-1)*propW3456**(-1)*s28**(-1) * ( za(p7,p2)*za(p5,p3)
      &    **2*zb(p1,p8)*zb(p6,p3)*zb(p4,p5)*s345**(-1) - za(p7,p2)*za(
-     &    p5,p3)*za(p3,p5)*zb(p1,p8)*zb(p5,p6)*zb(p4,p3)*s345**(-1) + 
+     &    p5,p3)*za(p3,p5)*zb(p1,p8)*zb(p5,p6)*zb(p4,p3)*s345**(-1) +
      &    za(p7,p2)*za(p5,p3)*zb(p1,p8)*zb(p6,p4)*zba2(p4,p3,p5,p4)*
      &    s345**(-1) )
       amp(jdu2,2,1) = amp(jdu2,2,1) + cxw**(-1)*propW34**(-1)*

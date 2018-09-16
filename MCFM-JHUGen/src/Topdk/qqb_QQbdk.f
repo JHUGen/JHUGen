@@ -6,7 +6,7 @@
 *     calculate the element squared and subtraction terms              *
 *     for the process                                                  *
 *                                                                      *
-*     q(-p1) +qbar(-p2)=bbar(p6)+e-(p7)+nubar(p8)+nu(p3)+e+(p4)+b(p5)  * 
+*     q(-p1) +qbar(-p2)=bbar(p6)+e-(p7)+nubar(p8)+nu(p3)+e+(p4)+b(p5)  *
 *                                                                      *
 *     Top is kept strictly on-shell although all spin correlations     *
 *     are retained.                                                    *
@@ -120,9 +120,9 @@ C---fill qb-q, gg and q-qb elements
       if ((j .lt. 0) .or. (j .gt. 0)) then
           msq(j,-j)=qqb
 C Division of quark into color structures is arbitrary
-          msq_cs(1,j,-j)=qqb/3d0 
-          msq_cs(2,j,-j)=qqb/3d0 
-          msq_cs(0,j,-j)=qqb/3d0 
+          msq_cs(1,j,-j)=qqb/3d0
+          msq_cs(2,j,-j)=qqb/3d0
+          msq_cs(0,j,-j)=qqb/3d0
       elseif (j .eq. 0) then
           msq(0,0)=msq_cs(1,0,0)+msq_cs(2,0,0)+msq_cs(0,0,0)
 C msq_cs(1,0,0)+msq_cs(2,0,0)+msq_cs(0,0,0)

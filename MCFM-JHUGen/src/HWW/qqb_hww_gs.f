@@ -6,7 +6,7 @@ C----averaged over initial colours and spins
 c     g(-p1)+g(-p2)-->H -->  W^- (e^-(p5)+nubar(p6)) + W^+ (nu(p3)+e^+(p4))
 c     +g(p7)
 c---
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'ptilde.f'
       include 'qqgg.f'
@@ -52,7 +52,7 @@ c---- entries are left as dummies
       enddo
       enddo
 
-      return      
+      return
       end
 
 

@@ -45,7 +45,7 @@ c--- for nwz=+1, initial state is b, for nwz=-1 it is b~
       do j=-nf,nf
       do k=-nf,nf
       msqv(j,k)=0d0
-      
+
       if     ((j .eq. ib) .and. (k .gt. 0)) then
       msqv(j,k)=(Vsq(-1,k)+Vsq(-2,k)+Vsq(-3,k)+Vsq(-4,k)+Vsq(-5,k))
      . *bu
@@ -59,7 +59,7 @@ c--- for nwz=+1, initial state is b, for nwz=-1 it is b~
       msqv(j,k)=(Vsq(j,+1)+Vsq(j,+2)+Vsq(j,+3)+Vsq(j,+4)+Vsq(j,+5))
      . *ubarb
       endif
-      
+
       enddo
       enddo
 

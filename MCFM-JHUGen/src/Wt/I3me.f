@@ -3,20 +3,20 @@
       include 'constants.f'
 c     Triangle function with one internal mass and two spacelike
 c     offshell lines and one timelike of mass k1sq
-c 
+c
 c                         | k2
 c                         |
 c                         /\
 c                        /__\____
-c               k3  *****-------- k1,(k1sq=msq)  
+c               k3  *****-------- k1,(k1sq=msq)
 c
-c   Mass of the one massive internal line is equal to k1sq 
+c   Mass of the one massive internal line is equal to k1sq
 c
 c   Adapted from
 c   %\cite{Denner:kt}
 c   \bibitem{Denner:kt}
 c   A.~Denner,
-c   %``Techniques For Calculation Of Electroweak Radiative 
+c   %``Techniques For Calculation Of Electroweak Radiative
 c   Corrections At The One Loop Level And Results For W Physics At Lep-200,''
 c   Fortsch.\ Phys.\  {\bf 41}, 307 (1993).
 c   %%CITATION = FPYKA,41,307;%%
@@ -65,7 +65,7 @@ c   %%CITATION = FPYKA,41,307;%%
       yim(i)=y0(i)-xm(i)
       I3mer=I3mer+polylog(y0(i),yip(i))+polylog(y0(i),yim(i))
 
-      enddo 
+      enddo
 
       aa=(y0(1)-1d0)/yim(1)
       bb=y0(0)/yip(0)

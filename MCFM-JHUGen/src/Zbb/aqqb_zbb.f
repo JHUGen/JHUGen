@@ -20,14 +20,14 @@ c      aqqb_zbb=
 c     & +zb(i1,i4)*za(i5,i2)*t2a(i3,i1,i4,i6)/(prop*s256)
 c     & +za(i3,i2)*zb(i6,i1)*t2a(i5,i2,i3,i4)/(prop*s234)
 
-c      return 
+c      return
 c      end
 
       double complex function aqqb_zbb_new(i1,i2,i3,i4,i5,i6)
 c--- This corresponds to A++(1,2,3,4) of eq. (12.3) in BDK
 c    The notation of BDK calculates the following amplitude
 c
-c     q3(L)----<----------q2            q3(L)------<--------q2          
+c     q3(L)----<----------q2            q3(L)------<--------q2
 c                 0                             0
 c                 0                             0
 c                 0                             0
@@ -48,7 +48,7 @@ C          -aqqb_zbb_new(i4,i3,i2,i1,i6,i5)
       double complex t2a
       double precision s123,s234,prop
 c--- statement function
-      t2a(i1,i2,i3,i4)=za(i1,i2)*zb(i2,i4)+za(i1,i3)*zb(i3,i4) 
+      t2a(i1,i2,i3,i4)=za(i1,i2)*zb(i2,i4)+za(i1,i3)*zb(i3,i4)
 
       s123=s(i1,i2)+s(i1,i3)+s(i2,i3)
       s234=s(i2,i3)+s(i2,i4)+s(i3,i4)
@@ -58,5 +58,5 @@ c--- statement function
      & +zb(i1,i2)*za(i5,i4)*t2a(i3,i1,i2,i6)/(prop*s123)
      & +za(i3,i4)*zb(i6,i1)*t2a(i5,i3,i4,i2)/(prop*s234)
 
-      return 
+      return
       end

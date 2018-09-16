@@ -38,15 +38,15 @@
       msq(j,k)=0d0
       enddo
       enddo
-      
+
 c--- veto this contribution if we're doing the subtraction and pt(b~)>25 GeV
 c      if (runstring(1:3) .eq. 'sub') then
 c        if (dsqrt(p(8,1)**2+p(8,2)**2) .gt. 60d0) then
 cc          return
 c        endif
 c      endif
-      
-c--- variable to determine whether or not to subtract tt contribution      
+
+c--- variable to determine whether or not to subtract tt contribution
       ttsubtract=.false.
 c      if (runstring(1:3) .eq. 'sub') then
 c        ttsubtract=.true.
@@ -63,7 +63,7 @@ c--- gg and qqb initial states should be zero
           nearmt=.false.
         endif
 c      endif
-      
+
       fac=gsq**2*gwsq**4
 
       propw=(two*dot(p,3,4)-wmass**2)**2+(wmass*wwidth)**2
@@ -96,8 +96,8 @@ c        enddo
 c        enddo
 c        write(6,*) 'massless ',msq_gg
 c--- end of check
-        
-c--- modifications to enable calculations with a massive b~ quark        
+
+c--- modifications to enable calculations with a massive b~ quark
 c        do ia=1,2
 c        do ig=1,2
 c        write(6,*) 'ampgg_ag',ia,ig,abs(ampgg_ag(ia,ig))**2/prop
@@ -138,9 +138,9 @@ c--- contribution from non-resonant diagrams only
         enddo
         enddo
         enddo
-     
+
       endif
-      
+
       msq_gg=0d0
 c--- sum over helicities of gluons, b-quark
       do ia=1,2
@@ -173,7 +173,7 @@ c--- subtract the gg->tt and qqb->tt contributions if necessary
 c        call qqb_ttb(q,msqa)
 c        msq_gg=msq_gg-msqa(0,0)/avegg/fac
       endif
-              
+
 c--- calculate matrix elements for q+q~ initial state
 c      if (nearmt) then
 c        msq_qqb=0d0

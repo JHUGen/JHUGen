@@ -14,9 +14,9 @@
       write(6,*) 'p8',p(8,1),p(8,2),p(8,3),p(8,4)
       write(6,*) 'p9',p(9,1),p(9,2),p(9,3),p(9,4)
       write(6,*) 'p0',p(10,1),p(10,2),p(10,3),p(10,4)
-        
+
       open(unit=7,file='kin.blo',status='unknown')
-      do iout=7,7 
+      do iout=7,7
       write(iout,*)'P ninput'
       write(iout,*)'Id,Numer,p1Dp1,',0
       write(iout,*)'Al,Numer,p1Dp2,',half*s(1,2)

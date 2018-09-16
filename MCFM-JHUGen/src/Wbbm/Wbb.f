@@ -98,7 +98,7 @@ C---This is qedf, for negative helicity gluon
       tmp(2,1)=-(bp/p4Dq5-bm/p3Dq5)/(2d0*zb(q3,q5)*s345)
      & *((zba3451*zba3267*za(q4,q5)*zb(q2,q6))/s267
      & -(zb(q3,q5)*zba6175+zb(q3,q4)*zba6174)
-     & *za(q4,q5)*za(q1,q7)*zb(q3,q2)/s167) 
+     & *za(q4,q5)*za(q1,q7)*zb(q3,q2)/s167)
 
       tmp(2,2)=
      & -m/(2d0*zb(q4,q5)*za(q4,q3)*p3Dq5*s267*s345)*(
@@ -160,35 +160,35 @@ c-- This is qcdb, for negative helicity gluon
       tmp(1,2)=
      & -(-zba4351*za(q3,q5)*bp*zba4267*zb(q2,q6))
      & /(2d0*zb(q4,q5)*p3Dq5*s267*s345)
-       
+
      & -((zb(q4,q5)*zba6175+zb(q4,q3)*zba6173)
      & *zb(q4,q2)*za(q3,q5)*za(q1,q7)*bp)
      & /(zb(q4,q5)*2d0*p3Dq5*s167*s345)
-       
+
      & -(zb(q4,q2)*zb(q4,q1)*zb(q2,q6)*za(q3,q1)*za(q1,q7))
      & /(zb(q4,q5)*zb(q2,q5)*s134*s34)
-       
+
      & -(-zba4267*zb(q4,q1)*zb(q2,q6)*za(q3,q1)*za(q1,q5))
      & /(zb(q4,q5)*s134*s267*s34)
-       
+
      & -(zba4267*zb(q2,q6)*za(q3,q5)*za(q1,q5))
      & /(s267*s345*s34)
-       
+
      & -(zb(q4,q2)*zba6175*za(q3,q5)*za(q1,q7))
      & /(s167*s345*s34)
-       
+
      & +(zb(q4,q2)*zb(q2,q6)*za(q3,q1)*za(q3,q7))
      & /(zb(q4,q5)*zb(q2,q5)*za(q4,q3)*s134)
-       
+
      & -(zba4267*zb(q2,q6)*za(q3,q1)*za(q3,q5))
      & /(zb(q4,q5)*za(q4,q3)*s134*s267)
-       
+
      & -(zba4267*zb(q2,q6)*za(q3,q1)*za(q3,q5))
      & /(zb(q4,q5)*za(q4,q3)*s267*s345)
-       
+
      & -(zb(q4,q2)**2*zba6173*za(q1,q7))
      & /(zb(q4,q5)*zb(q2,q5)*s167*s34)
-       
+
      & -(zb(q4,q2)*zb(q4,q3)*zba6173*za(q3,q5)*za(q1,q7))
      & /(zb(q4,q5)*s167*s345*s34)
 
@@ -356,5 +356,5 @@ c-- This is qcdb, for negative helicity gluon
       endif
 
       return
-       
+
       end

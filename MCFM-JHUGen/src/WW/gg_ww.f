@@ -3,7 +3,7 @@
 c--- Author: J. M. Campbell, March 2011
 c--- For now, work in the approximation of two massless isodoublets
 c--- Box contributions are then complete
-c--- Triangle (vector) pieces always vanish 
+c--- Triangle (vector) pieces always vanish
 c--- Triangle (axial) pieces cancel for massless isodoublets
 
       include 'constants.f'
@@ -26,14 +26,14 @@ c--- Triangle (axial) pieces cancel for massless isodoublets
       logical includegens1and2,includegen3
       parameter(del1=7,del2=8)
       parameter(k12h=9,k34h=10,k56h11=11,k34h11=12)
-      
+
 c--- if noglue or omitgg, set to zero and return
       if (noglue .or. omitgg) then
          msqgg=0d0
        return
       endif
 
-      if ((plabel(3) .eq. 'el') .and. (plabel(5) .eq. 'qj')) then 
+      if ((plabel(3) .eq. 'el') .and. (plabel(5) .eq. 'qj')) then
 C----swapped case for hadronic decay of Wp
       do j=1,4
       p(1,j)=pin(1,j)
@@ -55,16 +55,16 @@ C----swapped case for hadronic decay of Wp
       endif
 
 c--- set this to true to include generations 1 and 2 of (light) quarks
-      includegens1and2=.true.      
+      includegens1and2=.true.
 c--- set this to true to include 3rd generation of quarks (t,b)
       includegen3=.true.
 
 c--- omit massive loops for pt(W) < "ptWsafetycut_massive" (for num. stability)
       ptWsafetycut_massive=2d0
-      
+
 c--- omit massless loops for pt(W) < "ptWsafetycut_massless" (for num. stability)
       ptWsafetycut_massless=0.05d0
-      
+
       if (qlfirst .and. includegen3) then
          call qlinit
          qlfirst=.false.
@@ -77,8 +77,8 @@ c--- if neither contribution is included, set to zero and return
        return
       endif
 
-c--- if computing 3rd generation, set up extra flattened vectors 
-      if (includegen3) then     
+c--- if computing 3rd generation, set up extra flattened vectors
+      if (includegen3) then
 C--- define flattened vectors (k12 and k56)
       s12=2d0*dot(p,1,2)
       s56=2d0*dot(p,5,6)
@@ -94,7 +94,7 @@ C--- define flattened vectors (k12 and k56)
       p(del1,nu)=one/(one-afac*bfac)
      & *(p(5,nu)+p(6,nu)-bfac*(p(1,nu)+p(2,nu)))
       enddo
-      
+
 C--- define flattened vectors (k12 and k34)
       dot1234=0.5d0*(s56-s12-s34)
       delta=dot1234**2-s12*s34
@@ -108,7 +108,7 @@ C--- define flattened vectors (k12 and k34)
       p(k34h,nu)=one/(one-afac*bfac)
      & *(p(3,nu)+p(4,nu)-bfac*(p(1,nu)+p(2,nu)))
       enddo
-      
+
 C--- define flattened vectors (k56 and k34)
       dot3456=0.5d0*(s12-s56-s34)
       delta=dot3456**2-s56*s34
@@ -123,11 +123,11 @@ C--- define flattened vectors (k56 and k34)
      & *(p(3,nu)+p(4,nu)-bfac*(p(5,nu)+p(6,nu)))
       enddo
 
-      endif      
+      endif
 c--- end of 3rd generation initialization
 
 c--- set up spinor products (including for flat vectors, for 3rd gen)
-      if (includegen3) then 
+      if (includegen3) then
         call spinoru(12,p,za,zb)
       else
         call spinoru(6,p,za,zb)
@@ -156,12 +156,12 @@ c--- for pt(W) < "ptWsafetycut_massless" GeV
       enddo
       enddo
       endif
-      
+
 c--- fill amplitudes used for 3rd generation
       if (includegen3) then
 c--- ensure numerical stability: set massive loops to zero
 c--- for pt(W) < "ptWsafetycut_massive" GeV
-        if ((pttwo(3,4,p)/sqrt(s(1,2)) .lt. 1d-2) 
+        if ((pttwo(3,4,p)/sqrt(s(1,2)) .lt. 1d-2)
      &  .or.(pttwo(3,4,p) .lt. ptWsafetycut_massive)) then
           do h1=1,2
           do h2=1,2
@@ -184,11 +184,11 @@ c---    compute integrals and their coefficients
           call massivetri6(1,2,3,4,5,6,za,zb,triang)
           call massivebub(1,2,3,4,5,6,za,zb,bub)
 c---    this contribution is finite, so we only retain "0" piece
-          e=0 
+          e=0
           do h1=1,2
           do h2=1,2
            sum(h1,h2,e)=box(h1,h2,e)+triang(h1,h2,e)+bub(h1,h2,e)
-           Agen3(h1,h2)=sum(h1,h2,0) 
+           Agen3(h1,h2)=sum(h1,h2,0)
           enddo
           enddo
       endif
@@ -203,25 +203,25 @@ c---    this contribution is finite, so we only retain "0" piece
 c--- factor two for complete massless isodoublets
       faccont=dcmplx(2d0)
 
-c--- sum and square amplitudes      
+c--- sum and square amplitudes
       msqgg=0d0
       do h1=1,2
       do h2=1,2
       msqgg=msqgg+cdabs(faccont*Avec(h1,h2)+Agen3(h1,h2))**2
       enddo
       enddo
-      
+
 c--- overall factor from diagrams
       fac=avegg*V*(2d0*gwsq*gsq/(16d0*pisq)*gwsq/2d0)**2
      & *s(3,4)**2/((s(3,4)-wmass**2)**2+(wwidth*wmass)**2)
      & *s(5,6)**2/((s(5,6)-wmass**2)**2+(wwidth*wmass)**2)
-      
+
 C-----add in factor for hadronic decays
       if (plabel(5) .eq. 'qj') fac=2d0*xn*fac
 
       msqgg=msqgg*fac
-      
+
       return
       end
-      
-      
+
+

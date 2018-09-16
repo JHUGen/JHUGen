@@ -6,7 +6,7 @@
 *     calculate the element squared for the virtual corrections        *
 *     to the decay for the process                                     *
 *                                                                      *
-*     q(-p1) +qbar(-p2)=bbar(p6)+e-(p7)+nubar(p8)+nu(p3)+e+(p4)+b(p5)  * 
+*     q(-p1) +qbar(-p2)=bbar(p6)+e-(p7)+nubar(p8)+nu(p3)+e+(p4)+b(p5)  *
 *                                                                      *
 *     Top is kept strictly on-shell although all spin correlations     *
 *     are retained.                                                    *
@@ -43,7 +43,7 @@ C----set all elements to zero
       call adecay(p,7,8,6,manti)
       call tdecay_v(p,3,4,5,mtopv)
       call adecay_v(p,7,8,6,mantiv)
-      
+
       do hb=1,2
       do hc=1,2
       do h12=1,2

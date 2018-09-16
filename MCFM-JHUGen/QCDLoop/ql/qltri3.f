@@ -4,7 +4,7 @@
       double precision p2sq,p3sq,msq,musq,m2sqb,m3sqb,r
       double complex fac,qllnrat,Ival(-2:0),wlog2,wlog3,wlogm,
      . dilog2,dilog3,qlLi2omrat
-      
+
 
       m2sqb = msq-p2sq
       m3sqb = msq-p3sq
@@ -15,7 +15,7 @@
       wlog3=qllnrat(m3sqb,msq)
       wlogm=qllnrat(musq,msq)
       r =(m3sqb-m2sqb)/m2sqb
-      
+
       Ival(-2)=czip
       if (abs(r) .lt. 1d-6) then
       Ival(-1)=dcmplx((1d0-r/2d0)/m2sqb)

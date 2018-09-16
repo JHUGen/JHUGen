@@ -7,7 +7,7 @@
 c     q(-p1)+qbar(-p2) --> gam(p3) + gam(p4) + parton(p5) + parton(p6) *
 ************************************************************************
 
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'ptilde.f'
       include 'nflav.f'
@@ -18,10 +18,10 @@ c     q(-p1)+qbar(-p2) --> gam(p3) + gam(p4) + parton(p5) + parton(p6) *
       include 'msqbits.f'
       integer j,k,nd
 c --- remember: nd will count the dipoles
-      
+
       double precision p(mxpart,4),msq(maxd,-nf:nf,-nf:nf),facgg,
      & pdip(mxpart,4),pswap(mxpart,4)
-      double precision 
+      double precision
      & msq15_2(-nf:nf,-nf:nf),msq25_1(-nf:nf,-nf:nf),
      & msq16_2(-nf:nf,-nf:nf),msq26_1(-nf:nf,-nf:nf),
      & msq15_6(-nf:nf,-nf:nf),msq26_5(-nf:nf,-nf:nf),
@@ -47,13 +47,13 @@ c --- remember: nd will count the dipoles
      & msqbits35_1_swap(12),msqbits36_1_swap(12),
      & msqbits45_1_swap(12),msqbits46_1_swap(12)
       external qqb_gmgmjt,qqb_gmgmjt_gvec,qqb_dirgam_g,qqb_dirgam_g_swap
-      
+
       if (frag) then
         ndmax=10
       else
         ndmax=6
       endif
-      
+
 c--- calculate all the initial-initial dipoles
       call dips(1,p,1,5,2,sub15_2,sub15_2v,msq15_2,msq15_2v,
      . qqb_gmgmjt,qqb_gmgmjt_gvec)
@@ -91,30 +91,30 @@ c---       from q q~ -> q~ q instead of the usual ordering q q~ -> q q~
          msqbits35_1(:)=msqbits(:)
          call fill_gmgmjt_swap(7,msq35_1_swap)
          msqbits35_1_swap(:)=msqbits(:)
-                
+
          msqbits(:)=zip
          call dipsfrag(8,p,3,6,1,sub36_1,msq36_1,qqb_dirgam_g)
          msqbits36_1(:)=msqbits(:)
          call fill_gmgmjt_swap(8,msq36_1_swap)
          msqbits36_1_swap(:)=msqbits(:)
-               
+
          msqbits(:)=zip
          call dipsfrag(9,p,4,5,1,sub45_1,msq45_1,qqb_dirgam_g)
          msqbits45_1(:)=msqbits(:)
          call fill_gmgmjt_swap(9,msq45_1_swap)
          msqbits45_1_swap(:)=msqbits(:)
-                 
+
          msqbits(:)=zip
          call dipsfrag(10,p,4,6,1,sub46_1,msq46_1,qqb_dirgam_g)
          msqbits46_1(:)=msqbits(:)
          call fill_gmgmjt_swap(10,msq46_1_swap)
          msqbits46_1_swap(:)=msqbits(:)
-                 
+
          phot_dip(7:10)=.true.
       endif
 
       do j=-nf,nf
-      do k=-nf,nf      
+      do k=-nf,nf
       do nd=1,ndmax
         msq(nd,j,k)=0d0
       enddo
@@ -126,14 +126,14 @@ c--- in the gluon-gluon contribution
       facgg=
      &  (2d0*Q(2)**4+dfloat(nf-2)*Q(1)**4)
      & /(2d0*Q(2)**2+dfloat(nf-2)*Q(1)**2)
-      
+
 c--- 2-quark, 2-gluon subtraction pieces
       do j=-nf,nf
       do k=-nf,nf
-      
+
       if ((j .ne. 0) .and. (k .ne. 0) .and. (j.ne.-k)) goto 19
 
-c--- do only q-qb and qb-q cases      
+c--- do only q-qb and qb-q cases
       if (  ((j .gt. 0).and.(k .lt. 0))
      . .or. ((j .lt. 0).and.(k .gt. 0))) then
 C-----half=statistical factor
@@ -205,9 +205,9 @@ c---Hence 25 split multiplies g(p1)+q(p25)-->Z+q(p6)
 
 c--- 4-quark subtraction pieces
       do j=-nf,nf
-      do k=-nf,nf      
+      do k=-nf,nf
 
-      if (((j .gt. 0).and.(k .gt. 0)) .or. 
+      if (((j .gt. 0).and.(k .gt. 0)) .or.
      .    ((j .lt. 0).and.(k .lt. 0))) then
 c--q-q or qb-qb
       if (j.eq.k) then
@@ -273,8 +273,8 @@ c--- note: subtraction terms use symmetry of qqb and qbq amplitudes
      &           +2d0*msqbits46_1_swap(ddb_ssb))
      &  +Q(2)**2*(2d0*msqbits46_1_swap(ddb_uub)))
         endif
-      endif      
-      else 
+      endif
+      else
       msq(1,j,k)=msq(1,j,k)+(xn-1d0/xn)
      .  *(msq15_2(0,k)*sub15_2(gq)+msq15_2v(0,k)*sub15_2v)
       msq(4,j,k)=msq(4,j,k)+(xn-1d0/xn)
@@ -302,7 +302,7 @@ c      msq(3,j,k)=msq(3,j,k)+(xn-1d0/xn)
 c     .  *(msq16_2(0,k)*sub16_2(gq)+msq16_2v(0,k)*sub16_2v)
 c      msq(6,j,k)=msq(6,j,k)+2d0*tr*dfloat(nflav)
 c     . *(msq26_5(j,k)*sub56_2(gq)-msq56_2v(j,k)*sub56_2v)
-c      else 
+c      else
 c      msq(2,j,k)=msq(2,j,k)+(xn-1d0/xn)
 c     .  *(msq25_1(j,0)*sub25_1(gq)+msq25_1v(j,0)*sub25_1v)
 c      msq(3,j,k)=msq(3,j,k)+(xn-1d0/xn)
@@ -316,7 +316,7 @@ c      endif
 
       return
       end
-      
+
 
 
 
@@ -331,7 +331,7 @@ c--- output:msq_swap (array of matrix elements after 4<->5 swap)
       include 'incldip.f'
       integer nd
       double precision pdip(mxpart,4),msq_swap(-nf:nf,-nf:nf)
-      
+
       if (incldip(nd)) then
         call getptilde(nd,pdip)
         pdip(4,:)=pdip(4,:)/z_dip(nd)
@@ -339,7 +339,7 @@ c--- output:msq_swap (array of matrix elements after 4<->5 swap)
       else
         msq_swap(:,:)=0d0
       endif
-       
+
       return
       end
-      
+

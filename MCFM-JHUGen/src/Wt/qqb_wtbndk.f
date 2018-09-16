@@ -34,7 +34,7 @@ c--- calculate amplitudes for g+g in initial state
       call BBamps_nores(p,2,1,3,4,5,6,ampgg_ga)
 c      call BBamps(p,1,2,3,4,5,6,ampgg_ag)
 c      call BBamps(p,2,1,3,4,5,6,ampgg_ga)
-      
+
       msq_gg=0d0
 c--- sum over helicities of gluons and massive quarks
       do ib=1,2

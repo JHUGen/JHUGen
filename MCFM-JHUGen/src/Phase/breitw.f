@@ -1,9 +1,9 @@
-      subroutine breitw(x1,mminsq,mmaxsq,rmass,rwidth,msq,wt)       
+      subroutine breitw(x1,mminsq,mmaxsq,rmass,rwidth,msq,wt)
       implicit none
       include 'constants.f'
-c---- Given a number 0<x<1 generate a mass-squared msq and a weight wt 
+c---- Given a number 0<x<1 generate a mass-squared msq and a weight wt
 c---- such that mminsq<msq<mmaxsq
-c---- points are generated around resonance position rmass, but 
+c---- points are generated around resonance position rmass, but
 c---- breit-wigner should still be included in the matrix element
 c     wt is the jacobian between integration in msq and integration in x1
       double precision x1,mminsq,mmaxsq,rmass,rwidth,msq,wt
@@ -36,7 +36,7 @@ c---- bw=(1d0+tanal**2)*rmass**2*rwidth**2
         msq=mminsq
         wt=0d0
       endif
-      
+
       return
       end
 

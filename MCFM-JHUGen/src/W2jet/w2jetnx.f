@@ -20,15 +20,15 @@ C----nDp6 should be equal to zero
       call checkndotp(p,n,i6)
 
       call subqcdn(i1,i2,i3,i4,i5,i6,nDp5,za,zb,zab,zba,qcdabn,qcdban)
-            
+
 C--first argument is quark line
 C--second argument is polarization of i5 line
 C  1=L,2=R
-      qedn(1,1,1)=qcdabn(1,1,1)+qcdban(1,1,1) 
-      qedn(2,1,1)=qcdabn(2,1,1)+qcdban(2,1,1) 
+      qedn(1,1,1)=qcdabn(1,1,1)+qcdban(1,1,1)
+      qedn(2,1,1)=qcdabn(2,1,1)+qcdban(2,1,1)
 
       msq1= abs(qcdabn(1,1,1))**2+abs(qcdabn(2,1,1))**2
-      msq2= abs(qcdban(1,1,1))**2+abs(qcdban(2,1,1))**2 
+      msq2= abs(qcdban(1,1,1))**2+abs(qcdban(2,1,1))**2
       msqq= abs(qedn(1,1,1))**2+abs(qedn(2,1,1))**2
 
       mmsqv_cs(1,+1,+1)=msq1

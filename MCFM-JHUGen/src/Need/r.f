@@ -21,7 +21,7 @@ c----calculate the jets separation between p(i) and p(j)
       delphi=dacos(r2)
 
       r=dsqrt(dely**2+delphi**2)
-      
+
       return
       end
-      
+

@@ -2,7 +2,7 @@
       include 'constants.f'
       include 'decl_kininv.f'
       double precision p(mxpart,4)
-      
+
       p12(:)=p(1,:)+p(2,:)
       p26(:)=p(2,:)+p(6,:)
       p25(:)=p(2,:)+p(5,:)
@@ -29,4 +29,4 @@
       return
       end
 
-      
+

@@ -2,7 +2,7 @@
 ************************************************************************
 *     Author: Francesco Tramontano                                     *
 *     February, 2005.                                                  *
-*     Virtual matrix element squared and averaged over initial         * 
+*     Virtual matrix element squared and averaged over initial         *
 *      colours and spins (corrections in production)                   *
 *--- W+t production (nwz=-1)                                           *
 *     q(-p1) + qbar(-p2) --> W + t(p567)                               *
@@ -63,7 +63,7 @@ c--- set up lepton variables depending on whether it's t or tbar
 
 c--- overall factor contained in diag.prc
       fac=ason2pi*aveqg*(V/2d0)*2d0*gsq*gwsq**4
- 
+
 c-- calculate auxiliary momentum array - gq case
       twotDg=2d0*(dot(p,5,1)+dot(p,6,1)+dot(p,7,1))
       do k=1,4
@@ -79,8 +79,8 @@ c-- calculate auxiliary momentum array - gq case
       enddo
       r(5,k)=p(5,k)+p(6,k)+p(7,k)
       enddo
-      
-c---fill matrices of spinor products  
+
+c---fill matrices of spinor products
       call spinoru(8,q,za,zb)
 
 c--- Note: call to tree now passes top mass as a parameter
@@ -91,15 +91,15 @@ c--- Note: call to tree now passes top mass as a parameter
       spm_ft=virt_pm(mt,1,2,i3,i4,5,r)
       smm_ft=virt_mm(mt,1,2,i3,i4,5,r)
       smp_ft=virt_mp(mt,1,2,i3,i4,5,r)
-           
+
       wprop=dsqrt((s(3,4)-wmass**2)**2+(wmass*wwidth)**2)
 
-c--- we have demonstrated that amplp(1,1)=lomm_ft/wprop etc.     
+c--- we have demonstrated that amplp(1,1)=lomm_ft/wprop etc.
 
 c      write(6,*) 'amplp(1,1)',amplp(1,1)
 c      write(6,*) 'amplp(1,2)',amplp(1,2)
 c      write(6,*) 'amplp(2,1)',amplp(2,1)
-c      write(6,*) 'amplp(2,2)',amplp(2,2)      
+c      write(6,*) 'amplp(2,2)',amplp(2,2)
 c      write(6,*)'lomm_ft',lomm_ft/wprop
 c      write(6,*)'lomp_ft',lomp_ft/wprop
 c      write(6,*)'lopm_ft',lopm_ft/wprop
@@ -108,13 +108,13 @@ c      write(6,*)'lopp_ft',lopp_ft/wprop
 c--- Construct factored form of amplitudes by adding the helicities of
 c--- the heavy quark, for Born and virtual
 
-c--- lowest order amplitudes   
+c--- lowest order amplitudes
       ampl0(1)=amplp(1,1)*ampld(1)
      .        +amplp(2,1)*ampld(2)
 
       ampl0(2)=amplp(1,2)*ampld(1)
      .        +amplp(2,2)*ampld(2)
-      
+
 c--- virtual amplitudes
       amplv(1)=(smm_ft/wprop)*ampld(1)
      .        +(spm_ft/wprop)*ampld(2)
@@ -141,8 +141,8 @@ c      r(j,k)=p(j,k)
 c      enddo
 c      r(5,k)=p(5,k)+p(6,k)+p(7,k)
 c      enddo
-      
-c---fill matrices of spinor products  
+
+c---fill matrices of spinor products
       call spinoru(8,q,za,zb)
 
       call tree(mt,2,1,i3,i4,8,amplp)
@@ -152,15 +152,15 @@ c---fill matrices of spinor products
       spm_ft=virt_pm(mt,2,1,i3,i4,5,r)
       smm_ft=virt_mm(mt,2,1,i3,i4,5,r)
       smp_ft=virt_mp(mt,2,1,i3,i4,5,r)
-     
+
       wprop=dsqrt((s(3,4)-wmass**2)**2+(wmass*wwidth)**2)
 
-c--- we have demonstrated that amplp(1,1)=lomm_ft/wprop etc.     
+c--- we have demonstrated that amplp(1,1)=lomm_ft/wprop etc.
 
 c      write(6,*) 'amplp(1,1)',amplp(1,1)
 c      write(6,*) 'amplp(1,2)',amplp(1,2)
 c      write(6,*) 'amplp(2,1)',amplp(2,1)
-c      write(6,*) 'amplp(2,2)',amplp(2,2)      
+c      write(6,*) 'amplp(2,2)',amplp(2,2)
 c      write(6,*)'lomm_ft',lomm_ft/wprop
 c      write(6,*)'lomp_ft',lomp_ft/wprop
 c      write(6,*)'lopm_ft',lopm_ft/wprop
@@ -169,13 +169,13 @@ c      write(6,*)'lopp_ft',lopp_ft/wprop
 c--- Construct factored form of amplitudes by adding the helicities of
 c--- the heavy quark, for Born and virtual
 
-c--- lowest order amplitudes   
+c--- lowest order amplitudes
       ampl0(1)=amplp(1,1)*ampld(1)
      .        +amplp(2,1)*ampld(2)
 
       ampl0(2)=amplp(1,2)*ampld(1)
      .        +amplp(2,2)*ampld(2)
-      
+
 c--- virtual amplitudes
       amplv(1)=(smm_ft/wprop)*ampld(1)
      .        +(spm_ft/wprop)*ampld(2)
@@ -197,7 +197,7 @@ c--- virtual amplitudes
       endif
       enddo
       enddo
- 
+
       return
       end
 

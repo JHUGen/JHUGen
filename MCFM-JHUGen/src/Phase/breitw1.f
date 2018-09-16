@@ -1,6 +1,6 @@
-      subroutine breitw1(msq,mminsq,mmaxsq,rmass,rwidth,wt)       
+      subroutine breitw1(msq,mminsq,mmaxsq,rmass,rwidth,wt)
       implicit none
-c---- Given a mass-squared msq generate a weight wt 
+c---- Given a mass-squared msq generate a weight wt
 c---- breit-wigner should still be included in the matrix element
 c      double precision bw
       include 'constants.f'

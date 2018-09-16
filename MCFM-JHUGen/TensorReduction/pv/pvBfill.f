@@ -22,7 +22,7 @@ C    Attempt to implement the formula of Denner and Dittmaier
 C-----statement functions
       fac(n)=(-1d0)**n/dfloat(n+1)
       facnp(in,iP)=(-1d0)**(iP-2*in-1)
-      
+
       if (first) then
       first=.false.
 C--idp1=1/[D+1]
@@ -54,27 +54,27 @@ C--idm1=1/[D-1]
 C----self energies never contain double poles -- set to zero
       do Np=N+1,N+Nbb
       Bv(Np,-2)=czip
-      enddo 
+      enddo
 
 C----calculate B0
 c      do ep=-1,0
 c      Bv(bb0+N,ep)=trI2(p1sq,m0sq,m1sq,musq,ep)
 c      enddo
 
-      if ((abs(p1sq/musq) .lt. onshellcutoff) 
-     . .and. (abs(m0sq/musq) .lt. onshellcutoff) 
+      if ((abs(p1sq/musq) .lt. onshellcutoff)
+     . .and. (abs(m0sq/musq) .lt. onshellcutoff)
      . .and. (abs(m1sq/musq) .lt. onshellcutoff)) then
-      
+
       if (pvverbose) then
         write(6,*) 'setting zero psq, zero mass self-energy to zero'
         write(6,*) 'p1sq=',p1sq,m0sq,m1sq
       endif
-      
+
       do Np=N+1,N+Nbb
       do ep=-1,0
       Bv(Np,ep)=czip
-      enddo 
-      enddo 
+      enddo
+      enddo
       return
 
       elseif (abs(m0sq/musq) .lt. onshellcutoff) then
@@ -241,69 +241,69 @@ C----general case, DD (4.8)
 c--- Construct tensors involving the metric (these are general)
 c---  following the formulae of DD (4.4)
       f1=m1sq-m0sq-p1sq
-      
+
 c--- one factor of the metric
       in=0
-      
+
       iP=2
       do ep=-1,0
       Bv(bb00+N,ep)=-0.5d0/dfloat(iP-2*in-1)*(
      . facnp(in,iP)*Av(aa0+A2,ep)-f1*Bv(bb1+N,ep)
      . +2d0*p1sq*Bv(bb11+N,ep))
       enddo
-      
+
       iP=3
       do ep=-1,0
       Bv(bb001+N,ep)=-0.5d0/dfloat(iP-2*in-1)*(
      . facnp(in,iP)*Av(aa0+A2,ep)-f1*Bv(bb11+N,ep)
      . +2d0*p1sq*Bv(bb111+N,ep))
       enddo
-      
+
       iP=4
       do ep=-1,0
       Bv(bb0011+N,ep)=-0.5d0/dfloat(iP-2*in-1)*(
      . facnp(in,iP)*Av(aa0+A2,ep)-f1*Bv(bb111+N,ep)
      . +2d0*p1sq*Bv(bb1111+N,ep))
       enddo
-      
+
       iP=5
       do ep=-1,0
       Bv(bb00111+N,ep)=-0.5d0/dfloat(iP-2*in-1)*(
      . facnp(in,iP)*Av(aa0+A2,ep)-f1*Bv(bb1111+N,ep)
      . +2d0*p1sq*Bv(bb11111+N,ep))
       enddo
-      
+
       iP=6
       do ep=-1,0
       Bv(bb001111+N,ep)=-0.5d0/dfloat(iP-2*in-1)*(
      . facnp(in,iP)*Av(aa0+A2,ep)-f1*Bv(bb11111+N,ep)
      . +2d0*p1sq*Bv(bb111111+N,ep))
       enddo
-      
+
 c--- two factors of the metric
       in=1
-      
+
       iP=4
       do ep=-1,0
       Bv(bb0000+N,ep)=-0.5d0/dfloat(iP-2*in-1)*(
      . facnp(in,iP)*Av(aa00+A2,ep)-f1*Bv(bb001+N,ep)
      . +2d0*p1sq*Bv(bb0011+N,ep))
       enddo
-      
+
       iP=5
       do ep=-1,0
       Bv(bb00001+N,ep)=-0.5d0/dfloat(iP-2*in-1)*(
      . facnp(in,iP)*Av(aa00+A2,ep)-f1*Bv(bb0011+N,ep)
      . +2d0*p1sq*Bv(bb00111+N,ep))
       enddo
-      
+
       iP=6
       do ep=-1,0
       Bv(bb000011+N,ep)=-0.5d0/dfloat(iP-2*in-1)*(
      . facnp(in,iP)*Av(aa00+A2,ep)-f1*Bv(bb00111+N,ep)
      . +2d0*p1sq*Bv(bb001111+N,ep))
       enddo
-      
+
 c--- three factors of the metric
 
       in=2
@@ -313,7 +313,7 @@ c--- three factors of the metric
      . facnp(in,iP)*Av(aa0000+A2,ep)-f1*Bv(bb00001+N,ep)
      . +2d0*p1sq*Bv(bb000011+N,ep))
       enddo
-      
-      return 
+
+      return
       end
 

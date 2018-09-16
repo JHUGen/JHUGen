@@ -31,10 +31,10 @@ C***************************************************************C
       if(q2.lt.qsqmin.or.q2.gt.qsqmax) print 99,q2
 c      if(x.lt.xmin.or.x.gt.xmax)       print 98,x
           if(mode.eq.1) then
-        call mrst1f4(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu) 
+        call mrst1f4(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu)
       elseif(mode.eq.2) then
-        call mrst2f4(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu) 
-      endif 
+        call mrst2f4(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu)
+      endif
   99  format('  WARNING:  Q^2 VALUE IS OUT OF RANGE   ','q2= ',e10.5)
   98  format('  WARNING:   X  VALUE IS OUT OF RANGE   ','x= ',e10.5)
       return
@@ -131,7 +131,7 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
 
       init=1
    10 continue
-      
+
       xlog=dlog(x)
       qsqlog=dlog(qsq)
 
@@ -143,12 +143,12 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       call jeppe2(xlog,qsqlog,nx,nq,xxl,qql,cc8,dsea)
 
       chm=0.d0
-      if(qsq.gt.emc2) then 
+      if(qsq.gt.emc2) then
       call jeppe2(xlog,qsqlog,nx,nqc,xxl,qqlc,ccc,chm)
       endif
 
       bot=0.d0
-      if(qsq.gt.emb2) then 
+      if(qsq.gt.emb2) then
       call jeppe2(xlog,qsqlog,nx,nqb,xxl,qqlb,ccb,bot)
       endif
 
@@ -249,7 +249,7 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
 
       init=1
    10 continue
-      
+
       xlog=dlog(x)
       qsqlog=dlog(qsq)
 
@@ -261,12 +261,12 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       call jeppe2(xlog,qsqlog,nx,nq,xxl,qql,cc8,dsea)
 
       chm=0.d0
-      if(qsq.gt.emc2) then 
+      if(qsq.gt.emc2) then
       call jeppe2(xlog,qsqlog,nx,nqc,xxl,qqlc,ccc,chm)
       endif
 
       bot=0.d0
-      if(qsq.gt.emb2) then 
+      if(qsq.gt.emb2) then
       call jeppe2(xlog,qsqlog,nx,nqb,xxl,qqlb,ccb,bot)
       endif
 

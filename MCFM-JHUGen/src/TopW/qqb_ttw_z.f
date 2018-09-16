@@ -43,7 +43,7 @@ CDTS (5.45,5.77)
       mbar26=mt/dSqrt(-2d0*dot(p,2,6))
 CDTS (5.5)
       mbar56=mt/dSqrt(Q56sq)
-      
+
       xl12=dlog(+two*dot(p,1,2)/musq)
       xl15=dlog(-two*dot(p,1,5)/musq)
       xl16=dlog(-two*dot(p,1,6)/musq)

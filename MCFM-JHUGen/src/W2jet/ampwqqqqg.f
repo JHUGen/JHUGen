@@ -8,8 +8,8 @@ c--- amplitudes for the production of a W, four quarks and a gluon
       include 'masses.f'
       include 'qcdcouple.f'
       include 'ewcouple.f'
-      include 'lc.f' 
-      include 'first.f' 
+      include 'lc.f'
+      include 'first.f'
 
       double precision ofac,xmsqLR,xmsq1LR,xmsqLL,xmsqiLL,xmsqiiLL,
      .  xmsqRL
@@ -23,11 +23,11 @@ c      double complex eLR1,eLR2,eLR3,eLR4,eLR5,eLR6,
 c     .               eLR7,eLR8,eLR9,eLR10,eLR11,eLR12
       double complex eLRa1,eLRa2,eLRna1,eLRna2
 c      double complex fRL1,fRL2,fRL3,fRL4,fRL5,fRL6,
-c     .               fRL7,fRL8,fRL9,fRL10,fRL11,fRL12 
+c     .               fRL7,fRL8,fRL9,fRL10,fRL11,fRL12
       double complex fRLa1,fRLa2,fRLna1,fRLna2
 
 c      double complex dLL1,dLL2,dLL3,dLL4,dLL5,dLL6,
-c     .               dLL7,dLL8,dLL9,dLL10,dLL11,dLL12 
+c     .               dLL7,dLL8,dLL9,dLL10,dLL11,dLL12
       double complex dLLa1,dLLa2,dLLna1,dLLna2
 c      double complex eLL1,eLL2,eLL3,eLL4,eLL5,eLL6,
 c     .               eLL7,eLL8,eLL9,eLL10,eLL11,eLL12
@@ -35,7 +35,7 @@ c     .               eLL7,eLL8,eLL9,eLL10,eLL11,eLL12
       double complex diLLa1,diLLa2,diLLna1,diLLna2
 
 c      double complex fLL1,fLL2,fLL3,fLL4,fLL5,fLL6,
-c     .               fLL7,fLL8,fLL9,fLL10,fLL11,fLL12 
+c     .               fLL7,fLL8,fLL9,fLL10,fLL11,fLL12
       double complex fLLa1,fLLa2,fLLna1,fLLna2
       double complex fiLLa1,fiLLa2,fiLLna1,fiLLna2
 
@@ -58,7 +58,7 @@ c     .               fLL7,fLL8,fLL9,fLL10,fLL11,fLL12
       s467=s(j4,j6)+s(j4,j7)+s(j6,j7)
       s345=s(j3,j4)+s(j3,j5)+s(j4,j5)
 
-      if (first) then 
+      if (first) then
 c         write(*,*) 'Using new bit.f'
          first = .false.
       endif
@@ -371,7 +371,7 @@ c    - t(cb,i4,i3)*D(i1,i2)/2/n*(dLR5+dLR6+dLR11+dLR12)
 c + t(cb,i2,i3)*D(i1,i4)/2*(dLR3-dLR4+dLR6+dLR8+dLR9-dLR10+dLR12)
 c + t(cb,i4,i1)*D(i2,i3)/2*(dLR1+dLR2+dLR4+dLR5+dLR7+dLR10+dLR11)
 
-      if (colourchoice .eq.1) then 
+      if (colourchoice .eq.1) then
       diLLa1=eLLna1
       diLLa2=eLLna2
       diLLna1=dLLna1
@@ -397,7 +397,7 @@ c + t(cb,i4,i1)*D(i2,i3)/2*(dLR1+dLR2+dLR4+dLR5+dLR7+dLR10+dLR11)
       ofac=8d0*gsq**3*gwsq**2*aveqq
       ofac=ofac*s67**2/((s67-wmass**2)**2+(wmass*wwidth)**2)
 
-      if (colourchoice .eq. 1) then 
+      if (colourchoice .eq. 1) then
 
 C---eg uL+uR
       xmsqLR=ofac*V*xn/8d0*(abs(dLRna1)**2+abs(dLRna2)**2)
@@ -419,7 +419,7 @@ C--eg uL+uL
 C--eg uR+uL
       xmsqRL=ofac*V*xn/8d0*(abs(fRLna1)**2+abs(fRLna2)**2)
 
-      else 
+      else
 
 C---eg uL+uR
       xmsqLR=ofac*V*xn/8d0*(abs(dLRna1)**2+abs(dLRna2)**2

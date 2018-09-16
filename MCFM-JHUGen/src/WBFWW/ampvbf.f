@@ -7,13 +7,18 @@
       include 'masses.f'
       include 'ewcharge.f'
       include 'runstring.f'
+      include 'ewcouple.f'
       include 'zcouple.f'
+      include 'zacouplejk.f'
       include 'WWbits.f'
+      include 'spinzerohiggs_anomcoupl.f'
       integer jdu1,jdu2,h28,h17,i1,i2,i3,i4,i5,i6,i7,i8,
      & p1,p2,p3,p4,p5,p6,p7,p8
-      double complex zab2,amp(2,2,2,2),sqzmass,
-     & propw34,propw56,propz28,propz17,propH,propw1347,propw1567,
-     & gamZ17(2,2),gamz28(2,2),ZZ17(2,2),ZZ28(2,2),rxw
+      double complex zab2,amp(2,2,2,2),sqzmass,Amp_S_PR,Amp_S_DK,
+     & propw34,propw56,propz28,propz17,propH,propX,propw1347,propw1567,
+     & gamZ17(2,2),gamz28(2,2),ZZ17(2,2),ZZ28(2,2),AA17(2,2),AA28(2,2),
+     & rxw,facZZHWW,
+     & anomhzzamp,anomhzaamp,anomhaaamp,anomhwwamp
       double precision t4,s17,s28,s34,s56,s3456,s1347,s1567
 C     amp(jdu1,jdu2,h17,h28)
 C-----Begin statement functions
@@ -28,6 +33,8 @@ c--- special fix for Madgraph check
       else
         sqzmass=czmass2
       endif
+      facZZHWW = 2d0*sqzmass*cxw**(-2)*(4d0*cwmass2/vevsq*cxw/esq)
+
 
       rxw=sqrt((cone-cxw)/cxw)
       s17=s(i1,i7)
@@ -38,23 +45,30 @@ c--- special fix for Madgraph check
       s1567=t4(i1,i5,i6,i7)
       s3456=t4(i3,i4,i5,i6)
 
-      propw1347=s1347-cwmass2
-      propw1567=s1567-cwmass2
-      propw34=s34-cwmass2
-      propw56=s56-cwmass2
-      propz17=s17-czmass2
-      propz28=s28-czmass2
+      propw1347=s1347-dcmplx(wmass**2,-wmass*wwidth)
+      propw1567=s1567-dcmplx(wmass**2,-wmass*wwidth)
+      propw34=s34-dcmplx(wmass**2,-wmass*wwidth)
+      propw56=s56-dcmplx(wmass**2,-wmass*wwidth)
+      propz17=s17-dcmplx(zmass**2,-zmass*zwidth)
+      propz28=s28-dcmplx(zmass**2,-zmass*zwidth)
       propH=dcmplx(s3456-hmass**2,hmass*hwidth)
+      propX=dcmplx(s3456-h2mass**2,h2mass*h2width)
 
       do jdu1=1,2
-      gamz17(jdu1,1)=Q(jdu1)/s(i1,i7)+rxW*L(jdu1)/propz17
-      gamz17(jdu1,2)=Q(jdu1)/s(i1,i7)+rxW*R(jdu1)/propz17
-      gamz28(jdu1,1)=Q(jdu1)/s(i2,i8)+rxW*L(jdu1)/propz28
-      gamz28(jdu1,2)=Q(jdu1)/s(i2,i8)+rxW*R(jdu1)/propz28
-      ZZ17(jdu1,1)=L(jdu1)/propz17
-      ZZ17(jdu1,2)=R(jdu1)/propz17
-      ZZ28(jdu1,1)=L(jdu1)/propz28
-      ZZ28(jdu1,2)=R(jdu1)/propz28
+      gamz17(jdu1,1)=Q_jk(i1,i7,jdu1)/s(i1,i7)
+     & +rxW*L_jk(i1,i7,jdu1)/propz17
+      gamz17(jdu1,2)=Q_jk(i1,i7,jdu1)/s(i1,i7)
+     & +rxW*R_jk(i1,i7,jdu1)/propz17
+      ZZ17(jdu1,1)=L_jk(i1,i7,jdu1)/propz17
+      ZZ17(jdu1,2)=R_jk(i1,i7,jdu1)/propz17
+      AA17(jdu1,:)=Q_jk(i1,i7,jdu1)/s(i1,i7)
+      gamz28(jdu1,1)=Q_jk(i2,i8,jdu1)/s(i2,i8)
+     & +rxW*L_jk(i2,i8,jdu1)/propz28
+      gamz28(jdu1,2)=Q_jk(i2,i8,jdu1)/s(i2,i8)
+     & +rxW*R_jk(i2,i8,jdu1)/propz28
+      ZZ28(jdu1,1)=L_jk(i2,i8,jdu1)/propz28
+      ZZ28(jdu1,2)=R_jk(i2,i8,jdu1)/propz28
+      AA28(jdu1,:)=Q_jk(i2,i8,jdu1)/s(i2,i8)
       enddo
 
       p3=i3
@@ -78,11 +92,71 @@ c--- special fix for Madgraph check
       p2=i8
       p8=i2
       endif
+
       do jdu1=1,2
       do jdu2=1,2
-      amp(jdu1,jdu2,h17,h28)= + propw56**(-1)*propw34**(-1)*cxw**(-2)*
-     & Hbit * (  - 2.D0*za(p3,p5)*za(p7,p8)*zb(p4,p6)*zb(p1,p2)*ZZ17(
-     &    jdu1,h17)*ZZ28(jdu2,h28)*propH**(-1)*sqzmass )
+!     MARKUS: this is the ZZ-->H-->WW contribution
+!     original MCFM code
+!       amp(jdu1,jdu2,h17,h28)= + propw56**(-1)*propw34**(-1)*cxw**(-2)*
+!      & Hbit * (  - 2.D0*za(p3,p5)*za(p7,p8)*zb(p4,p6)*zb(p1,p2)
+!      &  *ZZ17(jdu1,h17)*ZZ28(jdu2,h28)*propH**(-1)*sqzmass )
+!       print *, "MARKUS check: old ZZ-->H-->WW:",amp(jdu1,jdu2,h17,h28)
+!     new code with anomalous couplings
+      amp(jdu1,jdu2,h17,h28)=czip
+      if( hmass.ge.zip .and. channeltoggle_stu.ne.1 ) then
+         if( AnomalCouplPR.eq.1 ) then
+      Amp_S_PR=
+     & anomhzzamp(p7,p1,p8,p2,1,s3456,s(p7,p1),s(p8,p2),za,zb)
+     & *ZZ17(jdu1,h17)*ZZ28(jdu2,h28)
+     & -anomhzaamp(p7,p1,p8,p2,1,s3456,s(p7,p1),s(p8,p2),za,zb)
+     & *ZZ17(jdu1,h17)*AA28(jdu2,h28)
+     & -anomhzaamp(p8,p2,p7,p1,1,s3456,s(p8,p2),s(p7,p1),za,zb)
+     & *AA17(jdu1,h17)*ZZ28(jdu2,h28)
+     & +anomhaaamp(p7,p1,p8,p2,1,s3456,s(p7,p1),s(p8,p2),za,zb)
+     & *AA17(jdu1,h17)*AA28(jdu2,h28)
+         else
+      Amp_S_PR=za(i7,i8)*zb(i1,i2)*ZZ17(jdu1,h17)*ZZ28(jdu2,h28)
+         endif
+      ! MCFM uses W-W+!
+         if( AnomalCouplDK.eq.1 ) then
+      Amp_S_DK=anomhwwamp(p5,p6,p3,p4,1,s3456,s(p5,p6),s(p3,p4),za,zb)
+         else
+      Amp_S_DK=za(i3,i5)*zb(i4,i6)
+         endif
+      amp(jdu1,jdu2,h17,h28)= amp(jdu1,jdu2,h17,h28)
+     &                      + propw56**(-1)*propw34**(-1)*facZZHWW*
+     & Hbit * ( -Amp_S_PR*Amp_S_DK*propH**(-1) )
+      endif
+!       print *, "MARKUS check: new ZZ-->H-->WW:",amp(jdu1,jdu2,h17,h28)
+!       pause
+
+
+!     adding a second resonance
+      if( h2mass.ge.zip .and. channeltoggle_stu.ne.1 ) then
+         if( AnomalCouplPR.eq.1 ) then
+      Amp_S_PR=
+     & anomhzzamp(p7,p1,p8,p2,2,s3456,s(p7,p1),s(p8,p2),za,zb)
+     & *ZZ17(jdu1,h17)*ZZ28(jdu2,h28)
+     & -anomhzaamp(p7,p1,p8,p2,2,s3456,s(p7,p1),s(p8,p2),za,zb)
+     & *ZZ17(jdu1,h17)*AA28(jdu2,h28)
+     & -anomhzaamp(p8,p2,p7,p1,2,s3456,s(p8,p2),s(p7,p1),za,zb)
+     & *AA17(jdu1,h17)*ZZ28(jdu2,h28)
+     & +anomhaaamp(p7,p1,p8,p2,2,s3456,s(p7,p1),s(p8,p2),za,zb)
+     & *AA17(jdu1,h17)*AA28(jdu2,h28)
+         else
+      Amp_S_PR=za(i7,i8)*zb(i1,i2)*ZZ17(jdu1,h17)*ZZ28(jdu2,h28)
+         endif
+      ! MCFM uses W-W+!
+         if( AnomalCouplDK.eq.1 ) then
+      Amp_S_DK=anomhwwamp(p5,p6,p3,p4,2,s3456,s(p5,p6),s(p3,p4),za,zb)
+         else
+      Amp_S_DK=za(i3,i5)*zb(i4,i6)
+         endif
+      amp(jdu1,jdu2,h17,h28)= amp(jdu1,jdu2,h17,h28)
+     &                      + propw56**(-1)*propw34**(-1)*facZZHWW*
+     & Hbit * ( -Amp_S_PR*Amp_S_DK*propX**(-1) )
+      endif
+
       amp(jdu1,jdu2,h17,h28) = amp(jdu1,jdu2,h17,h28) + gamz17(jdu1,h17
      & )*gamz28(jdu2,h28)*propw56**(-1)*propw34**(-1)*propw1347**(-1)*
      & cxw**(-1)*Bbit * ( 4.D0*za(p3,p5)*zb(p4,p6)*zab2(p7,p3,p4,p1)*

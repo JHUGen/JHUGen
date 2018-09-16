@@ -1,7 +1,7 @@
       double precision function xzqqqq(i,n1,n2)
       implicit none
 c*******************************************************************
-c     the matrix elements of the  
+c     the matrix elements of the
 C     helicity amplitudes for the QCD process
 c     q(-q1)+q(-q2)+a(-q6) --> q(q3)+q(q4)+l(q5)
 c     all squared
@@ -43,41 +43,41 @@ c*******************************************************************
 
 c----left-left matrix element
       mlll1=
-     & +flgl1*Lla(i(1),i(2),i(3),i(4))+flgl2*Lla(i(2),i(1),i(4),i(3))      
+     & +flgl1*Lla(i(1),i(2),i(3),i(4))+flgl2*Lla(i(2),i(1),i(4),i(3))
       mllr1=
-     & +frgl1*Lal(i(1),i(2),i(3),i(4))+frgl2*Lal(i(2),i(1),i(4),i(3))      
+     & +frgl1*Lal(i(1),i(2),i(3),i(4))+frgl2*Lal(i(2),i(1),i(4),i(3))
 
 c----right-right matrix element
       mrrr1=
-     & +frgr1*Rla(i(1),i(2),i(3),i(4))+frgr2*Rla(i(2),i(1),i(4),i(3))      
+     & +frgr1*Rla(i(1),i(2),i(3),i(4))+frgr2*Rla(i(2),i(1),i(4),i(3))
       mrrl1=
-     & +flgr1*Ral(i(1),i(2),i(3),i(4))+flgr2*Ral(i(2),i(1),i(4),i(3))      
+     & +flgr1*Ral(i(1),i(2),i(3),i(4))+flgr2*Ral(i(2),i(1),i(4),i(3))
 
 c----left-right matrix element
       mlrl1=
-     & +flgl1*Lla(i(1),i(4),i(3),i(2))+flgr2*Ral(i(2),i(3),i(4),i(1))      
+     & +flgl1*Lla(i(1),i(4),i(3),i(2))+flgr2*Ral(i(2),i(3),i(4),i(1))
       mlrr1=
-     & +frgl1*Lal(i(1),i(4),i(3),i(2))+frgr2*Rla(i(2),i(3),i(4),i(1))      
+     & +frgl1*Lal(i(1),i(4),i(3),i(2))+frgr2*Rla(i(2),i(3),i(4),i(1))
 
 c----right-left matrix element
       mrll1=
-     & +flgr1*Ral(i(1),i(4),i(3),i(2))+flgl2*Lla(i(2),i(3),i(4),i(1))      
+     & +flgr1*Ral(i(1),i(4),i(3),i(2))+flgl2*Lla(i(2),i(3),i(4),i(1))
       mrlr1=
-     & +frgr1*Rla(i(1),i(4),i(3),i(2))+frgl2*Lal(i(2),i(3),i(4),i(1))      
+     & +frgr1*Rla(i(1),i(4),i(3),i(2))+frgl2*Lal(i(2),i(3),i(4),i(1))
 
 
 C*************************************************************
 Case 1 Non-identical quarks diagonal coupling                *
 C     qi(-p1)+qj(-p2) --> qi(p3)+qj(p4) + Z0,Gamma           *
-c************************************************************* 
+c*************************************************************
 
       if (n1 .ne. n2) then
       xzqqqq=aveqq*von4*(
-     & +abs(mlll1)**2+abs(mllr1)**2     
-     & +abs(mrrl1)**2+abs(mrrr1)**2     
-     & +abs(mlrl1)**2+abs(mlrr1)**2     
-     & +abs(mrll1)**2+abs(mrlr1)**2)     
- 
+     & +abs(mlll1)**2+abs(mllr1)**2
+     & +abs(mrrl1)**2+abs(mrrr1)**2
+     & +abs(mlrl1)**2+abs(mlrr1)**2
+     & +abs(mrll1)**2+abs(mrlr1)**2)
+
       return
 
       elseif (n1 .eq. n2) then
@@ -89,8 +89,8 @@ C************************************************************
 
 
 c----left-left matrix element
-      mlll2=-flgl1*(Lla(i(1),i(2),i(4),i(3))+Lla(i(2),i(1),i(3),i(4)))      
-      mllr2=-frgl1*(Lal(i(1),i(2),i(4),i(3))+Lal(i(2),i(1),i(3),i(4)))      
+      mlll2=-flgl1*(Lla(i(1),i(2),i(4),i(3))+Lla(i(2),i(1),i(3),i(4)))
+      mllr2=-frgl1*(Lal(i(1),i(2),i(4),i(3))+Lal(i(2),i(1),i(3),i(4)))
 
 c----right-right matrix element
       mrrr2=-frgr1*(Rla(i(1),i(2),i(4),i(3))+Rla(i(2),i(1),i(3),i(4)))
@@ -104,9 +104,9 @@ c----left-right matrix element
 
 c----right-left matrix element
       mrll2=
-     & -flgr1*Ral(i(1),i(3),i(4),i(2))-flgl2*Lla(i(2),i(4),i(3),i(1))      
+     & -flgr1*Ral(i(1),i(3),i(4),i(2))-flgl2*Lla(i(2),i(4),i(3),i(1))
       mrlr2=
-     & -frgr1*Rla(i(1),i(3),i(4),i(2))-frgl2*Lal(i(2),i(4),i(3),i(1))      
+     & -frgr1*Rla(i(1),i(3),i(4),i(2))-frgl2*Lal(i(2),i(4),i(3),i(1))
 
 
       xzqqqq=half*aveqq*Von4*(
@@ -122,7 +122,7 @@ c----right-left matrix element
      & +abs(mlrl1)**2+abs(mlrl2)**2
      & +abs(mlll1)**2+abs(mlll2)**2
      & -two/XN*Dble(mlll1*Dconjg(mlll2)))
-      
+
       return
       endif
       return

@@ -2,8 +2,8 @@
       implicit none
 C-----Apart from overall factors returns the matrix element squared
 C-----msq dependent on the helicities pq and pl of the quark and
-C-----lepton lines for 
-C-----q(-p1)+qbar(-p2)-->l(p3)+al(p4)+g(p5)+g(p6) where 
+C-----lepton lines for
+C-----q(-p1)+qbar(-p2)-->l(p3)+al(p4)+g(p5)+g(p6) where
 C-----where gluon 6 has been contracted with the vector n
 Cargument 1-4 represent (i1) incoming quark line
 C                       (i2) incoming quark line
@@ -25,7 +25,7 @@ C                       (i6) outgoing gluon line contracted with n
       call checkndotp(p,n,i6)
 
       call subqcdn(i1,i2,i3,i4,i5,i6,nDp5,za,zb,zab,zba,qcdabn,qcdban)
-            
+
 C--first argument is gluon line
 C--second argument is polarization of i5 line pq
 C--third argument is polarization of lepton line pl

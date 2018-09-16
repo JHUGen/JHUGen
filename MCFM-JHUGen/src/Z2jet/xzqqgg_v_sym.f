@@ -25,14 +25,14 @@
       character*9,parameter:: st3(2,2)=
      & reshape((/'q+qb-g-g-','q+qb-g-g+','q+qb-g+g-','q+qb-g+g+'/)
      & ,(/2,2/))
-      
+
       fac=avegg*8d0*gsq**2*esq**2*cf*xn**3*ason2pi
 c--- no extra factor here since colour algebra is already done in (2.12)
 
       do hq=1,2
       do lh=1,2
       mqqb_ax(hq,lh)=0d0
-      
+
       if (colourchoice .le. 1) then
       do h2=1,2
       do h3=1,2
@@ -42,7 +42,7 @@ c--- no extra factor here since colour algebra is already done in (2.12)
         if (hq .eq. 1) then
         m(j)=  a6treeg1(st1(3-h(i2(j)),3-h(i3(j))),
      .     i4(1),i2(j),i3(j),i1(1),i6(lh),i5(lh),zb,za)
-c--- note: this symmetry relation (including minus sign) checked numerically 
+c--- note: this symmetry relation (including minus sign) checked numerically
         ml1_ax(j)=-a64ax(st3(3-h(i2(j)),3-h(i3(j))),
      .     i4(1),i1(1),i2(j),i3(j),i6(lh),i5(lh),zb,za)
         ml2_ax(j)=-a65ax(st3(3-h(i2(j)),3-h(i3(j))),
@@ -62,7 +62,7 @@ c--- note: this symmetry relation (including minus sign) checked numerically
      .    (xn-2d0/xn)*ml1_ax(1)-2d0/xn*ml1_ax(2)+one/xn*ml2_ax(1))
      . +Dconjg(m(2))*(
      .    (xn-2d0/xn)*ml1_ax(2)-2d0/xn*ml1_ax(1)+one/xn*ml2_ax(2)))
-      
+
       enddo
       enddo
       endif
@@ -72,4 +72,4 @@ c--- note: this symmetry relation (including minus sign) checked numerically
 
       return
       end
-      
+

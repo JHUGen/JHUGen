@@ -58,11 +58,11 @@ c--- special fix for Madgraph check
       twop34Dp3456=s34-s56+s3456
 
       proph1347=dcmplx(s1347-hmass**2,hmass*hwidth)
-      propw34=s34-cwmass2
-      propz56=s56-czmass2
-      propw3456=s3456-cwmass2
-      propw17=s17-cwmass2
-      propz28=s28-czmass2
+      propw34=s34-dcmplx(wmass**2,-wmass*wwidth)
+      propz56=s56-dcmplx(zmass**2,-zmass*zwidth)
+      propw3456=s3456-dcmplx(wmass**2,-wmass*wwidth)
+      propw17=s17-dcmplx(wmass**2,-wmass*wwidth)
+      propz28=s28-dcmplx(zmass**2,-zmass*zwidth)
 
       q3=qn
       l3=ln
@@ -108,8 +108,8 @@ c--- special fix for Madgraph check
      &    p1,p2)*zb(p4,p5)*zab2(p5,p3,p4,p6)*twop17Dp3456 )
       amp(jdu2,1,1) = amp(jdu2,1,1) + gamZ28qW(jdu2,1)*cxw**(-2)*Bbit*
      & propw17**(-1)*propw34**(-1)*propw3456**(-1)*s345**(-1) * ( 2.D0*
-     &    za(p3,p5)*za(p7,p8)*zb(p1,p2)*zb(p1,p6)*zba2(p4,p3,p5,p1) - 
-     &    za(p3,p5)*za(p7,p8)*zb(p1,p2)*zb(p3,p4)*zab2(p3,p4,p5,p6) + 
+     &    za(p3,p5)*za(p7,p8)*zb(p1,p2)*zb(p1,p6)*zba2(p4,p3,p5,p1) -
+     &    za(p3,p5)*za(p7,p8)*zb(p1,p2)*zb(p3,p4)*zab2(p3,p4,p5,p6) +
      &    za(p3,p5)*za(p7,p8)*zb(p1,p2)*zb(p4,p5)*zab2(p5,p3,p4,p6) - 2.
      &    D0*za(p3,p5)*za(p7,p8)*zb(p1,p2)*zb(p6,p7)*zba2(p4,p3,p5,p7)
      &     + 2.D0*za(p3,p5)*zb(p1,p6)*zab2(p8,p1,p7,p2)*zba2(p4,p3,p5,
@@ -123,7 +123,7 @@ c--- special fix for Madgraph check
      &    ,p6)*twop17Dp3456*s3456 + 2.D0*za(p3,p5)*za(p7,p8)*zb(p1,p2)*
      &    zb(p4,p6)*twop17Dp3456*twop34Dp3456 )
       amp(jdu2,1,1) = amp(jdu2,1,1) + gamZ28qW(jdu2,1)*gamZ56eW(1)*
-     & cxw**(-1)*Bbit*propw17**(-1)*propw34**(-1)*propw3456**(-1) * ( 
+     & cxw**(-1)*Bbit*propw17**(-1)*propw34**(-1)*propw3456**(-1) * (
      &     - 4.D0*za(p3,p5)*za(p7,p8)*zb(p1,p2)*zb(p4,p6)*s1347 + 2.D0*
      &    za(p3,p5)*za(p7,p8)*zb(p1,p2)*zb(p4,p6)*s3456 + 4.D0*za(p3,p5
      &    )*za(p7,p8)*zb(p1,p2)*zb(p4,p6)*s34 + 4.D0*za(p3,p5)*za(p7,p8
@@ -170,7 +170,7 @@ c--- special fix for Madgraph check
      &    twop17Dp3456 )
       amp(jdu2,1,1) = amp(jdu2,1,1) + gamZ28qW(jdu2,1)*gamZ56ee(1,1)*
      & cxw**(-1)*Bbit*propw17**(-1)*propw3456**(-1)*s456**(-1) * ( 4.D0
-     &    *za(p1,p3)*za(p7,p8)*zb(p1,p2)*zb(p4,p6)*zba2(p1,p4,p6,p5) - 
+     &    *za(p1,p3)*za(p7,p8)*zb(p1,p2)*zb(p4,p6)*zba2(p1,p4,p6,p5) -
      &    4.D0*za(p3,p7)*za(p7,p8)*zb(p1,p2)*zb(p4,p6)*zba2(p7,p4,p6,p5
      &    ) - 4.D0*za(p3,p7)*zb(p4,p6)*zab2(p8,p1,p7,p2)*zba2(p1,p4,p6,
      &    p5) + 4.D0*za(p3,p8)*zb(p4,p6)*zab2(p7,p2,p8,p1)*zba2(p2,p4,
@@ -215,7 +215,7 @@ c--- special fix for Madgraph check
      &    ,p5)*twop17Dp3456*s3456 + 2.D0*za(p3,p6)*za(p7,p8)*zb(p1,p2)*
      &    zb(p4,p5)*twop17Dp3456*twop34Dp3456 )
       amp(jdu2,1,2) = amp(jdu2,1,2) + gamZ28qW(jdu2,1)*gamZ56eW(2)*
-     & cxw**(-1)*Bbit*propw17**(-1)*propw34**(-1)*propw3456**(-1) * ( 
+     & cxw**(-1)*Bbit*propw17**(-1)*propw34**(-1)*propw3456**(-1) * (
      &     - 4.D0*za(p3,p6)*za(p7,p8)*zb(p1,p2)*zb(p4,p5)*s1347 + 2.D0*
      &    za(p3,p6)*za(p7,p8)*zb(p1,p2)*zb(p4,p5)*s3456 + 4.D0*za(p3,p6
      &    )*za(p7,p8)*zb(p1,p2)*zb(p4,p5)*s34 + 4.D0*za(p3,p6)*za(p7,p8
@@ -262,7 +262,7 @@ c--- special fix for Madgraph check
      &    twop17Dp3456 )
       amp(jdu2,1,2) = amp(jdu2,1,2) + gamZ28qW(jdu2,1)*gamZ56ee(1,2)*
      & cxw**(-1)*Bbit*propw17**(-1)*propw3456**(-1)*s456**(-1) * ( 4.D0
-     &    *za(p1,p3)*za(p7,p8)*zb(p1,p2)*zb(p4,p5)*zba2(p1,p4,p5,p6) - 
+     &    *za(p1,p3)*za(p7,p8)*zb(p1,p2)*zb(p4,p5)*zba2(p1,p4,p5,p6) -
      &    4.D0*za(p3,p7)*za(p7,p8)*zb(p1,p2)*zb(p4,p5)*zba2(p7,p4,p5,p6
      &    ) - 4.D0*za(p3,p7)*zb(p4,p5)*zab2(p8,p1,p7,p2)*zba2(p1,p4,p5,
      &    p6) + 4.D0*za(p3,p8)*zb(p4,p5)*zab2(p7,p2,p8,p1)*zba2(p2,p4,
@@ -316,7 +316,7 @@ c--- special fix for Madgraph check
      &    zb(p4,p6)*twop17Dp3456*twop34Dp3456 )
       amp(jdu2,2,1) = amp(jdu2,2,1) + gamZ28qW(jdu2,2)*gamZ56eW(1)*
      & cxw**(-1)*Bbit*propw17**(-1)*propw34**(-1)*propw3456**(-1) * ( 4.
-     &    D0*za(p2,p3)*zb(p4,p8)*zab2(p5,p3,p4,p6)*zab2(p7,p2,p8,p1) - 
+     &    D0*za(p2,p3)*zb(p4,p8)*zab2(p5,p3,p4,p6)*zab2(p7,p2,p8,p1) -
      &    4.D0*za(p2,p5)*zb(p6,p8)*zab2(p3,p5,p6,p4)*zab2(p7,p2,p8,p1)
      &     + 4.D0*za(p2,p7)*za(p3,p5)*zb(p1,p8)*zb(p4,p6)*s1347 - 2.D0*
      &    za(p2,p7)*za(p3,p5)*zb(p1,p8)*zb(p4,p6)*s3456 - 4.D0*za(p2,p7
@@ -345,7 +345,7 @@ c--- special fix for Madgraph check
      &    twop17Dp3456 )
       amp(jdu2,2,1) = amp(jdu2,2,1) + gamZ28qW(jdu2,2)*gamZ56ne(1,1)*
      & cxw**(-1)*Bbit*propw17**(-1)*propw3456**(-1)*s356**(-1) * ( 4.D0
-     &    *za(p2,p7)*za(p3,p5)*zb(p1,p4)*zb(p1,p8)*zba2(p6,p3,p5,p1) - 
+     &    *za(p2,p7)*za(p3,p5)*zb(p1,p4)*zb(p1,p8)*zba2(p6,p3,p5,p1) -
      &    2.D0*za(p2,p7)*za(p3,p5)*zb(p1,p8)*zb(p3,p6)*zab2(p3,p5,p6,p4
      &    ) - 4.D0*za(p2,p7)*za(p3,p5)*zb(p1,p8)*zb(p4,p7)*zba2(p6,p3,
      &    p5,p7) - 2.D0*za(p2,p7)*za(p3,p5)*zb(p1,p8)*zb(p5,p6)*zab2(p5
@@ -409,7 +409,7 @@ c--- special fix for Madgraph check
      &    zb(p4,p5)*twop17Dp3456*twop34Dp3456 )
       amp(jdu2,2,2) = amp(jdu2,2,2) + gamZ28qW(jdu2,2)*gamZ56eW(2)*
      & cxw**(-1)*Bbit*propw17**(-1)*propw34**(-1)*propw3456**(-1) * ( 4.
-     &    D0*za(p2,p3)*zb(p4,p8)*zab2(p7,p2,p8,p1)*zba2(p5,p3,p4,p6) - 
+     &    D0*za(p2,p3)*zb(p4,p8)*zab2(p7,p2,p8,p1)*zba2(p5,p3,p4,p6) -
      &    4.D0*za(p2,p6)*zb(p5,p8)*zab2(p3,p5,p6,p4)*zab2(p7,p2,p8,p1)
      &     + 4.D0*za(p2,p7)*za(p3,p6)*zb(p1,p8)*zb(p4,p5)*s1347 - 2.D0*
      &    za(p2,p7)*za(p3,p6)*zb(p1,p8)*zb(p4,p5)*s3456 - 4.D0*za(p2,p7
@@ -438,7 +438,7 @@ c--- special fix for Madgraph check
      &    twop17Dp3456 )
       amp(jdu2,2,2) = amp(jdu2,2,2) + gamZ28qW(jdu2,2)*gamZ56ne(1,2)*
      & cxw**(-1)*Bbit*propw17**(-1)*propw3456**(-1)*s356**(-1) * ( 4.D0
-     &    *za(p2,p7)*za(p3,p6)*zb(p1,p4)*zb(p1,p8)*zba2(p5,p3,p6,p1) - 
+     &    *za(p2,p7)*za(p3,p6)*zb(p1,p4)*zb(p1,p8)*zba2(p5,p3,p6,p1) -
      &    2.D0*za(p2,p7)*za(p3,p6)*zb(p1,p8)*zb(p3,p5)*zab2(p3,p5,p6,p4
      &    ) - 4.D0*za(p2,p7)*za(p3,p6)*zb(p1,p8)*zb(p4,p7)*zba2(p5,p3,
      &    p6,p7) + 2.D0*za(p2,p7)*za(p3,p6)*zb(p1,p8)*zb(p5,p6)*zab2(p6

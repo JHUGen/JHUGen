@@ -66,7 +66,7 @@ c---       and the fact that A0phiggggdagger=(c.c. of A0phigggg)
 
 c--- MODIFIED: overall sign of Rhat
       Rhat4mmpp=-Rhat4mmpp
-       
+
       return
       end
 
@@ -107,13 +107,13 @@ c--- set up 's-comma' products
       sc(4,2)=s(j4,j1)+s(j4,j2)+s(j1,j2)
       sc(4,3)=sc(1,4) !s(j1,j2)+s(j1,j3)+s(j1,j4)+s(j2,j3)+s(j2,j4)+s(j3,j4)
       sc(4,4)=zip
-      
+
       Np=2d0*(1d0-dfloat(nflav)/xn)
       bb0=(11d0*xn-2d0*dfloat(nflav))/3d0
       Born=A0phiggggmmpp(j1,j2,j3,j4,za,zb)
 
       sum=czip
-      do i=1,4      
+      do i=1,4
 c--- note: corrected third argument of F42me from
 c---       s_(i,j+1) to s_(i,j-1) [with j=i+3 here]
       sum=sum
@@ -180,7 +180,7 @@ c--- set up 's-comma' products
       sc(4,2)=s(j4,j1)+s(j4,j2)+s(j1,j2)
       sc(4,3)=sc(1,4) !s(j1,j2)+s(j1,j3)+s(j1,j4)+s(j2,j3)+s(j2,j4)+s(j3,j4)
       sc(4,4)=zip
-      
+
       Np=2d0*(1d0-dfloat(nflav)/xn)
       bb0=(11d0*xn-2d0*dfloat(nflav))/3d0
       Born=A0phiggggmmpp(j1,j2,j3,j4,za,zb)
@@ -236,7 +236,7 @@ C---  not yet implemented; instead, included in C by hatting procedure
      . +za(j1,j2)*zb(j2,j5)+za(j1,j3)*zb(j3,j5)+za(j1,j4)*zb(j4,j5)
       zba3(j1,j2,j3,j4,j5)=
      . +zb(j1,j2)*za(j2,j5)+zb(j1,j3)*za(j3,j5)+zb(j1,j4)*za(j4,j5)
-      
+
 c--- set up 's-comma' products
       sc(1,1)=zip
       sc(1,2)=s(j1,j2)
@@ -254,9 +254,9 @@ c--- set up 's-comma' products
       sc(4,2)=s(j4,j1)+s(j4,j2)+s(j1,j2)
       sc(4,3)=sc(1,4) !s(j1,j2)+s(j1,j3)+s(j1,j4)+s(j2,j3)+s(j2,j4)+s(j3,j4)
       sc(4,4)=zip
-      
+
       Np=2d0*(1d0-dfloat(nflav)/xn)
-       
+
       sum=
 c--- 1st line
      . za(j1,j4)*zb(j4,j3)*za(j3,j2)*zab2(j1,j2,j3,j4)*za(j4,j2)
@@ -265,7 +265,7 @@ c--- 1st line
 c--- 2nd line
      .+za(j1,j4)*zba3(j4,j2,j3,j4,j2)*zab3(j1,j2,j3,j4,j4)*za(j4,j2)
      . *(zab3(j1,j2,j3,j4,j4)*za(j4,j2)-za(j1,j4)*zba3(j4,j2,j3,j4,j2))
-     . /(sc(2,4)*zab3(j4,j2,j3,j4,j4)**2) 
+     . /(sc(2,4)*zab3(j4,j2,j3,j4,j4)**2)
 c--- 3rd line
      .+zab3(j1,j3,j4,j1,j3)*za(j3,j2)*za(j1,j3)*zba3(j3,j3,j4,j1,j2)
      . *(za(j1,j3)*zba3(j3,j3,j4,j1,j2)-zab3(j1,j3,j4,j1,j3)*za(j3,j2))
@@ -324,7 +324,7 @@ c--- set up 's-comma' products
       sc(4,2)=s(j4,j1)+s(j4,j2)+s(j1,j2)
       sc(4,3)=sc(1,4) !s(j1,j2)+s(j1,j3)+s(j1,j4)+s(j2,j3)+s(j2,j4)+s(j3,j4)
       sc(4,4)=zip
-      
+
       trm1432=trm(j1,j4,j3,j2)
       trm2341=trm(j2,j3,j4,j1)
       Np=2d0*(1d0-dfloat(nflav)/xn)
@@ -343,12 +343,12 @@ c---       s_(i,j+1) to s_(i,j-1) [with j=i+3 here]
       enddo
 
       sum=sum-(
-     . +Np/3d0*(trm1432/s(j1,j2))**3*BGRL3(sc(3,1),sc(4,1))    
-     . +Np/3d0*(trm2341/s(j1,j2))**3*BGRL3(sc(2,4),sc(2,3))    
-     . -Np/2d0*(trm1432/s(j1,j2))**2*BGRL2(sc(3,1),sc(4,1))    
-     . -Np/2d0*(trm2341/s(j1,j2))**2*BGRL2(sc(2,4),sc(2,3))    
-     . +(Np/6d0+bb0/xn)*(trm1432/s(j1,j2))*BGRL1(sc(3,1),sc(4,1)) 
-     . +(Np/6d0+bb0/xn)*(trm2341/s(j1,j2))*BGRL1(sc(2,4),sc(2,3))) 
+     . +Np/3d0*(trm1432/s(j1,j2))**3*BGRL3(sc(3,1),sc(4,1))
+     . +Np/3d0*(trm2341/s(j1,j2))**3*BGRL3(sc(2,4),sc(2,3))
+     . -Np/2d0*(trm1432/s(j1,j2))**2*BGRL2(sc(3,1),sc(4,1))
+     . -Np/2d0*(trm2341/s(j1,j2))**2*BGRL2(sc(2,4),sc(2,3))
+     . +(Np/6d0+bb0/xn)*(trm1432/s(j1,j2))*BGRL1(sc(3,1),sc(4,1))
+     . +(Np/6d0+bb0/xn)*(trm2341/s(j1,j2))*BGRL1(sc(2,4),sc(2,3)))
 
       C4mmpp322=Born*sum
 

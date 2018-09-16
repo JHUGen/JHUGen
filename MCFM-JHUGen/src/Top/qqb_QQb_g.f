@@ -1,4 +1,4 @@
-      subroutine qqb_QQb_g(p,msq) 
+      subroutine qqb_QQb_g(p,msq)
       implicit none
 
 ************************************************************************
@@ -12,7 +12,7 @@ C      Q(P1) + Qbar(P2) --> q(-P3) + qbar(-P4) + g(-P5)
 ************************************************************************
       include 'constants.f'
       include 'sprods_com.f'
-      
+
       integer j,k
       double precision msq(-nf:nf,-nf:nf),p(mxpart,4)
       double precision ttbqqbg,ttbggg
@@ -105,17 +105,17 @@ C      %%CITATION = NUPHA,B282,642;%%
      . *(4D0*V**2/xn*(P13/P15/P35+P24/P25/P45)
      . +4D0*V/xn*(2D0*P14/P15/P45+2D0*P23/P25/P35
      . -P13/P15/P35-P24/P25/P45-P12/P15/P25-P34/P35/P45) )
-      res2 = 
+      res2 =
      . -V*(xn**2-4D0)/xn
      . *2D0*XM2/S12/P34*((P13-P14)/P25-(P23-P24)/P15)
-     . +4D0*V**2/xn*XM2*( (P35**2+P45**2)/P35/P45/S12**2 
+     . +4D0*V**2/xn*XM2*( (P35**2+P45**2)/P35/P45/S12**2
      . -0.5d0*(1D0/P15+1D0/P25+1D0/P35+1D0/P45)/S12
      . -0.25d0*(1D0/P15+1D0/P25+XM2/P15**2+XM2/P25**2+4D0/S12)/P34
      . -(DL1**2+DL2**2+DL3**2+DL4**2)/4D0/P34**2)
      . -2D0*V/xn
      . *XM2/S12/P34*(1D0+2D0*P34/S12+XM2/P15+XM2/P25
-     . +(P35**2+P45**2)/P15/P25     
-     . +(P13-P14)*(DL1-DL2)/P34+(P23-P24)*(DL3-DL4)/P34 )     
+     . +(P35**2+P45**2)/P15/P25
+     . +(P13-P14)*(DL1-DL2)/P34+(P23-P24)*(DL3-DL4)/P34 )
 
 
       ttbqqbg=gsq**3*(res1+res2)
@@ -144,7 +144,7 @@ C      %%CITATION = NUPHA,B282,642;%%
 C      This is the four dimensional result for
 C      Quark antiquark annihilation into three gluons in order alfa_s^3
 C      Q(P1) + Qbar(P2) --> g(-P3) + g(-P4) + g(-P5)
-C      Result requires symmetrisation.   
+C      Result requires symmetrisation.
 C      No average over initial spins and colours
 C      Taken from:-
 C      %\cite{Ellis:1986ef}
@@ -165,7 +165,7 @@ C      %%CITATION = NUPHA,B282,642;%%
       if (first) then
       first=.false.
       write(6,*) 'Heavy Quark mass:',mass2
-      endif 
+      endif
 
 
       xm2=mass2**2
@@ -188,10 +188,10 @@ C      %%CITATION = NUPHA,B282,642;%%
      .   V*(xn**2+1D0)/4D0/xn**2
      .   *(P12*(P15**2+P25**2+2D0*XM2*(P35+P45))/P13/P14/P23/P24 )
      . -V*(xn**2+1D0)*XM2/xn**2
-     . *(S12**2+2D0*P13*P14+2D0*P23*P24+4D0*XM2*P12)/P13/P14/P23/P24/8D0 
+     . *(S12**2+2D0*P13*P14+2D0*P23*P24+4D0*XM2*P12)/P13/P14/P23/P24/8D0
      . -V*(
      . + P13*(P13**2+P23**2+2D0*XM2*(P34+P35))/P34/P14/P15/P25
-     . + (P15**2+P25**2+2D0*XM2*(P35+P45))/2D0/P34/P14/P23 ) 
+     . + (P15**2+P25**2+2D0*XM2*(P35+P45))/2D0/P34/P14/P23 )
      . +V*XM2
      . *( (P12-3D0*XM2)/P34/P15/P25
      .   +(3D0*P13*P23+5D0*P13*P25-2D0*P13**2)/P13/P14/P23/P24 )
@@ -199,7 +199,7 @@ C      %%CITATION = NUPHA,B282,642;%%
      . *( +(P13**2+P23**2+P15**2+P15*P25-S12*P13)/P34/P13/P24/P15/P25
      .    +(P15+P24)/P13/P23/P14/P25 )
       RES = RES
-     . +2D0*V*xn**2 
+     . +2D0*V*xn**2
      . *P23*(P13**2+P23**2+2D0*XM2*(P34+P35))/S12/P34/P45/P25
      . +V*xn**2
      . *(P14*P24*(P14**2+P24**2+2D0*XM2*(P34+P45))/S12/P34/P45/P13/P25)
@@ -207,7 +207,7 @@ C      %%CITATION = NUPHA,B282,642;%%
      . +2D0*V*xn**2*XM2
      . *(4D0*P15*P25+P13*P23+P14*P24
      . -0.125d0*S12*(S12+2D0*P34))/S12/P34/P15/P25
-     . +V*xn**2*XM2 
+     . +V*xn**2*XM2
      . *((P34-2D0*XM2)/S12/P13/P24-S12/4D0/P34/P15/P25)
      . -2D0*V*xn**2*XM4*(0.25d0*S12**2+P34**2+P45**2)
      . /S12/P34/P45/P13/P25
@@ -225,10 +225,10 @@ C      %%CITATION = NUPHA,B282,642;%%
      . +V**3/xn**2*XM2*0.5D0
      . *((XM4+4D0*XM2*P24-2D0*P24*P25)/P13**2/P24**2
      . +(S12*P34+2D0*P15*P25-P14*P24)/P13/P23/P14/P24)
-     . +V/xn**2*XM2 
+     . +V/xn**2*XM2
      . *(XM4/P13/P23/P14/P25
      . -(5D0*S12*P13+8D0*P13*P23+6D0*P13*P25-4D0*P13**2)
      .  /4D0/P13/P14/P23/P24)
       BSEXTON=RES
       RETURN
-      end 
+      end

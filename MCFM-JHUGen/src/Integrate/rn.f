@@ -3,7 +3,7 @@
         common/seed/ij,kl
         save init
         data init /1/
-        
+
         if (init.eq.1) then
         init=0
         if (ij .eq. 0) then
@@ -41,7 +41,7 @@
       if(uni .lt. 0d0) uni = uni + 1d0
       rvec = uni
       end
- 
+
       subroutine rmarin(ij,kl)
 *     -----------------
 * initializing routine for ranmar, must be called before generating

@@ -45,7 +45,7 @@ C---- (These are twiddle functions, c.f.arXiv:1101.5947[hep-ph],Eq.(91))
      &    q1,p3)*mt - 3.D0/2.D0/(zab(p2,q1,p3))/(za(p3,p2))*za(e1,p3)*
      &    za(e4,p3)*zab(p3,q1,p3)*mt3 + 1/(zab(p2,q1,p3))/(zab(p2,q1,p3
      &    ))*za(e1,p2)*za(e4,p3)*zb(p3,p2)*zab(p3,q1,p3)*mt3 + 1/(zab(
-     &    p2,q1,p3))/(zab(p2,q1,p3))*za(e4,e1)*zab(p3,q1,p3)*s12*mt3 - 
+     &    p2,q1,p3))/(zab(p2,q1,p3))*za(e4,e1)*zab(p3,q1,p3)*s12*mt3 -
      &    2.D0/(zab(p2,q1,p3))/(zab(p2,q1,p3))/(za(p3,p2))*za(e1,p2)*
      &    za(e4,p3)*zab(p2,q1,p2)*zab(p3,q1,p3)*mt3 + 1.D0/2.D0/(zab(p2
      &    ,q1,p3))/(zab(p2,q1,p3))/(zab(p2,q1,p3))/(za(p3,p2))*za(e1,p2
@@ -67,7 +67,7 @@ C---- (These are twiddle functions, c.f.arXiv:1101.5947[hep-ph],Eq.(91))
      &    zab(p3,q1,p2)*mt - 1.D0/2.D0/(zab(p2,q1,p3))*za(e4,e1)*zab(p2
      &    ,q1,p3)*zab(p3,q1,p2)**2*mt + 1.D0/2.D0/(zab(p2,q1,p3))*za(e4
      &    ,e1)*zab(p3,q1,p2)*s23*mt3 - 3.D0/2.D0/(zab(p2,q1,p3))/(za(p3
-     &    ,p2))*za(e1,p3)*za(e4,p3)*zab(p2,q1,p2)*zab(p3,q1,p3)*mt3 + 
+     &    ,p2))*za(e1,p3)*za(e4,p3)*zab(p2,q1,p2)*zab(p3,q1,p3)*mt3 +
      &    1/(zab(p2,q1,p3))/(zab(p2,q1,p3))*za(e1,p2)*za(e4,p3)*zb(p3,
      &    p2)*zab(p2,q1,p2)*zab(p3,q1,p3)*mt3 + 1/(zab(p2,q1,p3))/(zab(
      &    p2,q1,p3))*za(e4,e1)*zab(p2,q1,p2)*zab(p3,q1,p3)*s12*mt3 - 2.D

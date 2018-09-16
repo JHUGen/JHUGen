@@ -2,13 +2,13 @@
 C***************************************************************C
 C                                                               C
 C  This is a package for the new MRST 2002 updated NLO and      C
-C  NNLO parton distributions.                                   C 
+C  NNLO parton distributions.                                   C
 C  Reference: A.D. Martin, R.G. Roberts, W.J. Stirling and      C
 C  R.S. Thorne, hep-ph/0211080                                  C
 C                                                               C
 C  There are 2 pdf sets corresponding to mode = 1, 2            C
 C                                                               C
-C  Mode=1 gives the NLO set with alpha_s(M_Z,NLO) = 0.1197      C  
+C  Mode=1 gives the NLO set with alpha_s(M_Z,NLO) = 0.1197      C
 C  This set reads a grid whose first number is 0.00949          C
 C                                                               C
 C  Mode=2 gives the NNLO set with alpha_s(M_Z,NNLO) = 0.1154    C
@@ -21,15 +21,15 @@ C***************************************************************C
       data xmin,xmax,qsqmin,qsqmax/1d-5,1d0,1.25d0,1d7/
       save xmin,xmax,qsqmin,qsqmax
 !$omp threadprivate(xmin,xmax,qsqmin,qsqmax)
-                                                                                
+
        q2=q*q
       if(q2.lt.qsqmin.or.q2.gt.qsqmax) print 99,q2
 c      if(x.lt.xmin.or.x.gt.xmax)       print 98,x
           if(mode.eq.1) then
-        call mrst_02_1(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu) 
+        call mrst_02_1(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu)
       elseif(mode.eq.2) then
-        call mrst_02_2(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu) 
-      endif 
+        call mrst_02_2(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu)
+      endif
   99  format('  WARNING:  Q^2 VALUE IS OUT OF RANGE   ','q2= ',e10.5)
   98  format('  WARNING:   X  VALUE IS OUT OF RANGE   ','x= ',e10.5)
       return
@@ -137,12 +137,12 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       call jeppe2(xlog,qsqlog,nx,nq,xxl,qql,cc8,dsea)
 
       chm=0.d0
-      if(qsq.gt.emc2) then 
+      if(qsq.gt.emc2) then
       call jeppe2(xlog,qsqlog,nx,nqc,xxl,qqlc,ccc,chm)
       endif
 
       bot=0.d0
-      if(qsq.gt.emb2) then 
+      if(qsq.gt.emb2) then
       call jeppe2(xlog,qsqlog,nx,nqb,xxl,qqlb,ccb,bot)
       endif
 
@@ -252,12 +252,12 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       call jeppe2(xlog,qsqlog,nx,nq,xxl,qql,cc8,dsea)
 
       chm=0.d0
-      if(qsq.gt.emc2) then 
+      if(qsq.gt.emc2) then
       call jeppe2(xlog,qsqlog,nx,nqc,xxl,qqlc,ccc,chm)
       endif
 
       bot=0.d0
-      if(qsq.gt.emb2) then 
+      if(qsq.gt.emb2) then
       call jeppe2(xlog,qsqlog,nx,nqb,xxl,qqlb,ccb,bot)
       endif
 

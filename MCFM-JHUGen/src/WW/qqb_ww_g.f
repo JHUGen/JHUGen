@@ -2,7 +2,7 @@
 c---Matrix element squared averaged over initial colors and spins
 c     q(-p1)+qbar(-p2) -->  f'(p5)+bar{f'}(p6) + n(p3)+ebar(p4)+ g(p7)
 c   for the moment --- radiation only from initial line
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'qcdcouple.f'
       include 'masses.f'
@@ -39,7 +39,7 @@ c   for the moment --- radiation only from initial line
 C---multiply by factor for c-sbar+u-dbar hadronic decay
       if (plabel(5) .eq. 'qj') fac1=2d0*xn*fac1
 
-C----Change the momenta to DKS notation 
+C----Change the momenta to DKS notation
 C   swapped possibility if we want to swap momenta for hadronic case
 c   We have --- f(p1) + f'(p2)-->mu^-(p3)+nubar(p4)+e^+(p6)+nu(p5)+g(p7)
 c   DKS have--- ubar(q1)+u(q2)-->mu^-(q3)+nubar(q4)+e^+(q5)+nu(q6)+g(p7)
@@ -48,7 +48,7 @@ C   or normal configuration
 c   We have --- f(p1) + f'(p2)-->mu^-(p5)+nubar(p6)+e^+(p4)+nu(p3)+g(p7)
 c   DKS have--- ubar(q1)+u(q2)-->mu^-(q3)+nubar(q4)+e^+(q5)+nu(q6)+g(p7)
 
-      if ((plabel(5) .eq. 'qj') .and. (plabel(3) .eq. 'el')) then 
+      if ((plabel(5) .eq. 'qj') .and. (plabel(3) .eq. 'el')) then
 c----swapped case
       do j=1,4
       qdks(1,j)=p(1,j)
@@ -78,8 +78,8 @@ c--   s returned from sprodx (common block) is 2*dot product
 c--   calculate propagators
       s127=s(1,2)+s(1,7)+s(2,7)
       if     (zerowidth  .eqv. .true.) then
-      prop12=s127/dcmplx(s127-zmass**2,zmass*zwidth)  
-      cprop=1d0    
+      prop12=s127/dcmplx(s127-zmass**2,zmass*zwidth)
+      cprop=1d0
       elseif (zerowidth .neqv. .true.) then
       prop12=dcmplx(s127/(s127-zmass**2))
       offsh=s(3,4)-wmass**2
@@ -111,7 +111,7 @@ c-- couplings with or without photon pole
       cgamz(mplus,j)=two*xw*(-Q(j)+le*R(j)*prop12)
       endif
       enddo
-c-- 
+c--
 c      l(j)=(tau(j)-two*Q(j)*xw)/sin2w ; r(j)=(-two*Q(j)*xw)/sin2w
 c      le=(-1d0-two*(-1d0)*xw)/sin2w ; re=(-two*(-1d0)*xw)/sin2w
 c      ln=(+1d0-two*(+0d0)*xw)/sin2w ; rn=0d0
@@ -129,7 +129,7 @@ c--- apply a dipole form factor to anomalous couplings (only if tevscale > 0)
       xdelk_g=xfac*delk_g
       xlambda_z=xfac*lambda_z
       xlambda_g=xfac*lambda_g
-      
+
 c---remember ub-u is the basic process.
 c---case ubar-u
       call wwamps(1,2,3,4,5,6,7,za,zb,ub_u)
@@ -198,7 +198,7 @@ c---sum is over diagram type t,s(Z),e,n,s(photon)
             amp(jtype)=d_g(jtype,polg,polq)
           elseif(k .eq. 0 .and. tau(jk) .eq. -1d0 .and. jk .lt. 0) then
             amp(jtype)=ub_g(jtype,polg,polq)
-          elseif(k .eq. 0 .and. tau(jk) .eq.  1d0 .and. jk .lt. 0) then 
+          elseif(k .eq. 0 .and. tau(jk) .eq.  1d0 .and. jk .lt. 0) then
             amp(jtype)=db_g(jtype,polg,polq)
         endif
       enddo
@@ -209,7 +209,7 @@ C---tjk is equal to 2 (u,c) or 1 (d,s,b)
       A(polg,polq)=dcmplx(fac)*cprop
      . *(ct(polq,tjk)*amp(1)+cs_z(polq,tjk)*amp(2)+cs_g(polq,tjk)*amp(5)
      .  +cz(polq,tjk)*amp(3)+cgamz(polq,tjk)*amp(4))
-          
+
       enddo
       enddo
 
@@ -217,15 +217,15 @@ C---tjk is equal to 2 (u,c) or 1 (d,s,b)
      . (cdabs(A(mplus,minus))**2+cdabs(A(minus,minus))**2
      . +cdabs(A(mplus,mplus))**2+cdabs(A(minus,mplus))**2)
 
-        
+
    19 continue
       enddo
       enddo
       return
       end
 
-      
-      
+
+
 
 
 

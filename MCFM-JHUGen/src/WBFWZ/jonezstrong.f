@@ -2,6 +2,7 @@
       implicit none
       include 'constants.f'
       include 'cmplxmass.f'
+      include 'masses.f'
       include 'ewcharge.f'
       include 'zcouple.f'
       include 'sprods_com.f'
@@ -18,7 +19,7 @@ C---The one Z-current multiplied by i
 C---order of indices Lorentz,jdu up or down,
 C---quark-line helicity,lepton-line helicity
 C---order of indices gmZ(jdu,h2,h34)
-C---process 2 
+C---process 2
 c              2-----<-----------1          2--------<---------1
 c                 o         (                    (        o
 c                 o         )                    )        o
@@ -31,15 +32,15 @@ c--- j1l represents current corresponding to non-resonant diagrams
 c--- such as the one below:
 c              2-----<-----------1
 c                        (
-c                        ) 
+c                        )
 c                        (
 c                    3--<----4
-c                      o 
-c                      o 
-c                      o 
+c                      o
+c                      o
+c                      o
 c                     \mu
 c
-      
+
 C---setting up couplings dependent on whether we are doing 34-line or 56-line
       if (n3+n4 == 7) then
       xl=l1
@@ -55,7 +56,7 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
       endif
 
       s34=s(n3,n4)
-      propz34=dcmplx(s34)-czmass2
+      propz34=dcmplx(s34)-dcmplx(zmass**2,-zmass*zwidth)
 
       do jdu=1,2
       gmZ(jdu,1,1)=(dcmplx(Q(jdu)*xq/s34)+dcmplx(L(jdu)*xl)/propz34)
@@ -68,7 +69,7 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
       i2=n2
       do h34=1,2
 
-      if (h34.eq.1) then 
+      if (h34.eq.1) then
         i3=n3
         i4=n4
       elseif (h34.eq.2) then
@@ -95,8 +96,8 @@ C--Apply couplings for jdu=1,2 to j1
      & 2d0*gmZ(jdu,h12,h34)*(before(:,h12,h34)+after(:,h12,h34))
       enddo
       enddo
-      
+
       enddo
-      
+
       return
       end

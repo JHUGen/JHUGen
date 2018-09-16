@@ -22,7 +22,7 @@
 C     statement functions
       s4(p1,p2,p3,p4)=s(p1,p2)+s(p1,p3)+s(p1,p4)
      &               +s(p2,p3)+s(p2,p4)+s(p3,p4)
-C     end statement functions 
+C     end statement functions
 
       fac=4d0*V*xn*gwsq**2*esq**2*gsq**2
 
@@ -53,7 +53,7 @@ c      call TWZgg2w(p1,p2,p3,p4,p5,p6,p8,p7,BA2w)
       call TWZggSRA(p1,p2,p3,p4,p5,p6,p8,p7,BAsra)
       call TWZggSRL(p1,p2,p3,p4,p5,p6,p7,p8,ABsrl)
       call TWZggSRL(p1,p2,p3,p4,p5,p6,p8,p7,BAsrl)
- 
+
 
 C     First index is helicity of Z (56) decay line
       do h7=1,2
@@ -170,7 +170,7 @@ C     For u->dW^+ process Z is emitted after W for AB3456 and before W for AB563
       ampBA(2,h7,h8)=
      &  ((Q(jd)*qe+L(jd)*re*prop56)*BA1(2,h7,h8)
      &  +(Q(ju)*qe+L(ju)*re*prop56)*BA2(2,h7,h8)
-     &  +((Q(ju)-Q(jd))*qe+(L(ju)-L(jd))*re*prop56) 
+     &  +((Q(ju)-Q(jd))*qe+(L(ju)-L(jd))*re*prop56)
      &  *NBA1(2,h7,h8)*prop3456
      &  +0.5d0/xw*NBA2w(2,h7,h8)*prop3456)*prop34
      &  +(q3*qe+l3*re*prop56)*NBAsrl(2,h7,h8)*prop3456

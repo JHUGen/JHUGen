@@ -32,10 +32,10 @@ c--- special fix for Madgraph check
 
       proph1347=dcmplx(s1347-hmass**2,hmass*hwidth)
       proph1567=dcmplx(s1567-hmass**2,hmass*hwidth)
-      propw34=s34-cwmass2
-      propw56=s56-cwmass2
-      propw17=s17-cwmass2
-      propw28=s28-cwmass2
+      propw34=s34-dcmplx(wmass**2,-wmass*wwidth)
+      propw56=s56-dcmplx(wmass**2,-wmass*wwidth)
+      propw17=s17-dcmplx(wmass**2,-wmass*wwidth)
+      propw28=s28-dcmplx(wmass**2,-wmass*wwidth)
 
       amp= + Bbit*propw17**(-1)*propw28**(-1)*propw34**(-1)*
      & propw56**(-1) * ( 2.D0*za(p3,p5)*za(p7,p8)*zb(p1,p2)*zb(p4,p6)

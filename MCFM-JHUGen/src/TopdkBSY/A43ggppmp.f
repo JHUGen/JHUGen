@@ -13,7 +13,7 @@ C---- taken from arXiv:1101.5947 [hep-ph], Eq. (5,53)
       double complex BSYALggppmphp,BSYARggppmphp,BSYALslggpppm
       double complex BSYA0ggppmp,lnrat,Vslc
       integer e1,p2,p3,e4,e1p,e4p
-       
+
       mt2=mt**2
       beta=sqrt(1d0-4d0*mt2/s(p2,p3))
       xlog=log((1d0-beta)/(1d0+beta))/beta
@@ -24,10 +24,10 @@ c----   with an extra minus sign to account for A4;3 -> -Vslc, c.f. Eq. (53))
      &  +s(1,p3)/s(p2,p3)*(lnrat(musq,-s(1,p3))+lnrat(mt2,-s(1,p3)))
      & +lnrat(musq,-s(p2,p3))+(1d0-2d0*mt2/s(p2,p3))*xlog)
 
-c--- perform the swaps 5 <-> 7 and 6 <-> 8     
+c--- perform the swaps 5 <-> 7 and 6 <-> 8
       e1p=12-e1
       e4p=14-e4
-      
+
       A43ggppmp=(
      &  Vslc*(BSYA0ggppmp(e1,p2,p3,e4,za,zb,zab,zba)
      &       -BSYA0ggppmp(e1p,p3,p2,e4p,zb,za,zba,zab))

@@ -53,11 +53,11 @@ c--- set msqv=0 to initalize
       msqv(j,k)=0d0
       enddo
       enddo
-      
+
 c--- calculate the lowest order matrix element
       call qqb_ww(p,msq)
 
-C----Change the momenta to DKS notation 
+C----Change the momenta to DKS notation
 C   swapped possibility if we want to swap momenta
 c   We have --- f(p1) + f'(p2)-->mu^-(p3)+nubar(p4)+e^+(p6)+nu(p5)
 c   DKS have--- ubar(q1)+u(q2)-->mu^-(q3)+nubar(q4)+e^+(q5)+nu(q6)
@@ -67,7 +67,7 @@ c   We have --- f(p1) + f'(p2)-->mu^-(p5)+nubar(p6)+e^+(p4)+nu(p3)
 c   DKS have--- ubar(q1)+u(q2)-->mu^-(q3)+nubar(q4)+e^+(q5)+nu(q6)
 
 
-      if ((plabel(5) .eq. 'qj') .and. (plabel(3) .eq. 'el')) then 
+      if ((plabel(5) .eq. 'qj') .and. (plabel(3) .eq. 'el')) then
 C----swapped case for hadronic decay of Wp
 C----swapped case
       do j=1,4
@@ -108,7 +108,7 @@ c--   calculate propagators
       propzg=(s(1,2)-zmass**2)/dcmplx(s(1,2)-zmass**2,zmass*zwidth)
       cprop=propwp*propwm*propzg
       endif
-      
+
 c-- couplings with or without photon pole
       do j=1,2
       cl_z(j)=+mp(j)*l(j)*sin2w*prop12
@@ -135,7 +135,7 @@ c--- apply a dipole form factor to anomalous couplings (only if tevscale > 0)
       xdelk_g=xfac*delk_g
       xlambda_z=xfac*lambda_z
       xlambda_g=xfac*lambda_g
-      
+
 c---case dbar-d and d-dbar
       Fa126543=A6treea(1,2,6,5,4,3,za,zb)
       Fa216543=A6treea(2,1,6,5,4,3,za,zb)
@@ -160,7 +160,7 @@ c---case dbar-d and d-dbar
      .          +A6b_3*(xlambda_g/wmass**2)
       Fb216543_z=-Fb213456_z
       Fb216543_g=-Fb213456_g
-     
+
 c      Fb123456=A6treeb(1,2,3,4,5,6,za,zb)
 c      Fb126543=-Fb123456
 c      Fb213456=A6treeb(2,1,3,4,5,6,za,zb)
@@ -301,11 +301,11 @@ C-- Inclusion of width for W's a la Baur and Zeppenfeld
       AWWP=cprop*AWWP
       BWWM=cprop*BWWM
       BWWP=cprop*BWWP
-      
+
       msqv(j,k)=facnlo*fac*two*dble(dconjg(AWWM)*BWWM+dconjg(AWWP)*BWWP)
 
  20   continue
       enddo
-        
+
       return
       end

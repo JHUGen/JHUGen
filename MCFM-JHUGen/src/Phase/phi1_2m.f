@@ -3,7 +3,7 @@ c     massive particle p1 decaying into p2 mass m2 and p3 mass-squared s3.
 c     with invariant mass of particle three s3 integrated over.
 c     s3min is the minimum value of s3.
 c     Vectors returned p2 and p3 are in the same frame as p1 is supplied.
-c     Expression evaluated is 
+c     Expression evaluated is
 c     ds3 d^4 p2 d^4 p3 (2 pi)^4 delta(p1-p2-p3)/(2 pi)^6
 c     delta(p2^2-m2) delta(p3^2-s3)
       implicit none
@@ -20,7 +20,7 @@ c     delta(p2^2-m2) delta(p3^2-s3)
       parameter(wt0=one/8d0/pi)
 
       wt=0d0
-      s1=p1(4)**2-p1(1)**2-p1(2)**2-p1(3)**2  
+      s1=p1(4)**2-p1(1)**2-p1(2)**2-p1(3)**2
       if (s1 .lt. 0d0) return 1
       m1=dsqrt(s1)
       s2=m2**2
@@ -33,7 +33,7 @@ c     delta(p2^2-m2) delta(p3^2-s3)
       elseif (n3 .eq. 1) then
         if ((zerowidth) .and. (s3max .lt. mass3)) return 1
         xx=1d0
-        call breitw(x3,s3min,s3max,mass3,width3,s3,w3) 
+        call breitw(x3,s3min,s3max,mass3,width3,s3,w3)
       endif
 
       m3=dsqrt(s3)
@@ -45,7 +45,7 @@ c     delta(p2^2-m2) delta(p3^2-s3)
       cphi=dcos(phi)
       sphi=dsin(phi)
       lambda=((s1-s2-s3)**2-4d0*s2*s3)
-      
+
       if ((m1-m2-m3.lt. 0d0) .or. debug) then
       write(6,*) 'lambda in phi1_2m',lambda
       write(6,*) 's1 in phi1_2m',s1
@@ -76,8 +76,8 @@ c     delta(p2^2-m2) delta(p3^2-s3)
       p2(j)=p1(j)-p3(j)
       enddo
 
-      if (  (p1(4) .lt. 0d0) 
-     & .or. (p2(4) .lt. 0d0) 
+      if (  (p1(4) .lt. 0d0)
+     & .or. (p2(4) .lt. 0d0)
      & .or. (p3(4) .lt. 0d0)) then
       return 1
       endif

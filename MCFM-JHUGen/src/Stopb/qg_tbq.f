@@ -2,7 +2,7 @@
 ************************************************************************
 *     Lowest order t-channel single top, with explicit b-quark         *
 *                                                                      *
-*     q(p1) + g(p2) -> t(p3) + b(p4) + q'(p5)                          *      
+*     q(p1) + g(p2) -> t(p3) + b(p4) + q'(p5)                          *
 *                                                                      *
 *     Originally: R. Frederix and F. Tramontano, February 2008         *
 *        Adapted: J. Campbell, February 26, 2008                       *
@@ -34,7 +34,7 @@ c     u + g  ->  c + s + d  (t-channel single-charm)
       double precision b1scale,q2scale,q1scale,b2scale
       common/bqscale/b1scale,q2scale,q1scale,b2scale
 !$omp threadprivate(/bqscale/)
-c--- set this parameter to .false. to check amplitudes vs. squared ME      
+c--- set this parameter to .false. to check amplitudes vs. squared ME
       parameter(nocheck=.true.)
 
 c--- initialize
@@ -43,9 +43,9 @@ c--- initialize
       msq(j,k)=0d0
       enddo
       enddo
-      
+
       gsq_H=fourpi*as_H
-      
+
       if (dynstring .eq. 'DDIS') then
         fac1=aveqg*2d0*xn**2*Cf*gwsq**2
      &       *fourpi*alphas(b1scale,amz,nlooprun)
@@ -55,7 +55,7 @@ c--- initialize
         fac1=aveqg*2d0*xn**2*Cf*gsq_H*gwsq**2
         fac2=fac1
       endif
-      
+
 
 c--- extra correction factor to go from 4 to 5 flavours
 c      fac=fac*(1d0-as_H/2d0/pi*2d0/3d0*log(renscale_H/facscale_H))
@@ -81,11 +81,11 @@ c--- propagator for qg and qbarg amplitudes
 
 c--- propagator for gq and gqbar amplitudes
       Wprop25=1d0/(2d0*dot(p,2,5)-wmass**2)
-      
+
       call bornwrap(p,2,1,i3,i4,5,mq,ma,amps_gq)
       call bornwrap(p,5,1,i3,i4,2,mq,ma,amps_gqbar)
 
-c--- now square up amplitudes and add propagators      
+c--- now square up amplitudes and add propagators
       msq_qg=0d0
       msq_qbarg=0d0
       msq_gq=0d0
@@ -108,14 +108,14 @@ c--- fill matrix elements
         msq(0,+j)=fac1*Vsum(+j)*msq_gq
         msq(0,-j)=fac1*Vsum(-j)*msq_gqbar
       enddo
-      
-c--- normal return is here 
+
+c--- normal return is here
       if (nocheck) return
-      
+
 c--- else, check against squared matrix elements (code below)
- 
+
 c     u + g  ->  c + s + d  (t-channel single-charm)
- 
+
       sDg=dot(p,4,2)
       sDu=dot(p,4,1)
       sDc=dot(p,4,3)
@@ -144,7 +144,7 @@ c      uDd=dot(p,1,5)
      &  + 2.D0*sDu*gDc**(-1)*cDd
      &  - 2.D0*gDc**(-1)*cDd*uDc
      &
-      write(6,*) 
+      write(6,*)
 c      write(6,*) 'amps(2,2,2)=',amps(2,2,2)
 c      write(6,*) 'amps(2,2,1)=',amps(2,2,1)
 c      write(6,*) 'amps(2,1,2)=',amps(2,1,2)
@@ -156,7 +156,7 @@ c      write(6,*) 'amps(1,1,1)=',amps(1,1,1)
       write(6,*) 'qg = ',-lord*Wprop15**2,msq_qg,-lord*Wprop15**2/msq_qg
 
 c     g + u  ->  c + s + d  (t-channel single-charm)
- 
+
       sDg=dot(p,4,1)
       sDu=dot(p,4,2)
       sDc=dot(p,4,3)
@@ -202,7 +202,7 @@ c---  momenta to be permuted according to i1,i2,i5
       integer i1,i2,i3,i4,i5,j
       double precision p(mxpart,4),q(mxpart,4),mh,ml,dot
       double complex amps(2,2,2)
-      
+
       do j=1,4
         q(1,j)=p(i1,j)
         q(2,j)=p(i2,j)
@@ -216,11 +216,11 @@ c--- set up spinor products
 
 c---- calling amps(hg,hc,hs)
       call bornampsN(q,mh,ml,amps)
-      
+
       return
       end
-      
-      
+
+
       subroutine bornampsN(q,mc,ms,amps)
 c     u + g  ->  c + s + d  (t-channel single-charm)
       implicit none
@@ -228,7 +228,7 @@ c     u + g  ->  c + s + d  (t-channel single-charm)
       include 'zprods_com.f'
       double precision q(mxpart,4),dot,cDs,gDs,cDg,mc,ms
       double complex trg,trs,trc,trsgc,amps(2,2,2)
-      
+
       cDg=dot(q,3,2)
       gDs=dot(q,4,2)
       cDs=dot(q,3,4)+mc**2*gDs/2d0/cDg
@@ -240,17 +240,17 @@ c     u + g  ->  c + s + d  (t-channel single-charm)
       trsgc=2d0*zb(1,4)*za(4,2)*zb(2,3)*za(3,5)
 
 
-      amps(2,2,2)=(mc*(cDg*(-ms**2*trg+2d0*gDs*(trg + trs))- 
+      amps(2,2,2)=(mc*(cDg*(-ms**2*trg+2d0*gDs*(trg + trs))-
      -      gDs*trsgc))/(4d0*cDg*gDs)
 
-      amps(2,2,1)=-(mc*ms*(-2d0*cDg*cDs*gDs+gDs**2*mc**2+ 
+      amps(2,2,1)=-(mc*ms*(-2d0*cDg*cDs*gDs+gDs**2*mc**2+
      -       cDg**2*ms**2)*trg)/(4d0*cDg*gDs**2)
 
       amps(2,1,2)=(gDs**2*mc**2*trsgc-2d0*cDg*gDs*(gDs*mc**2*trg
-     -  +cDs*trsgc)+cDg**2*(4d0*gDs**2*trc-2d0*gDs*trsgc + 
+     -  +cDs*trsgc)+cDg**2*(4d0*gDs**2*trc-2d0*gDs*trsgc +
      -       ms**2*trsgc))/(4d0*cDg**2*gDs)
 
-      amps(2,1,1)=-(ms*(-2d0*cDg*cDs*gDs+gDs**2*mc**2+ 
+      amps(2,1,1)=-(ms*(-2d0*cDg*cDs*gDs+gDs**2*mc**2+
      -   cDg**2*ms**2)*(2d0*cDg*gDs*trc-gDs*mc**2*trg-cDg*trsgc))/
      -  (4d0*cDg**2*gDs**2)
 
@@ -258,11 +258,11 @@ c     u + g  ->  c + s + d  (t-channel single-charm)
      -     (-(cDg*ms**2*trg) + 2d0*cDg*gDs*trs - gDs*trsgc)
      -     )/(4d0*cDg**2*gDs**2)
 
-      amps(1,2,1)=(mc*ms*(-2d0*cDg*cDs*gDs + gDs**2*mc**2 + 
+      amps(1,2,1)=(mc*ms*(-2d0*cDg*cDs*gDs + gDs**2*mc**2 +
      -      cDg**2*ms**2)*trg)/(4d0*cDg**2*gDs)
 
       amps(1,1,2)=-(-2d0*cDg*gDs*(cDs+gDs)*trsgc+gDs**2*mc**2*trsgc+
-     -     cDg**2*(-2d0*gDs*ms**2*trg + 4d0*gDs**2*trs + 
+     -     cDg**2*(-2d0*gDs*ms**2*trg + 4d0*gDs**2*trs +
      -        ms**2*trsgc))/(4d0*cDg*gDs**2)
 
       amps(1,1,1)=(ms*(-gDs*mc**2*trg+cDg*(2d0*gDs*(trc+trg)-trsgc)))/

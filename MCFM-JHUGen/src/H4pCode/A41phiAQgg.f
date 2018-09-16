@@ -14,7 +14,7 @@ c--- implementation of arXiv:0906.0008, Eq.(2.21)
 
       return
       end
-      
+
       double complex function A41phiAQggmppp(j1,j2,j3,j4,za,zb)
       implicit none
       include 'constants.f'
@@ -32,7 +32,7 @@ c--- implementation of arXiv:0906.0008, Eq.(2.21)
 
       return
       end
-      
+
       double complex function A41phiAQggmpmp(j1,j2,j3,j4,za,zb)
       implicit none
       include 'constants.f'
@@ -49,7 +49,7 @@ c--- implementation of arXiv:0906.0008, Eq.(2.21)
 
       return
       end
-      
+
       double complex function A41phiAQggmppm(j1,j2,j3,j4,za,zb)
       implicit none
       include 'constants.f'
@@ -66,4 +66,4 @@ c--- implementation of arXiv:0906.0008, Eq.(2.21)
 
       return
       end
-      
+

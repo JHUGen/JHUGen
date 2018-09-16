@@ -248,7 +248,7 @@
 		endif
 		if ( absc(cb2i(1)).ge.xloss**2*xmax ) goto 100
 	    endif
-*  #]   improve: m1=m2: 
+*  #]   improve: m1=m2:
 *  #[   improve: |cp| < xm1 < xm2:
 *
 *	    try again (see bi.frm)
@@ -306,7 +306,7 @@
 	    endif
 *  #]   improve: |cp| < xm1 < xm2:
 *  #[   improve: |cp| < xm2 < xm1:
-	    if ( abs(DBLE(cp)).lt.xloss*absc(xm1) .and. 
+	    if ( abs(DBLE(cp)).lt.xloss*absc(xm1) .and.
      +	    		DBLE(xm2).lt.DBLE(xm1) ) then
 		slam = sqrt(clam)
 		alp = (2*xm2*xm1/(2*piDpj(1,2)+slam) + xm2)/(slam+dm1m2)

@@ -129,7 +129,7 @@ c--- u + g  ->  c + s + d  (t-channel single-charm)
       Appp = ls*(ms2*trsgc+mc2*ms2*trg)/(4*mc*gDs+2*mc*ms2)+Appp
 
       Appp = lc*mc*(mc2*trsgc/(2*cDg+mc2)**2+trg)/2.0d+0+Appp
-       
+
       Appp=Appp/zppp
 
       return

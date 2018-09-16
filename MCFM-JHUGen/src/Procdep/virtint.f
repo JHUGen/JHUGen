@@ -43,7 +43,7 @@
       include 'outputflags.f'
       include 'TRbadpoint.f'
       include 'dm_params.f'
-      include 'runstring.f' 
+      include 'runstring.f'
       include 'x1x2.f'
       include 'bypart.f'
       include 'energy.f'
@@ -51,7 +51,7 @@ c--- APPLgrid - grid includes
 c      include 'ptilde.f'
 c      include 'APPLinclude.f'
 c      double precision f_X1overZ, f_X2overZ, psCR, psCR0
-c--- APPLgrid - end 
+c--- APPLgrid - end
 
       double precision mqq(0:2,fn:nf,fn:nf)
       double precision msqx(0:2,-nf:nf,-nf:nf,-nf:nf,-nf:nf)
@@ -63,7 +63,7 @@ c---- SSbegin
       logical purevirt
       common/useropt/purevirt
       data purevirt/.false./
-c---- SSend 
+c---- SSend
 
       integer ih1,ih2,j,k,m,n,cs,ics,csmax,nvec,is,iq,ia,ib,ic,ii
       double precision p(mxpart,4),pjet(mxpart,4),r(mxdim),W,xmsq,
@@ -116,7 +116,7 @@ c--- ensure isolation code does not think this is fragmentation piece
       W=sqrts**2
 
       call gen_lops(r,p,pswt,*999)
-      
+
       nvec=npart+2
       call dotem(nvec,p,s)
 
@@ -125,19 +125,19 @@ c      call masscuts(p,*999)
 
 c----reject event if any s(i,j) is too small
       call smalls(s,npart,*999)
-         
+
 c--- see whether this point will pass cuts - if it will not, do not
 c--- bother calculating the matrix elements for it, instead bail out
       if (includedipole(0,p) .eqv. .false.) then
         goto 999
       endif
-      
+
       if (dynamicscale) call scaleset(rscalestart,fscalestart,p)
-     
+
       z=r(ndim)**2
 c      if (nshot .eq. 1) z=0.95d0
       xjac=two*dsqrt(z)
-      
+
       omz=1d0-z
 
       flux=fbGeV2/(2d0*xx(1)*xx(2)*W)
@@ -151,24 +151,24 @@ c--- to test poles, we need colourchoice=0, but save real value
         rvcolourchoice=colourchoice
         colourchoice=0
       endif
-      
+
    12 continue
 c--- point to restart from when checking epsilon poles
 
 c--- correction to epinv from AP subtraction when mu_FAC != mu_REN,
 c--- corresponding to subtracting -1/epinv*Pab*log(musq_REN/musq_FAC)
       epcorr=epinv+2d0*dlog(scale/facscale)
-      
+
 c--- for the case of virtual correction in the top quark decay,
 c--- ('tdecay','ttdkay','Wtdkay') there are no extra initial-state
 c--- contributions, so all these should be set to zero
-      if  ( (case .eq. 'tdecay') .or. (case .eq. 'ttdkay') 
+      if  ( (case .eq. 'tdecay') .or. (case .eq. 'ttdkay')
      . .or. (case .eq. 'Wtdkay') .or. (case .eq. 'tt_ldk')
      . .or. (case .eq. 'tt_hdk') .or. (case .eq. 'tthWdk')
      . .or. (case .eq. 'dk_4ft') .or. (case .eq. 'ttwldk')
      . .or. (case .eq. 'tt_udk') .or. (case .eq. 'HWWdkW') ) then
         epcorr=0d0
-      endif      
+      endif
 
 c--- for stop+b, splittings on light quark line produce a quark
       if ( (case .eq. 'qg_tbq') .or. (case .eq. '4ftwdk')
@@ -196,13 +196,13 @@ c--- modifications for running with mb>0
       AP(q,g,2)=-ason2pi*Tr*(z**2+omz**2)*dlog(facscale**2/mbsq)
       AP(a,g,2)=AP(q,g,2)
       endif
-      
+
       if ( ((case .eq. 'W_twdk') .or. (case .eq. 'W_tndk'))
      .  .and. (nores) ) then
       AP(q,g,2)=0d0
-      AP(a,g,2)=AP(q,g,2)      
+      AP(a,g,2)=AP(q,g,2)
       endif
-      
+
 c--- for stop+b, splittings on heavy quark line produce a gluon
       if ( (case .eq. 'qg_tbq') .or. (case .eq. '4ftwdk')
      & .or.(case .eq. 'dk_4ft')) then
@@ -251,7 +251,7 @@ c--- splittings on the heavy quark line make a gluon init. state
       enddo
       enddo
       endif
-      
+
       do ia=-1,+1
       do ib=-1,+1
       do ic=-1,+1
@@ -274,7 +274,7 @@ c--- splittings on the heavy quark line make a gluon init. state
       enddo
       enddo
       enddo
-      
+
 c--- test to see whether we need Gflag and Qflag together
       if ( ((case .eq. 'W_2jet') .or. (case .eq. 'Z_2jet'))
      &.and. (Qflag) .and. (Gflag) ) then
@@ -284,12 +284,12 @@ c--- first pass: Gflag
         Gflag=.true.
         Qflag=.false.
       endif
-      
+
 c--- restart from here when calculating with Qflag and Gflag
 c--- (W+2 jet and Z+2 jet processes only)
-   44 continue      
-      
-c--- Calculate the required matrix elements      
+   44 continue
+
+c--- Calculate the required matrix elements
       if     (case .eq. 'W_only') then
         call qqb_w(p,msq)
         call qqb_w_v(p,msqv)
@@ -302,7 +302,7 @@ c--- Calculate the required matrix elements
         call qqb_wgam(p,msq)
         call qqb_wgam_v(p,msqv)
         call qqb_wgam_z(p,z)
-      elseif (case .eq. 'Wgajet') then       
+      elseif (case .eq. 'Wgajet') then
          call qqb_wgam_g(p,msq)
          write(6,*) 'Not available at NLO'
          stop
@@ -327,7 +327,7 @@ c         call qqb_wgamjet_v(p,msqv)
         call qqb_wbb(p,msq)
         call qqb_wbb_v(p,msqv)
         call qqb_wbb_z(p,z)
-      elseif (case .eq. 'W_2jet') then         
+      elseif (case .eq. 'W_2jet') then
         call qqb_w2jetx(p,msq,mqq,msqx,msqx_cs)
         call qqb_w2jet_v(p,msqv)
         call qqb_w2jet_z(p,z)
@@ -351,7 +351,7 @@ c         call qqb_Waa_z(p,z)
         call qqb_z2jet_z(p,z)
       elseif (case .eq. 'Zgamma') then
         call qqb_zgam(p,msq)
-        call qqb_zgam_v(p,msqv)      
+        call qqb_zgam_v(p,msqv)
         call qqb_zgam_z(p,z)
         call gg_zgam(p,msqv(0,0)) ! additional gluon-gluon contribution
       elseif (case .eq. 'Z_2gam') then
@@ -494,8 +494,8 @@ c         call qqb_Waa_z(p,z)
         call qqb_gamgam(p,msq)
         call qqb_gamgam_v(p,msqv)
         call qqb_gamgam_z(p,z)
-      elseif (case .eq. 'gmgmjt') then 
-         call qqb_gmgmjt(p,msq) 
+      elseif (case .eq. 'gmgmjt') then
+         call qqb_gmgmjt(p,msq)
          call qqb_gmgmjt_v(p,msqv)
          call qqb_gmgmjt_z(p,z)
       elseif (case .eq. 'trigam') then
@@ -505,7 +505,7 @@ c         call qqb_Waa_z(p,z)
       elseif (case .eq. 'fourga') then
         call qqb_fourgam(p,msq)
         call qqb_fourgam_v(p,msqv)
-        call qqb_fourgam_z(p,z)         
+        call qqb_fourgam_z(p,z)
       elseif ((case .eq. 'tt_bbl') .or. (case .eq. 'tt_bbh')) then
         call qqb_QQbdk(p,msq)
         call qqb_QQbdk_v(p,msqv)
@@ -517,7 +517,7 @@ c         call qqb_Waa_z(p,z)
           do k=-nf,nf
             msqv(j,k)=msqv(j,k)+msqvdk(j,k)+msqvdkW(j,k)
           enddo
-          enddo     
+          enddo
         endif
       elseif ((case .eq. 'tt_ldk') .or. (case .eq. 'tt_hdk')) then
         msq(:,:)=0d0
@@ -535,7 +535,7 @@ c         call qqb_Waa_z(p,z)
           do k=-nf,nf
             msqv(j,k)=msqv(j,k)+msqvdk(j,k)
           enddo
-          enddo     
+          enddo
         endif
       elseif (case .eq. 'tt_udk') then
         msq(:,:)=0d0
@@ -577,13 +577,13 @@ c         call qqb_Waa_z(p,z)
         msq(:,:)=0d0
         call dkqqb_tbbdk_v(p,msqv)
       elseif (case .eq. 'W_tndk') then
-        call qqb_w_tndk(p,msq)    
-        call qqb_w_tndk_v(p,msqv)    
-        call qqb_w_tndk_z(p,z)    
+        call qqb_w_tndk(p,msq)
+        call qqb_w_tndk_v(p,msqv)
+        call qqb_w_tndk_z(p,z)
       elseif (case .eq. 'W_twdk') then
-        call qqb_w_twdk(p,msq)    
-        call qqb_w_twdk_v(p,msqv)    
-        call qqb_w_twdk_z(p,z)    
+        call qqb_w_twdk(p,msq)
+        call qqb_w_twdk_v(p,msqv)
+        call qqb_w_twdk_z(p,z)
         if (mypart .eq. 'todk') then
           call dkqqb_w_twdk_v(p,msqvdk)
           msqv(:,:)=msqv(:,:)+msqvdk(:,:)
@@ -699,12 +699,12 @@ c--- calculating corrections on the heavy quark line (for now)
         endif
         call qq_tchan_ztq_dk_z(p,z)
 
-c -- NLO corrections to decay ME -- can include flag for this at some stage...        
+c -- NLO corrections to decay ME -- can include flag for this at some stage...
 c         do j=-nf,nf
 c         do k=-nf,nf
 c         msqv=msqv+msqvdk
 c         enddo
-c         enddo 
+c         enddo
 c         call qq_tchan_ztq_z(p,z)
 
       elseif (case .eq. 'epem3j') then
@@ -753,23 +753,23 @@ c--- massive subtraction term only
         enddo
         enddo
         AP(q,g,2)=-ason2pi*Tr*(z**2+omz**2)*dlog(facscale**2/mcsq)
-        
+
       elseif (case.eq.'dm_jet') then
-         call qqb_dm_monojet_v(p,msqv) 
-         call qqb_dm_monojet(p,msq) 
-         if(dm_mediator.eq.'gluonO') then 
-            call gg_dm_monojet_z(p,z) 
+         call qqb_dm_monojet_v(p,msqv)
+         call qqb_dm_monojet(p,msq)
+         if(dm_mediator.eq.'gluonO') then
+            call gg_dm_monojet_z(p,z)
          else
-            call qqb_dm_monojet_z(p,z) 
+            call qqb_dm_monojet_z(p,z)
          endif
-         
-      elseif(case.eq.'dm_gam') then 
-         call qqb_dm_monophot_v(p,msqv) 
-         call qqb_dm_monophot(p,msq) 
-         call qqb_dm_monophot_z(p,z) 
-         
+
+      elseif(case.eq.'dm_gam') then
+         call qqb_dm_monophot_v(p,msqv)
+         call qqb_dm_monophot(p,msq)
+         call qqb_dm_monophot_z(p,z)
+
       endif
-      
+
 C---initialize to zero
       do j=-1,1
       do k=-1,1
@@ -778,14 +778,14 @@ C---initialize to zero
       enddo
 
       currentPDF=0
-            
+
 c--- initialize a PDF set here, if calculating errors
   777 continue
       xmsq=0d0
       if (PDFerrors) then
         call InitPDF(currentPDF)
       endif
-c--- calculate PDF's  
+c--- calculate PDF's
       if ( (case .eq. 'qg_tbq') .or. (case .eq. '4ftwdk')
      & .or.(case .eq. 'dk_4ft')) then
 c--- for single top + b, make sure to use two different scales
@@ -814,18 +814,18 @@ c          fx1(0)=1d0
 c          fx1(1)=1d0
 c          fx2(0)=1d0
 c          fx2(1)=1d0
-c        else   
-c--- usual case            
+c        else
+c--- usual case
           call fdist(ih1,xx(1),facscale,fx1)
           call fdist(ih2,xx(2),facscale,fx2)
 c      endif
       endif
-      
+
       do j=-nf,nf
       fx1z(j)=0d0
       fx2z(j)=0d0
       enddo
-            
+
       if (z .gt. xx(1)) then
         x1onz=xx(1)/z
 c--- for single top + b, make sure to use two different scales
@@ -839,8 +839,8 @@ c          if (runstring(1:5) .eq. 'carlo') then
 c           do j=-nf,nf
 c          fx1z(j)=0d0
 c          enddo
-c          else   
-c--- usual case            
+c          else
+c--- usual case
             call fdist(ih1,x1onz,facscale,fx1z)
 c--- APPLgrid - set factor
 c            f_X1overZ = 1d0
@@ -861,32 +861,32 @@ c          if (runstring(1:5) .eq. 'carlo') then
 c           do j=-nf,nf
 c          fx2z(j)=0d0
 c          enddo
-c          else   
-c--- usual case            
+c          else
+c--- usual case
             call fdist(ih2,x2onz,facscale,fx2z)
 c--- APPLgrid - set factor
 c            f_X2overZ = 1d0
 c--- APPLgrid - end
 c          endif
       endif
-      endif         
-      
+      endif
+
       do j=-nflav,nflav
       do k=-nflav,nflav
-   
+
       if (ggonly) then
       if ((j.ne.0) .or. (k.ne.0)) goto 20
       endif
 
       if (gqonly) then
       if (((j.eq.0).and.(k.eq.0)) .or. ((j.ne.0).and.(k.ne.0))) goto 20
-      endif      
-      
-      if (noglue) then 
+      endif
+
+      if (noglue) then
       if ((j.eq.0) .or. (k.eq.0)) goto 20
       endif
 
-      if (omitgg) then 
+      if (omitgg) then
       if ((j.eq.0) .and. (k.eq.0)) goto 20
       endif
 
@@ -896,7 +896,7 @@ c          endif
 
 c--- The variables R1 and R2 provide the Regular and Plus pieces associated
 c--- with radiation from leg 1 (R1(a,b,c,cs,is)) and leg 2 (R2(a,b,c,cs,is))
-c--- In each case the parton labelling is using the normal QM notation of 
+c--- In each case the parton labelling is using the normal QM notation of
 c--- putting everything backward
 c---       emitted line after emission =    a
 c---       emitter before emission     =    b
@@ -906,7 +906,7 @@ c--- Note that in general each piece will be composed of many different
 c--- dipole contributions
 
 c--- SUM BY COLOUR STRUCTURES: H+2jets only
-      if  ( (case .eq. 'ggfus2') 
+      if  ( (case .eq. 'ggfus2')
      . .or. (case .eq. 'gagajj')
      . .or. (case .eq. 'HWW2jt')
      . .or. (case .eq. 'HZZ2jt')) then
@@ -942,7 +942,7 @@ c      write(6,*) 'virtint: j,k,msqv=',j,k,fx1(j)*fx2(k)*msqv(j,k)
      & +(msq_struc(cs,m,n)*(AP(q,q,2)+AP(q,q,3)
      &                  +H2(q,q,q,cs,2)+H2(q,q,q,cs,3))
      & +msq_struc(cs,j,g)*(AP(g,q,2)+H2(g,q,q,cs,2)))*fx1(j)*fx2z(k)/z
-      enddo      
+      enddo
       xmsq=xmsq+xmsqt
 c      write(6,*) 'virtint: j,k,  ct=',j,k,xmsqt
 
@@ -974,7 +974,7 @@ c      do cs=4,6
      & +(msq_struc(cs,m,n)*(AP(a,a,2)+AP(a,a,3)
      &                  +H2(a,a,q,cs,2)+H2(a,a,q,cs,3))
      & + msq_struc(cs,j,g)*(AP(g,a,2)+H2(g,a,q,cs,2)))*fx1(j)*fx2z(k)/z
-c   67 continue   
+c   67 continue
       enddo
       xmsq=xmsq+xmsqt
 c      write(6,*) 'virtint: j,k,  ct=',j,k,xmsqt
@@ -1016,7 +1016,7 @@ c      write(6,*) 'virtint: j,k,msqv=',j,k,fx1(j)*fx2(k)*msqv(j,k)
       n=0
       xmsqt=0d0
       do cs=4,6
-      xmsqt=xmsqt    
+      xmsqt=xmsqt
      &+ msq_struc(cs,m,g)*(AP(q,q,1)-AP(q,q,3)
      &                 +H1(q,q,g,cs,1)-H1(q,q,g,cs,3)
      &                 +H2(g,g,q,cs,1)-H2(g,g,q,cs,3)
@@ -1033,17 +1033,17 @@ c      write(6,*) 'virtint: j,k,msqv=',j,k,fx1(j)*fx2(k)*msqv(j,k)
      &      +msq_struc(cs,j,-4)+msq_struc(cs,j,-5)
       msq_qq=msq_struc(cs,j,+1)+msq_struc(cs,j,+2)+msq_struc(cs,j,+3)
      &      +msq_struc(cs,j,+4)+msq_struc(cs,j,+5)
-      xmsqt=xmsqt    
+      xmsqt=xmsqt
      &+(msq_struc(cs,g,g)*(AP(g,q,2)+H1(g,q,g,cs,2)))*fx1z(j)/z*fx2(g)
      &+(+msq_qa*(AP(a,g,2)+H2(a,g,q,cs,2))
      &  +msq_qq*(AP(q,g,2)+H2(q,g,q,cs,2)))*fx1(j)*fx2z(g)/z
       enddo
-      xmsqt=xmsqt     
+      xmsqt=xmsqt
      & +msq_struc(iqr,m,-m)*(AP(a,g,2)+H2(a,g,q,iqr,2))*fx1(j)*fx2z(g)/z
       xmsq=xmsq+xmsqt
 c      write(6,*) 'virtint: j,k,  ct=',j,k,xmsqt
 c      write(6,*) 'virtint: j,k, SUM=',j,k,xmsqt+fx1(j)*fx2(k)*msqv(j,k)
-      
+
 c--- gluon-quark and gluon anti-quark
       elseif ((j .eq. 0) .and. (k .ne. 0)) then
 c      write(6,*) 'virtint: j,k,msqv=',j,k,fx1(j)*fx2(k)*msqv(j,k)
@@ -1051,7 +1051,7 @@ c      write(6,*) 'virtint: j,k,msqv=',j,k,fx1(j)*fx2(k)*msqv(j,k)
       n=+1
       xmsqt=0d0
       do cs=4,6
-      xmsqt=xmsqt     
+      xmsqt=xmsqt
      & +msq_struc(cs,g,n)*(AP(g,g,1)-AP(g,g,3)
      &                 +H1(g,g,q,cs,1)-H1(g,g,q,cs,3)
      &                 +AP(q,q,1)-AP(q,q,3)
@@ -1068,20 +1068,20 @@ c      write(6,*) 'virtint: j,k,msqv=',j,k,fx1(j)*fx2(k)*msqv(j,k)
      &      +msq_struc(cs,-4,k)+msq_struc(cs,-5,k)
       msq_qq=msq_struc(cs,+1,k)+msq_struc(cs,+2,k)+msq_struc(cs,+3,k)
      &      +msq_struc(cs,+4,k)+msq_struc(cs,+5,k)
-      xmsqt=xmsqt     
+      xmsqt=xmsqt
      & +(+msq_aq*(AP(a,g,2)+H1(a,g,q,cs,2))
      &   +msq_qq*(AP(q,g,2)+H1(q,g,q,cs,2)))*fx1z(g)/z*fx2(k)
      & +(+msq_struc(cs,g,g)*(AP(g,q,2)+H2(g,q,g,cs,2)))*fx1(g)*fx2z(k)/z
       enddo
-      xmsqt=xmsqt     
+      xmsqt=xmsqt
      & +msq_struc(iqr,-n,n)*(AP(a,g,2)+H1(a,g,q,iqr,2))*fx1z(g)/z*fx2(k)
       xmsq=xmsq+xmsqt
 c      write(6,*) 'virtint: j,k,  ct=',j,k,xmsqt
 
       endif
-      
+
       elseif (case .eq. 'twojet')then
-      
+
       xmsq=xmsq+fx1(j)*fx2(k)*(
      . msqv(j,k)+msq_cs(0,j,k)+msq_cs(1,j,k)+msq_cs(2,j,k))
 
@@ -1251,7 +1251,7 @@ c--- special case for W+bj - remove b-PDF contribution
      &      +msq_cs(cs,-4,k)+msq_cs(cs,-5,k)
       msq_qq=msq_cs(cs,+1,k)+msq_cs(cs,+2,k)+msq_cs(cs,+3,k)
      &      +msq_cs(cs,+4,k)+msq_cs(cs,+5,k)
-      xmsq=xmsq     
+      xmsq=xmsq
      & +msq_cs(cs,g,k)*(AP(g,g,1)-AP(g,g,3)
      &                 +R1(g,g,q,cs,1)-R1(g,g,q,cs,3)
      &                 +AP(q,q,1)-AP(q,q,3)
@@ -1266,7 +1266,7 @@ c--- special case for W+bj - remove b-PDF contribution
 
       enddo
       endif
-      
+
       elseif ((j .eq. g) .and. (k .lt. 0)) then
 c--- special case for W+bj - remove b-PDF contribution
       if ((case .eq. 'W_bjet') .and. (k .ne. -5)) then
@@ -1277,7 +1277,7 @@ c--- special case for W+bj - remove b-PDF contribution
      &      +msq_cs(cs,+4,k)+msq_cs(cs,+5,k)
       msq_aa=msq_cs(cs,-1,k)+msq_cs(cs,-2,k)+msq_cs(cs,-3,k)
      &      +msq_cs(cs,-4,k)+msq_cs(cs,-5,k)
-      xmsq=xmsq     
+      xmsq=xmsq
      & +msq_cs(cs,g,k)*(AP(g,g,1)-AP(g,g,3)
      &                 +R1(g,g,a,cs,1)-R1(g,g,a,cs,3)
      &                 +AP(a,a,1)-AP(a,a,3)
@@ -1292,7 +1292,7 @@ c--- special case for W+bj - remove b-PDF contribution
 
       enddo
       endif
-      
+
       elseif ((j .gt. 0) .and. (k .eq. g)) then
 c--- special case for W+bj - remove b-PDF contribution
       if ((case .eq. 'W_bjet') .and. (j .ne. 5)) then
@@ -1303,7 +1303,7 @@ c--- special case for W+bj - remove b-PDF contribution
      &      +msq_cs(cs,j,-4)+msq_cs(cs,j,-5)
       msq_qq=msq_cs(cs,j,+1)+msq_cs(cs,j,+2)+msq_cs(cs,j,+3)
      &      +msq_cs(cs,j,+4)+msq_cs(cs,j,+5)
-       xmsq=xmsq     
+       xmsq=xmsq
      &+ msq_cs(cs,j,g)*(AP(q,q,1)-AP(q,q,3)
      &                 +R1(q,q,g,cs,1)-R1(q,q,g,cs,3)
      &                 +R2(g,g,q,cs,1)-R2(g,g,q,cs,3)
@@ -1318,7 +1318,7 @@ c--- special case for W+bj - remove b-PDF contribution
 
       enddo
       endif
-      
+
       elseif ((j .lt. 0) .and. (k .eq. g)) then
 c--- special case for W+bj - remove b-PDF contribution
       if ((case .eq. 'W_bjet') .and. (j .ne. -5)) then
@@ -1329,7 +1329,7 @@ c--- special case for W+bj - remove b-PDF contribution
      &      +msq_cs(cs,j,+4)+msq_cs(cs,j,+5)
       msq_aa=msq_cs(cs,j,-1)+msq_cs(cs,j,-2)+msq_cs(cs,j,-3)
      &      +msq_cs(cs,j,-4)+msq_cs(cs,j,-5)
-       xmsq=xmsq     
+       xmsq=xmsq
      & + msq_cs(cs,j,g)*(AP(a,a,1)-AP(a,a,3)
      &                  +R1(a,a,g,cs,1)-R1(a,a,g,cs,3)
      &                  +AP(g,g,1)-AP(g,g,3)
@@ -1441,7 +1441,7 @@ C--Qbarg
      & + msq_aa*(AP(a,g,2)+Q2(a,g,a,2)))*fx1_L(j)*fx2z_H(g)/z
        endif
       endif
-      
+
       else
 
 c--- SUM BY TOTAL MATRIX ELEMENTS: everything else
@@ -1452,7 +1452,7 @@ c--- special code to remove the Q+Qb -> Z+Q+Qb contribution
      & + msq(j,g)*(AP(g,q,2)+Q2(g,q,q,2))*fx1(j)*fx2z(k)/z)
       endif
 c--- special code to remove the b+b(bar) -> W+t+b(bar) contribution
-      if ( (abs(j*k) .eq. nf*nf) .and. 
+      if ( (abs(j*k) .eq. nf*nf) .and.
      .     ((case .eq. 'W_tndk') .or. (case .eq. 'W_twdk')) ) then
         xmsq=xmsq-(
      & + msq(g,k)*(AP(g,q,2)+Q1(g,q,q,2))*fx1z(j)/z*fx2(k)
@@ -1682,7 +1682,7 @@ c--- replace subtraction with a b in initial state by massive sub
        endif
        endif
       endif
-      
+
 c      if (xmsq-tmp .ne. 0d0) write(6,*) j,k,'-> msqc = ',xmsq-tmp
 
       endif
@@ -1690,13 +1690,13 @@ c      if (xmsq-tmp .ne. 0d0) write(6,*) j,k,'-> msqc = ',xmsq-tmp
 c--- subtract off LO (we don't want it) for Wcs_ms case and for
 c--- the comparison with C. Oleari's e+e- --> QQbg calculation
 c      if ((case .eq. 'Wcs_ms') .or. (runstring(1:5) .eq. 'carlo')) then
-c--- (MCFM_original)  if (case .eq. 'Wcs_ms') then                                                                                          
-c---  SSbegin                                                                                                                      
+c--- (MCFM_original)  if (case .eq. 'Wcs_ms') then
+c---  SSbegin
       if ((case .eq. 'Wcs_ms') .or. (purevirt)) then
-c---  SSend                                                                                                                        
+c---  SSend
         xmsq=xmsq-msq(j,k)*fx1(j)*fx2(k)
-      endif  
-           
+      endif
+
       if     (j .gt. 0) then
         sgnj=+1
       elseif (j .lt. 0) then
@@ -1715,7 +1715,7 @@ c---  SSend
       if (currentPDF .eq. 0) then
         xmsq_bypart(sgnj,sgnk)=xmsq_bypart(sgnj,sgnk)+(xmsq-tmp)
       endif
-      
+
  20   continue
 
       enddo
@@ -1724,7 +1724,7 @@ c---  SSend
       if (currentPDF .eq. 0) then
         virtint=flux*xjac*pswt*xmsq/BrnRat
       endif
-            
+
 c--- loop over all PDF error sets, if necessary
       if (PDFerrors) then
         PDFwgt(currentPDF)=flux*xjac*pswt*xmsq/BrnRat*wgt/itmx
@@ -1732,9 +1732,9 @@ c--- loop over all PDF error sets, if necessary
      .     +PDFwgt(currentPDF)
         currentPDF=currentPDF+1
         if (currentPDF .le. maxPDFsets) goto 777
-      endif    
+      endif
 
-c--- code to check that epsilon poles cancel      
+c--- code to check that epsilon poles cancel
       if (nshot .eq. 1) then
         if (xmsq .eq. 0d0) goto 999
         xmsq_old=xmsq
@@ -1759,7 +1759,7 @@ c          pause
           colourchoice=rvcolourchoice
         endif
       endif
-      
+
 c      if (creatent) then
         wt_gg=xmsq_bypart(0,0)*wgt*flux*xjac*pswt/BrnRat/dfloat(itmx)
         wt_gq=(xmsq_bypart(+1,0)+xmsq_bypart(-1,0)
@@ -1772,7 +1772,7 @@ c      if (creatent) then
 c      endif
 
       call getptildejet(0,pjet)
-      
+
       call dotem(nvec,pjet,s)
 
       val=wgt*flux*xjac*pswt/BrnRat
@@ -1784,8 +1784,8 @@ c      endif
       enddo
       enddo
 
-      val=virtint*wgt 
-      val2=val**2 
+      val=virtint*wgt
+      val2=val**2
 c---  SSbegin
       virtint = virtint*reweight
 c---  SSend
@@ -1821,7 +1821,7 @@ c--- return both to .true. and assign value to virtint (to return to VEGAS)
         virtint=QandGint
       endif
       endif
-      
+
       return
 
  999  continue
@@ -1832,7 +1832,7 @@ c--- safety catch
         Qflag=.true.
         Gflag=.true.
       endif
-      
+
       return
       end
 

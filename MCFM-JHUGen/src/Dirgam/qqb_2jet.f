@@ -1,4 +1,4 @@
-!====== NEW routine for dirgam fragmentation dipoles 
+!====== NEW routine for dirgam fragmentation dipoles
 !====== fragmenting photon will be placed in position 3    implicit none
       subroutine qqb_2jet(p,msq)
       include 'constants.f'
@@ -11,7 +11,7 @@
      .  qaij_ij,aqij_ij,aqii_jj,qaii_jj,
      .  qqii_ii,aaii_ii,aqii_ii,qaii_ii,
      .  aq_gg,gq_qg,ga_ag,qg_qg,ag_ag,gg_qa,qa_gg,ss,tt,uu,
-     .  smalla,smallb,smallc 
+     .  smalla,smallb,smallc
       call dotem(4,p,s)
       fac=gsq**2
       ss=s(1,2)
@@ -20,10 +20,10 @@
 
       qqij_ij=fac*aveqq*smalla(ss,tt,uu)
       aaij_ij=fac*aveqq*smalla(ss,tt,uu)
-      
+
       qaii_jj=fac*aveqq*smalla(tt,ss,uu)
       qaij_ij=fac*aveqq*smalla(ss,tt,uu)
-      
+
       aqii_jj=fac*aveqq*smalla(uu,ss,tt)
       aqij_ij=fac*aveqq*smalla(ss,uu,tt)
 
@@ -33,7 +33,7 @@
       qaii_ii=fac*aveqq*smallb(uu,tt,ss)
 
 c--- aq variables are for qbar(1) q(2) -> q(3) qbar(4)
-     
+
 
       qg_qg=-fac*aveqg*smallc(tt,ss,uu)
       ag_ag=-fac*aveqg*smallc(tt,uu,ss)
@@ -43,8 +43,8 @@ c--- aq variables are for qbar(1) q(2) -> q(3) qbar(4)
 
       qa_gg=+fac*aveqq*smallc(ss,tt,uu)*half
       gg_qa=+fac*avegg*smallc(ss,tt,uu)
-      
-    
+
+
       aq_gg=+fac*aveqq*smallc(ss,tt,uu)*half
 
 c--- fill ancillary array that is used for fragmentation
@@ -68,7 +68,7 @@ c--- contributions in gmgmjt process
       do k=-nf,nf
 c--set msq=0 to initalize
       msq(j,k)=0d0
-C--qq      
+C--qq
       if ((j .gt. 0) .and. (k .gt. 0)) then
           if (j .eq. k) then
             msq(j,k)=qqii_ii
@@ -76,7 +76,7 @@ C--qq
             msq(j,k)=qqij_ij
           endif
 
-C--qa      
+C--qa
       elseif ((j .gt. 0) .and. (k .lt. 0)) then
           if (j .eq. -k) then
             msq(j,k)=qaii_ii+dfloat(nf-1)*qaii_jj+qa_gg
@@ -84,7 +84,7 @@ C--qa
             msq(j,k)=qaij_ij
           endif
 
-C--aa      
+C--aa
       elseif ((j .lt. 0) .and. (k .lt. 0)) then
           if (j .eq. k) then
             msq(j,k)=aaii_ii
@@ -92,7 +92,7 @@ C--aa
             msq(j,k)=aaij_ij
           endif
 
-C--aq      
+C--aq
       elseif ((j .lt. 0) .and. (k .gt. 0)) then
           if (j .eq. -k) then
             msq(j,k)=aqii_ii+dfloat(nf-1)*aqii_jj+aq_gg
@@ -100,19 +100,19 @@ C--aq
             msq(j,k)=aqij_ij
           endif
 
-C--qg_qg      
+C--qg_qg
       elseif ((j .gt. 0) .and. (k .eq. 0)) then
             msq(j,k)=qg_qg
-C--ag      
+C--ag
       elseif ((j .lt. 0) .and. (k .eq. 0)) then
             msq(j,k)=ag_ag
-C--gq_gq      
+C--gq_gq
       elseif ((j .eq. 0) .and. (k .gt. 0)) then
             msq(j,k)=gq_qg
-C--ga      
+C--ga
       elseif ((j .eq. 0) .and. (k .lt. 0)) then
             msq(j,k)=ga_ag
-C--gg      
+C--gg
       elseif ((j .eq. 0) .and. (k .eq. 0)) then
             msq(j,k)=gg_qa
       endif

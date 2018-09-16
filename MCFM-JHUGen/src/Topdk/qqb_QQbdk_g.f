@@ -8,7 +8,7 @@ C***********************************************************************
 *----My notation                                                       *
 *     q(-p1) +qbar(-p2)=t(nu(p3)+e^+(p4)+b(p5))                        *
 *                      +t~(b~(p6)+e^-(p7)+nu~(p8))+g(p9)               *
-*                                                                      * 
+*                                                                      *
 *     Only five diagrams included, leading to 2 on-shell top quarks    *
 ************************************************************************
       include 'constants.f'
@@ -22,9 +22,9 @@ C***********************************************************************
      . msq(-nf:nf,-nf:nf),p(mxpart,4),ps(mxpart,4)
       double precision ttbqqbg_sq,fac,
      . wtgg,wtqqb,wtqbq,wtqg,wtqbarg,wtgq,wtgqbar
-      double complex 
+      double complex
      . ttbgggppp,ttbgggmpp,ttbgggpmp,ttbgggppm,
-     . ttbgggmmm,ttbgggpmm,ttbgggmpm,ttbgggmmp,      
+     . ttbgggmmm,ttbgggpmm,ttbgggmpm,ttbgggmmp,
      . a123(2,2,2),a132(2,2,2),a213(2,2,2),a231(2,2,2),
      . a312(2,2,2),a321(2,2,2),
      . a6sum,a3sum1a,a3sum1b,a3sum2a,a3sum2b,a3sum3a,a3sum3b
@@ -32,7 +32,7 @@ C***********************************************************************
 c--- these definitions are used for gauge check only
 c      double complex a,
 c     . ttbgggppp_full,ttbgggmpp_full,ttbgggpmp_full,ttbgggppm_full,
-c     . ttbgggmmm_full,ttbgggpmm_full,ttbgggmpm_full,ttbgggmmp_full,      
+c     . ttbgggmmm_full,ttbgggpmm_full,ttbgggmpm_full,ttbgggmmp_full,
 c     . ttbqqbsqpp_full,ttbqqbsqpm_full,ttbqqbsqmp_full,ttbqqbsqmm_full,
 c     . ttbqqbtqpp_full,ttbqqbtqpm_full,ttbqqbtqmp_full,ttbqqbtqmm_full,
 c     . ttbqqbqqpp_full,ttbqqbqqpm_full,ttbqqbqqmp_full,ttbqqbqqmm_full,
@@ -45,21 +45,21 @@ C----set all elements to zero
       enddo
       enddo
 
-      p3Dp5=p(3,4)*p(5,4)-p(3,3)*p(5,3)-p(3,2)*p(5,2)-p(3,1)*p(5,1) 
-      p6Dp8=p(6,4)*p(8,4)-p(6,3)*p(8,3)-p(6,2)*p(8,2)-p(6,1)*p(8,1) 
+      p3Dp5=p(3,4)*p(5,4)-p(3,3)*p(5,3)-p(3,2)*p(5,2)-p(3,1)*p(5,1)
+      p6Dp8=p(6,4)*p(8,4)-p(6,3)*p(8,3)-p(6,2)*p(8,2)-p(6,1)*p(8,1)
 
       s34=2d0*(p(3,4)*p(4,4)-p(3,3)*p(4,3)-p(3,2)*p(4,2)-p(3,1)*p(4,1))
       s78=2d0*(p(7,4)*p(8,4)-p(7,3)*p(8,3)-p(7,2)*p(8,2)-p(7,1)*p(8,1))
 
-c      we will have no further need for p3 and p5 
-c      we will have no further need for p6 and p8 
-      
+c      we will have no further need for p3 and p5
+c      we will have no further need for p6 and p8
+
       do nu=1,4
       t(nu)=p(3,nu)+p(4,nu)+p(5,nu)
       r(nu)=p(6,nu)+p(7,nu)+p(8,nu)
-      enddo      
-      tDp4=t(4)*p(4,4)-t(3)*p(4,3)-t(2)*p(4,2)-t(1)*p(4,1) 
-      rDp7=r(4)*p(7,4)-r(3)*p(7,3)-r(2)*p(7,2)-r(1)*p(7,1)             
+      enddo
+      tDp4=t(4)*p(4,4)-t(3)*p(4,3)-t(2)*p(4,2)-t(1)*p(4,1)
+      rDp7=r(4)*p(7,4)-r(3)*p(7,3)-r(2)*p(7,2)-r(1)*p(7,1)
       do nu=1,4
       ps(1,nu)=p(1,nu)
       ps(2,nu)=p(2,nu)
@@ -111,7 +111,7 @@ c      write(6,*) 'mmp'
 c      do j3=3,8
 c      a=ttbgggmmp_full(1,2,9,5,3,6,8,j1,j2,j3)
 c      write(6,*) j,a,cdabs(a)
-c      enddo        
+c      enddo
 c      write(6,*) 'pmp'
 c      do j3=3,8
 c      a=ttbgggpmp_full(1,2,9,5,3,6,8,j1,j2,j3)
@@ -154,7 +154,7 @@ c     .           cdabs(ttbqqbqqmm_full(1,2,9,5,3,6,8,j)),
 c     .           cdabs(ttbqqbrqmm_full(1,2,9,5,3,6,8,j))
 c      enddo
 c      pause
-      
+
 c--- according to gfortify.frm and ttbggg.frm, the relationship between
 c--- the indices of the amplitudes calls and the real momenta is:
 c---  i1 -> p1                                         = ps(1)
@@ -242,7 +242,7 @@ c--- NB: make sure to permute helicity labels appropriately too
       enddo
       enddo
       enddo
-            
+
       wtqqb=ttbqqbg_sq(1,2,3,4,5,6,7)
       wtqbq=ttbqqbg_sq(2,1,3,4,5,6,7)
       wtqg=ttbqqbg_sq(1,3,2,4,5,6,7)
@@ -258,10 +258,10 @@ c--- include W decays
       fac=fac
      . *8d0*p3Dp5/((s34-wmass**2)**2+(wmass*wwidth)**2)
      . *8d0*p6Dp8/((s78-wmass**2)**2+(wmass*wwidth)**2)
-c--- correct normalization for p4 and p7     
+c--- correct normalization for p4 and p7
       fac=fac
      . /(0.5d0*mt**2/tDp4)
-     . /(0.5d0*mt**2/rDp7)     
+     . /(0.5d0*mt**2/rDp7)
 C--include factor for hadronic decays
       if (plabel(3).eq. 'pp') fac=2d0*xn*fac
       if (plabel(7).eq. 'pp') fac=2d0*xn*fac

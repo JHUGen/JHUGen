@@ -1,12 +1,12 @@
-      double complex function Fsc3(j1,j2,j3,j4,j5,j6,za,zb) 
+      double complex function Fsc3(j1,j2,j3,j4,j5,j6,za,zb)
       implicit none
       include 'constants.f'
       include 'zprods_decl.f'
       include 'sprods_com.f'
       integer j1,j2,j3,j4,j5,j6
       double complex L1
-      double precision t  
-      Fsc3= 
+      double precision t
+      Fsc3=
      .-((za(j4,j5)**2*((L1(-s(j5,j6),-t(j2,j3,j4))*
      .(za(j1,j5)*za(j2,j4)*zb(j1,j2)+
      .za(j1,j5)*za(j3,j4)*zb(j1,j3))**2)/

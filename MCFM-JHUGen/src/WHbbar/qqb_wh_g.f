@@ -13,7 +13,7 @@ c                           |    --> e^-(p3)+nubar(p4)
 c                           |
 c                           ---> b(p5)+b(p6)
 c   for the moment --- radiation only from initial line
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'ckm.f'
       include 'sprods_com.f'
@@ -74,12 +74,12 @@ c      write(6,*) 'gqWHq',gqWHq
       enddo
       enddo
       return
-      
+
       end
 
 
       double precision function radi(j1,j2,j3,j4,j5,j6,j7)
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'qcdcouple.f'
       include 'ewcouple.f'
@@ -98,7 +98,7 @@ c      write(6,*) 'gqWHq',gqWHq
 c---calculate the 2 W propagators
       prop=       ((s123-wmass**2)**2+(wmass*wwidth)**2)
       prop=prop*((s(j6,j7)-wmass**2)**2+(wmass*wwidth)**2)
-      
+
       fac=2d0*cf*xn*gsq*gwsq**3*wmass**2/prop
 c      hdecay=xn*gwsq*mbsq/(4d0*wmass**2)*2d0*(s45-4d0*mb**2)
       hdecay=msqhbb(s45)
@@ -116,7 +116,7 @@ c      fac=CF*xnsq*gsq*gw**8*mbsq*(s45-4d0*mb**2)/prop
       end
 
 c      double precision function radf(j1,j2,j3,j4,j5,j6,j7)
-c      implicit none 
+c      implicit none
 c      include 'constants.f'
 c      include 'ewcouple.f'
 c      include 'qcdcouple.f'
@@ -138,11 +138,11 @@ c---calculate the 3 propagators
 c      prop=     ((s12-wmass**2)**2+(wmass*wwidth)**2)
 c      prop=prop*((s67-wmass**2)**2+(wmass*wwidth)**2)
 c      prop=prop*((s345-hmass**2)**2+(hmass*hwidth)**2)
-c      
+c
 c      fac=two*CF*xnsq*gsq*gw**8*mbsq*s(j1,j7)*s(j2,j6)/prop
 c      radf=(s45/(s34*s35)-mb**2*(1d0/s34**2+1d0/s35**2))*(s45-2d0*mb**2)
 c     & +0.5d0*((s34+s35)**2+2*(s45-mb**2)*(s34+s35))/s34/s35
-c     & -mb**2*(s35/s34**2+s34/s35**2) 
+c     & -mb**2*(s35/s34**2+s34/s35**2)
 c      radf=fac*radf
 c      return
 c      end

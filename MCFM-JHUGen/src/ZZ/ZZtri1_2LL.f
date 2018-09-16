@@ -1,7 +1,7 @@
       subroutine ZZtri1_2LL(j1,j2,j3,j4,j5,j6,za,zb,mt,Xpp,Xmp,Xpm,Xmm,
      & Xrat)
 C-----Author: R.K. Ellis (September 2013)
-C-----Trianglecoefficient for LL coupling 
+C-----Trianglecoefficient for LL coupling
 C-----Triangle C0(p1,p2,mt,mt,mt)
 C-----Xpp and Xmp refer to the initial state gluon polarizations
       implicit none
@@ -79,7 +79,7 @@ c--- end statement functions
          elseif (h3 .eq.2) then
              k3=j4
              k4=j3
-         endif 
+         endif
       do h5=1,2
          if (h5 .eq.1) then
              k5=j5
@@ -87,20 +87,20 @@ c--- end statement functions
          elseif (h5 .eq.2) then
              k5=j6
              k6=j5
-         endif 
+         endif
 
       app2=Funcpp_2(k1,k2,k3,k4,k5,k6)+Funcpp_2(k2,k1,k5,k6,k3,k4)
 
        Xpp(h3,h5)=mtsq*app2
 c--- contribution to rational part (coefficient of -mt^2)
-      Xrat(2,2,h3,h5)=-app2     
-      
+      Xrat(2,2,h3,h5)=-app2
+
       if (computemp) then
         amp0=Funcmp_0(k1,k2,k3,k4,k5,k6)+Funcmp_0(k1,k2,k5,k6,k3,k4)
         amp2=Funcmp_2(k1,k2,k3,k4,k5,k6)+Funcmp_2(k1,k2,k5,k6,k3,k4)
         Xmp(h3,h5)=amp0+mtsq*amp2
 c--- contribution to rational part (coefficient of -mt^2)
-        Xrat(1,2,h3,h5)=-amp2     
+        Xrat(1,2,h3,h5)=-amp2
       else
         Xmp(h3,h5)=czip
         Xrat(1,2,h3,h5)=czip

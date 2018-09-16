@@ -65,7 +65,7 @@ c--- initialize
 c--- save original value of mass2
       oldmass2=mass2
 
-c--- subtractions for massive line   
+c--- subtractions for massive line
 c--- note: mass of final state particle for final-final dipoles
 c---       is passed in (clumsily) via mass2
       mass2=mt
@@ -93,7 +93,7 @@ c--- the dipole transformations are identical and ME's are the same
       qgproc=.false.
       gqproc=.true.
       ggproc=.true.
-      mass2=0d0           
+      mass2=0d0
       call dips_mass( 9,p,5,6,3,sub56_3,dsubv,msq56_3,msq56_3v,
      . qq_tbg,qq_tbg_gvec)
       sub56_3v_gg=subv_gg
@@ -105,9 +105,9 @@ c--- the dipole transformations are identical and ME's are the same
 
 c--- reset mass2 to original value
       mass2=oldmass2
-     
+
       do j=-nf,nf
-      do k=-nf,nf      
+      do k=-nf,nf
       do nd=1,ndmax
         msq(nd,j,k)=0d0
       enddo
@@ -118,7 +118,7 @@ c--- correction factors to replace the "gsq" that appears in the sub...
 c--- expressions with the correct gsq for that line
 c      corrL=as_L/as
       corrH=as_H/as
-      
+
 c--- leading colour (Ca) goes in (0,0)
 c--- subleading colour (2*Cf-Ca) goes in (0,1)
 c--- Tr terms go in (1,0)
@@ -126,16 +126,16 @@ c--- Tr terms go in (1,0)
 c--- leading contributions
       msq( 9,0,0)=(half*ca*(
      .               msq56_3(0,0)*sub56_3(gg)+msq56_3v(0,0)*sub56_3v_gg)
-     .              )*corrH 
+     .              )*corrH
       msq( 9,1,0)=(half*2d0*Tr*dfloat(nflav)*(
      .               msq56_3(0,0)*sub56_3(gq)-msq56_3v(0,0)*sub56_3v_gq)
-     .              )*corrH 
+     .              )*corrH
       msq(10,0,0)=(half*ca*(
      .               msq56_4(0,0)*sub56_4(gg)+msq56_4v(0,0)*sub56_4v_gg)
-     .              )*corrH 
+     .              )*corrH
       msq(10,1,0)=(half*2d0*Tr*dfloat(nflav)*(
      .               msq56_4(0,0)*sub56_4(gq)-msq56_4v(0,0)*sub56_4v_gq)
-     .              )*corrH 
+     .              )*corrH
       msq( 3,0,0)=half*ca*(msq35_6(0,0)*sub35_6(qq))*corrH
       msq( 4,0,0)=half*ca*(msq36_5(0,0)*sub36_5(qq))*corrH
       msq( 7,0,0)=half*ca*(msq45_6(0,0)*sub45_6(qq))*corrH
@@ -145,22 +145,22 @@ c--- subleading contributions
       msq( 2,0,1)=half*(2d0*cf-ca)*(msq36_4(0,0)*sub36_4(qq))*corrH
       msq( 5,0,1)=half*(2d0*cf-ca)*(msq45_3(0,0)*sub45_3(qq))*corrH
       msq( 6,0,1)=half*(2d0*cf-ca)*(msq46_3(0,0)*sub46_3(qq))*corrH
-        
+
 c      do j=-4,4
 c      do k=-4,4
-c      
+c
 c      if     ((j .gt. 0) .and. (k .lt. 0)) then
 cc--- leading contributions
 c        msq( 9,j,k)=(half*ca*(
 c     .               msq56_3(j,k)*sub56_3(gg)+msq56_3v(j,k)*sub56_3v_gg)
 c     .              +half*dfloat(nflav)*(
 c     .               msq56_3(j,k)*sub56_3(gq)-msq56_3v(j,k)*sub56_3v_gq)
-c     .              )*corrH 
+c     .              )*corrH
 c        msq(10,j,k)=(half*ca*(
 c     .               msq56_4(j,k)*sub56_4(gg)+msq56_4v(j,k)*sub56_4v_gg)
 c     .              +half*dfloat(nflav)*(
 c     .               msq56_4(j,k)*sub56_4(gq)-msq56_4v(j,k)*sub56_4v_gq)
-c     .              )*corrH 
+c     .              )*corrH
 c        msq( 3,j,k)=half*ca*(msq35_6(j,k)*sub35_6(qq))*corrH
 c        msq( 4,j,k)=half*ca*(msq36_5(j,k)*sub36_5(qq))*corrH
 c        msq( 7,j,k)=half*ca*(msq45_6(j,k)*sub45_6(qq))*corrH
@@ -176,12 +176,12 @@ c        msq( 9,j,k)=(half*ca*(
 c     .               msq56_3(j,k)*sub56_3(gg)+msq56_3v(j,k)*sub56_3v_gg)
 c     .              +half*dfloat(nflav)*(
 c     .               msq56_3(j,k)*sub56_3(gq)-msq56_3v(j,k)*sub56_3v_gq)
-c     .              )*corrH 
+c     .              )*corrH
 c        msq(10,j,k)=(half*ca*(
 c     .               msq56_4(j,k)*sub56_4(gg)+msq56_4v(j,k)*sub56_4v_gg)
 c     .              +half*dfloat(nflav)*(
 c     .               msq56_4(j,k)*sub56_4(gq)-msq56_4v(j,k)*sub56_4v_gq)
-c     .              )*corrH 
+c     .              )*corrH
 c        msq( 3,j,k)=half*ca*(msq35_6(j,k)*sub35_6(qq))*corrH
 c        msq( 4,j,k)=half*ca*(msq36_5(j,k)*sub36_5(qq))*corrH
 c        msq( 7,j,k)=half*ca*(msq45_6(j,k)*sub45_6(qq))*corrH
@@ -192,9 +192,9 @@ c      msq( 2,j,k)=half*(2d0*cf-ca)*(msq36_4(j,k)*sub36_4(qq))*corrH
 c      msq( 5,j,k)=half*(2d0*cf-ca)*(msq45_3(j,k)*sub45_3(qq))*corrH
 c      msq( 6,j,k)=half*(2d0*cf-ca)*(msq46_3(j,k)*sub46_3(qq))*corrH
 c      endif
-c        
+c
 c   99 continue
-c      
+c
 c      enddo
 c      enddo
 

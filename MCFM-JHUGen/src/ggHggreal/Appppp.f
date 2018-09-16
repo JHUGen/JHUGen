@@ -5,9 +5,9 @@
 *        AMPLITUDES CALCULATED BY ALBERTO FRIZZO        *
 *********************************************************
 
-      DOUBLE COMPLEX FUNCTION  Appppp(I1,I2,I3,I4,I5)                         
+      DOUBLE COMPLEX FUNCTION  Appppp(I1,I2,I3,I4,I5)
 * ---------------------------------------------------------------------
-*                            1+ 2+ 3+ 4+ 5+                            
+*                            1+ 2+ 3+ 4+ 5+
 * ---------------------------------------------------------------------
 
 
@@ -16,7 +16,7 @@
       include 'sprods_com.f'
       include 'zprods_com.f'
       INTEGER I1,I2,I3,I4,I5
-      DOUBLE PRECISION       MSQ      
+      DOUBLE PRECISION       MSQ
 
       MSQ=
      . +s(i1,i2)+s(i1,i3)+s(i1,i4)+s(i1,i5)

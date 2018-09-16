@@ -24,278 +24,320 @@ c                    input here. You have to know what you're doing.
 c
       implicit none
       include 'ewinput.f'
-c#ifndef CompileForMELA
-c      include 'spinzerohiggs_anomcoupl.f'
 
-cc     MARKUS: anomalous couplings for H resonance
-c      data AllowAnomalousCouplings / 0 /
-c      data distinguish_HWWcouplings / 0 /
-c      data AnomalCouplPR,AnomalCouplDK / 1, 1/
+c     Begin anomalous couplings
+      include 'spinzerohiggs_anomcoupl.f'
 
-c      data LambdaBSM / 1000d0 /
-c      data Lambda_Q  / 10000d0 /
+      data AllowAnomalousCouplings / 0 / ! Disables anomalous couplings
+      data distinguish_HWWcouplings / 0 /
+      data AnomalCouplPR,AnomalCouplDK / 1, 1/
+      data channeltoggle_stu / 2 /
+      data vvhvvtoggle_vbfvh / 2 /
 
-c      data Lambda_z1 / 10000d0 /
-c      data Lambda_z2 / 10000d0 /
-c      data Lambda_z3 / 10000d0 /
-c      data Lambda_z4 / 10000d0 /
+      data LambdaBSM / 1000d0 /
+      data Lambda2BSM / 1000d0 /
 
-c      data cz_q1sq / 0 /
-c      data cz_q2sq / 0 /
-c      data cz_q12sq / 0 /
-c      data Lambda_z11 / 100d0 /
-c      data Lambda_z21 / 100d0 /
-c      data Lambda_z31 / 100d0 /
-c      data Lambda_z41 / 100d0 /
-c      data Lambda_z12 / 100d0 /
-c      data Lambda_z22 / 100d0 /
-c      data Lambda_z32 / 100d0 /
-c      data Lambda_z42 / 100d0 /
-c      data Lambda_z10 / 100d0 /
-c      data Lambda_z20 / 100d0 /
-c      data Lambda_z30 / 100d0 /
-c      data Lambda_z40 / 100d0 /
+c     4th generation quark masses
+      data mt_4gen / 100000d0 /
+      data mb_4gen / 100000d0 /
 
-c      data ghz1 / (1d0,0d0) /
-c      data ghz1_prime / (0d0,0d0) /
-c      data ghz1_prime2 / (0d0,0d0) /
-c      data ghz1_prime3 / (0d0,0d0) /
-c      data ghz1_prime4 / (0d0,0d0) /
-c      data ghz1_prime5 / (0d0,0d0) /
-c      data ghz1_prime6 / (0d0,0d0) /
-c      data ghz1_prime7 / (0d0,0d0) /
+c     MARKUS: anomalous couplings for the first resonance
+c     Hgg and Hff anomalous couplings
+      data kappa_top / (0d0,0d0) / ! SM=1,0
+      data kappa_tilde_top / (0d0,0d0) / ! SM=0,0
+      data kappa_bot / (0d0,0d0) / ! SM=1,0
+      data kappa_tilde_bot / (0d0,0d0) / ! SM=0,0
+      data ghg2 / (0d0,0d0) / ! SM=0,0
+      data ghg3 / (0d0,0d0) / ! SM=0,0
+      data ghg4 / (0d0,0d0) / ! SM=0,0
 
-c      data ghz2 / (0d0,0d0) /
-c      data ghz2_prime / (0d0,0d0) /
-c      data ghz2_prime2 / (0d0,0d0) /
-c      data ghz2_prime3 / (0d0,0d0) /
-c      data ghz2_prime4 / (0d0,0d0) /
-c      data ghz2_prime5 / (0d0,0d0) /
-c      data ghz2_prime6 / (0d0,0d0) /
-c      data ghz2_prime7 / (0d0,0d0) /
+      data kappa_4gen_top / (0d0,0d0) /
+      data kappa_tilde_4gen_top / (0d0,0d0) /
+      data kappa_4gen_bot / (0d0,0d0) /
+      data kappa_tilde_4gen_bot / (0d0,0d0) /
+      data ghg2_4gen / (0d0,0d0) /
+      data ghg3_4gen / (0d0,0d0) /
+      data ghg4_4gen / (0d0,0d0) /
 
-c      data ghz3 / (0d0,0d0) /
-c      data ghz3_prime / (0d0,0d0) /
-c      data ghz3_prime2 / (0d0,0d0) /
-c      data ghz3_prime3 / (0d0,0d0) /
-c      data ghz3_prime4 / (0d0,0d0) /
-c      data ghz3_prime5 / (0d0,0d0) /
-c      data ghz3_prime6 / (0d0,0d0) /
-c      data ghz3_prime7 / (0d0,0d0) /
+c     HVV anomalous couplings
+      data Lambda_Q  / 10000d0 /
+      data Lambda_z1 / 10000d0 /
+      data Lambda_z2 / 10000d0 /
+      data Lambda_z3 / 10000d0 /
+      data Lambda_z4 / 10000d0 /
 
-c      data ghz4 / (0d0,0d0) /
-c      data ghz4_prime / (0d0,0d0) /
-c      data ghz4_prime2 / (0d0,0d0) /
-c      data ghz4_prime3 / (0d0,0d0) /
-c      data ghz4_prime4 / (0d0,0d0) /
-c      data ghz4_prime5 / (0d0,0d0) /
-c      data ghz4_prime6 / (0d0,0d0) /
-c      data ghz4_prime7 / (0d0,0d0) /
+      data cz_q1sq / 0 /
+      data cz_q2sq / 0 /
+      data cz_q12sq / 0 /
+      data Lambda_z11 / 100d0 /
+      data Lambda_z21 / 100d0 /
+      data Lambda_z31 / 100d0 /
+      data Lambda_z41 / 100d0 /
+      data Lambda_z12 / 100d0 /
+      data Lambda_z22 / 100d0 /
+      data Lambda_z32 / 100d0 /
+      data Lambda_z42 / 100d0 /
+      data Lambda_z10 / 100d0 /
+      data Lambda_z20 / 100d0 /
+      data Lambda_z30 / 100d0 /
+      data Lambda_z40 / 100d0 /
 
-c      data Lambda_zgs1 / 10000d0 /
+      data ghz1 / (1d0,0d0) /
+      data ghz1_prime / (0d0,0d0) /
+      data ghz1_prime2 / (0d0,0d0) /
+      data ghz1_prime3 / (0d0,0d0) /
+      data ghz1_prime4 / (0d0,0d0) /
+      data ghz1_prime5 / (0d0,0d0) /
+      data ghz1_prime6 / (0d0,0d0) /
+      data ghz1_prime7 / (0d0,0d0) /
 
-c      data ghzgs1_prime2 / (0d0,0d0) /
-c      data ghzgs2 / (0d0,0d0) /
-c      data ghzgs3 / (0d0,0d0) /
-c      data ghzgs4 / (0d0,0d0) /
+      data ghz2 / (0d0,0d0) /
+      data ghz2_prime / (0d0,0d0) /
+      data ghz2_prime2 / (0d0,0d0) /
+      data ghz2_prime3 / (0d0,0d0) /
+      data ghz2_prime4 / (0d0,0d0) /
+      data ghz2_prime5 / (0d0,0d0) /
+      data ghz2_prime6 / (0d0,0d0) /
+      data ghz2_prime7 / (0d0,0d0) /
 
-c      data ghgsgs2 / (0d0,0d0) /
-c      data ghgsgs3 / (0d0,0d0) /
-c      data ghgsgs4 / (0d0,0d0) /
+      data ghz3 / (0d0,0d0) /
+      data ghz3_prime / (0d0,0d0) /
+      data ghz3_prime2 / (0d0,0d0) /
+      data ghz3_prime3 / (0d0,0d0) /
+      data ghz3_prime4 / (0d0,0d0) /
+      data ghz3_prime5 / (0d0,0d0) /
+      data ghz3_prime6 / (0d0,0d0) /
+      data ghz3_prime7 / (0d0,0d0) /
 
-c      data Lambda_w1 / 10000d0 /
-c      data Lambda_w2 / 10000d0 /
-c      data Lambda_w3 / 10000d0 /
-c      data Lambda_w4 / 10000d0 /
+      data ghz4 / (0d0,0d0) /
+      data ghz4_prime / (0d0,0d0) /
+      data ghz4_prime2 / (0d0,0d0) /
+      data ghz4_prime3 / (0d0,0d0) /
+      data ghz4_prime4 / (0d0,0d0) /
+      data ghz4_prime5 / (0d0,0d0) /
+      data ghz4_prime6 / (0d0,0d0) /
+      data ghz4_prime7 / (0d0,0d0) /
 
-c      data cw_q1sq / 0 /
-c      data cw_q2sq / 0 /
-c      data cw_q12sq / 0 /
-c      data Lambda_w11 / 100d0 /
-c      data Lambda_w21 / 100d0 /
-c      data Lambda_w31 / 100d0 /
-c      data Lambda_w41 / 100d0 /
-c      data Lambda_w12 / 100d0 /
-c      data Lambda_w22 / 100d0 /
-c      data Lambda_w32 / 100d0 /
-c      data Lambda_w42 / 100d0 /
-c      data Lambda_w10 / 100d0 /
-c      data Lambda_w20 / 100d0 /
-c      data Lambda_w30 / 100d0 /
-c      data Lambda_w40 / 100d0 /
+      data Lambda_zgs1 / 10000d0 /
 
-c      data ghw1 / (1d0,0d0) /
-c      data ghw1_prime / (0d0,0d0) /
-c      data ghw1_prime2 / (0d0,0d0) /
-c      data ghw1_prime3 / (0d0,0d0) /
-c      data ghw1_prime4 / (0d0,0d0) /
-c      data ghw1_prime5 / (0d0,0d0) /
-c      data ghw1_prime6 / (0d0,0d0) /
-c      data ghw1_prime7 / (0d0,0d0) /
+      data ghzgs1_prime2 / (0d0,0d0) /
+      data ghzgs2 / (0d0,0d0) /
+      data ghzgs3 / (0d0,0d0) /
+      data ghzgs4 / (0d0,0d0) /
 
-c      data ghw2 / (0d0,0d0) /
-c      data ghw2_prime / (0d0,0d0) /
-c      data ghw2_prime2 / (0d0,0d0) /
-c      data ghw2_prime3 / (0d0,0d0) /
-c      data ghw2_prime4 / (0d0,0d0) /
-c      data ghw2_prime5 / (0d0,0d0) /
-c      data ghw2_prime6 / (0d0,0d0) /
-c      data ghw2_prime7 / (0d0,0d0) /
+      data ghgsgs2 / (0d0,0d0) /
+      data ghgsgs3 / (0d0,0d0) /
+      data ghgsgs4 / (0d0,0d0) /
 
-c      data ghw3 / (0d0,0d0) /
-c      data ghw3_prime / (0d0,0d0) /
-c      data ghw3_prime2 / (0d0,0d0) /
-c      data ghw3_prime3 / (0d0,0d0) /
-c      data ghw3_prime4 / (0d0,0d0) /
-c      data ghw3_prime5 / (0d0,0d0) /
-c      data ghw3_prime6 / (0d0,0d0) /
-c      data ghw3_prime7 / (0d0,0d0) /
+      data Lambda_w1 / 10000d0 /
+      data Lambda_w2 / 10000d0 /
+      data Lambda_w3 / 10000d0 /
+      data Lambda_w4 / 10000d0 /
 
-c      data ghw4 / (0d0,0d0) /
-c      data ghw4_prime / (0d0,0d0) /
-c      data ghw4_prime2 / (0d0,0d0) /
-c      data ghw4_prime3 / (0d0,0d0) /
-c      data ghw4_prime4 / (0d0,0d0) /
-c      data ghw4_prime5 / (0d0,0d0) /
-c      data ghw4_prime6 / (0d0,0d0) /
-c      data ghw4_prime7 / (0d0,0d0) /
+      data cw_q1sq / 0 /
+      data cw_q2sq / 0 /
+      data cw_q12sq / 0 /
+      data Lambda_w11 / 100d0 /
+      data Lambda_w21 / 100d0 /
+      data Lambda_w31 / 100d0 /
+      data Lambda_w41 / 100d0 /
+      data Lambda_w12 / 100d0 /
+      data Lambda_w22 / 100d0 /
+      data Lambda_w32 / 100d0 /
+      data Lambda_w42 / 100d0 /
+      data Lambda_w10 / 100d0 /
+      data Lambda_w20 / 100d0 /
+      data Lambda_w30 / 100d0 /
+      data Lambda_w40 / 100d0 /
+
+      data ghw1 / (1d0,0d0) /
+      data ghw1_prime / (0d0,0d0) /
+      data ghw1_prime2 / (0d0,0d0) /
+      data ghw1_prime3 / (0d0,0d0) /
+      data ghw1_prime4 / (0d0,0d0) /
+      data ghw1_prime5 / (0d0,0d0) /
+      data ghw1_prime6 / (0d0,0d0) /
+      data ghw1_prime7 / (0d0,0d0) /
+
+      data ghw2 / (0d0,0d0) /
+      data ghw2_prime / (0d0,0d0) /
+      data ghw2_prime2 / (0d0,0d0) /
+      data ghw2_prime3 / (0d0,0d0) /
+      data ghw2_prime4 / (0d0,0d0) /
+      data ghw2_prime5 / (0d0,0d0) /
+      data ghw2_prime6 / (0d0,0d0) /
+      data ghw2_prime7 / (0d0,0d0) /
+
+      data ghw3 / (0d0,0d0) /
+      data ghw3_prime / (0d0,0d0) /
+      data ghw3_prime2 / (0d0,0d0) /
+      data ghw3_prime3 / (0d0,0d0) /
+      data ghw3_prime4 / (0d0,0d0) /
+      data ghw3_prime5 / (0d0,0d0) /
+      data ghw3_prime6 / (0d0,0d0) /
+      data ghw3_prime7 / (0d0,0d0) /
+
+      data ghw4 / (0d0,0d0) /
+      data ghw4_prime / (0d0,0d0) /
+      data ghw4_prime2 / (0d0,0d0) /
+      data ghw4_prime3 / (0d0,0d0) /
+      data ghw4_prime4 / (0d0,0d0) /
+      data ghw4_prime5 / (0d0,0d0) /
+      data ghw4_prime6 / (0d0,0d0) /
+      data ghw4_prime7 / (0d0,0d0) /
 
 
-cc     MARKUS: mass and width for second resonance
-c      data h2mass  /750.0d0/
-c      data h2width /20.0d0/
+c     MARKUS: anomalous couplings for 2nd resonance
+c     Mass and width for second resonance
+      data h2mass  /-1d0/ ! -1 disables the resonance
+      data h2width /0d0/
 
-cc     MARKUS: anomalous couplings for 2nd resonance
+c     Hgg and Hff anomalous couplings
+      data kappa2_top / (0d0,0d0) /
+      data kappa2_tilde_top / (0d0,0d0) /
+      data kappa2_bot / (0d0,0d0) /
+      data kappa2_tilde_bot / (0d0,0d0) /
+      data gh2g2 / (0d0,0d0) /
+      data gh2g3 / (0d0,0d0) /
+      data gh2g4 / (0d0,0d0) /
 
-c      data Lambda2BSM / 1000d0 /
-c      data Lambda2_Q  / 10000d0 /
+      data kappa2_4gen_top / (0d0,0d0) /
+      data kappa2_tilde_4gen_top / (0d0,0d0) /
+      data kappa2_4gen_bot / (0d0,0d0) /
+      data kappa2_tilde_4gen_bot / (0d0,0d0) /
+      data gh2g2_4gen / (0d0,0d0) /
+      data gh2g3_4gen / (0d0,0d0) /
+      data gh2g4_4gen / (0d0,0d0) /
 
-c      data Lambda2_z1 / 10000d0 /
-c      data Lambda2_z2 / 10000d0 /
-c      data Lambda2_z3 / 10000d0 /
-c      data Lambda2_z4 / 10000d0 /
+c     HVV anomalous couplings
+      data Lambda2_Q  / 10000d0 /
+      data Lambda2_z1 / 10000d0 /
+      data Lambda2_z2 / 10000d0 /
+      data Lambda2_z3 / 10000d0 /
+      data Lambda2_z4 / 10000d0 /
 
-c      data c2z_q1sq / 0 /
-c      data c2z_q2sq / 0 /
-c      data c2z_q12sq / 0 /
-c      data Lambda2_z11 / 100d0 /
-c      data Lambda2_z21 / 100d0 /
-c      data Lambda2_z31 / 100d0 /
-c      data Lambda2_z41 / 100d0 /
-c      data Lambda2_z12 / 100d0 /
-c      data Lambda2_z22 / 100d0 /
-c      data Lambda2_z32 / 100d0 /
-c      data Lambda2_z42 / 100d0 /
-c      data Lambda2_z10 / 100d0 /
-c      data Lambda2_z20 / 100d0 /
-c      data Lambda2_z30 / 100d0 /
-c      data Lambda2_z40 / 100d0 /
+      data c2z_q1sq / 0 /
+      data c2z_q2sq / 0 /
+      data c2z_q12sq / 0 /
+      data Lambda2_z11 / 100d0 /
+      data Lambda2_z21 / 100d0 /
+      data Lambda2_z31 / 100d0 /
+      data Lambda2_z41 / 100d0 /
+      data Lambda2_z12 / 100d0 /
+      data Lambda2_z22 / 100d0 /
+      data Lambda2_z32 / 100d0 /
+      data Lambda2_z42 / 100d0 /
+      data Lambda2_z10 / 100d0 /
+      data Lambda2_z20 / 100d0 /
+      data Lambda2_z30 / 100d0 /
+      data Lambda2_z40 / 100d0 /
 
-c      data gh2z1 / (1d0,0d0) /
-c      data gh2z1_prime / (0d0,0d0) /
-c      data gh2z1_prime2 / (0d0,0d0) /
-c      data gh2z1_prime3 / (0d0,0d0) /
-c      data gh2z1_prime4 / (0d0,0d0) /
-c      data gh2z1_prime5 / (0d0,0d0) /
-c      data gh2z1_prime6 / (0d0,0d0) /
-c      data gh2z1_prime7 / (0d0,0d0) /
+      data gh2z1 / (0d0,0d0) /
+      data gh2z1_prime / (0d0,0d0) /
+      data gh2z1_prime2 / (0d0,0d0) /
+      data gh2z1_prime3 / (0d0,0d0) /
+      data gh2z1_prime4 / (0d0,0d0) /
+      data gh2z1_prime5 / (0d0,0d0) /
+      data gh2z1_prime6 / (0d0,0d0) /
+      data gh2z1_prime7 / (0d0,0d0) /
 
-c      data gh2z2 / (0d0,0d0) /
-c      data gh2z2_prime / (0d0,0d0) /
-c      data gh2z2_prime2 / (0d0,0d0) /
-c      data gh2z2_prime3 / (0d0,0d0) /
-c      data gh2z2_prime4 / (0d0,0d0) /
-c      data gh2z2_prime5 / (0d0,0d0) /
-c      data gh2z2_prime6 / (0d0,0d0) /
-c      data gh2z2_prime7 / (0d0,0d0) /
+      data gh2z2 / (0d0,0d0) /
+      data gh2z2_prime / (0d0,0d0) /
+      data gh2z2_prime2 / (0d0,0d0) /
+      data gh2z2_prime3 / (0d0,0d0) /
+      data gh2z2_prime4 / (0d0,0d0) /
+      data gh2z2_prime5 / (0d0,0d0) /
+      data gh2z2_prime6 / (0d0,0d0) /
+      data gh2z2_prime7 / (0d0,0d0) /
 
-c      data gh2z3 / (0d0,0d0) /
-c      data gh2z3_prime / (0d0,0d0) /
-c      data gh2z3_prime2 / (0d0,0d0) /
-c      data gh2z3_prime3 / (0d0,0d0) /
-c      data gh2z3_prime4 / (0d0,0d0) /
-c      data gh2z3_prime5 / (0d0,0d0) /
-c      data gh2z3_prime6 / (0d0,0d0) /
-c      data gh2z3_prime7 / (0d0,0d0) /
+      data gh2z3 / (0d0,0d0) /
+      data gh2z3_prime / (0d0,0d0) /
+      data gh2z3_prime2 / (0d0,0d0) /
+      data gh2z3_prime3 / (0d0,0d0) /
+      data gh2z3_prime4 / (0d0,0d0) /
+      data gh2z3_prime5 / (0d0,0d0) /
+      data gh2z3_prime6 / (0d0,0d0) /
+      data gh2z3_prime7 / (0d0,0d0) /
 
-c      data gh2z4 / (0d0,0d0) /
-c      data gh2z4_prime / (0d0,0d0) /
-c      data gh2z4_prime2 / (0d0,0d0) /
-c      data gh2z4_prime3 / (0d0,0d0) /
-c      data gh2z4_prime4 / (0d0,0d0) /
-c      data gh2z4_prime5 / (0d0,0d0) /
-c      data gh2z4_prime6 / (0d0,0d0) /
-c      data gh2z4_prime7 / (0d0,0d0) /
+      data gh2z4 / (0d0,0d0) /
+      data gh2z4_prime / (0d0,0d0) /
+      data gh2z4_prime2 / (0d0,0d0) /
+      data gh2z4_prime3 / (0d0,0d0) /
+      data gh2z4_prime4 / (0d0,0d0) /
+      data gh2z4_prime5 / (0d0,0d0) /
+      data gh2z4_prime6 / (0d0,0d0) /
+      data gh2z4_prime7 / (0d0,0d0) /
 
-c      data Lambda2_zgs1 / 10000d0 /
+      data Lambda2_zgs1 / 10000d0 /
 
-c      data gh2zgs1_prime2 / (0d0,0d0) /
-c      data gh2zgs2 / (0d0,0d0) /
-c      data gh2zgs3 / (0d0,0d0) /
-c      data gh2zgs4 / (0d0,0d0) /
+      data gh2zgs1_prime2 / (0d0,0d0) /
+      data gh2zgs2 / (0d0,0d0) /
+      data gh2zgs3 / (0d0,0d0) /
+      data gh2zgs4 / (0d0,0d0) /
 
-c      data gh2gsgs2 / (0d0,0d0) /
-c      data gh2gsgs3 / (0d0,0d0) /
-c      data gh2gsgs4 / (0d0,0d0) /
+      data gh2gsgs2 / (0d0,0d0) /
+      data gh2gsgs3 / (0d0,0d0) /
+      data gh2gsgs4 / (0d0,0d0) /
 
-c      data Lambda2_w1 / 10000d0 /
-c      data Lambda2_w2 / 10000d0 /
-c      data Lambda2_w3 / 10000d0 /
-c      data Lambda2_w4 / 10000d0 /
+      data Lambda2_w1 / 10000d0 /
+      data Lambda2_w2 / 10000d0 /
+      data Lambda2_w3 / 10000d0 /
+      data Lambda2_w4 / 10000d0 /
 
-c      data c2w_q1sq / 0 /
-c      data c2w_q2sq / 0 /
-c      data c2w_q12sq / 0 /
-c      data Lambda2_w11 / 100d0 /
-c      data Lambda2_w21 / 100d0 /
-c      data Lambda2_w31 / 100d0 /
-c      data Lambda2_w41 / 100d0 /
-c      data Lambda2_w12 / 100d0 /
-c      data Lambda2_w22 / 100d0 /
-c      data Lambda2_w32 / 100d0 /
-c      data Lambda2_w42 / 100d0 /
-c      data Lambda2_w10 / 100d0 /
-c      data Lambda2_w20 / 100d0 /
-c      data Lambda2_w30 / 100d0 /
-c      data Lambda2_w40 / 100d0 /
+      data c2w_q1sq / 0 /
+      data c2w_q2sq / 0 /
+      data c2w_q12sq / 0 /
+      data Lambda2_w11 / 100d0 /
+      data Lambda2_w21 / 100d0 /
+      data Lambda2_w31 / 100d0 /
+      data Lambda2_w41 / 100d0 /
+      data Lambda2_w12 / 100d0 /
+      data Lambda2_w22 / 100d0 /
+      data Lambda2_w32 / 100d0 /
+      data Lambda2_w42 / 100d0 /
+      data Lambda2_w10 / 100d0 /
+      data Lambda2_w20 / 100d0 /
+      data Lambda2_w30 / 100d0 /
+      data Lambda2_w40 / 100d0 /
 
-c      data gh2w1 / (1d0,0d0) /
-c      data gh2w1_prime / (0d0,0d0) /
-c      data gh2w1_prime2 / (0d0,0d0) /
-c      data gh2w1_prime3 / (0d0,0d0) /
-c      data gh2w1_prime4 / (0d0,0d0) /
-c      data gh2w1_prime5 / (0d0,0d0) /
-c      data gh2w1_prime6 / (0d0,0d0) /
-c      data gh2w1_prime7 / (0d0,0d0) /
+      data gh2w1 / (1d0,0d0) /
+      data gh2w1_prime / (0d0,0d0) /
+      data gh2w1_prime2 / (0d0,0d0) /
+      data gh2w1_prime3 / (0d0,0d0) /
+      data gh2w1_prime4 / (0d0,0d0) /
+      data gh2w1_prime5 / (0d0,0d0) /
+      data gh2w1_prime6 / (0d0,0d0) /
+      data gh2w1_prime7 / (0d0,0d0) /
 
-c      data gh2w2 / (0d0,0d0) /
-c      data gh2w2_prime / (0d0,0d0) /
-c      data gh2w2_prime2 / (0d0,0d0) /
-c      data gh2w2_prime3 / (0d0,0d0) /
-c      data gh2w2_prime4 / (0d0,0d0) /
-c      data gh2w2_prime5 / (0d0,0d0) /
-c      data gh2w2_prime6 / (0d0,0d0) /
-c      data gh2w2_prime7 / (0d0,0d0) /
+      data gh2w2 / (0d0,0d0) /
+      data gh2w2_prime / (0d0,0d0) /
+      data gh2w2_prime2 / (0d0,0d0) /
+      data gh2w2_prime3 / (0d0,0d0) /
+      data gh2w2_prime4 / (0d0,0d0) /
+      data gh2w2_prime5 / (0d0,0d0) /
+      data gh2w2_prime6 / (0d0,0d0) /
+      data gh2w2_prime7 / (0d0,0d0) /
 
-c      data gh2w3 / (0d0,0d0) /
-c      data gh2w3_prime / (0d0,0d0) /
-c      data gh2w3_prime2 / (0d0,0d0) /
-c      data gh2w3_prime3 / (0d0,0d0) /
-c      data gh2w3_prime4 / (0d0,0d0) /
-c      data gh2w3_prime5 / (0d0,0d0) /
-c      data gh2w3_prime6 / (0d0,0d0) /
-c      data gh2w3_prime7 / (0d0,0d0) /
+      data gh2w3 / (0d0,0d0) /
+      data gh2w3_prime / (0d0,0d0) /
+      data gh2w3_prime2 / (0d0,0d0) /
+      data gh2w3_prime3 / (0d0,0d0) /
+      data gh2w3_prime4 / (0d0,0d0) /
+      data gh2w3_prime5 / (0d0,0d0) /
+      data gh2w3_prime6 / (0d0,0d0) /
+      data gh2w3_prime7 / (0d0,0d0) /
 
-c      data gh2w4 / (0d0,0d0) /
-c      data gh2w4_prime / (0d0,0d0) /
-c      data gh2w4_prime2 / (0d0,0d0) /
-c      data gh2w4_prime3 / (0d0,0d0) /
-c      data gh2w4_prime4 / (0d0,0d0) /
-c      data gh2w4_prime5 / (0d0,0d0) /
-c      data gh2w4_prime6 / (0d0,0d0) /
-c      data gh2w4_prime7 / (0d0,0d0) /
+      data gh2w4 / (0d0,0d0) /
+      data gh2w4_prime / (0d0,0d0) /
+      data gh2w4_prime2 / (0d0,0d0) /
+      data gh2w4_prime3 / (0d0,0d0) /
+      data gh2w4_prime4 / (0d0,0d0) /
+      data gh2w4_prime5 / (0d0,0d0) /
+      data gh2w4_prime6 / (0d0,0d0) /
+      data gh2w4_prime7 / (0d0,0d0) /
 
-c#endif
+c     End anomalous couplings
+
 
       data ewscheme  / +3                  /   ! Chooses EW scheme
       data Gf_inp    / 1.16639d-5          /   ! G_F

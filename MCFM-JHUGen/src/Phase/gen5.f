@@ -31,9 +31,9 @@ c--- phase space volume only checked for x1=x2=1
         xx(2)=1d0
         xjac=1d0
       endif
-      
+
 c---if x's out of normal range alternative return
-      if   ((xx(1) .gt. 1d0) 
+      if   ((xx(1) .gt. 1d0)
      & .or. (xx(2) .gt. 1d0)
      & .or. (xx(1) .lt. xmin)
      & .or. (xx(2) .lt. xmin)) return 1
@@ -51,11 +51,11 @@ c---if x's out of normal range alternative return
       if     ((case .eq. 't_bbar') .or. (case .eq. 'qg_tbb')) then
         call phase51(r,p1,p2,p3,p4,p5,p6,p7,pswt)
       elseif ((case .eq. 'W_twdk') .or. (case .eq. 'Wtdkay')
-     .    .or.(case .eq. 'W_cwdk') .or. (case .eq. 'vlchwt'))  then  
+     .    .or.(case .eq. 'W_cwdk') .or. (case .eq. 'vlchwt'))  then
         call phase5a(r,p1,p2,p3,p4,p5,p6,p7,pswt)
-      elseif (case .eq. 'vlchk5')  then  
+      elseif (case .eq. 'vlchk5')  then
         call phase5(r,p1,p2,p3,p4,p5,p6,p7,pswt)
-      elseif (case .eq. 'WWqqdk')  then  
+      elseif (case .eq. 'WWqqdk')  then
         call phase5h(r,p1,p2,p3,p4,p5,p6,p7,pswt)
       else
         call phase5(r,p1,p2,p3,p4,p5,p6,p7,pswt)
@@ -69,7 +69,7 @@ c---if x's out of normal range alternative return
       p(5,nu)=p5(nu)
       p(6,nu)=p6(nu)
       p(7,nu)=p7(nu)
-      enddo 
+      enddo
 
       if (interference) then
         if (icount .eq. 1) then
@@ -80,14 +80,14 @@ c---if x's out of normal range alternative return
           do nu=1,4
             p(4,nu)=p6(nu)
             p(6,nu)=p4(nu)
-          enddo 
+          enddo
           icount=icount+1
         endif
       endif
-      
+
       wt5=xjac*pswt
 
       if (wt5 .eq. 0d0) return 1
-      
+
       return
       end

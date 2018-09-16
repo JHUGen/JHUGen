@@ -1,4 +1,4 @@
-      double complex function qlI2fin(p1sq,m0s,m1s,musq) 
+      double complex function qlI2fin(p1sq,m0s,m1s,musq)
 C---- Implementation of the formulae of Denner and Dittmaier
 C----%\cite{Denner:2005nn}
 C----\bibitem{Denner:2005nn}
@@ -32,7 +32,7 @@ C---deal with special cases for m0sq=0
 C----- (a,0,a)  p1sq=m1sq, DD(4.13)
       if (qlzero(abs(arg1))) then
       qlI2fin=dcmplx(log(musq/m1sq))+ctwo
-C----- (0,0,a) 
+C----- (0,0,a)
       elseif (qlzero(abs(p1sq/musq))) then
       qlI2fin=dcmplx(log(musq/m1sq))+cone
 C----- (a,0,0)
@@ -50,7 +50,7 @@ C---deal with special case, p1sq=0
       else
       xp=dcmplx(m0sq/(m0sq-m1sq))  ! other root is formally infinite
       qlI2fin=dcmplx(log(musq/m0sq))-qlfndd(0,xp,1d0)
-      endif     
+      endif
       else
 C----general case, DD (4.8)
       b=dcmplx(m1sq-m0sq-p1sq)
@@ -61,7 +61,7 @@ C----general case, DD (4.8)
       qlI2fin=dcmplx(log(musq/m0sq))-qlfndd(0,xp,1d0)-qlfndd(0,xm,-1d0)
 
       endif
-      return 
+      return
 
       end
 

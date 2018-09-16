@@ -9,7 +9,7 @@
 *                           |                                          *
 *                            ---> b(p5)+b(p6)+g(p7)                    *
 ************************************************************************
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'masses.f'
       include 'ewcouple.f'
@@ -39,7 +39,7 @@ c---calculate the 2 Z propagators
       call hbbdecay_g(p,5,6,7,hdecay)
       hdecay=hdecay/((s567-hmass**2)**2+(hmass*hwidth)**2)
       fac=fac*hdecay
-      
+
 c-- Old form of this matrix element (modified to facilitate extension
 c--- to H->WW decay)
 c      spinave only (color factors cancel)
@@ -66,13 +66,13 @@ c       fac=two*spinave*gw**8*(xw/(1d0-xw))**2*mbsq*(s56-4d0*mb**2)/prop
 
 c + L1(j)*L1(j)*L2(j)*L2(j)*gw^8*[1/4/XN]*mb^2*[s56-4*mb^2]
 c  * ( 2*zprop1^-1*zprop2^-1*hprop^-1*sinw^4*s14*s23*cos^-4 )
- 
+
 c + R1(j)*R1(j)*R2(j)*R2(j)*gw^8*[1/4/XN]*mb^2*[s56-4*mb^2]
 c  * ( 2*zprop1^-1*zprop2^-1*hprop^-1*sinw^4*s14*s23*cos^-4 )
 
 c + L1(j)*L1(j)*R2(j)*R2(j)*gw^8*[1/4/XN]*mb^2*[s56-4*mb^2]
 c  * ( 2*zprop1^-1*zprop2^-1*hprop^-1*sinw^4*s13*s24*cos^-4 )
- 
+
 c + R1(j)*R1(j)*L2(j)*L2(j)*gw^8*[1/4/XN]*mb^2*[s56-4*mb^2]
 c  * ( 2*zprop1^-1*zprop2^-1*hprop^-1*sinw^4*s13*s24*cos^-4 )
- 
+

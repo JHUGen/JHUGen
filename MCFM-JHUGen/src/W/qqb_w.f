@@ -13,8 +13,8 @@ c---
       include 'ckm.f'
       integer j,k
       double precision msq(-nf:nf,-nf:nf),p(mxpart,4),fac,qqb,qbq,s
-     
-c--statement function 
+
+c--statement function
       s(j,k)=2d0*(p(j,4)*p(k,4)-p(j,1)*p(k,1)
      .           -p(j,2)*p(k,2)-p(j,3)*p(k,3))
 

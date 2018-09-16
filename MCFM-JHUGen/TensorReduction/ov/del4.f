@@ -8,4 +8,4 @@
      &    -ovdot(p1,k4)*del3(p2,p3,p4,k1,k2,k3)
       return
       end
-      
+

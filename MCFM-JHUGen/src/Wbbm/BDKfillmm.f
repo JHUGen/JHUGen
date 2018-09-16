@@ -21,7 +21,7 @@
       loreduced=2d0/(s(k5,k6)*s(k2,k3))
      & *(+za(k1,k6)/s234*zba2(k5,k3,k4,k2)*zb(k2,k4)
      &   -zb(k5,k4)/s123*za(k1,k2)*zba2(k2,k1,k3,k6))
-     
+
       lomm=mq/zb(k2,k3)*loreduced
       lopp=mq/za(k2,k3)*loreduced
       xl14=Lnrat(musq,-s(k1,k4))
@@ -39,7 +39,7 @@
       A(e)=qlI1(mqsq,musq,e)
       enddo
       p2Dp3=0.5d0*(s(k2,k3)-2d0*mqsq)
-    
+
 C---Contribution of Final vertex function (massive  case)
 C   *(-2*p2.p3*C0(p2,p3,m,0,m)-B0(p23,m,m)+B0(p3,0,m)+1/2*A0(m)/m^2);
 
@@ -59,8 +59,8 @@ C   *(-2*p2.p3*C0(p2,p3,m,0,m)-B0(p23,m,m)+B0(p3,0,m)+1/2*A0(m)/m^2);
       ASLpp(0)=VV(0)*lopp+BDKfinite*mq/za(k2,k3)
       return
       end
- 
- 
- 
- 
+
+
+
+
 

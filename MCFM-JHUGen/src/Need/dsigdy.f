@@ -1,4 +1,4 @@
-      real*8 function dsigdy(x)      
+      real*8 function dsigdy(x)
       implicit real*8 (a-h,o-z)
       include 'nyy.f'
       real*8 sig(nyy),xyy(nyy),err
@@ -15,6 +15,6 @@ c      write(6,*) xyy(ny),sig(ny)
       close(unit=47)
       endif
       mpot=3
-      dsigdy=1d3*ddvdif(sig,xyy,nyy,x,mpot)    
-      return       
+      dsigdy=1d3*ddvdif(sig,xyy,nyy,x,mpot)
+      return
       end

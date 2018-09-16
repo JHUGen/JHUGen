@@ -5,13 +5,13 @@
 c---  DKS Eq. 3.15
       integer j1,j2,j3,j4,j5,j6,j7
       double complex a7treea
-     
+
       a7trees=a7treea(j1,j2,j3,j4,j5,j6,j7,za,zb)
      .       +a7treea(j1,j2,j6,j5,j4,j3,j7,za,zb)
-        
+
       return
       end
-        
+
       double complex function A7treea(j1,j2,j3,j4,j5,j6,j7,za,zb)
 C---This function taken from Eq. 2.22 of DKS
 c---Multiplied by a factor of (-i)
@@ -32,7 +32,7 @@ c---u(2)+dbar(1)-->nu(3)+e^+(3)+b(5)+bbar(6)+g(7)
      . *(za(j1,j3)*zb(j3,j4)*zb(j2,j5)*z2(j6,j2,j5,j7)/t256
      . +z2(j6,j1,j3,j4)*z2(j1,j2,j7,j5)/za(j7,j2))
      . /(za(j1,j7)*s(j3,j4)*s(j5,j6)*t134)
-      return 
+      return
       end
 
 
@@ -56,5 +56,5 @@ c     . *(z2(j1,j5,j6,j2)*za(j2,j1)+z2(j1,j5,j6,j7)*za(j7,j1))
 c     . +za(j1,j3)*z2(j1,j2,j7,j4)*z2(j6,j3,j4,j5)
 c     . -za(j1,j6)*z2(j1,j2,j7,j5)*z2(j3,j5,j6,j4))
 c     . /(za(j1,j7)*za(j7,j2)*s(j3,j4)*s(j5,j6)*t127)
-c      return 
+c      return
 c      end

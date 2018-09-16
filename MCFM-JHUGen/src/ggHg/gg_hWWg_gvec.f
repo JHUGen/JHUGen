@@ -44,7 +44,7 @@ C   Deal with Higgs decay
       p1p2(+1,0)=-aveqg*fac*qqghn(1,iglue,2,p,n)
       p1p2(-1,0)=-aveqg*fac*qqghn(iglue,1,2,p,n)
       p1p2(0,0)=+avegg*fac*ggghn(1,iglue,2,p,n)
-      elseif (in .eq. 7) then     
+      elseif (in .eq. 7) then
       p1p2(1,-1)=+aveqq*fac*qqghn(1,2,iglue,p,n)
       p1p2(-1,1)=+aveqq*fac*qqghn(2,1,iglue,p,n)
       p1p2(0,0)=+avegg*fac*ggghn(1,2,iglue,p,n)
@@ -73,7 +73,7 @@ C   Deal with Higgs decay
       endif
       enddo
       enddo
- 
+
       return
       end
 

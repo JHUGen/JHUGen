@@ -3,7 +3,7 @@
 *     Lowest order t-channel single top, with explicit b-quark         *
 *       (contracted with vector n)                                     *
 *                                                                      *
-*     q(p1) + g(p2) -> t(p3) + b(p4) + q'(p5)                          *      
+*     q(p1) + g(p2) -> t(p3) + b(p4) + q'(p5)                          *
 *                                                                      *
 *         Author: J. Campbell, March 19, 2008                          *
 *                         (added decay May 2011)                       *
@@ -26,7 +26,7 @@ c     u + g  ->  c + s + d  (t-channel single-charm)
       msq(j,k)=0d0
       enddo
       enddo
-      
+
       gsq_H=fourpi*as_H
       fac=aveqg*xn**2*Cf*gsq_H*gwsq**4
 
@@ -65,12 +65,12 @@ c--- fill matrix elements
         msq(0,+j)=fac*Vsum(+j)*msq_gq
         msq(0,-j)=fac*Vsum(-j)*msq_gqbar
       enddo
-      
+
       return
       end
 
       double precision function qg_tbqndk(p1,p2,p7,p3,p4,p,n)
-      implicit none 
+      implicit none
 C---calculates the amplitude squared for the process
 c   q(p1)+qbar(p2) --> W(l(p3)+a(p4)+g(p5)
 c   contracted with the vector n(mu)
@@ -83,14 +83,14 @@ c   contracted with the vector n(mu)
      &                 twonDpt,twonDp6,qg_tbqndk_ampanti
       double complex zanb(mxpart,mxpart),zbna(mxpart,mxpart)
       parameter(e6=5,k6=6)
-     
+
       call checkndotp(p,n,p2)
 
 c--- choice of arbitrary vector to make p6 massless
       ie6=2
-      
+
       c6=mb**2/(2d0*dot(p,6,ie6))
-      
+
       do nu=1,4
       q(1,nu)=p(p1,nu)
       q(2,nu)=p(p2,nu)
@@ -103,29 +103,29 @@ c--- choice of arbitrary vector to make p6 massless
 
       call spinoru(7,q,za,zb)
       call spinork(7,q,zanb,zbna,n)
-      
+
       twonDpt=2d0*(n(4)*(p(3,4)+p(4,4)+p(5,4))
      &            -n(1)*(p(3,1)+p(4,1)+p(5,1))
      &            -n(2)*(p(3,2)+p(4,2)+p(5,2))
      &            -n(3)*(p(3,3)+p(4,3)+p(5,3)))
       twonDp6=2d0*(n(4)*p(6,4)-n(1)*p(6,1)-n(2)*p(6,2)-n(3)*p(6,3))
-       
-      if (p3 .eq. 3) then  ! top-antibottom    
+
+      if (p3 .eq. 3) then  ! top-antibottom
        qg_tbqndk=qg_tbqndk_amp(1,2,3,4,7,k6,e6,twonDpt,twonDp6,zanb)
       else                 ! antitop-bottom
        qg_tbqndk=qg_tbqndk_ampanti(1,2,3,4,7,k6,e6,twonDpt,twonDp6,zanb)
       endif
-      
+
       s345=(p(3,4)+p(4,4)+p(5,4))**2-(p(3,1)+p(4,1)+p(5,1))**2
      &    -(p(3,2)+p(4,2)+p(5,2))**2-(p(3,3)+p(4,3)+p(5,3))**2
-     
+
 c--- add missing overall factors
       qg_tbqndk=qg_tbqndk
      &         /((2d0*dot(p,p1,p7)-wmass**2)**2)
      &         /((2d0*dot(p,p3,p4)-wmass**2)**2+(wmass*wwidth)**2)
      &         /((s345-mt**2)**2+(mt*twidth)**2)
      &         *2d0*dot(p,p3,5)
-      
+
       return
       end
 
@@ -143,7 +143,7 @@ c--- to the W and does not include the width in the W propagator
 c--- as it expects to be called with the W in the t-channel.
 
 c      double precision function qg_tbqndkold(p1,p2,p7,p3,p4,p,n)
-c      implicit none 
+c      implicit none
 cC---calculates the amplitude squared for the process
 cc   q(p1)+qbar(p2) --> W(l(p3)+a(p4)+g(p5)
 cc   contracted with the vector n(mu)
@@ -156,20 +156,20 @@ c      double precision p(mxpart,4),n(4),nDn,prop,s345,
 c     .                 c6,cn,q(mxpart,4),dot,qg_tbqndk_ampold,xnorm
 c      common/xnorm/xnorm
 c      parameter(e6=5,k6=6,en=8,nh=9)
-c     
+c
 c      call checkndotp(p,n,p2)
 c
 cc--- choice of arbitrary vectors to make p6 and n massless
 c      ie6=2
 c      ien=3
-c      
+c
 c      c6=mb**2/(2d0*dot(p,6,ie6))
 c      nDn=n(4)**2-n(1)**2-n(2)**2-n(3)**2
 c      cn=nDn/(2d0*(n(4)*p(ien,4)-n(1)*p(ien,1)
 c     &            -n(2)*p(ien,2)-n(3)*p(ien,3)))
 cc      xnorm=p(ien,4)
 c      xnorm=1d0
-c      
+c
 c      do nu=1,4
 c      q(1,nu)=p(p1,nu)
 c      q(2,nu)=p(p2,nu)
@@ -183,19 +183,19 @@ c      q(nh,nu)=(n(nu)-cn*q(en,nu))/xnorm
 c      enddo
 c
 c      call spinoru(9,q,za,zb)
-cc      
+cc
 c      qg_tbqndkold=qg_tbqndk_ampold(1,2,3,4,7,k6,e6,nh,en,nDn)
-c      
+c
 c      s345=(p(3,4)+p(4,4)+p(5,4))**2-(p(3,1)+p(4,1)+p(5,1))**2
 c     &    -(p(3,2)+p(4,2)+p(5,2))**2-(p(3,3)+p(4,3)+p(5,3))**2
-c     
+c
 cc--- add missing overall factors
 c      qg_tbqndkold=qg_tbqndkold
 c     &         /((2d0*dot(p,p1,p7)-wmass**2)**2)
 c     &         /((2d0*dot(p,p3,p4)-wmass**2)**2+(wmass*wwidth)**2)
 c     &         /((s345-mt**2)**2+(mt*twidth)**2)
 c     &         *2d0*dot(p,p3,5)
-c      
+c
 c      return
 c      end
 c

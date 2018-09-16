@@ -7,8 +7,8 @@ C         CTEQ5 PPARTON DISTRIBUTIONS"
 C
 C  hep-ph/9903282; to be published in Eur. Phys. J. C 1999.
 C
-C  These PDF's use quadratic interpolation of attached tables. A parametrized 
-C  version of the same PDF's without external tables is under construction.  
+C  These PDF's use quadratic interpolation of attached tables. A parametrized
+C  version of the same PDF's without external tables is under construction.
 C  They will become available later.
 C
 C   This package contains 7 sets of CTEQ5 PDF's; plus two updated ones.
@@ -32,38 +32,38 @@ C         --------------------------------------------------------
 C   8    CTEQ5M1  Improved CTEQ5M         0.118     326   226    cteq5m1.tbl
 C   9    CTEQ5HQ1 Improved CTEQ5HQ        0.118     326   226    ctq5hq1.tbl
 C ---------------------------------------------------------------------------
-C   
+C
 C  The available applied range is 10^-5 << x << 1 and 1.0 << Q << 10,000 (GeV).
-C   Lam5 (Lam4, Lam3) represents Lambda value (in MeV) for 5 (4,3) flavors. 
-C   The matching alpha_s between 4 and 5 flavors takes place at Q=4.5 GeV,  
+C   Lam5 (Lam4, Lam3) represents Lambda value (in MeV) for 5 (4,3) flavors.
+C   The matching alpha_s between 4 and 5 flavors takes place at Q=4.5 GeV,
 C   which is defined as the bottom quark mass, whenever it can be applied.
 C
 C   The Table_Files are assumed to be in the working directory.
-C   
+C
 C   Before using the PDF, it is necessary to do the initialization by
-C       Call SetCtq5(Iset) 
+C       Call SetCtq5(Iset)
 C   where Iset is the desired PDF specified in the above table.
-C   
+C
 C   The function Ctq5Pdf (Iparton, X, Q)
-C   returns the parton distribution inside the proton for parton [Iparton] 
+C   returns the parton distribution inside the proton for parton [Iparton]
 C   at [X] Bjorken_X and scale [Q] (GeV) in PDF set [Iset].
 C   Iparton  is the parton label (5, 4, 3, 2, 1, 0, -1, ......, -5)
 C                            for (b, c, s, d, u, g, u_bar, ..., b_bar),
 C      whereas CTEQ5F3 has, by definition, only 3 flavors and gluon;
 C              CTEQ5F4 has only 4 flavors and gluon.
-C   
-C   For detailed information on the parameters used, e.q. quark masses, 
-C   QCD Lambda, ... etc.,  see info lines at the beginning of the 
+C
+C   For detailed information on the parameters used, e.q. quark masses,
+C   QCD Lambda, ... etc.,  see info lines at the beginning of the
 C   Table_Files.
 C
 C   These programs, as provided, are in double precision.  By removing the
-C   "Implicit Double Precision" lines, they can also be run in single 
+C   "Implicit Double Precision" lines, they can also be run in single
 C   precision.
-C   
-C   If you have detailed questions concerning these CTEQ5 distributions, 
-C   or if you find problems/bugs using this package, direct inquires to 
+C
+C   If you have detailed questions concerning these CTEQ5 distributions,
+C   or if you find problems/bugs using this package, direct inquires to
 C   Hung-Liang Lai(lai@phys.nthu.edu.tw) or Wu-Ki Tung(Tung@pa.msu.edu).
-C   
+C
 C===========================================================================
 
       Function Ctq5Pdf (Iparton, X, Q)
@@ -116,7 +116,7 @@ C
       PARAMETER (M= 2, M1 = M + 1)
 C
       Logical First
-      Common 
+      Common
      > / CtqPar_5_1 / Al, XV(0:MXX), QL(0:MXQ), UPD(MXPQX)
      > / CtqPar_5_2 / Nx, Nt, NfMx
      > / XQrange / Qini, Qmax, Xmin
@@ -144,7 +144,7 @@ C                           Find lower end of interval containing X
       Jx = JL - (M-1)/2
       If (X .lt. Xmin .and. First ) Then
          First = .false.
-         Print '(A, 2(1pE12.4))', 
+         Print '(A, 2(1pE12.4))',
      >     ' WARNING: X << Xmin, extrapolation used; X, Xmin =', X, Xmin
          If (Jx .LT. 0) Jx = 0
       Elseif (Jx .GT. Nx-M) Then
@@ -166,11 +166,11 @@ C                                    Find the interval where Q lies
       Jq = JL - (M-1)/2
       If (Jq .LT. 0) Then
          Jq = 0
-         If (Q .lt. Qini)  Print '(A, 2(1pE12.4))', 
+         If (Q .lt. Qini)  Print '(A, 2(1pE12.4))',
      >     ' WARNING: Q << Qini, extrapolation used; Q, Qini =', Q, Qini
       Elseif (Jq .GT. Nt-M) Then
          Jq = Nt - M
-         If (Q .gt. Qmax)  Print '(A, 2(1pE12.4))', 
+         If (Q .gt. Qmax)  Print '(A, 2(1pE12.4))',
      >     ' WARNING: Q > Qmax, extrapolation used; Q, Qmax =', Q, Qmax
       Endif
 
@@ -247,21 +247,21 @@ C                             ********************
       Character Line*80
       PARAMETER (MXX = 105, MXQ = 25, MXF = 6)
       PARAMETER (MXPQX = (MXF *2 +2) * MXQ * MXX)
-      Common 
+      Common
      > / CtqPar_5_1 / Al, XV(0:MXX), QL(0:MXQ), UPD(MXPQX)
      > / CtqPar_5_2 / Nx, Nt, NfMx
      > / XQrange / Qini, Qmax, Xmin
      > / QCDtable /  Alambda, Nfl, Iorder
      > / Masstbl / Amass(6)
-      
-      Read  (Nu, '(A)') Line     
+
+      Read  (Nu, '(A)') Line
       Read  (Nu, '(A)') Line
       Read  (Nu, *) Dr, Fl, Al, (Amass(I),I=1,6)
       Iorder = Nint(Dr)
       Nfl = Nint(Fl)
       Alambda = Al
 
-      Read  (Nu, '(A)') Line 
+      Read  (Nu, '(A)') Line
       Read  (Nu, *) NX,  NT, NfMx
 
       Read  (Nu, '(A)') Line
@@ -274,9 +274,9 @@ C                             ********************
          QL(Iq) = Log (QL(Iq) /Al)
    11 Continue
 C
-C                  Since quark = anti-quark for nfl>2 at this stage, 
+C                  Since quark = anti-quark for nfl>2 at this stage,
 C                  we Read  out only the non-redundent data points
-C     No of flavors = NfMx (sea) + 1 (gluon) + 2 (valence) 
+C     No of flavors = NfMx (sea) + 1 (gluon) + 2 (valence)
 
       Nblk = (NX+1) * (NT+1)
       Npts =  Nblk  * (NfMx+3)
@@ -304,9 +304,9 @@ C               *************************
 C
 
       SUBROUTINE POLINT (XA,YA,N,X,Y,DY)
- 
+
       IMPLICIT DOUBLE PRECISION (A-H, O-Z)
-C                                        Adapted from "Numerical Recipes" 
+C                                        Adapted from "Numerical Recipes"
       PARAMETER (NMAX=10)
       DIMENSION XA(N),YA(N),C(NMAX),D(NMAX)
       NS=1

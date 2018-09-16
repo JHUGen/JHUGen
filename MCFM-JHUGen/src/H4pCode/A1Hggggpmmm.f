@@ -11,10 +11,10 @@ c---   %%CITATION = ARXIV:0909.4475;%%
       include 'zprods_decl.f'
       include 'sprods_com.f'
       double complex A0phiggggpmmm,V4,FR4pmmm,F31m
-      
+
       V4 = -A0phiggggpmmm(j1,j2,j3,j4,za,zb)*(
      &  +F31m(s(j1,j2))+F31m(s(j2,j3))+F31m(s(j3,j4))+F31m(s(j4,j1)))
-     
+
       A1Hggggpmmm=V4-FR4pmmm(j1,j2,j3,j4,za,zb)
 
       return
@@ -41,23 +41,23 @@ c--- of the box functions, but with an additional factor of two
       implicit none
       double complex F41mF
       double precision psq,s,t
-      
+
       F41mF_BGMW=2d0*F41mF(psq,s,t)
-      
+
       return
       end
-      
+
 
       double complex function F42mhF_BGMW(psq,qsq,s,t)
       implicit none
       double complex F42mhF
       double precision psq,qsq,s,t
-      
+
       F42mhF_BGMW=2d0*F42mhF(psq,qsq,s,t)
 
       return
       end
-      
+
 
       double complex function FR4unsym(j1,j2,j3,j4,za,zb)
 c--- This function is the sum of the finite cut-constructible
@@ -100,17 +100,17 @@ C----solve for gamma_+ and gamma_-
       k1Dk2=-dcmplx(s12+0.5d0*(s13+s14+s23+s24))
 C-gamma+ = k1Dk2+sqrt(k1Dk2**2-k1sq*k2sq)
 C-gamma- = k1Dk2-sqrt(k1Dk2**2-k1sq*k2sq)
-      
+
       coef3mass=czip
-      gamma=k1Dk2+sqrt(k1Dk2**2-k1sq*k2sq)      
-      
+      gamma=k1Dk2+sqrt(k1Dk2**2-k1sq*k2sq)
+
       do j=1,2
       factor=gamma/(gamma**2-k1sq*k2sq)
       a1=factor*(-gamma-k1sq)
       a2=a1
       a3=factor*(-gamma)
       a4=a3
-      
+
       coef3mass=coef3mass+mhsq**2*za(j3,j4)**3
      &  *(+a3*za(j2,j3)*zb(j3,j1)+a4*za(j2,j4)*zb(j4,j1))
      &  *(+a1*za(j2,j1)*zb(j1,j3)+a4*za(j2,j4)*zb(j4,j3))
@@ -138,7 +138,7 @@ c---  Eq.(8.18)
      . + za(j2,j4)**4*mhsq**2
      . /(za(j1,j2)*za(j1,j4)*zab2(j2,j1,j4,j3)*zab2(j4,j1,j2,j3)))*W3
      .   *(-1d0)*(1d0)
-      
+
      . +coef3mass*F33m(mhsq,s12,s34)
 
      . +(1d0-dfloat(nflav)/4d0/xn)
@@ -178,7 +178,7 @@ c---  Eq.(8.18)
 C-----Add rational piece Eq.(8.25)
       FR4unsym=FR4unsym
      . -0.5d0*(1d0-dfloat(nflav)/xn)
-     . *(-za(j2,j3)*za(j3,j4)*zab2(j4,j2,j3,j1)*zb(j3,j1) 
+     . *(-za(j2,j3)*za(j3,j4)*zab2(j4,j2,j3,j1)*zb(j3,j1)
      . /(3d0*s123*za(j1,j2)*zb(j2,j1)*zb(j3,j2))
      . -zab2(j3,j2,j4,j1)**2/(s124*zb(j4,j2)**2)
      . -za(j2,j4)*za(j3,j4)*zab2(j3,j2,j4,j1)*zb(j4,j1)
@@ -193,7 +193,7 @@ C-----Add rational piece Eq.(8.25)
 
       return
       end
-      
+
 
 
       double complex function FR4pmmm(j1,j2,j3,j4,za,zb)
@@ -207,5 +207,5 @@ C-----Add rational piece Eq.(8.25)
 
       return
       end
-      
+
 

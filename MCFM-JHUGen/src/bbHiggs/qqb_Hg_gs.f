@@ -14,15 +14,15 @@
 *    isub = 2 : g + g -> b~ + b , b + b  -> b + b                      *
 ************************************************************************
 
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'ptilde.f'
       include 'qqgg.f'
       integer j,k,nd,isub
 c --- remember: nd will count the dipoles
-      
+
       double precision p(mxpart,4),msq(maxd,-nf:nf,-nf:nf)
-      double precision 
+      double precision
      & msq15_2(-nf:nf,-nf:nf),msq25_1(-nf:nf,-nf:nf),
      & msq16_2(-nf:nf,-nf:nf),msq26_1(-nf:nf,-nf:nf),
      & msq15_6(-nf:nf,-nf:nf),msq26_5(-nf:nf,-nf:nf),
@@ -44,12 +44,12 @@ c --- remember: nd will count the dipoles
 
       do j=-nf,nf
       do k=-nf,nf
-      
+
       do nd=1,ndmax
         msq(nd,j,k)=0d0
       enddo
       enddo
-      enddo      
+      enddo
 
 c--- calculate all the initial-initial dipoles
       call dips(1,p,1,5,2,sub15_2,sub15_2v,msq15_2,msq15_2v,
@@ -78,13 +78,13 @@ c--- sub... and sub...v
       call dips(6,p,2,5,6,sub25_6,sub25_6v,dummy,dummyv,
      . qqb_Hg,donothing_gvec)
 
-c--- 2-quark singularities      
+c--- 2-quark singularities
       do j=-5,+5,5
-      do k=-5,+5,5     
+      do k=-5,+5,5
 
       if (j .ne. 0 .and. k .ne. 0 .and. j.ne.-k) goto 19
 
-c--- do only q-qb and qb-q cases      
+c--- do only q-qb and qb-q cases
 c--- there are no such initial states for the 2-gluon piece here
       if (  ((j .gt. 0).and.(k .lt. 0))
      . .or. ((j .lt. 0).and.(k .gt. 0))) then
@@ -107,7 +107,7 @@ c     . +0.5d0*msq56_2v(j,k)*sub56_2v)
       elseif ((k .eq. 0).and.(j.ne.0)) then
 c--- q-g and qb-g cases
 c      msq(2,j,k)=2d0*tr*msq25_1(j,-j)*sub25_1(qg)
-      if ((isub .eq. 1) .or. (isub .eq. 0)) then                
+      if ((isub .eq. 1) .or. (isub .eq. 0)) then
       msq(3,j,k)=xn*msq16_2(j,k)*sub16_2(qq)
       msq(4,j,k)=xn*(msq26_1(j,k)*sub26_1(gg)+msq26_1v(j,k)*sub26_1v)
       msq(5,j,k)=-(msq15_6(j,k)*sub16_5(qq)+msq15_6(j,k)*sub56_1(qq))/xn
@@ -118,7 +118,7 @@ c      msq(2,j,k)=2d0*tr*msq25_1(j,-j)*sub25_1(qg)
       elseif ((j .eq. 0).and.(k.ne.0)) then
 c--- g-q and g-qb cases
 c      msq(1,j,k)=2d0*tr*msq15_2(-k,k)*sub15_2(qg)
-      if ((isub .eq. 1) .or. (isub .eq. 0)) then                
+      if ((isub .eq. 1) .or. (isub .eq. 0)) then
       msq(3,j,k)=xn*(msq16_2(j,k)*sub16_2(gg)+msq16_2v(j,k)*sub16_2v)
       msq(4,j,k)=xn*msq26_1(j,k)*sub26_1(qq)
       msq(5,j,k)=xn*(msq15_6(j,k)*sub16_5(gg)+msq15_6v(j,k)*sub16_5v
@@ -145,9 +145,9 @@ c---Hence 25 split multiplies g(p1)+q(p25)-->H+q(p6)
 
 c--- 4-quark singularities
       do j=-nf,nf
-      do k=-nf,nf      
+      do k=-nf,nf
 
-      if (((j .gt. 0).and.(k .gt. 0)) .or. 
+      if (((j .gt. 0).and.(k .gt. 0)) .or.
      .    ((j .lt. 0).and.(k .lt. 0))) then
 c--q-q or qb-qb
       if (j.eq.k) then
@@ -181,7 +181,7 @@ c q-qbar
       msq(4,j,k)=msq(4,j,k)+(xn-1d0/xn)
      .  *(msq26_1(j,0)*sub26_1(gq)+msq26_1v(j,0)*sub26_1v)
       endif
-      else 
+      else
       if ((isub .eq. 1) .or. (isub .eq. 0)) then
       if (abs(j) .eq. 5) then
       msq(4,j,k)=msq(4,j,k)+(xn-1d0/xn)
@@ -201,7 +201,7 @@ c--qbar-q
       msq(3,j,k)=msq(3,j,k)+(xn-1d0/xn)
      .  *(msq16_2(0,k)*sub16_2(gq)+msq16_2v(0,k)*sub16_2v)
       endif
-      else 
+      else
       if ((isub .eq. 1) .or. (isub .eq. 0)) then
       if (abs(j) .eq. 5) then
       msq(4,j,k)=msq(4,j,k)+(xn-1d0/xn)
@@ -221,4 +221,4 @@ c--qbar-q
 
       return
       end
-      
+

@@ -14,7 +14,7 @@ c---This routine does not function if both Qflag and Gflag=.true.
 c
 c--- all momenta are incoming
 
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'ptilde.f'
       include 'qqgg.f'
@@ -24,9 +24,9 @@ c--- all momenta are incoming
 c--- np6,np12,... = n+6,n+12,...
 c -- nd counts the dipoles
       integer j,k,n,np6,np12,np18,np21,nd
-c--- slightly obtuse notation, fn=-nf, to simplify declaration lines      
+c--- slightly obtuse notation, fn=-nf, to simplify declaration lines
       double precision p(mxpart,4),msq(maxd,fn:nf,fn:nf)
-      double precision 
+      double precision
      & msq17_2(fn:nf,fn:nf),msq27_1(fn:nf,fn:nf),
      & msq15_2(fn:nf,fn:nf),msq25_1(fn:nf,fn:nf),
      & msq16_2(fn:nf,fn:nf),msq26_1(fn:nf,fn:nf),
@@ -74,8 +74,8 @@ c--- slightly obtuse notation, fn=-nf, to simplify declaration lines
      & m27_6x(0:2,fn:nf,fn:nf,fn:nf,fn:nf),
      & m15_6x(0:2,fn:nf,fn:nf,fn:nf,fn:nf),
      & m25_6x(0:2,fn:nf,fn:nf,fn:nf,fn:nf)
-           
-      double precision 
+
+      double precision
      . msq1a_b(6,0:2,fn:nf,fn:nf),msqba_1(6,0:2,fn:nf,fn:nf),
      . msqab_c(6,0:2,fn:nf,fn:nf),
      . msqbc_2(6,0:2,fn:nf,fn:nf),msq2c_b(6,0:2,fn:nf,fn:nf),
@@ -90,7 +90,7 @@ c--- slightly obtuse notation, fn=-nf, to simplify declaration lines
      . sub1b_2(6,4),sub2b_1(6,4),
      . msq1b_2v(6,0:2,fn:nf,fn:nf),msq2b_1v(6,0:2,fn:nf,fn:nf),
      . sub1b_2v(6),sub2b_1v(6)
-      double precision 
+      double precision
      . m57_1g(0:2,fn:nf,fn:nf),m57_1vg(0:2,fn:nf,fn:nf),
      . m57_1vx(fn:nf,fn:nf,fn:nf,fn:nf),
      . m26_1g(0:2,fn:nf,fn:nf),m26_1vg(0:2,fn:nf,fn:nf),
@@ -122,11 +122,11 @@ c--- slightly obtuse notation, fn=-nf, to simplify declaration lines
      . m65_7g(0:2,fn:nf,fn:nf),
      . m57_6vx(fn:nf,fn:nf,fn:nf,fn:nf),m57_6vg(0:2,fn:nf,fn:nf),
      . m57_6g(0:2,fn:nf,fn:nf)
-      
+
       double precision mqq(0:2,fn:nf,fn:nf),
      . msqx(0:2,-nf:nf,-nf:nf,-nf:nf,-nf:nf),mg(0:2,-nf:nf,-nf:nf),
      . mvg(0:2,-nf:nf,-nf:nf),mvxg(-nf:nf,-nf:nf,-nf:nf,-nf:nf)
-    
+
       external qqb_z2jet,qqb_z2jet_gvec
       external qqb_z2jetx,qqb_z2jet_gvecx,donothing_gvecx
 
@@ -147,7 +147,7 @@ c--- slightly obtuse notation, fn=-nf, to simplify declaration lines
 
 c-- initialize the matrix elements to zero
       do j=-nf,nf
-      do k=-nf,nf      
+      do k=-nf,nf
       do nd=1,ndmax
         msq(nd,j,k)=0d0
       enddo
@@ -210,12 +210,12 @@ c--- initial-initial
 c-- fill the matrix elements
       do j=-nf,nf
       do k=-nf,nf
-      
+
 c--- QUARK-ANTIQUARK contributions
       if    ((j.gt.0).and.(k.lt.0)) then
 c------ leading colour
           if ((colourchoice .eq. 1) .or. (colourchoice .eq. 0)) then
-          do n=1,6   
+          do n=1,6
           msq(n,j,k)   =subab_c(n,gg)/2d0
      .                  *(msqab_c(n,pntr(a(n),c(n)),j,k)
      .                   +msqab_c(n,pntr(c(n),a(n)),j,k))*xn/3d0
@@ -234,12 +234,12 @@ c------ leading colour
           endif
 c------ sub-leading colour
           if ((colourchoice .eq. 2) .or. (colourchoice .eq. 0)) then
-          do n=1,6 
+          do n=1,6
           msq(6+n,j,k)=msq(6+n,j,k)
      .                 +(sub1a_b(n,qq)+subba_1(n,gg)/2d0)
      .                  *msq1a_b(n,0,j,k)*xn/3d0
      .                 +subba_1v(n)/2d0
-     .                  *msqba_1v(n,0,j,k)*xn/3d0  
+     .                  *msqba_1v(n,0,j,k)*xn/3d0
           msq(12+n,j,k)=msq(12+n,j,k)
      .                 +(subbc_2(n,gg)/2d0+sub2c_b(n,qq))
      .                  *msq2c_b(n,0,j,k)*xn/3d0
@@ -264,13 +264,13 @@ c------ sub-sub-leading colour
           msq(21+n,j,k)=msq(21+n,j,k)
      .                  -sub2b_1(n,qq)
      .                  *msq2b_1(n,0,j,k)*(xn+1d0/xn)/3d0
-         enddo         
+         enddo
          endif
 c--- ANTIQUARK-QUARK contributions
       elseif((j.lt.0).and.(k.gt.0)) then
 c------ leading colour
           if ((colourchoice .eq. 1) .or. (colourchoice .eq. 0)) then
-          do n=1,6   
+          do n=1,6
           msq(n,j,k)   =subab_c(n,gg)/2d0
      .                  *(msqab_c(n,pntr(a(n),c(n)),j,k)
      .                   +msqab_c(n,pntr(c(n),a(n)),j,k))*xn/3d0
@@ -289,12 +289,12 @@ c------ leading colour
           endif
 c------ sub-leading colour
           if ((colourchoice .eq. 2) .or. (colourchoice .eq. 0)) then
-          do n=1,6 
+          do n=1,6
           msq(6+n,j,k)=msq(6+n,j,k)
      .                 +(sub1a_b(n,qq)+subba_1(n,gg)/2d0)
      .                  *msq1a_b(n,0,j,k)*xn/3d0
      .                 +subba_1v(n)/2d0
-     .                  *msqba_1v(n,0,j,k)*xn/3d0  
+     .                  *msqba_1v(n,0,j,k)*xn/3d0
           msq(12+n,j,k)=msq(12+n,j,k)
      .                 +(subbc_2(n,gg)/2d0+sub2c_b(n,qq))
      .                  *msq2c_b(n,0,j,k)*xn/3d0
@@ -319,7 +319,7 @@ c------ sub-sub-leading colour
           msq(21+n,j,k)=msq(21+n,j,k)
      .                  -sub2b_1(n,qq)
      .                  *msq2b_1(n,0,j,k)*(xn+1d0/xn)/3d0
-         enddo         
+         enddo
          endif
 c--- GLUON-GLUON contributions
       elseif ((j.eq.0) .and. (k.eq.0)) then
@@ -470,7 +470,7 @@ c--- QUARK-GLUON contributions
       elseif ((j.gt.0) .and. (k.eq.0)) then
 c------ leading colour
           if ((colourchoice .eq. 1) .or. (colourchoice .eq. 0)) then
-          do n=1,2  
+          do n=1,2
 c-- (a,b,c) = (5,6,7) and (5,7,6)
           msq(n,j,k)   =subab_c(n,qq)
      .                  *msqab_c(n,pntr(a(n),c(n)),j,k)*xn/2d0
@@ -507,7 +507,7 @@ c-- (a,b,c) = (7,5,6) and (6,5,7)
      .                  *msq2c_b(n,pntr(a(n),b(n)),j,k)*xn/2d0
      .                 +sub2c_bv(n)
      .                  *msq2c_bv(n,pntr(a(n),b(n)),j,k)*xn/2d0
-          enddo      
+          enddo
 c--- additional (qg) collinear contributions
 c--- choose n=3 which is (7,5,6)
           do n=3,3
@@ -538,8 +538,8 @@ c-- (a,b,c) = (7,5,6) and (6,5,7)
      .                  *msq2c_b(n,0,j,k)*xn/2d0
      .                 +sub2c_bv(n)
      .                  *msq2c_bv(n,0,j,k)*xn/2d0
-          enddo      
-          do n=1,2  
+          enddo
+          do n=1,2
 c-- (a,b,c) = (5,6,7) and (5,7,6)
           msq(n,j,k)   =msq(n,j,k)
      .                 +subab_c(n,qq)
@@ -552,13 +552,13 @@ c-- (a,b,c) = (5,6,7) and (5,7,6)
      .                  *msq2b_1(n,0,j,k)*xn/2d0
      .                 +sub2b_1v(n)
      .                  *msq2b_1v(n,0,j,k)*xn/2d0
-          enddo    
+          enddo
 c-- [n=4] (a,b,c) = (6,7,5)
           msq(4,j,k)  =msq(4,j,k)
      .                 +subab_c(4,gg)
-     .                  *msqab_c(4,0,j,k)*xn/2d0                
+     .                  *msqab_c(4,0,j,k)*xn/2d0
      .                 +subab_cv(4)
-     .                  *msqab_cv(4,0,j,k)*xn/2d0                
+     .                  *msqab_cv(4,0,j,k)*xn/2d0
 c--- additional (qg) collinear contributions
 c--- choose n=3 which is (7,5,6)
           do n=3,3
@@ -569,7 +569,7 @@ c--- choose n=3 which is (7,5,6)
      .      +msq2b_1(n,2,j,-4)+msq2b_1(n,2,j,-5))/xn
      .     +(msq2b_1(n,0,j,-1)+msq2b_1(n,0,j,-2)+msq2b_1(n,0,j,-3)
      .      +msq2b_1(n,0,j,-4)+msq2b_1(n,0,j,-5))*2d0*xn)
-          enddo          
+          enddo
           endif
 c------ sub-sub-leading colour
           if ((colourchoice .eq. 3) .or. (colourchoice .eq. 0)) then
@@ -585,13 +585,13 @@ c--- choose n=3 which is (7,5,6)
           msq(21+n,j,k)=msq(21+n,j,k)+sub2b_1(n,qg)*(aveqg/aveqq)*
      .      (msq2b_1(n,0,j,-1)+msq2b_1(n,0,j,-2)+msq2b_1(n,0,j,-3)
      .      +msq2b_1(n,0,j,-4)+msq2b_1(n,0,j,-5))*(-xn-1d0/xn)
-          enddo          
+          enddo
           endif
 c--- GLUON-QUARK contributions
       elseif ((j.eq.0) .and. (k.gt.0)) then
 c------ leading colour
           if ((colourchoice .eq. 1) .or. (colourchoice .eq. 0)) then
-          do n=1,2  
+          do n=1,2
 c-- (a,b,c) = (5,6,7) and (5,7,6)
           msq(n,j,k)   =subab_c(n,qq)
      .                  *msqab_c(n,pntr(a(n),c(n)),j,k)*xn/2d0
@@ -628,7 +628,7 @@ c-- (a,b,c) = (6,5,7) and (7,5,6)
      .                  *msq1a_b(n,pntr(c(n),b(n)),j,k)*xn/2d0
      .                 +sub1a_bv(n)
      .                  *msq1a_bv(n,pntr(c(n),b(n)),j,k)*xn/2d0
-          enddo              
+          enddo
 c--- additional (qg) collinear contributions
 c--- choose n=3 which is (7,5,6)
           do n=3,3
@@ -659,8 +659,8 @@ c-- (a,b,c) = (7,5,6) and (6,5,7)
      .                  *msq1a_b(n,0,j,k)*xn/2d0
      .                 +sub1a_bv(n)
      .                  *msq1a_bv(n,0,j,k)*xn/2d0
-          enddo      
-          do n=1,2  
+          enddo
+          do n=1,2
 c-- (a,b,c) = (5,6,7) and (5,7,6)
           msq(n,j,k)   =msq(n,j,k)
      .                 +subab_c(n,qq)
@@ -673,13 +673,13 @@ c-- (a,b,c) = (5,6,7) and (5,7,6)
           msq(21+n,j,k)=msq(21+n,j,k)
      .                 +sub2b_1(n,qq)
      .                  *msq2b_1(n,0,j,k)*xn/2d0
-          enddo    
+          enddo
 c-- [n=4] (a,b,c) = (6,7,5)
           msq(4,j,k)  =msq(4,j,k)
      .                 +subab_c(4,gg)
-     .                  *msqab_c(4,0,j,k)*xn/2d0                
+     .                  *msqab_c(4,0,j,k)*xn/2d0
      .                 +subab_cv(4)
-     .                  *msqab_cv(4,0,j,k)*xn/2d0                
+     .                  *msqab_cv(4,0,j,k)*xn/2d0
 c--- choose n=3 which is (7,5,6)
           do n=3,3
           msq(18+n,j,k)=msq(18+n,j,k)+sub1b_2(n,qg)*(aveqg/aveqq)*
@@ -710,7 +710,7 @@ c--- GLUON-ANTIQUARK contributions
       elseif ((j.eq.0) .and. (k.lt.0)) then
 c------ leading colour
           if ((colourchoice .eq. 1) .or. (colourchoice .eq. 0)) then
-          do n=1,2  
+          do n=1,2
 c-- (a,b,c) = (5,6,7) and (5,7,6)
           msq(n,j,k)   =subab_c(n,qq)
      .                  *msqab_c(n,pntr(c(n),a(n)),j,k)*xn/2d0
@@ -747,7 +747,7 @@ c-- (a,b,c) = (6,5,7) and (7,5,6)
      .                  *msq1a_b(n,pntr(b(n),c(n)),j,k)*xn/2d0
      .                 +sub1a_bv(n)
      .                  *msq1a_bv(n,pntr(b(n),c(n)),j,k)*xn/2d0
-          enddo              
+          enddo
 c--- choose n=1 which is (7,5,6)
           do n=3,3
           msq(18+n,j,k)=msq(18+n,j,k)+sub1b_2(n,qg)*
@@ -777,8 +777,8 @@ c-- (a,b,c) = (7,5,6) and (6,5,7)
      .                  *msq1a_b(n,0,j,k)*xn/2d0
      .                 +sub1a_bv(n)
      .                  *msq1a_bv(n,0,j,k)*xn/2d0
-          enddo      
-          do n=1,2  
+          enddo
+          do n=1,2
 c-- (a,b,c) = (5,6,7) and (5,7,6)
           msq(n,j,k)   =msq(n,j,k)
      .                 +subab_c(n,qq)
@@ -791,13 +791,13 @@ c-- (a,b,c) = (5,6,7) and (5,7,6)
           msq(21+n,j,k)=msq(21+n,j,k)
      .                 +sub2b_1(n,qq)
      .                  *msq2b_1(n,0,j,k)*xn/2d0
-          enddo    
+          enddo
 c-- [n=4] (a,b,c) = (6,7,5)
           msq(4,j,k)  =msq(4,j,k)
      .                 +subab_c(4,gg)
-     .                  *msqab_c(4,0,j,k)*xn/2d0                
+     .                  *msqab_c(4,0,j,k)*xn/2d0
      .                 +subab_cv(4)
-     .                  *msqab_cv(4,0,j,k)*xn/2d0                
+     .                  *msqab_cv(4,0,j,k)*xn/2d0
 c--- choose n=1 which is (7,5,6)
           do n=3,3
           msq(18+n,j,k)=msq(18+n,j,k)+sub1b_2(n,qg)*(aveqg/aveqq)*
@@ -828,7 +828,7 @@ c--- ANTIQUARK-GLUON contributions
       elseif ((j.lt.0) .and. (k.eq.0)) then
 c------ leading colour
           if ((colourchoice .eq. 1) .or. (colourchoice .eq. 0)) then
-          do n=1,2  
+          do n=1,2
 c-- (a,b,c) = (5,6,7) and (5,7,6)
           msq(n,j,k)   =subab_c(n,qq)
      .                  *msqab_c(n,pntr(c(n),a(n)),j,k)*xn/2d0
@@ -865,7 +865,7 @@ c-- (a,b,c) = (7,5,6) and (6,5,7)
      .                  *msq2c_b(n,pntr(b(n),a(n)),j,k)*xn/2d0
      .                 +sub2c_bv(n)
      .                  *msq2c_bv(n,pntr(b(n),a(n)),j,k)*xn/2d0
-          enddo      
+          enddo
 c--- additional (qg) collinear contributions
 c--- choose n=1 which is (7,5,6)
           do n=3,3
@@ -896,8 +896,8 @@ c-- (a,b,c) = (7,5,6) and (6,5,7)
      .                  *msq2c_b(n,0,j,k)*xn/2d0
      .                 +sub2c_bv(n)
      .                  *msq2c_bv(n,0,j,k)*xn/2d0
-          enddo      
-          do n=1,2  
+          enddo
+          do n=1,2
 c-- (a,b,c) = (5,6,7) and (5,7,6)
           msq(n,j,k)   =msq(n,j,k)
      .                 +subab_c(n,qq)
@@ -910,13 +910,13 @@ c-- (a,b,c) = (5,6,7) and (5,7,6)
      .                  *msq2b_1(n,0,j,k)*xn/2d0
      .                 +sub2b_1v(n)
      .                  *msq2b_1v(n,0,j,k)*xn/2d0
-          enddo    
+          enddo
 c-- [n=4] (a,b,c) = (6,7,5)
           msq(4,j,k)  =msq(4,j,k)
      .                 +subab_c(4,gg)
-     .                  *msqab_c(4,0,j,k)*xn/2d0                
+     .                  *msqab_c(4,0,j,k)*xn/2d0
      .                 +subab_cv(4)
-     .                  *msqab_cv(4,0,j,k)*xn/2d0                
+     .                  *msqab_cv(4,0,j,k)*xn/2d0
 c--- choose n=1 which is (7,5,6)
           do n=3,3
           msq(21+n,j,k)=msq(21+n,j,k)+sub2b_1(n,qg)*(aveqg/aveqq)*
@@ -942,7 +942,7 @@ c--- choose n=3 which is (7,5,6)
           msq(21+n,j,k)=msq(21+n,j,k)+sub2b_1(n,qg)*(aveqg/aveqq)*
      .      (msq2b_1(n,0,j,+1)+msq2b_1(n,0,j,+2)+msq2b_1(n,0,j,+3)
      .      +msq2b_1(n,0,j,+4)+msq2b_1(n,0,j,+5))*(-xn-1d0/xn)
-          enddo          
+          enddo
           endif
       endif
 
@@ -951,7 +951,7 @@ c--- choose n=3 which is (7,5,6)
 
       endif
 
-      
+
       if (Qflag) then
 
 c---arguments of dipsx:
@@ -1013,7 +1013,7 @@ c--- sub..
      . qqb_z2jetx,donothing_gvecx,m27_6,m27_6x,mg,mvg,mvxg)
       call dipsx(13,p,6,7,2,sub67_2,sub67_2v,dummy,dummyv,
      . qqb_z2jetx,qqb_z2jet_gvecx,mqq,msqx,m67_2g,m67_2vg,m67_2vx)
- 
+
       call dipsx(17,p,2,7,5,sub27_5,dsubv,msq27_5,dummyv,
      . qqb_z2jetx,donothing_gvecx,m27_5,m27_5x,mg,mvg,mvxg)
       call dipsx(17,p,5,7,2,sub57_2,sub57_2v,dummy,dummyv,
@@ -1023,10 +1023,10 @@ c--- sub..
      . qqb_z2jetx,donothing_gvecx,m25_6,m25_6x,m25_6g,mvg,mvxg)
       call dipsx(18,p,6,5,2,sub65_2,sub65_2v,dummy,dummyv,
      . qqb_z2jetx,qqb_z2jet_gvecx,mqq,msqx,m65_2g,m65_2vg,m65_2vx)
-      
+
 c--- calculate all the initial-initial dipoles
       call dipsx(19,p,1,6,2,sub16_2,sub16_2v,msq16_2,msq16_2v,
-     . qqb_z2jetx,qqb_z2jet_gvecx,m16_2,m16_2x,m16_2g,m16_2vg,m16_2vx)      
+     . qqb_z2jetx,qqb_z2jet_gvecx,m16_2,m16_2x,m16_2g,m16_2vg,m16_2vx)
       call dipsx(20,p,1,7,2,sub17_2,sub17_2v,msq17_2,msq17_2v,
      . qqb_z2jetx,qqb_z2jet_gvecx,m17_2,m17_2x,m17_2g,m17_2vg,m17_2vx)
       call dipsx(21,p,1,5,2,sub15_2,sub15_2v,msq15_2,msq15_2v,
@@ -1041,7 +1041,7 @@ c--- calculate all the initial-initial dipoles
 c--- fill the dipole contributions
       do j=-nf,nf
       do k=-nf,nf
-      
+
       if ((j .gt. 0) .and. (k.gt.0)) then
 c---QQ
       msq(2,j,k)=msq(2,j,k)
@@ -1316,7 +1316,7 @@ c---------G-Q and G-Qbar
      .     (m16_2x(0,1,1,1,1)+m16_2x(1,1,1,1,1)+m16_2x(2,1,1,1,1))
      .    +2d0*(m16_2x(0,3,1,3,1)+m16_2x(1,3,1,3,1)+m16_2x(2,3,1,3,1))
      .    +2d0*(m16_2x(0,2,1,2,1)+m16_2x(1,2,1,2,1)+m16_2x(2,2,1,2,1)))
- 
+
           msq(20,j,k)=msq(20,j,k)+(xn-one/xn)*sub17_2(qg)*aveqg/aveqq
      .   *(0.5d0
      .   *(m17_2x(0,-1,1,1,-1)+m17_2x(1,-1,1,1,-1)+m17_2x(2,-1,1,1,-1))
@@ -1363,7 +1363,7 @@ c---------G-Q and G-Qbar
      .     3d0*(m16_2x(0,1,2,1,2)+m16_2x(1,1,2,1,2)+m16_2x(2,1,2,1,2))
      .    +(m16_2x(0,4,2,4,2)+m16_2x(1,4,2,4,2)+m16_2x(2,4,2,4,2))
      .    +(m16_2x(0,2,2,2,2)+m16_2x(1,2,2,2,2)+m16_2x(2,2,2,2,2)))
- 
+
           msq(20,j,k)=msq(20,j,k)+(xn-one/xn)*sub17_2(qg)*aveqg/aveqq
      .   *(0.5d0
      .   *(m17_2x(0,-2,2,2,-2)+m17_2x(1,-2,2,2,-2)+m17_2x(2,-2,2,2,-2))
@@ -1536,7 +1536,7 @@ c---------Q-G and Qbar-G
      .     (m26_1x(0,1,1,1,1)+m26_1x(1,1,1,1,1)+m26_1x(2,1,1,1,1))
      .    +2d0*(m26_1x(0,1,3,3,1)+m26_1x(1,1,3,3,1)+m26_1x(2,1,3,3,1))
      .    +2d0*(m26_1x(0,1,2,2,1)+m26_1x(1,1,2,2,1)+m26_1x(2,1,2,2,1)))
- 
+
           msq(23,j,k)=msq(23,j,k)+(xn-one/xn)*sub27_1(qg)*aveqg/aveqq
      .   *(0.5d0
      .   *(m27_1x(0,1,-1,1,-1)+m27_1x(1,1,-1,1,-1)+m27_1x(2,1,-1,1,-1))
@@ -1572,7 +1572,7 @@ c---------Q-G and Qbar-G
      .     3d0*(m26_1x(0,2,1,1,2)+m26_1x(1,2,1,1,2)+m26_1x(2,2,1,1,2))
      .    +(m26_1x(0,2,4,4,2)+m26_1x(1,2,4,4,2)+m26_1x(2,2,4,4,2))
      .    +(m26_1x(0,2,2,2,2)+m26_1x(1,2,2,2,2)+m26_1x(2,2,2,2,2)))
- 
+
           msq(23,j,k)=msq(23,j,k)+(xn-one/xn)*sub27_1(qg)*aveqg/aveqq
      .   *(0.5d0
      .   *(m27_1x(0,2,-2,2,-2)+m27_1x(1,2,-2,2,-2)+m27_1x(2,2,-2,2,-2))
@@ -1702,10 +1702,10 @@ c---------Q-G and Qbar-G
 
       enddo
       enddo
-      
-      endif 
+
+      endif
 
       return
       end
-      
-      
+
+

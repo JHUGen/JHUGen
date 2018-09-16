@@ -2,8 +2,8 @@
       implicit none
 c--- Virtual matrix element squared averaged over initial colors and spins
 c
-c     g(-p1)+g(-p2)-->H -->  W^- (e^-(p5)+nubar(p6)) 
-c                          + W^+ (nu(p3)+e^+(p4))+g(p_iglue1=7)+g(p_iglue2=8) 
+c     g(-p1)+g(-p2)-->H -->  W^- (e^-(p5)+nubar(p6))
+c                          + W^+ (nu(p3)+e^+(p4))+g(p_iglue1=7)+g(p_iglue2=8)
 c
 c    Calculation is fully analytic
 C  in is the label of the momentum contracted with n
@@ -27,7 +27,7 @@ C  in is the label of the momentum contracted with n
       enddo
 
 C---fill dot products
-      call spinoru(i6,p,za,zb)  
+      call spinoru(i6,p,za,zb)
 
 C   Deal with Higgs decay to WW
       s3456=s(3,4)+s(3,5)+s(3,6)+s(4,5)+s(4,6)+s(5,6)
@@ -55,7 +55,7 @@ C     The function gggghn calculates g(p1)+g(p2)-->H+g(p3)+g(p4)
 C     with p1 contracted with n
 
 c--- Note that I have removed all references to p1p2(j,k) since
-c--- the appropriate terms are actually used only in their 
+c--- the appropriate terms are actually used only in their
 c--- colour-separated forms
 
       if     (in .eq. 1) then
@@ -81,9 +81,9 @@ c     .                  +msq_strucv(igggg_c,0,0))/2d0
 c     .      +dfloat(nf)*(msq_strucv(igg_ab,0,0)+msq_strucv(igg_ba,0,0)
 c     .                  +msq_strucv(igg_sym,0,0))
         call gggghn_amp(1,2,i5,i6,p,n,c1234,c1243,c1423)
-        msq_strucv(igggg_a,0,0)=avegg*fac*0.5d0*c1234  
-        msq_strucv(igggg_b,0,0)=avegg*fac*0.5d0*c1423 
-        msq_strucv(igggg_c,0,0)=avegg*fac*0.5d0*c1243  
+        msq_strucv(igggg_a,0,0)=avegg*fac*0.5d0*c1234
+        msq_strucv(igggg_b,0,0)=avegg*fac*0.5d0*c1423
+        msq_strucv(igggg_c,0,0)=avegg*fac*0.5d0*c1243
 c        p1p2(0,0)=avegg*fac*(0.5d0*(c1234+c1243+c1423)
 c     .                 +dfloat(nf)*qqgghn_old(i5,i6,2,1,p,n))
 
@@ -113,13 +113,13 @@ c     .                  +msq_strucv(igggg_c,0,0))/2d0
 c     .      +dfloat(nf)*(msq_strucv(igg_ab,0,0)+msq_strucv(igg_ba,0,0)
 c     .                  +msq_strucv(igg_sym,0,0))
         call gggghn_amp(2,1,i5,i6,p,n,c1234,c1243,c1423)
-        msq_strucv(igggg_a,0,0)=avegg*fac*0.5d0*c1243     
-        msq_strucv(igggg_b,0,0)=avegg*fac*0.5d0*c1423     
-        msq_strucv(igggg_c,0,0)=avegg*fac*0.5d0*c1234     
+        msq_strucv(igggg_a,0,0)=avegg*fac*0.5d0*c1243
+        msq_strucv(igggg_b,0,0)=avegg*fac*0.5d0*c1423
+        msq_strucv(igggg_c,0,0)=avegg*fac*0.5d0*c1234
 c        p1p2(0,0)=+avegg*fac*(0.5d0*(c1234+c1243+c1324)
 c     .                 +dfloat(nf)*qqgghn_old(i5,i6,1,2,p,n))
 
-      elseif (in .eq. i5) then     
+      elseif (in .eq. i5) then
 c        p1p2(1,-1)=+aveqq*fac*qqgghn_old(1,2,i6,i5,p,n)
         call qqgghn(1,2,i6,i5,p,n,qqgghn_ab,qqgghn_ba,qqgghn_sym)
         msq_strucv(igg_ab,+1,-1)=aveqq*fac*0.5d0*qqgghn_ba
@@ -135,12 +135,12 @@ c        p1p2(-1,1)=+aveqq*fac*qqgghn_old(2,1,i6,i5,p,n)
 c        p1p2(-1,+1)=msq_strucv(igg_ab,-1,+1)+msq_strucv(igg_ba,-1,+1)
 c     .             +msq_strucv(igg_sym,-1,+1)
        call gggghn_amp(i5,i6,1,2,p,n,c1234,c1243,c1423)
-        msq_strucv(igggg_a,0,0)=avegg*fac*0.5d0*c1234     
-        msq_strucv(igggg_b,0,0)=avegg*fac*0.5d0*c1423     
-        msq_strucv(igggg_c,0,0)=avegg*fac*0.5d0*c1243     
+        msq_strucv(igggg_a,0,0)=avegg*fac*0.5d0*c1234
+        msq_strucv(igggg_b,0,0)=avegg*fac*0.5d0*c1423
+        msq_strucv(igggg_c,0,0)=avegg*fac*0.5d0*c1243
 c        p1p2(0,0)=+0.5d0*avegg*fac*(c1234+c1243+c1423)
 
-      elseif (in .eq. i6) then     
+      elseif (in .eq. i6) then
 c        p1p2(1,-1)=+aveqq*fac*qqgghn_old(1,2,i5,i6,p,n)
         call qqgghn(1,2,i5,i6,p,n,qqgghn_ab,qqgghn_ba,qqgghn_sym)
         msq_strucv(igg_ab,+1,-1)=aveqq*fac*0.5d0*qqgghn_ab
@@ -155,7 +155,7 @@ c        p1p2(-1,1)=+aveqq*fac*qqgghn_old(2,1,i5,i6,p,n)
         msq_strucv(igg_sym,-1,+1)=aveqq*fac*0.5d0*qqgghn_sym
 c        p1p2(-1,+1)=msq_strucv(igg_ab,-1,+1)+msq_strucv(igg_ba,-1,+1)
 c     .             +msq_strucv(igg_sym,-1,+1)
-c--- for the qg, gq pieces, note that qbar-g and g-qbar are never used        
+c--- for the qg, gq pieces, note that qbar-g and g-qbar are never used
         call qqgghn(1,i5,2,i6,p,n,qqgghn_ab,qqgghn_ba,qqgghn_sym)
         msq_strucv(igg_ab,+1,0)=-aveqg*fac*qqgghn_ab
         msq_strucv(igg_ba,+1,0)=-aveqg*fac*qqgghn_ba
@@ -169,12 +169,12 @@ c     .            +msq_strucv(igg_sym,+1,0)
 c        p1p2(0,+1)=msq_strucv(igg_ab,0,+1)+msq_strucv(igg_ba,0,+1)
 c     .            +msq_strucv(igg_sym,0,+1)
         call gggghn_amp(i6,1,2,i5,p,n,c1234,c1243,c1423)
-        msq_strucv(igggg_a,0,0)=avegg*fac*0.5d0*c1234     
-        msq_strucv(igggg_b,0,0)=avegg*fac*0.5d0*c1243     
-        msq_strucv(igggg_c,0,0)=avegg*fac*0.5d0*c1423     
+        msq_strucv(igggg_a,0,0)=avegg*fac*0.5d0*c1234
+        msq_strucv(igggg_b,0,0)=avegg*fac*0.5d0*c1243
+        msq_strucv(igggg_c,0,0)=avegg*fac*0.5d0*c1423
 c        p1p2(0,0)=+0.5d0*avegg*fac*(c1234+c1243+c1423)
       endif
- 
+
       return
       end
 

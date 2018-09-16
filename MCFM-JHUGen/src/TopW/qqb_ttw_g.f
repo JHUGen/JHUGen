@@ -9,7 +9,7 @@ c                           |     |
 c                           |      --> nu(p9)+e^+(p10)
 c                           |
 c                           ---> t(p3+p4+p5)+t(p6+p7+p8)
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'qcdcouple.f'
       include 'ewcouple.f'
@@ -76,7 +76,7 @@ C---Create rodrigo momenta
       endif
       enddo
       enddo
-C--- and calculate their spinor products     
+C--- and calculate their spinor products
       call spinoru(7,q,za,zb)
 
 c--- q-qb and qb-q
@@ -101,7 +101,7 @@ c--- g-qb and qb-g
       msq(j,k)=Vsq(j,k)*qbqWbbg
 
       elseif ((j .gt. 0) .and. (k .eq. 0)) then
-      msq(j,k)=Vsum(j)*qgWbbq 
+      msq(j,k)=Vsum(j)*qgWbbq
       elseif ((j .lt. 0) .and. (k .eq. 0)) then
       msq(j,k)=Vsum(j)*qbgWbbqb
 

@@ -8,8 +8,8 @@ c---Matrix element squared averaged over initial colors and spins
 c     q(-p1)+qbar(-p2) -->  Z^0 + f(p5)+f(p6)+g(p7)
 c                           |
 c                            --> e^-(p3)+e^+(p4)
-c                           
-      implicit none 
+c
+      implicit none
       include 'constants.f'
       include 'masses.f'
       include 'qcdcouple.f'
@@ -82,19 +82,19 @@ C---call spinor routine and load common block twopij
 *     Calculate contributions from the QQGGG matrix elements            *
 ************************************************************************
 
-c-- matrix elements for gg -> qbq      
+c-- matrix elements for gg -> qbq
       call xzqqggg(5,1,2,7,6,3,4,mmsq_gg)
-c-- matrix elements for qqb -> gg      
+c-- matrix elements for qqb -> gg
       call xzqqggg(1,5,6,7,2,3,4,mmsq_qqb)
-c-- matrix elements for qbq -> gg      
+c-- matrix elements for qbq -> gg
       call xzqqggg(2,5,6,7,1,3,4,mmsq_qbq)
-c-- matrix elements for qg -> qg      
+c-- matrix elements for qg -> qg
       call xzqqggg(1,2,6,7,5,3,4,mmsq_qg)
-c-- matrix elements for gq -> gq      
+c-- matrix elements for gq -> gq
       call xzqqggg(2,1,6,7,5,3,4,mmsq_gq)
-c-- matrix elements for gqb -> gqb      
+c-- matrix elements for gqb -> gqb
       call xzqqggg(5,1,6,7,2,3,4,mmsq_gqb)
-c-- matrix elements for qbg -> qbg      
+c-- matrix elements for qbg -> qbg
       call xzqqggg(5,2,6,7,1,3,4,mmsq_qbg)
 
       do j=-nf,nf
@@ -105,7 +105,7 @@ c-- matrix elements for qbg -> qbg
       if     ((j .eq. 0) .and. (k .eq. 0)) then
            ggtemp=0d0
            do nquark=1,nf
-          
+
            ggtemp=ggtemp
      .            +abs(Q(nquark)*q1+L(nquark)*l1*prop)**2*mmsq_gg(1,1)
      .            +abs(Q(nquark)*q1+R(nquark)*r1*prop)**2*mmsq_gg(2,2)
@@ -170,7 +170,7 @@ c--- extra factor of 2**3=8 to compensate for Ta normalization
 c--- note: the following two arrays end up being overall 1<->2 symmetric
       call msq_ZqqQQg(5,1,2,6,7,4,3,msqn_qqbs,msqi_qqbs)
       call msq_ZqqQQg(1,6,5,2,7,4,3,msqn_qbqs,msqi_qbqs)
-      
+
       call msq_ZqqQQg(2,1,5,6,7,4,3,msqn_qqb,msqi_qqb)
       call msq_ZqqQQg(1,2,5,6,7,4,3,msqn_qbq,msqi_qbq)
 
@@ -186,7 +186,7 @@ c      call msq_ZqqQQg(5,1,6,7,2,4,3,msqn_qg,msqi_qg)
 
       do j=-nf,nf
       do k=-nf,nf
-       
+
       if ((j .gt. 0) .and. (k .lt. 0)) then
 c-qqb
            if (k.eq.-j) then

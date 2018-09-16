@@ -3,7 +3,7 @@
 *     Lowest order s-channel single top + jet                          *
 *       (contracted with vector n)                                     *
 *                                                                      *
-*     q(p1) + q(p2) -> t(p3) + b(p4) + g(p5)                           *      
+*     q(p1) + q(p2) -> t(p3) + b(p4) + g(p5)                           *
 *                                                                      *
 *         Author: J. Campbell, June 24, 2008                           *
 *                                                                      *
@@ -31,7 +31,7 @@ c     u + g  ->  c + s + d  (t-channel single-charm)
       msq(j,k)=0d0
       enddo
       enddo
-      
+
       gsq_H=fourpi*as_H
       fac=aveqq*2d0*xn**2*Cf*gsq_H*gwsq**2
       call dotem(5,p,s)
@@ -55,7 +55,7 @@ c        msq_qbarq=+qg_tbqn(i3,i4,2,1,5,p,n)
         stop
       endif
 
-c--- put result in msq(0,0) element for convenience 
+c--- put result in msq(0,0) element for convenience
       msq(0,0)=fac*msq_qqbar
 
 c--- fill matrix elements

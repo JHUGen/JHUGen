@@ -5,7 +5,7 @@ c                           |    |
 c                           |    --> fermion(p3)+antifermion(p4)
 c                           |
 c                           ---> Z(e^-(p5),e^+(p6)) Z(mu^-(p7),mu^+(p8))
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'zcouple.f'
       include 'sprods_com.f'
@@ -73,7 +73,7 @@ c                           ---> Z(e^-(p5),e^+(p6)) Z(mu^-(p7),mu^+(p8))
 
 
       double precision function radiLL_zz(j1,j2,j3,j4,j5,j6,j7,j8,j9)
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'qcdcouple.f'
       include 'masses.f'
@@ -98,8 +98,8 @@ c---calculate the 2 Z propagators
      & ( ((l1*l2)**2+(r1*r2)**2)*s(j4,j6)*s(j5,j7)
      &  +((r1*l2)**2+(r2*l1)**2)*s(j4,j7)*s(j5,j6))
       hdecay=hdecay/((s(j4,j5)-zmass**2)**2+(zmass*zwidth)**2)
-      hdecay=hdecay/((s(j6,j7)-zmass**2)**2+(zmass*zwidth)**2)                                                       
-      hdecay=hdecay/((s4567-hmass**2)**2+(hmass*hwidth)**2)                                                                      
+      hdecay=hdecay/((s(j6,j7)-zmass**2)**2+(zmass*zwidth)**2)
+      hdecay=hdecay/((s4567-hmass**2)**2+(hmass*hwidth)**2)
       fac=fac*hdecay
 
       radiLL_zz=s12/s13/s23

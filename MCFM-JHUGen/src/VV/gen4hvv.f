@@ -19,31 +19,31 @@ c--- Z(34) Z(56) or W(54) W(36)
       double precision p(mxpart,4),rtshat
       double precision pswt,xjac,s34,s56,s45,s36,wt_ww,wt_zz
       double precision s3456,wt3456,ymax,yave
-      
+
       wt4=0d0
 
       call breitw(r(9),0d0,sqrts**2,hmass,hwidth,s3456,wt3456)
-            
+
       rtshat=dsqrt(s3456)
       ymax=dlog(sqrts/rtshat)
       yave=ymax*(two*r(10)-1d0)
       xjac=two*ymax*wt3456
-           
+
       xx(1)=rtshat/sqrts*exp(+yave)
       xx(2)=rtshat/sqrts*exp(-yave)
 
-      if   ((xx(1) .gt. 1d0) 
+      if   ((xx(1) .gt. 1d0)
      & .or. (xx(2) .gt. 1d0)
      & .or. (xx(1) .lt. xmin)
      & .or. (xx(2) .lt. xmin)) then
-        return 1 
+        return 1
       endif
 
       p1(4)=-0.5d0*xx(1)*sqrts
       p1(1)=0d0
       p1(2)=0d0
       p1(3)=-0.5d0*xx(1)*sqrts
-      
+
       p2(4)=-0.5d0*xx(2)*sqrts
       p2(1)=0d0
       p2(2)=0d0
@@ -56,7 +56,7 @@ c--- generating Z(34) Z(56)
         mass3=zmass
         width2=zwidth
         width3=zwidth
-        call phase4(r,p1,p2,p3,p4,p5,p6,pswt,*999) 
+        call phase4(r,p1,p2,p3,p4,p5,p6,pswt,*999)
       else
 c--- generating W(54) W(36)
         bw34_56=.false.
@@ -64,9 +64,9 @@ c--- generating W(54) W(36)
         mass3=wmass
         width2=wwidth
         width3=wwidth
-        call phase4(r,p1,p2,p5,p4,p3,p6,pswt,*999) 
+        call phase4(r,p1,p2,p5,p4,p3,p6,pswt,*999)
       endif
-      
+
       s34=2d0*(p3(4)*p4(4)-p3(1)*p4(1)-p3(2)*p4(2)-p3(3)*p4(3))
       s56=2d0*(p5(4)*p6(4)-p5(1)*p6(1)-p5(2)*p6(2)-p5(3)*p6(3))
       s36=2d0*(p3(4)*p6(4)-p3(1)*p6(1)-p3(2)*p6(2)-p3(3)*p6(3))
@@ -93,10 +93,10 @@ c--- wt_zz must also suppress possible photon pole for Z(34), in addition to BW
       p(5,nu)=p5(nu)
       p(6,nu)=p6(nu)
       p(7,nu)=0d0
-      enddo 
-      
+      enddo
+
       wt4=xjac*pswt/sqrts**2
-            
+
       if (debug) write(6,*) 'wt4 in gen4hvv',wt4
       return
 

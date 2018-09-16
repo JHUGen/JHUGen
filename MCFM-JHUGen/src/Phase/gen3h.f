@@ -22,7 +22,7 @@ c---- are required
       double precision pswt,xjac,tau,y
 
       wt3=0d0
-      
+
 c--- dummy values if there's no decay
       if (nodecay) then
         rdk1=0.5d0
@@ -31,9 +31,9 @@ c--- dummy values if there's no decay
         rdk1=r(6)
         rdk2=r(7)
       endif
-      
+
       call breitw(r(4),0d0,sqrts**2,hmass,hwidth,s12,wtbw)
-      
+
       tau=s12/sqrts**2
       y=0.5d0*dlog(tau)*(1d0-2d0*r(5))
       xjac=-wtbw/sqrts**2*dlog(tau)
@@ -43,7 +43,7 @@ c--- dummy values if there's no decay
 
 
 c---if x's out of normal range alternative return
-      if   ((xx(1) .gt. 1d0) 
+      if   ((xx(1) .gt. 1d0)
      & .or. (xx(2) .gt. 1d0)
      & .or. (xx(1) .lt. xmin)
      & .or. (xx(2) .lt. xmin)) return 1
@@ -69,7 +69,7 @@ c---if x's out of normal range alternative return
       p(5,nu)=p5(nu)
       p(6,nu)=p6(nu)
       p(7,nu)=p7(nu)
-      enddo 
+      enddo
       wt3=xjac*pswt
 
       if(wt3 .eq. 0d0) then

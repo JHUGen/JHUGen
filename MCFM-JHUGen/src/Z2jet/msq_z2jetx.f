@@ -34,7 +34,7 @@
          msq1=(abs(a111)**2+abs(a112)**2+abs(a221)**2+abs(a222)**2
      .        +abs(a122)**2+abs(a212)**2+abs(a121)**2+abs(a211)**2)
          msq2=zip
-      
+
       elseif (ja .eq. ka) then
          a111=(Q(ja)*q1+L(ja)*l1*prop)*(amp1_a(1,1,1)+amp1_b(1,1,1))
          b111=(Q(ja)*q1+L(ja)*l1*prop)*(amp2_a(1,1,1)+amp2_b(1,1,1))
@@ -75,7 +75,7 @@
 
       return
       end
-      
+
       subroutine msq_qqb(ja,ka,amp1_a,amp1_b,amp2_a,amp2_b,prop,
      .                  msq0,msq1,msq2,msq_up,msq_down)
       implicit none
@@ -90,7 +90,7 @@
       double complex amp2_a(2,2,2),amp2_b(2,2,2)
       double precision msq0,msq1,msq2,msq_up,msq_down
 
-      if (ja .ne. -ka) then 
+      if (ja .ne. -ka) then
          a111=(Q(+ja)*q1+L(+ja)*l1*prop)*amp1_a(1,1,1)
      .       +(Q(-ka)*q1+L(-ka)*l1*prop)*amp1_b(1,1,1)
          a112=(Q(+ja)*q1+L(+ja)*r1*prop)*amp1_a(1,1,2)
@@ -122,16 +122,16 @@
 c--case where final state from annihilation diagrams is the same quark
          a111=(Q(ja)*q1+L(ja)*l1*prop)*(amp1_a(1,1,1)+amp1_b(1,1,1))
          b111=(Q(ja)*q1+L(ja)*l1*prop)*(amp2_a(1,1,1)+amp2_b(1,1,1))
- 
+
          a112=(Q(ja)*q1+L(ja)*r1*prop)*(amp1_a(1,1,2)+amp1_b(1,1,2))
          b112=(Q(ja)*q1+L(ja)*r1*prop)*(amp2_a(1,1,2)+amp2_b(1,1,2))
- 
+
          a221=(Q(ja)*q1+R(ja)*l1*prop)*(amp1_a(2,2,1)+amp1_b(2,2,1))
          b221=(Q(ja)*q1+R(ja)*l1*prop)*(amp2_a(2,2,1)+amp2_b(2,2,1))
 
          a222=(Q(ja)*q1+R(ja)*r1*prop)*(amp1_a(2,2,2)+amp1_b(2,2,2))
          b222=(Q(ja)*q1+R(ja)*r1*prop)*(amp2_a(2,2,2)+amp2_b(2,2,2))
- 
+
          a121=(Q(+ja)*q1+L(+ja)*l1*prop)*amp1_a(1,2,1)
      .       +(Q(-ka)*q1+R(-ka)*l1*prop)*amp1_b(1,2,1)
          a122=(Q(+ja)*q1+L(+ja)*r1*prop)*amp1_a(1,2,2)
@@ -140,7 +140,7 @@ c--case where final state from annihilation diagrams is the same quark
      .       +(Q(-ka)*q1+L(-ka)*l1*prop)*amp1_b(2,1,1)
          a212=(Q(+ja)*q1+R(+ja)*r1*prop)*amp1_a(2,1,2)
      .       +(Q(-ka)*q1+L(-ka)*r1*prop)*amp1_b(2,1,2)
- 
+
          b121=(Q(+ja)*q1+L(+ja)*l1*prop)*amp2_a(1,2,1)
      .       +(Q(-ka)*q1+R(-ka)*l1*prop)*amp2_b(1,2,1)
          b122=(Q(+ja)*q1+L(+ja)*r1*prop)*amp2_a(1,2,2)
@@ -176,11 +176,11 @@ c--case where final state from annihilation diagrams is the same quark
      .       +(Q(+1)*q1+L(+1)*l1*prop)*amp2_b(2,1,1)
          b212=(Q(+ja)*q1+R(+ja)*r1*prop)*amp2_a(2,1,2)
      .       +(Q(+1)*q1+L(+1)*r1*prop)*amp2_b(2,1,2)
-       
+
          msq_down=(
      .   +abs(b111)**2+abs(b112)**2+abs(b221)**2+abs(b222)**2
      .   +abs(b122)**2+abs(b212)**2+abs(b121)**2+abs(b211)**2)
- 
+
          b111=(Q(+ja)*q1+L(+ja)*l1*prop)*amp2_a(1,1,1)
      .       +(Q(+2)*q1+L(+2)*l1*prop)*amp2_b(1,1,1)
          b112=(Q(+ja)*q1+L(+ja)*r1*prop)*amp2_a(1,1,2)
@@ -197,12 +197,12 @@ c--case where final state from annihilation diagrams is the same quark
      .    +(Q(+2)*q1+L(+2)*l1*prop)*amp2_b(2,1,1)
          b212=(Q(+ja)*q1+R(+ja)*r1*prop)*amp2_a(2,1,2)
      .       +(Q(+2)*q1+L(+2)*r1*prop)*amp2_b(2,1,2)
- 
+
          msq_up=(
      .   +abs(b111)**2+abs(b112)**2+abs(b221)**2+abs(b222)**2
      .   +abs(b122)**2+abs(b212)**2+abs(b121)**2+abs(b211)**2)
 
       endif
-      
+
       return
       end

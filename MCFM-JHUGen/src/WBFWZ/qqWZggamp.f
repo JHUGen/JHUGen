@@ -3,6 +3,7 @@
       implicit none
       include 'constants.f'
       include 'cmplxmass.f'
+      include 'masses.f'
       include 'zprods_decl.f'
       include 'sprods_com.f'
       include 'ewcharge.f'
@@ -52,9 +53,9 @@ C-----end statement functions
       s456=t3(p4,p5,p6)
       s3456=t4(p3,p4,p5,p6)
 
-      propw3456=s3456-cwmass2
-      propw34=s34-cwmass2
-      propz56=s56-czmass2
+      propw3456=s3456-dcmplx(wmass**2,-wmass*wwidth)
+      propw34=s34-dcmplx(wmass**2,-wmass*wwidth)
+      propz56=s56-dcmplx(zmass**2,-zmass*zwidth)
 
 
       gamzew56(1)=qe/s56+rxw*le/propz56
@@ -92,7 +93,7 @@ C-----end statement functions
 
       if (j78==1) then
 C---  amp78(h56,h7,h8)
-      amp78(1,1,1)= + gamzqe56(jdu,1,1)*propw34**(-1)*s278**(-1) * ( 
+      amp78(1,1,1)= + gamzqe56(jdu,1,1)*propw34**(-1)*s278**(-1) * (
      &     - 2.D0*za(p2,p7)*zb(p1,p6)*zba2(p4,p1,p6,p5)*izb(p1,p8)*izb(
      &    p7,p8)*zba3(p1,p2,p7,p8,p3)*s156**(-1) - 2.D0*za(p2,p8)*zb(p1
      &    ,p6)*zba2(p4,p1,p6,p5)*izb(p1,p7)*izb(p7,p8)*zba3(p1,p2,p7,p8
@@ -146,7 +147,7 @@ C---  amp78(h56,h7,h8)
      &    zba2(p1,p2,p7,p8)*izb(p2,p7)*izb(p1,p7)*izb(p1,p8)*zba3(p1,p2
      &    ,p7,p8,p3) - 2.D0*zb(p1,p6)*zab2(p3,p5,p6,p4)*zba2(p1,p2,p7,
      &    p8)*izb(p2,p7)*izb(p1,p7)*izb(p1,p8)*zba3(p1,p2,p7,p8,p5) )
-      amp78(1,2,1)= + gamzqe56(jdu,1,1)*propw34**(-1)*s178**(-1) * ( 
+      amp78(1,2,1)= + gamzqe56(jdu,1,1)*propw34**(-1)*s178**(-1) * (
      &     - 2.D0*za(p2,p3)*zb(p1,p7)**2*zba2(p4,p2,p3,p5)*zba2(p6,p1,
      &    p7,p8)*iza(p7,p8)*izb(p1,p8)*izb(p7,p8)*s234**(-1) )
       amp78(1,2,1) = amp78(1,2,1) + gamzqe56(jdu,1,1)*propw34**(-1)*
@@ -208,7 +209,7 @@ C---  amp78(h56,h7,h8)
      &    iza(p2,p7)*iza(p7,p8)*izb(p1,p8)*izb(p7,p8) - 2.D0*za(p2,p5)*
      &    za(p2,p8)*zb(p1,p6)*zb(p1,p7)*zab2(p3,p5,p6,p4)*iza(p2,p7)*
      &    iza(p7,p8)*izb(p1,p8)*izb(p7,p8) )
-      amp78(1,1,2)= + gamzqe56(jdu,1,1)*propw34**(-1)*s178**(-1) * ( 
+      amp78(1,1,2)= + gamzqe56(jdu,1,1)*propw34**(-1)*s178**(-1) * (
      &     - 2.D0*za(p2,p3)*za(p1,p7)*zb(p1,p8)*zba2(p4,p2,p3,p5)*zba2(
      &    p6,p1,p8,p7)*iza(p1,p8)*iza(p7,p8)*izb(p7,p8)*s234**(-1) )
       amp78(1,1,2) = amp78(1,1,2) + gamzqe56(jdu,1,1)*propw34**(-1)*
@@ -270,7 +271,7 @@ C---  amp78(h56,h7,h8)
      &    iza(p7,p8)*izb(p2,p7)*izb(p7,p8) + 2.D0*zab2(p5,p3,p4,p6)*
      &    zba2(p4,p1,p8,p7)*zba2(p8,p2,p7,p3)*iza(p1,p8)*iza(p7,p8)*
      &    izb(p2,p7)*izb(p7,p8) )
-      amp78(1,2,2)= + gamzqe56(jdu,1,1)*propw34**(-1)*s178**(-1) * ( 
+      amp78(1,2,2)= + gamzqe56(jdu,1,1)*propw34**(-1)*s178**(-1) * (
      &     - 2.D0*za(p2,p3)*zb(p1,p7)*zba2(p4,p2,p3,p5)*iza(p2,p8)*iza(
      &    p7,p8)*zba3(p6,p1,p7,p8,p2)*s234**(-1) - 2.D0*za(p2,p3)*zb(p1
      &    ,p8)*zba2(p4,p2,p3,p5)*iza(p2,p7)*iza(p7,p8)*zba3(p6,p1,p7,p8
@@ -325,7 +326,7 @@ C---  amp78(h56,h7,h8)
      &    zba3(p6,p1,p7,p8,p2) - 2.D0*za(p2,p5)*zab2(p3,p5,p6,p4)*zba2(
      &    p7,p1,p8,p2)*iza(p2,p7)*iza(p2,p8)*iza(p1,p8)*zba3(p6,p1,p7,
      &    p8,p2) )
-      amp78(2,1,1)= + gamzqe56(jdu,1,2)*propw34**(-1)*s278**(-1) * ( 
+      amp78(2,1,1)= + gamzqe56(jdu,1,2)*propw34**(-1)*s278**(-1) * (
      &     - 2.D0*za(p2,p7)*zb(p1,p5)*zba2(p4,p1,p5,p6)*izb(p1,p8)*izb(
      &    p7,p8)*zba3(p1,p2,p7,p8,p3)*s156**(-1) - 2.D0*za(p2,p8)*zb(p1
      &    ,p5)*zba2(p4,p1,p5,p6)*izb(p1,p7)*izb(p7,p8)*zba3(p1,p2,p7,p8
@@ -379,7 +380,7 @@ C---  amp78(h56,h7,h8)
      &    zba2(p5,p3,p4,p6)*izb(p2,p7)*izb(p1,p7)*izb(p1,p8)*zba3(p1,p2
      &    ,p7,p8,p3) - 2.D0*zb(p1,p5)*zab2(p3,p5,p6,p4)*zba2(p1,p2,p7,
      &    p8)*izb(p2,p7)*izb(p1,p7)*izb(p1,p8)*zba3(p1,p2,p7,p8,p6) )
-      amp78(2,2,1)= + gamzqe56(jdu,1,2)*propw34**(-1)*s178**(-1) * ( 
+      amp78(2,2,1)= + gamzqe56(jdu,1,2)*propw34**(-1)*s178**(-1) * (
      &     - 2.D0*za(p2,p3)*zb(p1,p7)**2*zba2(p4,p2,p3,p6)*zba2(p5,p1,
      &    p7,p8)*iza(p7,p8)*izb(p1,p8)*izb(p7,p8)*s234**(-1) )
       amp78(2,2,1) = amp78(2,2,1) + gamzqe56(jdu,1,2)*propw34**(-1)*
@@ -441,7 +442,7 @@ C---  amp78(h56,h7,h8)
      &    iza(p2,p7)*iza(p7,p8)*izb(p1,p8)*izb(p7,p8) - 2.D0*za(p2,p6)*
      &    za(p2,p8)*zb(p1,p5)*zb(p1,p7)*zab2(p3,p5,p6,p4)*iza(p2,p7)*
      &    iza(p7,p8)*izb(p1,p8)*izb(p7,p8) )
-      amp78(2,1,2)= + gamzqe56(jdu,1,2)*propw34**(-1)*s178**(-1) * ( 
+      amp78(2,1,2)= + gamzqe56(jdu,1,2)*propw34**(-1)*s178**(-1) * (
      &     - 2.D0*za(p2,p3)*za(p1,p7)*zb(p1,p8)*zba2(p4,p2,p3,p6)*zba2(
      &    p5,p1,p8,p7)*iza(p1,p8)*iza(p7,p8)*izb(p7,p8)*s234**(-1) )
       amp78(2,1,2) = amp78(2,1,2) + gamzqe56(jdu,1,2)*propw34**(-1)*
@@ -503,7 +504,7 @@ C---  amp78(h56,h7,h8)
      &    iza(p7,p8)*izb(p2,p7)*izb(p7,p8) + 2.D0*zba2(p4,p1,p8,p7)*
      &    zba2(p5,p3,p4,p6)*zba2(p8,p2,p7,p3)*iza(p1,p8)*iza(p7,p8)*
      &    izb(p2,p7)*izb(p7,p8) )
-      amp78(2,2,2)= + gamzqe56(jdu,1,2)*propw34**(-1)*s178**(-1) * ( 
+      amp78(2,2,2)= + gamzqe56(jdu,1,2)*propw34**(-1)*s178**(-1) * (
      &     - 2.D0*za(p2,p3)*zb(p1,p7)*zba2(p4,p2,p3,p6)*iza(p2,p8)*iza(
      &    p7,p8)*zba3(p5,p1,p7,p8,p2)*s234**(-1) - 2.D0*za(p2,p3)*zb(p1
      &    ,p8)*zba2(p4,p2,p3,p6)*iza(p2,p7)*iza(p7,p8)*zba3(p5,p1,p7,p8
@@ -828,7 +829,7 @@ C---  bmp78(h56,h7,h8)
      &    p8,p2)*iza(p2,p7)*iza(p2,p8)*iza(p1,p8)*zba3(p4,p1,p7,p8,p2)
      &     )
       elseif (j78==2) then
-      amp87(1,1,1)= + gamzqe56(jdu,1,1)*propw34**(-1)*s278**(-1) * ( 
+      amp87(1,1,1)= + gamzqe56(jdu,1,1)*propw34**(-1)*s278**(-1) * (
      &     - 2.D0*za(p2,p7)*zb(p1,p6)*zba2(p4,p1,p6,p5)*izb(p1,p8)*izb(
      &    p7,p8)*zba3(p1,p2,p7,p8,p3)*s156**(-1) - 2.D0*za(p2,p8)*zb(p1
      &    ,p6)*zba2(p4,p1,p6,p5)*izb(p1,p7)*izb(p7,p8)*zba3(p1,p2,p7,p8
@@ -882,7 +883,7 @@ C---  bmp78(h56,h7,h8)
      &    zba2(p1,p2,p7,p8)*izb(p2,p7)*izb(p1,p7)*izb(p1,p8)*zba3(p1,p2
      &    ,p7,p8,p3) - 2.D0*zb(p1,p6)*zab2(p3,p5,p6,p4)*zba2(p1,p2,p7,
      &    p8)*izb(p2,p7)*izb(p1,p7)*izb(p1,p8)*zba3(p1,p2,p7,p8,p5) )
-      amp87(1,1,2)= + gamzqe56(jdu,1,1)*propw34**(-1)*s178**(-1) * ( 
+      amp87(1,1,2)= + gamzqe56(jdu,1,1)*propw34**(-1)*s178**(-1) * (
      &     - 2.D0*za(p2,p3)*zb(p1,p7)**2*zba2(p4,p2,p3,p5)*zba2(p6,p1,
      &    p7,p8)*iza(p7,p8)*izb(p1,p8)*izb(p7,p8)*s234**(-1) )
       amp87(1,1,2) = amp87(1,1,2) + gamzqe56(jdu,1,1)*propw34**(-1)*
@@ -944,7 +945,7 @@ C---  bmp78(h56,h7,h8)
      &    iza(p2,p7)*iza(p7,p8)*izb(p1,p8)*izb(p7,p8) - 2.D0*za(p2,p5)*
      &    za(p2,p8)*zb(p1,p6)*zb(p1,p7)*zab2(p3,p5,p6,p4)*iza(p2,p7)*
      &    iza(p7,p8)*izb(p1,p8)*izb(p7,p8) )
-      amp87(1,2,1)= + gamzqe56(jdu,1,1)*propw34**(-1)*s178**(-1) * ( 
+      amp87(1,2,1)= + gamzqe56(jdu,1,1)*propw34**(-1)*s178**(-1) * (
      &     - 2.D0*za(p2,p3)*za(p1,p7)*zb(p1,p8)*zba2(p4,p2,p3,p5)*zba2(
      &    p6,p1,p8,p7)*iza(p1,p8)*iza(p7,p8)*izb(p7,p8)*s234**(-1) )
       amp87(1,2,1) = amp87(1,2,1) + gamzqe56(jdu,1,1)*propw34**(-1)*
@@ -1006,7 +1007,7 @@ C---  bmp78(h56,h7,h8)
      &    iza(p7,p8)*izb(p2,p7)*izb(p7,p8) + 2.D0*zab2(p5,p3,p4,p6)*
      &    zba2(p4,p1,p8,p7)*zba2(p8,p2,p7,p3)*iza(p1,p8)*iza(p7,p8)*
      &    izb(p2,p7)*izb(p7,p8) )
-      amp87(1,2,2)= + gamzqe56(jdu,1,1)*propw34**(-1)*s178**(-1) * ( 
+      amp87(1,2,2)= + gamzqe56(jdu,1,1)*propw34**(-1)*s178**(-1) * (
      &     - 2.D0*za(p2,p3)*zb(p1,p7)*zba2(p4,p2,p3,p5)*iza(p2,p8)*iza(
      &    p7,p8)*zba3(p6,p1,p7,p8,p2)*s234**(-1) - 2.D0*za(p2,p3)*zb(p1
      &    ,p8)*zba2(p4,p2,p3,p5)*iza(p2,p7)*iza(p7,p8)*zba3(p6,p1,p7,p8
@@ -1061,7 +1062,7 @@ C---  bmp78(h56,h7,h8)
      &    zba3(p6,p1,p7,p8,p2) - 2.D0*za(p2,p5)*zab2(p3,p5,p6,p4)*zba2(
      &    p7,p1,p8,p2)*iza(p2,p7)*iza(p2,p8)*iza(p1,p8)*zba3(p6,p1,p7,
      &    p8,p2) )
-      amp87(2,1,1)= + gamzqe56(jdu,1,2)*propw34**(-1)*s278**(-1) * ( 
+      amp87(2,1,1)= + gamzqe56(jdu,1,2)*propw34**(-1)*s278**(-1) * (
      &     - 2.D0*za(p2,p7)*zb(p1,p5)*zba2(p4,p1,p5,p6)*izb(p1,p8)*izb(
      &    p7,p8)*zba3(p1,p2,p7,p8,p3)*s156**(-1) - 2.D0*za(p2,p8)*zb(p1
      &    ,p5)*zba2(p4,p1,p5,p6)*izb(p1,p7)*izb(p7,p8)*zba3(p1,p2,p7,p8
@@ -1115,7 +1116,7 @@ C---  bmp78(h56,h7,h8)
      &    zba2(p5,p3,p4,p6)*izb(p2,p7)*izb(p1,p7)*izb(p1,p8)*zba3(p1,p2
      &    ,p7,p8,p3) - 2.D0*zb(p1,p5)*zab2(p3,p5,p6,p4)*zba2(p1,p2,p7,
      &    p8)*izb(p2,p7)*izb(p1,p7)*izb(p1,p8)*zba3(p1,p2,p7,p8,p6) )
-      amp87(2,1,2)= + gamzqe56(jdu,1,2)*propw34**(-1)*s178**(-1) * ( 
+      amp87(2,1,2)= + gamzqe56(jdu,1,2)*propw34**(-1)*s178**(-1) * (
      &     - 2.D0*za(p2,p3)*zb(p1,p7)**2*zba2(p4,p2,p3,p6)*zba2(p5,p1,
      &    p7,p8)*iza(p7,p8)*izb(p1,p8)*izb(p7,p8)*s234**(-1) )
       amp87(2,1,2) = amp87(2,1,2) + gamzqe56(jdu,1,2)*propw34**(-1)*
@@ -1177,7 +1178,7 @@ C---  bmp78(h56,h7,h8)
      &    iza(p2,p7)*iza(p7,p8)*izb(p1,p8)*izb(p7,p8) - 2.D0*za(p2,p6)*
      &    za(p2,p8)*zb(p1,p5)*zb(p1,p7)*zab2(p3,p5,p6,p4)*iza(p2,p7)*
      &    iza(p7,p8)*izb(p1,p8)*izb(p7,p8) )
-      amp87(2,2,1)= + gamzqe56(jdu,1,2)*propw34**(-1)*s178**(-1) * ( 
+      amp87(2,2,1)= + gamzqe56(jdu,1,2)*propw34**(-1)*s178**(-1) * (
      &     - 2.D0*za(p2,p3)*za(p1,p7)*zb(p1,p8)*zba2(p4,p2,p3,p6)*zba2(
      &    p5,p1,p8,p7)*iza(p1,p8)*iza(p7,p8)*izb(p7,p8)*s234**(-1) )
       amp87(2,2,1) = amp87(2,2,1) + gamzqe56(jdu,1,2)*propw34**(-1)*
@@ -1239,7 +1240,7 @@ C---  bmp78(h56,h7,h8)
      &    iza(p7,p8)*izb(p2,p7)*izb(p7,p8) + 2.D0*zba2(p4,p1,p8,p7)*
      &    zba2(p5,p3,p4,p6)*zba2(p8,p2,p7,p3)*iza(p1,p8)*iza(p7,p8)*
      &    izb(p2,p7)*izb(p7,p8) )
-      amp87(2,2,2)= + gamzqe56(jdu,1,2)*propw34**(-1)*s178**(-1) * ( 
+      amp87(2,2,2)= + gamzqe56(jdu,1,2)*propw34**(-1)*s178**(-1) * (
      &     - 2.D0*za(p2,p3)*zb(p1,p7)*zba2(p4,p2,p3,p6)*iza(p2,p8)*iza(
      &    p7,p8)*zba3(p5,p1,p7,p8,p2)*s234**(-1) - 2.D0*za(p2,p3)*zb(p1
      &    ,p8)*zba2(p4,p2,p3,p6)*iza(p2,p7)*iza(p7,p8)*zba3(p5,p1,p7,p8

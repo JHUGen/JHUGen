@@ -1,7 +1,7 @@
-      subroutine ATLAS_hww2013(p,failed_cuts) 
+      subroutine ATLAS_hww2013(p,failed_cuts)
 c--- Implementation of H->WW cuts in ATLAS-CONF-2013-030 (Njet=0)
-      implicit none 
-      include 'constants.f' 
+      implicit none
+      include 'constants.f'
       include 'masses.f'
       include 'runstring.f'
       double precision p(mxpart,4)
@@ -15,8 +15,8 @@ c--- Implementation of H->WW cuts in ATLAS-CONF-2013-030 (Njet=0)
       logical first,l1muon,l2muon,highMT
       data first/.true./
       save first,highMT,mllmax,phimax
- 
-C---- optional cut on mtrans 
+
+C---- optional cut on mtrans
 c      etvec(1)=p(3,1)+p(6,1)
 c      etvec(2)=p(3,2)+p(6,2)
 c--- transverse mass
@@ -24,26 +24,26 @@ c      Etll=dsqrt(max(0d0,(p(4,4)+p(5,4))**2-(p(4,3)+p(5,3))**2))
 c      MET=dsqrt(max(0d0,etvec(1)**2+etvec(2)**2))
 c      mtrans=MET+Etll
 
-c      if(mtrans.lt.300d0) then 
-c        failed_cuts=.true. 
-c         return 
+c      if(mtrans.lt.300d0) then
+c        failed_cuts=.true.
+c         return
 c      endif
 
 c--- flag for (e,mu + mu,e) or (e,e) or (mu,mu)
 c      idlept=1    ! (e,mu)
 c      idlept=2    ! (e,e)
 c      idlept=3    ! (mu,mu)
-      
+
       idlept=1
 
       ptminl1=25d0
       ptminl2=15d0
-      
+
       etamaxmu=2.5d0
       etamaxe=2.47d0
       etaegapmin=1.37d0
       etaegapmax=1.52d0
-      
+
       ptllmin=30d0
 
       if     (idlept .eq. 1) then
@@ -74,22 +74,22 @@ c      idlept=3    ! (mu,mu)
         stop
       endif
 
-         
-      if(first) then 
+
+      if(first) then
       mllmax=50d0
-      phimax=1.8d0      
+      phimax=1.8d0
       if (index(runstring,'nomll') .gt. 0) then
         mllmax=1d4
       endif
       if (index(runstring,'basic') .gt. 0) then
         mllmax=1d4
         phimax=1d4
-      endif      
+      endif
       if (index(runstring,'highMT') .gt. 0) then
         highMT=.true.
       else
         highMT=.false.
-      endif      
+      endif
       first=.false.
       write(6,*)  '******** ATLAS H->WW Search cuts ******'
       write(6,*)  '*                                     *'
@@ -120,8 +120,8 @@ c      idlept=3    ! (mu,mu)
       endif
       write(6,*)  '***************************************'
       endif
-      
-      failed_cuts = .false. 
+
+      failed_cuts = .false.
 
 c--- reject event if transverse mass too small, if requested
       if (highMT) then
@@ -157,7 +157,7 @@ c--- veto on dilepton invariant mass around Z mass
 
       ptl1=pt(4,p)
       ptl2=pt(5,p)
-      
+
       if (ptl2 .gt. ptl1) then
         tmp=ptl1
         ptl1=ptl2
@@ -173,12 +173,12 @@ c--- pt cut on hardest lepton
       if (ptl1 .lt. ptminl1) then
         failed_cuts=.true.
         return
-      endif 
+      endif
 c--- pt cut on softest lepton
       if (ptl2 .lt. ptminl2) then
         failed_cuts=.true.
         return
-      endif 
+      endif
 
 c--- rapidity cut on hardest lepton
       if (l1muon) then
@@ -252,10 +252,10 @@ c--- dilepton phi
       endif
 
  99   format(1x,a23,f6.2,a10)
-      
-      return 
+
+      return
       end
 
 
-         
+
 

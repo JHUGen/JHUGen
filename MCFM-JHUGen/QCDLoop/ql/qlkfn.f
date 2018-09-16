@@ -28,7 +28,7 @@
 
       if  ((xm .eq. 0d0) .or. (xmp .eq. 0d0)) then
       write(6,*) 'Error in qlkfn,xm,xmp=',xm,xmp
-      stop 
+      stop
       endif
 
       xx1 = xpi - (xm-xmp)**2
@@ -37,7 +37,7 @@
       if (qlzero(dble(rat))) then
            cx(2) = -2d0*im*sqrt(rat)+2d0*rat
            cx(1) = cone-cx(2)
-           cx(3) = ctwo-cx(2) 
+           cx(3) = ctwo-cx(2)
       else
 
            root = sqrt((rat-cone)/rat)

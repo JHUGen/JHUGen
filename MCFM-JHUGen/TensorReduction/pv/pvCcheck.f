@@ -29,9 +29,9 @@ c     & ,FB63a(y6max,-2:0)
      & trhs,tq
       logical failed
       parameter(epmin=0) ! Only check finite pieces
-      
+
       failed=.false.
-      
+
       Cacc=1d-8
 
       q1Dq1=q1(4)**2-q1(1)**2-q1(2)**2-q1(3)**2
@@ -39,10 +39,10 @@ c     & ,FB63a(y6max,-2:0)
       q1Dq2=q1(4)*q2(4)-q1(1)*q2(1)-q1(2)*q2(2)-q1(3)*q2(3)
       s12=q1Dq1+q2Dq2-2d0*q1Dq2
 
-c      write(6,'(a35,5(e12.5,a2))') 
+c      write(6,'(a35,5(e12.5,a2))')
 c     . '(p1sq, p2sq, m1sq, m2sq, m3sq) = ( ',
 c     .  q1Dq1,', ',s12,', ',m0s,', ',m1s,', ',m2s,' )'
-      
+
       do ep=-2,0
       sing2(ep)=zip
       sing3(ep)=zip
@@ -52,7 +52,7 @@ c     .  q1Dq1,', ',s12,', ',m0s,', ',m1s,', ',m2s,' )'
       enddo
       do nu=1,4
       p2(nu)=q2(nu)-q1(nu)
-      enddo  
+      enddo
 
       call pvBtensor(q2,m0s,m2s,FB01,FB11,FB21,FB31,FB41,FB51,FB61)
       call pvBtensor(q1,m0s,m1s,FB02,FB12,FB22,FB32,FB42,FB52,FB62)
@@ -83,7 +83,7 @@ c--- check rank 1
      &    -q1(3)*FC1(3,ep)
       trhs=
      & -0.5d0*(FB01(ep)-FB03(ep)+f1*FC0(ep))
-      call checkaccuracy(trhs,tq,Cacc,failed) 
+      call checkaccuracy(trhs,tq,Cacc,failed)
       enddo
 
       if (pvverbose) write(6,*) 'q2.FC1'
@@ -94,11 +94,11 @@ c--- check rank 1
      &    -q2(3)*FC1(3,ep)
       trhs=
      & -0.5d0*(FB02(ep)-FB03(ep)+f2*FC0(ep))
-      call checkaccuracy(trhs,tq,Cacc,failed) 
+      call checkaccuracy(trhs,tq,Cacc,failed)
       enddo
-      
+
       endif
-      
+
 
 c--- check for rank 2
       if (rank .eq. 2) then
@@ -112,7 +112,7 @@ c      do ep=epmin,0
      &    -q1(3)*FC2(y2(3,n2),ep)
       trhs=
      & -0.5d0*(FB11(n2,ep)-FB13a(n2,ep)+f1*FC1(n2,ep))
-      call checkaccuracy(trhs,tq,Cacc,failed) 
+      call checkaccuracy(trhs,tq,Cacc,failed)
       enddo
 c      enddo
 
@@ -126,13 +126,13 @@ c      do ep=epmin,0
      &   -q2(3)*FC2(y2(3,n2),ep)
       trhs=
      & -0.5d0*(FB12(n2,ep)-FB13a(n2,ep)+f2*FC1(n2,ep))
-      call checkaccuracy(trhs,tq,Cacc,failed) 
+      call checkaccuracy(trhs,tq,Cacc,failed)
       enddo
 c      enddo
 
       if (pvverbose) write(6,*) 'g_(mu,nu)*FC2'
-      sing2(0)=-0.5d0 
-c      do ep=epmin,0 
+      sing2(0)=-0.5d0
+c      do ep=epmin,0
       ep=0
       tq=FC2(y2(4,4),ep)
      & -FC2(y2(1,1),ep)
@@ -141,11 +141,11 @@ c      do ep=epmin,0
      & -m0s*FC0(ep)-FB03(ep)
       trhs=
      & +dcmplx(sing2(ep))
-      call checkaccuracy(trhs,tq,Cacc,failed) 
+      call checkaccuracy(trhs,tq,Cacc,failed)
 c      enddo
 
       endif
-      
+
 
       if (rank .eq. 3) then
       if (pvverbose) write(6,*) 'q1.FC3'
@@ -159,11 +159,11 @@ c      enddo
       trhs=
      &    -0.5d0*(FB21(y2(n2,n3),ep)
      &           -FB23a(y2(n2,n3),ep)+f1*FC2(y2(n2,n3),ep))
-      call checkaccuracy(trhs,tq,Cacc,failed) 
+      call checkaccuracy(trhs,tq,Cacc,failed)
       enddo
       enddo
       enddo
-      
+
       if (pvverbose) write(6,*) 'q2.FC3'
       do ep=epmin,0
       do n2= 1,4
@@ -175,7 +175,7 @@ c      enddo
       trhs=
      &    -0.5d0*(FB22(y2(n2,n3),ep)
      &           -FB23a(y2(n2,n3),ep)+f2*FC2(y2(n2,n3),ep))
-      call checkaccuracy(trhs,tq,Cacc,failed) 
+      call checkaccuracy(trhs,tq,Cacc,failed)
       enddo
       enddo
       enddo
@@ -184,7 +184,7 @@ c      enddo
       do ep=epmin,0
       do n3=1,4
       sing3(0)=+1d0/6d0*(q1(n3)+q2(n3))
- 
+
       tq=FC3(y3(4,4,n3),ep)
      & -FC3(y3(1,1,n3),ep)
      & -FC3(y3(2,2,n3),ep)
@@ -192,12 +192,12 @@ c      enddo
      & -m0s*FC1(n3,ep)-FB13a(n3,ep)
       trhs=
      & +dcmplx(sing3(ep))
-      call checkaccuracy(trhs,tq,Cacc,failed) 
+      call checkaccuracy(trhs,tq,Cacc,failed)
       enddo
       enddo
-  
+
       endif
-      
+
       if (rank .eq. 4) then
       if (pvverbose) write(6,*) 'q1.FC4'
       do ep=epmin,0
@@ -211,7 +211,7 @@ c      enddo
       trhs=
      & -0.5d0*(FB31(y3(n2,n3,n4),ep)
      &       -FB33a(y3(n2,n3,n4),ep)+f1*FC3(y3(n2,n3,n4),ep))
-      call checkaccuracy(trhs,tq,Cacc,failed) 
+      call checkaccuracy(trhs,tq,Cacc,failed)
       enddo
       enddo
       enddo
@@ -229,7 +229,7 @@ c      enddo
       trhs=
      & -0.5d0*(FB32(y3(n2,n3,n4),ep)
      &       -FB33a(y3(n2,n3,n4),ep)+f2*FC3(y3(n2,n3,n4),ep))
-      call checkaccuracy(trhs,tq,Cacc,failed) 
+      call checkaccuracy(trhs,tq,Cacc,failed)
       enddo
       enddo
       enddo
@@ -245,7 +245,7 @@ c      s12=q1Dq1+q2Dq2-2*q1Dq2
      &  -1d0/12d0*q2(n3)*q2(n4)
      &  -1d0/24d0*(q1(n3)*q2(n4)+q1(n4)*q2(n3))
      &  +(1d0/48d0*(s12+q1Dq1+q2Dq2)-1d0/12d0*(m0s+m1s+m2s))*g(n3,n4)
-      tq= 
+      tq=
      &     FC4(y4(4,4,n3,n4),ep)
      &    -FC4(y4(1,1,n3,n4),ep)
      &    -FC4(y4(2,2,n3,n4),ep)
@@ -253,13 +253,13 @@ c      s12=q1Dq1+q2Dq2-2*q1Dq2
      &    -m0s*FC2(y2(n3,n4),ep)
      &    -FB23a(y2(n3,n4),ep)
       trhs=+dcmplx(sing4(ep))
-      call checkaccuracy(trhs,tq,Cacc,failed) 
+      call checkaccuracy(trhs,tq,Cacc,failed)
       enddo
       enddo
       enddo
-         
+
       endif
-      
+
       if (rank .eq. 5) then
       if (pvverbose) write(6,*) 'q1.FC5'
       do ep=epmin,0
@@ -274,7 +274,7 @@ c      s12=q1Dq1+q2Dq2-2*q1Dq2
       trhs=
      & -0.5d0*(FB41(y4(n2,n3,n4,n5),ep)
      &       -FB43a(y4(n2,n3,n4,n5),ep)+f1*FC4(y4(n2,n3,n4,n5),ep))
-      call checkaccuracy(trhs,tq,Cacc,failed) 
+      call checkaccuracy(trhs,tq,Cacc,failed)
       enddo
       enddo
       enddo
@@ -295,7 +295,7 @@ c      s12=q1Dq1+q2Dq2-2*q1Dq2
       trhs=
      & -0.5d0*(FB42(y4(n2,n3,n4,n5),ep)
      &       -FB43a(y4(n2,n3,n4,n5),ep)+f2*FC4(y4(n2,n3,n4,n5),ep))
-      call checkaccuracy(trhs,tq,Cacc,failed) 
+      call checkaccuracy(trhs,tq,Cacc,failed)
       enddo
       enddo
       enddo
@@ -327,7 +327,7 @@ c      s12=q1Dq1+q2Dq2-2*q1Dq2
      &    -m0s*FC3(y3(n3,n4,n5),ep)
      &    -FB33a(y3(n3,n4,n5),ep)
       trhs=+dcmplx(sing5(ep))
-      call checkaccuracy(trhs,tq,Cacc,failed) 
+      call checkaccuracy(trhs,tq,Cacc,failed)
       enddo
       enddo
       enddo
@@ -335,7 +335,7 @@ c      s12=q1Dq1+q2Dq2-2*q1Dq2
 
       endif
 
-      
+
       if (rank .eq. 6) then
       if (pvverbose) write(6,*) 'q1.FC6'
       do ep=epmin,0
@@ -352,7 +352,7 @@ c      s12=q1Dq1+q2Dq2-2*q1Dq2
       trhs=
      &   -0.5d0*(FB51(y5(n2,n3,n4,n5,n6),ep)
      & -FB53a(y5(n2,n3,n4,n5,n6),ep)+f1*FC5(y5(n2,n3,n4,n5,n6),ep))
-      call checkaccuracy(trhs,tq,Cacc,failed) 
+      call checkaccuracy(trhs,tq,Cacc,failed)
       enddo
       enddo
       enddo
@@ -360,7 +360,7 @@ c      s12=q1Dq1+q2Dq2-2*q1Dq2
       enddo
       enddo
 
-      
+
       if (pvverbose) write(6,*) 'q2.FC6'
       do ep=epmin,0
       do n2= 1,4
@@ -372,11 +372,11 @@ c      s12=q1Dq1+q2Dq2-2*q1Dq2
      &   -q2(1)*FC6(y6(1,n2,n3,n4,n5,n6),ep)
      &   -q2(2)*FC6(y6(2,n2,n3,n4,n5,n6),ep)
      &   -q2(3)*FC6(y6(3,n2,n3,n4,n5,n6),ep)
-    
+
       trhs=
      & -0.5d0*(FB52(y5(n2,n3,n4,n5,n6),ep)
      & -FB53a(y5(n2,n3,n4,n5,n6),ep)+f2*FC5(y5(n2,n3,n4,n5,n6),ep))
-      call checkaccuracy(trhs,tq,Cacc,failed) 
+      call checkaccuracy(trhs,tq,Cacc,failed)
       enddo
       enddo
       enddo
@@ -416,7 +416,7 @@ c      s12=q1Dq1+q2Dq2-2*q1Dq2
      & -pvSPKKK(n3,n4,n5,n6,q2,q1)/120d0
      & -pvSPPKK(n3,n4,n5,n6,q2,q1)/180d0
 
-      tq = 
+      tq =
      & +FC6(y6(4,4,n3,n4,n5,n6),ep)
      & -FC6(y6(1,1,n3,n4,n5,n6),ep)
      & -FC6(y6(2,2,n3,n4,n5,n6),ep)
@@ -427,13 +427,13 @@ c      s12=q1Dq1+q2Dq2-2*q1Dq2
       trhs=
      & -FB43a(y4(n3,n4,n5,n6),ep)
      & +dcmplx(sing6(ep))
-      call checkaccuracy(trhs,tq,Cacc,failed) 
+      call checkaccuracy(trhs,tq,Cacc,failed)
       enddo
       enddo
       enddo
       enddo
       enddo
-      
+
       endif
 
       return

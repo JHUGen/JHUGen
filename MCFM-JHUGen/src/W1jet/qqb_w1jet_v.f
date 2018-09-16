@@ -20,7 +20,7 @@ c---
      . p(mxpart,4),fac,sw,prop,virt5,subuv,
      . qqbWg,qbqWg,qgWq,gqWq,qbgWqb,gqbWqb
 
-      integer,parameter:: 
+      integer,parameter::
      & iqqbg(5)=(/1,2,3,4,5/),iqgq(5)=(/1,5,3,4,2/),
      & igqq(5)=(/2,5,3,4,1/),iqbqg(5)=(/2,1,3,4,5/),
      & iqbgqb(5)=(/5,1,3,4,2/),igqbqb(5)=(/5,2,3,4,1/)
@@ -42,9 +42,9 @@ c      if ((abs(s(1,5)) .lt. cutoff).or.(abs(s(2,5)) .lt. cutoff)) return
 
 c--- calculate lowest order
       call qqb_w_g(p,msq0)
-      
+
 c--- UV counterterm contains the finite renormalization to arrive
-c--- at MS bar scheme.      
+c--- at MS bar scheme.
       subuv=ason2pi*xn*(epinv*(11d0-2d0*dble(nflav)/xn)-1d0)/6d0
 
 c--- calculate propagator
@@ -59,7 +59,7 @@ c--- calculate propagator
       qgWq=aveqg*fac*virt5(iqgq,za,zb)
       gqbWqb=aveqg*fac*virt5(igqbqb,za,zb)
       qbgWqb=aveqg*fac*virt5(iqbgqb,za,zb)
-      
+
       do j=-nf,nf
       do k=-nf,nf
 

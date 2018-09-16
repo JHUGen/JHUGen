@@ -17,7 +17,7 @@
 *									*
 *	Calls:	ffcb0p,ffxb0p						*
 *									*
-***#]*comment:*********************************************************** 
+***#]*comment:***********************************************************
 *  #[ declarations:
 	implicit none
 *
@@ -47,7 +47,7 @@
 *
 	data init,initc /2*0/
 *
-*  #] declarations: 
+*  #] declarations:
 !$omp threadprivate(init,initc)
 
 *  #[ check input:
@@ -76,10 +76,10 @@
 	    endif
 	endif
 *
-*  #] check input: 
+*  #] check input:
 *  #[ the real cases:
 *
-	if ( DIMAG(cma) .eq. 0 .and. DIMAG(cmb) .eq. 0 .and. 
+	if ( DIMAG(cma) .eq. 0 .and. DIMAG(cmb) .eq. 0 .and.
      +		DIMAG(cp).eq.0 ) then
 	    lreal = .TRUE.
 	    if ( lwrite ) print *,'ffcb0: real masses'
@@ -138,7 +138,7 @@
 	    return
 	endif
 *
-*  #] the real cases: 
+*  #] the real cases:
 *  #[ get differences:
 *
 	cmamb = cma - cmb
@@ -154,7 +154,7 @@
      +		call ffwarn(96,ier0,absc(cmbp),absc(cp))
 	endif
 *
-*  #] get differences: 
+*  #] get differences:
 *  #[ calculations:
 *
 *	no more schem-checking, please...
@@ -184,10 +184,10 @@
 	    call fferr(3,ier)
 	    cb0 = -cb0p + DBLE(d0)
 	endif
-*  #] calculations: 
+*  #] calculations:
 *  #[ check output:
 	if ( ltest ) then
-	    if ( DIMAG(cb0).lt.0 .and. abs(cp).gt.1.1*(sqrt(abs(cma)) + 
+	    if ( DIMAG(cb0).lt.0 .and. abs(cp).gt.1.1*(sqrt(abs(cma)) +
      +	    		sqrt(abs(cmb)))**2 ) then
 	    	print *,'ffcb0: warning: sign imaginary part looks '//
      +	    		'suspicious: ',cb0
@@ -195,8 +195,8 @@
 	    	print *,'  p,m1,m2 = ',cp,cma,cmb
 	    endif
 	endif
-*  #] check output: 
-*###] ffcb0: 
+*  #] check output:
+*###] ffcb0:
 	end
 *###[ ffcb0p:
 	subroutine ffcb0p(cb0p,cp,cma,cmb,cmap,cmbp,cmamb,ier)
@@ -222,7 +222,7 @@
 *									*
 *	Calls:	(z/a)log, atan.						*
 *									*
-***#]*comment:*********************************************************** 
+***#]*comment:***********************************************************
 *  #[ declarations:
 	implicit none
 *
@@ -278,7 +278,7 @@
 !$omp threadprivate(xprceq,bdeq01,bdeq05,bdeq11,bdeq17,bdeq25,
 !$omp& 		    xprcn1,bdn101,bdn105,bdn110,bdn115,
 !$omp&		    xprnn2,bdn201,bdn205,bdn210,bdn215)
- 
+
 *  #[ check input:
 *
 	if (ltest) then
@@ -299,7 +299,7 @@
 	    endif
 	endif
 *
-*  #] check input: 
+*  #] check input:
 *  #[ fill some dotproducts:
 *
 	call ffcot2(cpiDpj,cp,cma,cmb,cmap,cmbp,cmamb,ier)
@@ -312,10 +312,10 @@
    20	    continue
 	endif
 *
-*  #] fill some dotproducts: 
+*  #] fill some dotproducts:
 *  #[ the real cases:
 *
-	if ( DIMAG(cma) .eq. 0 .and. DIMAG(cmb) .eq. 0 .and. 
+	if ( DIMAG(cma) .eq. 0 .and. DIMAG(cmb) .eq. 0 .and.
      +		DIMAG(cp).eq.0 ) then
 	    lreal = .TRUE.
 	    if ( lwrite ) print *,'ffcb0p: real masses'
@@ -377,7 +377,7 @@
 	    return
 	endif
 *
-*  #] the real cases: 
+*  #] the real cases:
 *  #[ which case:
 *
 *	sort according to the type of mass combination encountered:
@@ -417,7 +417,7 @@
 		is1 = 1
 	endif
 	goto 400
-*  #] which case: 
+*  #] which case:
 *  #[ both masses equal to zero:
   100	continue
 	if ( absc(cp) .gt. xclogm ) then
@@ -431,7 +431,7 @@
 	    call fferr(7,ier)
 	endif
 	return
-*  #] both masses equal to zero: 
+*  #] both masses equal to zero:
 *  #[ one mass zero:
   200	continue
 *
@@ -460,7 +460,7 @@
 	if ( lwarn .and. absc(cb0p) .lt. xloss*2 ) call
      +		ffwarn(1,ier,absc(cb0p),x2)
 	goto 990
-*  #] one mass zero: 
+*  #] one mass zero:
 *  #[ both masses equal:
   300	continue
 *
@@ -499,7 +499,7 @@
 		bdeq25 = ffbnd(1,25,xpneq)
 		precx = sprec
 	    endif
-*  #] data and bounds: 
+*  #] data and bounds:
 	    cx = cp/cm
 	    ax = absc(cx)
 	    if ( lwarn .and. ax .gt. bdeq25 ) then
@@ -534,7 +534,7 @@
 	    endif
 	    goto 990
 	endif
-* -#] taylor expansion: 
+* -#] taylor expansion:
 * -#[ normal case:
 *
 *	normal case. first determine if the arguments of the logarithm
@@ -579,7 +579,7 @@
 	    call ffclmb(clamr,-ck,-cm,-cm,cm-ck,cm-ck,c0,ier)
 	    cslamr = sqrt(clamr)
 	    call ffcoot(zmr,zpr,c1,c05,cm/ck,cslamr/(2*ck),ier)
-	    if ( absc(zm-zmr)+absc(zp-zpr).gt.absc(zm-zpr)+absc(zp-zmr) 
+	    if ( absc(zm-zmr)+absc(zp-zpr).gt.absc(zm-zpr)+absc(zp-zmr)
      +	    		) then
 	    	cs1 = zmr
 	    	zmr = zpr
@@ -608,9 +608,9 @@
 	if ( lwarn .and. absc(cb0p) .lt. xloss*max(x2,absc(cs)) )
      +		call ffwarn(4,ier,absc(cb0p),x2)
 	goto 990
-* -#] normal case: 
+* -#] normal case:
 *
-*  #] both masses equal: 
+*  #] both masses equal:
 *  #[ unequal nonzero masses:
   400	continue
 * -#[	get log(xm2/xm1):
@@ -624,7 +624,7 @@
 	else
 	    clogmm = log(cx)
 	endif
-* -#]	get log(xm2/xm1): 
+* -#]	get log(xm2/xm1):
 * -#[	cp = 0:
 *
 *	first a special case
@@ -662,7 +662,7 @@
 			bdn115 = ffbnd(1,15,xpnn1)
 			precx = sprec
 		    endif
-*--#]		    data and bounds: 
+*--#]		    data and bounds:
 *		    calculate:
 		    if ( lwarn .and. ax .gt. bdn115 )
      +			call ffwarn(5,ier,precc,abs(xpnn1(15))*ax**15)
@@ -689,7 +689,7 @@
 			print *,'	 in ',cx
 			print *,'	 gives cs ',cs/2
 		    endif
-*		#] taylor 1: 
+*		#] taylor 1:
 		else
 *		#[ taylor 2:
 *
@@ -710,7 +710,7 @@
 			bdn215 = ffbnd(4,15,xinfac)
 			precx = sprec
 		    endif
-*  #]		    bounds: 
+*  #]		    bounds:
 *		    calculate:
 		    cy = 2*cx/(2-cx)
 		    ay = absc(cy)
@@ -741,13 +741,13 @@
 			print *,'	 in ',cy
 			print *,'	 cs = ',cs/2
 		    endif
-*		#] taylor 2: 
+*		#] taylor 2:
 		endif
 	    endif
 	    cb0p = cs/2
 	    goto 990
 	endif
-* -#]	cp = 0: 
+* -#]	cp = 0:
 * -#[	normal case:
 *
 *	(programmed anew 28-oct-1991)
@@ -793,7 +793,7 @@
 	    ck = DBLE(cp)
 	    call ffclmb(clamr,cm1,cm2,ck,cm1m2,cm1-ck,cm2-ck,ier)
 	    cslamr = sqrt(clamr)
-	    if ( absc(cslamr-cslam).gt.absc(cslamr+cslam) ) 
+	    if ( absc(cslamr-cslam).gt.absc(cslamr+cslam) )
      +	    	cslamr = -cslamr
 	    cs = (cm2-cm1+ck)/2
 	    call ffcoot(zmr,zpr,ck,cs,cm2,cslamr/2,ier)
@@ -839,14 +839,14 @@
 	    print *,'cb0p              ',cb0p
 	endif
 	goto 990
-* -#]	normal case: 
-*  #] unequal nonzero masses: 
+* -#]	normal case:
+*  #] unequal nonzero masses:
 *  #[ debug:
   990	continue
 	if (lwrite) then
 	    print *,'cb0p    = ',cb0p
 	endif
-*  #] debug: 
+*  #] debug:
 *  #[ check output:
 	if ( .FALSE. .and. ltest ) then
 	    ier0 = 0
@@ -874,8 +874,8 @@
 		print *,'       (input = ',xp,cma,cmb,')'
 	    endif
 	endif
-*  #] check output: 
-*###] ffcb0p: 
+*  #] check output:
+*###] ffcb0p:
 	end
 *###[ ffc1lg:
 	subroutine ffc1lg(cs,z,z1,zr,z1r,is,ier)
@@ -891,7 +891,7 @@
 *	Output	cs	complex		see above			*
 *		ier	integer		usual error flag		*
 *									*
-***#]*comment:*********************************************************** 
+***#]*comment:***********************************************************
 *  #[ declarations:
 	implicit none
 *
@@ -913,7 +913,7 @@
 *
 	absc(c) = abs(DBLE(c)) + abs(DIMAG(c))
 *
-*  #] declarations: 
+*  #] declarations:
 *  #[ work:
 	if ( 1 .lt. xclogm*absc(z) ) then
 	    cs = 0
@@ -952,8 +952,8 @@
 	    if ( lwrite ) print *,'ffc1lg: Taylor',z,z1
 	    call ffcayl(cs,1/z,xninv(2),29,ier)
 	endif
-*  #] work: 
-*###] ffc1lg: 
+*  #] work:
+*###] ffc1lg:
 	end
 *###[ ffcot2:
 	subroutine ffcot2(cpiDpj,cp,cma,cmb,cmap,cmbp,cmamb,ier)
@@ -963,7 +963,7 @@
 *									*
 *	Input:	see ffxc0p						*
 *									*
-***#]*comment:*********************************************************** 
+***#]*comment:***********************************************************
 *  #[ declarations:
 	implicit none
 *
@@ -985,7 +985,7 @@
 *	statement function
 *
 	absc(c) = abs(DBLE(c)) + abs(DIMAG(c))
-*  #] declarations: 
+*  #] declarations:
 *  #[ work:
 	ier1 = ier
 	cpiDpj(1,1) = cma
@@ -1026,6 +1026,6 @@
 		ier1 = max(ier0,ier1)
 	endif
 	ier = ier1
-*  #] work: 
-*###] ffcot2: 
+*  #] work:
+*###] ffcot2:
 	end

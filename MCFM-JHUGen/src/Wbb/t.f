@@ -1,4 +1,4 @@
-      double precision function t(j1,j2,j3)  
+      double precision function t(j1,j2,j3)
       implicit none
       include 'constants.f'
       include 'sprods_com.f'

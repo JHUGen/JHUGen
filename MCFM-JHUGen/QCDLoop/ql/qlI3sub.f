@@ -7,12 +7,12 @@ C so that msq(1) .le. msq(2) .le. msq(3)
       double precision msq(3),psq(3),musq,Y(3,3),xpi(6)
       double complex Ival(-2:0)
       integer j,massive,ier
-      logical qlzero, qlnonzero 
+      logical qlzero, qlnonzero
 
       do j=1,3
       xpi(j)=msq(j)
       xpi(j+3)=psq(j)
-      Y(j,j)=msq(j) 
+      Y(j,j)=msq(j)
       enddo
       Y(1,2)=0.5d0*(msq(1)+msq(2)-psq(1))
       Y(1,3)=0.5d0*(msq(1)+msq(3)-psq(3))
@@ -35,10 +35,10 @@ C--------------three internal masses
 
 C--------------two internal masses
       elseif (massive .eq. 2) then
-           if   (qlzero(abs(Y(1,2))) 
-     .     .and. qlzero(abs(Y(1,3)))) then  
+           if   (qlzero(abs(Y(1,2)))
+     .     .and. qlzero(abs(Y(1,3)))) then
                 call qltri6(psq(2),msq(2),msq(3),musq,Ival)
-            else 
+            else
                 call qlI3fin(Ival(0),xpi,ier)
             endif
 
@@ -65,7 +65,7 @@ C--------------qlzero internal masses
                   call qltri1(psq(3),musq,Ival)
            elseif  (qlzero(abs(Y(1,2)))) then
                  call qltri2(psq(2),psq(3),musq,Ival)
-           else 
+           else
                  call qlI3fin(Ival(0),xpi,ier)
            endif
       endif
@@ -74,4 +74,4 @@ C--------------qlzero internal masses
 
 
 
-      
+

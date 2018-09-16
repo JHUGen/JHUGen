@@ -33,7 +33,7 @@ c--- Second label is the gluon helicity
      &    p5)*zb(p1,p7)*zb(p3,p4)*s234**(-1) )
 
       Fa(2,1)= + izb(p5,p7)*izb(p6,p7)*s567**(-1)*s34**(-1) * (  - za(
-     &    p2,p3)*za(p2,p6)*zb(p1,p5)*zb(p2,p4)*zb(p5,p6)*s234**(-1) - 
+     &    p2,p3)*za(p2,p6)*zb(p1,p5)*zb(p2,p4)*zb(p5,p6)*s234**(-1) -
      &    za(p2,p3)*za(p3,p6)*zb(p1,p5)*zb(p3,p4)*zb(p5,p6)*s234**(-1)
      &     )
       Fa(2,1) = Fa(2,1) + izb(p6,p7)*s567**(-1)*s34**(-1) * (  - za(p2,
@@ -57,7 +57,7 @@ c--- Second label is the gluon helicity
      &    )*s134**(-1) )
 
       Fb(1,2)= + iza(p5,p7)*iza(p6,p7)*s567**(-1)*s34**(-1) * (  - za(
-     &    p1,p3)*za(p2,p5)*za(p5,p6)*zb(p1,p4)*zb(p1,p6)*s134**(-1) + 
+     &    p1,p3)*za(p2,p5)*za(p5,p6)*zb(p1,p4)*zb(p1,p6)*s134**(-1) +
      &    za(p2,p5)*za(p3,p4)*za(p5,p6)*zb(p1,p4)*zb(p4,p6)*s134**(-1)
      &     )
       Fb(1,2) = Fb(1,2) + iza(p6,p7)*s567**(-1)*s34**(-1) * (  - za(p1,
@@ -107,7 +107,7 @@ c--- Second label is the gluon helicity
      &    ,p3)*zb(p1,p4)*zab(p6,p1,p2,p7) + za(p2,p6)*zb(p1,p7)*zab(p3,
      &    p1,p2,p4) - za(p3,p6)*zb(p4,p7)*zab(p2,p3,p4,p1) )
       Fc(2,2) = Fc(2,2) + iza(p5,p7)*iza(p6,p7)*s567**(-1)*s34**(-1)*
-     & s12**(-1) * ( za(p2,p3)*za(p5,p6)*zb(p1,p4)*zab(p6,p1,p2,p5) - 
+     & s12**(-1) * ( za(p2,p3)*za(p5,p6)*zb(p1,p4)*zab(p6,p1,p2,p5) -
      &    za(p2,p6)*za(p5,p6)*zb(p1,p5)*zab(p3,p1,p2,p4) + za(p3,p6)*
      &    za(p5,p6)*zb(p4,p5)*zab(p2,p3,p4,p1) )
 

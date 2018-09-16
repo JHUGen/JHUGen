@@ -1,4 +1,4 @@
-      subroutine qqb_QQb(p,msq) 
+      subroutine qqb_QQb(p,msq)
       implicit none
 
 ************************************************************************
@@ -17,7 +17,7 @@ C      q(P1) + qbar(P2) --> Q(-P3) + Qbar(-P4)                         *
       include 'msq_cs.f'
       include 'breit.f'
       include 'first.f'
-      
+
       integer j,k,cs
       double precision msq(-nf:nf,-nf:nf),p(mxpart,4)
       double precision wtqqb,wtgg,t1,t2,ro
@@ -25,7 +25,7 @@ C      q(P1) + qbar(P2) --> Q(-P3) + Qbar(-P4)                         *
       if (first) then
       first=.false.
       write(6,*) 'Heavy Quark mass:',mass2
-      endif 
+      endif
 
 C----set all elements to zero
       do j=-nf,nf

@@ -241,11 +241,11 @@
      +	    	    	'momenta for npoint>5'
 	    	    stop
 	    	endif
-	    	if ( abs(xpi(is1)-xpi(ip)).lt.-5*DIMAG(cpi(is1)) 
+	    	if ( abs(xpi(is1)-xpi(ip)).lt.-5*DIMAG(cpi(is1))
      +	    		.and. xpi(is2).lt.-DIMAG(cpi(is1)) ) then
 		    xpi(ip) = xpi(is1)
 *why?		    xpi(is2) = 0
-	    	elseif ( abs(xpi(is2)-xpi(ip)).lt.-5*DIMAG(cpi(is2)) 
+	    	elseif ( abs(xpi(is2)-xpi(ip)).lt.-5*DIMAG(cpi(is2))
      +	    		.and. xpi(is1).lt.-DIMAG(cpi(is2)) ) then
 		    xpi(ip) = xpi(is2)
 *why?		    xpi(is1) = 0
@@ -546,7 +546,7 @@
 	    do 500 i=1,k
 		ier = 0
 		ialsav = isgnal
-		call ffzei(cai,cbij,ccij,cdi,ce, a(1),a(2), cpi,xpi, 
+		call ffzei(cai,cbij,ccij,cdi,ce, a(1),a(2), cpi,xpi,
      +			ndiv,ntens,ier)
 		ce0 = ce(1)
   500	    continue

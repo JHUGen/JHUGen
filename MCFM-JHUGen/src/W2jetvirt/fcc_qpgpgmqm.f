@@ -1,11 +1,11 @@
-      double complex function Fcc_qpgpgmqm(j1,j2,j3,j4,j5,j6,za,zb) 
+      double complex function Fcc_qpgpgmqm(j1,j2,j3,j4,j5,j6,za,zb)
       implicit none
       integer j1,j2,j3,j4,j5,j6
       include 'constants.f'
       include 'zprods_decl.f'
       include 'sprods_com.f'
       double complex L0,Lsm1,Lsm1_2mht,I3m
-      double precision t  
+      double precision t
 
       Fcc_qpgpgmqm=
      .(I3m(s(j1,j2),s(j3,j4),s(j5,j6))*zb(j1,j2)*
@@ -67,4 +67,4 @@
 
       return
       end
-      
+

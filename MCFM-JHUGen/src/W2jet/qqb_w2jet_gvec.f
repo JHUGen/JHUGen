@@ -53,8 +53,8 @@ c---     3 --> Total (0+1+2)
       prop=s(3,4)**2/((s(3,4)-wmass**2)**2+wmass**2*wwidth**2)
       fac=V*xn/eight*(gsq*gwsq)**2*prop
       call spinoru(6,p,za,zb)
-C   zab=<i-|k|j-> zba=<i+|k|j+> where k is an arbitrary 4-vector 
-c---Arbitrary conventions of Bern, Dixon, Kosower, Weinzierl, 
+C   zab=<i-|k|j-> zba=<i+|k|j+> where k is an arbitrary 4-vector
+c---Arbitrary conventions of Bern, Dixon, Kosower, Weinzierl,
 c---za(i,j)*zb(j,i)=s(i,j)
       call spinork(6,p,zab,zba,n)
 
@@ -118,7 +118,7 @@ c      p1p2(-1,1)=aveqq*fac*w2jetn(2,1,3,4,6,5,p,n,za,zb,zab,zba)
 c      p1p2(+1,0)=aveqg*fac*w2jetn(1,6,3,4,2,5,p,n,za,zb,zab,zba)
 c      p1p2(-1,0)=aveqg*fac*w2jetn(6,1,3,4,2,5,p,n,za,zb,zab,zba)
 c      p1p2(0,+1)=aveqg*fac*w2jetn(2,6,3,4,1,5,p,n,za,zb,zab,zba)
-c      p1p2(0,-1)=aveqg*fac*w2jetn(6,2,3,4,1,5,p,n,za,zb,zab,zba) 
+c      p1p2(0,-1)=aveqg*fac*w2jetn(6,2,3,4,1,5,p,n,za,zb,zab,zba)
       elseif (in .eq. 6) then
         call w2jetn(1,2,3,4,5,6,p,n,za,zb,zab,zba)
         call storecsv(1,-1)
@@ -195,7 +195,7 @@ c      p1p2(0,-1)=aveqg*fac*w2jetn(5,2,3,4,1,6,p,n,za,zb,zab,zba)
 
       return
       end
- 
+
       subroutine w2jetn(i1,i2,i3,i4,i5,i6,p,n,za,zb,zab,zba)
 C----matrix element squared with p5 line contracted with n(mu)
 C----nDp6 should be equal to zero
@@ -214,15 +214,15 @@ C----nDp6 should be equal to zero
       call checkndotp(p,n,i6)
 
       call subqcdn(i1,i2,i3,i4,i5,i6,nDp5,za,zb,zab,zba,qcdabn,qcdban)
-            
+
 C--first argument is quark line
 C--second argument is polarization of i5 line
 C  1=L,2=R
-      qedn(1,1,1)=qcdabn(1,1,1)+qcdban(1,1,1) 
-      qedn(2,1,1)=qcdabn(2,1,1)+qcdban(2,1,1) 
+      qedn(1,1,1)=qcdabn(1,1,1)+qcdban(1,1,1)
+      qedn(2,1,1)=qcdabn(2,1,1)+qcdban(2,1,1)
 
       msq1= abs(qcdabn(1,1,1))**2+abs(qcdabn(2,1,1))**2
-      msq2= abs(qcdban(1,1,1))**2+abs(qcdban(2,1,1))**2 
+      msq2= abs(qcdban(1,1,1))**2+abs(qcdban(2,1,1))**2
       msqq= abs(qedn(1,1,1))**2+abs(qedn(2,1,1))**2
 
       mmsqv_cs(0,+1,+1)=-ninth*msqq
@@ -241,13 +241,13 @@ c-- for the W2jet_gvec matrix elements into elements (..,i,j) of p1p2
       double precision p1p2(0:2,-1:1,-1:1)
       common/p1p2/p1p2
 !$omp threadprivate(/p1p2/)
-      
+
       do k=0,2
         p1p2(k,i,j)=mmsqv_cs(k,+1,+1)
       enddo
-      
+
       return
       end
-      
+
 
 

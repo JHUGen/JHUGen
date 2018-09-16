@@ -18,7 +18,7 @@
       ttbqqbtqpp = ttbqqbtqpp + s6789**(-1) * (  - 1/(za(k1,k2))/(za(k5
      &    ,k3))/(zb(k1,k2))*za(k1,k5)*za(k5,k6)*za(k6,k7)*zb(k2,k6)*zb(
      &    k4,k5)*zb(k6,k3) - 1/(za(k1,k2))/(za(k5,k3))/(zb(k1,k2))*za(
-     &    k1,k5)*za(k5,k7)*za(k6,k7)*zb(k2,k7)*zb(k4,k5)*zb(k6,k3) - 
+     &    k1,k5)*za(k5,k7)*za(k6,k7)*zb(k2,k7)*zb(k4,k5)*zb(k6,k3) -
      &    1/(za(k1,k2))/(zb(k1,k2))*za(k1,k5)*za(k6,k7)*zb(k2,k3)*zb(k4
      &    ,k5)*zb(k6,k3) )
       ttbqqbtqpp = ttbqqbtqpp + mtsq*s129**(-1) * ( 1/(za(k1,k2))/(za(

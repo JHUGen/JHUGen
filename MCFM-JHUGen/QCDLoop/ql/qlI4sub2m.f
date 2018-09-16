@@ -45,7 +45,7 @@ C     Calculates the general box with qlzero masses
       endif
 
       jdiff=jsort2-jsort1
-       
+
       if ((jdiff .eq. 1) .or. (jdiff .eq. 2)) then
          do j=1,Npt
          xpiout(swap(j,jsort2))=xpi(j)
@@ -61,6 +61,6 @@ C     Calculates the general box with qlzero masses
       else
       call qlI4sub2ma(xpiout,musq,Ival)
       endif
-       
+
       return
       end

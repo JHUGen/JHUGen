@@ -73,10 +73,10 @@ c--- W+t process, radiation in production
 c--- W+t process, radiation in decay
         call phase6b(r,p1,p2,p3,p4,p5,p6,p7,p8,pswt,*999)
       else
-c--- generic case 
+c--- generic case
         call phase6(r,p1,p2,p3,p4,p5,p6,p7,p8,pswt,*999)
       endif
-      
+
       do nu=1,4
         q(1,nu)=p1(nu)
         q(2,nu)=p2(nu)
@@ -86,8 +86,8 @@ c--- generic case
         q(6,nu)=p6(nu)
         q(7,nu)=p7(nu)
         q(8,nu)=p8(nu)
-      enddo 
-      
+      enddo
+
       wt6=xjac*pswt
 
       if (debug) write(6,*) 'wt6 in gen6',wt6
@@ -96,6 +96,6 @@ c--- generic case
 
  999  q(:,:)=0d0
       return 1
-      
+
       end
 

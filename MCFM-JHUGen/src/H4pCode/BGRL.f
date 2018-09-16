@@ -1,4 +1,4 @@
-c--- Combinations of bubble integrals, 0704.3914v3 Eq. (3.21) 
+c--- Combinations of bubble integrals, 0704.3914v3 Eq. (3.21)
 c--- The hatted versions of these functions are further defined
 c--- by Eqs. (3.25), (3.26) and (3.27)
       double complex function BGRL1(s,t)

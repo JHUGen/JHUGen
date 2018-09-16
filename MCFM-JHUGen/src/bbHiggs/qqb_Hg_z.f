@@ -51,7 +51,7 @@ c--- (g,g)
       Q1(a,g,g,is)=Q1(q,g,g,is)
       Q2(q,g,g,is)=Q1(q,g,g,is)
       Q2(a,g,g,is)=Q1(q,g,g,is)
-      
+
       enddo
 
 c--- 4-quark terms
@@ -66,6 +66,6 @@ c--- 4-quark terms
       Q2(g,q,a,is)=Q2(g,q,q,is)
 
       enddo
-      
+
       return
       end

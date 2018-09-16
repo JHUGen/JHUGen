@@ -19,7 +19,7 @@ C                                                                      *
       include 'qcdcouple.f'
       include 'masses.f'
       include 'plabel.f'
-      
+
       integer j,k,nu,j1,j2,hb,hc
       double precision msq(-nf:nf,-nf:nf),pin(mxpart,4),p(mxpart,4),
      & s34,fac,qqb,qbq,q(mxpart,4),
@@ -40,7 +40,7 @@ C--setup amplitudes for top decay
       call adecayrod(pin,3,4,5,6,7,8,0,manti)
       call tdecayrod_v(pin,3,4,5,6,7,8,mtopv)
       call adecayrod_v(pin,3,4,5,6,7,8,mantiv)
-      
+
       do nu=1,4
       p(1,nu)=pin(1,nu)
       p(2,nu)=pin(2,nu)
@@ -123,7 +123,7 @@ c--- include factor for hadronic decays of W
       enddo
       enddo
 
-     
+
 C----set all elements to zero
       do j=-nf,nf
       do k=-nf,nf

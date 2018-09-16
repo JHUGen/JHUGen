@@ -1,6 +1,6 @@
 FC = gfortran
 #FFLAGS 	= -g
-FFLAGS 	=  -fno-f2c -fPIC -g
+FFLAGS 	=  -fno-f2c -fPIC -g -O2
 
 recurdir:
 	(cd smallG; make) 

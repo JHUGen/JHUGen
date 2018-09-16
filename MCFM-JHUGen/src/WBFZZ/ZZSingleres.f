@@ -2,13 +2,17 @@
       implicit none
       include 'constants.f'
       include 'cmplxmass.f'
+      include 'masses.f'
       include 'ewcharge.f'
       include 'zcouple.f'
       include 'sprods_com.f'
       include 'zprods_decl.f'
-      
+      include 'zacouplejk.f'
+      include 'pid_pdg.f'
+
       double precision s17,s28,s56,t3,
      & s356,s456,s137,s147,s238,s248,xl1,xr1,xq1,xl2,xr2,xq2
+      double precision yq1,yl1,yr1 ! complementary couplings
       double complex zab2,ZZ17(2,2,2),ZZ28(2,2,2),
      & prop28,prop17,prop56,propw28,propw17,
      & ZZ(2,2,2,2,2,2),ZZ56(2,2),lZ56(0:1,2,2),
@@ -23,7 +27,7 @@ C---begin statement functions
 C---end statement functions
 
 C---setting up couplings dependent on whether we are doing 34-line or 56-line
-      if (n3+n4 == 7) then
+      if ((n3+n4 == 7) .or. (n3+n4 == 9)) then
       xl1=l1
       xr1=r1
       xq1=q1
@@ -42,6 +46,51 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
       stop
       endif
 
+      ! Find the complementary charges for the n3-n4 line
+      if(pid_pdg(n3).eq.0 .and. pid_pdg(n4).eq.0) then
+         ! Assign same couplings if both particles are unknown (jets).
+         yl1=xl1
+         yr1=xr1
+         yq1=xq1
+      else if(
+     & abs(pid_pdg(n3)).eq.11 .or.
+     & abs(pid_pdg(n3)).eq.13 .or.
+     & abs(pid_pdg(n3)).eq.15) then
+         ! n3-n4 is an e current
+         yl1=ln
+         yr1=rn
+         yq1=0d0
+      else if(
+     & abs(pid_pdg(n3)).eq.12 .or.
+     & abs(pid_pdg(n3)).eq.14 .or.
+     & abs(pid_pdg(n3)).eq.16) then
+         ! n3-n4 is a nu current
+         yl1=le
+         yr1=re
+         yq1=qe
+      else if(
+     & abs(pid_pdg(n3)).eq.1 .or.
+     & abs(pid_pdg(n3)).eq.3 .or.
+     & abs(pid_pdg(n3)).eq.5) then
+         ! n3-n4 is a d quark current
+         yl1=L(2)
+         yr1=R(2)
+         yq1=Q(2)
+      else if(
+     & abs(pid_pdg(n3)).eq.2 .or.
+     & abs(pid_pdg(n3)).eq.4) then
+         ! n3-n4 is a u quark current
+         yl1=L(1)
+         yr1=R(1)
+         yq1=Q(1)
+      else
+         ! n3-n4 case is unknown, kill the relevant amplitude.
+         yl1=0d0
+         yr1=0d0
+         yq1=0d0
+      endif
+
+
       s17=s(n1,n7)
       s28=s(n2,n8)
       s56=s(n5,n6)
@@ -53,22 +102,30 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
       s238=t3(n2,n3,n8)
       s248=t3(n2,n4,n8)
 
-      prop17=dcmplx(s17)-czmass2
-      prop28=dcmplx(s28)-czmass2
-      prop56=dcmplx(s56)-czmass2
+      prop17=dcmplx(s17)-dcmplx(zmass**2,-zmass*zwidth)
+      prop28=dcmplx(s28)-dcmplx(zmass**2,-zmass*zwidth)
+      prop56=dcmplx(s56)-dcmplx(zmass**2,-zmass*zwidth)
 
-      propw17=dcmplx(s17)-cwmass2
-      propw28=dcmplx(s28)-cwmass2
+      propw17=dcmplx(s17)-dcmplx(wmass**2,-wmass*wwidth)
+      propw28=dcmplx(s28)-dcmplx(wmass**2,-wmass*wwidth)
 
       do jdu1=1,2
-      ZZ17(jdu1,1,1)=dcmplx(Q(jdu1)*xq1/s17)+dcmplx(L(jdu1)*xl1)/prop17
-      ZZ17(jdu1,1,2)=dcmplx(Q(jdu1)*xq1/s17)+dcmplx(L(jdu1)*xr1)/prop17
-      ZZ17(jdu1,2,1)=dcmplx(Q(jdu1)*xq1/s17)+dcmplx(R(jdu1)*xl1)/prop17
-      ZZ17(jdu1,2,2)=dcmplx(Q(jdu1)*xq1/s17)+dcmplx(R(jdu1)*xr1)/prop17
-      ZZ28(jdu1,1,1)=dcmplx(Q(jdu1)*xq1/s28)+dcmplx(L(jdu1)*xl1)/prop28
-      ZZ28(jdu1,1,2)=dcmplx(Q(jdu1)*xq1/s28)+dcmplx(L(jdu1)*xr1)/prop28
-      ZZ28(jdu1,2,1)=dcmplx(Q(jdu1)*xq1/s28)+dcmplx(R(jdu1)*xl1)/prop28
-      ZZ28(jdu1,2,2)=dcmplx(Q(jdu1)*xq1/s28)+dcmplx(R(jdu1)*xr1)/prop28
+      ZZ17(jdu1,1,1)=dcmplx(Q_jk(n1,n7,jdu1)*xq1/s17)
+     & +dcmplx(L_jk(n1,n7,jdu1)*xl1)/prop17
+      ZZ17(jdu1,1,2)=dcmplx(Q_jk(n1,n7,jdu1)*xq1/s17)
+     & +dcmplx(L_jk(n1,n7,jdu1)*xr1)/prop17
+      ZZ17(jdu1,2,1)=dcmplx(Q_jk(n1,n7,jdu1)*xq1/s17)
+     & +dcmplx(R_jk(n1,n7,jdu1)*xl1)/prop17
+      ZZ17(jdu1,2,2)=dcmplx(Q_jk(n1,n7,jdu1)*xq1/s17)
+     & +dcmplx(R_jk(n1,n7,jdu1)*xr1)/prop17
+      ZZ28(jdu1,1,1)=dcmplx(Q_jk(n2,n8,jdu1)*xq1/s28)
+     & +dcmplx(L_jk(n2,n8,jdu1)*xl1)/prop28
+      ZZ28(jdu1,1,2)=dcmplx(Q_jk(n2,n8,jdu1)*xq1/s28)
+     & +dcmplx(L_jk(n2,n8,jdu1)*xr1)/prop28
+      ZZ28(jdu1,2,1)=dcmplx(Q_jk(n2,n8,jdu1)*xq1/s28)
+     & +dcmplx(R_jk(n2,n8,jdu1)*xl1)/prop28
+      ZZ28(jdu1,2,2)=dcmplx(Q_jk(n2,n8,jdu1)*xq1/s28)
+     & +dcmplx(R_jk(n2,n8,jdu1)*xr1)/prop28
       enddo
 
       ZZ56(1,1)=dcmplx(xq1*xq2/s56)+dcmplx(xl1*xl2)/prop56
@@ -76,19 +133,19 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
       ZZ56(2,1)=dcmplx(xq1*xq2/s56)+dcmplx(xr1*xl2)/prop56
       ZZ56(2,2)=dcmplx(xq1*xq2/s56)+dcmplx(xr1*xr2)/prop56
 
-      lZ56(0,1,1)=dcmplx(ln*xl2)/prop56
-      lZ56(0,1,2)=dcmplx(ln*xr2)/prop56
-      lZ56(0,2,1)=dcmplx(rn*xl2)/prop56
-      lZ56(0,2,2)=dcmplx(rn*xr2)/prop56
-      lZ56(1,1,1)=dcmplx(qe*xq2/s56)+dcmplx(le*xl2)/prop56
-      lZ56(1,1,2)=dcmplx(qe*xq2/s56)+dcmplx(le*xr2)/prop56
-      lZ56(1,2,1)=dcmplx(qe*xq2/s56)+dcmplx(re*xl2)/prop56
-      lZ56(1,2,2)=dcmplx(qe*xq2/s56)+dcmplx(re*xr2)/prop56
+      lZ56(0,1,1)=dcmplx(yq1*xq2/s56)+dcmplx(yl1*xl2)/prop56
+      lZ56(0,1,2)=dcmplx(yq1*xq2/s56)+dcmplx(yl1*xr2)/prop56
+      lZ56(0,2,1)=dcmplx(yq1*xq2/s56)+dcmplx(yr1*xl2)/prop56
+      lZ56(0,2,2)=dcmplx(yq1*xq2/s56)+dcmplx(yr1*xr2)/prop56
+      lZ56(1,1,1)=dcmplx(xq1*xq2/s56)+dcmplx(xl1*xl2)/prop56
+      lZ56(1,1,2)=dcmplx(xq1*xq2/s56)+dcmplx(xl1*xr2)/prop56
+      lZ56(1,2,1)=dcmplx(xq1*xq2/s56)+dcmplx(xr1*xl2)/prop56
+      lZ56(1,2,2)=dcmplx(xq1*xq2/s56)+dcmplx(xr1*xr2)/prop56
 
       i3=n3
       i4=n4
       do h17=1,2
-         if (h17.eq.1) then 
+         if (h17.eq.1) then
             i7=n7
             i1=n1
          elseif (h17.eq.2) then
@@ -96,7 +153,7 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
             i1=n7
          endif
       do h28=1,2
-         if (h28.eq.1) then 
+         if (h28.eq.1) then
             i8=n8
             i2=n2
          elseif (h28.eq.2) then
@@ -104,14 +161,14 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
             i2=n8
          endif
       do h56=1,2
-         if (h56.eq.1) then 
+         if (h56.eq.1) then
             i5=n5
             i6=n6
          elseif (h56.eq.2) then
             i5=n6
             i6=n5
          endif
-      
+
 
 C---  Id,srmbl=-8*e^6/s356/s248
 C---   *zab2(i8,i2,i4,i1)*za(i3,i5)*zab2(i7,i3,i5,i6)*zb(i2,i4);
@@ -191,8 +248,8 @@ C---   *zab2(i8,i2,i3,i1)*za(i4,i5)*zab2(i7,i4,i5,i6)*zb(i2,i3);
      &  +srpa(h17,h28,h34,h56))
       enddo
       enddo
-      
-      if (xq1 < 0) then
+
+      if (xq1 .lt. 0d0) then
       if ((h17.eq.1).and.(h28.eq.1).and.(h34.eq.1)) then
       WWm(h56)=0.25d0/(cxw**2*propw17*propw28)
      & *(srmb(h17,h28,h34,h56)*lZ56(1,h34,h56)
@@ -209,14 +266,14 @@ C---   *zab2(i8,i2,i3,i1)*za(i4,i5)*zab2(i7,i4,i5,i6)*zb(i2,i3);
 
       if ((h17.eq.1).and.(h28.eq.1).and.(h34.eq.1)) then
       WWm(h56)=0.25d0/(cxw**2*propw17*propw28)
-     & *(srpb(h17,h28,h34,h56)*lZ56(0,h34,h56)
-     &  +srpm(h17,h28,h34,h56)*lZ56(1,h34,h56)
-     &  +srpa(h17,h28,h34,h56)*lZ56(0,h34,h56))
+     & *(srpb(h17,h28,h34,h56)*lZ56(1,h34,h56)
+     &  +srpm(h17,h28,h34,h56)*lZ56(0,h34,h56)
+     &  +srpa(h17,h28,h34,h56)*lZ56(1,h34,h56))
 
       WWp(h56)=0.25d0/(cxw**2*propw17*propw28)
-     & *(srmb(h17,h28,h34,h56)*lZ56(0,h34,h56)
-     &  +srmm(h17,h28,h34,h56)*lZ56(1,h34,h56)
-     &  +srma(h17,h28,h34,h56)*lZ56(0,h34,h56))
+     & *(srmb(h17,h28,h34,h56)*lZ56(1,h34,h56)
+     &  +srmm(h17,h28,h34,h56)*lZ56(0,h34,h56)
+     &  +srma(h17,h28,h34,h56)*lZ56(1,h34,h56))
       endif
 
       endif

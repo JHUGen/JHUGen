@@ -39,7 +39,7 @@ C Calculates the general box with qlzero masses
       do j=1,4
       if (qlnonzero(xpi(j+4))) then
       offshell=offshell+1
-      if (jsort1 .eq. 0) then 
+      if (jsort1 .eq. 0) then
       jsort1=j
       else
       jsort2=j
@@ -79,11 +79,11 @@ C Calculates the general box with qlzero masses
 C--if we performed a swap rename the array
       if (swapped) then
       do j=1,13
-      xpi(j)=xpiout(j) 
+      xpi(j)=xpiout(j)
       enddo
       endif
 
-      call qlYcalc(xpi,Y,Yalt)      
+      call qlYcalc(xpi,Y,Yalt)
 C--------------four offshell external lines
       if (offshell .eq. 4) then
            Ival(-2)=czip

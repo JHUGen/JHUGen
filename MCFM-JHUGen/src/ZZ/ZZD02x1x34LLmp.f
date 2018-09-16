@@ -21,7 +21,7 @@ C---end statement functions
       k1=j1
       k2=j2
       mtsq=mt**2
-      
+
       do h3=1,2
       do h5=1,2
       if (h3 .eq. 1) then
@@ -38,7 +38,7 @@ C---end statement functions
         k5=j6
         k6=j5
       endif
-      
+
       amp2=(
      & +za(k2,k5)*zb(k1,k4)/zab2(k2,k3,k4,k1)**2*(
      &  -0.5d0*s134**2*(za(k1,k3)*zb(k2,k6)+za(k1,k5)*za(k2,k3)
@@ -60,7 +60,7 @@ C---end statement functions
      &  +0.5d0*zab2(k1,k3,k4,k2)*zab2(k5,k1,k3,k4)
      &   *(za(k2,k3)*zb(k2,k6)+za(k3,k5)*zb(k5,k6)
      &     -2d0*za(k3,k4)*zb(k4,k6))) )/s(k3,k4)/s(k5,k6)
-      
+
       amp4=2d0/(s(k1,k2)*s(k3,k4)*s(k5,k6)*zab2(k2,k3,k4,k1)**2)
      & *(za(k2,k5)*zb(k1,k4)*zab2(k1,k3,k4,k2)
      &  -za(k1,k5)*zb(k2,k4)*zab2(k2,k3,k4,k1))

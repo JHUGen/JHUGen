@@ -18,7 +18,7 @@ C                                                                      *
       include 'qcdcouple.f'
       include 'masses.f'
       include 'plabel.f'
-      
+
       integer j,k,nu,j1,j2,hb,hc
       double precision msq(-nf:nf,-nf:nf),pin(mxpart,4),p(mxpart,4),
      & s34,fac,qqb,qbq,q(mxpart,4),
@@ -111,7 +111,7 @@ c--- include factor for hadronic decays of W
       enddo
       enddo
 
-     
+
 C----set all elements to zero
       do j=-nf,nf
       do k=-nf,nf

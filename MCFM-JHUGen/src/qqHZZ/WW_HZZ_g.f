@@ -1,9 +1,9 @@
       subroutine WW_HZZ_g(p,msq)
-      implicit none 
+      implicit none
 c--- Weak Boson Fusion by W-W exchange only
 c---Matrix element squared averaged over initial colors and spins
 c
-c     q(-p1)+q(-p2) -->  H(p3,p4)+q(p5)+q(p6)+g(p7) 
+c     q(-p1)+q(-p2) -->  H(p3,p4)+q(p5)+q(p6)+g(p7)
 c                           |
 c                           |
 c                           |
@@ -18,7 +18,7 @@ c                           ---> W+(nu(p3)+e+(p4))+W-(e-(p5)+nub(p6))
       double precision p(mxpart,4),facqq,facqg,s3456
       double precision msq(-nf:nf,-nf:nf),hdecay,
      . ud_dug,uub_ddbg,ug_dudb,gu_uddb
-      
+
       integer,parameter::pn(-nf:nf)=(/-1,-2,-1,-2,-1,0,1,2,1,2,1/)
 
       do j=-nf,nf
@@ -26,7 +26,7 @@ c                           ---> W+(nu(p3)+e+(p4))+W-(e-(p5)+nub(p6))
       msq(j,k)=0d0
       enddo
       enddo
-      
+
       call dotem(9,p,s)
 
       s3456=s(3,4)+s(3,5)+s(3,6)+s(4,5)+s(4,6)+s(5,6)
@@ -35,7 +35,7 @@ c                           ---> W+(nu(p3)+e+(p4))+W-(e-(p5)+nub(p6))
      & + ((r1*l2)**2+(r2*l1)**2)*s(3,6)*s(4,5))
       hdecay=hdecay/((s(3,4)-zmass**2)**2+(zmass*zwidth)**2)
       hdecay=hdecay/((s(5,6)-zmass**2)**2+(zmass*zwidth)**2)
-      hdecay=hdecay/((s3456-hmass**2)**2+(hmass*hwidth)**2)                                                                          
+      hdecay=hdecay/((s3456-hmass**2)**2+(hmass*hwidth)**2)
       facqq=0.25d0*gsq*Cf*gwsq**3*hdecay
       facqg=-facqq*(aveqg/aveqq)
 C Extra factor of gsq*Cf compared to lowest order

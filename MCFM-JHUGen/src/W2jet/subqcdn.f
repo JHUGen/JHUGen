@@ -29,26 +29,26 @@ C     2 is right handed
       enddo
 
 
-      
+
       s34=s(p3,p4)
       t15=s(p1,p5)
       t16=s(p1,p6)
       t25=s(p2,p5)
       t26=s(p2,p6)
       t56=s(p5,p6)
-      t156=t15+t16+t56      
-      t256=t25+t26+t56      
+      t156=t15+t16+t56
+      t256=t25+t26+t56
 
       ab24=za(p1,p2)*zb(p1,p4)+za(p2,p5)*zb(p4,p5)
       ab31=za(p2,p3)*zb(p1,p2)-za(p3,p5)*zb(p1,p5)
       ab35=za(p1,p3)*zb(p1,p5)-za(p3,p4)*zb(p4,p5)
       ab36=za(p1,p3)*zb(p1,p6)-za(p3,p4)*zb(p4,p6)
       ab54=za(p2,p5)*zb(p2,p4)+za(p3,p5)*zb(p3,p4)
-      ab64=za(p2,p6)*zb(p2,p4)+za(p3,p6)*zb(p3,p4) 
+      ab64=za(p2,p6)*zb(p2,p4)+za(p3,p6)*zb(p3,p4)
       aba23=zab(p2,p1)*za(p1,p3)-zab(p2,p4)*za(p3,p4)
 
 
-      qcdab(1,1,1) = 
+      qcdab(1,1,1) =
      & +za(p2,p5)/zb(p1,p5)*za(p3,p4)*zb(p1,p4)*zb(p1,p4)
      & *2d0/t256/t56*nDp5
      & -(zab(p1,p1)*zb(p1,p4)-zab(p6,p1)*zb(p4,p6))
@@ -65,7 +65,7 @@ C     2 is right handed
       qcdab(1,1,1) =2d0*qcdab(1,1,1)/s34
 
 c      aRLAB=[TATB]*(2d0*sw^2*gzle*Lu)*qcdab(2,1,1)
-      qcdab(2,1,1)= 
+      qcdab(2,1,1)=
      & (-2d0*za(p2,p3)*za(p2,p3)*zb(p1,p5)*zb(p3,p4)*nDp5
      & +zba(p5,p2)*za(p2,p3)*zb(p1,p6)*ab64
      & +za(p2,p3)*za(p2,p3)*zb(p3,p4)*t56/t16
@@ -119,7 +119,7 @@ c      aRLBA=[TBTA]*(2d0*sw^2*gzle*Lu)*qcdba(2,1,1)
 
 
 c      aLRAB = qcdab(1,2,1)*sw/cw*(-2d0*Qu*sw^2)*gzle
-      qcdab(1,2,1) = 
+      qcdab(1,2,1) =
      & +ab64x*zab(p5,p2)*za(p1,p3)*zb(p2,p6)/t256/t56
      &  +ab36x*zab(p5,p2)*za(p1,p6)*zb(p2,p4)/t156/t56
      &  +(zba(p1,p1)*za(p1,p5)-zba(p6,p1)*za(p5,p6))
@@ -133,7 +133,7 @@ c      aLRAB = qcdab(1,2,1)*sw/cw*(-2d0*Qu*sw^2)*gzle
       qcdab(1,2,1) = 2d0/s34*qcdab(1,2,1)/zb(p2,p5)
 
 c      aRRAB = qcdab(2,2,1)*sw/cw*(-2d0*Qu*sw^2)*gzle
-      qcdab(2,2,1) = 
+      qcdab(2,2,1) =
      & -(zba(p1,p1)*za(p1,p3)-zba(p6,p1)*za(p3,p6))
      & *za(p1,p2)*zb(p2,p4)/za(p1,p5)/za(p2,p5)/t16
      & +(zba(p1,p1)*za(p1,p3)-zba(p6,p1)*za(p3,p6))
@@ -156,7 +156,7 @@ c      aRRAB = qcdab(2,2,1)*sw/cw*(-2d0*Qu*sw^2)*gzle
 
 
 c      aLRBA = qcdba(1,2,1)*sw/cw*(-2d0*Qu*sw^2)*gzle
-      qcdba(1,2,1) = 
+      qcdba(1,2,1) =
      & -ab64x*zab(p5,p2)*za(p1,p3)*zb(p2,p6)/zb(p2,p5)/t256/t56
      & -ab36x*zab(p5,p2)*za(p1,p6)*zb(p2,p4)/zb(p2,p5)/t156/t56
      & -(zba(p2,p1)*zb(p1,p4)+zba(p2,p3)*zb(p3,p4))
@@ -175,9 +175,9 @@ c      aLRBA = qcdba(1,2,1)*sw/cw*(-2d0*Qu*sw^2)*gzle
      & +za(p1,p5)*za(p3,p4)*zb(p2,p4)*zb(p2,p4)/zb(p2,p5)
      & *(2d0/t156/t56*nDp5)
       qcdba(1,2,1) = 2d0/s34*qcdba(1,2,1)
- 
+
 c      aRRBA = qcdba(2,2,1)*sw/cw*(-2d0*Qu*sw^2)*gzle
-      qcdba(2,2,1) = 
+      qcdba(2,2,1) =
      & +(zba(p2,p1)*zb(p1,p4)+zba(p2,p3)*zb(p3,p4))
      &  *za(p1,p3)*za(p1,p6)/za(p5,p6)/t256
      &  +(zba(p2,p2)*zb(p2,p5)-zba(p2,p6)*zb(p5,p6))
@@ -187,7 +187,7 @@ c      aRRBA = qcdba(2,2,1)*sw/cw*(-2d0*Qu*sw^2)*gzle
      &  +ab64x*zba(p5,p1)*za(p1,p3)*zb(p2,p6)/t256/t56
      &  +ab36x*zba(p5,p1)*za(p1,p6)*zb(p2,p4)/t156/t56
      &  -za(p1,p3)*za(p1,p3)*zb(p2,p5)*zb(p3,p4)
-     &  *2d0*nDp5/t256/t56 
+     &  *2d0*nDp5/t256/t56
       qcdba(2,2,1) = 2d0/s34*qcdba(2,2,1)/za(p1,p5)
 
 

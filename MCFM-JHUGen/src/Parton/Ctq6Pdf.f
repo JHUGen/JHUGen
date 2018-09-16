@@ -21,8 +21,8 @@ C     ------------------------------
 C   1xx  CTEQ6M1xx  +/- w.r.t. CTEQ6M     0.118     326   226    cteq6m1xx.tbl
 C    (where xx=01--40)
 C ---------------------------------------------------------------------------
-C   ** ALL fits are obtained by using the same coupling strength 
-C   \alpha_s(Mz)=0.118 and the NLO running \alpha_s formula, except CTEQ6L1 
+C   ** ALL fits are obtained by using the same coupling strength
+C   \alpha_s(Mz)=0.118 and the NLO running \alpha_s formula, except CTEQ6L1
 C   which uses the LO running \alpha_s and its value determined from the fit.
 C   For the LO fits, the evolution of the PDF and the hard cross sections are
 C   calculated at LO.  More detailed discussions are given in hep-ph/0201195.

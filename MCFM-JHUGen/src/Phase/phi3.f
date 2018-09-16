@@ -9,9 +9,9 @@ c result is 1/8/pi * 2|p|/sqrts  * domega/(4*pi)
       double precision wt0,wt
       integer j
       parameter(pi=3.141592654d0,wt0=1d0/8d0/pi)
-      s=p1(4)**2-p1(1)**2-p1(2)**2-p1(3)**2  
+      s=p1(4)**2-p1(1)**2-p1(2)**2-p1(3)**2
       roots=dsqrt(s)
-      costh=2d0*xth-1d0      
+      costh=2d0*xth-1d0
       phi=2d0*pi*xphi
       sinth=dsqrt(1d0-costh**2)
       cphi=dcos(phi)

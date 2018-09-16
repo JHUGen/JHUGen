@@ -5,7 +5,7 @@ c----in the heavy quark (mt=Infinity) limit.
 C----averaged over initial colours and spins
 c     g(-p1)+g(-p2)-->H --> (b(p3)+b~(p4))+g(p5)
 c---
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'ptilde.f'
       include 'qqgg.f'
@@ -52,7 +52,7 @@ c---- entries are left as dummies
       enddo
       enddo
 
-      return      
+      return
       end
 
 

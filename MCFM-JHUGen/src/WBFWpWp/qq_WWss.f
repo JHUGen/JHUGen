@@ -43,10 +43,10 @@ c--- q(-p1)+q(-p2)->W(p3,p4)+W(p5,p6)+q(p7)+q(p8);
 
 c--- This calculation uses the complex-mass scheme (c.f. arXiv:hep-ph/0605312)
 c--- and the following lines set up the appropriate masses and sin^2(theta_w)
-      cwmass2=dcmplx(wmass**2,-wmass*wwidth)
-      czmass2=dcmplx(zmass**2,-zmass*zwidth)
-      cxw=cone-cwmass2/czmass2
-      
+      cwmass2=dcmplx(wmass**2,0d0)
+      czmass2=dcmplx(zmass**2,0d0)
+      cxw=dcmplx(xw,0d0)
+
       doHO=.false.
       doBO=.false.
       if     (runstring(4:5) .eq. 'HO') then
@@ -94,6 +94,9 @@ c--- set identity of quark line based on nwz
       ampa(:,:,:)=czip
       ampb(:,:,:)=czip
 
+C---call plabel/pdgid conversion
+      call convertPLabelsToPDGIds()
+
 C---setup spinors and spinorvector products
       call spinorcurr(8,p,za,zb,zab,zba)
 
@@ -117,7 +120,7 @@ c--- Higgs and WWWW vertex 'D' diagrams: contribution from jmidWpWp
      & (j1(j),j2(j),i3,i4,i5,i6,j7(j),j8(j),za,zb,jmidWpWp17)
       call ampmidWpWp
      & (j1(j),j2(j),i3,i4,i5,i6,j8(j),j7(j),za,zb,jmidWpWp18)
-      
+
 c--- these are not used in calculation of Higgs contribution
       if (doHO .eqv. .false.) then
 
@@ -142,7 +145,7 @@ c--- Z/photon currents, 'A' diagrams: contribution from jtwodiagsWpWp
       call jonewWpWp(j7(j),i3,i4,j2(j),za,zb,zab,j7_34_2z,j7_34_2g)
 
       else
-      
+
       jB17=czip
       jB18=czip
       jtwodiagsWpWp17=czip
@@ -165,8 +168,8 @@ c--- Z/photon currents, 'A' diagrams: contribution from jtwodiagsWpWp
       j7_34_2g=czip
 
       endif
-      
-C-----setup for (uqcq_uqcq) 
+
+C-----setup for (uqcq_uqcq)
       amp(uqcq_uqcq,1,1)=
      & +jB17
      & +jmidWpWp17
@@ -174,17 +177,19 @@ C-----setup for (uqcq_uqcq)
      & +cdotpr(j7_34_1g(iq,:),j8_56_2g(iq,:))/s7341
      & +(cdotpr(j7_34_1z(iq,:),j8_56_2z(iq,:))
      &  -cdotpr(j7_34_1z(iq,:),k7341(:))
-     &  *cdotpr(k7341(:),j8_56_2z(iq,:))/czmass2)/(s7341-czmass2)
+     &  *cdotpr(k7341(:),j8_56_2z(iq,:))/czmass2)
+     & /(s7341-dcmplx(zmass**2,-zmass*zwidth))
      & +cdotpr(j7_56_1g(iq,:),j8_34_2g(iq,:))/s8342
      & +(cdotpr(j7_56_1z(iq,:),j8_34_2z(iq,:))
      &  -cdotpr(j7_56_1z(iq,:),k8342(:))
-     &  *cdotpr(k8342(:),j8_34_2z(iq,:))/czmass2)/(s8342-czmass2)
+     &  *cdotpr(k8342(:),j8_34_2z(iq,:))/czmass2)
+     & /(s8342-dcmplx(zmass**2,-zmass*zwidth))
 
       temp(2,4)=temp(2,4)+esq**6*spinavge
      &   *dble(amp(uqcq_uqcq,1,1)
      & *dconjg(amp(uqcq_uqcq,1,1)))
-      
-C-----setup for (uquq_uquq) 
+
+C-----setup for (uquq_uquq)
 c-------- ampa
       ampa(uquq_uquq,1,1)=amp(uqcq_uqcq,1,1)
 
@@ -196,11 +201,13 @@ c-------- ampb
      & +cdotpr(j8_34_1g(iq,:),j7_56_2g(iq,:))/s8341
      & +(cdotpr(j8_34_1z(iq,:),j7_56_2z(iq,:))
      &  -cdotpr(j8_34_1z(iq,:),k8341(:))
-     &  *cdotpr(k8341(:),j7_56_2z(iq,:))/czmass2)/(s8341-czmass2)
+     &  *cdotpr(k8341(:),j7_56_2z(iq,:))/czmass2)
+     & /(s8341-dcmplx(zmass**2,-zmass*zwidth))
      & +cdotpr(j8_56_1g(iq,:),j7_34_2g(iq,:))/s7342
      & +(cdotpr(j8_56_1z(iq,:),j7_34_2z(iq,:))
      &  -cdotpr(j8_56_1z(iq,:),k7342(:))
-     &  *cdotpr(k7342(:),j7_34_2z(iq,:))/czmass2)/(s7342-czmass2)
+     &  *cdotpr(k7342(:),j7_34_2z(iq,:))/czmass2)
+     & /(s7342-dcmplx(zmass**2,-zmass*zwidth))
 
       temp(2,2)=temp(2,2)+esq**6*spinavge
      &   *dble(ampa(uquq_uquq,1,1)
@@ -244,7 +251,7 @@ c--- qbar-q
       msq(-1,4)=temp(2,4)
       msq(-3,2)=temp(2,4)
       msq(-1,2)=temp(2,2) ! d~u -> u~d
-      
+
 c--- q-qbar
       elseif (j.eq.6) then
       msq(2,-1)=temp(2,2) ! ud~ -> u~d
@@ -262,7 +269,7 @@ c--- qbar-q extra pieces
       msq(-3,4)=msq(-1,2)
 
       endif
-      
+
       enddo
 
 c--- above assignments assume W+W-; re-assign for W-W-
@@ -294,4 +301,4 @@ c--- above assignments assume W+W-; re-assign for W-W-
    79 format(' *  sin^2(theta_w)   (',f11.5,',',f11.5,')      *')
 
       end
-      
+

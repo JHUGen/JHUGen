@@ -47,7 +47,7 @@ C   Deal with Higgs decay
       p1p2(+1,0)=-aveqg*fac*qqghn(1,5,2,p,n)
       p1p2(-1,0)=-aveqg*fac*qqghn(5,1,2,p,n)
       p1p2(0,0)=+avegg*fac*ggghn(1,5,2,p,n)
-      elseif (in .eq. 5) then     
+      elseif (in .eq. 5) then
       p1p2(1,-1)=+aveqq*fac*qqghn(1,2,5,p,n)
       p1p2(-1,1)=+aveqq*fac*qqghn(2,1,5,p,n)
       p1p2(0,0)=+avegg*fac*ggghn(1,2,5,p,n)
@@ -76,7 +76,7 @@ C   Deal with Higgs decay
       endif
       enddo
       enddo
- 
+
       return
       end
 
@@ -136,7 +136,7 @@ c   contracted with the vector n(mu)
       t=2d0*Dot(p,j1,j5)
       u=2d0*Dot(p,j2,j5)
       sh=s+t+u
-      
+
 c--- JMC answer, gggH.frm
 c -f(b,a,c)^2/s12/s13/s23*(
 c -(n.n)/2*(s12^4+s13^4+s23^4+mHsq^4-2*(s13^2*s23^2+s12^2*mHsq^2))
@@ -148,4 +148,4 @@ c +2*(p1.n*s23-p2.n*s13)^2/s13/s23*(s13^2*s23^2+s12^2*mHsq^2)/s12);
 
       return
       end
-      
+

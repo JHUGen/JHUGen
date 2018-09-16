@@ -1,8 +1,8 @@
       subroutine gg_hWWggg(p,msq)
       implicit none
-c     g(-p1)+g(-p2)-->H -->  W^- (e^-(p5)+nubar(p6)) 
+c     g(-p1)+g(-p2)-->H -->  W^- (e^-(p5)+nubar(p6))
 c                          + W^+ (nu(p3)+e^+(p4))
-c      +g(p_iglue1=7)+g(p_iglue2=8) +g(p_iglue2=9) 
+c      +g(p_iglue1=7)+g(p_iglue2=8) +g(p_iglue2=9)
 c--- Using the results of
 c---\bibitem{DelDuca:2004wt}
 c---  V.~Del Duca, A.~Frizzo and F.~Maltoni,
@@ -53,7 +53,7 @@ C---swap momenta so that Higgs decay products are last
       enddo
 
 C---fill spinor products up to maximum number
-      call spinoru(5,q,za,zb)  
+      call spinoru(5,q,za,zb)
 
 
 C--five gluon terms
@@ -79,7 +79,7 @@ C---  q~ r --> q~ r g
 
 C---  q r~ --> q r~ g
       call h4qg(3,1,2,4,5,ra_rag,qa_qag)
-      
+
 C---  q~ r~--> q~ r~ g
       call h4qg(4,2,3,1,5,ab_abg,aa_aag)
 
@@ -88,7 +88,7 @@ C---  q q~ -> r r~ g (note that dummy is the same as qa_qag)
 
 C---  q~ q -> r~ r g (note that dummy is the same as aq_aqg)
       call h4qg(1,2,4,3,5,aq_brg,dummy)
-      
+
 C---  g r --> r q q~
       call h4qg(3,2,4,5,1,gr_rqa,gq_qqa)
 
@@ -105,7 +105,7 @@ C---  r~ g --> r~ q~ q
 
 c--- apply flags
       Hggggg=f0q*Hggggg
-      
+
       Hqaggg=f2q*Hqaggg
       Haqggg=f2q*Haqggg
       Hqgqgg=f2q*Hqgqgg
@@ -144,7 +144,7 @@ C----Fill up array with values;
       msq(j,k)=0d0
 
 C ---qq
-      if ((j.gt.0).and.(k.gt.0)) then 
+      if ((j.gt.0).and.(k.gt.0)) then
         if (j.eq.k) then
           msq(j,k)=0.5d0*aveqq*fac*qq_qqg
         else
@@ -153,7 +153,7 @@ C ---qq
       endif
 
 C ---aa
-      if ((j.lt.0).and.(k.lt.0)) then 
+      if ((j.lt.0).and.(k.lt.0)) then
         if (j.eq.k) then
           msq(j,k)=0.5d0*aveqq*fac*aa_aag
         else
@@ -183,7 +183,7 @@ c--- qg
       if ((j.gt.0).and.(k.eq.0)) then
        msq(j,0)=aveqg*fac*((Hqgqgg+qg_qqa)*0.5d0+dfloat(nflav-1)*rg_rqa)
       endif
-      
+
 c--- ag
       if ((j.lt.0).and.(k.eq.0)) then
        msq(j,0)=aveqg*fac*((Hagagg+ag_aaq)*0.5d0+dfloat(nflav-1)*bg_baq)
@@ -203,11 +203,11 @@ c--- gg
       if ((j.eq.0).and.(k.eq.0)) then
         msq(0,0)=avegg*fac*(Hggggg/6d0+dfloat(nflav)*Hggqag)
       endif
-      
+
       enddo
       enddo
 
       return
       end
 
- 
+

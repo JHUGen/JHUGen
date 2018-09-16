@@ -11,7 +11,7 @@ C---- arXiv:1101.5947 [hep-ph], Eq. (92)
       double precision mt2,xlog,beta
       double complex BSYA0ggppmp,BSYARggppmp,VR
       integer e1,p2,p3,e4
- 
+
       mt2=mt**2
       beta=sqrt(1d0-4d0*mt2/s(p2,p3))
       xlog=log((1d0-beta)/(1d0+beta))/beta

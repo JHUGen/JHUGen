@@ -73,7 +73,7 @@ c--- no extra factor here since colour algebra is already done in (2.12)
         if (colourchoice .le. 1) then
         ml_vec(j)=a64v(st3(3-h(i2(j)),3-h(i3(j))),
      .     i1(1),i4(1),i2(j),i3(j),i6(lh),i5(lh),zb,za)
-c--- note: this symmetry relation (including minus sign) checked numerically 
+c--- note: this symmetry relation (including minus sign) checked numerically
         ml1_ax(j)=-a64ax(st3(3-h(i2(j)),3-h(i3(j))),
      .     i1(1),i4(1),i2(j),i3(j),i6(lh),i5(lh),zb,za)
         ml2_ax(j)=-a65ax(st3(3-h(i2(j)),3-h(i3(j))),
@@ -143,7 +143,7 @@ c--- note: this symmetry relation (including minus sign) checked numerically
      .   +ml4(2)/xn
      .   -(ml4(1)+ml4(2))/xn**3)))
       endif
-      
+
       if (colourchoice .le. 1) then
       mqqb_vec(hq,lh)=mqqb_vec(hq,lh)+fac/xnsq*(
      .  Dconjg(m(1))*(xn-4d0/xn)*ml_vec(1)
@@ -154,9 +154,9 @@ c--- note: this symmetry relation (including minus sign) checked numerically
      .    (xn-2d0/xn)*ml1_ax(1)-2d0/xn*ml1_ax(2)+one/xn*ml2_ax(1))
      . +Dconjg(m(2))*(
      .    (xn-2d0/xn)*ml1_ax(2)-2d0/xn*ml1_ax(1)+one/xn*ml2_ax(2)))
-     
+
       endif
-      
+
       enddo
       enddo
 
@@ -165,7 +165,7 @@ c--- note: this symmetry relation (including minus sign) checked numerically
 
       return
       end
-      
+
       double complex function a61g1lc(st,j1,j2,j3,j4,j5,j6,za,zb)
       implicit none
 c----wrapper to a61g that also includes config st='q+g-g-qb-'
@@ -180,7 +180,7 @@ c----wrapper to a61g that also includes config st='q+g-g-qb-'
       else
         a61g1lc=a61gcol(st,j1,j2,j3,j4,j5,j6,za,zb,1)
       endif
-      
+
       return
       end
 
@@ -198,7 +198,7 @@ c----wrapper to a61g that also includes config st='q+g-g-qb-'
       else
         a61g1slc=a61gcol(st,j4,j3,j2,j1,j6,j5,zb,za,2)
       endif
-      
+
       return
       end
 
@@ -216,7 +216,7 @@ c----wrapper to a61g that also includes config st='q+g-g-qb-'
       else
         a61g1nf=a61gcol(st,j1,j2,j3,j4,j5,j6,za,zb,3)
       endif
-      
+
       return
       end
 
@@ -262,7 +262,7 @@ c----wrapper to a63g that also includes config st='q+qb-g-g-'
       else
         a63g1=a63g(st,j1,j4,j2,j3,j5,j6,za,zb)
       endif
-      
+
       return
       end
 
@@ -285,7 +285,7 @@ c----definition (2.13) of BDK, writes in terms of fvs and fvf
         a64v=-fvs(st,j1,j4,j2,j3,j5,j6,za,zb)
      .       -fvf(st,j1,j4,j2,j3,j5,j6,za,zb)
       endif
-      
+
       return
       end
 
@@ -299,7 +299,7 @@ c----definition (2.13) of BDK
       double complex fax
 
       if (st.eq.'q+qb-g-g-') then
-c--- note: this symmetry relation checked numerically 
+c--- note: this symmetry relation checked numerically
         a64ax=fax('q+qb-g+g+',j4,j1,j3,j2,j6,j5,zb,za)
       else
         a64ax=fax(st,j1,j4,j2,j3,j5,j6,za,zb)
@@ -318,14 +318,14 @@ c----definition (2.13) of BDK
       double complex faxsl
 
       if     (st.eq.'q+qb-g-g-') then
-c--- note: this symmetry relation checked numerically 
+c--- note: this symmetry relation checked numerically
         a65ax=faxsl('q+qb-g+g+',j4,j1,j2,j3,j6,j5,zb,za)
       elseif (st.eq.'q+qb-g-g+') then
         a65ax=faxsl('q+qb-g+g-',j1,j4,j3,j2,j5,j6,za,zb)
       else
         a65ax=faxsl(st,j1,j4,j2,j3,j5,j6,za,zb)
       endif
-      
+
       return
       end
 

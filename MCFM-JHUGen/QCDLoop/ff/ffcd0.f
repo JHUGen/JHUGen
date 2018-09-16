@@ -532,7 +532,7 @@
      +			xpi(j),xpi(ij)
 		    goto 39
 		endif
-		if ( ltest .and. DIMAG(cpi(i)).eq.0 .and. 
+		if ( ltest .and. DIMAG(cpi(i)).eq.0 .and.
      +			DIMAG(cpi(j)).eq.0 ) then
 		    print *,'ffcd0c: error: threshold without complex '
      +		    	//'masses: ',i,cpi(i),j,cpi(j)

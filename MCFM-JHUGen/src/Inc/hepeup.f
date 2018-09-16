@@ -1,5 +1,5 @@
 
-      integer maxnup 
+      integer maxnup
       parameter (maxnup=500)
       integer nup,idprup,idup(maxnup),istup(maxnup),mothup(2,maxnup)
      & ,icolup(2,maxnup)
@@ -7,4 +7,4 @@
      & ,spinup(maxnup) ,vtimup(maxnup)
       common /hepeup/nup,idprup,idup,istup,mothup,icolup,
      &     xwgtup,scalup,aqedup,aqcdup,pup,vtimup
-     & ,spinup 
+     & ,spinup

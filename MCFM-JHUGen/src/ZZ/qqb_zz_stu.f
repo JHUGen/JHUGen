@@ -3,7 +3,7 @@
 
 C----Author R.K.Ellis December 1998
 C----modified by JMC to include supplementary diagrams February 1999
-C----modified by RKE (following suggestion of GZ) 
+C----modified by RKE (following suggestion of GZ)
 c----to correct supplementary diagrams April 2011
 c----Matrix element for ZZ production
 c----NB: we also include virtual photons
@@ -31,7 +31,7 @@ c     2 = t+u
 
       double precision msq(-nf:nf,-nf:nf),p(mxpart,4),qdks(mxpart,4),
      & ave,v1(2),v2(2),rescale1,rescale2,oprat
-      integer channeltoggle     
+      integer channeltoggle
       double complex qqb(2,2,2),qbq(2,2,2),q_qb,qb_q
       double complex qqb1(2,2,2),qbq1(2,2,2),qqb2(2,2,2),qbq2(2,2,2)
       double complex a6trees,prop12,prop34,prop56
@@ -74,18 +74,18 @@ c     vsymfact=symmetry factor
       v2(2)=r2
 
 C----setup factor to avoid summing over too many neutrinos
-C----if coupling enters twice    
-      if (q1 .eq. 0d0) then   
-      rescale1=1d0/sqrt(3d0)    
-      else 
-      rescale1=1d0    
-      endif          
-      if (q2 .eq. 0d0) then   
-      rescale2=1d0/sqrt(3d0)    
-      else 
-      rescale2=1d0    
-      endif          
-                                                                                                                                            
+C----if coupling enters twice
+      if (q1 .eq. 0d0) then
+      rescale1=1d0/sqrt(3d0)
+      else
+      rescale1=1d0
+      endif
+      if (q2 .eq. 0d0) then
+      rescale2=1d0/sqrt(3d0)
+      else
+      rescale2=1d0
+      endif
+
 c--set msq=0 to initalize
       do j=-nf,nf
       do k=-nf,nf
@@ -94,7 +94,7 @@ c--set msq=0 to initalize
       enddo
       enddo
 
-C----Change the momenta to DKS notation 
+C----Change the momenta to DKS notation
 c   We have --- q(-p1)+qbar(-p2)-->l(p3)+lbar(p4) + l'(p5)+lbar'(p6)
 c   DKS have--- q(q2) +qbar(q1) -->mu^-(q3)+mu^+(q4)+e^-(q6)+e^+(q5)
 
@@ -125,19 +125,19 @@ c--   calculate propagators
       prop12=s(1,2)/dcmplx(s(1,2)-zmass**2,zmass*zwidth)
       prop34=s(3,i4(ii))/dcmplx(s(3,i4(ii))-zmass**2,zmass*zwidth)
       prop56=s(i5(ii),6)/dcmplx(s(i5(ii),6)-zmass**2,zmass*zwidth)
-            
+
 c-- here the labels correspond to the polarizations of the
 c-- quark, lepton 4 and lepton 6 respectively
 
       if((channeltoggle.eq.0).or.(channeltoggle.eq.2)) then
-       qbq(1,1,1)=A6trees(1,2,6,i5(ii),i4(ii),3,za,zb) 
-       qbq(1,1,2)=A6trees(1,2,6,i5(ii),3,i4(ii),za,zb) 
-       qbq(1,2,1)=A6trees(1,2,i5(ii),6,i4(ii),3,za,zb) 
-       qbq(1,2,2)=A6trees(1,2,i5(ii),6,3,i4(ii),za,zb) 
+       qbq(1,1,1)=A6trees(1,2,6,i5(ii),i4(ii),3,za,zb)
+       qbq(1,1,2)=A6trees(1,2,6,i5(ii),3,i4(ii),za,zb)
+       qbq(1,2,1)=A6trees(1,2,i5(ii),6,i4(ii),3,za,zb)
+       qbq(1,2,2)=A6trees(1,2,i5(ii),6,3,i4(ii),za,zb)
 
        qqb(1,1,1)=A6trees(2,1,6,i5(ii),i4(ii),3,za,zb)
-       qqb(1,1,2)=A6trees(2,1,6,i5(ii),3,i4(ii),za,zb) 
-       qqb(1,2,1)=A6trees(2,1,i5(ii),6,i4(ii),3,za,zb) 
+       qqb(1,1,2)=A6trees(2,1,6,i5(ii),3,i4(ii),za,zb)
+       qqb(1,2,1)=A6trees(2,1,i5(ii),6,i4(ii),3,za,zb)
        qqb(1,2,2)=A6trees(2,1,i5(ii),6,3,i4(ii),za,zb)
 
 c       write(6,*) 'channeltoggle 0 2 qqb=',qqb(1,1,1)
@@ -150,7 +150,7 @@ c---for supplementary diagrams.
         qbq1(1,1,1)=+A6trees(3,i4(ii),1,2,i5(ii),6,za,zb)
         qbq2(1,1,1)=+A6trees(6,i5(ii),1,2,i4(ii),3,za,zb)
         qbq1(1,1,2)=-A6trees(i4(ii),3,1,2,i5(ii),6,za,zb)
-        qbq2(1,1,2)=+A6trees(6,i5(ii),1,2,3,i4(ii),za,zb)      
+        qbq2(1,1,2)=+A6trees(6,i5(ii),1,2,3,i4(ii),za,zb)
         qbq1(1,2,1)=+A6trees(3,i4(ii),1,2,6,i5(ii),za,zb)
         qbq2(1,2,1)=-A6trees(i5(ii),6,1,2,i4(ii),3,za,zb)
         qbq1(1,2,2)=-A6trees(i4(ii),3,1,2,6,i5(ii),za,zb)
@@ -159,7 +159,7 @@ c---for supplementary diagrams.
         qqb1(1,1,1)=-A6trees(3,i4(ii),2,1,i5(ii),6,za,zb)
         qqb2(1,1,1)=-A6trees(6,i5(ii),2,1,i4(ii),3,za,zb)
         qqb1(1,1,2)=+A6trees(i4(ii),3,2,1,i5(ii),6,za,zb)
-        qqb2(1,1,2)=-A6trees(6,i5(ii),2,1,3,i4(ii),za,zb)      
+        qqb2(1,1,2)=-A6trees(6,i5(ii),2,1,3,i4(ii),za,zb)
         qqb1(1,2,1)=-A6trees(3,i4(ii),2,1,6,i5(ii),za,zb)
         qqb2(1,2,1)=+A6trees(i5(ii),6,2,1,i4(ii),3,za,zb)
         qqb1(1,2,2)=+A6trees(i4(ii),3,2,1,6,i5(ii),za,zb)
@@ -217,7 +217,7 @@ c        write(6,*) 'channeltoggle 0 1 qqb1=',qqb1(1,1,1)
 
 c      write(6,*) 'channeltoggle 0 1 2 q_qb=',q_qb
 
-      
+
       if (interference .eqv. .false.) then
 c--- normal case
         msq(j,k)=msq(j,k)+ave*abs(q_qb)**2
@@ -313,7 +313,7 @@ c---    2nd pass --> fill msq
 
  20   continue
       enddo !end j-loop
-      enddo   ! end ii loop 
+      enddo   ! end ii loop
 
 C----extend matrix element to full flavor range
       do j=-nf,nf

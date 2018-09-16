@@ -64,7 +64,7 @@ C ===========================================================================
 C   ** ALL fits are obtained by using the same coupling strength
 C   \alpha_s(Mz)=0.118 and the NLO (HOPPET) running \alpha_s formula.
 C
-C   The table grids are generated for 
+C   The table grids are generated for
 C    *  10^-8 < x < 1 and 1.3 < Q < 10^5 (GeV) for CT10 & CT10W series;
 C
 C   PDF values outside of the above range are returned using extrapolation.
@@ -105,7 +105,7 @@ C===========================================================================
       Data Warn /.true./
       Data Qsml /.3d0/
       save Warn,Qsml
-!$omp threadprivate(Warn,Qsml)      
+!$omp threadprivate(Warn,Qsml)
 
       If (X .lt. 0d0 .or. X .gt. 1D0) Then
         Print *, 'X out of range in CT10Pdf: ', X
@@ -266,8 +266,8 @@ c
       Save tmp1, tmp2, tdet
       data Isetch /1/
       save Isetch
-!$omp threadprivate(Isetch)     
-!$omp threadprivate(X,Q,JX,JQ,JLX,JLQ)     
+!$omp threadprivate(Isetch)
+!$omp threadprivate(X,Q,JX,JQ,JLX,JLQ)
 !$omp threadprivate(ss,const1,const2,const3,const4,const5,const6)
 !$omp threadprivate(sy2,sy3,s23,tt,t12,t13,t23,t24,t34,ty2,ty3)
 !$omp threadprivate(tmp1, tmp2, tdet)

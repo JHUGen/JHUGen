@@ -6,8 +6,8 @@ c     Modified version of phi1_2 such that p2 decays using a BW form with
 c     parameters given in the arguments above, and p3 decays without BW
 c
 c     vectors returned p2 and p3 are in the same frame as p1 is supplied
-c     Expression evaluated is 
-c     ds2 ds3 d^4 p2 d^4 p3 (2 pi)^4 delta(p1-p2-p3)/(2 pi)^6 
+c     Expression evaluated is
+c     ds2 ds3 d^4 p2 d^4 p3 (2 pi)^4 delta(p1-p2-p3)/(2 pi)^6
 c     delta(p2^2-s2) delta(p3^2-s3)
 c
       implicit none
@@ -19,8 +19,8 @@ c
       include 'verbose.f'
       include 'breit.f'
       include 'limits.f'
-      include 'dm_params.f' 
-      include 'first.f' 
+      include 'dm_params.f'
+      include 'first.f'
       double precision p1(4),p2(4),p3(4),p3cm(4)
       double precision x1,x2,x3,x4,costh,sinth,phi,cphi,sphi
       double precision wt,wt0,w2,w3
@@ -48,14 +48,14 @@ c
 
       s2min=1d-8
       s2max=s1
-      
+
 c--- adjust limits to match input file if it is more restrictive
       s2min=max(s2min,m3456min**2)
       s2max=min(s2max,m3456max**2)
       if (s2max .lt. s2min)  return 1 ! for safety
 
       call breitw(x1,s2min,s2max,bwmass,bwwidth,s2,w2)
-      
+
       m2=dsqrt(s2)
       s3min=1d-8
       s3max=(m2-m1)**2
@@ -65,7 +65,7 @@ c--- adjust limits to match input file if it is more restrictive
       w3=s3max-s3min
       s3=s3max*x2+s3min*(1d0-x2)
 
-      costh=two*x3-one      
+      costh=two*x3-one
       phi=twopi*x4
       sinth=dsqrt(one-costh**2)
       cphi=dcos(phi)
@@ -87,10 +87,10 @@ c--- adjust limits to match input file if it is more restrictive
       do j=1,4
       p2(j)=p1(j)-p3(j)
       enddo
-      if (  (p1(4) .lt. 0d0) 
-     & .or. (p2(4) .lt. 0d0) 
-     & .or. (p3(4) .lt. 0d0)) then 
-       if (case(1:5) .ne. 'vlchk') then 
+      if (  (p1(4) .lt. 0d0)
+     & .or. (p2(4) .lt. 0d0)
+     & .or. (p3(4) .lt. 0d0)) then
+       if (case(1:5) .ne. 'vlchk') then
         write(6,*) '   m1=',m1
         write(6,*) 's2min=',s2min
         write(6,*) 's2max=',s2max

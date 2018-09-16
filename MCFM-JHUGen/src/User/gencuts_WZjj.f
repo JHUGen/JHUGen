@@ -1,6 +1,6 @@
       logical function gencuts_WZjj(pjet,njets)
 c -- these cuts taken from CMS FCNC search, arxiv:1208.0957
-c -- R. Rontsch 2103-03-01   
+c -- R. Rontsch 2103-03-01
       implicit none
       include 'leptcuts.f'
       include 'jetcuts.f'
@@ -54,7 +54,7 @@ c -- write out cuts
       write(*,*) '*sum (pt+E)/pt,lept >', Wisol, 'for lepton from W'
       write(*,*) '*'
       write(*,*) '*Jet cuts'
-      write(*,*) '*pt,jet >',ptjetmin 
+      write(*,*) '*pt,jet >',ptjetmin
       write(*,*) '*| eta,j| <', etajetmax
       write(*,*) '* Jet isolation: R_jet,lept >', Rjlmin
       write(*,*) '*'
@@ -85,19 +85,19 @@ c -- lepton index for t and tbar production
       endif
 
 c     -- lepton cuts
-      do j=1,3 
+      do j=1,3
          k=leptindex(j)
          ST=ST+pt(k,pjet)
 c     -- pt and rap
-         if ( (pt(k,pjet) .le. leptpt) .or. 
+         if ( (pt(k,pjet) .le. leptpt) .or.
      &        (abs(etarap(k,pjet)) .ge. leptrap) ) then
             gencuts_WZjj=.true.
             return
          endif
       enddo
-c -- dilepton mass cuts, for both l+l- pairings            
+c -- dilepton mass cuts, for both l+l- pairings
 
-c -- first establish which leptons reconstruct Z 
+c -- first establish which leptons reconstruct Z
       Zpair1=(/3,4/)
       Wpair1=(/5,6/)
       isol1=(/Zisol,Zisol,Wisol/)
@@ -144,10 +144,10 @@ c -- for same flavours, check which l-l+ pair reconstructs Z mass best
             endif
          endif
       endif
-      
-      
+
+
 c---  identify the jets
-      countjet=0      
+      countjet=0
       do j=3,mxpart
          if ((plabel(j) .eq. 'pp') .or. (plabel(j) .eq. 'qj')
      &        .or. (plabel(j) .eq.'bq') .or. (plabel(j) .eq. 'ba')) then
@@ -173,16 +173,16 @@ c     --lepton isolation
                incone(j)=incone(j)+2d0*pt(kk,pjet)
             endif
          enddo
-         
+
       enddo
-      
+
       if ( incone(1)/pt(leptindex(1),pjet) .ge. isol(1) .or.
      &     incone(2)/pt(leptindex(2),pjet) .ge. isol(2) .or.
      &     incone(3)/pt(leptindex(3),pjet) .ge. isol(3) ) then
          gencuts_WZjj=.true.
          return
       endif
-      
+
 c     --pt,miss
       ST=ST+pt(nuindex,pjet)
       if (pt(nuindex,pjet) .le. misspt) then
@@ -191,9 +191,9 @@ c     --pt,miss
       endif
 
 c     -- jet cuts
-      
+
 c---  countjet will pick up the extra 'pp' needed for the real piece,
-c---  therefore we should subtract 1 from this number     
+c---  therefore we should subtract 1 from this number
       if (countjet .gt. njets) countjet=countjet-1
 
       if ((njets .ne. countjet) .and. (notag .eq. 0)) then
@@ -212,12 +212,12 @@ c -- jet isolation cuts
       do j=1,njets
          jj=jetindex(j)
          ST=ST+pt(jj,pjet)
-         if ( (pt(jj,pjet) .le. ptjetmin) .or. 
+         if ( (pt(jj,pjet) .le. ptjetmin) .or.
      &        (abs(etarap(jj,pjet)) .ge. etajetmax) ) then
             gencuts_WZjj=.true.
             return
          endif
-         
+
          do k=1,3
             kk=leptindex(k)
             if (R(pjet,jj,kk) .le. Rjlmin) then
@@ -233,14 +233,14 @@ c -- reconstruct top mass using either jet and W/Z boson
       mWj1=threemass(Wpair(1),Wpair(2),jetindex(1),pjet)
       mWj2=threemass(Wpair(1),Wpair(2),jetindex(2),pjet)
 
- 
-      
+
+
       if (cut_id .eq. 'stee') then
 c -- "ST selection"
 
-         if ( (mZj1 .ge. mZjmin .and. mZj1 .le. mZjmax) .and. 
+         if ( (mZj1 .ge. mZjmin .and. mZj1 .le. mZjmax) .and.
      &        (mWj2 .ge. mWbmin .and. mWj2 .le. mWbmax) ) then
-         elseif ( (mZj2 .ge. mZjmin .and. mZj2 .le. mZjmax) .and. 
+         elseif ( (mZj2 .ge. mZjmin .and. mZj2 .le. mZjmax) .and.
      &        (mWj1 .ge. mWbmin .and. mWj1 .le. mWbmax) ) then
             continue
          else
@@ -253,16 +253,16 @@ c -- "ST selection"
           return
        endif
       endif
-      
-      
+
+
        return
-       end   
+       end
 
 
 
-            
 
-         
-         
-         
-         
+
+
+
+
+

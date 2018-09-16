@@ -11,14 +11,14 @@
       include 'PR_cs_new.f'
       double precision z,p(mxpart,4),dot
       double precision xl12,xl15,xl16,xl25,xl26,xl56
-      double precision 
+      double precision
      .                 ii_qq,ii_qg,
      .                 if_qq,
      .                 fi_qq,
      .                 ff_qq
       double precision tempqg
       integer is
-      
+
       xl12=dlog(+two*dot(p,1,2)/musq)
       xl15=dlog(-two*dot(p,1,5)/musq)
       xl16=dlog(-two*dot(p,1,6)/musq)
@@ -28,7 +28,7 @@
 
 ************************************************************************
 *     Contributions from QQQQ matrix elements                          *
-************************************************************************            
+************************************************************************
 c--- Note that, in all cases, the (1) contribution is equal to the
 c--- (2) contribution, after the interchange of 5 and 6
 c--- In this way, the 2 pieces provide all the necessary terms to deal
@@ -67,7 +67,7 @@ c--- ANTIQUARK-ANTIQUARK contributions
       R1(a,a,a,2,is)=R1(q,q,q,2,is)
       R2(a,a,a,1,is)=R2(q,q,q,1,is)
       R2(a,a,a,2,is)=R2(q,q,q,2,is)
-      
+
       enddo
 
 c--- QUARK-ANTIQUARK contributions
@@ -94,7 +94,7 @@ c--- QUARK-ANTIQUARK contributions
      . +ff_qq(z,xl56,is)*(xn-two/xn))
 
       enddo
-      
+
 c--- ANTIQUARK-QUARK contributions
 c      do is=1,3
 c      R1(a,a,q,1,is)=ason4pi*(

@@ -38,12 +38,12 @@ c---calculate the lowest order matrix element and fill the common block
 c---twopij with s_{ij}
       call qqb_wbb(p,msq)
       if (
-     .      (s(5,6) .lt. four*mbsq) 
-     . .or. (s(1,5)*s(2,5)/s(1,2) .lt. mbsq) 
-     . .or. (s(1,6)*s(2,6)/s(1,2) .lt. mbsq) ) return 
+     .      (s(5,6) .lt. four*mbsq)
+     . .or. (s(1,5)*s(2,5)/s(1,2) .lt. mbsq)
+     . .or. (s(1,6)*s(2,6)/s(1,2) .lt. mbsq) ) return
 
-c---  Now transform momenta into a notation 
-c---  suitable for calling the BDKW function with notation which is 
+c---  Now transform momenta into a notation
+c---  suitable for calling the BDKW function with notation which is
 c---  q-(-p4)+Q+(-p2)+l-(-p5) ---> q+(p1)+Q-(p3)+l+(p6)
       do nu=1,4
       q(1,nu)=p(2,nu)
@@ -52,12 +52,12 @@ c---  q-(-p4)+Q+(-p2)+l-(-p5) ---> q+(p1)+Q-(p3)+l+(p6)
       q(4,nu)=p(1,nu)
       q(5,nu)=p(4,nu)
       q(6,nu)=p(3,nu)
-      enddo      
+      enddo
 
       call spinoru(6,q,za,zb)
       faclo=V*aveqq*gw**4*gsq**2
       fac=faclo*xn*0.5d0*ason2pi
-      
+
 c----do whatever needs to be done q-qb case
       tLLL=atrLLL(1,2,3,4,5,6,za,zb)
       fLLL=a61LLL(1,2,3,4,5,6,za,zb)
@@ -66,7 +66,7 @@ c----do whatever needs to be done q-qb case
 
       qqb=fac*dble(tLLL*dconjg(fLLL)+fLLL*dconjg(tLLL)
      .            +tLRL*dconjg(fLRL)+fLRL*dconjg(tLRL))
-      
+
 c----now look at qb-q case, swap the momenta
       tLLL=atrLLL(4,2,3,1,5,6,za,zb)
       fLLL=a61LLL(4,2,3,1,5,6,za,zb)
@@ -92,4 +92,4 @@ c----now look at qb-q case, swap the momenta
 
       return
       end
-     
+

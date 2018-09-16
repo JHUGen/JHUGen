@@ -158,8 +158,8 @@
 *	p(|ii(1,)|-|ii(3,)|) = s(i)					*
 *	p(|ii(4,)|-|ii(6,)|) = p(i) = sgn(ii())*(s(i+1) - s(i))		*
 *									*
-*	At this moment (26-apr-1990) only the diagonal is tried		*									
-*									*									
+*	At this moment (26-apr-1990) only the diagonal is tried		*
+*									*
 *	Input:	xpi(ns)		(real)	m^2(i),i=1,3; p^2(i-3),i=4,10	*
 *		piDpj(ns,ns)	(real)					*
 *		ii(6,2)		(integer)	see above		*
@@ -233,7 +233,7 @@
 
 		xhck = piDpj(abs(ii(i,j)),ii(2,j))
      +		     - piDpj(abs(ii(i,j)),ii(3,j))
-     +		     + sign(1,ii(5,j))*piDpj(abs(ii(i,j)),abs(ii(5,j))) 
+     +		     + sign(1,ii(5,j))*piDpj(abs(ii(i,j)),abs(ii(5,j)))
 		xmax = max(abs(piDpj(abs(ii(i,j)),ii(2,j))),
      +			abs(piDpj(abs(ii(i,j)),ii(3,j))))
 		if ( xlosn*abs(xhck) .gt. precx*xmax ) print *,'ffdl3s:'
@@ -242,9 +242,9 @@
      +		  piDpj(abs(ii(i,j)),ii(3,j)),
      +		  piDpj(abs(ii(i,j)),abs(ii(5,j))),xhck
 
-		xhck = piDpj(abs(ii(i,j)),ii(3,j)) 
+		xhck = piDpj(abs(ii(i,j)),ii(3,j))
      +		     - piDpj(abs(ii(i,j)),ii(1,j))
-     +		     + sign(1,ii(6,j))*piDpj(abs(ii(i,j)),abs(ii(6,j))) 
+     +		     + sign(1,ii(6,j))*piDpj(abs(ii(i,j)),abs(ii(6,j)))
 		xmax = max(abs(piDpj(abs(ii(i,j)),ii(3,j))),
      +			abs(piDpj(abs(ii(i,j)),ii(1,j))))
 		if ( xlosn*abs(xhck) .gt. precx*xmax ) print *,'ffdl3s:'
@@ -253,7 +253,7 @@
      +		  piDpj(abs(ii(i,j)),ii(1,j)),
      +		  piDpj(abs(ii(i,j)),abs(ii(6,j))),xhck
 
-		xhck = sign(1,ii(4,j))*piDpj(abs(ii(i,j)),abs(ii(4,j))) 
+		xhck = sign(1,ii(4,j))*piDpj(abs(ii(i,j)),abs(ii(4,j)))
      +		     + sign(1,ii(5,j))*piDpj(abs(ii(i,j)),abs(ii(5,j)))
      +		     + sign(1,ii(6,j))*piDpj(abs(ii(i,j)),abs(ii(6,j)))
 		xmax = max(abs(piDpj(abs(ii(i,j)),abs(ii(4,j)))),

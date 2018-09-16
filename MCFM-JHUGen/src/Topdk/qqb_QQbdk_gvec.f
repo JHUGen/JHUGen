@@ -53,7 +53,7 @@ C----set all elements to zero
      .    *dcmplx(zip,mt*twidth)**2
       fac=V*xn/4d0*gwsq**4*gsq**2/abs(prop)**2*s(5,3)*s(6,8)
       fac=fac*2d0 ! extra factor from ggn.frm
-      
+
       mt2=mt**2
       nDn=n(4)**2-n(1)**2-n(2)**2-n(3)**2
       nDp4=n(4)*p(4,4)-n(1)*p(4,1)-n(2)*p(4,2)-n(3)*p(4,3)
@@ -65,17 +65,17 @@ C----set all elements to zero
 
 c--- pt=p3+p4+p5, ptb=p6+p7+p8
       do nu=1,4
-      q(1,nu)=p(1,nu)    
-      q(2,nu)=p(2,nu)    
+      q(1,nu)=p(1,nu)
+      q(2,nu)=p(2,nu)
       q(3,nu)=+(p(3,nu)+p(4,nu)+p(5,nu)-c1*p(4,nu))
-      q(4,nu)=p(4,nu)    
+      q(4,nu)=p(4,nu)
       q(5,nu)=p(6,nu)+(1d0-c2)*p(7,nu)+p(8,nu)
-      q(6,nu)=p(3,nu)+p(4,nu)+p(5,nu)+(1d0-c6)*p(1,nu)    
-      q(7,nu)=p(7,nu)    
-      q(8,nu)=p(3,nu)+p(4,nu)+p(5,nu)+(1d0-c8)*p(2,nu)    
+      q(6,nu)=p(3,nu)+p(4,nu)+p(5,nu)+(1d0-c6)*p(1,nu)
+      q(7,nu)=p(7,nu)
+      q(8,nu)=p(3,nu)+p(4,nu)+p(5,nu)+(1d0-c8)*p(2,nu)
       q(9,nu)=n(nu)-c9*p(4,nu)
       enddo
-      
+
       call spinoru(9,q,za,zb)
       do j=1,8
       do k=1,8

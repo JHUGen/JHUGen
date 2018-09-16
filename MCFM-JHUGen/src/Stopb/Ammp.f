@@ -189,6 +189,6 @@ c--- u + g  ->  c + s + d  (t-channel single-charm)
      &   c2*trg)*gDs)/((2*cDg+mc2)**2*gDs)/2.0d+0+Ammp
 
       Ammp=Ammp/zmmp
-      
+
       return
       end

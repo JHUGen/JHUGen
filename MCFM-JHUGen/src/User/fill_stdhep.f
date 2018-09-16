@@ -16,19 +16,19 @@
       data eventnumber/0/
       save eventnumber
 
-c--- increase the event number by 1      
+c--- increase the event number by 1
       eventnumber=eventnumber+1
 
 c--- nevhep is the STDHEP event number
       nevhep=eventnumber
-      
+
 c--- nhep is the number of entries in this record
 c---    number of initial state particles = 2
 c---    number of  final  state particles = npart
 c---      additional particle for weight  = 1
 cc    nhep=npart+3
       nhep=npart+2
-    
+
 c--- isthep is the status code for each particle:
 c---    0 - null
 c---    1 - final state
@@ -39,7 +39,7 @@ c--- fictitious weight particle
 
 c--- For expandability, we will put the weight in as particle 1
 c---  and "STDHEP particle #" = "MCFM particle #" + 1
-c---  DSW, 31.07.2002. Use 
+c---  DSW, 31.07.2002. Use
       isthep(1)=21
       isthep(2)=21
 cc    isthep(3)=0
@@ -49,8 +49,8 @@ cc    enddo
       do n=3,nhep
          isthep(n)=1
       enddo
-    
-c--- idhep is the particle ID number, as per the PDG standard      
+
+c--- idhep is the particle ID number, as per the PDG standard
 c--- (g,d,u,s,c,b,t) = (21,1,2,3,4,5,6)
       if (ij .eq. 0) then
 cc      idhep(2)=21
@@ -97,7 +97,7 @@ cc    do nu=1,4
 cc      phep(nu,1)=0d0
 cc    enddo
 cc    phep(5,1)=wgt_jk
- 
+
 c--- note that all matrix elements are calculated for massless
 c--- particles, so that there will be a mismatch between p.p
 c--- and this assigned mass. The energy is thus re-scaled,
@@ -118,7 +118,7 @@ cc      do nu=1,3
 cc        phep(nu,n)=p(n-1,nu)
 cc      enddo
 c--- here's the re-scaling
-cc      phep(4,n)=dsqrt(p(n-1,4)**2+mass**2)      
+cc      phep(4,n)=dsqrt(p(n-1,4)**2+mass**2)
 cc    enddo
 
       do n=1,nhep
@@ -137,22 +137,22 @@ cc    enddo
           phep(nu,n)=p(n,nu)
         enddo
 c--- here's the re-scaling
-        phep(4,n)=dsqrt(p(n,4)**2+mass**2)      
+        phep(4,n)=dsqrt(p(n,4)**2+mass**2)
       enddo
-  
 
-    
+
+
 c--- vhep(1..4) is vertex information, zero here
       do n=1,nhep
         do nu=1,4
           vhep(nu,n)=0d0
         enddo
       enddo
-             
+
 c--- write-out common block (to unit 6) for checking, if necessary
 c     call write_stdhep(6)
 c     pause
-            
+
       return
       end
-      
+

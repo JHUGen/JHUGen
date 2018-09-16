@@ -1,8 +1,8 @@
       subroutine qq_Hqq_g(p,msq)
-      implicit none 
+      implicit none
 c---Matrix element squared averaged over initial colors and spins
 c
-c     q(-p1)+q(-p2) -->  H(p3,p4)+q(p5)+q(p6)+g(p7) 
+c     q(-p1)+q(-p2) -->  H(p3,p4)+q(p5)+q(p6)+g(p7)
 c                           |
 c                           |
 c                           |
@@ -23,7 +23,7 @@ c                           ---> b(p3)+bbar(p4)
       double precision msqx(fn:nf,fn:nf,fn:nf,fn:nf)
       common/msq_all/msqx
       logical includeall
-      
+
       integer,parameter::pn(-nf:nf)=(/-1,-2,-1,-2,-1,0,1,2,1,2,1/)
 
 c--- This flag decides whether or not to include all types of diagrams:
@@ -76,30 +76,30 @@ C q-q and qbar-qbar
       do m=1,nf
       do n=1,nf
 
-      if ((j.eq.m) .and. (k.eq.n)) then     
-      msqx(j,k,m,n)=msqx(j,k,m,n)+facqq*( 
+      if ((j.eq.m) .and. (k.eq.n)) then
+      msqx(j,k,m,n)=msqx(j,k,m,n)+facqq*(
      . +msqll*((L(j)*L(k))**2+(R(j)*R(k))**2)
      . +msqlr*((L(j)*R(k))**2+(R(j)*L(k))**2))
       endif
       if ((j.eq.n) .and. (k.eq.m)) then
-      msqx(j,k,m,n)=msqx(j,k,m,n)+facqq*( 
+      msqx(j,k,m,n)=msqx(j,k,m,n)+facqq*(
      . +msxll*((L(j)*L(k))**2+(R(j)*R(k))**2)
      . +msxlr*((L(j)*R(k))**2+(R(j)*L(k))**2))
       endif
       if ((j.eq.k) .and. (j.eq.m) .and. (j.eq.n)) then
-      msqx(j,k,m,n)=msqx(j,k,m,n)+facqq*( 
+      msqx(j,k,m,n)=msqx(j,k,m,n)+facqq*(
      . +msqzzin*((L(j)*L(k))**2+(R(j)*R(k))**2))
       endif
       if (  (pn(j)+pn(m) .eq. +3) .and. (pn(k)+pn(n) .eq. +3)
      ..and. (pn(j)+pn(k) .eq. +3) ) then
-      msqx(j,k,m,n)=msqx(j,k,m,n)+facqq*Vsq(j,-m)*Vsq(k,-n)*( 
+      msqx(j,k,m,n)=msqx(j,k,m,n)+facqq*Vsq(j,-m)*Vsq(k,-n)*(
      . +msxwzin*L(j)*L(k)+msxwl)
-      endif 
+      endif
       if (  (pn(j)+pn(n) .eq. +3) .and. (pn(k)+pn(m) .eq. +3)
      ..and. (pn(j)+pn(k) .eq. +3) ) then
-      msqx(j,k,m,n)=msqx(j,k,m,n)+facqq*Vsq(j,-n)*Vsq(k,-m)*( 
+      msqx(j,k,m,n)=msqx(j,k,m,n)+facqq*Vsq(j,-n)*Vsq(k,-m)*(
      . +msqwzin*L(j)*L(k)+msqwl)
-      endif 
+      endif
       if (j .eq. k) then
         msqx(j,k,m,n)=msqx(j,k,m,n)/2d0
       endif
@@ -119,29 +119,29 @@ C q-qb
       do k=-nf,-1
       do m=1,nf
       do n=-nf,-1
-      
+
       if ((j.eq.m) .and. (k.eq.n)) then
-      msqx(j,k,m,n)=msqx(j,k,m,n)+facqq*( 
+      msqx(j,k,m,n)=msqx(j,k,m,n)+facqq*(
      . +msqll*((L(j)*L(-k))**2+(R(j)*R(-k))**2)
      . +msqlr*((L(j)*R(-k))**2+(R(j)*L(-k))**2))
-       if (includeall) then       
-      msqx(j,k,m,n)=msqx(j,k,m,n)+facqq*Vsq(j,k)*Vsq(m,n)*( 
+       if (includeall) then
+      msqx(j,k,m,n)=msqx(j,k,m,n)+facqq*Vsq(j,k)*Vsq(m,n)*(
      . +msqwzin*L(j)*L(-k)+msqwl)
          if (j .eq. -k) then
-      msqx(j,k,m,n)=msqx(j,k,m,n)+facqq*( 
+      msqx(j,k,m,n)=msqx(j,k,m,n)+facqq*(
      . +msxll*((L(j)*L(j))**2+(R(j)*R(j))**2)
      . +msxlr*((L(j)*R(j))**2+(R(j)*L(j))**2)
      . +msqzzin*((L(j)*L(j))**2+(R(j)*R(j))**2))
          endif
        endif
       endif
-      
+
       if (   (pn(j)+pn(m) .eq. +3) .and. (pn(k)+pn(n) .eq. -3)
      . .and. (pn(j)+pn(k) .eq. pn(m)+pn(n)) ) then
       msqx(j,k,m,n)=msqx(j,k,m,n)+facqq*Vsq(j,-m)*Vsq(k,-n)*msxwl
        if (includeall) then
          if ((j .eq. -k) .and. (m .eq. -n)) then
-      msqx(j,k,m,n)=msqx(j,k,m,n)+facqq*( 
+      msqx(j,k,m,n)=msqx(j,k,m,n)+facqq*(
      . +msxll*((L(j)*L(m))**2+(R(j)*R(m))**2)
      . +msxlr*((L(j)*R(m))**2+(R(j)*L(m))**2)
      . +msxwzin*L(j)*L(m)*Vsq(j,-m)*Vsq(k,-n)
@@ -149,7 +149,7 @@ C q-qb
          endif
        endif
       endif
-      
+
       msqx(-j,-k,-m,-n)=msqx(j,k,m,n)
 
       enddo
@@ -165,29 +165,29 @@ C qb-q
       do k=1,nf
       do m=1,nf
       do n=-nf,-1
-      
+
       if ((j.eq.n) .and. (k.eq.m)) then
-      msqx(j,k,m,n)=msqx(j,k,m,n)+facqq*( 
+      msqx(j,k,m,n)=msqx(j,k,m,n)+facqq*(
      . +msqll*((L(-j)*L(k))**2+(R(-j)*R(k))**2)
      . +msqlr*((L(-j)*R(k))**2+(R(-j)*L(k))**2))
        if (includeall) then
-      msqx(j,k,m,n)=msqx(j,k,m,n)+facqq*Vsq(j,k)*Vsq(m,n)*( 
+      msqx(j,k,m,n)=msqx(j,k,m,n)+facqq*Vsq(j,k)*Vsq(m,n)*(
      . +msqwzin*L(-j)*L(k)+msqwl)
          if (j .eq. -k) then
-      msqx(j,k,m,n)=msqx(j,k,m,n)+facqq*( 
+      msqx(j,k,m,n)=msqx(j,k,m,n)+facqq*(
      . +msxll*((L(-j)*L(-j))**2+(R(-j)*R(-j))**2)
      . +msxlr*((L(-j)*R(-j))**2+(R(-j)*L(-j))**2)
      . +msqzzin*((L(-j)*L(-j))**2+(R(-j)*R(-j))**2))
          endif
        endif
       endif
-      
+
       if (   (pn(j)+pn(n) .eq. -3) .and. (pn(k)+pn(m) .eq. +3)
      . .and. (pn(j)+pn(k) .eq. pn(m)+pn(n)) ) then
       msqx(j,k,m,n)=msqx(j,k,m,n)+facqq*Vsq(j,-n)*Vsq(k,-m)*msxwl
        if (includeall) then
          if ((j .eq. -k) .and. (m .eq. -n)) then
-      msqx(j,k,m,n)=msqx(j,k,m,n)+facqq*( 
+      msqx(j,k,m,n)=msqx(j,k,m,n)+facqq*(
      . +msxll*((L(-j)*L(m))**2+(R(-j)*R(m))**2)
      . +msxlr*((L(-j)*R(m))**2+(R(-j)*L(m))**2)
      . +msxwzin*L(-j)*L(m)*Vsq(j,-n)*Vsq(k,-m)
@@ -195,7 +195,7 @@ C qb-q
          endif
        endif
       endif
-      
+
       msqx(-j,-k,-m,-n)=msqx(j,k,m,n)
 
       enddo
@@ -212,28 +212,28 @@ C q-g and qbar-g
       do m=1,nf
       do n=1,nf
 
-      if ((j.eq.m) .and. (n.gt.0)) then     
-      msqx(j,k,m,n)=msqx(j,k,m,n)+facqg*( 
+      if ((j.eq.m) .and. (n.gt.0)) then
+      msqx(j,k,m,n)=msqx(j,k,m,n)+facqg*(
      . +msqll*((L(j)*L(n))**2+(R(j)*R(n))**2)
      . +msqlr*((L(j)*R(n))**2+(R(j)*L(n))**2))
       endif
       if ((j.eq.n) .and. (m.gt.0)) then
-      msqx(j,k,m,n)=msqx(j,k,m,n)+facqg*( 
+      msqx(j,k,m,n)=msqx(j,k,m,n)+facqg*(
      . +msxll*((L(j)*L(m))**2+(R(j)*R(m))**2)
      . +msxlr*((L(j)*R(m))**2+(R(j)*L(m))**2))
       endif
       if ((j.eq.m) .and. (j.eq.n) .and. (m.gt.0)) then
-      msqx(j,k,m,n)=msqx(j,k,m,n)+facqg*( 
+      msqx(j,k,m,n)=msqx(j,k,m,n)+facqg*(
      . +msqzzin*((L(j)*L(m))**2+(R(j)*R(m))**2))
       endif
       if (  (pn(j)+pn(m) .eq. +3) .and. (pn(m)+pn(n) .eq. +3)) then
-      msqx(j,k,m,n)=msqx(j,k,m,n)+facqg*Vsq(j,-m)*Vsum(n)*( 
+      msqx(j,k,m,n)=msqx(j,k,m,n)+facqg*Vsq(j,-m)*Vsum(n)*(
      . +msxwzin*L(j)*L(m)+msxwl)
-      endif 
+      endif
       if (  (pn(j)+pn(n) .eq. +3) .and. (pn(m)+pn(n) .eq. +3)) then
-      msqx(j,k,m,n)=msqx(j,k,m,n)+facqg*Vsq(j,-n)*Vsum(m)*( 
+      msqx(j,k,m,n)=msqx(j,k,m,n)+facqg*Vsq(j,-n)*Vsum(m)*(
      . +msqwzin*L(j)*L(n)+msqwl)
-      endif 
+      endif
       if (m .eq. n) then
         msqx(j,k,m,n)=msqx(j,k,m,n)/2d0
       endif
@@ -253,28 +253,28 @@ C g-q and g-qbar
       do m=1,nf
       do n=1,nf
 
-      if ((k.eq.n) .and. (m.gt.0)) then     
-      msqx(j,k,m,n)=msqx(j,k,m,n)+facqg*( 
+      if ((k.eq.n) .and. (m.gt.0)) then
+      msqx(j,k,m,n)=msqx(j,k,m,n)+facqg*(
      . +msqll*((L(k)*L(m))**2+(R(k)*R(m))**2)
      . +msqlr*((L(k)*R(m))**2+(R(k)*L(m))**2))
       endif
       if ((k.eq.m) .and. (n.gt.0)) then
-      msqx(j,k,m,n)=msqx(j,k,m,n)+facqg*( 
+      msqx(j,k,m,n)=msqx(j,k,m,n)+facqg*(
      . +msxll*((L(k)*L(n))**2+(R(k)*R(n))**2)
      . +msxlr*((L(k)*R(n))**2+(R(k)*L(n))**2))
       endif
       if ((k.eq.m) .and. (k.eq.n) .and. (m.gt.0)) then
-      msqx(j,k,m,n)=msqx(j,k,m,n)+facqg*( 
+      msqx(j,k,m,n)=msqx(j,k,m,n)+facqg*(
      . +msqzzin*((L(k)*L(m))**2+(R(k)*R(m))**2))
       endif
       if (  (pn(k)+pn(n) .eq. +3) .and. (pn(m)+pn(n) .eq. +3)) then
-      msqx(j,k,m,n)=msqx(j,k,m,n)+facqg*Vsq(k,-n)*Vsum(m)*( 
+      msqx(j,k,m,n)=msqx(j,k,m,n)+facqg*Vsq(k,-n)*Vsum(m)*(
      . +msxwzin*L(k)*L(n)+msxwl)
-      endif 
+      endif
       if (  (pn(k)+pn(m) .eq. +3) .and. (pn(m)+pn(n) .eq. +3)) then
-      msqx(j,k,m,n)=msqx(j,k,m,n)+facqg*Vsq(k,-m)*Vsum(n)*( 
+      msqx(j,k,m,n)=msqx(j,k,m,n)+facqg*Vsq(k,-m)*Vsum(n)*(
      . +msqwzin*L(k)*L(m)+msqwl)
-      endif 
+      endif
       if (m .eq. n) then
         msqx(j,k,m,n)=msqx(j,k,m,n)/2d0
       endif
@@ -292,7 +292,7 @@ C g-q and g-qbar
 c--- add in to total for msq(j,k)
 c        if (m.ge.n) then
 c          msq(j,k) = msq(j,k)+msqx(j,k,m,n)
-c        endif 
+c        endif
 c        if     ((j .gt. 0) .and. (k .lt. 0)) then
 c          if (m.ge.n) msq(j,k) = msq(j,k)+msqx(j,k,m,n)
 c        elseif ((j .lt. 0) .and. (k .gt. 0)) then
@@ -305,7 +305,7 @@ c          if ((pn(j).eq.pn(n)) .and. (pn(k).eq.pn(m)))
 c     .                msq(j,k) = msq(j,k)+msqx(j,k,m,n)
 c        else
 c          if (m.ge.n) msq(j,k) = msq(j,k)+msqx(j,k,m,n)
-c        endif 
+c        endif
         if ((j.eq.m) .and. (k .eq. n)) then
           msq(j,k) = msq(j,k)+msqx(j,k,m,n)
         endif
@@ -371,7 +371,7 @@ c--- Obtain (26) radiation from (15) by 1<->2, 5<->6.
       msqinterfx_a=msq_ginterfx(i1,i2,i5,i6,i7)
       msqinterfx_b=msq_ginterfx(i2,i1,i6,i5,i7)
 
-c--- catch the unwanted diagrams for the gluon-quark processes     
+c--- catch the unwanted diagrams for the gluon-quark processes
       if (i7 .eq. 1) then
         msqll_b=0d0
         msqlr_b=0d0
@@ -388,7 +388,7 @@ c--- catch the unwanted diagrams for the gluon-quark processes
         msqinterfx_b=0d0
         msqll_c=0d0
       endif
-     
+
       zll=msqll_a/(propz(s157)*propz(s26))**2
      .   +msqll_b/(propz(s267)*propz(s15))**2
 
@@ -438,7 +438,7 @@ c--- catch the unwanted diagrams for the gluon-quark processes
 
       return
       end
-      
+
       double precision function msq_gopphel(j1,j2,j5,j6,j7)
       implicit none
       integer j1,j2,j5,j6,j7
@@ -455,7 +455,7 @@ c--- catch the unwanted diagrams for the gluon-quark processes
      .    + 2d0*s(j1,j6)*s(j2,j7)/s(j5,j7)
      .    + 2d0/s(j1,j7)*s(j2,j5)*s(j6,j7)
      .    - 2d0*s(j2,j5)*s(j5,j6)/s(j5,j7)
-      
+
       return
       end
 

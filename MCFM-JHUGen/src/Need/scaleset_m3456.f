@@ -6,7 +6,8 @@ c--- invariant mass of particles 3, 4, 5 and 6
       include 'process.f'
       double precision p(mxpart,4),mu0
 
-      if((case .eq. 'WWqqbr') .or.
+      if(
+     &   (case .eq. 'WWqqbr') .or.
      &   (case .eq. 'WWnpol') .or.
      &   (case .eq. 'WW_jet') .or.
      &   (case .eq. 'WZbbar') .or.
@@ -41,17 +42,21 @@ c--- invariant mass of particles 3, 4, 5 and 6
      &   (case .eq. 'ggVVbx') .or.
      &   (case .eq. 'ggZZ4l') .or.
      &   (case .eq. 'ggZZbx') .or.
-     &   (case .eq. 'HmZZ4l')) then 
+     &   (case .eq. 'HmZZ4l') .or.
+     &   (case .eq. 'qqZZqq') .or.
+     &   (case .eq. 'qqWWqq') .or.
+     &   (case .eq. 'qqVVqq')
+     & ) then
         mu0=(p(3,4)+p(4,4)+p(5,4)+p(6,4))**2
      &     -(p(3,1)+p(4,1)+p(5,1)+p(6,1))**2
      &     -(p(3,2)+p(4,2)+p(5,2)+p(6,2))**2
-     &     -(p(3,3)+p(4,3)+p(5,3)+p(6,3))**2       
+     &     -(p(3,3)+p(4,3)+p(5,3)+p(6,3))**2
         mu0=dsqrt(dabs(mu0))
       else
         write(6,*)'dynamicscale m(3456) not supported for this process.'
         stop
       endif
-      
+
       return
       end
-      
+

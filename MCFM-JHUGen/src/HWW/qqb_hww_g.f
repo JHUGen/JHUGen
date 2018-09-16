@@ -3,7 +3,7 @@
 c----NLO matrix element for H production
 c----in the heavy quark (mt=Infinity) limit.
 C----averaged over initial colours and spins
-c     g(-p1)+g(-p2)-->H -->  W^- (e^-(p5)+nubar(p6)) 
+c     g(-p1)+g(-p2)-->H -->  W^- (e^-(p5)+nubar(p6))
 c                          + W^+ (nu(p3)+e^+(p4))+g(p7)
       include 'constants.f'
       include 'masses.f'

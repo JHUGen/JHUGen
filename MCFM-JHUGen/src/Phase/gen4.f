@@ -30,8 +30,8 @@ c      tau=(one-taumin)*r(9)**2+taumin
 c      xjac=2*r(9)*(one-taumin)
 
       x1mx2=two*r(10)-one
-      surd=dsqrt(x1mx2**2+four*tau) 
-           
+      surd=dsqrt(x1mx2**2+four*tau)
+
       xx(1)=half*(+x1mx2+surd)
       xx(2)=half*(-x1mx2+surd)
 !      write(*,*) r(1),r(9),r(10)
@@ -46,10 +46,10 @@ c        xx(2)=1d0
 c        xjac=1d0
 c      endif
 
-      if   ((xx(1) .gt. 1d0) 
+      if   ((xx(1) .gt. 1d0)
      & .or. (xx(2) .gt. 1d0)
      & .or. (xx(1) .lt. xmin)
-     & .or. (xx(2) .lt. xmin)) return 1 
+     & .or. (xx(2) .lt. xmin)) return 1
 
       p1(4)=-xx(1)*sqrts*half
       p1(1)=zip
@@ -65,13 +65,13 @@ c      endif
      . .or.(case .eq. 'bq_tpq')) then
       call phase41(r,p1,p2,p3,p4,p5,p6,pswt,*999)
       elseif (
-     .      (case .eq. 'qqttbb') 
-     . .or. (case .eq. 'qqttgg'))  then  
+     .      (case .eq. 'qqttbb')
+     . .or. (case .eq. 'qqttgg'))  then
       call phase4m(r,p1,p2,p3,p4,p5,p6,pswt,*999)
-      elseif (case .eq. 'vlchk4')  then  
+      elseif (case .eq. 'vlchk4')  then
       call phase4(r,p1,p2,p3,p4,p5,p6,pswt,*999)
       else
-      call phase4(r,p1,p2,p3,p4,p5,p6,pswt,*999) 
+      call phase4(r,p1,p2,p3,p4,p5,p6,pswt,*999)
       endif
 
       do nu=1,4
@@ -82,7 +82,7 @@ c      endif
       p(5,nu)=p5(nu)
       p(6,nu)=p6(nu)
       p(7,nu)=0d0
-      enddo 
+      enddo
 
       if (interference) then
         if (icount .eq. 1) then
@@ -93,11 +93,11 @@ c      endif
           do nu=1,4
             p(4,nu)=p6(nu)
             p(6,nu)=p4(nu)
-          enddo 
+          enddo
           icount=icount+1
         endif
       endif
-      
+
       wt4=xjac*pswt
       if (debug) write(6,*) 'wt4 in gen4',wt4
       return

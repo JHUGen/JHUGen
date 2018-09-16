@@ -2,7 +2,7 @@
       implicit none
 C--- Expresssion of Eq. (19) of Badger and Glover, hep-ph/0607139v2
 c--- Note that the corresponding phigggg-dagger amplitude is zero (Eq.(24))
-c--- so that this is the full cut-constructible result for the Higgs 
+c--- so that this is the full cut-constructible result for the Higgs
       include 'constants.f'
       include 'sprods_com.f'
       include 'scprods_com.f'
@@ -28,7 +28,7 @@ c--- set up 's-comma' products
       sc(4,2)=s(j4,j1)+s(j4,j2)+s(j1,j2)
       sc(4,3)=sc(1,4) !s(j1,j2)+s(j1,j3)+s(j1,j4)+s(j2,j3)+s(j2,j4)+s(j3,j4)
       sc(4,4)=zip
-      
+
       A1ggggmmmmCC=czip
       do i=1,4
 c--- NOTE: Arguments of F41m , F42m have been changed to be consistent
@@ -41,7 +41,7 @@ c---                          F42me(s,t;Psq,Qsq) -> F42me(Psq,Qsq;s,t)
      . -0.5d0*F41m(sc(ii(i),ii(i+2)),sc(ii(i),ii(i+1)),
      .                               sc(ii(i+1),ii(i+2)))
       enddo
-      A1ggggmmmmCC=A0phiggggmmmm(j1,j2,j3,j4,za,zb)*A1ggggmmmmCC 
+      A1ggggmmmmCC=A0phiggggmmmm(j1,j2,j3,j4,za,zb)*A1ggggmmmmCC
       return
       end
 
@@ -67,7 +67,7 @@ c--- Note: overall factor of (fourpi)**2 removed, c.f. Eq. (23)
       return
       end
 
-      
+
       double complex function A1ggggmmmmsub(j1,j2,j3,j4,za,zb)
       implicit none
 C--- Expresssion of Eq. (25) of Badger and Glover, hep-ph/0607139v2

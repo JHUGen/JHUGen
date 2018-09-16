@@ -19,7 +19,7 @@
       double precision mqqb,fac
       double complex m(2),ml1(2),ml2(2),ml3,ml4(2)
       double complex a6treeg1,a61g1lc,a61g1slc,a61g1nf,a63g1
-      integer,parameter:: 
+      integer,parameter::
      & i1(2)=(/1,4/),i2(2)=(/2,3/),i3(2)=(/3,2/),
      & i4(2)=(/4,1/),i5(2)=(/6,5/),i6(2)=(/5,6/)
       character*9,parameter:: st1(2,2)=reshape(
@@ -28,8 +28,8 @@
      & (/'q+qb-g+g+','q+qb-g+g-','q+qb-g-g+','q+qb-g-g-'/),(/2,2/))
       character*9,parameter:: st3(2,2)=reshape(
      & (/'q+qb-g-g-','q+qb-g-g+','q+qb-g+g-','q+qb-g+g+'/),(/2,2/))
-      
-      
+
+
 C ---final matrix element squared is needed for left-handed
 c--  quark and lepton line helicity
 
@@ -45,7 +45,7 @@ c--- no extra factor here since colour algebra is already done in (2.12)
         h(2)=h2
         h(3)=h3
         do j=1,2
-        if (hq .eq. 1) then        
+        if (hq .eq. 1) then
         m(j)=  a6treeg1(st1(3-h(i2(j)),3-h(i3(j))),
      .     i1(1),i2(j),i3(j),i4(1),i6(lh),i5(lh),zb,za)
         if (colourchoice .le. 2) then
@@ -84,7 +84,7 @@ c--- no extra factor here since colour algebra is already done in (2.12)
         else
         ml3=a63g1(st3(h2,h3),1,4,2,3,i5(lh),i6(lh),za,zb)
         endif
-        endif       
+        endif
 
       if     (colourchoice .eq. 1) then
         mqqb=mqqb+fac*(Dble(Dconjg(m(1))*ml1(1))
@@ -116,11 +116,11 @@ c--- no extra factor here since colour algebra is already done in (2.12)
      .     +ml4(2)/xn
      .     -(ml4(1)+ml4(2))/xn**3)))
       endif
-     
+
       enddo
       enddo
 
-         
+
       return
       end
-      
+

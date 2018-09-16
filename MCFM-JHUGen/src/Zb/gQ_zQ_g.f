@@ -46,9 +46,9 @@ c      double complex qbq_a(2,2,2),qbq_b(2,2,2)
       double complex qq_a(2,2,2),qq_b(2,2,2)
 
       double complex qbqb_a(2,2,2),qbqb_b(2,2,2)
-      
+
       common/isub/isub
-      
+
       integer,parameter::swap(2)=(/2,1/)
 
       do j=-nf,nf
@@ -74,12 +74,12 @@ c--- calculate 2-quark, 2-gluon amplitudes
         enddo
         enddo
       endif
-      
+
       if (isub .eq. 2) then
 c--- NB this is the matrix element for gg->Z qb(5) q(6)
         call z2jetsq(5,6,3,4,1,2,za,zb,ggZqbq2)
       endif
-      
+
 c--- Add the overall factor and average over colour, spins
       fac=v*xn/four*(esq*gsq)**2
       do pq=1,2
@@ -91,19 +91,19 @@ c--- Add the overall factor and average over colour, spins
           qbgZqbg2(pq,pl)= aveqg*fac*qbgZqbg2(pq,pl)
         endif
         if (isub .eq. 2) then
-          ggZqbq2(pq,pl) = avegg*fac*ggZqbq2(pq,pl) 
+          ggZqbq2(pq,pl) = avegg*fac*ggZqbq2(pq,pl)
         endif
       enddo
       enddo
 
 c--- now calculate the four quark amplitudes
-     
+
       if ((isub .eq. 1) .or. (isub .eq. 2)) then
-c--- qR->qR (i.e. Q+q -> Q+q) 
+c--- qR->qR (i.e. Q+q -> Q+q)
         call ampqqb_qqb(1,5,6,2,qR_a,qR_b)
-c--- Rq->qR (i.e. q+Q -> Q+q) 
+c--- Rq->qR (i.e. q+Q -> Q+q)
         call ampqqb_qqb(1,6,5,2,Rq_a,Rq_b)
-     
+
 c--- qbRb->qbRb (i.e. Qb+qb -> Qb+qb)
         call ampqqb_qqb(5,1,2,6,qbRb_a,qbRb_b)
 c--- Rbqb->qbRb (i.e. qb+Qb -> Qb+qb)
@@ -122,13 +122,13 @@ c instead of calling ampqqb_qqb(6,1,2,5,qbqb_a,qbqb_b)
         enddo
         enddo
       endif
-      
+
       if (isub .eq. 1) then
-c--- qRb->qRb (i.e. Q+qb -> Q+qb) 
+c--- qRb->qRb (i.e. Q+qb -> Q+qb)
         call ampqqb_qqb(1,5,2,6,qRb_a,qRb_b)
-c--- Rqb->qbR (i.e. q+Qb -> Qb+q) 
+c--- Rqb->qbR (i.e. q+Qb -> Qb+q)
         call ampqqb_qqb(1,6,2,5,Rqb_a,Rqb_b)
-     
+
 c--- qR->qR
 c instead of calling ampqqb_qqb(1,5,6,2,qR_a,qR_b)
 c      do j1=1,2
@@ -157,8 +157,8 @@ c      enddo
 c      enddo
 
 c--- qqb->qqb
-        call ampqqb_qqb(1,2,5,6,qqb_a,qqb_b)      
-      
+        call ampqqb_qqb(1,2,5,6,qqb_a,qqb_b)
+
 c      call ampqqb_qqb(2,1,6,5,qbq_a,qbq_b)
 c      do j1=1,2
 c      do j2=1,2
@@ -172,8 +172,8 @@ c      enddo
 c      enddo
 c      enddo
 c      pause
-      
-      
+
+
 c--- qbq->qbq
 c instead of calling ampqqb_qqb(2,1,6,5,qbq_a,qbq_b)
 c        do j1=1,2
@@ -185,8 +185,8 @@ c        enddo
 c        enddo
 c        enddo
       endif
-      
-      faclo=4d0*V*gsq**2*esq**2*aveqq 
+
+      faclo=4d0*V*gsq**2*esq**2*aveqq
 
 c--- sum up the helicity amplitudes for the 2-quark, 2-gluon pieces
       do j=-flav,flav,flav
@@ -282,7 +282,7 @@ c--- q-q case
             a222=(Q(j)*q1+R(j)*r1*prop)*Rq_a(2,2,2)
      .          +(Q(k)*q1+R(k)*r1*prop)*Rq_b(2,2,2)
             endif
-            
+
             mqq(j,k)=
      .      +faclo*(abs(a111)**2+abs(a112)**2+abs(a221)**2+abs(a222)**2
      .             +abs(a122)**2+abs(a212)**2+abs(a121)**2+abs(a211)**2)
@@ -373,7 +373,7 @@ c--- qb-qb case
             a222=(Q(-j)*q1+R(-j)*r1*prop)*Rbqb_a(2,2,2)
      .          +(Q(-k)*q1+R(-k)*r1*prop)*Rbqb_b(2,2,2)
             endif
-            
+
             mqq(j,k)=
      .      +faclo*(abs(a111)**2+abs(a112)**2+abs(a221)**2+abs(a222)**2
      .             +abs(a122)**2+abs(a212)**2+abs(a121)**2+abs(a211)**2)
@@ -424,10 +424,10 @@ c            goto 20
 
         elseif ((j .gt. 0) .and. (k .lt. 0)) then
 c--- q-qb case
-          if (j .ne. -k) then 
+          if (j .ne. -k) then
             if ((j .ne. flav) .and. (k .ne. -flav)) goto 20
             if (isub .eq. 2) goto 20
-            
+
             if (j .eq. flav) then
             a111=(Q(+j)*q1+L(+j)*l1*prop)*qRb_a(1,1,1)
      .          +(Q(-k)*q1+L(-k)*l1*prop)*qRb_b(1,1,1)
@@ -465,7 +465,7 @@ c--- q-qb case
             a212=(Q(+j)*q1+R(+j)*r1*prop)*Rqb_a(2,1,2)
      .          +(Q(-k)*q1+L(-k)*r1*prop)*Rqb_b(2,1,2)
             endif
-            
+
             mqq(j,k)=
      .      +faclo*(abs(a111)**2+abs(a112)**2+abs(a221)**2+abs(a222)**2
      .             +abs(a122)**2+abs(a212)**2+abs(a121)**2+abs(a211)**2)
@@ -522,7 +522,7 @@ c     .                +faclo*
 c     .        (abs(a111)**2+abs(a112)**2+abs(a221)**2+abs(a222)**2
 c     .        +abs(a122)**2+abs(a212)**2+abs(a121)**2+abs(a211)**2)
             endif
-           
+
 c            if (isub .eq. 2) then
 c              b111=(Q(+j)*q1+L(+j)*l1*prop)*qqb_a(1,1,1)
 c     .            +(Q(flav)*q1+L(flav)*l1*prop)*qqb_b(1,1,1)
@@ -539,7 +539,7 @@ c     .            +(Q(flav)*q1+R(flav)*r1*prop)*qqb_b(1,2,2)
 c              b211=(Q(+j)*q1+R(+j)*l1*prop)*qqb_a(2,1,1)
 c     .            +(Q(flav)*q1+L(flav)*l1*prop)*qqb_b(2,1,1)
 c              b212=(Q(+j)*q1+R(+j)*r1*prop)*qqb_a(2,1,2)
-c     .            +(Q(flav)*q1+L(flav)*r1*prop)*qqb_b(2,1,2)              
+c     .            +(Q(flav)*q1+L(flav)*r1*prop)*qqb_b(2,1,2)
 c              tanni=faclo*(
 c     .              abs(b111)**2+abs(b112)**2+abs(b221)**2+abs(b222)**2
 c     .             +abs(b122)**2+abs(b212)**2+abs(b121)**2+abs(b211)**2)
@@ -547,13 +547,13 @@ c              mqq(j,k)=mqq(j,k)+tanni
 c            endif
 
           endif
-          
+
         elseif ((j .lt. 0) .and. (k .gt. 0)) then
 C---qb-q case
           if (j .ne. -k) then
             if ((j .ne. -flav) .and. (k .ne. flav)) goto 20
             if (isub .eq. 2) goto 20
-            
+
             if (k .eq. flav) then
             a111=(Q(-j)*q1+L(-j)*l1*prop)*Rbq_a(1,1,1)
      .          +(Q(+k)*q1+L(+k)*l1*prop)*Rbq_b(1,1,1)
@@ -571,7 +571,7 @@ C---qb-q case
      .          +(Q(+k)*q1+L(+k)*r1*prop)*Rbq_b(2,1,2)
             a222=(Q(-j)*q1+R(-j)*r1*prop)*Rbq_a(2,2,2)
      .          +(Q(+k)*q1+R(+k)*r1*prop)*Rbq_b(2,2,2)
-            else            
+            else
             a111=(Q(-j)*q1+L(-j)*l1*prop)*qbR_a(1,1,1)
      .          +(Q(+k)*q1+L(+k)*l1*prop)*qbR_b(1,1,1)
             a121=(Q(-j)*q1+L(-j)*l1*prop)*qbR_a(1,2,1)
@@ -589,7 +589,7 @@ C---qb-q case
             a222=(Q(-j)*q1+R(-j)*r1*prop)*qbR_a(2,2,2)
      .          +(Q(+k)*q1+R(+k)*r1*prop)*qbR_b(2,2,2)
             endif
-            
+
             mqq(j,k)=
      .      +faclo*(abs(a111)**2+abs(a112)**2+abs(a221)**2+abs(a222)**2
      .             +abs(a122)**2+abs(a212)**2+abs(a121)**2+abs(a211)**2)
@@ -642,7 +642,7 @@ c     .                +faclo*(
 c     .        +abs(b111)**2+abs(b112)**2+abs(b221)**2+abs(b222)**2
 c     .        +abs(b122)**2+abs(b212)**2+abs(b121)**2+abs(b211)**2)
             endif
-            
+
 c            if (isub .eq. 2) then
 c              b111=(Q(-j)*q1+L(-j)*l1*prop)*qbq_a(1,1,1)
 c     .            +(Q(flav)*q1+L(flav)*l1*prop)*qbq_b(1,1,1)
@@ -667,19 +667,19 @@ c              mqq(j,k)=mqq(j,k)+tanni
 c            endif
 
           endif
-            
+
         endif
-          
-   20 continue   
-          
+
+   20 continue
+
       msq(j,k)=msq(j,k)+mqq(j,k)
       enddo
       enddo
 
       return
       end
-          
-    
 
-      
-     
+
+
+
+

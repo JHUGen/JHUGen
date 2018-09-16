@@ -18,9 +18,9 @@ c--- By R. Frederix, July 16, 2008.
 
 c color matrix:
 c      integer CF(3,3)
-c      DATA (CF(i,1  ),i=1  ,3  ) /     16,    0,    0/    
-c      DATA (CF(i,2  ),i=1  ,3  ) /      0,   16,   -2/    
-c      DATA (CF(i,3  ),i=1  ,3  ) /      0,   -2,   16/    
+c      DATA (CF(i,1  ),i=1  ,3  ) /     16,    0,    0/
+c      DATA (CF(i,2  ),i=1  ,3  ) /      0,   16,   -2/
+c      DATA (CF(i,3  ),i=1  ,3  ) /      0,   -2,   16/
 
 
       t1=7
@@ -66,7 +66,7 @@ c--- should receive a factor of gsq_L, all others should be gsq_H
       gsq_L=fourpi*as_L
       gsq_H=fourpi*as_H
 
-      
+
       me=0d0
       do i=1,2
          do j=1,2

@@ -52,7 +52,7 @@ C----set all elements to zero
         call singleatoponshell(7,1,2,p,0,mgqb)
         call adecay(p,3,4,5,manti)
       endif
-      
+
       mtotqg(:,:,:)=czip
       mtotgq(:,:,:)=czip
       mtotqbg(:,:,:)=czip
@@ -75,7 +75,7 @@ C----set all elements to zero
       enddo
       enddo
       enddo
-      
+
       else
 
       do hb=1,2
@@ -96,7 +96,7 @@ C----set all elements to zero
       enddo
 
       endif
-      
+
 
       prop=dcmplx(zip,mt*twidth)
       fac=V*xn*gwsq**4*fourpi*as_H/abs(prop)**2

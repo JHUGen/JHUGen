@@ -19,14 +19,14 @@
       include 'flags.f'
       double precision z,p(mxpart,4),dot
       double precision xl12,xl15,xl16,xl25,xl26,xl56
-      double precision 
+      double precision
      .                 ii_qq,ii_qg,ii_gq,ii_gg,
      .                 if_qq,if_gg,
      .                 fi_qq,fi_gg,
      .                 ff_qq,ff_gg
       double precision tempgq,tempqg
       integer is
-      
+
       xl12=dlog(+two*dot(p,1,2)/musq)
       xl15=dlog(-two*dot(p,1,5)/musq)
       xl16=dlog(-two*dot(p,1,6)/musq)
@@ -36,8 +36,8 @@
 
 ************************************************************************
 *     Contributions from QQGG matrix elements                          *
-************************************************************************            
-      if (Gflag) then      
+************************************************************************
+      if (Gflag) then
 c--- QUARK-ANTIQUARK contributions
       if ((colourchoice .eq. 1) .or. (colourchoice .eq. 0)) then
       do is=1,3
@@ -222,7 +222,7 @@ c--- ason4pi*xn*(ff_qq(z,xl56,2) + ff_gg(z,xl56,2)/2d0) * (1)
       R2(q,g,q,1,is)=R2(a,g,q,1,is)
       R2(q,g,q,2,is)=R2(a,g,q,2,is)
       enddo
-      
+
 c--- GLUON-QUARK contributions
 c--- additional final-final pieces that are 0:
 c--- ason4pi*xn*(ff_qq(z,xl56,2) + ff_gg(z,xl56,2)/2d0) * (1)
@@ -276,7 +276,7 @@ c--- ason4pi*xn*(ff_qq(z,xl56,2) + ff_gg(z,xl56,2)/2d0) * (1)
       R1(q,g,q,1,is)=R1(a,g,q,1,is)
       R1(q,g,q,2,is)=R1(a,g,q,2,is)
       enddo
-      
+
 c--- GLUON-ANTIQUARK contributions
 c--- additional final-final pieces that are 0:
 c--- ason4pi*xn*(ff_qq(z,xl56,2) + ff_gg(z,xl56,2)/2d0) * (1)
@@ -284,7 +284,7 @@ c--- ason4pi*xn*(ff_qq(z,xl56,2) + ff_gg(z,xl56,2)/2d0) * (1)
       R1(g,g,a,1,is)= R1(g,g,q,2,is)
       R1(g,g,a,2,is)= R1(g,g,q,1,is)
       R1(g,g,a,0,is)= R1(g,g,q,0,is)
-      R2(a,a,g,1,is)= R2(q,q,g,2,is)    
+      R2(a,a,g,1,is)= R2(q,q,g,2,is)
       R2(a,a,g,2,is)= R2(q,q,g,1,is)
       R2(a,a,g,0,is)= R2(q,q,g,0,is)
       R1(q,g,a,0,is)= R1(a,g,q,0,is)
@@ -312,8 +312,8 @@ c--- ason4pi*xn*(ff_qq(z,xl56,2) + ff_gg(z,xl56,2)/2d0) * (1)
       R2(a,g,a,1,is)= R2(q,g,q,1,is)
       R2(a,g,a,2,is)= R2(q,g,q,2,is)
       enddo
-       
-            
+
+
 C--- off-diagonal qflag->gflag pieces
 
       do is=1,3
@@ -362,11 +362,11 @@ C--- off-diagonal qflag->gflag pieces
 
       enddo
 
-      endif 
+      endif
 
 ************************************************************************
 *     Contributions from QQQQ matrix elements                          *
-************************************************************************            
+************************************************************************
       if (Qflag) then
 c--- QUARK-QUARK contributions
       do is=1,3
@@ -412,7 +412,7 @@ c--- ANTIQUARK-ANTIQUARK contributions
       R2(a,a,a,0,is)=R2(q,q,q,0,is)
       R2(a,a,a,1,is)=R2(q,q,q,1,is)
       R2(a,a,a,2,is)=R2(q,q,q,2,is)
-      
+
       enddo
 
 c--- QUARK-ANTIQUARK contributions
@@ -449,7 +449,7 @@ c--- QUARK-ANTIQUARK contributions
      . +ff_qq(z,xl56,is)*(xn-two/xn))
 
       enddo
-      
+
 c--- ANTIQUARK-QUARK contributions
       do is=1,3
       R1(a,a,q,0,is)=ason4pi*(

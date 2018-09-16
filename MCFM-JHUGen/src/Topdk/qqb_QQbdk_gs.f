@@ -6,20 +6,20 @@
 *     averaged over initial colors and spins                           *
 *     for the process                                                  *
 *                                                                      *
-*     q(-p1) +qbar(-p2)=bbar(p6)+e-(p7)+nubar(p8)+nu(p3)+e+(p4)+b(p5)  * 
+*     q(-p1) +qbar(-p2)=bbar(p6)+e-(p7)+nubar(p8)+nu(p3)+e+(p4)+b(p5)  *
 *                                                                      *
 *     Top is kept strictly on-shell although all spin correlations     *
 *     are retained.                                                    *
 ************************************************************************
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'ptilde.f'
       include 'qqgg.f'
-     
+
       integer j,k
 c --- remember: nd will count the dipoles
       integer nd
-c--- slightly obtuse notation, to simplify declaration lines      
+c--- slightly obtuse notation, to simplify declaration lines
       double precision p(mxpart,4),msqc(maxd,fn:nf,fn:nf)
       double precision
      & msq15_2(fn:nf,fn:nf),msq25_1(fn:nf,fn:nf),
@@ -69,7 +69,7 @@ c--- slightly obtuse notation, to simplify declaration lines
 
       external qqb_QQbdk,qqb_QQbdk_gvec,donothing_gvec
 
-      
+
       qqproc=.true.
       qgproc=.false.
       gqproc=.false.
@@ -79,13 +79,13 @@ c--- slightly obtuse notation, to simplify declaration lines
 
 c-- initialize the matrix elements to zero
       do j=-nf,nf
-      do k=-nf,nf      
+      do k=-nf,nf
       do nd=1,ndmax
         msqc(nd,j,k)=0d0
       enddo
       enddo
       enddo
-      
+
 
 c--initial-initial
       call dips_mass(1,p,1,5,2,sub15_2,sub15_2v,msq15_2,msq15_2v,
@@ -109,7 +109,7 @@ c--initial final
      . qqb_QQbdk,qqb_QQbdk_gvec)
       call storedip_mass(m25_4,m25_4v)
 
-c--final-initial 
+c--final-initial
       call dips_mass(7,p,3,5,1,sub35_1,sub35_1v,msq35_1,msq35_1v,
      . qqb_QQbdk,donothing_gvec)
       call storedip_mass(m35_1,m35_1v)
@@ -158,7 +158,7 @@ c--- fill the dipole contributions
      .            +(+m15_2v(1,j,k)+m15_2v(2,j,k))*sub15_2v*xn
       msqc(2,j,k)= (+m25_1(1,j,k)+m25_1(2,j,k))*sub25_1(gg)*xn
      .            +(+m25_1v(1,j,k)+m25_1v(2,j,k))*sub25_1v*xn
-      
+
       msqc(3,j,k)= (+m15_3(2,j,k)+m15_3(0,j,k))*sub15_3(gg)*xn
      .            +(+m15_3v(2,j,k)+m15_3v(0,j,k))*sub15_3v*xn
       msqc(4,j,k)= (+m25_3(1,j,k)+m25_3(0,j,k))*sub25_3(gg)*xn
@@ -229,5 +229,5 @@ c--- fill the dipole contributions
       enddo
 
       return
-      end            
-      
+      end
+

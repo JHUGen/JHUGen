@@ -23,7 +23,7 @@ c--- set msq=0 to initialize
       enddo
       enddo
       s12=s(1,2)
-      
+
 C   Deal with Higgs decay
       if (hdecaymode == 'tlta') then
           call htautaudecay(p,3,4,hdecay)
@@ -39,7 +39,7 @@ C   Deal with Higgs decay
 
       hprod=1d0
 C--- The following lines may be uncommented in order to implement
-c--- the correct dependence on the top quark mass      
+c--- the correct dependence on the top quark mass
 c      tn = 4d0*(mt/hmass)**2
 c      if (tn.lt.(1.0d0)) then
 c         ftn = 0.5d0*((dlog((1d0+dsqrt(1d0-tn))
@@ -54,6 +54,6 @@ c      write(6,*) 'hprod',hprod
       Asq=(as/(3d0*pi))**2/vevsq
       gg=0.5d0*Asq*V*s12**2
       msq(0,0)=avegg*gg*hdecay*hprod
-            
+
       return
       end

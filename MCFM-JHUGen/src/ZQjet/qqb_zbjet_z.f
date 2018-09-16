@@ -11,14 +11,14 @@
       include 'PR_cs_new.f'
       double precision z,p(mxpart,4),dot
       double precision xl12,xl15,xl16,xl25,xl26,xl56
-      double precision 
+      double precision
      .                 ii_qq,ii_qg,ii_gq,ii_gg,
      .                 if_qq,if_gg,
      .                 fi_qq,fi_gg,
      .                 ff_qq,ff_gg
       double precision tempgq,tempqg
       integer is
-      
+
       xl12=dlog(+two*dot(p,1,2)/musq)
       xl15=dlog(-two*dot(p,1,5)/musq)
       xl16=dlog(-two*dot(p,1,6)/musq)
@@ -28,7 +28,7 @@
 
 ************************************************************************
 *     Contributions from QQGG matrix elements                          *
-************************************************************************            
+************************************************************************
 
 c--- QUARK-GLUON contributions
 c--- additional final-final pieces that are 0:
@@ -80,7 +80,7 @@ c--- ason4pi*xn*(ff_qq(z,xl56,2) + ff_gg(z,xl56,2)/2d0) * (1)
       R2(q,g,q,1,is)=R2(a,g,q,1,is)
       R2(q,g,q,2,is)=R2(a,g,q,2,is)
       enddo
-      
+
 c--- GLUON-QUARK contributions
 c--- additional final-final pieces that are 0:
 c--- ason4pi*xn*(ff_qq(z,xl56,2) + ff_gg(z,xl56,2)/2d0) * (1)
@@ -130,7 +130,7 @@ c--- ason4pi*xn*(ff_qq(z,xl56,2) + ff_gg(z,xl56,2)/2d0) * (1)
       R1(q,g,q,1,is)=R1(a,g,q,1,is)
       R1(q,g,q,2,is)=R1(a,g,q,2,is)
       enddo
-      
+
 c--- GLUON-ANTIQUARK contributions
 c--- additional final-final pieces that are 0:
 c--- ason4pi*xn*(ff_qq(z,xl56,2) + ff_gg(z,xl56,2)/2d0) * (1)
@@ -138,7 +138,7 @@ c--- ason4pi*xn*(ff_qq(z,xl56,2) + ff_gg(z,xl56,2)/2d0) * (1)
       R1(g,g,a,1,is)= R1(g,g,q,2,is)
       R1(g,g,a,2,is)= R1(g,g,q,1,is)
       R1(g,g,a,0,is)= R1(g,g,q,0,is)
-      R2(a,a,g,1,is)= R2(q,q,g,2,is)    
+      R2(a,a,g,1,is)= R2(q,q,g,2,is)
       R2(a,a,g,2,is)= R2(q,q,g,1,is)
       R2(a,a,g,0,is)= R2(q,q,g,0,is)
       R1(q,g,a,0,is)= R1(a,g,q,0,is)
@@ -170,11 +170,11 @@ c--- ason4pi*xn*(ff_qq(z,xl56,2) + ff_gg(z,xl56,2)/2d0) * (1)
 c--- GLUON-GLUON (isub=2) contribution
 c--- originating from diagrams such as:
 c---
-c---                   Q 
-c---                 / 
+c---                   Q
+c---                 /
 c---                /
 c---               /
-c---         oooooo------ooooooooo 
+c---         oooooo------ooooooooo
 c---                    |
 c---                    |
 c---                    |
@@ -188,14 +188,14 @@ c---
       R2(q,g,g,1,is)=R1(q,g,g,0,is)
       R2(q,g,g,2,is)=R1(q,g,g,0,is)
       enddo
-      
+
 C--- off-diagonal Qflag->Gflag pieces, for example:
 c---
-c---                   q 
-c---                 / 
+c---                   q
+c---                 /
 c---                /
 c---               /
-c---       q ------ooooooooooooooo 
+c---       q ------ooooooooooooooo
 c---                    o
 c---                    o
 c---                    o
@@ -238,7 +238,7 @@ c--- Qbar-Q diagrams
 
 ************************************************************************
 *     Contributions from QQQQ matrix elements                          *
-************************************************************************            
+************************************************************************
 c--- QUARK-QUARK contributions
       do is=1,3
       R1(q,q,q,0,is)=ason4pi*(
@@ -283,7 +283,7 @@ c--- ANTIQUARK-ANTIQUARK contributions
       R2(a,a,a,0,is)=R2(q,q,q,0,is)
       R2(a,a,a,1,is)=R2(q,q,q,1,is)
       R2(a,a,a,2,is)=R2(q,q,q,2,is)
-      
+
       enddo
 
 c--- QUARK-ANTIQUARK contributions
@@ -320,7 +320,7 @@ c--- QUARK-ANTIQUARK contributions
      . +ff_qq(z,xl56,is)*(xn-two/xn))
 
       enddo
-      
+
 c--- ANTIQUARK-QUARK contributions
       do is=1,3
       R1(a,a,q,0,is)=ason4pi*(
@@ -360,8 +360,8 @@ c--- ANTIQUARK-QUARK contributions
 
 c--- These contributions arise from, e.g.
 c---
-c---                   q 
-c---                 / 
+c---                   q
+c---                 /
 c---                /
 c---               /
 c---         oooooo--------------- qbar

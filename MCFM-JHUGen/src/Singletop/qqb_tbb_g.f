@@ -24,7 +24,7 @@ c---               $
 c---               $
 c---    g ~~~~~------------ t
 c---           \
-c---            \ 
+c---            \
 c---              b~
 
 
@@ -44,10 +44,10 @@ c---              b~
 
       call spinoru(7,p,za,zb)
       fac=2d0*gsq*cf*gw**8*xn**2
-      
+
       if (nwz .eq. +1) then
 c--- t production
-      
+
       if     (isub .eq. 1) then
         qqb=0d0
         qbq=0d0
@@ -65,7 +65,7 @@ c--- t production
      .   *(ubtdg_l(6,1,3,4,5,2,7,p)+ubtdg_h(6,1,3,4,5,2,7,p))
 c--- Note that the two '_h' radiation terms below correspond to
 c---  diagrams of the form g+b-->W(s+c)+t(->W+b) and are a large
-c---  contribution at the LHC that is not included in B. Harris et al.  
+c---  contribution at the LHC that is not included in B. Harris et al.
         bg=aveqg*fac
      .   *(ubtdg_l(7,1,3,4,5,6,2,p)+zip*ubtdg_h(7,1,3,4,5,6,2,p))
         gb=aveqg*fac
@@ -116,7 +116,7 @@ c contribution - Z. Sullivan 1/25/05
         write(6,*) 'Value of isub is wrong in qqb_tbb_g.f: isub=',isub
         stop
       endif
-      
+
       do j=-nf,nf
       do k=-nf,nf
       msq(j,k)=0d0
@@ -126,16 +126,16 @@ c--- Q-Qbar
         if (j .eq. 5) then
           msq(j,k)=(Vsq(+1,k)+Vsq(+2,k)+Vsq(+3,k)
      .             +Vsq(+4,k)+Vsq(+5,k))*bubar
-        else        
-          msq(j,k)=Vsq(j,k)*qqb 
-        endif        
+        else
+          msq(j,k)=Vsq(j,k)*qqb
+        endif
 c--- Qbar-Q
       elseif ((j .lt. 0) .and. (k .gt. 0)) then
         if (k .eq. 5) then
           msq(j,k)=(Vsq(j,+1)+Vsq(j,+2)+Vsq(j,+3)
      .             +Vsq(j,+4)+Vsq(j,+5))*ubarb
         else
-          msq(j,k)=Vsq(j,k)*qbq 
+          msq(j,k)=Vsq(j,k)*qbq
         endif
 c--- Q-Q
       elseif ((j .eq. 5) .and. (k .gt. 0)) then
@@ -143,19 +143,19 @@ c--- Q-Q
      .           +Vsq(-4,k)+Vsq(-5,k))*bu
       elseif ((j .gt. 0) .and. (k .eq. 5)) then
         msq(j,k)=(Vsq(j,-1)+Vsq(j,-2)+Vsq(j,-3)
-     .           +Vsq(j,-4)+Vsq(j,-5))*ub    
+     .           +Vsq(j,-4)+Vsq(j,-5))*ub
 c--- g-Q
       elseif ((j .eq. 0) .and. (k .gt. 0)) then
         if (k .eq. 5) then
-          msq(j,k)=2d0*gb 
+          msq(j,k)=2d0*gb
         else
           msq(j,k)=(Vsq(-1,k)+Vsq(-2,k)+Vsq(-3,k)
-     .             +Vsq(-4,k)+Vsq(-5,k))*gq 
+     .             +Vsq(-4,k)+Vsq(-5,k))*gq
         endif
 c--- g-Qbar
       elseif ((j .eq. 0) .and. (k .lt. 0)) then
         msq(j,k)=(Vsq(+1,k)+Vsq(+2,k)+Vsq(+3,k)
-     .           +Vsq(+4,k)+Vsq(+5,k))*gqb 
+     .           +Vsq(+4,k)+Vsq(+5,k))*gqb
 c--- Q-g
       elseif ((j .gt. 0) .and. (k .eq. 0)) then
         if (j .eq. 5) then
@@ -167,7 +167,7 @@ c--- Q-g
 c--- Qbar-g
       elseif ((j .lt. 0) .and. (k .eq. 0)) then
         msq(j,k)=(Vsq(j,+1)+Vsq(j,+2)+Vsq(j,+3)
-     .           +Vsq(j,+4)+Vsq(j,+5))*qbg 
+     .           +Vsq(j,+4)+Vsq(j,+5))*qbg
       endif
 
 c      write(6,*) j,k,msq(j,k)
@@ -178,7 +178,7 @@ c      write(6,*) j,k,msq(j,k)
 c      pause
       elseif (nwz .eq. -1) then
 c--- t~ production
-      
+
       if     (isub .eq. 1) then
         qqb=0d0
         qbq=0d0
@@ -196,7 +196,7 @@ c--- t~ production
      .   *(ubtdg_l(2,1,4,3,5,6,7,p)+ubtdg_h(2,1,4,3,5,6,7,p))
 c--- Note that the two '_h' radiation terms below correspond to
 c---  diagrams of the form g+b-->W(s+c)+t(->W+b) and are a large
-c---  contribution at the LHC that is not included in B. Harris et al.  
+c---  contribution at the LHC that is not included in B. Harris et al.
         bg=aveqg*fac
      .   *(ubtdg_l(6,1,4,3,5,7,2,p)+zip*ubtdg_h(6,1,4,3,5,7,2,p))
         gb=aveqg*fac
@@ -247,7 +247,7 @@ c contribution - Z. Sullivan 1/25/05
         write(6,*) 'Value of isub is wrong in qqb_tbb_g.f: isub=',isub
         stop
       endif
-      
+
       do j=-nf,nf
       do k=-nf,nf
       msq(j,k)=0d0
@@ -257,16 +257,16 @@ c--- Q-Qbar
         if (k .eq. -5) then
           msq(j,k)=(Vsq(j,-1)+Vsq(j,-2)+Vsq(j,-3)
      .             +Vsq(j,-4)+Vsq(j,-5))*ub
-        else        
-          msq(j,k)=Vsq(j,k)*qqb 
-        endif        
+        else
+          msq(j,k)=Vsq(j,k)*qqb
+        endif
 c--- Qbar-Q
       elseif ((j .lt. 0) .and. (k .gt. 0)) then
         if (j .eq. -5) then
           msq(j,k)=(Vsq(-1,k)+Vsq(-2,k)+Vsq(-3,k)
      .             +Vsq(-4,k)+Vsq(-5,k))*bu
         else
-          msq(j,k)=Vsq(j,k)*qbq 
+          msq(j,k)=Vsq(j,k)*qbq
         endif
 c--- Qbar-Qbar
       elseif ((j .eq. -5) .and. (k .lt. 0)) then
@@ -274,18 +274,18 @@ c--- Qbar-Qbar
      .           +Vsq(+4,k)+Vsq(+5,k))*bubar
       elseif ((j .lt. 0) .and. (k .eq. -5)) then
         msq(j,k)=(Vsq(j,+1)+Vsq(j,+2)+Vsq(j,+3)
-     .           +Vsq(j,+4)+Vsq(j,+5))*ubarb    
+     .           +Vsq(j,+4)+Vsq(j,+5))*ubarb
 c--- g-Q
       elseif ((j .eq. 0) .and. (k .gt. 0)) then
           msq(j,k)=(Vsq(-1,k)+Vsq(-2,k)+Vsq(-3,k)
-     .             +Vsq(-4,k)+Vsq(-5,k))*gq 
+     .             +Vsq(-4,k)+Vsq(-5,k))*gq
 c--- g-Qbar
       elseif ((j .eq. 0) .and. (k .lt. 0)) then
         if (k .eq. -5) then
-          msq(j,k)=2d0*gb 
+          msq(j,k)=2d0*gb
         else
         msq(j,k)=(Vsq(+1,k)+Vsq(+2,k)+Vsq(+3,k)
-     .           +Vsq(+4,k)+Vsq(+5,k))*gqb 
+     .           +Vsq(+4,k)+Vsq(+5,k))*gqb
         endif
 c--- Q-g
       elseif ((j .gt. 0) .and. (k .eq. 0)) then
@@ -297,7 +297,7 @@ c--- Qbar-g
           msq(j,k)=2d0*bg
         else
         msq(j,k)=(Vsq(j,+1)+Vsq(j,+2)+Vsq(j,+3)
-     .           +Vsq(j,+4)+Vsq(j,+5))*qbg 
+     .           +Vsq(j,+4)+Vsq(j,+5))*qbg
         endif
       endif
 
@@ -307,7 +307,7 @@ c      write(6,*) j,k,msq(j,k)
       enddo
 
       endif
-      
+
 c      pause
 
       return
@@ -315,11 +315,11 @@ c      pause
 
 
       double precision function ubtdg_l(ju,jb,jn,je,jc,jd,jg,p)
-C     Matrix element squared for single top production with gluon 
+C     Matrix element squared for single top production with gluon
 C     radiation in production
 C      u(ju) b(jb) -> t(n~(jn)+e+(je)+c(jc))+d(jd)+g(jg)
 C     masses of b quarks c.c=b.b=0
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'masses.f'
       include 'zprods_com.f'
@@ -336,7 +336,7 @@ C     masses of b quarks c.c=b.b=0
 
       sne=s(jn,je)
       sdug=s(jd,ju)+s(jd,jg)+s(ju,jg)
-      
+
       if (sdug .lt. 0d0) then
       prop=(sdug-wmass**2)**2
       else
@@ -344,7 +344,7 @@ C     masses of b quarks c.c=b.b=0
       endif
       prop=((sne-wmass**2)**2+(wmass*wwidth)**2)
      .    *((ptDpt-mt**2)**2+(mt*twidth)**2)*prop
-      
+
 C  -Lefthanded gluon
       ampi(1)=(zb(je,jc)*za(jc,jd)+zb(je,jn)*za(jn,jd))
      . *zb(ju,jd)/(zb(jg,ju)*zb(jg,jd))
@@ -357,18 +357,18 @@ C  -Righthanded gluon
       ampi(2)=-ampi(2)*za(jc,jn)*zb(ju,jb)
      . *(zb(je,jc)*za(jc,jd)+zb(je,jn)*za(jn,jd))
 
-      
+
       ubtdg_l=(cdabs(ampi(1))**2+cdabs(ampi(2))**2)/prop
       return
       end
 
 
       double precision function ubtdg_h(ju,jb,jn,je,jc,jd,jg,p)
-C     Matrix element squared for single top production with gluon 
+C     Matrix element squared for single top production with gluon
 C     radiation in production (radiation from final line)
 C      u(ju) b(jb) -> t(n~(jn)+e+(je)+c(jc))+d(jd)+g(jg)
 C     masses of b quarks c.c=b.b=0
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'masses.f'
       include 'zprods_com.f'
@@ -394,7 +394,7 @@ C     masses of b quarks c.c=b.b=0
       endif
       prop=((sne-wmass**2)**2+(wmass*wwidth)**2)
      .    *((ptDpt-mt**2)**2+(mt*twidth)**2)*prop
-      
+
 C  -Lefthanded gluon tb-line
       ampf(1)=
      . -(zb(je,jc)*za(jc,jg)+zb(je,jn)*za(jn,jg))*zb(jb,ju)*za(ju,jd)

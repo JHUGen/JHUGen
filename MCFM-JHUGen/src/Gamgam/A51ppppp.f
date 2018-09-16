@@ -15,4 +15,4 @@ C--- to give (16*pi^2)*(-i)*A^{[1/2]}_{5;1}
       A51ppppp=-(sym+asym)
      % /(6d0*za(j1,j2)*za(j2,j3)*za(j3,j4)*za(j4,j5)*za(j5,j1))
       return
-      end 
+      end

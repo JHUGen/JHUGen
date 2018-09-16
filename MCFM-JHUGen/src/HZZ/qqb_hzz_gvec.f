@@ -16,7 +16,7 @@ C  kp is the label of the spectator parton
       nDn=n(4)**2-n(3)**2-n(2)**2-n(1)**2
       call qqb_hzz(p,msqt)
 
-      msq(0,0)=-0.5d0*nDn*msqt(0,0)      
+      msq(0,0)=-0.5d0*nDn*msqt(0,0)
 
       return
       end

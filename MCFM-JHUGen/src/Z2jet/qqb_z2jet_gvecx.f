@@ -57,13 +57,13 @@ C in is the label of the contracted line
       qbgZqbg_cs(icol,pq,pl)=0d0
       ggZqbq_cs(icol,pq,pl) =0d0
       ggZqqb_cs(icol,pq,pl) =0d0
-      enddo      
-      enddo      
-      enddo      
+      enddo
+      enddo
+      enddo
 
       call spinoru(6,p,za,zb)
-C   zab=<i-|k|j-> zba=<i+|k|j+> where k is an arbitrary 4-vector 
-c---Conventions of Bern, Dixon, Kosower, Weinzierl, 
+C   zab=<i-|k|j-> zba=<i+|k|j+> where k is an arbitrary 4-vector
+c---Conventions of Bern, Dixon, Kosower, Weinzierl,
 c---ie, za(i,j)*zb(j,i)=s(i,j)
       call spinork(6,p,zab,zba,n)
 
@@ -118,7 +118,7 @@ c--- extra term for gg -> qqb
           call z2jetsqn(5,2,1,6,p,n,za,zb,zab,zba,gqbZqbg)
           call storezcsv(gqbZqbg_cs)
       endif
-      
+
       prop=s(3,4)/dcmplx((s(3,4)-zmass**2),zmass*zwidth)
       fac=v*xn/four*(esq*gsq)**2*two
 
@@ -133,9 +133,9 @@ c--- extra term for gg -> qqb
       qbgZqbg_cs(icol,pq,pl)=aveqg*fac*qbgZqbg_cs(icol,pq,pl)
       ggZqbq_cs(icol,pq,pl) =avegg*fac*ggZqbq_cs(icol,pq,pl)
       ggZqqb_cs(icol,pq,pl) =avegg*fac*ggZqqb_cs(icol,pq,pl)
-      enddo      
-      enddo      
-      enddo      
+      enddo
+      enddo
+      enddo
 
       do j=-nf,nf
       do k=-nf,nf

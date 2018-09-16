@@ -4,7 +4,7 @@
       DOUBLE PRECISION ROOT(10)
       COMMON/CSTD/SPL,SMN
       COMMON/MOM/PLAB(4,10)
-!$omp threadprivate(/MOM/,/CSTD/)  
+!$omp threadprivate(/MOM/,/CSTD/)
 
 
       DO 5 K=1,10

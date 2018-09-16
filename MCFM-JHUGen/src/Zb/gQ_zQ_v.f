@@ -28,7 +28,7 @@
       double precision gqbZqbLL,gqbZqbRR,gqbZqbLR,gqbZqbRL
       double precision qbgZqbLL,qbgZqbRR,qbgZqbLR,qbgZqbRL
       double complex prop
-      integer,parameter:: 
+      integer,parameter::
      & iqgqLL(5)=(/1,5,3,4,2/),iqgqRR(5)=(/5,1,4,3,2/),
      & iqgqRL(5)=(/5,1,3,4,2/),iqgqLR(5)=(/1,5,4,3,2/),
      & igqqLL(5)=(/2,5,3,4,1/),igqqRR(5)=(/5,2,4,3,1/),
@@ -47,9 +47,9 @@ c--calculate spinor and dot-products (using BDK type notation)
 
 c--- calculate lowest order
       call gQ_zQ(p,msq0)
-      
+
 c----UV counterterm contains the finite renormalization to arrive
-c----at MS bar scheme.      
+c----at MS bar scheme.
       subuv=ason2pi*xn*(epinv*(11d0-2d0*dble(nflav)/xn)-1d0)/6d0
 
 c--   calculate propagator
@@ -77,7 +77,7 @@ c--   calculate propagator
       qbgZqbRR=qgZqLR
       qbgZqbLL=qgZqRL
       qbgZqbLR=qgZqRR
-      
+
 
 
       do j=-flav,flav,flav
@@ -110,7 +110,7 @@ c--   calculate propagator
      .             +cdabs(Q(-k)*q1+R(-k)*l1*prop)**2*gqbZqbRL
      .             -subuv*msq0(j,k)
       endif
-      
+
    19 continue
       enddo
       enddo

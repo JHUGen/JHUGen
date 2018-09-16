@@ -46,7 +46,7 @@ c--set msq=0 to initalize
       enddo
       enddo
 
-C----Change the momenta to DKS notation 
+C----Change the momenta to DKS notation
 C   swapped possibility if we want to swap momenta for hadronic case
 c   We have --- f(p1) + f'(p2)-->mu^-(p3)+nubar(p4)+e^+(p6)+nu(p5)
 c   DKS have--- ubar(q1)+u(q2)-->mu^-(q3)+nubar(q4)+e^+(q5)+nu(q6)
@@ -55,7 +55,7 @@ C   or normal configuration
 c   We have --- f(p1) + f'(p2)-->mu^-(p5)+nubar(p6)+e^+(p4)+nu(p3)
 c   DKS have--- ubar(q1)+u(q2)-->mu^-(q3)+nubar(q4)+e^+(q5)+nu(q6)
 
-      if ((plabel(3) .eq. 'el') .and. (plabel(5) .eq. 'qj')) then 
+      if ((plabel(3) .eq. 'el') .and. (plabel(5) .eq. 'qj')) then
 C----swapped case for hadronic decay of Wp
       do j=1,4
       qdks(1,j)=p(1,j)
@@ -77,7 +77,7 @@ C----swapped case for hadronic decay of Wp
       endif
       call spinoru(6,qdks,za,zb)
 c--   s returned from sprod (common block) is 2*dot product
-      
+
       if     (zerowidth  .eqv. .true.) then
       prop12=s(1,2)/dcmplx(s(1,2)-zmass**2,zmass*zwidth)
       prop34=s(3,4)/dcmplx(s(3,4)-wmass**2,wmass*wwidth)
@@ -92,7 +92,7 @@ c--   s returned from sprod (common block) is 2*dot product
       propzg=(s(1,2)-zmass**2)/dcmplx(s(1,2)-zmass**2,zmass*zwidth)
       cprop=propwp*propwm*propzg
       endif
-      
+
 c-- couplings with or without photon pole
       do j=1,2
       cs_z(minus,j)=+mp(j)*l(j)*sin2w*prop12
@@ -119,9 +119,9 @@ c--- apply a dipole form factor to anomalous couplings (only if tevscale > 0)
       xdelk_g=xfac*delk_g
       xlambda_z=xfac*lambda_z
       xlambda_g=xfac*lambda_g
-      
+
 c---case dbar-d and d-dbar
-   
+
       Fa126543=A6treea(1,2,6,5,4,3,za,zb)
       Fa216543=A6treea(2,1,6,5,4,3,za,zb)
       Fa123456=A6treea(1,2,3,4,5,6,za,zb)
@@ -145,7 +145,7 @@ c---case dbar-d and d-dbar
      .          +A6b_3*(xlambda_g/wmass**2)
       Fb216543_z=-Fb213456_z
       Fb216543_g=-Fb213456_g
-     
+
 c      Fb123456=A6treeb(1,2,3,4,5,6,za,zb)
 c      Fb126543=-Fb123456
 c      Fb213456=A6treeb(2,1,3,4,5,6,za,zb)
@@ -196,11 +196,11 @@ c---Remember that base process is ub-u so this has the natural 123456 order
      .                 +cs_g(mplus,1)*Fb216543_g)*prop56*prop34
           endif
       endif
-     
+
       if (srdiags) then
 c---we need supplementary diagrams for gauge invariance.
 C---tjk is equal to 2 (u,c) or 1 (d,s,b)
-      tjk=2-mod(abs(jk),2)     
+      tjk=2-mod(abs(jk),2)
       if (j .gt. 0) then
           AWW(minus)=AWW(minus)
      .              +cgamz(minus,tjk)*(Fa342156*prop56+Fa653412*prop34)
@@ -225,7 +225,7 @@ C-- Inclusion of width for W's a la Baur and Zeppenfeld with cprop.
  20   continue
 
       enddo
-      
+
       return
       end
 

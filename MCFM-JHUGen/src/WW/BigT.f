@@ -6,7 +6,7 @@
       integer j1,j2,j3,j4,j5,j6,i1,i2,i3,i4
       double complex z2
       double precision t134,t234,del3,del12,del34,del56
-C---statement function  
+C---statement function
       z2(i1,i2,i3,i4)=za(i1,i2)*zb(i2,i4)+za(i1,i3)*zb(i3,i4)
 
       t134=s(j1,j3)+s(j1,j4)+s(j3,j4)
@@ -37,13 +37,13 @@ c----fourth line
      . +2d0*za(j1,j6)*zb(j2,j4)
      . *(za(j6,j5)*zb(j5,j4)*del56-za(j6,j3)*zb(j3,j4)*del34)
      . /(zb(j3,j4)*za(j5,j6)*Del3)
-     
+
 c---"fourth" line from the bottom
       BigT=BigT+2d0*z2(j6,j2,j5,j4)/(z2(j2,j5,j6,j1)*Del3)
      . *((za(j6,j5)*zb(j5,j2)*za(j2,j1)*zb(j1,j4)*del56
      .   -za(j6,j2)*zb(j2,j1)*za(j1,j3)*zb(j3,j4)*del34
      .   +z2(j6,j2,j5,j4)*s(j1,j2)*del12)/(zb(j3,j4)*za(j5,j6))
-     .  +2d0*z2(j3,j2,j6,j5)*s(j1,j2)) 
+     .  +2d0*z2(j3,j2,j6,j5)*s(j1,j2))
 
 c---"third" line from the bottom
       BigT=BigT-zb(j1,j4)*za(j2,j6)*z2(j3,j2,j6,j5)/z2(j2,j5,j6,j1)**2

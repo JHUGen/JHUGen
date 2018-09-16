@@ -87,7 +87,7 @@ c      common/runstring/runstring
       endif
 
       scheme='dred'
-      
+
       do j=-nf,nf
       do k=-nf,nf
       msqv(j,k)=0d0
@@ -97,15 +97,15 @@ c      common/runstring/runstring
 c--- calculate the lowest order matrix element and fill the
 c--- common block twopij with s_{ij}
       call qqb_w2jetx(p,msq,mqq,msqx,msqx_cs)
-      
+
       prop=s(3,4)/dcmplx(s(3,4)-wmass**2,wmass*wwidth)
-      
+
 ************************************************************************
 *     Contributions from QQGG matrix elements                          *
-************************************************************************            
+************************************************************************
       if (Gflag) then
 c----UV counterterm contains the finite renormalization to arrive
-c----at MS bar scheme. 
+c----at MS bar scheme.
       if     (colourchoice .eq. 1) then
         subuv(1)=2d0*xn*(epinv*(11d0-2d0*dble(nf)/xn)-1d0)/6d0
         subuv(2)=subuv(1)
@@ -137,9 +137,9 @@ c      endif
 
 c--- Now calculate the relevant lowest-order matrix elements
 c--- for each possible initial state from the QQGG contribution
-      
+
 c---  calculate the qqb terms
-CALL    0--> q(p2)+g(p5)+g(p6)+qb(p1)+l(p3)+lbar(p4) 
+CALL    0--> q(p2)+g(p5)+g(p6)+qb(p1)+l(p3)+lbar(p4)
 c-BDKW  0--> q(p1)+g(p2)+g(p3)+qb(p4)+lbar(p5)+l(p6)
       do nu=1,4
       pswap(1,nu)=p(2,nu)
@@ -153,7 +153,7 @@ c-BDKW  0--> q(p1)+g(p2)+g(p3)+qb(p4)+lbar(p5)+l(p6)
       call xwqqgg_v(mmsq_qqb)
 
 c---  calculate the qbq terms
-CALL    0--> q(p1)+g(p5)+g(p6)+qb(p2)+l(p3)+lbar(p4) 
+CALL    0--> q(p1)+g(p5)+g(p6)+qb(p2)+l(p3)+lbar(p4)
 c-BDKW  0--> q(p1)+g(p2)+g(p3)+qb(p4)+lbar(p5)+l+(p6)
       do nu=1,4
       pswap(1,nu)=p(1,nu)
@@ -167,7 +167,7 @@ c-BDKW  0--> q(p1)+g(p2)+g(p3)+qb(p4)+lbar(p5)+l+(p6)
       call xwqqgg_v(mmsq_qbq)
 
 c---  calculate the gq terms
-CALL    0--> q(p5)+g(p1)+g(p6)+qb(p2)+l(p3)+lbar(p4) 
+CALL    0--> q(p5)+g(p1)+g(p6)+qb(p2)+l(p3)+lbar(p4)
 c-BDKW  0--> q(p1)+g(p2)+g(p3)+qb(p4)+lbar(p5)+l+(p6)
       do nu=1,4
       pswap(1,nu)=p(5,nu)
@@ -181,7 +181,7 @@ c-BDKW  0--> q(p1)+g(p2)+g(p3)+qb(p4)+lbar(p5)+l+(p6)
       call xwqqgg_v(mmsq_gq)
 
 c---  calculate the qg terms
-CALL    0--> q(p5)+g(p2)+g(p6)+qb(p1)+l(p3)+lbar(p4) 
+CALL    0--> q(p5)+g(p2)+g(p6)+qb(p1)+l(p3)+lbar(p4)
 c-BDKW  0--> q(p1)+g(p2)+g(p3)+qb(p4)+lbar(p5)+l+(p6)
       do nu=1,4
       pswap(1,nu)=p(5,nu)
@@ -195,7 +195,7 @@ c-BDKW  0--> q(p1)+g(p2)+g(p3)+qb(p4)+lbar(p5)+l+(p6)
       call xwqqgg_v(mmsq_qg)
 
 c---  calculate the gqb terms
-CALL    0--> q(p2)+g(p1)+g(p6)+qb(p5)+l(p3)+lbar(p4) 
+CALL    0--> q(p2)+g(p1)+g(p6)+qb(p5)+l(p3)+lbar(p4)
 c-BDKW  0--> q(p1)+g(p2)+g(p3)+qb(p4)+lbar(p5)+l+(p6)
       do nu=1,4
       pswap(1,nu)=p(2,nu)
@@ -209,7 +209,7 @@ c-BDKW  0--> q(p1)+g(p2)+g(p3)+qb(p4)+lbar(p5)+l+(p6)
       call xwqqgg_v(mmsq_gqb)
 
 c---  calculate the qbg terms
-CALL    0--> q(p1)+g(p2)+g(p6)+qb(p5)+l(p3)+lbar(p4) 
+CALL    0--> q(p1)+g(p2)+g(p6)+qb(p5)+l(p3)+lbar(p4)
 c-BDKW  0--> q(p1)+g(p2)+g(p3)+qb(p4)+lbar(p5)+l+(p6)
       do nu=1,4
       pswap(1,nu)=p(1,nu)
@@ -234,16 +234,16 @@ c--- calculate the gg terms
       call spinoru(6,pswap,za,zb)
       call xwqqgg_v(mmsq_gg)
       endif
-      
+
 ************************************************************************
 *     Contributions from QQQQ matrix elements                          *
-************************************************************************            
+************************************************************************
       if (Qflag) then
 c--- UV counter-term is already included in a6routine.f
       subuv(1)=0d0
       subuv(2)=subuv(1)
       subuv(0)=subuv(1)
-      
+
 c--- transfer lowest order matrix elements
 c--- NB: this breaks the routine if Qflag = Gflag = .true.
 
@@ -260,11 +260,11 @@ c      if (runstring(1:5) .eq. 'alpha') then
 c        return
 c      endif
 
-c--- early return if there's no contribution here      
-      if ((gqonly) .or. (ggonly)) return      
+c--- early return if there's no contribution here
+      if ((gqonly) .or. (ggonly)) return
 
-c---  Now transform momenta into a notation 
-c---  suitable for calling the BDKW function with notation which is 
+c---  Now transform momenta into a notation
+c---  suitable for calling the BDKW function with notation which is
 c---  q-(-p4)+Q+(-p2)+l-(-p5) ---> q+(p1)+Q-(p3)+l+(p6)
       do nu=1,4
       q(1,nu)=p(2,nu)
@@ -273,7 +273,7 @@ c---  q-(-p4)+Q+(-p2)+l-(-p5) ---> q+(p1)+Q-(p3)+l+(p6)
       q(4,nu)=p(1,nu)
       q(5,nu)=p(4,nu)
       q(6,nu)=p(3,nu)
-      enddo      
+      enddo
       call spinoru(6,q,za,zb)
       fac=V*xn*gw**4*gsq**2*ason2pi
 
@@ -299,7 +299,7 @@ c--- Add VIRTUAL terms
 
 ************************************************************************
 *     Contributions from QQGG matrix elements                          *
-************************************************************************            
+************************************************************************
       if (Gflag) then
       if     ((j .gt. 0) .and. (k .lt. 0)) then
         msqv(j,k)=msqv(j,k)+Vsq(j,k)*mmsq_qqb*cdabs(prop)**2
@@ -334,7 +334,7 @@ c--- Add VIRTUAL terms
      .           +mmsq_gg*Vfac*cdabs(prop)**2*(gwsq**2/4d0/esq**2)
       endif
       endif
-      
+
       if (Qflag) then
       if     ((j .gt. 0) .and. (k .lt. 0)) then
         if (j .ne. -k) then
@@ -402,10 +402,10 @@ c--- Add VIRTUAL terms
         endif
       endif
       endif
-      
+
       enddo
       enddo
-  
+
 ************************************************************************
 *     UV contributions are included here                               *
 ************************************************************************
@@ -416,12 +416,12 @@ c--- Add VIRTUAL terms
       msqv(j,k)=msqv(j,k)+
      .  ason2pi*(-subuv(cs))*msq_cs(cs,j,k)
       enddo
-      
+
       enddo
-      enddo             
- 
+      enddo
+
       return
       end
-     
-     
- 
+
+
+

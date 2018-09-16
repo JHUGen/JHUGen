@@ -4,13 +4,13 @@
       include 'jetlabel.f'
       integer i,nbq,nba
       double precision pjet(mxpart,4)
-      
+
 c--- note: this function ASSUMES that there is at most one b-quark
 c--- and one anti-b-quark, returning zero if there are less than this
 
       nbq=0
       nba=0
-     
+
       do i=1,jets
         if (jetlabel(i) .eq. 'bq') nbq=i+4
         if (jetlabel(i) .eq. 'ba') nba=i+4
@@ -18,4 +18,4 @@ c--- and one anti-b-quark, returning zero if there are less than this
 
       return
       end
-       
+

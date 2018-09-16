@@ -1,6 +1,6 @@
       double precision function Rgen(pjet,i,p,j)
 c--- Calculate the angular separation between pjet(i) and p(j)
-c--- This routine is a generalization of R.f: Rgen(p,i,p,j) == R(p,i,j) 
+c--- This routine is a generalization of R.f: Rgen(p,i,p,j) == R(p,i,j)
       implicit none
       include 'constants.f'
       double precision pjet(mxpart,4),p(mxpart,4),
@@ -21,7 +21,7 @@ c--- This routine is a generalization of R.f: Rgen(p,i,p,j) == R(p,i,j)
       delphi=dacos(r2)
 
       Rgen=dsqrt(dely**2+delphi**2)
-      
+
       return
       end
-      
+

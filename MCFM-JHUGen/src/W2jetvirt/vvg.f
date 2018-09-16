@@ -49,7 +49,7 @@
      . -(+(epinv*epinv2+xl12*epinv+half*xl12**2)
      .   +(epinv*epinv2+xl23*epinv+half*xl23**2))-two*(epinv+xl56)
       Vsc=half*(one+epinv+xl56)
- 
+
 
       elseif(st.eq.'q+g+qb-g+') then
       Vcc=-four
@@ -57,7 +57,7 @@
      . -(epinv*epinv2+xl23*epinv+half*xl23**2)-two*(epinv+xl56)
       Vsc=half*(one+epinv+xl56)
 
-      elseif(st.eq.'q+qb-g-g+') then 
+      elseif(st.eq.'q+qb-g-g+') then
       Vcc=-four-(epinv*epinv2+xl12*epinv+half*xl12**2)-two*(epinv+xl56)
       Vsc=half*(one+epinv+xl56)
 
@@ -68,7 +68,7 @@
       elseif(st.eq.'q+qb-g+g+') then
       Vcc=-four-(epinv*epinv2+xl12*epinv+half*xl12**2)-two*(epinv+xl56)
       Vsc=half*(one+epinv+xl56)
-      else 
+      else
       write(6,*) 'unimplemented st',st
       stop
       endif

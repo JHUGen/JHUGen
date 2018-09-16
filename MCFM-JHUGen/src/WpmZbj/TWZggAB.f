@@ -6,7 +6,7 @@
 C     Author: R.K. Ellis Feb, 2013
 C     written by program WZggdiags.frm
 C     These are the Abelian diagrams with both the W and Z coming
-C     off light line, only three diagrams with W emitted before Z 
+C     off light line, only three diagrams with W emitted before Z
 C     as we proceed from p1 to p2
 C     Calculation is performed for LH light-line (perforce because of W)
 C     Calculation is performed for LH Z-dcay line

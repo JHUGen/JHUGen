@@ -22,7 +22,7 @@ C     Author:R.K.Ellis, February 2013
 C     statement functions
       s4(p1,p2,p3,p4)=s(p1,p2)+s(p1,p3)+s(p1,p4)
      &               +s(p2,p3)+s(p2,p4)+s(p3,p4)
-C     end statement functions 
+C     end statement functions
 
 C     First index of d123 etc is helicity of Z (56) decay line
 C     Second index of d123 etc is helicity of (78) bbar-line

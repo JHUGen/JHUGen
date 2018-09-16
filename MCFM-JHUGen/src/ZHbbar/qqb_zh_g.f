@@ -6,7 +6,7 @@ c                           |    --> fermion(p3)+antifermion(p4)
 c                           |
 c                           ---> b(p5)+b(p6)
 c   for the moment --- radiation only from initial line
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'zcouple.f'
       include 'sprods_com.f'
@@ -74,7 +74,7 @@ c   for the moment --- radiation only from initial line
 
 
       double precision function radiLL(j1,j2,j3,j4,j5,j6,j7)
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'qcdcouple.f'
       include 'masses.f'

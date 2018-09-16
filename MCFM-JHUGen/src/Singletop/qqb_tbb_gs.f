@@ -2,7 +2,7 @@
 c---Matrix element SUBTRACTION squared averaged over initial colors and spins
 c     q(-p1)+qbar(-p2) -->  t(l(p3)+a(p4)+c(p5))+b(p6)+g(p7)
 c   positively charged W only
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'ptilde.f'
       include 'nwz.f'
@@ -12,7 +12,7 @@ c   positively charged W only
       integer j,k,ib,nd,isub
 
       double precision p(mxpart,4),msq(maxd,-nf:nf,-nf:nf)
-      double precision 
+      double precision
      . msq15_2(-nf:nf,-nf:nf),msq25_1(-nf:nf,-nf:nf),
      . msq35_4(-nf:nf,-nf:nf),msq45_3(-nf:nf,-nf:nf),
      . msq14_2(-nf:nf,-nf:nf),msq24_1(-nf:nf,-nf:nf),
@@ -32,7 +32,7 @@ c   positively charged W only
       common/isub/isub
 
 c--- section for two b-quarks in the final state (s-channel, plus
-c---  some t-channel g-q diagrams)      
+c---  some t-channel g-q diagrams)
       if (isub .eq. 2) then
 
       ndmax=4
@@ -45,7 +45,7 @@ c---- entries are left as dummies
      . qqb_tbb,donothing_gvec)
       call dips_mass(2,p,2,5,1,sub25_1,dsubv,msq25_1,dummyv,
      . qqb_tbb,donothing_gvec)
-      qqproc=.true.      
+      qqproc=.true.
       call dips_mass(3,p,3,5,4,sub35_4,dsubv,msq35_4,dummyv,
      . qqb_tbb,donothing_gvec)
       oldmass2=mass2
@@ -57,7 +57,7 @@ c      call dips_mass(5,p,1,4,2,sub14_2,dsubv,msq14_2,dummyv,
 c     . bq_tpq,donothing_gvec)
 c      call dips_mass(6,p,2,4,1,sub24_1,dsubv,msq24_1,dummyv,
 c     . bq_tpq,donothing_gvec)
-      
+
       do j=-nf,nf
       do k=-nf,nf
 
@@ -93,7 +93,7 @@ c         msq(5,j,k)=2d0*tr*sub14_2(qg)*msq14_2(5,k)
 
       endif
 
-c--- section for one b-quark in the final state (only t-channel)      
+c--- section for one b-quark in the final state (only t-channel)
       if (isub .eq. 1) then
       ndmax=12
 
@@ -101,7 +101,7 @@ c---- calculate both initial-initial dipoles
 c---- note that we do not require the gg dipoles, so the v-type
 c---- entries are left as dummies
 
-      qqproc=.true.      
+      qqproc=.true.
       oldmass2=mass2
       mass2=0d0
       call dips_mass(1,p,1,5,4,sub15_4,dsubv,msq15_4,dummyv,
@@ -129,7 +129,7 @@ c---- entries are left as dummies
      . bq_tpq,donothing_gvec)
       call dips_mass(10,p,2,5,1,sub25_1,dsubv,msq25_1,dummyv,
      . bq_tpq,donothing_gvec)
-      
+
       call dips_mass(11,p,1,4,2,sub14_2,dsubv,msq14_2,dummyv,
      . bq_tpq,donothing_gvec)
       call dips_mass(12,p,2,4,1,sub24_1,dsubv,msq24_1,dummyv,
@@ -148,13 +148,13 @@ c--- for nwz=+1, initial state is b, for nwz=-1 it is b~
       if  ((j .eq. 0) .and. (k .eq. 0)) then
          goto 21
       elseif ((j .eq. ib) .and. (k .ne. 0)) then
-c--- checked 15,25,45 singularities, soft singularity looks ok      
+c--- checked 15,25,45 singularities, soft singularity looks ok
         msq(5,j,k)=2d0*cf*sub25_4(qq)*msq25_4(j,k)
         msq(6,j,k)=2d0*cf*sub45_2(qq)*msq45_2(j,k)
         msq(7,j,k)=2d0*cf*sub15_3(qq)*msq15_3(j,k)
         msq(8,j,k)=2d0*cf*sub35_1(qq)*msq35_1(j,k)
       elseif ((j .ne. 0) .and. (k .eq. ib)) then
-c--- checked 15,25,45 singularities, soft singularity looks ok      
+c--- checked 15,25,45 singularities, soft singularity looks ok
         msq(1,j,k)=2d0*cf*sub15_4(qq)*msq15_4(j,k)
         msq(2,j,k)=2d0*cf*sub45_1(qq)*msq45_1(j,k)
         msq(3,j,k)=2d0*cf*sub25_3(qq)*msq25_3(j,k)
@@ -179,7 +179,7 @@ c--- checked
          msq(9,j,k)=2d0*tr*sub15_2(qg)*msq15_2(ib,k)
          endif
       endif
-      
+
  21   continue
 
       enddo
@@ -187,7 +187,7 @@ c--- checked
 
       endif
 
-      return      
+      return
       end
 
 

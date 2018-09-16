@@ -36,7 +36,7 @@ C--   Valence quarks.
       sv  = GetOnePDF(prefix,ih,x,q,9)
       cv  = GetOnePDF(prefix,ih,x,q,10)
       bv  = GetOnePDF(prefix,ih,x,q,11)
-      
+
 C--   Antiquarks = quarks - valence quarks.
       dsea = dn - dnv
       usea = up - upv
@@ -69,7 +69,7 @@ C--   Alternative LHAPDF-like interface: return PDFs in an array.
       end do
       xpdf(0) = GetOnePDF(prefix,ih,x,q,0) ! gluon
       xphoton = GetOnePDF(prefix,ih,x,q,13) ! photon
-      
+
       return
       end
 
@@ -130,7 +130,7 @@ C--   heavy quark masses and alphaS parameters in COMMON block.
      &     1.8d6,3.2d6,5.6d6,1d7,1.8d7,3.2d7,5.6d7,1d8,
      &     1.8d8,3.2d8,5.6d8,1d9/
       save xx,qq,oldprefix,io
-!$omp threadprivate(xx,qq,oldprefix,io)     
+!$omp threadprivate(xx,qq,oldprefix,io)
 !$omp threadprivate(/mstwCommon/)
       if (f.lt.-6.or.f.gt.13) then
          print *,"Error: invalid parton flavour = ",f
@@ -173,7 +173,7 @@ C--   Line below can be commented out if you don't want this message.
          end if
 
 C--   Read header containing heavy quark masses and alphaS values.
-         read(33,*) 
+         read(33,*)
          read(33,*)
          read(33,*) dummyChar,dummyWord,dummyWord,dummyChar,
      &        distance,tolerance
@@ -201,7 +201,7 @@ C--   Check that the heavy quark masses are sensible.
             print *,"Error in GetOnePDF: invalid mBottom = ",mBottom
             stop
          end if
-         
+
 C--   The nExtraFlavours variable is provided to aid compatibility
 C--   with future grids where, for example, a photon distribution
 C--   might be provided (cf. the MRST2004QED PDFs).
@@ -286,7 +286,7 @@ C--   If mc2 < qsq < mc2+eps, then qsq = mc2+eps.
       if (qsq.gt.qq(nqc0).and.qsq.lt.qq(nqc0+1)) qsq = qq(nqc0+1)
 C--   If mb2 < qsq < mb2+eps, then qsq = mb2+eps.
       if (qsq.gt.qq(nqb0).and.qsq.lt.qq(nqb0+1)) qsq = qq(nqb0+1)
-      
+
       xlog=log10(x)
       qsqlog=log10(qsq)
 
@@ -306,7 +306,7 @@ C--   If mb2 < qsq < mb2+eps, then qsq = mb2+eps.
          if (warn.or.fatal) print *,"Error in GetOnePDF: f = ",f
          if (fatal) stop
       end if
-      
+
       if (x.le.0.d0.or.x.gt.xmax.or.q.le.0.d0) then
 
          if (warn.or.fatal) print *,"Error in GetOnePDF: x,qsq = ",
@@ -314,7 +314,7 @@ C--   If mb2 < qsq < mb2+eps, then qsq = mb2+eps.
          if (fatal) stop
 
       else if (abs(f).eq.6.or.f.eq.12) then ! set top quarks to zero
-         
+
          res = 0.d0
 
       else if (qsq.lt.qsqmin) then ! extrapolate to low Q^2
@@ -336,9 +336,9 @@ C--   If mb2 < qsq < mb2+eps, then qsq = mb2+eps.
                res1 = res1 - ExtrapolatePDF(ip+5,np,ih,nhess,xlog,
      &              log10(1.01D0*qsqmin),nx,nq,xxl,qql,cc)
             end if
-            
+
          else                   ! do usual interpolation
-            
+
             res = InterpolatePDF(ip,np,ih,nhess,xlog,
      &           log10(qsqmin),nx,nq,xxl,qql,cc)
             res1 = InterpolatePDF(ip,np,ih,nhess,xlog,
@@ -349,7 +349,7 @@ C--   If mb2 < qsq < mb2+eps, then qsq = mb2+eps.
                res1 = res1 - InterpolatePDF(ip+5,np,ih,nhess,xlog,
      &              log10(1.01D0*qsqmin),nx,nq,xxl,qql,cc)
             end if
-            
+
          end if
 
 C--   Calculate the anomalous dimension, dlog(xf)/dlog(qsq),
@@ -374,14 +374,14 @@ C--   anomalous dimension to 1 to prevent rounding errors.
 
          res = ExtrapolatePDF(ip,np,ih,nhess,xlog,
      &        qsqlog,nx,nq,xxl,qql,cc)
-         
+
          if (f.le.-1.and.f.ge.-5) then ! antiquark = quark - valence
             res = res - ExtrapolatePDF(ip+5,np,ih,nhess,xlog,
      &           qsqlog,nx,nq,xxl,qql,cc)
          end if
 
       else                      ! do usual interpolation
-         
+
          res = InterpolatePDF(ip,np,ih,nhess,xlog,
      &        qsqlog,nx,nq,xxl,qql,cc)
 
@@ -389,9 +389,9 @@ C--   anomalous dimension to 1 to prevent rounding errors.
             res = res - InterpolatePDF(ip+5,np,ih,nhess,xlog,
      &           qsqlog,nx,nq,xxl,qql,cc)
          end if
-            
+
       end if
-      
+
       GetOnePDF = res
 
       return
@@ -426,7 +426,7 @@ C----------------------------------------------------------------------
      &     -6,6,-6,6,-3,-3,3,3,-4,4,2,-2,-2,-2,-1,-1,
      &     4,-4,4,-4,2,2,-2,-2,2,-2,-2,2,1,1,1,1/
       save iwt
-!$omp threadprivate(iwt)     
+!$omp threadprivate(iwt)
       do m=1,my
          ff1(1,m)=polderiv1(xx(1),xx(2),xx(3),
      &        ff(ip,1,m),ff(ip,2,m),ff(ip,3,m))
@@ -495,34 +495,34 @@ C--   Take the average of (d/dx)(d/dy) and (d/dy)(d/dx).
             d1=xx(n+1)-xx(n)
             d2=yy(m+1)-yy(m)
             d1d2=d1*d2
-            
+
             yy0(1)=ff(ip,n,m)
             yy0(2)=ff(ip,n+1,m)
             yy0(3)=ff(ip,n+1,m+1)
             yy0(4)=ff(ip,n,m+1)
-            
+
             yy1(1)=ff1(n,m)
             yy1(2)=ff1(n+1,m)
             yy1(3)=ff1(n+1,m+1)
             yy1(4)=ff1(n,m+1)
-            
+
             yy2(1)=ff2(n,m)
             yy2(2)=ff2(n+1,m)
             yy2(3)=ff2(n+1,m+1)
             yy2(4)=ff2(n,m+1)
-            
+
             yy12(1)=ff12(n,m)
             yy12(2)=ff12(n+1,m)
             yy12(3)=ff12(n+1,m+1)
             yy12(4)=ff12(n,m+1)
-            
+
             do k=1,4
                z(k)=yy0(k)
                z(k+4)=yy1(k)*d1
                z(k+8)=yy2(k)*d2
                z(k+12)=yy12(k)*d1d2
             enddo
-            
+
             do l=1,16
                xxd=0.d0
                do k=1,16
@@ -553,10 +553,10 @@ C----------------------------------------------------------------------
 
       n=locx_mstw(xx,nx,x)
       m=locx_mstw(yy,my,y)
-      
+
       t=(x-xx(n))/(xx(n+1)-xx(n))
       u=(y-yy(m))/(yy(m+1)-yy(m))
-      
+
       z=0.d0
       do l=4,1,-1
          z=t*z+((cc(ip,ih,n,m,l,4)*u+cc(ip,ih,n,m,l,3))*u
@@ -576,10 +576,10 @@ C----------------------------------------------------------------------
       integer ih,nx,my,nhess,locx_mstw,n,m,ip,np
       double precision xx(nx),yy(my),cc(np,0:nhess,nx,my,4,4),
      &     x,y,z,f0,f1,z0,z1,InterpolatePDF
-      
+
       n=locx_mstw(xx,nx,x)           ! 0: below xmin, nx: above xmax
       m=locx_mstw(yy,my,y)           ! 0: below qsqmin, my: above qsqmax
-      
+
 C--   If extrapolation in small x only:
       if (n.eq.0.and.m.gt.0.and.m.lt.my) then
          f0 = InterpolatePDF(ip,np,ih,nhess,xx(1),y,nx,my,xx,yy,cc)
@@ -629,7 +629,7 @@ C--   If extrapolation into large q AND small x:
          stop
       end if
 
-      ExtrapolatePDF = z      
+      ExtrapolatePDF = z
 
       return
       end
@@ -647,7 +647,7 @@ C--   nx is the length of the array with xx(nx) the highest element.
          return
       endif
       if(x.eq.xx(nx)) then
-         locx_mstw=nx-1  
+         locx_mstw=nx-1
          return
       endif
       ju=nx+1

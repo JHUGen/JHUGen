@@ -23,7 +23,7 @@ C---hep-ph/9708239, Eqn 2.13
       integer j1,j2,j3,j4,j5,j6
       character*9 st,stamp(6)
       double complex a6g
-      
+
 c      write(*,*) 'Called a63g with arguments'
 c      write(*,*) 'st',st
 c      write(*,*) 'j1,j4,j2,j3,j5,j6',j1,j4,j2,j3,j5,j6
@@ -127,7 +127,7 @@ C---hep-ph/9708239, Eqn 2.13
       integer j1,j2,j3,j4,j5,j6
 c--- modified 4/18/00, according to BDK hep-ph/9708239, eq. (8.2)
       a6sg=czip
-      if (st .eq. 'q+g+g+qb-') 
+      if (st .eq. 'q+g+g+qb-')
      .  a6sg=one/three/za(j2,j3)**2/s(j5,j6)*(
      .        -(zb(j6,j1)*za(j1,j3)+zb(j6,j2)*za(j2,j3))*zb(j3,j1)
      .         *za(j4,j5)/(s(j1,j2)+s(j1,j3)+s(j2,j3))
@@ -158,7 +158,7 @@ c--- checked 4/18/00, this piece vanishes identically, eq. (8.3)
       double complex a6sg
 c--- modified 4/18/00, according to BDK hep-ph/9708239, eq. (8.3)
       a6tg=czip
-      if (st .eq. 'q+g+g+qb-') 
+      if (st .eq. 'q+g+g+qb-')
      .  a6tg=one/20d0*s(j2,j3)/mt**2*a6sg(st,j1,j2,j3,j4,j5,j6,za,zb)
       return
       end

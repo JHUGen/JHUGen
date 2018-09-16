@@ -109,14 +109,14 @@ C   End statement functions
      &    e5)*zab2(p6,p3,p4,p1)*zab2(p7,p3,p4,p2)*mt**2*mw**(-1)*cWWH
      &     - izb(p2,p7)*za(p1,p6)*za(p7,k5)*zb(p1,p2)**2*mw*cWWH + izb(
      &    p2,p7)*za(p7,k5)*zb(p1,p2)*zba2(p2,p3,p4,p6)*mw*cWWH )
-      Amp(1,1,t25) = Amp(1,1,t25) + prW(s16)*prt(s1267)*prt(s126) * ( 
+      Amp(1,1,t25) = Amp(1,1,t25) + prW(s16)*prt(s1267)*prt(s126) * (
      &     - 1.D0/2.D0*izb(p2,p7)*izb(k5,e5)*za(p1,p6)*zb(p1,p2)**2*
      &    zba2(e5,p3,p4,p7)*mt**2*mw**(-1)*cttH - izb(p2,p7)*izb(k5,e5)
      &    *za(p6,p7)*zb(p1,p2)*zb(p2,e5)*mt**4*mw**(-1)*cttH - izb(p2,
      &    p7)*za(p1,p6)*za(p7,k5)*zb(p1,p2)**2*mt**2*mw**(-1)*cttH - 1.D
      &    0/2.D0*izb(p2,p7)*za(p6,p7)*zb(p1,p2)*zab2(k5,p3,p4,p2)*mt**2
      &    *mw**(-1)*cttH )
-      Amp(1,1,t25) = Amp(1,1,t25) + prW(s16)*prt(s12346)*prt(s126) * ( 
+      Amp(1,1,t25) = Amp(1,1,t25) + prW(s16)*prt(s12346)*prt(s126) * (
      &    1.D0/2.D0*izb(p2,p7)*izb(k5,e5)*za(p1,p6)*zb(p1,p2)*zb(p2,e5)
      &    *zab2(p7,p3,p4,p1)*mt**2*mw**(-1)*cttH + 1.D0/2.D0*izb(p2,p7)
      &    *izb(k5,e5)*za(p2,p6)*zb(p1,p2)*zb(p2,e5)*zab2(p7,p3,p4,p2)*
@@ -157,7 +157,7 @@ C   End statement functions
      &    iza(p2,p7)*izb(k5,e5)*zb(p1,p7)*zba2(e5,p3,p4,p6)*mt**2*
      &    mw**(-1)*cttH + iza(p2,p7)*za(p6,k5)*zb(p1,p7)*mt**2*mw**(-1)
      &    *cttH )
-      Amp(1,2,t25) = Amp(1,2,t25) + prW(s16)*prt(s12346)*prt(s126) * ( 
+      Amp(1,2,t25) = Amp(1,2,t25) + prW(s16)*prt(s12346)*prt(s126) * (
      &    1.D0/2.D0*iza(p2,p7)*izb(k5,e5)*za(p1,p2)*za(p2,p6)*zb(p1,p2)
      &    **2*zb(p7,e5)*mt**2*mw**(-1)*cttH + 1.D0/2.D0*iza(p2,p7)*izb(
      &    k5,e5)*za(p1,p6)*za(p2,p6)*zb(p1,p2)*zb(p1,p6)*zb(p7,e5)*
@@ -182,14 +182,14 @@ C   End statement functions
      &    zb(p2,p6)*zb(p2,k5)*zab2(p6,p3,p4,p1)*mt*mw**(-1)*cWWH + 1.D0/
      &    2.D0*izb(p2,p7)*zb(p2,k5)*zab2(p6,p3,p4,p1)*zab2(p7,p3,p4,p2)
      &    *mt*mw**(-1)*cWWH )
-      Amp(2,1,t25) = Amp(2,1,t25) + prW(s16)*prt(s1267)*prt(s126) * ( 
+      Amp(2,1,t25) = Amp(2,1,t25) + prW(s16)*prt(s1267)*prt(s126) * (
      &    iza(k5,e5)*izb(p2,p7)*za(p1,p6)*za(p7,e5)*zb(p1,p2)**2*mt**3*
      &    mw**(-1)*cttH + 1.D0/2.D0*iza(k5,e5)*izb(p2,p7)*za(p6,p7)*zb(
      &    p1,p2)*zab2(e5,p3,p4,p2)*mt**3*mw**(-1)*cttH + 1.D0/2.D0*izb(
      &    p2,p7)*za(p1,p6)*zb(p1,p2)**2*zba2(k5,p3,p4,p7)*mt*mw**(-1)*
      &    cttH + izb(p2,p7)*za(p6,p7)*zb(p1,p2)*zb(p2,k5)*mt**3*
      &    mw**(-1)*cttH )
-      Amp(2,1,t25) = Amp(2,1,t25) + prW(s16)*prt(s12346)*prt(s126) * ( 
+      Amp(2,1,t25) = Amp(2,1,t25) + prW(s16)*prt(s12346)*prt(s126) * (
      &    iza(k5,e5)*izb(p2,p7)*za(p1,p6)*za(p7,e5)*zb(p1,p2)**2*mt**3*
      &    mw**(-1)*cttH - 1.D0/2.D0*iza(k5,e5)*izb(p2,p7)*za(p7,e5)*zb(
      &    p1,p2)*zba2(p2,p3,p4,p6)*mt**3*mw**(-1)*cttH - 1.D0/2.D0*izb(
@@ -215,7 +215,7 @@ C   End statement functions
       Amp(2,2,t25) = Amp(2,2,t25) + prW(s16)*prW(s1346) * (  - iza(p2,
      &    p7)*iza(k5,e5)*za(p6,e5)*zb(p1,p7)*mt*mw*cWWH + 1.D0/2.D0*
      &    iza(p2,p7)*zb(p7,k5)*zab2(p6,p3,p4,p1)*mt*mw**(-1)*cWWH )
-      Amp(2,2,t25) = Amp(2,2,t25) + prW(s16)*prt(s1267)*prt(s126) * ( 
+      Amp(2,2,t25) = Amp(2,2,t25) + prW(s16)*prt(s1267)*prt(s126) * (
      &     - iza(p2,p7)*iza(k5,e5)*za(p1,p6)*za(p2,e5)*zb(p1,p2)*zb(p1,
      &    p7)*mt**3*mw**(-1)*cttH - iza(p2,p7)*iza(k5,e5)*za(p2,p6)*za(
      &    p2,e5)*zb(p1,p2)*zb(p2,p7)*mt**3*mw**(-1)*cttH + 1.D0/2.D0*
@@ -229,7 +229,7 @@ C   End statement functions
      &    p7)*iza(k5,e5)*za(p6,e5)*zb(p1,p7)*mt**3*mw**(-1)*cttH - 1.D0/
      &    2.D0*iza(p2,p7)*zb(p1,p7)*zba2(k5,p3,p4,p6)*mt*mw**(-1)*cttH
      &     )
-      Amp(2,2,t25) = Amp(2,2,t25) + prW(s16)*prt(s12346)*prt(s126) * ( 
+      Amp(2,2,t25) = Amp(2,2,t25) + prW(s16)*prt(s12346)*prt(s126) * (
      &     - iza(p2,p7)*iza(k5,e5)*za(p1,p6)*za(p2,e5)*zb(p1,p2)*zb(p1,
      &    p7)*mt**3*mw**(-1)*cttH - iza(p2,p7)*iza(k5,e5)*za(p2,p6)*za(
      &    p2,e5)*zb(p1,p2)*zb(p2,p7)*mt**3*mw**(-1)*cttH + 1.D0/2.D0*

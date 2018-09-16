@@ -3,7 +3,7 @@ C----Author: R.K. Ellis Dec 2009
 c----Virtual corrections matrix element for H production
 c----in the heavy quark (mt=Infinity) limit.
 C----averaged over initial colours and spins
-c     g(-p1)+g(-p2)-->H -->  Z (e^-(p5)+e^(p6)) 
+c     g(-p1)+g(-p2)-->H -->  Z (e^-(p5)+e^(p6))
 c                          + Z(mu^-(p3)+mu^+(p4))+g(p_iglue1=7)
       implicit none
       include 'constants.f'
@@ -37,7 +37,7 @@ C     Modified by overall factors
       hdecay=hdecay/((s(3,4)-zmass**2)**2+(zmass*zwidth)**2)
       hdecay=hdecay/((s(5,6)-zmass**2)**2+(zmass*zwidth)**2)
       hdecay=hdecay/((s3456-hmass**2)**2+(hmass*hwidth)**2)
-      
+
       fac=ason2pi*Asq*gsq*hdecay
       call hjetfill(ss,tt,uu,virtgg,virtqa,virtaq,virtqg,virtgq)
 

@@ -1,7 +1,7 @@
       subroutine dkqqb_wz_g(p,msq)
       implicit none
 C----Author R.K.Ellis June 2012
-c----Matrix element for WZ production with radiation in the 
+c----Matrix element for WZ production with radiation in the
 C----hadronic decay of the Z
 C----averaged over initial colours and spins
 C----massless final state particles
@@ -33,7 +33,7 @@ c      include 'anomcoup.f'
 
       fac=aveqq*xn*gw**8*gsq*2d0*CF
       flqqb=2
-      srdiags=.true.      
+      srdiags=.true.
       do j=-nf,nf
       do k=-nf,nf
 c--set msq=0 to initalize
@@ -46,7 +46,7 @@ c   We have --- f(p1) + f'(p2)--> q(p3)+qbar(p4)+e^-(p5)+nu~(p6)+g(p7)
 
       call spinoru(7,p,za,zb)
 
-  
+
       if     (zerowidth  .eqv. .true.) then
       write(6,*) 'dkqqb_ww_g.f:zerowidth should be false'
       stop
@@ -55,11 +55,11 @@ c--   calculate propagators
       cotw=dsqrt((one-xw)/xw)
       s567=s(5,6)+s(5,7)+s(6,7)
       if     (zerowidth  .eqv. .true.) then
-      prop12=s(1,2)/dcmplx(s(1,2)-wmass**2,wmass*wwidth)  
+      prop12=s(1,2)/dcmplx(s(1,2)-wmass**2,wmass*wwidth)
       prop34=s(3,4)/dcmplx(s(3,4)-wmass**2,wmass*wwidth)
       prop567=s567/dcmplx(s567-zmass**2,zmass*zwidth)
       cprop=dcmplx(1d0)
-      elseif (zerowidth .neqv. .true.) then      
+      elseif (zerowidth .neqv. .true.) then
       prop12=dcmplx(s(1,2)/(s(1,2)-wmass**2))
       prop34=dcmplx(s(3,4)/(s(3,4)-wmass**2))
       prop567=dcmplx(s567/(s567-zmass**2))
@@ -77,7 +77,7 @@ c--- DEBUG to compare with Madgraph
 c--- DEBUG to compare with Madgraph
 
       endif
-      
+
 c-- couplings with or without photon pole
 c---first index is quark helicity, second is weak isospin
       do j=1,2
@@ -170,7 +170,7 @@ C-- Inclusion of width for W's a la Baur and Zeppenfeld with cprop.
      & (+abs(AWZqbq(1,1))**2+abs(AWZqbq(1,2))**2
      &  +abs(AWZqbq(2,1))**2+abs(AWZqbq(2,2))**2)
 
-      
+
       do j=-nf,nf
       do k=-nf,nf
 c--set msq=0 to initalize

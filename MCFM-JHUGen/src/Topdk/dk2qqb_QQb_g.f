@@ -69,7 +69,7 @@ c--- include factor for W hadronic decays
       enddo
       enddo
       enddo
-      
+
 c--- gg amplitudes
       do hb=1,2
       do hg=1,2
@@ -109,7 +109,7 @@ c--- gg amplitudes
       enddo
       enddo
       enddo
-       
+
 C---fill qb-q, gg and q-qb elements
       do j=-nf,nf
       if ((j .lt. 0) .or. (j .gt. 0)) then

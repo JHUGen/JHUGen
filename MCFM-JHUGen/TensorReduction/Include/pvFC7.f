@@ -77,7 +77,7 @@
      &     + q1(n3)*q1(n5)*q1(n6)*q1(n7)*q2(n1)*q2(n2)*q2(n4)
      &     + q1(n4)*q1(n5)*q1(n6)*q1(n7)*q2(n1)*q2(n2)*q2(n3)
      &     )
-      FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)=FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep) 
+      FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)=FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)
      &    + Cv(cc1112222 + C0i,ep) * (
      &     + q1(n1)*q1(n2)*q1(n3)*q2(n4)*q2(n5)*q2(n6)*q2(n7)
      &     + q1(n1)*q1(n2)*q1(n4)*q2(n3)*q2(n5)*q2(n6)*q2(n7)
@@ -109,7 +109,7 @@
      &     + q1(n3)*q1(n4)*q1(n7)*q2(n1)*q2(n2)*q2(n5)*q2(n6)
      &     + q1(n3)*q1(n5)*q1(n6)*q2(n1)*q2(n2)*q2(n4)*q2(n7)
      &     )
-      FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)=FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep) 
+      FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)=FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)
      &   + Cv(cc1112222 + C0i,ep) * (
      &     + q1(n3)*q1(n5)*q1(n7)*q2(n1)*q2(n2)*q2(n4)*q2(n6)
      &     + q1(n3)*q1(n6)*q1(n7)*q2(n1)*q2(n2)*q2(n4)*q2(n5)
@@ -142,7 +142,7 @@
      &     + q1(n5)*q1(n7)*q2(n1)*q2(n2)*q2(n3)*q2(n4)*q2(n6)
      &     + q1(n6)*q1(n7)*q2(n1)*q2(n2)*q2(n3)*q2(n4)*q2(n5)
      &     )
-      FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)=FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep) 
+      FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)=FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)
      &    + Cv(cc1222222 + C0i,ep) * (
      &     + q1(n1)*q2(n2)*q2(n3)*q2(n4)*q2(n5)*q2(n6)*q2(n7)
      &     + q1(n2)*q2(n1)*q2(n3)*q2(n4)*q2(n5)*q2(n6)*q2(n7)
@@ -152,11 +152,11 @@
      &     + q1(n6)*q2(n1)*q2(n2)*q2(n3)*q2(n4)*q2(n5)*q2(n7)
      &     + q1(n7)*q2(n1)*q2(n2)*q2(n3)*q2(n4)*q2(n5)*q2(n6)
      &     )
-      FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)=FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep) 
+      FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)=FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)
      &  + Cv(cc2222222 + C0i,ep) * (
      &     + q2(n1)*q2(n2)*q2(n3)*q2(n4)*q2(n5)*q2(n6)*q2(n7)
      &     )
-      FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)=FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep) 
+      FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)=FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)
      &   + Cv(cc0011111 + C0i,ep) * (
      &     + g(n1,n2)*q1(n3)*q1(n4)*q1(n5)*q1(n6)*q1(n7)
      &     + g(n1,n3)*q1(n2)*q1(n4)*q1(n5)*q1(n6)*q1(n7)
@@ -180,7 +180,7 @@
      &     + g(n5,n7)*q1(n1)*q1(n2)*q1(n3)*q1(n4)*q1(n6)
      &     + g(n6,n7)*q1(n1)*q1(n2)*q1(n3)*q1(n4)*q1(n5)
      &     )
-      FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)=FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep) 
+      FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)=FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)
      &     + Cv(cc0011112 + C0i,ep) * (
      &     + g(n1,n2)*q1(n3)*q1(n4)*q1(n5)*q1(n6)*q2(n7)
      &     + g(n1,n2)*q1(n3)*q1(n4)*q1(n5)*q1(n7)*q2(n6)
@@ -212,7 +212,7 @@
      &     + g(n1,n7)*q1(n2)*q1(n3)*q1(n5)*q1(n6)*q2(n4)
      &     + g(n1,n7)*q1(n2)*q1(n4)*q1(n5)*q1(n6)*q2(n3)
      &     )
-      FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)=FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep) 
+      FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)=FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)
      &     + Cv(cc0011112 + C0i,ep) * (
      &     + g(n1,n7)*q1(n3)*q1(n4)*q1(n5)*q1(n6)*q2(n2)
      &     + g(n2,n3)*q1(n1)*q1(n4)*q1(n5)*q1(n6)*q2(n7)
@@ -244,7 +244,7 @@
      &     + g(n3,n4)*q1(n1)*q1(n2)*q1(n5)*q1(n7)*q2(n6)
      &     + g(n3,n4)*q1(n1)*q1(n2)*q1(n6)*q1(n7)*q2(n5)
      &     )
-      FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)=FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep) 
+      FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)=FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)
      &     + Cv(cc0011112 + C0i,ep) * (
      &     + g(n3,n4)*q1(n1)*q1(n5)*q1(n6)*q1(n7)*q2(n2)
      &     + g(n3,n4)*q1(n2)*q1(n5)*q1(n6)*q1(n7)*q2(n1)
@@ -361,7 +361,7 @@
      &     + g(n1,n7)*q1(n3)*q1(n4)*q1(n5)*q2(n2)*q2(n6)
      &     + g(n1,n7)*q1(n3)*q1(n4)*q1(n6)*q2(n2)*q2(n5)
      &     )
-      FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)=FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep) 
+      FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)=FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)
      &  + Cv(cc0011122 + C0i,ep) * (
      &     + g(n1,n7)*q1(n3)*q1(n5)*q1(n6)*q2(n2)*q2(n4)
      &     + g(n1,n7)*q1(n4)*q1(n5)*q1(n6)*q2(n2)*q2(n3)
@@ -393,7 +393,7 @@
      &     + g(n2,n5)*q1(n1)*q1(n6)*q1(n7)*q2(n3)*q2(n4)
      &     + g(n2,n5)*q1(n3)*q1(n4)*q1(n6)*q2(n1)*q2(n7)
      &     )
-      FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)=FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep) 
+      FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)=FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)
      &  + Cv(cc0011122 + C0i,ep) * (
      &     + g(n2,n5)*q1(n3)*q1(n4)*q1(n7)*q2(n1)*q2(n6)
      &     + g(n2,n5)*q1(n3)*q1(n6)*q1(n7)*q2(n1)*q2(n4)
@@ -563,7 +563,7 @@
      &     + g(n1,n4)*q1(n5)*q1(n6)*q2(n2)*q2(n3)*q2(n7)
      &     + g(n1,n4)*q1(n5)*q1(n7)*q2(n2)*q2(n3)*q2(n6)
      &     )
-      FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)=FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep) 
+      FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)=FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)
      &   + Cv(cc0011222 + C0i,ep) * (
      &     + g(n1,n4)*q1(n6)*q1(n7)*q2(n2)*q2(n3)*q2(n5)
      &     + g(n1,n5)*q1(n2)*q1(n3)*q2(n4)*q2(n6)*q2(n7)
@@ -970,7 +970,7 @@
      &     + g(n1,n7)*g(n3,n6)*q1(n2)*q1(n4)*q1(n5)
      &     + g(n1,n7)*g(n4,n5)*q1(n2)*q1(n3)*q1(n6)
      &     )
-      FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)=FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep) 
+      FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)=FC7(y7(n1,n2,n3,n4,n5,n6,n7),ep)
      &   + Cv(cc0000111 + C0i,ep) * (
      &     + g(n1,n7)*g(n4,n6)*q1(n2)*q1(n3)*q1(n5)
      &     + g(n1,n7)*g(n5,n6)*q1(n2)*q1(n3)*q1(n4)

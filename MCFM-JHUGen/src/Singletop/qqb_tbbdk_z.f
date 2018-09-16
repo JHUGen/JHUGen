@@ -15,7 +15,7 @@
 c---- note: the q-qbar integrated counterterms corresponding to final-final
 c----       dipoles depend on whether the b~ quark is massless or not
       do is=1,3
-      
+
       if (abs(mb) .lt. 1d-6) then
 c--- integrated dipole for mb=0
         mbar12=mt/dsqrt(two*dot(p,1,2))
@@ -40,6 +40,6 @@ c--- integrated dipole for mb>0
       Q1(a,g,q,is)=tempqg
       Q1(q,g,a,is)=tempqg
       enddo
-      
+
       return
       end

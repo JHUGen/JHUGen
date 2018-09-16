@@ -18,7 +18,7 @@ c---     u,q1,d,q2 are already fixed for this crossing
       integer u,q1,q2,d,t,b,b1,t1,b2,t2
 
 c color matrix:
-c      DATA (CF(i,1  ),i=1  ,1  ) /     6    /                
+c      DATA (CF(i,1  ),i=1  ,1  ) /     6    /
 
 c particle identifiers:
       u=1
@@ -64,10 +64,10 @@ c inner products for the 'common terms' below:
       bDg  = s(q1,q2)/2d0+s(q1,b1)/2d0+bDq2
       tDg  = s(q1,q2)/2d0+s(q1,t1)/2d0+tDq2
 
-    
+
 c Only one color structure
       call reals_qq(u,q1,d,t1,b1,q2,q1,mq,ma,za,zb,gs)
-      
+
       me=0d0
       do i=1,2
          do j=1,2
@@ -81,9 +81,9 @@ c--- 1/12/08: JC replaced "6d0" by (xn^2*Cf)/2d0
       enddo
 
 c--- note that these are all corrections to the heavy quark line and
-c--- thus should receive a factor of gsq_H    
+c--- thus should receive a factor of gsq_H
       gsq_H=fourpi*as_H
-      
+
 c Multiply by coupling constants:
 c      me=me*GG(1)**4*GWF(1)**4    !MG/ME value
       me=me*gsq_H**2*gwsq**2/4d0    !MCFM

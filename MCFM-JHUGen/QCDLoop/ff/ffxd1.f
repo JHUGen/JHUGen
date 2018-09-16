@@ -142,7 +142,7 @@
 *		md1i(3)	     real	maximum partial sum in D1i	*
 *		ier	     integer	number of dgits lost		*
 *									*
-***#]*comment:*********************************************************** 
+***#]*comment:***********************************************************
 *  #[ declarations:
 	implicit none
 *
@@ -167,7 +167,7 @@
 *	statement function
 *
 	absc(cc) = abs(DBLE(cc)) + abs(DIMAG(cc))
-*  #] declarations: 
+*  #] declarations:
 *  #[ Form-ula:
 *	see the Form job D1.frm
 *   D1 =

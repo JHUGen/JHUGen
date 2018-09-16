@@ -7,7 +7,7 @@
       include 'scale.f'
       include 'masses.f'
       include 'decl_kininv.f'
-      
+
       double precision mtsq
       integer ep
       double complex qlI2,qlI3,epqlI3,ep2qlI3
@@ -15,14 +15,14 @@
       double complex vert25x10,vert25x11,vert25x12,vert25x13,vert25x14
       double complex vert25x15, vert25x16
       double precision p5Dp234,denbt2
- 
+
       mtsq=mt**2
       p5Dp234=(s16-s234-mtsq)/2d0
 !      qlI2diffs234s34(ep)=qlI2(s234,0d0,0d0,musq,ep)
 !     & -qlI2(s34,0d0,0d0,musq,ep)
-     & 
+     &
       denbt2=1d0/(mtsq*s234-p5Dp234**2)
-      
+
       vert25x8= + qlI2(mtsq,zip,mtsq,musq,ep) * (  - 1.D0/2.D0*denbt2*
      &    s16 + 1.D0/8.D0*denbt2**2*s16**3 + 1.D0/2.D0*s234*denbt2 - 3.D
      &    0/8.D0*s234*denbt2**2*s16**2 + 3.D0/8.D0*s234**2*denbt2**2*
@@ -122,7 +122,7 @@
       vert25x10 = vert25x10 + qlI2(s234,zip,zip,musq,ep) * ( 1.D0/2.D0*
      &    denbt2*s16**2 - 1.D0/2.D0*s234*denbt2*s16 - 1.D0/16.D0*s234*
      &    denbt2**2*s16**3 + 3.D0/16.D0*s234**2*denbt2**2*s16**2 - 3.D0/
-     &    16.D0*s234**3*denbt2**2*s16 + 1.D0/16.D0*s234**4*denbt2**2 - 
+     &    16.D0*s234**3*denbt2**2*s16 + 1.D0/16.D0*s234**4*denbt2**2 -
      &    1.D0/2.D0*mtsq*denbt2*s16 + 3.D0/16.D0*mtsq*s234*denbt2**2*
      &    s16**2 - 1.D0/8.D0*mtsq*s234**2*denbt2**2*s16 - 1.D0/16.D0*
      &    mtsq*s234**3*denbt2**2 - 3.D0/16.D0*mtsq**2*s234*denbt2**2*
@@ -156,7 +156,7 @@
      &    /8.D0*epqlI3(s234,mtsq,s16,zip,zip,mtsq,musq,ep)*mtsq*s234**2
      &    *denbt2**2*s16**2 - 1.D0/4.D0*epqlI3(s234,mtsq,s16,zip,zip,
      &    mtsq,musq,ep)*mtsq*s234**3*denbt2**2*s16 + 1.D0/8.D0*epqlI3(
-     &    s234,mtsq,s16,zip,zip,mtsq,musq,ep)*mtsq*s234**4*denbt2**2 - 
+     &    s234,mtsq,s16,zip,zip,mtsq,musq,ep)*mtsq*s234**4*denbt2**2 -
      &    1.D0/4.D0*epqlI3(s234,mtsq,s16,zip,zip,mtsq,musq,ep)*mtsq**2*
      &    s234**2*denbt2**2*s16 - 1.D0/4.D0*epqlI3(s234,mtsq,s16,zip,
      &    zip,mtsq,musq,ep)*mtsq**2*s234**3*denbt2**2 + 1.D0/8.D0*
@@ -166,7 +166,7 @@
      &    zip,zip,mtsq,musq,ep)*mtsq*s234**2*denbt2**2*s16**2
       vert25x10 = vert25x10 - 1.D0/4.D0*ep2qlI3(s234,mtsq,s16,zip,zip,
      & mtsq,musq,ep)*mtsq*s234**3*denbt2**2*s16 + 1.D0/8.D0*ep2qlI3(
-     &    s234,mtsq,s16,zip,zip,mtsq,musq,ep)*mtsq*s234**4*denbt2**2 - 
+     &    s234,mtsq,s16,zip,zip,mtsq,musq,ep)*mtsq*s234**4*denbt2**2 -
      &    1.D0/4.D0*ep2qlI3(s234,mtsq,s16,zip,zip,mtsq,musq,ep)*mtsq**2
      &    *s234**2*denbt2**2*s16 - 1.D0/4.D0*ep2qlI3(s234,mtsq,s16,zip,
      &    zip,mtsq,musq,ep)*mtsq**2*s234**3*denbt2**2 + 1.D0/8.D0*
@@ -237,7 +237,7 @@
      &    denbt2*s16 - 1.D0/2.D0*mt*s234*denbt2**2*s16**3 + 1.D0/4.D0*
      &    mt*s234**2*denbt2**2*s16**2 - 2.D0*mt*mtsq*denbt2*s16 - mt*
      &    mtsq*denbt2**2*s16**3 - mt*mtsq*s234*denbt2 + 1.D0/2.D0*mt*
-     &    mtsq*s234*denbt2**2*s16**2 + mt*mtsq*s234**2*denbt2**2*s16 + 
+     &    mtsq*s234*denbt2**2*s16**2 + mt*mtsq*s234**2*denbt2**2*s16 +
      &    mt*mtsq**2*denbt2 + 3.D0/2.D0*mt*mtsq**2*denbt2**2*s16**2 + 1.
      &    D0/2.D0*mt*mtsq**2*s234*denbt2**2*s16 + 1.D0/4.D0*mt*mtsq**2*
      &    s234**2*denbt2**2 - mt*mtsq**3*denbt2**2*s16 - 1.D0/2.D0*mt*
@@ -264,8 +264,8 @@
      &     - 1.D0/8.D0*denbt2**2*s16**3 - 1.D0/2.D0*s234*denbt2 + 3.D0/
      &    8.D0*s234*denbt2**2*s16**2 - 3.D0/8.D0*s234**2*denbt2**2*s16
      &     + 1.D0/8.D0*s234**3*denbt2**2 + mtsq*denbt2 + 3.D0/8.D0*mtsq
-     &    *denbt2**2*s16**2 - 1.D0/2.D0*mtsq*s234*denbt2*s16**(-1) - 
-     &    mtsq*s234*denbt2**2*s16 + 5.D0/8.D0*mtsq*s234**2*denbt2**2 + 
+     &    *denbt2**2*s16**2 - 1.D0/2.D0*mtsq*s234*denbt2*s16**(-1) -
+     &    mtsq*s234*denbt2**2*s16 + 5.D0/8.D0*mtsq*s234**2*denbt2**2 +
      &    1.D0/2.D0*mtsq**2*denbt2*s16**(-1) - 3.D0/8.D0*mtsq**2*
      &    denbt2**2*s16 + 5.D0/8.D0*mtsq**2*s234*denbt2**2 + 1.D0/8.D0*
      &    mtsq**3*denbt2**2 )
@@ -393,7 +393,7 @@
      &    /8.D0*epqlI3(s234,mtsq,s16,zip,zip,mtsq,musq,ep)*mtsq*s234**2
      &    *denbt2**2*s16**2 + 1.D0/4.D0*epqlI3(s234,mtsq,s16,zip,zip,
      &    mtsq,musq,ep)*mtsq*s234**3*denbt2**2*s16 - 1.D0/8.D0*epqlI3(
-     &    s234,mtsq,s16,zip,zip,mtsq,musq,ep)*mtsq*s234**4*denbt2**2 + 
+     &    s234,mtsq,s16,zip,zip,mtsq,musq,ep)*mtsq*s234**4*denbt2**2 +
      &    1.D0/4.D0*epqlI3(s234,mtsq,s16,zip,zip,mtsq,musq,ep)*mtsq**2*
      &    s234**2*denbt2**2*s16 + 1.D0/4.D0*epqlI3(s234,mtsq,s16,zip,
      &    zip,mtsq,musq,ep)*mtsq**2*s234**3*denbt2**2 - 1.D0/8.D0*
@@ -403,14 +403,14 @@
      &    zip,zip,mtsq,musq,ep)*mtsq*s234**2*denbt2**2*s16**2
       vert25x16 = vert25x16 + 1.D0/4.D0*ep2qlI3(s234,mtsq,s16,zip,zip,
      & mtsq,musq,ep)*mtsq*s234**3*denbt2**2*s16 - 1.D0/8.D0*ep2qlI3(
-     &    s234,mtsq,s16,zip,zip,mtsq,musq,ep)*mtsq*s234**4*denbt2**2 + 
+     &    s234,mtsq,s16,zip,zip,mtsq,musq,ep)*mtsq*s234**4*denbt2**2 +
      &    1.D0/4.D0*ep2qlI3(s234,mtsq,s16,zip,zip,mtsq,musq,ep)*mtsq**2
      &    *s234**2*denbt2**2*s16 + 1.D0/4.D0*ep2qlI3(s234,mtsq,s16,zip,
      &    zip,mtsq,musq,ep)*mtsq**2*s234**3*denbt2**2 - 1.D0/8.D0*
      &    ep2qlI3(s234,mtsq,s16,zip,zip,mtsq,musq,ep)*mtsq**3*s234**2*
      &    denbt2**2
 
-      
+
       return
       end
-      
+

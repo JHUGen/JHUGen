@@ -21,14 +21,14 @@
       include 'qqgg.f'
       include 'incldip.f'
       double precision msqc(maxd,-nf:nf,-nf:nf),p(mxpart,4)
-      double precision 
+      double precision
      & msq39_4(-nf:nf,-nf:nf),msq49_3(-nf:nf,-nf:nf),
      & dummyv(-nf:nf,-nf:nf),sub39_4(4),sub49_3(4),dsubv
       integer j,k,nd
       external qqb_QQbdk,donothing_gvec
 
       ndmax=2
-      
+
       do j=-nf,nf
       do k=-nf,nf
       do nd=1,ndmax
@@ -47,7 +47,7 @@
         msqc(1,j,k)=sub39_4(qq)*msq39_4(j,k)*2d0*cf
         msqc(2,j,k)=sub49_3(qq)*msq49_3(j,k)*2d0*cf
       enddo
-                  
+
       return
       end
 

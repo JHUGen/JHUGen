@@ -19,8 +19,8 @@ c--- By R. Frederix, July 17, 2008.
       integer u,q1,q2,d,b1,t1,proj,i3,i4
 
 c color matrix:
-c      DATA (CF(i,1  ),i=1  ,2  ) /     6,   2    /                
-c      DATA (CF(i,2  ),i=1  ,2  ) /     2,   6    /                
+c      DATA (CF(i,1  ),i=1  ,2  ) /     6,   2    /
+c      DATA (CF(i,2  ),i=1  ,2  ) /     2,   6    /
 
       if (nwz .eq. +1) then
         t1=9
@@ -29,7 +29,7 @@ c      DATA (CF(i,2  ),i=1  ,2  ) /     2,   6    /
         t1=10
         b1=9
       endif
-      
+
 c momentum to project the spin of top and bottom quarks
       proj=1
 
@@ -70,7 +70,7 @@ c W propagator and common factors:
       bDg=(s(q1,d)+s(6,q1)+s(6,d))/2d0
       tDg=(s(q1,d)+s(3,q1)+s(3,d)+s(4,q1)+s(4,d)+s(5,q1)+s(5,d))/2d0
       wprop_b = bDg*tDg*(wmass**2-2d0*ud)
-    
+
 c Only one structure
       call reals_qq(u,q1,q2,9,10,d,proj,mq,ma,za,zb,gs_b)
 
@@ -110,12 +110,12 @@ c Only one structure
      &    -(pp(3,1)+pp(4,1)+pp(5,1))**2
      &    -(pp(3,2)+pp(4,2)+pp(5,2))**2
      &    -(pp(3,3)+pp(4,3)+pp(5,3))**2
-     
+
 c--- now dress up with appropriate factors to include the top quark decay
       fac=gwsq*dsqrt(2d0*dot(pp,i3,5))
      &    /dsqrt((2d0*dot(pp,3,4)-wmass**2)**2+(wmass*wwidth)**2)
      &    /dsqrt((s345-mt**2)**2+(mt*twidth)**2)
-     
+
       do i=1,2
       do j=1,2
       if     (nwz .eq. +1) then
@@ -148,7 +148,7 @@ c--- now dress up with appropriate factors to include the top quark decay
         write(6,*) 'nwz must be +1 or -1 in interdk_qq'
         stop
       endif
-      
+
       enddo
       enddo
 
@@ -204,7 +204,7 @@ c--- ensure array pp is not contaminated upon return
       pp(t1,k)=zip
       pp(b1,k)=zip
       enddo
-      
+
       return
       end
 

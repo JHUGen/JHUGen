@@ -60,8 +60,8 @@ c--- two outgoing particles switched (eg. gg->qqb rather than gg->qbq)
       prop=s(3,4)**2/((s(3,4)-wmass**2)**2+wmass**2*wwidth**2)
       fac=V*xn/eight*(gsq*gwsq)**2*prop
       call spinoru(6,p,za,zb)
-C   zab=<i-|k|j-> zba=<i+|k|j+> where k is an arbitrary 4-vector 
-c---Arbitrary conventions of Bern, Dixon, Kosower, Weinzierl, 
+C   zab=<i-|k|j-> zba=<i+|k|j+> where k is an arbitrary 4-vector
+c---Arbitrary conventions of Bern, Dixon, Kosower, Weinzierl,
 c---za(i,j)*zb(j,i)=s(i,j)
       call spinork(6,p,zab,zba,n)
 
@@ -130,7 +130,7 @@ c      p1p2(-1,1)=aveqq*fac*w2jetn(2,1,3,4,6,5,p,n,za,zb,zab,zba)
 c      p1p2(+1,0)=aveqg*fac*w2jetn(1,6,3,4,2,5,p,n,za,zb,zab,zba)
 c      p1p2(-1,0)=aveqg*fac*w2jetn(6,1,3,4,2,5,p,n,za,zb,zab,zba)
 c      p1p2(0,+1)=aveqg*fac*w2jetn(2,6,3,4,1,5,p,n,za,zb,zab,zba)
-c      p1p2(0,-1)=aveqg*fac*w2jetn(6,2,3,4,1,5,p,n,za,zb,zab,zba) 
+c      p1p2(0,-1)=aveqg*fac*w2jetn(6,2,3,4,1,5,p,n,za,zb,zab,zba)
       elseif (in .eq. 6) then
         call w2jetnx(1,2,3,4,5,6,p,n,za,zb,zab,zba)
         call storecsv_px(1,-1)
@@ -231,8 +231,8 @@ c      p1p2(0,-1)=aveqg*fac*w2jetn(5,2,3,4,1,6,p,n,za,zb,zab,zba)
 
       return
       end
- 
 
-      
+
+
 
 

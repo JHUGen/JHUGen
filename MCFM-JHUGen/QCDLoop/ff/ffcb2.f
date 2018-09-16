@@ -359,7 +359,7 @@
 		cs(5) = -xma*xlogmm/2
 		csom = cs(1) + cs(2) + cs(3) + cs(4) + cs(5)
 		xmxp = max(absc(cs(2)),absc(cs(3)),absc(cs(4)),
-     +			absc(cs(5))) 
+     +			absc(cs(5)))
 		if ( lwrite ) then
 		    print *,'cb22+= ',csom,xmxp
 		    print *,'with cs '

@@ -3,7 +3,7 @@ c     g(ig)+s(is)-->W^-{e^-(ie)+nbar(in)}+t{W^+[n(jn)+e^+(je)]+b(jb)}+a(ja)
 c---- helicities: gs(ht,ha)
 c--- labels on amplitudes represent helicities for the heavy quark
 c--- and the gluon (ja) respectively
-c---   1 = negative helicity, 2 = positive helicity    
+c---   1 = negative helicity, 2 = positive helicity
 c--- heavy quark momentum is made massless (ic) with the gluon momentum ig
       implicit none
       include 'constants.f'
@@ -17,8 +17,8 @@ c--- heavy quark momentum is made massless (ic) with the gluon momentum ig
 
       propd=dsqrt((s(je,jn)-wmass**2)**2+(wmass*wwidth)**2)
       tsq  =s(je,jn)+s(je,jb)+s(je,ja)+s(jn,jb)+s(jn,ja)+s(jb,ja)
-      propt=dsqrt((tsq-mt**2)**2+(mt*twidth)**2) 
-      
+      propt=dsqrt((tsq-mt**2)**2+(mt*twidth)**2)
+
       mtsq=mt**2
       bDa=+dot(p,jb,ja)
       tDa=+dot(p,je,ja)+dot(p,jn,ja)+dot(p,jb,ja)

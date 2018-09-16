@@ -15,7 +15,7 @@ c---
       integer j,k
       double precision msq(-nf:nf,-nf:nf),p(mxpart,4),s,fac,s34
       double complex prop,qqb,qbq
-      
+
 c---statement function
       s(j,k)=2*(p(j,4)*p(k,4)-p(j,1)*p(k,1)-p(j,2)*p(k,2)-p(j,3)*p(k,3))
 
@@ -26,7 +26,7 @@ c--set msq=0 to initialize
       enddo
       enddo
       s34=s(3,4)
-c      if (s34 .lt. 4d0*mbsq) return 
+c      if (s34 .lt. 4d0*mbsq) return
 
       fac=4d0*esq**2*xn
 

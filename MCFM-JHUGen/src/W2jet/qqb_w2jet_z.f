@@ -19,14 +19,14 @@
       include 'flags.f'
       double precision z,p(mxpart,4),dot,xninv
       double precision xl12,xl15,xl16,xl25,xl26,xl56
-      double precision 
+      double precision
      .                 ii_qq,ii_qg,ii_gq,ii_gg,
      .                 if_qq,if_gg,
      .                 fi_qq,fi_gg,
      .                 ff_qq,ff_gg
       double precision tempgq,tempqg
       integer is
-      
+
       if (Qflag .and. Gflag) then
         write(6,*) 'Both Qflag and Gflag cannot be true'
         write(6,*) 'They are set in file input.DAT'
@@ -45,8 +45,8 @@
 
 ************************************************************************
 *     Contributions from QQGG matrix elements                          *
-************************************************************************            
-      if (Gflag) then      
+************************************************************************
+      if (Gflag) then
 c--- QUARK-ANTIQUARK contributions
       if ((colourchoice .eq. 1) .or. (colourchoice .eq. 0)) then
       do is=1,3
@@ -281,7 +281,7 @@ c--- ason4pi*xn*(ff_qq(z,xl56,2) + ff_gg(z,xl56,2)/2d0) * (1)
       R1(g,g,a,1,is)= R1(g,g,q,2,is)
       R1(g,g,a,2,is)= R1(g,g,q,1,is)
       R1(g,g,a,0,is)= R1(g,g,q,0,is)
-      R2(a,a,g,1,is)= R2(q,q,g,2,is)    
+      R2(a,a,g,1,is)= R2(q,q,g,2,is)
       R2(a,a,g,2,is)= R2(q,q,g,1,is)
       R2(a,a,g,0,is)= R2(q,q,g,0,is)
       R1(q,g,a,0,is)= R1(a,g,q,0,is)
@@ -303,8 +303,8 @@ c--- ason4pi*xn*(ff_qq(z,xl56,2) + ff_gg(z,xl56,2)/2d0) * (1)
       R2(q,g,a,1,is)= R2(a,g,q,1,is)
       R2(q,g,a,2,is)= R2(a,g,q,2,is)
       enddo
-       
-            
+
+
 C--- off-diagonal Qflag -> Gflag pieces
 
       do is=1,3
@@ -353,20 +353,20 @@ C--- off-diagonal Qflag -> Gflag pieces
 
       enddo
 
-      endif 
+      endif
 
 ************************************************************************
 *     Contributions from QQQQ matrix elements                          *
-************************************************************************            
+************************************************************************
       if (Qflag) then
 
 c--- implement leading color by defining color factors in which 1/xn=0
       if (colourchoice .eq. 1) then
         xninv=0d0
       else
-        xninv=1d0/xn   
+        xninv=1d0/xn
       endif
-      
+
 c--- QUARK-QUARK contributions
       do is=1,3
       R1(q,q,q,0,is)=ason4pi*(
@@ -411,7 +411,7 @@ c--- ANTIQUARK-ANTIQUARK contributions
       R2(a,a,a,0,is)=R2(q,q,q,0,is)
       R2(a,a,a,1,is)=R2(q,q,q,1,is)
       R2(a,a,a,2,is)=R2(q,q,q,2,is)
-      
+
       enddo
 
 c--- QUARK-ANTIQUARK contributions
@@ -448,7 +448,7 @@ c--- QUARK-ANTIQUARK contributions
      . +ff_qq(z,xl56,is)*(xn-two*xninv))
 
       enddo
-      
+
 c--- ANTIQUARK-QUARK contributions
       do is=1,3
       R1(a,a,q,0,is)=ason4pi*(

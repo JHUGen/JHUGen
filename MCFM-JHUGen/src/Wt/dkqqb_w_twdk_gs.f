@@ -43,7 +43,7 @@ c                            --> e^-(p3) + nubar(p4)
         return
       endif
 
-      call qqb_w_twdk(q,msq) 
+      call qqb_w_twdk(q,msq)
       fac=gsq*cf*(1d0/pbDpg*(2d0/omz-1d0-z)-(mt/ptDpg)**2)
 
 
@@ -52,7 +52,7 @@ c                            --> e^-(p3) + nubar(p4)
       msqc(1,j,k)=fac*msq(j,k)
       enddo
       enddo
-      
+
       return
       end
 

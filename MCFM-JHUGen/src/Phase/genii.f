@@ -20,7 +20,7 @@
 
       i1=j1(nperms)
       i2=j2(nperms)
-   
+
 c first of all calculate the variables with which one started
 c---NB all incoming
 
@@ -31,7 +31,7 @@ c      omxmin=one-xmin
       omxmin=one-xx(i1)
       alpha=-dot(p,i2,3)/dot(p,i1,i2)
       omx=one-x
-      a=alpha/omx   
+      a=alpha/omx
       oma=1d0-a
       if (impsample) then
       jacbit=four*sqrt(omx*omxmin)/(half/sqrt(a)+half/sqrt(oma))
@@ -39,7 +39,7 @@ c      omxmin=one-xmin
       jacbit=omxmin
       endif
 
-c---at this stage the p are momenta including radiation 
+c---at this stage the p are momenta including radiation
       wt5_4=wt0*dot(p,i1,i2)*omx/x*jacbit
 
       call itransform(p,q,x,i1,3,i2)
@@ -62,21 +62,21 @@ c      write(6,*) 'wt in genii.f',wt
       endif
 
 c---q are in Born level four momenta
-      
+
       if (justjac) return
-      
+
       call qqb_WH(q,msq)
 
       Pqq=CF*(one+x**2)/omx
       Pqg=TR*(one-two*x*omx)
       facq=-2*gsq/x*Pqq
       facg=-2*gsq/x*Pqg
-     
+
       do j=-nf,nf
       do k=-nf,nf
       msq(j,k)=0d0
 
-      
+
       if     ((j .gt. 0) .and. (k .lt. 0)) then
       msq(j,k)=facq/s13*msq(j,k)
       elseif ((j .lt. 0) .and. (k .gt. 0)) then
@@ -89,7 +89,7 @@ c---q are in Born level four momenta
      &(msq(+1,k)+msq(+2,k)+msq(+3,k)+msq(+4,k)+msq(+5,k))
 
       endif
-      
+
       enddo
       enddo
 

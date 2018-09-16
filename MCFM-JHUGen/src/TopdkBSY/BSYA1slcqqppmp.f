@@ -17,7 +17,7 @@ C---- (These are twiddle functions, c.f.arXiv:1101.5947[hep-ph],Eq.(91))
       s23=s(p2,p3)
       xbeta2=1d0-4d0*mt**2/s23
 
-      BSYA1slcqqppmp=-BSYA0qqppmp(e1,p2,p3,e4,za,zb,zab,zba)*( 
+      BSYA1slcqqppmp=-BSYA0qqppmp(e1,p2,p3,e4,za,zb,zab,zba)*(
      & s23*I32x3x41+(s23-2d0*mt**2)*I3m1x23x4+1.5d0*I2h23
      & +(1d0+(2d0*zab(p2,q1,p2)+s23)/(2d0*s23*xbeta2))*F2m23
      &  +I2m-4d0

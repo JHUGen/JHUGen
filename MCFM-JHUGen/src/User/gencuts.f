@@ -18,7 +18,7 @@
       double precision pjet(mxpart,4)
 !$omp threadprivate(makeVBScuts,makeATLAS_sscuts)
 !$omp threadprivate(makeCMS_hzz,makeCMS_hzz_vbf)
-      
+
       if (first) then
         first=.false.
         makeVBScuts=(index(runstring,'VBS') .gt. 0)
@@ -26,9 +26,9 @@
         makeCMS_hzz=(index(runstring,'CMS_hzz') .gt. 0)
         makeCMS_hzz_vbf=(index(runstring,'CMS_hzz_vbf') .gt. 0)
       endif
-      
+
       gencuts=.false.
-      
+
       if (makeVBScuts) then
         call VBS(pjet,failed)
         if (failed) gencuts=.true.
@@ -46,32 +46,32 @@
         if (failed) gencuts=.true.
         return
       endif
-      
+
       if (makeCMS_hzz) then
         call CMS_hzz(pjet,failed)
         if (failed) gencuts=.true.
         return
       endif
-      
+
 c--- Default: use the cuts from the input file
       gencuts=gencuts_input(pjet,njets)
-        
+
       return
 
 
       end
- 
 
 
 
- 
- 
+
+
+
 c      if ( (case .eq. 'HZZ_4l')
 c     & .or.(case .eq. 'HZZ_tb')
 c     & .or.(case .eq. 'HZZint')
 c     & .or.(case .eq. 'HZZH+i')
-c     & .or.(case .eq. 'ggZZ4l') 
-c     & .or.(case .eq. 'HZZqgI')) then 
+c     & .or.(case .eq. 'ggZZ4l')
+c     & .or.(case .eq. 'HZZqgI')) then
 c        call CMS_hzz(pjet,failed)
 c        if (failed) gencuts=.true.
 c        return
@@ -81,8 +81,8 @@ c      if ( (case .eq. 'HWW_4l')
 c     & .or.(case .eq. 'HWW_tb')
 c     & .or.(case .eq. 'HWWint')
 c     & .or.(case .eq. 'HWWH+i')
-c     & .or.(case .eq. 'ggWW4l') 
-c     & .or.(case .eq. 'WWqqbr')) then 
+c     & .or.(case .eq. 'ggWW4l')
+c     & .or.(case .eq. 'WWqqbr')) then
 c        call ATLAS_hww2013(pjet,failed)
 c        if (failed) gencuts=.true.
 c        return
@@ -99,4 +99,4 @@ c         gencuts=gencuts_WZjj(pjet,njets)
 c         return
 c      endif
 
- 
+

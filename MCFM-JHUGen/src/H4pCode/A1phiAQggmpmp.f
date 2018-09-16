@@ -16,7 +16,7 @@ c---   i.e. complete LHS
       double precision s3,mhsq,s123,s234,s341,s412
       zab2(j1,j2,j3,j4)=+za(j1,j2)*zb(j2,j4)+za(j1,j3)*zb(j3,j4)
       s3(j1,j2,j3)=s(j1,j2)+s(j1,j3)+s(j2,j3)
-      
+
       s123=s3(j1,j2,j3)
       s234=s3(j2,j3,j4)
       s341=s3(j3,j4,j1)
@@ -33,9 +33,9 @@ c---   i.e. complete LHS
      . -epinv**2-epinv*l41-0.5d0*l41**2
      . +13d0/6d0*(epinv+l12)
      . +119d0/18d0-deltar/6d0
-     . -Lsm1_2me(s123,s234,s(j2,j3),mhsq) 
-     . -Lsm1_2me(s341,s412,s(j4,j1),mhsq) 
-     . -Lsm1_2me(s412,s123,s(j1,j2),mhsq) 
+     . -Lsm1_2me(s123,s234,s(j2,j3),mhsq)
+     . -Lsm1_2me(s341,s412,s(j4,j1),mhsq)
+     . -Lsm1_2me(s412,s123,s(j1,j2),mhsq)
 
       A1phiAQggmpmpL=A0phiAQggmpmp(j1,j2,j3,j4,za,zb)
      . *(V1L-13d0/6d0*lnrat(-s412,-s(j1,j2))
@@ -76,7 +76,7 @@ c---   i.e. complete LHS
      .  +za(j2,j3)**2*zb(j2,j4)/(za(j2,j4)**2*zb(j1,j4))
      .  +2d0*za(j2,j3)**3*za(j1,j4)*zb(j2,j4)
      .      /(za(j2,j4)**2*za(j3,j4)*za(j1,j2)*zb(j1,j4)))
-     .  *lnrat(-s412,-s(j1,j2))     
+     .  *lnrat(-s412,-s(j1,j2))
      . +za(j1,j2)**2*za(j3,j4)*zb(j2,j4)
      .  /(za(j2,j4)**2*za(j1,j4)*zb(j3,j4))*lnrat(-s234,-s(j2,j3))
      . +za(j3,j4)**2*za(j1,j2)*zb(j2,j4)
@@ -100,7 +100,7 @@ c---   i.e. complete LHS
      . -zb(j2,j4)**2*za(j3,j4)*za(j2,j3)
      .  /(s(j4,j1)*za(j2,j4)*zb(j1,j2))
      . -2d0*A0phidAQggmpmp(j1,j2,j3,j4,za,zb)
-     
+
       A1phiAQggmpmpL=A1phiAQggmpmpL+sum
 
       return
@@ -123,7 +123,7 @@ c---   i.e. complete LHS
       double precision s3,mhsq,s341,s234,s412
       zab2(j1,j2,j3,j4)=+za(j1,j2)*zb(j2,j4)+za(j1,j3)*zb(j3,j4)
       s3(j1,j2,j3)=s(j1,j2)+s(j1,j3)+s(j2,j3)
-      
+
       mhsq=s(j1,j2)+s(j1,j3)+s(j1,j4)+s(j2,j3)+s(j2,j4)+s(j3,j4)
       l12=lnrat(musq,-s(j1,j2))
       s341=s3(j3,j4,j1)
@@ -133,7 +133,7 @@ c---   i.e. complete LHS
       VR=-epinv**2-epinv*l12-0.5d0*l12**2
      .   -3d0/2d0*(epinv+l12)-7d0/2d0-deltar/2d0
      .   -Lsm1_2me(s234,s341,s(j3,j4),mhsq)
-      
+
       A1phiAQggmpmpR=
      . +za(j1,j2)**2*za(j3,j4)**2/(za(j1,j4)*za(j2,j4)**3)
      . *(Lsm1DS(s(j2,j3),s(j3,j4),s234)+Lsm1DS(s(j4,j1),s(j1,j2),s412))
@@ -170,10 +170,10 @@ c---   i.e. complete LHS
      . -za(j1,j2)*zb(j2,j4)*za(j3,j4)*zab2(j1,j2,j3,j4)
      .  /(s(j2,j3)*za(j1,j4)*zb(j3,j4)*za(j2,j4))
      . +za(j1,j3)*zb(j2,j4)/(zb(j2,j3)*za(j2,j4))
-     
+
       A1phiAQggmpmpR=A1phiAQggmpmpR
      .             +A0phiAQggmpmp(j1,j2,j3,j4,za,zb)*VR
-      
+
       return
       end
 
@@ -191,7 +191,7 @@ c---   i.e. complete LHS
       double complex l12,zab2,L2,lnrat,A0phiAQggmpmp
       double precision s412
       zab2(j1,j2,j3,j4)=+za(j1,j2)*zb(j2,j4)+za(j1,j3)*zb(j3,j4)
-      
+
       s412=s(j4,j1)+s(j4,j2)+s(j1,j2)
 
       l12=lnrat(musq,-s(j1,j2))
@@ -208,6 +208,6 @@ c---   i.e. complete LHS
      .                  /(zb(j1,j2)*za(j3,j4)*za(j1,j4)*s412)
      .+1d0/6d0*za(j1,j3)**3*s412
      .        /(s(j1,j2)*za(j1,j2)*za(j3,j4)*za(j1,j4))
-      
+
       return
       end

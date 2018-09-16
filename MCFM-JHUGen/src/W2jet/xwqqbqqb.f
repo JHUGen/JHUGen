@@ -15,7 +15,7 @@
 
 
       if (n1 .ne. -n2) then
-Case 3 Distinct quarks- charged coupling 
+Case 3 Distinct quarks- charged coupling
 C*************************************************************
 
 C++++ subcase a
@@ -39,7 +39,7 @@ c      left-right matrix element
 
       xma=fac*aveqq*Von4*(abs(mlll1)**2+abs(mlrl1)**2)
 
-C++++ subcase b 
+C++++ subcase b
 c     qi(-p1)+qbarj(-p2)-->qi(p3)+qbark(p4)+W+/-  (k .ne. i,j)
 
       fac=0d0
@@ -50,7 +50,7 @@ c     qi(-p1)+qbarj(-p2)-->qi(p3)+qbark(p4)+W+/-  (k .ne. i,j)
 c      left-left matrix element
       mlll1=+Lla(i2,i1,i4,i3)
 c      right-left matrix element
-      mrll1=+Lla(i2,i3,i4,i1)      
+      mrll1=+Lla(i2,i3,i4,i1)
 
       xmb=fac*aveqq*Von4*(abs(mlll1)**2+abs(mrll1)**2)
 
@@ -79,25 +79,25 @@ c     qi(-p1)+qbarj(-p2)-->qi(p3)+qbari(p4)+W+/-  (k .eq. i)
       fac=(fl*gl(n2,n1)*VV(n2,n1))**2
 
 c      left-left matrix element
-      mlll1=+Lla(i2,i1,i4,i3)     
-      mlll2=-Lla(i1,i2,i4,i3)     
+      mlll1=+Lla(i2,i1,i4,i3)
+      mlll2=-Lla(i1,i2,i4,i3)
 c      right-left matrix element
-      mrll1=+Lla(i2,i3,i4,i1)      
-      mrll2=-Lla(i1,i3,i4,i2)      
+      mrll1=+Lla(i2,i3,i4,i1)
+      mrll2=-Lla(i1,i3,i4,i2)
 
       xmd=fac*half*aveqq*Von4*(
      & +abs(mlll1)**2+abs(mlll2)**2-two/XN*dble(mlll1*Dconjg(mlll2))
      & +abs(mrll1)**2+abs(mrll2)**2)
-      
+
 c++++ subcase e
 
 c     qi(-p1)+qbarj(-p2)-->qk(p3)+qbark(p4)+W+/-  (k .ne. i,j)
 
 c      left-left matrix element
       fac=(fl*gl(n1,n2)*VV(n1,n2))**2*(nf-2)
-      mlll2=-Lla(i1,i2,i4,i3)      
+      mlll2=-Lla(i1,i2,i4,i3)
 c      right-left matrix element
-      mlrl2=-Lla(i1,i3,i4,i2)      
+      mlrl2=-Lla(i1,i3,i4,i2)
       xme=fac*half*aveqq*Von4*(
      & +abs(mlll2)**2+abs(mlrl2)**2)
 
@@ -119,7 +119,7 @@ c     qi(-p1)+qbari(-p2)-->qj(p3)+qbari(p4)+W+/-  (k .ne. i)
 
 c----left-left matrix element
       mlll1=+Lla(i1,i2,i3,i4)
-      mlll2=-Lla(i2,i1,i3,i4)      
+      mlll2=-Lla(i2,i1,i3,i4)
 
 c----left-right matrix element
       mlrl1=+Lla(i1,i4,i3,i2)
@@ -137,7 +137,7 @@ c     qi(-p1)+qbari(-p2)-->qi(p3)+qbark(p4)+W+/-  (k .ne. i)
       do nk=-nf,nf
       fac=fac+(fl*gl(n2,nk)*VV(n2,nk))**2
       enddo
-      
+
 c----left-left matrix element
       mlll1=+Lla(i2,i1,i4,i3)
       mlll2=-Lla(i2,i1,i3,i4)
@@ -151,7 +151,7 @@ c----right-left matrix element
      & +abs(mlll1)**2+abs(mlll2)**2
      & -two/XN*dble(mlll1*Dconjg(mlll2))
      & +abs(mrll1)**2+abs(mrll2)**2)
-     
+
 
 c++++ subcase c
 c     qi(-p1)+qbari(-p2)-->qj(p3)+qbark(p4)+W+/-  (j,k .ne. i)
@@ -177,7 +177,7 @@ c----left-right matrix element
       xmc=fac*aveqq*Von4*(abs(mlll2)**2+abs(mlrl2)**2)
 
       xwqqbqqb=xma+xmb+xmc
- 
+
       endif
 
       return

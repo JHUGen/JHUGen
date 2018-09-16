@@ -15,7 +15,7 @@
 *           includes the effect of the b-quark mass.                   *
 *                                                                      *
 ************************************************************************
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'ptilde.f'
       include 'qqgg.f'
@@ -24,7 +24,7 @@
       integer j,k,nd
 
       double precision p(mxpart,4),msq(maxd,-nf:nf,-nf:nf)
-      double precision 
+      double precision
      . msq15_2(-nf:nf,-nf:nf),msq25_1(-nf:nf,-nf:nf),
      . msq35_4(-nf:nf,-nf:nf),msq45_3(-nf:nf,-nf:nf),
      . sub15_2(4),sub25_1(4),
@@ -42,9 +42,9 @@ c---- entries are left as dummies
      . qqb_tbbdk,donothing_gvec)
       call dips_mass(2,p,2,5,1,sub25_1,dsubv,msq25_1,dummyv,
      . qqb_tbbdk,donothing_gvec)
-     
+
 c--- dipoles for the final state
-      qqproc=.true.      
+      qqproc=.true.
       oldmass2=mass2
       mass2=mt
       call dips_mass(3,p,3,5,4,sub35_4,dsubv,msq35_4,dummyv,
@@ -53,7 +53,7 @@ c--- dipoles for the final state
       call dips_mass(4,p,4,5,3,sub45_3,dsubv,msq45_3,dummyv,
      . qqb_tbbdk,donothing_gvec)
       mass2=oldmass2
-      
+
       do j=-nf,nf
       do k=-nf,nf
 
@@ -82,7 +82,7 @@ c--- dipoles for the final state
       enddo
       enddo
 
-      return      
+      return
       end
 
 

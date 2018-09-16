@@ -25,7 +25,7 @@ c----p(6,i) and p(7,i) are set equal to zero
       xx(2)=sqrt(tau)*exp(-y)
 
 c---if x's out of normal range alternative return
-      if   ((xx(1) .gt. 1d0) 
+      if   ((xx(1) .gt. 1d0)
      & .or. (xx(2) .gt. 1d0)
      & .or. (xx(1) .lt. xmin)
      & .or. (xx(2) .lt. xmin)) return 1
@@ -51,7 +51,7 @@ c---if x's out of normal range alternative return
       p(5,nu)=p5(nu)
       p(6,nu)=p6(nu)
       p(7,nu)=p7(nu)
-      enddo 
+      enddo
 
       wt3=xjac*pswt
       if(wt3 .eq. 0d0) then

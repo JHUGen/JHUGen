@@ -25,7 +25,7 @@ c---- SB see changes in BSYALggppmp.f
       tmp =  + F4m1x2x3x4(j) * (  - 2.D0/(za(p3,p2))
      &    *za(e1,p2)*za(e4,p3)*zab(p3,q1,p2)**2*mt - 3.D0/(za(p3,p2))*
      &    za(e1,p3)*za(e4,p3)*zab(p3,q1,p2)*mt3 )
-      tmp = tmp + I3m1x23x4 * ( 2.D0*mt2*AT0ggppmp - 
+      tmp = tmp + I3m1x23x4 * ( 2.D0*mt2*AT0ggppmp -
      &    s23*AT0ggppmp )
       tmp = tmp + I3m12x3x4(j) * ( 4.D0/(zab(p2,q1,p2))
      &    /(za(p3,p2))*za(e1,p2)*za(e4,p3)*zab(p2,q1,p2)*zab(p3,q1,p2)
@@ -145,9 +145,9 @@ c---- SB see changes in BSYALggppmp.f
      &    zab(p2,q1,p3)*zab(p3,q1,p2)*s23**(-2)*mt*xbeta2**(-1) - 3.D0/
      &    2.D0/(zab(p2,q1,p3))/(za(p3,p2))*za(e1,p3)*za(e4,p3)*zab(p2,
      &    q1,p3)*zab(p3,q1,p2)*s23**(-1)*mt*xbeta2**(-1) )
-      
+
 c---- SB see changes in BSYALggppmp.f
       BSYARggppmphp=-tmp
-      
+
       return
       end

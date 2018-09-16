@@ -1,7 +1,7 @@
       subroutine clust(jets,npar)
       implicit double precision (a-h,o-z)
       parameter(pi=3.141592653589793238d0)
-      common /jetdef/ etminj,etmaxj,delrjj,rapmaxj,rapminj 
+      common /jetdef/ etminj,etmaxj,delrjj,rapmaxj,rapminj
       common /clusdef/ rsep,jalg1,jalg2
       common /jetcom/ icol,ji,jj,jk
       common /parmom/ ppar(4,10)
@@ -11,7 +11,7 @@
       if(init.eq.0) then
         init=1
         write(*,*)' jet clustering as of 12/8/95 '
-      endif     
+      endif
 *
 * pjet(5,j) = ET
 * pjet(6,j) = pseudorapidity
@@ -31,7 +31,7 @@ c--added by RKE
       pjet(8,7)=-1d0
 c--added by RKE
       if (npar.eq.0) then
-         jets=0 
+         jets=0
          return
       endif
       icol=0
@@ -65,10 +65,10 @@ c--added by RKE
                if (jalg1.eq.1) then
                   dely=pjet(6,j1)-pjet(6,j2)
                   rar=(pjet(1,j1)*pjet(1,j2)+pjet(2,j1)*pjet(2,j2))
-     .                 /pjet(5,j1)/pjet(5,j2) 
-                  if (rar.lt.-1d0) then 
+     .                 /pjet(5,j1)/pjet(5,j2)
+                  if (rar.lt.-1d0) then
                       delfi=pi
-                  elseif (rar.gt.1d0) then 
+                  elseif (rar.gt.1d0) then
                       delfi=0d0
                   else
                       delfi=dacos(rar)
@@ -85,10 +85,10 @@ c--added by RKE
                  if(jalg1.eq.4)then
                    dely=pjet(6,j1)-pjet(6,j2)
                    rar=(pjet(1,j1)*pjet(1,j2)+pjet(2,j1)*pjet(2,j2))
-     .                 /pjet(5,j1)/pjet(5,j2) 
-                   if (rar.lt.-1d0) then 
+     .                 /pjet(5,j1)/pjet(5,j2)
+                   if (rar.lt.-1d0) then
                       delfi=pi
-                   elseif (rar.gt.1d0) then 
+                   elseif (rar.gt.1d0) then
                       delfi=0d0
                    else
                       delfi=dacos(rar)
@@ -106,27 +106,27 @@ c--added by RKE
                    theta=atan2(pt,pz)
                    if(jalg2.eq.1)then
                      etjet=pt1+pt2
-                   elseif(jalg2.eq.3)then 
+                   elseif(jalg2.eq.3)then
                      etjet=pt
-                   elseif(jalg2.eq.4)then 
+                   elseif(jalg2.eq.4)then
                      etjet=ee*dsin(theta)
                    endif
                    etajet=-dlog(dabs(dtan(theta/2.0d0)))
                    phijet=datan2(px,py)
                    rar=(pjet(1,j1)*px+pjet(2,j1)*py)
      .                 /pt1/pt
-                   if (rar.lt.-1d0) then 
+                   if (rar.lt.-1d0) then
                       delfi1=pi
-                   elseif (rar.gt.1d0) then 
+                   elseif (rar.gt.1d0) then
                       delfi1=0d0
                    else
                       delfi1=dacos(rar)
                    endif
                    rar=(pjet(1,j2)*px+pjet(2,j2)*py)
      .                 /pt2/pt
-                   if (rar.lt.-1d0) then 
+                   if (rar.lt.-1d0) then
                       delfi2=pi
-                   elseif (rar.gt.1d0) then 
+                   elseif (rar.gt.1d0) then
                       delfi2=0d0
                    else
                       delfi2=dacos(rar)
@@ -139,15 +139,15 @@ c--added by RKE
                    phijet=(pjet(7,j1)*pjet(5,j1)
      .                    +pjet(7,j2)*pjet(5,j2))/etjet
                    rar=(pjet(1,j1)*pjet(1,j2)+pjet(2,j1)*pjet(2,j2))
-     .                 /pjet(5,j1)/pjet(5,j2) 
-                   if (rar.lt.-1d0) then 
+     .                 /pjet(5,j1)/pjet(5,j2)
+                   if (rar.lt.-1d0) then
                       delfi=pi
-                   elseif (rar.gt.1d0) then 
+                   elseif (rar.gt.1d0) then
                       delfi=0d0
                    else
                       delfi=dacos(rar)
                    endif
-                   delfi1= pjet(5,j2)*delfi/etjet ! phi_1 - phijet 
+                   delfi1= pjet(5,j2)*delfi/etjet ! phi_1 - phijet
                    delfi2=-pjet(5,j1)*delfi/etjet ! phi_2 - phijet
                  endif
                  dely1=pjet(6,j1)-etajet
@@ -169,10 +169,10 @@ c--added by RKE
                if (jalg1.eq.3) then
                   dely=pjet(6,j1)-pjet(6,j2)
                   rar=(pjet(1,j1)*pjet(1,j2)+pjet(2,j1)*pjet(2,j2))
-     .                /pjet(5,j1)/pjet(5,j2) 
-                  if (rar.lt.-1d0) then 
+     .                /pjet(5,j1)/pjet(5,j2)
+                  if (rar.lt.-1d0) then
                      delfi=pi
-                  elseif (rar.gt.1d0) then 
+                  elseif (rar.gt.1d0) then
                      delfi=0d0
                   else
                      delfi=dacos(rar)
@@ -202,7 +202,7 @@ c----Added by RKE
              if ((ji .eq. 5).or.(ji .eq. 6)
      .       .or.(jj .eq. 5).or.(jj .eq. 6)) then
              pjet(8,ji)=+1d0
-             else 
+             else
              pjet(8,ji)=-1d0
              endif
         jk=ji
@@ -238,15 +238,15 @@ c----Added by RKE
      .          (pjet(7,ji)*pjet(5,ji)+pjet(7,jj)*pjet(5,jj))/etjet
              eejet=exp(etajet)
              rar=(pjet(1,ji)*pjet(1,jj)+pjet(2,ji)*pjet(2,jj))
-     .           /pjet(5,ji)/pjet(5,jj) 
-             if (rar.lt.-1d0) then 
+     .           /pjet(5,ji)/pjet(5,jj)
+             if (rar.lt.-1d0) then
                   delfi=pi
-             elseif (rar.gt.1d0) then 
+             elseif (rar.gt.1d0) then
                   delfi=0d0
              else
                   delfi=dacos(rar)
              endif
-             delfi1= pjet(5,jj)*delfi/etjet ! phi_1 - phijet 
+             delfi1= pjet(5,jj)*delfi/etjet ! phi_1 - phijet
              cde=dcos(delfi1)
              sde=dsin(delfi1)
              if (pjet(2,ji)*pjet(1,jj).gt.pjet(2,jj)*pjet(1,ji))
@@ -281,7 +281,7 @@ c----Added by RKE
            endif
          enddo
       enddo
-* count number of observed jets 
+* count number of observed jets
 *      etminj  <  et < etmaxj
 *      rapminj < eta < rapmaxj
       jets=0
@@ -291,7 +291,7 @@ c----Added by RKE
            if (pjet(5,j).ge.etminj
      .        .and.pjet(5,j).le.etmaxj
      .        .and.abs(pjet(6,j)).le.rapmaxj
-     .        .and.abs(pjet(6,j)).ge.rapminj) then 
+     .        .and.abs(pjet(6,j)).ge.rapminj) then
               jets=jets+1
            else
               pjet(4,j)=-1d0
@@ -304,4 +304,4 @@ c----Added by RKE
              write(6,*) 'end of clust:pjet(4,7)',pjet(4,7)
       end
 *
-************************************************************************ 
+************************************************************************

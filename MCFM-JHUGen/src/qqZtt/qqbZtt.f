@@ -15,7 +15,7 @@
       include 'zprods_com.f'
       include 'masses.f'
       include 'topzlabels.f'
-      
+
       integer j,k,nu
       double precision msq(-nf:nf,-nf:nf),pin(mxpart,4),p(mxpart,4)
       double precision pw1(4),pw2(4),p12(4),q(4),a(4)
@@ -25,7 +25,7 @@
       double precision facqqb,p4Dq,p7Da
       double complex propz
       integer,parameter::jj(-nf:nf)=(/-1,-2,-1,-2,-1,0,1,2,1,2,1/)
-      
+
 C----set all elements to zero
       do j=-nf,nf
       do k=-nf,nf
@@ -36,7 +36,7 @@ C----set all elements to zero
       do nu=1,4
       do j=1,8
       p(j,nu)=pin(j,nu)
-      enddo      
+      enddo
 
       p12(nu)=p(1,nu)+p(2,nu)
       pw1(nu)=p(3,nu)+p(4,nu)
@@ -44,12 +44,12 @@ C----set all elements to zero
 
       q(nu)=+p(3,nu)+p(4,nu)+p(5,nu)
       a(nu)=-p(6,nu)-p(7,nu)-p(8,nu)
-      enddo      
+      enddo
 
 
       s12=(p12(4)**2-p12(1)**2-p12(2)**2-p12(3)**2)
 
-      if (s12 .lt. 4d0*mt**2) then 
+      if (s12 .lt. 4d0*mt**2) then
       write(6,*) 'qqbZtt: s12',s12
       return
       endif
@@ -83,8 +83,8 @@ C----set all elements to zero
       do nu=1,4
       p(q4,nu)=q(nu)-gamq4*p(4,nu)
       p(a7,nu)=a(nu)-gama7*p(7,nu)
-      enddo      
-      
+      enddo
+
       call spinoru(7,p,za,zb)
       call qqbZtt1(propz,wtqqb,wtqbq)
 
@@ -97,6 +97,6 @@ C---fill qb-q and q-qb elements
           msq(j,-j)=aveqq*facqqb*wtqqb(jj(j))
       endif
       enddo
-       
+
       return
       end

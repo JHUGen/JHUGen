@@ -17,10 +17,10 @@
 
       if ((st .eq. 'pp') .or. (st .eq. 'pm')) then
 
-c   Vpm =Vpp= 
+c   Vpm =Vpp=
 c     - 2*epinv^2   + epinv* ( 2/3 - xlog12 - xlog34 )
 c     + 10/9 - 1/2*xlog12^2 - 1/2*xlog34^2 + 13/6*xlog23 - 3/2*xlog56
-c   Vsl = 
+c   Vsl =
 c    -2*epinv^2 + epinv* ( - 3 - xlog12 - xlog34 )
 c    -15/2 - 3/2*xlog12 - 1/2*xlog12^2 - 3/2*xlog34 - 1/2*xlog34^2
 
@@ -39,7 +39,7 @@ c    -15/2 - 3/2*xlog12 - 1/2*xlog12^2 - 3/2*xlog34 - 1/2*xlog34^2
       endif
 
       end
- 
- 
- 
+
+
+
 

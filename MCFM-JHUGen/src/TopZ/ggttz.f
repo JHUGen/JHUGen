@@ -147,7 +147,7 @@
      &    ,u2)*zb(p4,p10) - za(p1,p2)**2*za(p1,p9)*za(p2,u2)*za(p7,a7)*
      &    zb(p1,a7)*zb(p2,u2)*zb(p4,p10) + za(p1,p2)**2*za(p1,u1)*za(p2
      &    ,p7)*za(p9,u2)*zb(p1,u1)*zb(p2,u2)*zb(p4,p10) )
-      mab(1,1,2,1) = mab(1,1,2,1) + s12**(-2)*mt**2*denu**(-1) * (  - 
+      mab(1,1,2,1) = mab(1,1,2,1) + s12**(-2)*mt**2*denu**(-1) * (  -
      &    za(p1,p2)**2*za(p1,p7)*za(p9,u1)*zb(p1,u1)*zb(p4,p10) + za(p1
      &    ,p2)**2*za(p1,p9)*za(p7,a7)*zb(p1,a7)*zb(p4,p10) )
       mab(1,1,2,1) = mab(1,1,2,1) + s12**(-2)*mt**2*denq1**(-1)*
@@ -183,7 +183,7 @@
      &    p2,u2)*zb(p4,p9) - za(p1,p2)**2*za(p1,p10)*za(p2,u2)*za(p7,a7
      &    )*zb(p1,a7)*zb(p2,u2)*zb(p4,p9) + za(p1,p2)**2*za(p1,u1)*za(
      &    p2,p7)*za(p10,u2)*zb(p1,u1)*zb(p2,u2)*zb(p4,p9) )
-      mab(1,1,2,2) = mab(1,1,2,2) + s12**(-2)*mt**2*denu**(-1) * (  - 
+      mab(1,1,2,2) = mab(1,1,2,2) + s12**(-2)*mt**2*denu**(-1) * (  -
      &    za(p1,p2)**2*za(p1,p7)*za(p10,u1)*zb(p1,u1)*zb(p4,p9) + za(p1
      &    ,p2)**2*za(p1,p10)*za(p7,a7)*zb(p1,a7)*zb(p4,p9) )
       mab(1,1,2,2) = mab(1,1,2,2) + s12**(-2)*mt**2*denq1**(-1)*
@@ -315,7 +315,7 @@
      & dena2**(-1) * ( za(p1,p7)*za(p2,u2)*za(p9,u1)*zb(p1,p2)**2*zb(p1
      &    ,u1)*zb(p2,u2)*zb(p4,p10) - za(p1,u1)*za(p2,p9)*za(p7,a7)*zb(
      &    p1,p2)**2*zb(p1,u1)*zb(p2,a7)*zb(p4,p10) )
-      mab(2,2,2,1) = mab(2,2,2,1) + s12**(-2)*mt**2*denu**(-1) * (  - 
+      mab(2,2,2,1) = mab(2,2,2,1) + s12**(-2)*mt**2*denu**(-1) * (  -
      &    za(p1,p7)*za(p9,u1)*zb(p1,p2)**2*zb(p1,u1)*zb(p4,p10) + za(p1
      &    ,p9)*za(p7,a7)*zb(p1,p2)**2*zb(p1,a7)*zb(p4,p10) )
       mab(2,2,2,1) = mab(2,2,2,1) + s12**(-2)*mt**2*denq1**(-1)*
@@ -351,7 +351,7 @@
      & dena2**(-1) * ( za(p1,p7)*za(p2,u2)*za(p10,u1)*zb(p1,p2)**2*zb(
      &    p1,u1)*zb(p2,u2)*zb(p4,p9) - za(p1,u1)*za(p2,p10)*za(p7,a7)*
      &    zb(p1,p2)**2*zb(p1,u1)*zb(p2,a7)*zb(p4,p9) )
-      mab(2,2,2,2) = mab(2,2,2,2) + s12**(-2)*mt**2*denu**(-1) * (  - 
+      mab(2,2,2,2) = mab(2,2,2,2) + s12**(-2)*mt**2*denu**(-1) * (  -
      &    za(p1,p7)*za(p10,u1)*zb(p1,p2)**2*zb(p1,u1)*zb(p4,p9) + za(p1
      &    ,p10)*za(p7,a7)*zb(p1,p2)**2*zb(p1,a7)*zb(p4,p9) )
       mab(2,2,2,2) = mab(2,2,2,2) + s12**(-2)*mt**2*denq1**(-1)*
@@ -420,7 +420,7 @@
      & dena2**(-1) * ( za(p1,p7)*za(p1,p10)*zb(p2,p4)*zb(p2,p9) )
 
       mab(1,2,2,1)= + s12**(-1)*mt**2*denb**(-1)*denq1**(-1) * (  - za(
-     &    p1,q4)*za(p1,b2)*za(p7,p9)*zb(p2,p10)*zb(p2,b2)*zb(p4,q4) + 
+     &    p1,q4)*za(p1,b2)*za(p7,p9)*zb(p2,p10)*zb(p2,b2)*zb(p4,q4) +
      &    za(p1,b1)**2*za(p7,p9)*zb(p2,p4)*zb(p2,b1)*zb(p10,b1) )
       mab(1,2,2,1) = mab(1,2,2,1) + s12**(-1)*mt**2*denu**(-1)*
      & dena2**(-1) * ( za(p1,p7)*za(p1,u1)*za(p9,u2)*zb(p2,u1)*zb(p2,u2
@@ -436,11 +436,11 @@
      &    p2,p4)*zb(p2,u2)*zb(p10,b1) - za(p1,p9)*za(p1,q4)*za(p7,a7)*
      &    zb(p2,p10)*zb(p2,a7)*zb(p4,q4) + za(p1,p9)*za(p1,b1)*za(p7,a7
      &    )*zb(p2,p4)*zb(p2,a7)*zb(p10,b1) )
-      mab(1,2,2,1) = mab(1,2,2,1) + mt**2*denq1**(-1)*dena2**(-1) * ( 
+      mab(1,2,2,1) = mab(1,2,2,1) + mt**2*denq1**(-1)*dena2**(-1) * (
      &    za(p1,p7)*za(p1,p9)*zb(p2,p4)*zb(p2,p10) )
 
       mab(1,2,2,2)= + s12**(-1)*mt**2*denb**(-1)*denq1**(-1) * (  - za(
-     &    p1,q4)*za(p1,b2)*za(p7,p10)*zb(p2,p9)*zb(p2,b2)*zb(p4,q4) + 
+     &    p1,q4)*za(p1,b2)*za(p7,p10)*zb(p2,p9)*zb(p2,b2)*zb(p4,q4) +
      &    za(p1,b1)**2*za(p7,p10)*zb(p2,p4)*zb(p2,b1)*zb(p9,b1) )
       mab(1,2,2,2) = mab(1,2,2,2) + s12**(-1)*mt**2*denu**(-1)*
      & dena2**(-1) * ( za(p1,p7)*za(p1,u1)*za(p10,u2)*zb(p2,u1)*zb(p2,
@@ -456,7 +456,7 @@
      &    zb(p2,p4)*zb(p2,u2)*zb(p9,b1) - za(p1,p10)*za(p1,q4)*za(p7,a7
      &    )*zb(p2,p9)*zb(p2,a7)*zb(p4,q4) + za(p1,p10)*za(p1,b1)*za(p7,
      &    a7)*zb(p2,p4)*zb(p2,a7)*zb(p9,b1) )
-      mab(1,2,2,2) = mab(1,2,2,2) + mt**2*denq1**(-1)*dena2**(-1) * ( 
+      mab(1,2,2,2) = mab(1,2,2,2) + mt**2*denq1**(-1)*dena2**(-1) * (
      &    za(p1,p7)*za(p1,p10)*zb(p2,p4)*zb(p2,p9) )
 
       mab(2,1,1,1)= + s12**(-1)*denb**(-1)*denq1**(-1) * ( za(p2,q4)*
@@ -518,7 +518,7 @@
      &    p2,p10)*za(p2,q4)*za(p7,a7)*zb(p1,p9)*zb(p1,a7)*zb(p4,q4) )
 
       mab(2,1,2,1)= + s12**(-1)*mt**2*denb**(-1)*denq1**(-1) * (  - za(
-     &    p2,q4)*za(p2,b1)*za(p7,p9)*zb(p1,p10)*zb(p1,b1)*zb(p4,q4) + 
+     &    p2,q4)*za(p2,b1)*za(p7,p9)*zb(p1,p10)*zb(p1,b1)*zb(p4,q4) +
      &    za(p2,b2)**2*za(p7,p9)*zb(p1,p4)*zb(p1,b2)*zb(p10,b2) )
       mab(2,1,2,1) = mab(2,1,2,1) + s12**(-1)*mt**2*denu**(-1)*
      & dena2**(-1) * ( za(p2,p7)*za(p2,u2)*za(p9,u1)*zb(p1,u1)*zb(p1,u2
@@ -532,7 +532,7 @@
      &    *zb(p1,a7)*zb(p10,b2) )
 
       mab(2,1,2,2)= + s12**(-1)*mt**2*denb**(-1)*denq1**(-1) * (  - za(
-     &    p2,q4)*za(p2,b1)*za(p7,p10)*zb(p1,p9)*zb(p1,b1)*zb(p4,q4) + 
+     &    p2,q4)*za(p2,b1)*za(p7,p10)*zb(p1,p9)*zb(p1,b1)*zb(p4,q4) +
      &    za(p2,b2)**2*za(p7,p10)*zb(p1,p4)*zb(p1,b2)*zb(p9,b2) )
       mab(2,1,2,2) = mab(2,1,2,2) + s12**(-1)*mt**2*denu**(-1)*
      & dena2**(-1) * ( za(p2,p7)*za(p2,u2)*za(p10,u1)*zb(p1,u1)*zb(p1,
@@ -566,13 +566,13 @@
      & denq2**(-1) * ( za(p1,p2)**3*za(p7,a7)*za(p9,b2)*zb(p1,p4)*zb(p2
      &    ,b2)*zb(p10,a7) - za(p1,p2)**2*za(p1,p9)*za(p2,b2)*za(p7,a7)*
      &    zb(p1,p4)*zb(p2,b2)*zb(p10,a7) )
-      mba(1,1,1,1) = mba(1,1,1,1) + s12**(-2)*mt**2*denb**(-1) * (  - 
+      mba(1,1,1,1) = mba(1,1,1,1) + s12**(-2)*mt**2*denb**(-1) * (  -
      &    za(p1,p2)**2*za(p1,p9)*za(p7,a7)*zb(p1,p4)*zb(p10,a7) )
       mba(1,1,1,1) = mba(1,1,1,1) + s12**(-2)*mt**2*denu**(-1)*
      & dena1**(-1) * ( za(p1,p2)**3*za(p7,a7)*za(p9,q4)*zb(p1,p10)*zb(
      &    p2,a7)*zb(p4,q4) - za(p1,p2)**2*za(p1,p7)*za(p2,u2)*za(p9,q4)
      &    *zb(p1,p10)*zb(p2,u2)*zb(p4,q4) )
-      mba(1,1,1,1) = mba(1,1,1,1) + s12**(-2)*mt**2*denu**(-1) * (  - 
+      mba(1,1,1,1) = mba(1,1,1,1) + s12**(-2)*mt**2*denu**(-1) * (  -
      &    za(p1,p2)**2*za(p1,p7)*za(p9,q4)*zb(p1,p10)*zb(p4,q4) )
       mba(1,1,1,1) = mba(1,1,1,1) + s12**(-2)*mt**2*denq2**(-1)*
      & dena1**(-1) * ( za(p1,p2)**3*za(p2,p9)*za(p7,a7)*zb(p1,p4)*zb(p2
@@ -614,13 +614,13 @@
      & denq2**(-1) * ( za(p1,p2)**3*za(p7,a7)*za(p10,b2)*zb(p1,p4)*zb(
      &    p2,b2)*zb(p9,a7) - za(p1,p2)**2*za(p1,p10)*za(p2,b2)*za(p7,a7
      &    )*zb(p1,p4)*zb(p2,b2)*zb(p9,a7) )
-      mba(1,1,1,2) = mba(1,1,1,2) + s12**(-2)*mt**2*denb**(-1) * (  - 
+      mba(1,1,1,2) = mba(1,1,1,2) + s12**(-2)*mt**2*denb**(-1) * (  -
      &    za(p1,p2)**2*za(p1,p10)*za(p7,a7)*zb(p1,p4)*zb(p9,a7) )
       mba(1,1,1,2) = mba(1,1,1,2) + s12**(-2)*mt**2*denu**(-1)*
      & dena1**(-1) * ( za(p1,p2)**3*za(p7,a7)*za(p10,q4)*zb(p1,p9)*zb(
      &    p2,a7)*zb(p4,q4) - za(p1,p2)**2*za(p1,p7)*za(p2,u2)*za(p10,q4
      &    )*zb(p1,p9)*zb(p2,u2)*zb(p4,q4) )
-      mba(1,1,1,2) = mba(1,1,1,2) + s12**(-2)*mt**2*denu**(-1) * (  - 
+      mba(1,1,1,2) = mba(1,1,1,2) + s12**(-2)*mt**2*denu**(-1) * (  -
      &    za(p1,p2)**2*za(p1,p7)*za(p10,q4)*zb(p1,p9)*zb(p4,q4) )
       mba(1,1,1,2) = mba(1,1,1,2) + s12**(-2)*mt**2*denq2**(-1)*
      & dena1**(-1) * ( za(p1,p2)**3*za(p2,p10)*za(p7,a7)*zb(p1,p4)*zb(
@@ -645,7 +645,7 @@
      &    p1,p2)**2*za(p1,b1)*za(p2,q4)*za(p7,p9)*zb(p1,b1)*zb(p2,p10)*
      &    zb(p4,q4) + za(p1,p2)**2*za(p1,b1)*za(p2,b2)*za(p7,p9)*zb(p1,
      &    p4)*zb(p2,b2)*zb(p10,b1) )
-      mba(1,1,2,1) = mba(1,1,2,1) + s12**(-2)*mt**2*denb**(-1) * (  - 
+      mba(1,1,2,1) = mba(1,1,2,1) + s12**(-2)*mt**2*denb**(-1) * (  -
      &    za(p1,p2)**2*za(p1,q4)*za(p7,p9)*zb(p1,p10)*zb(p4,q4) + za(p1
      &    ,p2)**2*za(p1,b1)*za(p7,p9)*zb(p1,p4)*zb(p10,b1) )
       mba(1,1,2,1) = mba(1,1,2,1) + s12**(-2)*mt**2*denu**(-1)*
@@ -681,7 +681,7 @@
      &    p1,p2)**2*za(p1,b1)*za(p2,q4)*za(p7,p10)*zb(p1,b1)*zb(p2,p9)*
      &    zb(p4,q4) + za(p1,p2)**2*za(p1,b1)*za(p2,b2)*za(p7,p10)*zb(p1
      &    ,p4)*zb(p2,b2)*zb(p9,b1) )
-      mba(1,1,2,2) = mba(1,1,2,2) + s12**(-2)*mt**2*denb**(-1) * (  - 
+      mba(1,1,2,2) = mba(1,1,2,2) + s12**(-2)*mt**2*denb**(-1) * (  -
      &    za(p1,p2)**2*za(p1,q4)*za(p7,p10)*zb(p1,p9)*zb(p4,q4) + za(p1
      &    ,p2)**2*za(p1,b1)*za(p7,p10)*zb(p1,p4)*zb(p9,b1) )
       mba(1,1,2,2) = mba(1,1,2,2) + s12**(-2)*mt**2*denu**(-1)*
@@ -734,13 +734,13 @@
      & denq2**(-1) * (  - za(p1,q4)*za(p2,p9)*za(p7,a7)*zb(p1,p2)**3*
      &    zb(p4,q4)*zb(p10,a7) - za(p1,b1)*za(p2,p9)*za(p7,a7)*zb(p1,p2
      &    )**2*zb(p1,b1)*zb(p2,p4)*zb(p10,a7) )
-      mba(2,2,1,1) = mba(2,2,1,1) + s12**(-2)*mt**2*denb**(-1) * (  - 
+      mba(2,2,1,1) = mba(2,2,1,1) + s12**(-2)*mt**2*denb**(-1) * (  -
      &    za(p1,p9)*za(p7,a7)*zb(p1,p2)**2*zb(p1,p4)*zb(p10,a7) )
       mba(2,2,1,1) = mba(2,2,1,1) + s12**(-2)*mt**2*denu**(-1)*
      & dena1**(-1) * (  - za(p1,u1)*za(p2,p7)*za(p9,q4)*zb(p1,p2)**3*
      &    zb(p4,q4)*zb(p10,u1) - za(p1,u1)*za(p2,p7)*za(p9,q4)*zb(p1,p2
      &    )**2*zb(p1,u1)*zb(p2,p10)*zb(p4,q4) )
-      mba(2,2,1,1) = mba(2,2,1,1) + s12**(-2)*mt**2*denu**(-1) * (  - 
+      mba(2,2,1,1) = mba(2,2,1,1) + s12**(-2)*mt**2*denu**(-1) * (  -
      &    za(p1,p7)*za(p9,q4)*zb(p1,p2)**2*zb(p1,p10)*zb(p4,q4) )
       mba(2,2,1,1) = mba(2,2,1,1) + s12**(-2)*mt**2*denq2**(-1)*
      & dena1**(-1) * ( za(p1,p9)*za(p1,q4)*za(p2,p7)*zb(p1,p2)**3*zb(p1
@@ -782,13 +782,13 @@
      & denq2**(-1) * (  - za(p1,q4)*za(p2,p10)*za(p7,a7)*zb(p1,p2)**3*
      &    zb(p4,q4)*zb(p9,a7) - za(p1,b1)*za(p2,p10)*za(p7,a7)*zb(p1,p2
      &    )**2*zb(p1,b1)*zb(p2,p4)*zb(p9,a7) )
-      mba(2,2,1,2) = mba(2,2,1,2) + s12**(-2)*mt**2*denb**(-1) * (  - 
+      mba(2,2,1,2) = mba(2,2,1,2) + s12**(-2)*mt**2*denb**(-1) * (  -
      &    za(p1,p10)*za(p7,a7)*zb(p1,p2)**2*zb(p1,p4)*zb(p9,a7) )
       mba(2,2,1,2) = mba(2,2,1,2) + s12**(-2)*mt**2*denu**(-1)*
      & dena1**(-1) * (  - za(p1,u1)*za(p2,p7)*za(p10,q4)*zb(p1,p2)**3*
      &    zb(p4,q4)*zb(p9,u1) - za(p1,u1)*za(p2,p7)*za(p10,q4)*zb(p1,p2
      &    )**2*zb(p1,u1)*zb(p2,p9)*zb(p4,q4) )
-      mba(2,2,1,2) = mba(2,2,1,2) + s12**(-2)*mt**2*denu**(-1) * (  - 
+      mba(2,2,1,2) = mba(2,2,1,2) + s12**(-2)*mt**2*denu**(-1) * (  -
      &    za(p1,p7)*za(p10,q4)*zb(p1,p2)**2*zb(p1,p9)*zb(p4,q4) )
       mba(2,2,1,2) = mba(2,2,1,2) + s12**(-2)*mt**2*denq2**(-1)*
      & dena1**(-1) * ( za(p1,p10)*za(p1,q4)*za(p2,p7)*zb(p1,p2)**3*zb(
@@ -810,11 +810,11 @@
      &    zb(p4,q4) )
 
       mba(2,2,2,1)= + s12**(-2)*mt**2*denb**(-1)*denq2**(-1) * ( za(p1,
-     &    q4)*za(p2,b2)*za(p7,p9)*zb(p1,p2)**3*zb(p4,q4)*zb(p10,b2) - 
+     &    q4)*za(p2,b2)*za(p7,p9)*zb(p1,p2)**3*zb(p4,q4)*zb(p10,b2) -
      &    za(p1,q4)*za(p2,b2)*za(p7,p9)*zb(p1,p2)**2*zb(p1,p10)*zb(p2,
      &    b2)*zb(p4,q4) + za(p1,b1)*za(p2,b2)*za(p7,p9)*zb(p1,p2)**2*
      &    zb(p1,b1)*zb(p2,p4)*zb(p10,b2) )
-      mba(2,2,2,1) = mba(2,2,2,1) + s12**(-2)*mt**2*denb**(-1) * (  - 
+      mba(2,2,2,1) = mba(2,2,2,1) + s12**(-2)*mt**2*denb**(-1) * (  -
      &    za(p1,q4)*za(p7,p9)*zb(p1,p2)**2*zb(p1,p10)*zb(p4,q4) + za(p1
      &    ,b1)*za(p7,p9)*zb(p1,p2)**2*zb(p1,p4)*zb(p10,b1) )
       mba(2,2,2,1) = mba(2,2,2,1) + s12**(-2)*mt**2*denu**(-1)*
@@ -846,11 +846,11 @@
      & denq2**(-1) * (  - za(p7,p9)*zb(p1,p2)*zb(p1,p10)*zb(p2,p4) )
 
       mba(2,2,2,2)= + s12**(-2)*mt**2*denb**(-1)*denq2**(-1) * ( za(p1,
-     &    q4)*za(p2,b2)*za(p7,p10)*zb(p1,p2)**3*zb(p4,q4)*zb(p9,b2) - 
+     &    q4)*za(p2,b2)*za(p7,p10)*zb(p1,p2)**3*zb(p4,q4)*zb(p9,b2) -
      &    za(p1,q4)*za(p2,b2)*za(p7,p10)*zb(p1,p2)**2*zb(p1,p9)*zb(p2,
      &    b2)*zb(p4,q4) + za(p1,b1)*za(p2,b2)*za(p7,p10)*zb(p1,p2)**2*
      &    zb(p1,b1)*zb(p2,p4)*zb(p9,b2) )
-      mba(2,2,2,2) = mba(2,2,2,2) + s12**(-2)*mt**2*denb**(-1) * (  - 
+      mba(2,2,2,2) = mba(2,2,2,2) + s12**(-2)*mt**2*denb**(-1) * (  -
      &    za(p1,q4)*za(p7,p10)*zb(p1,p2)**2*zb(p1,p9)*zb(p4,q4) + za(p1
      &    ,b1)*za(p7,p10)*zb(p1,p2)**2*zb(p1,p4)*zb(p9,b1) )
       mba(2,2,2,2) = mba(2,2,2,2) + s12**(-2)*mt**2*denu**(-1)*
@@ -940,7 +940,7 @@
      &    p1,p10)*za(p1,q4)*za(p7,a7)*zb(p2,p9)*zb(p2,a7)*zb(p4,q4) )
 
       mba(1,2,2,1)= + s12**(-1)*mt**2*denb**(-1)*denq2**(-1) * (  - za(
-     &    p1,q4)*za(p1,b2)*za(p7,p9)*zb(p2,p10)*zb(p2,b2)*zb(p4,q4) + 
+     &    p1,q4)*za(p1,b2)*za(p7,p9)*zb(p2,p10)*zb(p2,b2)*zb(p4,q4) +
      &    za(p1,b1)**2*za(p7,p9)*zb(p2,p4)*zb(p2,b1)*zb(p10,b1) )
       mba(1,2,2,1) = mba(1,2,2,1) + s12**(-1)*mt**2*denu**(-1)*
      & dena1**(-1) * ( za(p1,p7)*za(p1,u1)*za(p9,u2)*zb(p2,u1)*zb(p2,u2
@@ -954,7 +954,7 @@
      &    *zb(p2,a7)*zb(p10,b1) )
 
       mba(1,2,2,2)= + s12**(-1)*mt**2*denb**(-1)*denq2**(-1) * (  - za(
-     &    p1,q4)*za(p1,b2)*za(p7,p10)*zb(p2,p9)*zb(p2,b2)*zb(p4,q4) + 
+     &    p1,q4)*za(p1,b2)*za(p7,p10)*zb(p2,p9)*zb(p2,b2)*zb(p4,q4) +
      &    za(p1,b1)**2*za(p7,p10)*zb(p2,p4)*zb(p2,b1)*zb(p9,b1) )
       mba(1,2,2,2) = mba(1,2,2,2) + s12**(-1)*mt**2*denu**(-1)*
      & dena1**(-1) * ( za(p1,p7)*za(p1,u1)*za(p10,u2)*zb(p2,u1)*zb(p2,
@@ -1012,7 +1012,7 @@
      & dena1**(-1) * ( za(p2,p7)*za(p2,p10)*zb(p1,p4)*zb(p1,p9) )
 
       mba(2,1,2,1)= + s12**(-1)*mt**2*denb**(-1)*denq2**(-1) * (  - za(
-     &    p2,q4)*za(p2,b1)*za(p7,p9)*zb(p1,p10)*zb(p1,b1)*zb(p4,q4) + 
+     &    p2,q4)*za(p2,b1)*za(p7,p9)*zb(p1,p10)*zb(p1,b1)*zb(p4,q4) +
      &    za(p2,b2)**2*za(p7,p9)*zb(p1,p4)*zb(p1,b2)*zb(p10,b2) )
       mba(2,1,2,1) = mba(2,1,2,1) + s12**(-1)*mt**2*denu**(-1)*
      & dena1**(-1) * ( za(p2,p7)*za(p2,u2)*za(p9,u1)*zb(p1,u1)*zb(p1,u2
@@ -1028,11 +1028,11 @@
      &    p1,p4)*zb(p1,u1)*zb(p10,b2) - za(p2,p9)*za(p2,q4)*za(p7,a7)*
      &    zb(p1,p10)*zb(p1,a7)*zb(p4,q4) + za(p2,p9)*za(p2,b2)*za(p7,a7
      &    )*zb(p1,p4)*zb(p1,a7)*zb(p10,b2) )
-      mba(2,1,2,1) = mba(2,1,2,1) + mt**2*denq2**(-1)*dena1**(-1) * ( 
+      mba(2,1,2,1) = mba(2,1,2,1) + mt**2*denq2**(-1)*dena1**(-1) * (
      &    za(p2,p7)*za(p2,p9)*zb(p1,p4)*zb(p1,p10) )
 
       mba(2,1,2,2)= + s12**(-1)*mt**2*denb**(-1)*denq2**(-1) * (  - za(
-     &    p2,q4)*za(p2,b1)*za(p7,p10)*zb(p1,p9)*zb(p1,b1)*zb(p4,q4) + 
+     &    p2,q4)*za(p2,b1)*za(p7,p10)*zb(p1,p9)*zb(p1,b1)*zb(p4,q4) +
      &    za(p2,b2)**2*za(p7,p10)*zb(p1,p4)*zb(p1,b2)*zb(p9,b2) )
       mba(2,1,2,2) = mba(2,1,2,2) + s12**(-1)*mt**2*denu**(-1)*
      & dena1**(-1) * ( za(p2,p7)*za(p2,u2)*za(p10,u1)*zb(p1,u1)*zb(p1,
@@ -1048,7 +1048,7 @@
      &    p1,p4)*zb(p1,u1)*zb(p9,b2) - za(p2,p10)*za(p2,q4)*za(p7,a7)*
      &    zb(p1,p9)*zb(p1,a7)*zb(p4,q4) + za(p2,p10)*za(p2,b2)*za(p7,a7
      &    )*zb(p1,p4)*zb(p1,a7)*zb(p9,b2) )
-      mba(2,1,2,2) = mba(2,1,2,2) + mt**2*denq2**(-1)*dena1**(-1) * ( 
+      mba(2,1,2,2) = mba(2,1,2,2) + mt**2*denq2**(-1)*dena1**(-1) * (
      &    za(p2,p7)*za(p2,p10)*zb(p1,p4)*zb(p1,p9) )
 
 c--- sum over couplings of Z to top quark line
@@ -1067,13 +1067,13 @@ c--- (for charge and couplings of top quark, use up-charge)
       enddo
 
       wtgg=0d0
-      do h1=2,1,-1                               
-      do h2=2,1,-1                               
-      do h3=1,2                               
-      wtgg=wtgg                               
-     & +cdabs(xab(h1,h2,h3))**2                   
-     & +cdabs(xba(h1,h2,h3))**2                   
-     & -1d0/xnsq*cdabs(xab(h1,h2,h3)+xba(h1,h2,h3))**2 
+      do h1=2,1,-1
+      do h2=2,1,-1
+      do h3=1,2
+      wtgg=wtgg
+     & +cdabs(xab(h1,h2,h3))**2
+     & +cdabs(xba(h1,h2,h3))**2
+     & -1d0/xnsq*cdabs(xab(h1,h2,h3)+xba(h1,h2,h3))**2
       enddo
       enddo
       enddo

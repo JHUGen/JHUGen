@@ -2,11 +2,11 @@ c--- abbreviated version of the routine in qqb_wp2jet_g.f
       subroutine addhel_wbj(i1,i2,i3,i4,i5,i6,i7,xmsq_us_ds)
       implicit none
       integer i1,i2,i3,i4,i5,i6,i7
-C     u(i1)+d~(i2)+b(i3)+b~(i4)+g(i5)+l(i6)+lbar(i7)  
+C     u(i1)+d~(i2)+b(i3)+b~(i4)+g(i5)+l(i6)+lbar(i7)
       double precision xmsq_us_ds,
      .uLdR_dLdRp,uLsL_dLsLp,uLdR_dLdRm,uLsL_dLsLm
 
-c--- basic set of +ve gluon helicity amplitudes for QQ -> QQ       
+c--- basic set of +ve gluon helicity amplitudes for QQ -> QQ
       call testem_wbj(i1,i2,i3,i4,i5,i6,i7,uLdR_dLdRp,uLsL_dLsLp)
 
 c--- generate -ve gluon helicity amplitudes this way for now
@@ -28,7 +28,7 @@ c---                and   uL dL -> dL dL  <===>  uL uL -> dL uL
       include 'masses.f'
       include 'qcdcouple.f'
       include 'ewcouple.f'
-C     u(j1)+d~(j2)+b(j3)+b~(j4)+g(j5)+l(j6)+lbar(j7)  
+C     u(j1)+d~(j2)+b(j3)+b~(j4)+g(j5)+l(j6)+lbar(j7)
 
       double precision ofac,xmsqLR,xmsqLL
       double precision s167,s267,s134,s234,s345

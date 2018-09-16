@@ -1,6 +1,6 @@
-      double complex function a63(st,j1,j2,j3,j4,j5,j6,za,zb) 
+      double complex function a63(st,j1,j2,j3,j4,j5,j6,za,zb)
       implicit none
-C     implementation of last parts of 
+C     implementation of last parts of
 C     Eqs. (2.15) and (2.16 ) of Nucl Phys. 513, 3 (1998)
 
       include 'constants.f'
@@ -14,7 +14,7 @@ C     Eqs. (2.15) and (2.16 ) of Nucl Phys. 513, 3 (1998)
       elseif (st .eq. 'pm') then
       a63=+a6ax(j1,j4,j2,j3,j5,j6,za,zb)
       else
-      write(6,*) 'Unimplemented st in a63',st 
+      write(6,*) 'Unimplemented st in a63',st
       stop
       endif
       return

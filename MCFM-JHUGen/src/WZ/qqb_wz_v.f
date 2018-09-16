@@ -1,7 +1,7 @@
       subroutine qqb_wz_v(p,msqv)
 C----Author R.K.Ellis December 1998
 C----modified by JMC to include supplementary diagrams February 1999
-c---  calculate the virtual matrix element squared and endpoint 
+c---  calculate the virtual matrix element squared and endpoint
 c     subtraction terms for the process
 C For nwz=+1
 c     u(-p1)+dbar(-p2)-->mu^-(p5)+mu^+(p6)+n(p3)+e^+(p4)
@@ -59,7 +59,7 @@ c      double complex Fa561243,Fa562143
       else
       write(6,*) 'nwz ne +1 or -1'
       stop
-      endif 
+      endif
       if     (nwz.eq.-1) then
         cl1=1d0
         cl2=0d0
@@ -78,16 +78,16 @@ c      double complex Fa561243,Fa562143
 c--- wwflag=1 for most cases, indicating presence of diagram with 2 W's
       wwflag=1d0
 c--- but for Z -> bbbar this diagram contains |V_tb|**2 which we take 0
-      if (plabel(5) .eq. 'bq') then    
+      if (plabel(5) .eq. 'bq') then
         wwflag=0d0
       endif
-      
+
 c-- if Z -> neutrinos, we need to switch c1 and c2
       if (plabel(5) .eq. 'nl') then
         cl1=1d0-cl1
         cl2=1d0-cl2
       endif
-      
+
       do j=-nf,nf
       do k=-nf,nf
       msqv(j,k)=0d0
@@ -97,7 +97,7 @@ c-- if Z -> neutrinos, we need to switch c1 and c2
 c---calculate the lowest order matrix element
       call qqb_wz(p,msq)
 
-c---Change the momenta to DKS notation 
+c---Change the momenta to DKS notation
 c   We have --- d(-p1)+ubar(-p2)-->nu(p6)+e^+(p7)+mu^-(p4)+mu^+(p5)
 c   DKS have--- u( q2)+dbar( q1)-->nu(q3)+e^+(q4)+mu^-(q6)+mu^+(q5)
 
@@ -111,7 +111,7 @@ c   DKS have--- u( q2)+dbar( q1)-->nu(q3)+e^+(q4)+mu^-(q6)+mu^+(q5)
       enddo
 
       call spinoru(6,qdks,za,zb)
-      
+
 c--   s returned from sprod (common block) is 2*dot product
 c--   calculate propagators
       if     (zerowidth  .eqv. .true.) then
@@ -146,11 +146,11 @@ c---case dbar-u
       call A6treeb_anom_wz(1,2,3,4,5,6,za,zb,A6b_1,A6b_2,A6b_3,A6b_4)
       Fb123456_z=A6b_1*(2d0+xdelg1_z+xdelk_z+xlambda_z*s(1,2)/wmass**2)
      .          +A6b_2*(2d0+xdelg1_z+xdelk_z+xlambda_z)
-     .          +A6b_3*2d0*(1d0+xdelg1_z) 
+     .          +A6b_3*2d0*(1d0+xdelg1_z)
      .          +A6b_4*xlambda_z/wmass**2
       Fb123456_g=A6b_1*(2d0+xdelg1_g+xdelk_g+xlambda_g*s(1,2)/wmass**2)
      .          +A6b_2*(2d0+xdelg1_g+xdelk_g+xlambda_g)
-     .          +A6b_3*2d0*(1d0+xdelg1_g) 
+     .          +A6b_3*2d0*(1d0+xdelg1_g)
      .          +A6b_4*xlambda_g/wmass**2
       Fa123456=A6treea(1,2,3,4,5,6,za,zb)
       Fa126543=A6treea(1,2,6,5,4,3,za,zb)
@@ -158,11 +158,11 @@ c---case dbar-u
       call A6treeb_anom_wz(1,2,3,4,6,5,za,zb,A6b_1,A6b_2,A6b_3,A6b_4)
       Fb123465_z=A6b_1*(2d0+xdelg1_z+xdelk_z+xlambda_z*s(1,2)/wmass**2)
      .          +A6b_2*(2d0+xdelg1_z+xdelk_z+xlambda_z)
-     .          +A6b_3*2d0*(1d0+xdelg1_z) 
+     .          +A6b_3*2d0*(1d0+xdelg1_z)
      .          +A6b_4*xlambda_z/wmass**2
       Fb123465_g=A6b_1*(2d0+xdelg1_g+xdelk_g+xlambda_g*s(1,2)/wmass**2)
      .          +A6b_2*(2d0+xdelg1_g+xdelk_g+xlambda_g)
-     .          +A6b_3*2d0*(1d0+xdelg1_g) 
+     .          +A6b_3*2d0*(1d0+xdelg1_g)
      .          +A6b_4*xlambda_g/wmass**2
       Fa123465=A6treea(1,2,3,4,6,5,za,zb)
       Fa125643=A6treea(1,2,5,6,4,3,za,zb)
@@ -184,11 +184,11 @@ c---case u-dbar
       call A6treeb_anom_wz(2,1,3,4,5,6,za,zb,A6b_1,A6b_2,A6b_3,A6b_4)
       Fb213456_z=A6b_1*(2d0+xdelg1_z+xdelk_z+xlambda_z*s(1,2)/wmass**2)
      .          +A6b_2*(2d0+xdelg1_z+xdelk_z+xlambda_z)
-     .          +A6b_3*2d0*(1d0+xdelg1_z) 
+     .          +A6b_3*2d0*(1d0+xdelg1_z)
      .          +A6b_4*xlambda_z/wmass**2
       Fb213456_g=A6b_1*(2d0+xdelg1_g+xdelk_g+xlambda_g*s(1,2)/wmass**2)
      .          +A6b_2*(2d0+xdelg1_g+xdelk_g+xlambda_g)
-     .          +A6b_3*2d0*(1d0+xdelg1_g) 
+     .          +A6b_3*2d0*(1d0+xdelg1_g)
      .          +A6b_4*xlambda_g/wmass**2
       Fa213456=A6treea(2,1,3,4,5,6,za,zb)
       Fa216543=A6treea(2,1,6,5,4,3,za,zb)
@@ -196,11 +196,11 @@ c---case u-dbar
       call A6treeb_anom_wz(2,1,3,4,6,5,za,zb,A6b_1,A6b_2,A6b_3,A6b_4)
       Fb213465_z=A6b_1*(2d0+xdelg1_z+xdelk_z+xlambda_z*s(1,2)/wmass**2)
      .          +A6b_2*(2d0+xdelg1_z+xdelk_z+xlambda_z)
-     .          +A6b_3*2d0*(1d0+xdelg1_z) 
+     .          +A6b_3*2d0*(1d0+xdelg1_z)
      .          +A6b_4*xlambda_z/wmass**2
       Fb213465_g=A6b_1*(2d0+xdelg1_g+xdelk_g+xlambda_g*s(1,2)/wmass**2)
      .          +A6b_2*(2d0+xdelg1_g+xdelk_g+xlambda_g)
-     .          +A6b_3*2d0*(1d0+xdelg1_g) 
+     .          +A6b_3*2d0*(1d0+xdelg1_g)
      .          +A6b_4*xlambda_g/wmass**2
       Fa213465=A6treea(2,1,3,4,6,5,za,zb)
       Fa215643=A6treea(2,1,5,6,4,3,za,zb)
@@ -238,10 +238,10 @@ c---loop diagrams just tree*Vpole since they're all triangle-type
 c---set up left/right handed couplings for both Z and gamma*
 c---note that L/R labels the LEPTON coupling v2, NOT the quarks (all L)
       do j=1,nf
-        ZgL(j)=L(j)*v2(1)*prop56+Q(j)*q1           
-        ZgR(j)=L(j)*v2(2)*prop56+Q(j)*q1           
+        ZgL(j)=L(j)*v2(1)*prop56+Q(j)*q1
+        ZgR(j)=L(j)*v2(2)*prop56+Q(j)*q1
       enddo
-      
+
       do j=-nf,nf
       do k=-nf,nf
       if (Vsq(j,k) .ne. 0d0) then
@@ -306,7 +306,7 @@ c---4th term (l-h only) contains two W propagators
             BWZP=BWZP+suppl*Vpole12
         endif
         endif
-      
+
 C-- Inclusion of width for W,Z a la Baur and Zeppenfeld
       AWZM=cprop*AWZM
       AWZP=cprop*AWZP
@@ -320,7 +320,7 @@ C-- Inclusion of width for W,Z a la Baur and Zeppenfeld
 
       enddo
       enddo
-      
+
         return
       end
 

@@ -79,7 +79,7 @@ c--- from non-resonant diagrams only (gauge-dependent)
       call gs_wt_prog_nores(p,1,8,i3,i4,i5,i6,7,2,ampgg_ag)
       call gs_wt_prog_nores(p,2,8,i3,i4,i5,i6,7,1,ampgg_ga)
       endif
-      
+
       msq_gq=0d0
       msq_qg=0d0
       msq_gg=0d0
@@ -118,7 +118,7 @@ c--- calculate matrix elements for q+q~ initial state
 c      if (nores .eqv. .false.) then
 c      call qb_wtq(p,1,8,3,4,5,6,7,2,msq_qqb)
 c      endif
-      
+
 c--- subtract the gg->tt and qqb->tt contributions if necessary
 c      if (ttsubtract) then
 c        do j=1,4
@@ -135,14 +135,14 @@ c        call qqb_ttb(q,msqa)
 c        msq_gg=msq_gg-msqa(0,0)/avegg/fac
 c        msq_qqb=msq_qqb-msqa(1,-1)
 c      endif
-       
+
 c--- if we're doing the window method, we must have mb>0 and the
 c--- gg, qqb contributions shouldn't be included here
 c      if (runstring(1:3) .ne. 'sub') then
 c        msq_gg=0d0
 c        msq_qqb=0d0
 c      endif
-      
+
       do j=-nf,nf,nf
       do k=-nf,nf,nf
       msq(j,k)=0d0

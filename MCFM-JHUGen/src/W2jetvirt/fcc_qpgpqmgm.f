@@ -1,11 +1,11 @@
-      double complex function Fcc_qpgpqmgm(j1,j2,j3,j4,j5,j6,za,zb) 
+      double complex function Fcc_qpgpqmgm(j1,j2,j3,j4,j5,j6,za,zb)
       implicit none
       integer j1,j2,j3,j4,j5,j6
       include 'constants.f'
       include 'zprods_decl.f'
       include 'sprods_com.f'
       double complex L0,Lsm1,Lsm1_2mh,Lnrat,I3m
-      double precision t  
+      double precision t
 
       Fcc_qpgpqmgm=
      .(2d0*L0(-t(j2,j3,j4),-s(j2,j3))*za(j4,j5)*zb(j2,j4)*
@@ -85,7 +85,7 @@
      .2d0*s(j2,j3)*s(j5,j6)+s(j5,j6)**2)*
      .(za(j1,j2)*zb(j2,j4)+za(j1,j3)*zb(j3,j4))*
      .(-(za(j1,j2)*zb(j1,j3))-za(j2,j4)*zb(j3,j4)))
-     
+
       Fcc_qpgpqmgm=Fcc_qpgpqmgm+
      .I3m(s(j1,j4),s(j2,j3),s(j5,j6))*
      .((-((-s(j1,j4)+s(j2,j3)-s(j5,j6))*za(j3,j5)*zb(j1,j2)*
@@ -142,7 +142,7 @@
      .2d0*s(j2,j3)*s(j5,j6)+s(j5,j6)**2)*
      .(za(j1,j2)*zb(j2,j4)+za(j1,j3)*zb(j3,j4))*
      .(-(za(j1,j2)*zb(j1,j3))-za(j2,j4)*zb(j3,j4)))
-     
+
       Fcc_qpgpqmgm=Fcc_qpgpqmgm+
      .Lsm1_2mh(s(j1,j2),t(j2,j3,j4),s(j3,j4),s(j5,j6))*
      .((za(j3,j5)*zb(j2,j3)+za(j4,j5)*zb(j2,j4))**2/
@@ -186,4 +186,4 @@
 
       return
       end
-      
+

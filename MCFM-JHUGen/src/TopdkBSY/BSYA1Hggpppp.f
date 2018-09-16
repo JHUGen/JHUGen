@@ -12,7 +12,7 @@ C---- (These are twiddle functions, c.f.arXiv:1101.5947[hep-ph],Eq.(91))
       include 'massiveintegrals.f'
       double precision s23,mt2
       integer e1,p2,p3,e4
- 
+
       s23=s(p2,p3)
       mt2=mt**2
       BSYA1Hggpppp=

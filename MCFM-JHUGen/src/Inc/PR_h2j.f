@@ -23,7 +23,7 @@ c      parameter(igggg_a=1,igggg_b=2,igggg_c=3)
 c--- One extra parameter needed for non-identical quark pieces
 c      parameter(iqr=7)
 
-      double precision 
+      double precision
      . H1(-1:1,-1:1,-1:1,8,3),H2(-1:1,-1:1,-1:1,8,3)
       common/RP_h2j/H1,H2
 !$omp threadprivate(/RP_h2j/)
