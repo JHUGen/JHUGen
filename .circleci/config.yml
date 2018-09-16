@@ -340,28 +340,31 @@ jobs:
       - run: echo "export LHEDIR=$HOME/artifacts/ggH" >> $BASH_ENV
       - run: mkdir -p $LHEDIR/
       - run:
-         name: "check if plots are needed"
-         command: |
-           cd ..
-           if [ -f reference_check/reference_failed_ggH ]; then
-             DOPLOTS=true
-           elif [ -z "$CIRCLE_COMPARE_URL" ]; then  #first build on the branch
-             DOPLOTS=true
-           else
-             DOPLOTS=false
-             #from https://discuss.circleci.com/t/does-circleci-2-0-work-with-monorepos/10378/8
-             COMMIT_RANGE=$(echo $CIRCLE_COMPARE_URL | sed 's:^.*/compare/::g')
-             echo "Commit range: " $COMMIT_RANGE
-             git diff $COMMIT_RANGE --name-status
-             echo
-             for a in .circleci/angularDistributions_spin0_HVV.cc ScalarPdfFactory_HVV RooSpinZero_7DComplex_withAccep_HVV; do
-               if git diff $COMMIT_RANGE --name-status | grep $a; then
-                 DOPLOTS=true
-                 echo "^^^^ changed --> doing plots"
-               fi
-             done
-           fi
-           echo "export DOPLOTS=$DOPLOTS" >> $BASH_ENV
+          name: "md5sum of files relevant for analytical plots"
+          command: |
+            cd ..
+            #take the whole MELA C++ code because of interdependencies (TCouplingsBase etc.), too complicated to sort out
+            #but no need for fortran or python
+            md5sum $(
+              git ls-files \
+                .circleci/angularDistributions_spin0_HVV.cc \
+                JHUGenMELA/MELA/src/ \
+                JHUGenMELA/MELA/interface/ \
+              | sort
+            ) > JHUGenerator/analytical-md5sum
+      - restore_cache:
+          key: v1-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum" }}
+      - run:
+          name: "see if we need ggH analytical plots"
+          command: |
+            DOPLOTS=true
+            if [ -f no-need-for-ggH-plots ]; then
+              DOPLOTS=false
+            fi
+            if [ -f reference_check/reference_failed_ggH ]; then
+              DOPLOTS=true
+            fi
+            echo "export DOPLOTS=$DOPLOTS" >> $BASH_ENV
       - run:
           name: generate
           command: |
@@ -395,6 +398,10 @@ jobs:
             fi
       - store_artifacts:
           path: ~/artifacts/ggH
+      - run: touch no-need-for-ggH-plots
+      - save_cache:
+          key: v1-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum" }}
+          paths: ~/JHUGen/JHUGenerator/no-need-for-ggH-plots
       - run: '! [ -f reference_check/reference_failed_ggH ]'
 
   plots_VBF:
