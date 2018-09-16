@@ -396,6 +396,7 @@ jobs:
               #root -b -q '../JHUGenMELA/MELA/test/loadMELA.C angularDistributions_spin0_HVV.cc+("$LHEDIR/fa30.5i.root", "ghv1=1,0;ghv4=0,2.55052", "ZZ4l", "$LHEDIR/fa30.5i/")'
               root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/a2.root", "ghv2=1,0", "ZZ4l", "$LHEDIR/a2/")'
             fi
+          no_output_timeout: 1h
       - store_artifacts:
           path: ~/artifacts/ggH
       - run: touch no-need-for-ggH-plots
