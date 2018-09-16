@@ -1,0 +1,114 @@
+\BOOKMARK [1][-]{section.1}{Overview}{}
+\BOOKMARK [1][-]{section.2}{Installation}{}
+\BOOKMARK [2][-]{subsection.2.1}{Installation to use OpenMP}{section.2}
+\BOOKMARK [2][-]{subsection.2.2}{Installation as a library}{section.2}
+\BOOKMARK [1][-]{section.3}{Input parameters}{}
+\BOOKMARK [2][-]{subsection.3.1}{Parton distributions}{section.3}
+\BOOKMARK [1][-]{section.4}{Runtime options}{}
+\BOOKMARK [1][-]{section.5}{Nuclear collisions}{}
+\BOOKMARK [1][-]{section.6}{Output}{}
+\BOOKMARK [2][-]{subsection.6.1}{Histograms}{section.6}
+\BOOKMARK [2][-]{subsection.6.2}{Other output modes}{section.6}
+\BOOKMARK [3][-]{subsubsection.6.2.1}{Simple n-tuple output}{subsection.6.2}
+\BOOKMARK [3][-]{subsubsection.6.2.2}{n-tuples using FROOT}{subsection.6.2}
+\BOOKMARK [3][-]{subsubsection.6.2.3}{Unweighted events}{subsection.6.2}
+\BOOKMARK [1][-]{section.7}{Other user options}{}
+\BOOKMARK [1][-]{section.8}{Notes on specific processes}{}
+\BOOKMARK [2][-]{subsection.8.1}{W-boson production, processes 1,6}{section.8}
+\BOOKMARK [2][-]{subsection.8.2}{W+ jet production, processes 11,16}{section.8}
+\BOOKMARK [2][-]{subsection.8.3}{W+b production, processes 12,17}{section.8}
+\BOOKMARK [2][-]{subsection.8.4}{W+c production, processes 13,18}{section.8}
+\BOOKMARK [2][-]{subsection.8.5}{W+c production \(mc=0\), processes 14,19}{section.8}
+\BOOKMARK [2][-]{subsection.8.6}{W+b"7016b production, processes 20,25}{section.8}
+\BOOKMARK [2][-]{subsection.8.7}{W+b"7016b production \(mb=0\), processes 21,26}{section.8}
+\BOOKMARK [2][-]{subsection.8.8}{W+2 jets production, processes 22,27}{section.8}
+\BOOKMARK [2][-]{subsection.8.9}{W+3 jets production, processes 23,28}{section.8}
+\BOOKMARK [2][-]{subsection.8.10}{W+b"7016b+ jet production \(mb=0\), processes 24,29}{section.8}
+\BOOKMARK [2][-]{subsection.8.11}{Z-boson production, processes 31--33}{section.8}
+\BOOKMARK [2][-]{subsection.8.12}{Z-boson production decaying to jets, processes 34--35}{section.8}
+\BOOKMARK [2][-]{subsection.8.13}{t "7016t production mediated by Z/*-boson exchange, process 36}{section.8}
+\BOOKMARK [2][-]{subsection.8.14}{Z+ jet production, processes 41--43}{section.8}
+\BOOKMARK [2][-]{subsection.8.15}{Z+2 jets production, processes 44, 46}{section.8}
+\BOOKMARK [2][-]{subsection.8.16}{Z+3 jets production, processes 45, 47}{section.8}
+\BOOKMARK [2][-]{subsection.8.17}{Z+b"7016b production, process 50}{section.8}
+\BOOKMARK [2][-]{subsection.8.18}{Z+b"7016b production \(mb=0\), processes 51--53}{section.8}
+\BOOKMARK [2][-]{subsection.8.19}{Z+b"7016b+ jet production \(mb=0\), process 54}{section.8}
+\BOOKMARK [2][-]{subsection.8.20}{Z+c"7016c production \(mc=0\), process 56}{section.8}
+\BOOKMARK [2][-]{subsection.8.21}{Di-boson production, processes 61--89}{section.8}
+\BOOKMARK [3][-]{subsubsection.8.21.1}{WW production, processes 61-64, 69}{subsection.8.21}
+\BOOKMARK [3][-]{subsubsection.8.21.2}{WW+jet production, process 66}{subsection.8.21}
+\BOOKMARK [3][-]{subsubsection.8.21.3}{WZ production, processes 71--80}{subsection.8.21}
+\BOOKMARK [3][-]{subsubsection.8.21.4}{ZZ production, processes 81--84, 86--90}{subsection.8.21}
+\BOOKMARK [3][-]{subsubsection.8.21.5}{ZZ+jet production, process 85}{subsection.8.21}
+\BOOKMARK [3][-]{subsubsection.8.21.6}{Anomalous couplings}{subsection.8.21}
+\BOOKMARK [2][-]{subsection.8.22}{WH production, processes 91-94, 96-99}{section.8}
+\BOOKMARK [2][-]{subsection.8.23}{ZH production, processes 101--109}{section.8}
+\BOOKMARK [2][-]{subsection.8.24}{Higgs production, processes 111--121}{section.8}
+\BOOKMARK [2][-]{subsection.8.25}{H W+W- production, processes 123-126}{section.8}
+\BOOKMARK [2][-]{subsection.8.26}{H ZZ e- e+ - + production, processes 128-133}{section.8}
+\BOOKMARK [2][-]{subsection.8.27}{H+b production, processes 136--138}{section.8}
+\BOOKMARK [2][-]{subsection.8.28}{t"7016t production with 2 semi-leptonic decays, processes 141--145}{section.8}
+\BOOKMARK [2][-]{subsection.8.29}{t"7016t production with decay and a gluon, process 143}{section.8}
+\BOOKMARK [2][-]{subsection.8.30}{t"7016t production with one hadronic decay, processes 146--151}{section.8}
+\BOOKMARK [2][-]{subsection.8.31}{QQ production, processes 157--159}{section.8}
+\BOOKMARK [2][-]{subsection.8.32}{t"7016t+ jet production, process 160}{section.8}
+\BOOKMARK [2][-]{subsection.8.33}{Single top production, processes 161--177}{section.8}
+\BOOKMARK [2][-]{subsection.8.34}{Wt production, processes 180--187}{section.8}
+\BOOKMARK [2][-]{subsection.8.35}{H+ jet production, processes 201--210}{section.8}
+\BOOKMARK [2][-]{subsection.8.36}{Higgs production via WBF, processes 211--217}{section.8}
+\BOOKMARK [2][-]{subsection.8.37}{+- production, process 221}{section.8}
+\BOOKMARK [2][-]{subsection.8.38}{e-e+ \040"7016 -pair production via WBF, processes 222}{section.8}
+\BOOKMARK [2][-]{subsection.8.39}{e e+ - +-pair production via WBF, processes 223,2231}{section.8}
+\BOOKMARK [2][-]{subsection.8.40}{e- "7016e \040+-pair production via WBF, processes 224,2241}{section.8}
+\BOOKMARK [2][-]{subsection.8.41}{e- "7016e - +-pair production via WBF, processes 225,2251}{section.8}
+\BOOKMARK [2][-]{subsection.8.42}{e- e+ "7016e e-pair production via WBF, processes 226}{section.8}
+\BOOKMARK [2][-]{subsection.8.43}{e e+ \040+ -pair production via WBF, processes 228,2281}{section.8}
+\BOOKMARK [2][-]{subsection.8.44}{e- "7016e - "7016 -pair production via WBF, processes 229,2291}{section.8}
+\BOOKMARK [2][-]{subsection.8.45}{t-channel single top with an explicit b-quark, processes 231--240}{section.8}
+\BOOKMARK [2][-]{subsection.8.46}{W+W++jets production, processes 251,252}{section.8}
+\BOOKMARK [2][-]{subsection.8.47}{Z+Q production, processes 261--267}{section.8}
+\BOOKMARK [2][-]{subsection.8.48}{H + 2 jet production, processes 270--274}{section.8}
+\BOOKMARK [2][-]{subsection.8.49}{H + 3 jet production, processes 275-278}{section.8}
+\BOOKMARK [2][-]{subsection.8.50}{Direct \040production, processes 280--282}{section.8}
+\BOOKMARK [2][-]{subsection.8.51}{Direct \040+ heavy flavour production, processes 283--284}{section.8}
+\BOOKMARK [2][-]{subsection.8.52}{ production, processes 285-286}{section.8}
+\BOOKMARK [2][-]{subsection.8.53}{ production, process 287}{section.8}
+\BOOKMARK [2][-]{subsection.8.54}{ production, process 289}{section.8}
+\BOOKMARK [2][-]{subsection.8.55}{W production, processes 290-297}{section.8}
+\BOOKMARK [3][-]{subsubsection.8.55.1}{Anomalous WW couplings}{subsection.8.55}
+\BOOKMARK [2][-]{subsection.8.56}{Z, production, processes 300, 305}{section.8}
+\BOOKMARK [3][-]{subsubsection.8.56.1}{Anomalous ZZ and Z couplings}{subsection.8.56}
+\BOOKMARK [2][-]{subsection.8.57}{Z production processes, 301, 306}{section.8}
+\BOOKMARK [2][-]{subsection.8.58}{Zj, production, processes 302, 307}{section.8}
+\BOOKMARK [2][-]{subsection.8.59}{Zj and Zj j , 303, 304, 308 and 309}{section.8}
+\BOOKMARK [2][-]{subsection.8.60}{W+Q+ jet production processes 311--326}{section.8}
+\BOOKMARK [2][-]{subsection.8.61}{W+c+ jet production, processes 331, 336}{section.8}
+\BOOKMARK [2][-]{subsection.8.62}{Z+Q+jet production, processes 341--357}{section.8}
+\BOOKMARK [2][-]{subsection.8.63}{c s W+, processes 361--363}{section.8}
+\BOOKMARK [2][-]{subsection.8.64}{W production, processes 370-371}{section.8}
+\BOOKMARK [2][-]{subsection.8.65}{W+Q production in the 4FNS, processes 401--408}{section.8}
+\BOOKMARK [2][-]{subsection.8.66}{W+Q production in the 5FNS, processes 411, 416}{section.8}
+\BOOKMARK [2][-]{subsection.8.67}{W+Q production in the combined 4FNS/5FNS, processes 421, 426}{section.8}
+\BOOKMARK [2][-]{subsection.8.68}{W+b"7016b+ jet production, processes 431,436}{section.8}
+\BOOKMARK [2][-]{subsection.8.69}{W+t"7016t processes 500--516}{section.8}
+\BOOKMARK [2][-]{subsection.8.70}{Zt"7016t production, processes 529-533}{section.8}
+\BOOKMARK [2][-]{subsection.8.71}{Ht and H"7016t production, processes 540--557}{section.8}
+\BOOKMARK [2][-]{subsection.8.72}{Zt and Z"7016t production, processes 560--569}{section.8}
+\BOOKMARK [2][-]{subsection.8.73}{HH production, processes 601--602}{section.8}
+\BOOKMARK [2][-]{subsection.8.74}{Ht"7016t production, processes 640--660}{section.8}
+\BOOKMARK [2][-]{subsection.8.75}{Dark Matter Processes Mono-jet and Mono-photon 800-848}{section.8}
+\BOOKMARK [1][-]{section.A}{MCFM references}{}
+\BOOKMARK [1][-]{section.B}{Processes included in MCFM}{}
+\BOOKMARK [1][-]{section.C}{Version 7.0 changelog}{}
+\BOOKMARK [1][-]{section.D}{Version 6.7 changelog}{}
+\BOOKMARK [1][-]{section.E}{Versions 6.6 and 6.5 changelog}{}
+\BOOKMARK [1][-]{section.F}{Version 6.4 changelog}{}
+\BOOKMARK [2][-]{subsection.F.1}{Code changes}{section.F}
+\BOOKMARK [1][-]{section.G}{Version 6.3 changelog}{}
+\BOOKMARK [2][-]{subsection.G.1}{Code changes}{section.G}
+\BOOKMARK [1][-]{section.H}{Version 6.2 changelog}{}
+\BOOKMARK [2][-]{subsection.H.1}{Input file changes}{section.H}
+\BOOKMARK [2][-]{subsection.H.2}{Code changes}{section.H}
+\BOOKMARK [1][-]{section.I}{Version 6.1 changelog}{}
+\BOOKMARK [2][-]{subsection.I.1}{Input file changes}{section.I}
+\BOOKMARK [2][-]{subsection.I.2}{Code changes}{section.I}

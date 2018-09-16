@@ -1,0 +1,20 @@
+This is a tensor reduction routine
+based on the work of Passarino and Veltman
+
+@article{Passarino:1978jh,
+      author         = "Passarino, G. and Veltman, M.J.G.",
+      title          = "{One Loop Corrections for e+ e- Annihilation Into mu+ mu-
+                        in the Weinberg Model}",
+      journal        = "Nucl.Phys.",
+      volume         = "B160",
+      pages          = "151",
+      doi            = "10.1016/0550-3213(79)90234-7",
+      year           = "1979",
+      reportNumber   = "Print-79-0284 (UTRECHT)",
+      SLACcitation   = "%%CITATION = NUPHA,B160,151;%%",
+}
+
+The notation for the form factors 
+is however different that the notation
+of PV. In particular the tensor integrals are functions
+of the off-set momenta,q_i, not the external momenta, p_i. 

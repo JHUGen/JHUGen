@@ -1,0 +1,32 @@
+These are a set of routines performing the reduction of tensor
+integrals to scalar integrals. They are loosely based on the 
+paper of van Oldenborgh and Vermaseren
+
+@article{vanOldenborgh:1989wn,
+      author         = "van Oldenborgh, G.J. and Vermaseren, J.A.M.",
+      title          = "{New Algorithms for One Loop Integrals}",
+      journal        = "Z.Phys.",
+      volume         = "C46",
+      pages          = "425-438",
+      doi            = "10.1007/BF01621031",
+      year           = "1990",
+      reportNumber   = "NIKHEF-H/89-17",
+      SLACcitation   = "%%CITATION = ZEPYA,C46,425;%%",
+}
+In particular on the idea of separating the physical and 
+transverse spaces. This allows the reduction to occur by
+relating the Tensor Integrals themselves, rather than the
+form factors as in the Passarino-Veltman method.
+The tensor integrals are functions
+of the the external momenta, p_i not the off-set momenta, q_i.
+The determination of the tensor integrals reduces to 
+solving a series of linear equations of the form (say,for n=3)
+where Gram(i,j)=p_i.p_j
+
+                 (x1)     (b1)
+     Gram(i,j) * (x2)  =  (b2) 
+                 (x3)     (b3)
+
+which are solved by LU decomposition and back substitution.
+
+ 
