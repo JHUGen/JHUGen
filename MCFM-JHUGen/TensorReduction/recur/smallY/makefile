@@ -1,0 +1,126 @@
+# Makefile routine.
+VPATH		= $(PWD)/obj
+INCPATH1 = $(PWD)/../Include/
+INCPATH2 = $(PWD)/../../Include/
+OUTPUT_OPTION	= -o $(PWD)/obj/$@ 
+
+ifeq ($(origin FC),environment)
+    $(info Inheriting FC from environment: $(FC))
+else
+    FC = gfortran
+endif
+FFLAGS 	= -O2 -fno-f2c -g -I$(INCPATH1) -I$(INCPATH2) -Iobj -Jobj
+
+LIBRARY	      = libsmallY.a
+
+
+# -----------------------------------------------------------------------------
+# Specify the object files. 
+
+OBJS = \
+Cfill_recur2.o \
+Dfill_recur2.o \
+runCY_0.o \
+runCY_00.o \
+runCY_0000.o \
+runCY_000000.o \
+runCY_000000i.o \
+runCY_000000l.o \
+runCY_0000i.o \
+runCY_0000i1i2.o \
+runCY_0000i1i2i3.o \
+runCY_0000l.o \
+runCY_0000li.o \
+runCY_0000li1i2.o \
+runCY_0000ll.o \
+runCY_0000lli.o \
+runCY_0000lll.o \
+runCY_00i.o \
+runCY_00i1i2.o \
+runCY_00i1i2i3.o \
+runCY_00i1i2i3i4.o \
+runCY_00i1i2i3i4i5.o \
+runCY_00l.o \
+runCY_00li.o \
+runCY_00li1i2.o \
+runCY_00li1i2i3.o \
+runCY_00li1i2i3i4.o \
+runCY_00ll.o \
+runCY_00lli.o \
+runCY_00lli1i2.o \
+runCY_00lli1i2i3.o \
+runCY_00lll.o \
+runCY_00llli.o \
+runCY_00llli1i2.o \
+runCY_00llll.o \
+runCY_00lllli.o \
+runCY_00lllll.o \
+runCY_i.o \
+runCY_i1i2.o \
+runCY_i1i2i3.o \
+runCY_i1i2i3i4.o \
+runCY_i1i2i3i4i5.o \
+runY_0.o \
+runY_00.o \
+runY_0000.o \
+runY_000000.o \
+runY_000000i.o \
+runY_000000l.o \
+runY_0000i.o \
+runY_0000i1i2.o \
+runY_0000i1i2i3.o \
+runY_0000l.o \
+runY_0000li.o \
+runY_0000li1i2.o \
+runY_0000ll.o \
+runY_0000lli.o \
+runY_0000lll.o \
+runY_00i.o \
+runY_00i1i2.o \
+runY_00i1i2i3.o \
+runY_00i1i2i3i4.o \
+runY_00i1i2i3i4i5.o \
+runY_00l.o \
+runY_00li.o \
+runY_00li1i2.o \
+runY_00li1i2i3.o \
+runY_00li1i2i3i4.o \
+runY_00ll.o \
+runY_00lli.o \
+runY_00lli1i2.o \
+runY_00lli1i2i3.o \
+runY_00lll.o \
+runY_00llli.o \
+runY_00llli1i2.o \
+runY_00llll.o \
+runY_00lllli.o \
+runY_00lllll.o \
+runY_i.o \
+runY_i1i2.o \
+runY_i1i2i3.o \
+runY_i1i2i3i4.o \
+runY_i1i2i3i4i5.o
+
+
+$(LIBRARY):	$(OBJS) 
+		ar cru $(LIBRARY) $(patsubst %,obj/%,$(OBJS)) 
+		ranlib $(LIBRARY)
+		mv $(LIBRARY) ..
+ 
+# -----------------------------------------------------------------------------
+
+
+
+all:		$(LIBRARY)
+
+
+# -----------------------------------------------------------------------------
+
+clean:
+	- rm -f obj/*.o *.s *.prj *.a *~ core
+
+# -----------------------------------------------------------------------------
+
+# DO NOT DELETE
+
+

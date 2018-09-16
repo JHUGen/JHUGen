@@ -1,0 +1,42 @@
+FTNCHEKPATH = /home/ellis/Fortran/Ftnchek/ftnchek-3.1.2
+FORCHKPATH = /usr/local/bin/
+FFLAGS 	= -g -Wall 
+HERE = $(PWD)
+LIBNAME = QCDLoop
+LIBDIR = $(HERE)/Lib
+INCDIR = $(HERE)/pv/Include
+PVDIR  = $(HERE)/pv
+OVDIR  = $(HERE)/ov
+QLDIR  = $(HERE)/../QCDLoop/ql
+FFDIR  = $(HERE)/../QCDLoop/ff
+RRDIR  = $(HERE)/recur
+ifeq ($(origin FC),environment)
+    $(info Inheriting FC from environment: $(FC))
+else
+    FC = gfortran
+endif
+
+# -----------------------------------------------------------------------------
+# This make -f makefile_omps the libraries that we need
+
+libs:
+	(cd $(RRDIR)/smallG; make -f makefile_omp) 
+	(cd $(RRDIR)/smallY; make -f makefile_omp) 
+	(cd $(RRDIR)/smallP; make -f makefile_omp) 
+	(cd $(RRDIR)/smallF; make -f makefile_omp) 
+	(cd $(PVDIR); make -f makefile_omp) 
+	(cd $(OVDIR); make -f makefile_omp) 
+
+clean:
+	(cd $(RRDIR)/smallG; make -f makefile_omp clean) 
+	(cd $(RRDIR)/smallY; make -f makefile_omp clean) 
+	(cd $(RRDIR)/smallP; make -f makefile_omp clean) 
+	(cd $(RRDIR)/smallF; make -f makefile_omp clean) 
+	(cd $(PVDIR); make -f makefile_omp clean) 
+	(cd $(OVDIR); make -f makefile_omp clean) 
+
+# -----------------------------------------------------------------------------
+
+# DO NOT DELETE
+
+

@@ -1,0 +1,71 @@
+# Makefile routine.
+VPATH		= $(PWD)/obj
+INCPATH1 = $(PWD)/../Include/
+INCPATH2 = $(PWD)/../../Include/
+OUTPUT_OPTION	= -o $(PWD)/obj/$@ 
+
+ifeq ($(origin FC),environment)
+    $(info Inheriting FC from environment: $(FC))
+else
+    FC = gfortran
+endif
+FFLAGS 	= -O2 -fno-f2c -g -I$(INCPATH1) -I$(INCPATH2) -Iobj -Jobj
+
+LIBRARY	      = libsmallF.a
+
+
+# -----------------------------------------------------------------------------
+# Specify the object files. 
+
+OBJS = \
+Cfill_recur4.o \
+Dfill_recur4.o \
+runCF_0.o \
+runCF_00.o \
+runCF_00i.o \
+runCF_00ii.o \
+runCF_00iii.o \
+runCF_00iiii.o \
+runCF_00iiiii.o \
+runCF_i.o \
+runCF_ii.o \
+runCF_iii.o \
+runCF_iiii.o \
+runCF_iiiii.o \
+runF_0.o \
+runF_00.o \
+runF_00i.o \
+runF_00ii.o \
+runF_00iii.o \
+runF_00iiii.o \
+runF_00iiiii.o \
+runF_i.o \
+runF_ii.o \
+runF_iii.o \
+runF_iiii.o \
+runF_iiiii.o
+
+
+$(LIBRARY):	$(OBJS) 
+		ar cru $(LIBRARY) $(patsubst %,obj/%,$(OBJS)) 
+		ranlib $(LIBRARY)
+		mv $(LIBRARY) ..
+ 
+
+# -----------------------------------------------------------------------------
+
+
+
+all:		$(LIBRARY)
+
+
+# -----------------------------------------------------------------------------
+
+clean:
+	- rm -f obj/*.o *.s *.prj *.a *~ core
+
+# -----------------------------------------------------------------------------
+
+# DO NOT DELETE
+
+
