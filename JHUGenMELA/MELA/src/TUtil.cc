@@ -1429,7 +1429,7 @@ void TUtil::SetAlphaS(double& Q_ren, double& Q_fac, double multiplier_ren, doubl
   double muren_jhu = scale_.scale*GeV;
   double mufac_jhu = facscale_.facscale*GeV;
   __modjhugenmela_MOD_setmurenfac(&muren_jhu, &mufac_jhu);
-  __modkinematics_MOD_evalalphas();
+  __modparameters_MOD_evalalphas();
   TUtil::GetAlphaS(&(qcdcouple_.as), &(couple_.amz));
 
   qcdcouple_.gsq = 4.0*TMath::Pi()*qcdcouple_.as;

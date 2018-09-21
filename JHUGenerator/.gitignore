@@ -10,8 +10,11 @@ JHUGen.exe
 *_CSmax.bin
 *_commandlineinfo.txt
 *_gridinfo.txt
-NNPDF30_lo_as_0130.LHgrid
+*_collierfiles
 PMZZdistribution.out
+
+#downloaded pdf
+NNPDF30_lo_as_0130.LHgrid
 
 # MCFM links
 *.DAT
