@@ -17,10 +17,10 @@ command line parameter quick reference:
     ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,
                        250 GeV for e+e-
     Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance,
-                       50=pp/ee->VH, 51=pp/ee->VH (beta),
+                       50=qq/ee->VH, 51=gg->ZH,
                        60=weakVBF, 61=pp->Hjj, 62=pp->Hj,
                        66=VVHVV offshell, 67=VVVVbkg, 68=VVHVV+VVVV,
-                       69=QCD JJVV bkg, 80=ttH, 90=bbH,
+                       80=ttH, 90=bbH,
                        110=t+H t channel, 111=tbar+H t channel,
                        112=t+H s channel, 113=tbar+H s channel
                        114=t/tbar+H t/s channels
@@ -56,7 +56,7 @@ command line parameter quick reference:
                        stable; if it is 1, they decay to Wnu, with the W's decaying
                        according to DecayModes1,2.
     HbbDK:             For VH production, decay H->bb
-    VH_PC:             VH partonic channel and mode selection
+    VH_PC:             VH partonic channel and mode selection for Process=51
                        ee = lo = e- e+ @LO (beta)
                        qq = lo = q qbar @LO (beta)
                        gg = triangles + boxes of gg (set as default)

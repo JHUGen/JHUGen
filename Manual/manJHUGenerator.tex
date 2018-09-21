@@ -108,14 +108,15 @@ Examples of running the generator.  The number of events is determined using \te
 		./JHUGen Process=50 DecayMode1=7 VegasNc2=100000 DataFile=ZtogammaH ghzgs2=1,0
 		\end{verbatim}
 	\end{itemize}
-		\item New $VH$:
+		\item $gg\to VH$:
 	\begin{itemize}
-		\item \texttt{Process=51} includes all the features of \texttt{Process=50} in addition to $gg \to ZH$, e.g.,
+		\item For $gg\to ZH$, use \texttt{Process=51} instead of \texttt{50}
 		\item $ZH$ production with $a_2$ anomalous coupling, decay to $Z\to 2l,~H\to b\bar{b}$:
 		\begin{verbatim}
 		./JHUGen Collider=1 Process=51 VH_PC=gg HbbDK=1 DecayMode1=0 VegasNc2=100000 \\
 		DataFile=ggZH2lbb ghz1=0,0 ghz2=1,0
 		\end{verbatim}
+		\item \texttt{Process=51} also includes all the features of \texttt{Process=50}, but is currently in beta; we recommend using it only for $gg\to ZH$.
 	\end{itemize}
 	\item VBF:
 	\begin{itemize}
@@ -130,6 +131,7 @@ Examples of running the generator.  The number of events is determined using \te
 		pTjetcut=15 deltaRcut=0
 		\end{verbatim}
 		(Requires cut on jet $p_T$ to avoid divergences when $q_\gamma^2\to 0$.  15 GeV is the default cut, but is shown explicitly as an example.)
+		\item For the offshell VBF process, including up to two scalar resonances and interference with the SM background, see below.
 	\end{itemize}
 	\item $H+jj$:
 	\begin{verbatim}
@@ -179,10 +181,10 @@ This is the list of command line configurables (also defined in the \verb|README
     ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,
                        250 GeV for e+e-
     Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance,
-                       50=pp/ee->VH, 51=pp/ee->VH (beta),
+                       50=qq/ee->VH, 51=gg->ZH,
                        60=weakVBF, 61=pp->Hjj, 62=pp->Hj,
                        66=VVHVV offshell, 67=VVVVbkg, 68=VVHVV+VVVV,
-                       69=QCD JJVV bkg, 80=ttH, 90=bbH,
+                       80=ttH, 90=bbH,
                        110=t+H t channel, 111=tbar+H t channel,
                        112=t+H s channel, 113=tbar+H s channel
                        114=t/tbar+H t/s channels
@@ -218,7 +220,7 @@ This is the list of command line configurables (also defined in the \verb|README
                        stable; if it is 1, they decay to Wnu, with the W's decaying
                        according to DecayModes1,2.
     HbbDK:             For VH production, decay H->bb
-    VH_PC:             VH partonic channel and mode selection
+    VH_PC:             VH partonic channel and mode selection for Process=51
                        ee = lo = e- e+ @LO (beta)
                        qq = lo = q qbar @LO (beta)
                        gg = triangles + boxes of gg (set as default)
@@ -334,13 +336,15 @@ This is the list of command line configurables (also defined in the \verb|README
 \item \verb|PDFSet|, \verb|LHAPDF|, \verb|LHAPDFMem|: To use LHAPDF, this functionality must be enabled in the makefile and the relevant environment variables must be set.  See the instructions in Sec.~\ref{sec:LHAPDF}.  Otherwise \verb|PDFSet| gives the choice between a more limited number of PDF sets.
 \end{itemize}
 
-\paragraph{New VH}
+\subsubsection{Process-specific configuration}
 
-Process 51 is a new implementation of VH with matrix elements expressed with the spinor-helicity formalism, including LO $q \bar q \to V \to VH$ (currently in beta), one-loop induced LO $gg \to ZH$, and $q \bar q \to V \to VH$ at NLO (currently in development). The initial state, order of calculation, and diagrams (triangle, box, both, or the interference term between the two, for gg) is set by the parameter \texttt{VH\_PC}, with its options listed above. $\gamma H$, i.e. \texttt{DecayMode1=7}, not yet implemented for \texttt{Process=51}.
+\paragraph{\texorpdfstring{$gg\to VH$}{gg to VH}}
+
+Process 51 is a new implementation of VH with matrix elements expressed with the spinor-helicity formalism, including LO $q \bar q \to V \to VH$ (currently in beta), one-loop induced LO $gg \to ZH$, and $q \bar q \to V \to VH$ at NLO (currently in development). The initial state, order of calculation, and diagrams (triangle, box, both, or the interference term between the two, for gg) is set by the parameter \texttt{VH\_PC}, with its options listed above. $\gamma H$, i.e. \texttt{DecayMode1=7}, is not yet implemented for \texttt{Process=51}.
 
 \paragraph{Offshell VBF}
 
-Processes 66--69 provide an interface to a modified version of MCFM~\cite{Campbell:2010ff} to produce offshell VBF production $VV\to VV$, including all anomalous couplings.  For these processes, a second spin-zero resonance can be activated by setting \verb|MReso2| and \verb|GaReso2| to nonzero values.  The second resonance's couplings can be set to arbitrary values, similar to the first resonance's.
+Processes 66 (signal), 67 (background), and 68 (signal+background+interference) provide an interface to a modified version of MCFM~\cite{Campbell:2010ff} to produce offshell VBF production $VV\to VV$, including all anomalous couplings.  For these processes, a second spin-zero resonance can be activated by setting \verb|MReso2| and \verb|GaReso2| to nonzero values.  The second resonance's couplings can be set to arbitrary values, similar to the first resonance's.
 
 When producing unweighted VBF offshell events, jobs must be submitted in two steps, with five jobs per step.  Each set of five jobs can be run in parallel, but none of the jobs in the the second set can start until all five jobs of the first set finish.
 
@@ -825,8 +829,8 @@ Since text processing is simple in Python, the Python MELA interface is especial
 \noindent
 In going from \verb|v7.1.4| to \verb|v7.2.0| (September 21, 2018), the updates are as follows:
 \begin{itemize}
-\item Process 66 is added to generate offshell VBF events, including the continuum background and up to two scalar resonances.  The matrix elements are provided through an interface to MCFM, modified to include $HVV$ and $XVV$ anomalous couplings.
-\item Process 51 is added with a new procedure to generate $VH$ events, including $gg\to ZH$.  ($qq\to ZH$ and $ee\to ZH$ using this process are currently in beta.)
+\item Processes 66 (signal), 67 (background), and 68 (signal+background+interference) is added to generate offshell VBF events, including the continuum background and up to two scalar resonances.  The matrix elements are provided through an interface to MCFM, modified to include $HVV$ and $XVV$ anomalous couplings.
+\item Process 51 is added with a new procedure to generate $gg \to ZH$ events.  ($qq\to VH$ and $ee\to ZH$ are also supported but currently in beta.  We recommend using Process 50 instead for them.)
 \end{itemize}
 \noindent
 In going from \verb|v7.1.2| to \verb|v7.1.4| (March 23, 2018), the updates are as follows:
