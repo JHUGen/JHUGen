@@ -27,7 +27,7 @@ Manual for the JHU generator and MELA package
 \begin{center}
 \small
 For simulation, reweighting, and analysis of a single-produced resonance at hadron colliders \\
-(version v7.1.5, release date August 24, 2018, manual date August 24, 2018) \\
+(version v7.2.0, release date September 21, 2018, manual date September 21, 2018) \\
 \normalsize
 \end{center}
 
@@ -179,7 +179,7 @@ This is the list of command line configurables (also defined in the \verb|README
     ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,
                        250 GeV for e+e-
     Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance,
-                       50=old =pp/ee->VH, 51=pp/ee->VH, 52=gg->HH,
+                       50=pp/ee->VH, 51=pp/ee->VH (beta),
                        60=weakVBF, 61=pp->Hjj, 62=pp->Hj,
                        66=VVHVV offshell, 67=VVVVbkg, 68=VVHVV+VVVV,
                        69=QCD JJVV bkg, 80=ttH, 90=bbH,
@@ -823,12 +823,18 @@ Since text processing is simple in Python, the Python MELA interface is especial
 
 \section{Release notes}
 \noindent
-In going from \verb|v7.1.2| to \verb|v7.1.4| (March 23, 2017), the updates are as follows:
+In going from \verb|v7.1.4| to \verb|v7.2.0| (September 21, 2018), the updates are as follows:
+\begin{itemize}
+\item Process 66 is added to generate offshell $gg\to ZZ$ events, including the continuum background and up to two scalar resonances.  The matrix elements are provided through an interface to MCFM, modified to include $HVV$ and $XVV$ anomalous couplings.
+\item Process 51 is added with a new procedure to generate $VH$ events, including $gg\to ZH$.  ($qq\to ZH$ and $ee\to ZH$ using this process are currently in beta.)
+\end{itemize}
+\noindent
+In going from \verb|v7.1.2| to \verb|v7.1.4| (March 23, 2018), the updates are as follows:
 \begin{itemize}
 \item Reusing the previous grid via the \verb|ReadCSmax| command line option is improved.
 \end{itemize}
 \noindent
-In going from \verb|v7.0.2| to \verb|v7.1.2| (February 22, 2017), the updates are as follows:
+In going from \verb|v7.0.2| to \verb|v7.1.2| (February 22, 2018), the updates are as follows:
 \begin{itemize}
 \item MELA package interface is completely rewritten and streamlined, including new processes implemented
 \item Add the option for an intermediate $Z^\prime$ or $W^\prime$ in spin 0 and spin 2 resonance decay and in VBF and $VH$ production.  $V^\prime$ can have finite or infinite mass; in the second case, the \verb|ghzzp1| coupling is equivalent to the contact terms formulation~\cite{Gonzalez-Alonso:2014eva}

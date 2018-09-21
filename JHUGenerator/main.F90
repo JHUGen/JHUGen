@@ -6374,7 +6374,7 @@ implicit none
         print *, "   ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,"
         print *, "                      250 GeV for e+e-"
         print *, "   Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance,"
-        print *, "                      50=old =pp/ee->VH, 51=pp/ee->VH, 52=gg->HH,"
+        print *, "                      50=pp/ee->VH, 51=pp/ee->VH (beta),"
         print *, "                      60=weakVBF, 61=pp->Hjj, 62=pp->Hj,"
         print *, "                      66=VVHVV offshell, 67=VVVVbkg, 68=VVHVV+VVVV,"
         print *, "                      69=QCD JJVV bkg, 80=ttH, 90=bbH,"
