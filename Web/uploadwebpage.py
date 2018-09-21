@@ -175,9 +175,8 @@ class Version(object):
 def create_Download(mostrecentversion, *olderversions):
     if not mostrecentversion.visible:
         raise ValueError("The most recent version has to be visible")
-    if not os.path.exists(os.path.join(Webdir, "Manual.pdf")):
-        mostrecentversion.createtarball(force=True)
-        check_call(["cp", os.path.join(gitdir, mostrecentversion.manualname), os.path.join(Webdir, "Manual.pdf")])
+    mostrecentversion.createtarball(force=True)
+    check_call(["cp", os.path.join(gitdir, mostrecentversion.manualname), os.path.join(Webdir, "Manual.pdf")])
     for version in [mostrecentversion] + list(olderversions) + list(reallyold):
         version.createtarball()
     Download = Download_template.format(
