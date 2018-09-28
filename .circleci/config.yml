@@ -516,7 +516,7 @@ jobs:
               ./JHUGen PDFSet=3 Process=80  VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/ttH DecayMode1=11 DecayMode2=11 TopDK=1
             )
             python lhefile.py --lhefile-hwithdecay=tbarH_t_ZZ.lhe --lhefile-jhugenvbfvh=WH.lhe --lhefile-jhugentth=ttH.lhe ||
-            mv *.lhe ~/artifacts/MELA/
+            (mv *.lhe ~/artifacts/MELA/; exit 1)
       - store_artifacts:
           path:
             ~/artifacts/MELA/
