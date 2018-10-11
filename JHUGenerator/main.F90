@@ -3972,7 +3972,7 @@ call InitReadLHE(BeginEventLine)
     write(io_stdout,*) "Alert  Counter: ",AlertCounter
     if( dble(AlertCounter)/dble(AccepCounter) .gt. 1d0*percent ) then
         write(io_stdout,*) "ALERT: The number of rejected events exceeds 1%."
-        write(io_stdout,*) "       Increase CSMAX in main.F90 or VegasNc1."
+        write(io_stdout,*) "       Increase CSMAX in main.F90 or VegasNc0."
     endif
    write(io_stdout,*)  "Event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
    if( RequestNLeptons.gt.0 .or. RequestNJets.gt.0 ) write(io_stdout,"(A,1F6.2,A)") " Filter efficiency:",dble(AccepCounter)/dble(NEvent)*100d0," %"
@@ -3985,7 +3985,7 @@ call InitReadLHE(BeginEventLine)
     write(io_LogFile,*) "Alert  Counter: ",AlertCounter
     if( dble(AlertCounter)/dble(AccepCounter) .gt. 1d0*percent ) then
         write(io_LogFile,*) "ALERT: The number of rejected events exceeds 1%."
-        write(io_LogFile,*) "       Increase CSMAX in main.F90 or VegasNc1."
+        write(io_LogFile,*) "       Increase CSMAX in main.F90 or VegasNc0."
     endif
    write(io_LogFile,*)  "Event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
    if( RequestNLeptons.gt.0 .or. RequestNJets.gt.0 ) write(io_LogFile,"(A,1F6.2,A)") " Filter efficiency:",dble(AccepCounter)/dble(NEvent)*100d0," %"

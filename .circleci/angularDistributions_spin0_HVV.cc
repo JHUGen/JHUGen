@@ -1,27 +1,31 @@
 #ifndef __CINT__
 #include "RooGlobalFunc.h"
 #endif
-#include <iostream>
-#include <cmath>
-#include <string>
-#include <algorithm>
-#include "RooRealVar.h"
-#include "RooDataSet.h"
-#include "RooGaussModel.h"
-#include "RooDecay.h"
+
+#include "Mela.h"
+
+#include "RooBinning.h"
 #include "RooBMixDecay.h"
 #include "RooCategory.h"
-#include "RooBinning.h"
+#include "RooDataSet.h"
+#include "RooDecay.h"
+#include "RooGaussModel.h"
 #include "RooPlot.h"
-#include "TSystem.h"
-#include "TMath.h"
-#include "TCanvas.h"
+#include "RooRealVar.h"
+
 #include "TAxis.h"
-#include "TH1.h"
-#include "TGaxis.h"
-#include "TString.h"
+#include "TCanvas.h"
 #include "TChain.h"
-#include "Mela.h"
+#include "TGaxis.h"
+#include "TH1.h"
+#include "TMath.h"
+#include "TString.h"
+#include "TSystem.h"
+
+#include <algorithm>
+#include <cmath>
+#include <iostream>
+#include <string>
 
 
 using namespace RooFit;

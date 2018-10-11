@@ -7,7 +7,8 @@ MELADir = $(Here)/../JHUGenMELA/MELA
 MELAFortranDir = $(MELADir)/fortran
 MELADataDir = $(MELADir)/data
 MELALibDir = $(MELADataDir)/slc6_amd64_gcc530
-MCFMLib = mcfm_705 # libmcfm_705.so
+#libmcfm_705.so
+MCFMLib = mcfm_705
 PDFDir = $(Here)/pdfs
 VegasDir = $(Here)/vegas
 CollierDir = $(Here)/../lib/COLLIER-1.2/
@@ -66,7 +67,10 @@ ifeq ($(linkMELA),Yes)
  ifeq ($(Comp),gfort)
     MELAflags = -DlinkMELA=1 -L$(MELALibDir) -l$(MCFMLib)
  else
-    linkMELA = No
+    $(error linkMELA = Yes only works with gfortran.  Please set your Compiler to gfort or set linkMELA to No in the makefile.)
+ endif
+ ifeq ("$(wildcard $(MELALibDir)/lib$(MCFMLib).so)", "")
+    $(error Your MELA release is not compiled.  Please either compile it by running setup.sh or set linkMELA to No in the JHUGen makefile)
  endif
 endif
 
