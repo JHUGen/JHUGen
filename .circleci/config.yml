@@ -216,7 +216,7 @@ jobs:
       - run:
           name: "save reference"
           command: |
-            if ! (cat reference_check/exit_status && exit $(cat reference_check/exit_status); then
+            if ! (cat reference_check/exit_status && exit $(cat reference_check/exit_status)); then
               mkdir -p ~/artifacts/
               mv compare_to_reference ~/artifacts/reference_lhes
             fi
