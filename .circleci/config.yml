@@ -25,7 +25,7 @@ env: &env
 
         SEED: "765543533"
 
-        REFERENCE_FILENAMES: "ggH_ZZ.lhe ggH_WW.lhe ggH_Zgamma.lhe ggH_gammagamma.lhe ggH_ZZ_contact.lhe ggH_ZZ_Zprime.lhe spin1_ZZ.lhe spin1_WW.lhe gg_spin2_ZZ.lhe qq_spin2_WW.lhe gg_spin2_Zgamma.lhe qq_spin2_gammagamma.lhe ZH_bb.lhe WH_Zgamma.lhe ee_gammaH_bb.lhe VBF_ZZ.lhe HJJ_WW.lhe HJ_gammagamma.lhe ttH_tautau.lhe gg_bbH_tautau.lhe qq_bbH.lhe tqH_110.lhe tqH_111.lhe tqH_112.lhe tqH_113.lhe tqH_114.lhe gg_ZH_llbb.lhe"
+        REFERENCE_FILENAMES: "ggH_ZZ.lhe ggH_WW.lhe ggH_Zgamma.lhe ggH_gammagamma.lhe ggH_ZZ_contact.lhe ggH_ZZ_Zprime.lhe spin1_ZZ.lhe spin1_WW.lhe gg_spin2_ZZ.lhe qq_spin2_WW.lhe gg_spin2_Zgamma.lhe qq_spin2_gammagamma.lhe ZH_bb.lhe WH_Zgamma.lhe ee_gammaH_bb.lhe VBF_ZZ.lhe HJJ_WW.lhe HJ_gammagamma.lhe ttH_tautau.lhe gg_bbH_tautau.lhe qq_bbH.lhe tqH_110.lhe tqH_111.lhe tqH_112.lhe tqH_113.lhe tqH_114.lhe gg_ZH_llbb.lhe ee_ZH_llbb.lhe qq_ZH_llbb.lhe"
         REFERENCE_FILENAME_GGH: "ggH_ZZ.lhe"
         REFERENCE_FILENAME_VBF: "VBF_ZZ.lhe"
         REFERENCE_FILENAME_HJJ: "HJJ_WW.lhe"
@@ -137,7 +137,7 @@ jobs:
       - run: ./JHUGen Seed=$SEED Collider=0 Process=50 VegasNc0=100000 VegasNc2=100 HbbDK DataFile=compare_to_reference/ee_gammaH_bb DecayMode1=7 $REFERENCE_COUPLINGS_SPIN0
       - run: ./JHUGen Seed=$SEED Collider=1 Process=51 VH_PC=gg HbbDK=1 DecayMode1=0 $REFERENCE_COUPLINGS_SPIN0 Unweighted=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/gg_ZH_llbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0
       - run: ./JHUGen Seed=$SEED Collider=0 Process=51 VH_PC=ee HbbDK=1 DecayMode1=0 $REFERENCE_COUPLINGS_SPIN0 Unweighted=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ee_ZH_llbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0 epPolarization=-100 emPolarization=100
-      - run: ./JHUGen Seed=$SEED Collider=1 Process=51 VH_PC=qq HbbDK=1 DecayMode1=0 $REFERENCE_COUPLINGS_SPIN0 Unweighted=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ee_ZH_llbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0 ghz1=0.0,0.0 ghz4=1.0,0.0
+      - run: ./JHUGen Seed=$SEED Collider=1 Process=51 VH_PC=qq HbbDK=1 DecayMode1=0 $REFERENCE_COUPLINGS_SPIN0 Unweighted=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/qq_ZH_llbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0 ghz1=0.0,0.0 ghz4=1.0,0.0
 
       #don't use WW separate in VBF.  In any case, there is interference
       - run: ./JHUGen Seed=$SEED PDFSet=3 Process=60 VegasNc0=5000000 VegasNc2=100 DataFile=compare_to_reference/VBF $REFERENCE_COUPLINGS_SPIN0
@@ -165,7 +165,7 @@ jobs:
       - run:
           name: "download reference lhes"
           command: |
-            exitstatus=0
+            echo 0 > reference_check/exit_status
             mkdir reference
             cd reference
             JHUGEN_VERSION=$(grep -i JHUGen_Version ~/JHUGen/JHUGenerator/mod_Parameters.F90 | sed -r 's|.*"(.*)".*|\1|g')
@@ -176,7 +176,7 @@ jobs:
               fullname="$(grep $filename /tmp/artifacts.txt)" &&
               wget "$fullname" &&
               sed -i -r "s/(Output from the JHUGenerator )$REFERENCE_JHUGEN_VERSION/\1$JHUGEN_VERSION/" $filename || {
-                exitstatus=1
+                echo 1 > reference_check/exit_status
                 touch reference_check/reference_failed
                 if [ $filename == $REFERENCE_FILENAME_GGH ]; then
                   touch reference_check/reference_failed_ggH
@@ -186,11 +186,11 @@ jobs:
                 fi
               }
             done
-            exit $exitstatus
+            exit $(cat reference_check/exit_status)
+          when: always
       - run:
           name: "compare to reference"
           command: |
-            exitstatus=0
             {
               for filename in $REFERENCE_FILENAMES; do
                 echo "================"
@@ -198,7 +198,7 @@ jobs:
                 echo "================"
                 echo
                 sdiff -s reference/$filename compare_to_reference/$filename && echo "no change" || {
-                  exitstatus=1
+                  echo 1 > reference_check/exit_status
                   touch reference_check/reference_failed
                   if [ $filename == $REFERENCE_FILENAME_GGH ]; then
                     touch reference_check/reference_failed_ggH
@@ -209,17 +209,18 @@ jobs:
                 }
               done
             } |& tee reference_check/output
-            echo $exitstatus > reference_check/exit_status
-            #do NOT exit $exitstatus
+            #do NOT exit $(cat reference_check/exit_status)
             #if the ggH or VBF files have changed, this job needs to succeed
             #so that the dependent jobs to make plots run
             #a separate job reference_check will actually exit $(cat reference_check/exit_status)
       - run:
           name: "save reference"
           command: |
-            mkdir -p ~/artifacts/
-            mv compare_to_reference ~/artifacts/reference_lhes
-          when: on_fail
+            if ! (cat reference_check/exit_status && exit $(cat reference_check/exit_status); then
+              mkdir -p ~/artifacts/
+              mv compare_to_reference ~/artifacts/reference_lhes
+            fi
+          when: always
       - store_artifacts:
           path: ~/artifacts/reference_lhes
       - persist_to_workspace:
