@@ -298,7 +298,7 @@ dontupload = [
               "[.]gitignore$",
               "[.]git$",
              ]
-MCFMprecompiledcommit = "46a2987319695e802914b45141b7acebf8108b5d"
+MCFMprecompiledcommit = "2d21a124764751c589ffcfc1ace2326ece6ebe6a"
 websitebase = "http://spin.pha.jhu.edu"
 #end of inputs
 ########################################################################################
