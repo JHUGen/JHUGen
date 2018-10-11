@@ -176,7 +176,7 @@ jobs:
               fullname="$(grep $filename /tmp/artifacts.txt)" &&
               wget "$fullname" &&
               sed -i -r "s/(Output from the JHUGenerator )$REFERENCE_JHUGEN_VERSION/\1$JHUGEN_VERSION/" $filename || {
-                echo 1 > reference_check/exit_status
+                echo 1 > ../reference_check/exit_status
                 touch reference_check/reference_failed
                 if [ $filename == $REFERENCE_FILENAME_GGH ]; then
                   touch reference_check/reference_failed_ggH
@@ -186,7 +186,7 @@ jobs:
                 fi
               }
             done
-            exit $(cat reference_check/exit_status)
+            exit $(cat ../reference_check/exit_status)
           when: always
       - run:
           name: "compare to reference"
