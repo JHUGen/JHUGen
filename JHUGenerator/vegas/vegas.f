@@ -95,7 +95,7 @@ c--- read-in grid if necessary
          if (readin) then
            open(unit=11,file=ingridfile,status='unknown')
         write(6,*)'****************************************************'
-        write(6,*)'* Reading in vegas grid from ',ingridfile
+        write(6,*)'* Reading in vegas grid from ',trim(ingridfile)
         write(6,*)'****************************************************'
            call flush(6)
            do j=1,ndim
@@ -308,7 +308,7 @@ c--- write-out grid if necessary
          if (writeout) then
            open(unit=11,file=outgridfile,status='unknown')
         write(6,*)'****************************************************'
-        write(6,*)'* Writing out vegas grid to ',outgridfile
+        write(6,*)'* Writing out vegas grid to ',trim(outgridfile)
         write(6,*)'****************************************************'
            call flush(6)
            do j=1,ndim
