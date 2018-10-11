@@ -1532,7 +1532,7 @@ id2 = abs(id2in)
     endif
   !Z nu nu
   else if(id1.eq.convertLHE(NuE_).or.id1.eq.convertLHE(NuM_).or.id1.eq.convertLHE(NuT_))then
-    if((id1in*h1).gt.0d0)then
+    if((id1in*h1).lt.0d0)then
       ZFFbare = aL_neu
     else
       print*,"Noright-handed neutrino here!",id1in,h1
