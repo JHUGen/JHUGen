@@ -2593,7 +2593,7 @@ integer :: NBin(:)
 integer :: i,j,k,l,idME2(1:9)
 real(8) :: m_jj,y_j1,y_j2,dphi_jj, m_ll, pt_V, pt_H, pt1, pt2, deltaR, m_Vstar, m_inv_H, m_inv_V, costheta1, costheta2, phistar1, phi
 double precision MomBoost(1:4), MomFerm(1:4), MomLeptX(1:4,1:4), ScatteringAxis(1:4), MomReso(1:4), MomZ(1:4), MomFerm1(1:4), MomFerm2(1:4)
-double precision MomLeptPlane1(2:4), MomLeptPlane2(2:4), dummy(2:4), signPhi
+double precision MomLeptPlane1(2:4), MomLeptPlane2(2:4), dummy(2:4), signPhi, EHat
 double precision, intent(in) :: MomExt(1:4,1:10)
 logical :: hasAonshell
 real(8) :: MomBoostCOM(1:4)
@@ -2613,6 +2613,8 @@ real(8) :: MomBoostCOM(1:4)
 !print*, "m_inv_V", m_inv_V
      pt_H = get_PT(MomExt(1:4,5))
      pt_V = get_PT(MomExt(1:4,4))
+
+     EHat = MomExt(1,1)+MomExt(1,2)
 
 MomBoostCOM(1)   = +MomExt(1,3)
 MomBoostCOM(2:4) = -MomExt(2:4,3)
@@ -2777,6 +2779,7 @@ MomBoostCOM(2:4) = -MomExt(2:4,3)
      Nbin(7)  = WhichBin(7,costheta2)
      Nbin(8)  = WhichBin(8,phistar1)
      Nbin(9)  = WhichBin(9,phi)
+     Nbin(10) = WhichBin(10,EHat)
 
 RETURN
 END SUBROUTINE Kinematics_VH
