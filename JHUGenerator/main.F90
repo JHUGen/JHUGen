@@ -6423,7 +6423,7 @@ implicit none
         print *, "                      sb = for NLO development (in development)"
         print *, "                      sp = for NLO development (in development)"
         print *, "                      qg = gq = qg + gq (in development)"
-        print *, "                      nl = full oneloop = q qbar @LO + NLO + gg + gq (indevelopment)"
+        print *, "                      nl = full oneloop = q qbar @LO + NLO + gg + gq (in development)"
         print *, "                      VH_PC overrides Pchannel,"
         print *, "                      but Pchannel applies to VH_PC = nl,"
         print *, "                      where 0 = gg, 1 = qq, and 2 = both + gq"
