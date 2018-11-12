@@ -1560,6 +1560,7 @@ implicit none
 real(8) :: AFF
 integer :: id1, id2, id1in, id2in
 real(8) :: h1,h2
+logical, save :: printedneutrinowarning = .false.
 
 id1 = abs(id1in)
 id2 = abs(id2in)
@@ -1591,7 +1592,10 @@ id2 = abs(id2in)
   !photon nu nu
   else if(id1.eq.convertLHE(NuE_).or.id1.eq.convertLHE(NuM_).or.id1.eq.convertLHE(NuT_))then
     AFF = 0d0
-    print*,"Warning, gamma > nu nu~ gives 0.",id1in,id2in
+    if (.not. printedneutrinowarning) then
+      print*,"Warning, gamma > nu nu~ gives 0.",id1in,id2in
+      printedneutrinowarning = .true.
+    endif
   else
     print*,"Not a valid photon to fermion pair vertex!",id1in,id2in
     stop

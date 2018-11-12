@@ -5749,7 +5749,7 @@ character :: arg*(500)
     if( Process.eq.69 ) write(TheUnit,"(4X,A,L)") "Intermediate off-shell gluons: ",includeGammaStar
 
     write(TheUnit,"(4X,A)") ""
-    if( Process.eq.0 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.62 .or. Process.eq.66 .or. Process.eq.68 .or. Process.eq.50 ) then
+    if( (Process.eq.0 .and. TauDecays.lt.0) .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.62 .or. Process.eq.66 .or. Process.eq.68 .or. Process.eq.50 .or. (Process.eq.51 .and. VH_PC.ne."bo") ) then
         write(TheUnit,"(4X,A)") "spin-0-VV couplings: "
         write(TheUnit,"(6X,A,L)") "generate_as=",generate_as
         if( generate_as ) then
@@ -6054,13 +6054,20 @@ character :: arg*(500)
                 if( cdabs(ewp_Top_right).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_Top_right=",ewp_Top_right,"i"
             endif
         endif
-    elseif( Process.eq.1 ) then
+    endif
+    if( (Process.eq.0 .and. TauDecays.ge.0) .or. Process.eq.80 .or. Process.eq.90 .or. (Process.eq.51 .and. VH_PC.ne."tr" .and. VH_PC.ne."ee" .and. VH_PC.ne."qq") ) then
+        write(TheUnit,"(4X,A)") "spin-0-ff couplings: "
+        if( cdabs(kappa ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "kappa=",kappa,"i"
+        if( cdabs(kappa_tilde ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "kappa_tilde=",kappa_tilde,"i"
+    endif
+    if( Process.eq.1 ) then
         write(TheUnit,"(4X,A)") "spin-1-VV couplings: "
         write(TheUnit,"(6X,A,2E16.8,A1)") "zprime_qq_left =",zprime_qq_left,"i"
         write(TheUnit,"(6X,A,2E16.8,A1)") "zprime_qq_right=",zprime_qq_right,"i"
         write(TheUnit,"(6X,A,2E16.8,A1)") "zprime_zz_1=",zprime_zz_1,"i"
         write(TheUnit,"(6X,A,2E16.8,A1)") "zprime_zz_2=",zprime_zz_2,"i"
-    elseif( Process.eq.2 ) then
+    endif
+    if( Process.eq.2 ) then
         write(TheUnit,"(4X,A)") "spin-2-VV couplings: "
         write(TheUnit,"(6X,A,L)") "generate_bis=",generate_bis
         write(TheUnit,"(6X,A,L)") "use_dynamic_MG=",use_dynamic_MG
