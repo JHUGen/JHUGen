@@ -2901,6 +2901,7 @@ IF( .NOT. (Process.ge.66 .and. Process.le.69) ) THEN! special treatment for offs
     print *, "Rescale CrossSecMax by ",calls_rescale
 
     PreviousSum = 0
+    if( sum(RequEvents(:,:)).eq.0 ) StatusPercent = 100d0
     do while( StatusPercent.lt.100d0  )
 !     do while( AccepCounter_part(iPart_sel,jPart_sel).lt.RequEvents(iPart_sel,jPart_sel) )
         call cpu_time(time_start)
@@ -3195,6 +3196,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
     print *, "Rescale CrossSecMax2 by ",calls_rescale
 
     PreviousSum = 0
+    if( sum(RequEvents2(:)).eq.0 ) StatusPercent = 100d0
     do while( StatusPercent.lt.100d0  )
         call cpu_time(time_start)
         readin=.true.  ! this prevents adapting the grid during this while-loop
