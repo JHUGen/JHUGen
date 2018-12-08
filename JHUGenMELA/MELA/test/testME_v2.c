@@ -197,6 +197,38 @@ void testME_Dec_ANALYTICAL_Ping(int erg_tev=13, bool useConstants=false, shared_
     mela.computeP(p0minus, useConstants);
     cout << "p0minus: " << p0minus << '\n' << endl;
 
+    float pg1g2=0;
+    mela.setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, TVar::ZZGG);
+    mela.selfDHggcoupl[0][gHIGGS_GG_2][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_2][0]=1;
+    mela.computeP(pg1g2, useConstants);
+    cout << "pg1g2: " << pg1g2 << '\n' << endl;
+
+    float pg1g4=0;
+    mela.setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, TVar::ZZGG);
+    mela.selfDHggcoupl[0][gHIGGS_GG_2][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_4][0]=1;
+    mela.computeP(pg1g4, useConstants);
+    cout << "pg1g4: " << pg1g4 << '\n' << endl;
+
+    float pg1g2_im=0;
+    mela.setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, TVar::ZZGG);
+    mela.selfDHggcoupl[0][gHIGGS_GG_2][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_2][1]=1;
+    mela.computeP(pg1g2_im, useConstants);
+    cout << "pg1g2_im: " << pg1g2_im << '\n' << endl;
+
+    float pg1g4_im=0;
+    mela.setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, TVar::ZZGG);
+    mela.selfDHggcoupl[0][gHIGGS_GG_2][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_4][1]=1;
+    mela.computeP(pg1g4_im, useConstants);
+    cout << "pg1g4_im: " << pg1g4_im << '\n' << endl;
+
     float p0mplus_ana=0;
     mela.setProcess(TVar::HSMHiggs, TVar::ANALYTICAL, TVar::ZZGG);
     mela.computeP(p0mplus_ana, useConstants);
@@ -211,6 +243,34 @@ void testME_Dec_ANALYTICAL_Ping(int erg_tev=13, bool useConstants=false, shared_
     mela.setProcess(TVar::H0minus, TVar::ANALYTICAL, TVar::ZZGG);
     mela.computeP(p0minus_ana, useConstants);
     cout << "p0minus_ana: " << p0minus_ana << '\n' << endl;
+
+    float pg1g2_ana=0;
+    mela.setProcess(TVar::SelfDefine_spin0, TVar::ANALYTICAL, TVar::ZZGG);
+    mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_2][0]=1;
+    mela.computeP(pg1g2_ana, useConstants);
+    cout << "pg1g2_ana: " << pg1g2_ana << '\n' << endl;
+
+    float pg1g4_ana=0;
+    mela.setProcess(TVar::SelfDefine_spin0, TVar::ANALYTICAL, TVar::ZZGG);
+    mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_4][0]=1;
+    mela.computeP(pg1g4_ana, useConstants);
+    cout << "pg1g4_ana: " << pg1g4_ana << '\n' << endl;
+
+    float pg1g2_im_ana=0;
+    mela.setProcess(TVar::SelfDefine_spin0, TVar::ANALYTICAL, TVar::ZZGG);
+    mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_2][1]=1;
+    mela.computeP(pg1g2_im_ana, useConstants);
+    cout << "pg1g2_im_ana: " << pg1g2_im_ana << '\n' << endl;
+
+    float pg1g4_im_ana=0;
+    mela.setProcess(TVar::SelfDefine_spin0, TVar::ANALYTICAL, TVar::ZZGG);
+    mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_4][1]=1;
+    mela.computeP(pg1g4_im_ana, useConstants);
+    cout << "pg1g4_im_ana: " << pg1g4_im_ana << '\n' << endl;
 
     mela.resetInputEvent();
   }
