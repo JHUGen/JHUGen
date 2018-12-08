@@ -281,6 +281,199 @@ void testME_Dec_ANALYTICAL_Ping(int erg_tev=13, bool useConstants=false, shared_
   cout.precision(bkpprecision);
 }
 
+void testME_Dec_ANALYTICAL_FullSim(int erg_tev=13, bool useConstants=false, shared_ptr<Mela> melaptr=nullptr){
+  TString strtout = Form("testME_Dec_ANALYTICAL_FullSim_%iTeV_%i.out", erg_tev, (int) useConstants);
+  ofstream tout(strtout.Data());
+  streambuf* coutbuf = cout.rdbuf();
+  cout.rdbuf(tout.rdbuf());
+
+  float mPOLE=125.;
+  float wPOLE=4.07e-3;
+
+  TVar::VerbosityLevel verbosity = TVar::ERROR;
+  if (verbosity>=TVar::DEBUG) cout << "Initializing Mela..." << endl;
+  if (!melaptr) melaptr.reset(new Mela(erg_tev, mPOLE, verbosity));
+  Mela& mela = *melaptr;
+  TVar::VerbosityLevel bkpverbosity = mela.getVerbosity();
+  auto bkpprecision = cout.precision(10);
+  mela.setVerbosity(verbosity);
+  if (verbosity>=TVar::DEBUG) cout << "Mela is initialized" << endl;
+  //mela.resetMCFM_EWKParameters(1.16639E-05, 1./128., 79.9549392, 91.1876, 0.23119);
+
+  TFile fin("a2.root", "read");
+  TTree* tin = (TTree*) fin.Get("SelectedTree");
+  float GenLepPt[4];
+  float GenLepEta[4];
+  float GenLepPhi[4];
+  float GenLepMass[4];
+  int GenLepId[4];
+  for (unsigned int ip=0; ip<4; ip++){
+    tin->SetBranchAddress(Form("GenLep%iPt", ip+1), GenLepPt+ip);
+    tin->SetBranchAddress(Form("GenLep%iEta", ip+1), GenLepEta+ip);
+    tin->SetBranchAddress(Form("GenLep%iPhi", ip+1), GenLepPhi+ip);
+    tin->SetBranchAddress(Form("GenLep%iMass", ip+1), GenLepMass+ip);
+    tin->SetBranchAddress(Form("GenLep%iId", ip+1), GenLepId+ip);
+  }
+  std::vector<float>* GenMotherPz=nullptr;
+  std::vector<int>* GenMotherId=nullptr;
+  tin->SetBranchAddress("GenMotherPz", &GenMotherPz);
+  tin->SetBranchAddress("GenMotherId", &GenMotherId);
+  float GenZMass[2];
+  for (unsigned int ip=0; ip<2; ip++) tin->SetBranchAddress(Form("GenZ%iMass", ip+1), GenZMass+ip);
+  float Gencosthetastar; tin->SetBranchAddress("Gencosthetastar", &Gencosthetastar);
+  float GenhelcosthetaZ1; tin->SetBranchAddress("GenhelcosthetaZ1", &GenhelcosthetaZ1);
+  float GenhelcosthetaZ2; tin->SetBranchAddress("GenhelcosthetaZ2", &GenhelcosthetaZ2);
+  float Genhelphi; tin->SetBranchAddress("Genhelphi", &Genhelphi);
+  float GenphistarZ1; tin->SetBranchAddress("GenphistarZ1", &GenphistarZ1);
+
+
+  TFile fout("test.root", "recreate");
+  TTree tnew("TestTree", "");
+  for (unsigned int ip=0; ip<4; ip++){
+    tnew.Branch(Form("GenLep%iPt", ip+1), GenLepPt+ip);
+    tnew.Branch(Form("GenLep%iEta", ip+1), GenLepEta+ip);
+    tnew.Branch(Form("GenLep%iPhi", ip+1), GenLepPhi+ip);
+    tnew.Branch(Form("GenLep%iMass", ip+1), GenLepMass+ip);
+    tnew.Branch(Form("GenLep%iId", ip+1), GenLepId+ip);
+  }
+  for (unsigned int ip=0; ip<2; ip++) tnew.Branch(Form("GenZ%iMass", ip+1), GenZMass+ip);
+  tnew.Branch("Gencosthetastar", &Gencosthetastar);
+  tnew.Branch("GenhelcosthetaZ1", &GenhelcosthetaZ1);
+  tnew.Branch("GenhelcosthetaZ2", &GenhelcosthetaZ2);
+  tnew.Branch("Genhelphi", &Genhelphi);
+  tnew.Branch("GenphistarZ1", &GenphistarZ1);
+
+  float p0mplus=0; tnew.Branch("p0mplus", &p0mplus);
+  float p0hplus=0; tnew.Branch("p0hplus", &p0hplus);
+  float p0minus=0; tnew.Branch("p0minus", &p0minus);
+  float pg1g2=0; tnew.Branch("pg1g2", &pg1g2);
+  float pg1g4=0; tnew.Branch("pg1g4", &pg1g4);
+  float pg1g2_im=0; tnew.Branch("pg1g2_im", &pg1g2_im);
+  float pg1g4_im=0; tnew.Branch("pg1g4_im", &pg1g4_im);
+  float p0mplus_ana=0; tnew.Branch("p0mplus_ana", &p0mplus_ana);
+  float p0hplus_ana=0; tnew.Branch("p0hplus_ana", &p0hplus_ana);
+  float p0minus_ana=0; tnew.Branch("p0minus_ana", &p0minus_ana);
+  float pg1g2_ana=0; tnew.Branch("pg1g2_ana", &pg1g2_ana);
+  float pg1g4_ana=0; tnew.Branch("pg1g4_ana", &pg1g4_ana);
+  float pg1g2_im_ana=0; tnew.Branch("pg1g2_im_ana", &pg1g2_im_ana);
+  float pg1g4_im_ana=0; tnew.Branch("pg1g4_im_ana", &pg1g4_im_ana);
+
+  int nEntries=tin->GetEntries();
+  for (int ev = 0; ev < nEntries; ev++){
+    tin->GetEntry(ev);
+
+    SimpleParticleCollection_t daughters;
+    for (unsigned int ip=0; ip<4; ip++){
+      TLorentzVector pDau;
+      pDau.SetPtEtaPhiM(
+        GenLepPt[ip],
+        GenLepEta[ip],
+        GenLepPhi[ip],
+        GenLepMass[ip]
+      );
+      daughters.push_back(SimpleParticle_t(GenLepId[ip], pDau));
+    }
+    SimpleParticleCollection_t mothers;
+    for (unsigned int ip=0; ip<GenMotherId->size(); ip++){
+      TLorentzVector pMom(0,0, GenMotherPz->at(ip),std::abs(GenMotherPz->at(ip)));
+      mothers.push_back(SimpleParticle_t(GenMotherId->at(ip), pMom));
+    }
+
+    mela.setCandidateDecayMode(TVar::CandidateDecay_ZZ);
+    mela.setInputEvent(&daughters, nullptr, &mothers);
+
+    if (ev==0){
+      cout << "*******************************************************" << endl;
+      for (int ic=0; ic<mela.getNCandidates(); ic++){
+        cout << "Summary of candidate " << ic << ":" << endl;
+        mela.setCurrentCandidateFromIndex(ic);
+        TUtil::PrintCandidateSummary(mela.getCurrentCandidate());
+        cout << "*******************************************************" << endl;
+      }
+      cout << "*******************************************************" << endl;
+      cout << endl;
+    }
+
+    int cindex;
+    cindex=0;
+    mela.setCurrentCandidateFromIndex(cindex);
+
+    mela.setProcess(TVar::HSMHiggs, TVar::JHUGen, TVar::ZZGG);
+    mela.computeP(p0mplus, useConstants);
+
+    mela.setProcess(TVar::H0hplus, TVar::JHUGen, TVar::ZZGG);
+    mela.computeP(p0hplus, useConstants);
+
+    mela.setProcess(TVar::H0minus, TVar::JHUGen, TVar::ZZGG);
+    mela.computeP(p0minus, useConstants);
+
+    mela.setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, TVar::ZZGG);
+    mela.selfDHggcoupl[0][gHIGGS_GG_2][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_2][0]=1;
+    mela.computeP(pg1g2, useConstants);
+
+    mela.setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, TVar::ZZGG);
+    mela.selfDHggcoupl[0][gHIGGS_GG_2][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_4][0]=1;
+    mela.computeP(pg1g4, useConstants);
+
+    mela.setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, TVar::ZZGG);
+    mela.selfDHggcoupl[0][gHIGGS_GG_2][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_2][1]=1;
+    mela.computeP(pg1g2_im, useConstants);
+
+    mela.setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, TVar::ZZGG);
+    mela.selfDHggcoupl[0][gHIGGS_GG_2][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_4][1]=1;
+    mela.computeP(pg1g4_im, useConstants);
+
+    mela.setProcess(TVar::HSMHiggs, TVar::ANALYTICAL, TVar::ZZGG);
+    mela.computeP(p0mplus_ana, useConstants);
+
+    mela.setProcess(TVar::H0hplus, TVar::ANALYTICAL, TVar::ZZGG);
+    mela.computeP(p0hplus_ana, useConstants);
+
+    mela.setProcess(TVar::H0minus, TVar::ANALYTICAL, TVar::ZZGG);
+    mela.computeP(p0minus_ana, useConstants);
+
+    mela.setProcess(TVar::SelfDefine_spin0, TVar::ANALYTICAL, TVar::ZZGG);
+    mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_2][0]=1;
+    mela.computeP(pg1g2_ana, useConstants);
+
+    mela.setProcess(TVar::SelfDefine_spin0, TVar::ANALYTICAL, TVar::ZZGG);
+    mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_4][0]=1;
+    mela.computeP(pg1g4_ana, useConstants);
+
+    mela.setProcess(TVar::SelfDefine_spin0, TVar::ANALYTICAL, TVar::ZZGG);
+    mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_2][1]=1;
+    mela.computeP(pg1g2_im_ana, useConstants);
+
+    mela.setProcess(TVar::SelfDefine_spin0, TVar::ANALYTICAL, TVar::ZZGG);
+    mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_4][1]=1;
+    mela.computeP(pg1g4_im_ana, useConstants);
+
+    mela.resetInputEvent();
+
+    tnew.Fill();
+  }
+  fout.WriteTObject(&tnew);
+  fout.Close();
+  fin.Close();
+
+  cout.rdbuf(coutbuf);
+  tout.close();
+  mela.setVerbosity(bkpverbosity);
+  cout.precision(bkpprecision);
+}
+
 
 void testME_Dec_MCFM_Ping(int flavor=2, int useMothers=0, bool useConstants=false, shared_ptr<Mela> melaptr=nullptr){
   ofstream tout(TString("testME_Dec_MCFM_Ping_")+long(flavor)+"_"+long(useMothers)+"_"+long(useConstants)+".out");
