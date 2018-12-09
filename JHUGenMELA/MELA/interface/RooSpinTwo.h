@@ -32,6 +32,7 @@ public:
   virtual Double_t evaluate() const = 0;
   virtual Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName=0) const = 0;
   virtual Double_t analyticalIntegral(Int_t code, const char* rangeName=0) const = 0;
+  virtual void printParameters() const;
 
 protected:
 

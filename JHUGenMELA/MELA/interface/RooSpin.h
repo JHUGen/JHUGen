@@ -101,7 +101,7 @@ public:
 
   virtual void defaultIntegration(){ intCodeStart=1; }
   virtual void alwaysIntegrate(Int_t code=1);
-
+  virtual void printParameters() const;
 
 protected:
 

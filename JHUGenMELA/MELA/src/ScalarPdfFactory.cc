@@ -513,7 +513,8 @@ void ScalarPdfFactory::initGVals(){
     for (int v=0; v<8; v++){
       for (int im=0; im<2; im++){
         TString strcore;
-        double initval = 0;
+        double initval = ((v==0 && im==0) ? 1 : 0);
+
         TString strapp = "Val";
         if (im==1) strapp.Append("Im");
         if (v>1) strapp.Prepend(Form("%i", v));
@@ -521,7 +522,6 @@ void ScalarPdfFactory::initGVals(){
 
         strcore = "g1";
         strcore.Append(strapp);
-        if (v==0 && im==0) initval = 1;
         RooRealVar* g1Val = new RooRealVar(strcore, strcore, initval, -1e15, 1e15);
         g1Val->removeMin();
         g1Val->removeMax();

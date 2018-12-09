@@ -393,3 +393,22 @@ Bool_t RooSpin::checkFundamentalType(const RooRealProxy& proxy)const{
   RooAbsArg* arg = proxy.absArg();
   return (dynamic_cast<RooRealVar*>(arg)!=0);
 }
+
+void RooSpin::printParameters() const{
+  MELAout << "mX: " << mX << endl;
+  MELAout << "gamX: " << gamX << endl;
+  MELAout << "mW: " << mW << endl;
+  MELAout << "gamW: " << gamW << endl;
+  MELAout << "mZ: " << mZ << endl;
+  MELAout << "gamZ: " << gamZ << endl;
+  MELAout << "mWprime: " << mWprime << endl;
+  MELAout << "gamWprime: " << gamWprime << endl;
+  MELAout << "mZprime: " << mZprime << endl;
+  MELAout << "gamZprime: " << gamZprime << endl;
+  MELAout << "Sin2ThetaW: " << Sin2ThetaW << endl;
+  MELAout << "vev: " << vev << endl;
+  MELAout << "gVprimeff_decay1_left: " << gVprimeff_decay1_left << endl;
+  MELAout << "gVprimeff_decay1_right: " << gVprimeff_decay1_right << endl;
+  MELAout << "gVprimeff_decay2_left: " << gVprimeff_decay2_left << endl;
+  MELAout << "gVprimeff_decay2_right: " << gVprimeff_decay2_right << endl;
+}
