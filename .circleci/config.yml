@@ -383,7 +383,7 @@ jobs:
               #./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/fa30.5i ghz1=1,0 ghz4=0,2.55052
               #./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/a2 ghz1=0,0 ghz2=1,0
               #./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/SMa2a3 ghz1=1,0 ghz2=1,0 ghz4=0,1
-              ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/SMa3imag ghz1=1,0 ghz4=0,1
+              ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/SMa3imag ghz1=1,0 ghz4=0,2.55052
               #./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/CT_left ghz1=0,0 ghzzp1=1,0 ezp_El_left=1,0 ezp_Mu_left=1,0
               #./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/CT_leftright ghz1=0,0 ghzzp1=1,0 ezp_El_left=1,0 ezp_Mu_left=1,0 ezp_El_right=1,0 ezp_Mu_right=1,0
             else
@@ -416,7 +416,7 @@ jobs:
               #root -b -q '../JHUGenMELA/MELA/test/loadMELA.C angularDistributions_spin0_HVV.cc+("$LHEDIR/fa30.5i.root", "ghv1=1,0;ghv4=0,2.55052", "ZZ4l", "$LHEDIR/fa30.5i/")'
               #root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/a2.root", "ghv1=0,0;ghv2=1,0", "ZZ4l", "$LHEDIR/a2/")'
               #root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/SMa2a3.root", "ghv1=1,0;ghv2=1,0;ghv4=0,1", "ZZ4l", "$LHEDIR/SMa2a3/")'
-              root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/SMa3imag.root", "ghv1=1,0;ghv4=0,1", "ZZ4l", "$LHEDIR/SMa3imag/")'
+              root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/SMa3imag.root", "ghv1=1,0;ghv4=0,2.55052", "ZZ4l", "$LHEDIR/SMa3imag/")'
 
               #from plugging this into mathematica:
               #formula and constants come from MELA/test/testME_more.py
