@@ -111,8 +111,6 @@ jobs:
           at: ~/JHUGen
       - run:
           <<: *cmsrelcmsenv
-      - restore_cache:
-          key: v1_boost_1_61_0
       - run: mkdir -p reference_check compare_to_reference
 
       - run: ./JHUGen Seed=$SEED PDFSet=3 Process=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ggH_ZZ DecayMode1=9 DecayMode2=9 $REFERENCE_COUPLINGS_SPIN0
@@ -237,8 +235,6 @@ jobs:
       - run:
           <<: *cmsrelcmsenv
       - run: echo "export LHEDIR=$HOME/artifacts/syntax_check" >> $BASH_ENV
-      - restore_cache:
-          key: v1_boost_1_61_0
       - run: mkdir -p $LHEDIR/
 
       #gg/qqbar -> spin0/1/2
@@ -326,8 +322,6 @@ jobs:
       - attach_workspace:
           at: ~/JHUGen
       - restore_cache:
-          key: v1_boost_1_61_0
-      - restore_cache:
           key: v1_analyzer
       - run:
           <<: *cmsrelcmsenv
@@ -360,7 +354,7 @@ jobs:
               | sort
             ) > JHUGenerator/analytical-md5sum
       - restore_cache:
-          key: v1-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum" }}
+          key: v2-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum" }}
       - run:
           name: "see if we need ggH analytical plots"
           command: |
@@ -376,11 +370,14 @@ jobs:
           name: generate
           command: |
             if $DOPLOTS; then
-              ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/SM
-              ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/PS ghz1=0,0 ghz4=1,0
+              #./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/SM
+              #./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/PS ghz1=0,0 ghz4=1,0
               #./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/fa30.5 ghz1=1,0 ghz4=2.55052,0
               #./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/fa30.5i ghz1=1,0 ghz4=0,2.55052
-              ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/a2 ghz1=0,0 ghz2=1,0
+              #./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/a2 ghz1=0,0 ghz2=1,0
+              ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/SMa2a3 ghz1=1,0 ghz2=1,0 ghz4=0,1
+              ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/CT_left ghz1=0,0 ghzzp1=1,0 ezp_El_left=1,0 ezp_Mu_left=1,0
+              ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/CT_leftright ghz1=0,0 ghzzp1=1,0 ezp_El_left=1,0 ezp_Mu_left=1,0 ezp_El_right=1,0 ezp_Mu_right=1,0
             else
               echo "The LHE files can be found in the artifacts at $(cat no-need-for-ggH-plots)"
             fi
@@ -388,11 +385,14 @@ jobs:
           name: analyzer
           command: |
             if $DOPLOTS; then
-              analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SM.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 SM.lhe
-              analyzer fileLevel=0 outdir=$LHEDIR/ outfile=PS.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 PS.lhe
+              #analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SM.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 SM.lhe
+              #analyzer fileLevel=0 outdir=$LHEDIR/ outfile=PS.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 PS.lhe
               #analyzer fileLevel=0 outdir=$LHEDIR/ outfile=fa30.5.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 fa30.5.lhe
               #analyzer fileLevel=0 outdir=$LHEDIR/ outfile=fa30.5i.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 fa30.5i.lhe
-              analyzer fileLevel=0 outdir=$LHEDIR/ outfile=a2.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 a2.lhe
+              #analyzer fileLevel=0 outdir=$LHEDIR/ outfile=a2.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 a2.lhe
+              analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SMa2a3.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 SMa2a3.lhe
+              analyzer fileLevel=0 outdir=$LHEDIR/ outfile=CT_left.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 CT_left.lhe
+              analyzer fileLevel=0 outdir=$LHEDIR/ outfile=CT_leftright.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 CT_leftright.lhe
             else
               echo "The root files can be found in the artifacts at $(cat no-need-for-ggH-plots)"
             fi
@@ -401,20 +401,31 @@ jobs:
           command: |
             if $DOPLOTS; then
               cd ../.circleci
-              root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/SM.root", "ghv1=1,0", "ZZ4l", "$LHEDIR/SM/")'
-              root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/PS.root", "ghv1=0,0;ghv4=1,0", "ZZ4l", "$LHEDIR/PS/")'
+              #root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/SM.root", "ghv1=1,0", "ZZ4l", "$LHEDIR/SM/")'
+              #root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/PS.root", "ghv1=0,0;ghv4=1,0", "ZZ4l", "$LHEDIR/PS/")'
               #root -b -q '../JHUGenMELA/MELA/test/loadMELA.C angularDistributions_spin0_HVV.cc+("$LHEDIR/fa30.5.root", "ghv1=1,0;ghv4=2.55052,0", "ZZ4l", "$LHEDIR/fa30.5/")'
               #root -b -q '../JHUGenMELA/MELA/test/loadMELA.C angularDistributions_spin0_HVV.cc+("$LHEDIR/fa30.5i.root", "ghv1=1,0;ghv4=0,2.55052", "ZZ4l", "$LHEDIR/fa30.5i/")'
-              root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/a2.root", "ghv1=0,0;ghv2=1,0", "ZZ4l", "$LHEDIR/a2/")'
+              #root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/a2.root", "ghv1=0,0;ghv2=1,0", "ZZ4l", "$LHEDIR/a2/")'
+              root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/SMa2a3.root", "ghv1=1,0;ghv2=1,0;ghv4=0,1", "ZZ4l", "$LHEDIR/SMa2a3/")'
+
+              #from plugging this into mathematica:
+              #formula and constants come from MELA/test/testME_more.py
+              #formula = Solve[ghz1CT == ghz1 + 2 ghz1prime2 + (mZ^2 - I mZ GaZ)/L1^2 && ghzzp1L == mZ^2/L1^2 aL ghz1prime2 + e ghzgs1prime2 && ghzzp1R == mZ^2/L1^2 aR ghz1prime2 + e ghzgs1prime2, {ghz1, ghz1prime2, ghzgs1prime2}]
+              #constants = {mZ -> 91.1876, GaZ -> 2.4952, aL -> -0.53762, aR -> 0.46238, e -> 0.8431872482432357, L1 -> 10000}
+              #formula /. constants /. {ghz1CT -> 0, ghzzp1L -> 1, ghzzp1R -> 0}
+              root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/CT_left.root", "ghv1=24052.4,2.27531e-6;ghv1_prime2=-12026.2,0;ghzgs1_prime2=0.548372,0", "ZZ4l", "$LHEDIR/CT_left/")'
+
+              #formula /. constants /. {ghz1CT -> 0, ghzzp1L -> 1, ghzzp1R -> 1}
+              root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/CT_leftright.root", "ghv1=-0.0000831518,2.27531e-6;ghv1_prime2=0,0;ghzgs1_prime2=1.18598,0", "ZZ4l", "$LHEDIR/CT_leftright/")'
             else
               echo "The plots can be found in the artifacts at $(cat no-need-for-ggH-plots)"
             fi
           no_output_timeout: 1h
       - store_artifacts:
           path: ~/artifacts/ggH
-      - run: echo "$CIRCLE_BUILD_URL" > no-need-for-ggH-plots
+      - run: echo "$CIRCLE_BUILD_URL\nolder versions at:\n- https://circleci.com/gh/JHUGen/JHUGen/743 (pure SM, a2, a3)" > no-need-for-ggH-plots
       - save_cache:
-          key: v1-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum" }}
+          key: v2-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum" }}
           paths: ~/JHUGen/JHUGenerator/no-need-for-ggH-plots
       - run: '! [ -f reference_check/reference_failed_ggH ]'
 
@@ -424,8 +435,6 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/JHUGen
-      - restore_cache:
-          key: v1_boost_1_61_0
       - restore_cache:
           key: v1_analyzer
       - run:
