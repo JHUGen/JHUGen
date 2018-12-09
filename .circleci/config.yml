@@ -29,6 +29,7 @@ env: &env
         REFERENCE_FILENAME_GGH: "ggH_ZZ.lhe"
         REFERENCE_FILENAME_VBF: "VBF_ZZ.lhe"
         REFERENCE_FILENAME_HJJ: "HJJ_WW.lhe"
+        REFERENCE_FILENAME_ZH:  "ZH_bb.lhe"
 
 cmsrelcmsenv: &cmsrelcmsenv
   name: "cmsrel, cmsenv"
@@ -182,6 +183,9 @@ jobs:
                 if [ $filename == $REFERENCE_FILENAME_VBF ] || [ $filename == $REFERENCE_FILENAME_HJJ ]; then
                   touch ../reference_check/reference_failed_VBF
                 fi
+                if [ $filename == $REFERENCE_FILENAME_ZH ]; then
+                  touch ../reference_check/reference_failed_ZH
+                fi
               }
             done
           when: always
@@ -202,6 +206,9 @@ jobs:
                   fi
                   if [ $filename == $REFERENCE_FILENAME_VBF ] || [ $filename == $REFERENCE_FILENAME_HJJ ]; then
                     touch reference_check/reference_failed_VBF
+                  fi
+                  if [ $filename == $REFERENCE_FILENAME_ZH ]; then
+                    touch reference_check/reference_failed_ZH
                   fi
                 }
               done
