@@ -7,9 +7,9 @@ using namespace MELAStreamHelpers;
 RooSpinTwo::RooSpinTwo() : RooSpin(){}
 RooSpinTwo::RooSpinTwo(
   const char* name, const char* title,
-  modelMeasurables _measurables,
-  modelParameters _parameters,
-  modelCouplings _couplings,
+  modelMeasurables const& _measurables,
+  modelParameters const& _parameters,
+  modelCouplings const& _couplings,
   RooSpin::VdecayType _Vdecay1, RooSpin::VdecayType _Vdecay2,
   TVar::VerbosityLevel verbosity_
 ) : RooSpin(

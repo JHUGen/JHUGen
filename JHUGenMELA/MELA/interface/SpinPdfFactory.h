@@ -11,7 +11,7 @@ public:
   RooSpin::modelMeasurables measurables;
   RooSpin::modelParameters parameters;
 
-  SpinPdfFactory(RooSpin::modelMeasurables measurables_, RooSpin::VdecayType V1decay_=RooSpin::kVdecayType_Zll, RooSpin::VdecayType V2decay_=RooSpin::kVdecayType_Zll, Bool_t OnshellH_=true);
+  SpinPdfFactory(RooSpin::modelMeasurables const& measurables_, RooSpin::VdecayType V1decay_=RooSpin::kVdecayType_Zll, RooSpin::VdecayType V2decay_=RooSpin::kVdecayType_Zll, Bool_t OnshellH_=true);
   virtual ~SpinPdfFactory();
 
   virtual void getMVGamV(Double_t* mV=0, Double_t* gamV=0) const;
@@ -42,7 +42,7 @@ protected:
 
   RooSpin* PDF_base;
 
-  virtual void initMeasurables(RooSpin::modelMeasurables measurables_);
+  virtual void initMeasurables(RooSpin::modelMeasurables const& measurables_);
 
   virtual void initMassPole();
   virtual void initVdecayParams();

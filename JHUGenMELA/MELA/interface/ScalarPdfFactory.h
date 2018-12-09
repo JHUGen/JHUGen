@@ -66,9 +66,9 @@ public:
   RooRealVar* gVVpRatioVal[1][1];
   RooRealVar* gVpVpRatioVal[1][1];
 
-  ScalarPdfFactory(RooSpin::modelMeasurables measurables_, bool acceptance_=false, RooSpin::VdecayType V1decay_=RooSpin::kVdecayType_Zll, RooSpin::VdecayType V2decay_=RooSpin::kVdecayType_Zll, Bool_t OnshellH_=true);
+  ScalarPdfFactory(RooSpin::modelMeasurables const& measurables_, bool acceptance_=false, RooSpin::VdecayType V1decay_=RooSpin::kVdecayType_Zll, RooSpin::VdecayType V2decay_=RooSpin::kVdecayType_Zll, Bool_t OnshellH_=true);
   ScalarPdfFactory(
-    RooSpin::modelMeasurables measurables_,
+    RooSpin::modelMeasurables const& measurables_,
     double gRatio_[4][8],
     double gZGsRatio_[4][1],
     double gGsGsRatio_[3][1],
