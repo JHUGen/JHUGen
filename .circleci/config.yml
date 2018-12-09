@@ -402,10 +402,10 @@ jobs:
             if $DOPLOTS; then
               cd ../.circleci
               root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/SM.root", "ghv1=1,0", "ZZ4l", "$LHEDIR/SM/")'
-              root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/PS.root", "ghv4=1,0", "ZZ4l", "$LHEDIR/PS/")'
+              root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/PS.root", "ghv1=0,0;ghv4=1,0", "ZZ4l", "$LHEDIR/PS/")'
               #root -b -q '../JHUGenMELA/MELA/test/loadMELA.C angularDistributions_spin0_HVV.cc+("$LHEDIR/fa30.5.root", "ghv1=1,0;ghv4=2.55052,0", "ZZ4l", "$LHEDIR/fa30.5/")'
               #root -b -q '../JHUGenMELA/MELA/test/loadMELA.C angularDistributions_spin0_HVV.cc+("$LHEDIR/fa30.5i.root", "ghv1=1,0;ghv4=0,2.55052", "ZZ4l", "$LHEDIR/fa30.5i/")'
-              root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/a2.root", "ghv2=1,0", "ZZ4l", "$LHEDIR/a2/")'
+              root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/a2.root", "ghv1=0,0;ghv2=1,0", "ZZ4l", "$LHEDIR/a2/")'
             else
               echo "The plots can be found in the artifacts at $(cat no-need-for-ggH-plots)"
             fi
