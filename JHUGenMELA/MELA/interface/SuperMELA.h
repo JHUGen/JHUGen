@@ -29,10 +29,10 @@ public:
   void SetPathToCards(std::string dirToCards);
 
   std::pair<double, double> M4lProb(double m4l);
-  std::pair<double, double> M4lProb(std::pair<double, double>);
+  std::pair<double, double> M4lProb(std::pair<double, double> const&);
 
 protected:
-  void splitLine(const std::string rawoption, std::vector<std::string>& splitoptions, char delimiter);
+  void splitLine(const std::string& rawoption, std::vector<std::string>& splitoptions, char delimiter);
   void readSigParsFromFile(
     std::string& str_mean_CB,
     std::string& str_sigma_CB,
