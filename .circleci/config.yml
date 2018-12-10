@@ -361,7 +361,7 @@ jobs:
               | sort
             ) > JHUGenerator/analytical-md5sum
       - restore_cache:
-          key: v3-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum" }}
+          key: v4-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum" }}
       - run:
           name: "see if we need ggH analytical plots"
           command: |
@@ -383,7 +383,8 @@ jobs:
               #./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/fa30.5i ghz1=1,0 ghz4=0,2.55052
               #./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/a2 ghz1=0,0 ghz2=1,0
               #./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/SMa2a3 ghz1=1,0 ghz2=1,0 ghz4=0,1
-              ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/SMa3imag ghz1=1,0 ghz4=0,2.55052
+              ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/SMa3 ghz1=1,0 ghz4=2.55052,0
+              #./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/SMa3imag ghz1=1,0 ghz4=0,2.55052
               #./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/CT_left ghz1=0,0 ghzzp1=1,0 ezp_El_left=1,0 ezp_Mu_left=1,0
               #./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/CT_leftright ghz1=0,0 ghzzp1=1,0 ezp_El_left=1,0 ezp_Mu_left=1,0 ezp_El_right=1,0 ezp_Mu_right=1,0
             else
@@ -399,7 +400,8 @@ jobs:
               #analyzer fileLevel=0 outdir=$LHEDIR/ outfile=fa30.5i.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 fa30.5i.lhe
               #analyzer fileLevel=0 outdir=$LHEDIR/ outfile=a2.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 a2.lhe
               #analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SMa2a3.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 SMa2a3.lhe
-              analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SMa3imag.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 SMa3imag.lhe
+              analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SMa3.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 SMa3.lhe
+              #analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SMa3imag.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 SMa3imag.lhe
               #analyzer fileLevel=0 outdir=$LHEDIR/ outfile=CT_left.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 CT_left.lhe
               #analyzer fileLevel=0 outdir=$LHEDIR/ outfile=CT_leftright.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 CT_leftright.lhe
             else
@@ -416,7 +418,8 @@ jobs:
               #root -b -q '../JHUGenMELA/MELA/test/loadMELA.C angularDistributions_spin0_HVV.cc+("$LHEDIR/fa30.5i.root", "ghv1=1,0;ghv4=0,2.55052", "ZZ4l", "$LHEDIR/fa30.5i/")'
               #root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/a2.root", "ghv1=0,0;ghv2=1,0", "ZZ4l", "$LHEDIR/a2/")'
               #root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/SMa2a3.root", "ghv1=1,0;ghv2=1,0;ghv4=0,1", "ZZ4l", "$LHEDIR/SMa2a3/")'
-              root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/SMa3imag.root", "ghv1=1,0;ghv4=0,2.55052", "ZZ4l", "$LHEDIR/SMa3imag/")'
+              root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/SMa3.root", "ghv1=1,0;ghv4=2.55052,0", "ZZ4l", "$LHEDIR/SMa3/")'
+              #root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/SMa3imag.root", "ghv1=1,0;ghv4=0,2.55052", "ZZ4l", "$LHEDIR/SMa3imag/")'
 
               #from plugging this into mathematica:
               #formula and constants come from MELA/test/testME_more.py
@@ -428,15 +431,17 @@ jobs:
               #formula /. constants /. {ghz1CT -> 0, ghzzp1L -> 1, ghzzp1R -> 1}
               #root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/CT_leftright.root", "ghv1=-0.0000831518,2.27531e-6;ghv1_prime2=0,0;ghzgs1_prime2=1.18598,0", "ZZ4l", "$LHEDIR/CT_leftright/")'
             else
-              echo "The plots can be found in the artifacts at $(cat no-need-for-ggH-plots)"
+              echo "The plots can be found in the artifacts at $(cat no-need-for-ggH-plots older-ggH-plots)"
             fi
           no_output_timeout: 1h
       - store_artifacts:
           path: ~/artifacts/ggH
-      - run: echo "$CIRCLE_BUILD_URL\nolder versions at:\n- https://circleci.com/gh/JHUGen/JHUGen/743 (pure SM, a2, a3)\n- https://circleci.com/gh/hroskes/JHUGen/1759 (g1=g2=1 g4=i, left CT, vector CT - all buggy)" > no-need-for-ggH-plots
+      - run: echo "$CIRCLE_BUILD_URL" > no-need-for-ggH-plots
+      - run: echo "older versions at:\n- https://circleci.com/gh/JHUGen/JHUGen/743 (pure SM, a2, a3)\n- https://circleci.com/gh/hroskes/JHUGen/1759 (g1=g2=1 g4=i, left CT, vector CT - all buggy)\n- https://circleci.com/gh/hroskes/JHUGen/1776 (g1=1 g4=i - buggy)" > older-ggH-plots
       - save_cache:
-          key: v3-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum" }}
+          key: v4-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum" }}
           paths: ~/JHUGen/JHUGenerator/no-need-for-ggH-plots
+          paths: ~/JHUGen/JHUGenerator/older-ggH-plots
       - run: '! [ -f reference_check/reference_failed_ggH ]'
 
   plots_VBF:
