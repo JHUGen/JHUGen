@@ -736,7 +736,7 @@ jobs:
             ! ./JHUGen Process=50 PDFSet=231 DataFile=VH_readcsmax.lhe MReso=250 VegasNc2=500 pTjetcut=30.0d0 Interf GaReso=10 $REFERENCE_COUPLINGS_SPIN0 ReadCSmax
 
             #same for process that has a grid rather than CSmax.bin
-            ./JHUGen Process=0 VegasNc0=10000 VegasNc2=1 MReso=250 GaReso=10 $REFERENCE_COUPLINGS_SPIN0 pTjetcut=30 NoInterf $REFERENCE_COUPLINGS_SPIN0_ZP PDFSet=231 DataFile=ggH_firstrun.lhe $REFERENCE_COUPLINGS_CONTACT
+            ./JHUGen Process=0 VegasNc0=100000 VegasNc2=1 MReso=250 GaReso=10 $REFERENCE_COUPLINGS_SPIN0 pTjetcut=30 NoInterf $REFERENCE_COUPLINGS_SPIN0_ZP PDFSet=231 DataFile=ggH_firstrun.lhe $REFERENCE_COUPLINGS_CONTACT
             cp ggH_firstrun_commandlineinfo.txt ggH_readcsmax_commandlineinfo.txt
             cp ggH_firstrun.grid ggH_readcsmax.grid
             cp ggH_firstrun_step2.grid ggH_readcsmax_step2.grid
