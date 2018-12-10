@@ -114,57 +114,79 @@ jobs:
           <<: *cmsrelcmsenv
       - run: mkdir -p reference_check compare_to_reference
 
-      - run: ./JHUGen Seed=$SEED PDFSet=3 Process=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ggH_ZZ DecayMode1=9 DecayMode2=9 $REFERENCE_COUPLINGS_SPIN0
-      - run: ./JHUGen Seed=$SEED PDFSet=3 Process=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ggH_WW DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS_SPIN0
-      - run: ./JHUGen Seed=$SEED PDFSet=3 Process=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ggH_Zgamma DecayMode1=9 DecayMode2=7 $REFERENCE_COUPLINGS_SPIN0
-      - run: ./JHUGen Seed=$SEED PDFSet=3 Process=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ggH_gammagamma DecayMode1=7 DecayMode2=7 $REFERENCE_COUPLINGS_SPIN0
+      - run:
+          name: "md5sum of files relevant for the generator"
+          command: |
+            cd ..
+            md5sum $(
+              git ls-files \
+                JHUGenerator/ \
+                JHUGenMELA/MELA/COLLIER \
+              | sort
+            ) > JHUGenerator/generator-md5sum
+      - restore_cache:
+          key: v1-do-i-need-to-test-generator-reference-{{ checksum "generator-md5sum" }}
+      - run:
+          name: "see if we need to test the generator"
+          command: |
+            DOREFERENCE=true
+            if [ "$(cat no-need-for-generator-reference)" ]; then
+              DOREFERENCE=false
+            fi
+            echo "export DOREFERENCE=$DOREFERENCE" >> $BASH_ENV
 
-      - run: ./JHUGen Seed=$SEED PDFSet=3 Process=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/spin1_ZZ DecayMode1=9 DecayMode2=9 $REFERENCE_COUPLINGS_SPIN1
-      - run: ./JHUGen Seed=$SEED PDFSet=3 Process=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/spin1_WW DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS_SPIN1
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ggH_ZZ DecayMode1=9 DecayMode2=9 $REFERENCE_COUPLINGS_SPIN0"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ggH_WW DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS_SPIN0"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ggH_Zgamma DecayMode1=9 DecayMode2=7 $REFERENCE_COUPLINGS_SPIN0"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ggH_gammagamma DecayMode1=7 DecayMode2=7 $REFERENCE_COUPLINGS_SPIN0"
 
-      - run: ./JHUGen Seed=$SEED PDFSet=3 Process=2 PChannel=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/gg_spin2_ZZ DecayMode1=9 DecayMode2=9 $REFERENCE_COUPLINGS_SPIN2 $REFERENCE_COUPLINGS_SPIN2_ZZ
-      - run: ./JHUGen Seed=$SEED PDFSet=3 Process=2 PChannel=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/qq_spin2_WW DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS_SPIN2 $REFERENCE_COUPLINGS_SPIN2_ZZ
-      - run: ./JHUGen Seed=$SEED PDFSet=3 Process=2 PChannel=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/gg_spin2_Zgamma DecayMode1=9 DecayMode2=7 $REFERENCE_COUPLINGS_SPIN2 $REFERENCE_COUPLINGS_SPIN2_ZG
-      - run: ./JHUGen Seed=$SEED PDFSet=3 Process=2 PChannel=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/qq_spin2_gammagamma DecayMode1=7 DecayMode2=7 $REFERENCE_COUPLINGS_SPIN2 $REFERENCE_COUPLINGS_SPIN2_GG
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/spin1_ZZ DecayMode1=9 DecayMode2=9 $REFERENCE_COUPLINGS_SPIN1"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/spin1_WW DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS_SPIN1"
 
-      - run: ./JHUGen Seed=$SEED PDFSet=3 Process=0 VegasNc0=100000 VegasNc1=100 VegasNc2=100 DataFile=compare_to_reference/ggH_ZZ_contact Unweighted=0 WriteWeightedLHE DecayMode1=9 DecayMode2=9 $REFERENCE_COUPLINGS_SPIN0 $REFERENCE_COUPLINGS_SPIN0_ZP $REFERENCE_COUPLINGS_CONTACT
-      - run: ./JHUGen Seed=$SEED PDFSet=3 Process=0 VegasNc0=100000 VegasNc1=100 VegasNc2=100 DataFile=compare_to_reference/ggH_ZZ_Zprime Unweighted=0 WriteWeightedLHE DecayMode1=9 DecayMode2=9 $REFERENCE_COUPLINGS_SPIN0 $REFERENCE_COUPLINGS_SPIN0_ZP $REFERENCE_COUPLINGS_CONTACT MZprime=50 GaZprime=10
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=2 PChannel=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/gg_spin2_ZZ DecayMode1=9 DecayMode2=9 $REFERENCE_COUPLINGS_SPIN2 $REFERENCE_COUPLINGS_SPIN2_ZZ"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=2 PChannel=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/qq_spin2_WW DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS_SPIN2 $REFERENCE_COUPLINGS_SPIN2_ZZ"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=2 PChannel=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/gg_spin2_Zgamma DecayMode1=9 DecayMode2=7 $REFERENCE_COUPLINGS_SPIN2 $REFERENCE_COUPLINGS_SPIN2_ZG"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=2 PChannel=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/qq_spin2_gammagamma DecayMode1=7 DecayMode2=7 $REFERENCE_COUPLINGS_SPIN2 $REFERENCE_COUPLINGS_SPIN2_GG"
 
-      - run: ./JHUGen Seed=$SEED PDFSet=3 Process=50 VegasNc0=100000 VegasNc2=100 HbbDK DataFile=compare_to_reference/ZH_bb DecayMode1=9 $REFERENCE_COUPLINGS_SPIN0
-      - run: ./JHUGen Seed=$SEED PDFSet=3 Process=50 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/WH DecayMode1=11 $REFERENCE_COUPLINGS_SPIN0
-      - run: ./JHUGen Seed=$SEED VegasNc0=100000 ReadLHE=compare_to_reference/WH.lhe DataFile=compare_to_reference/WH_Zgamma DecayMode1=9 DecayMode2=7 $REFERENCE_COUPLINGS_SPIN0
-      - run: ./JHUGen Seed=$SEED Collider=0 Process=50 VegasNc0=100000 VegasNc2=100 HbbDK DataFile=compare_to_reference/ee_gammaH_bb DecayMode1=7 $REFERENCE_COUPLINGS_SPIN0
-      - run: ./JHUGen Seed=$SEED Collider=1 Process=51 VH_PC=gg HbbDK=1 DecayMode1=0 $REFERENCE_COUPLINGS_SPIN0 Unweighted=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/gg_ZH_llbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0
-      - run: ./JHUGen Seed=$SEED Collider=0 Process=51 VH_PC=ee HbbDK=1 DecayMode1=0 $REFERENCE_COUPLINGS_SPIN0 Unweighted=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ee_ZH_llbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0 epPolarization=-100 emPolarization=100
-      - run: ./JHUGen Seed=$SEED Collider=1 Process=51 VH_PC=qq HbbDK=1 DecayMode1=0 $REFERENCE_COUPLINGS_SPIN0 Unweighted=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/qq_ZH_llbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0 ghz1=0.0,0.0 ghz4=1.0,0.0
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=0 VegasNc0=100000 VegasNc1=100 VegasNc2=100 DataFile=compare_to_reference/ggH_ZZ_contact Unweighted=0 WriteWeightedLHE DecayMode1=9 DecayMode2=9 $REFERENCE_COUPLINGS_SPIN0 $REFERENCE_COUPLINGS_SPIN0_ZP $REFERENCE_COUPLINGS_CONTACT"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=0 VegasNc0=100000 VegasNc1=100 VegasNc2=100 DataFile=compare_to_reference/ggH_ZZ_Zprime Unweighted=0 WriteWeightedLHE DecayMode1=9 DecayMode2=9 $REFERENCE_COUPLINGS_SPIN0 $REFERENCE_COUPLINGS_SPIN0_ZP $REFERENCE_COUPLINGS_CONTACT MZprime=50 GaZprime=10"
+
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=50 VegasNc0=100000 VegasNc2=100 HbbDK DataFile=compare_to_reference/ZH_bb DecayMode1=9 $REFERENCE_COUPLINGS_SPIN0"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=50 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/WH DecayMode1=11 $REFERENCE_COUPLINGS_SPIN0"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED VegasNc0=100000 ReadLHE=compare_to_reference/WH.lhe DataFile=compare_to_reference/WH_Zgamma DecayMode1=9 DecayMode2=7 $REFERENCE_COUPLINGS_SPIN0"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED Collider=0 Process=50 VegasNc0=100000 VegasNc2=100 HbbDK DataFile=compare_to_reference/ee_gammaH_bb DecayMode1=7 $REFERENCE_COUPLINGS_SPIN0"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED Collider=1 Process=51 VH_PC=gg HbbDK=1 DecayMode1=0 $REFERENCE_COUPLINGS_SPIN0 Unweighted=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/gg_ZH_llbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED Collider=0 Process=51 VH_PC=ee HbbDK=1 DecayMode1=0 $REFERENCE_COUPLINGS_SPIN0 Unweighted=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ee_ZH_llbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0 epPolarization=-100 emPolarization=100"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED Collider=1 Process=51 VH_PC=qq HbbDK=1 DecayMode1=0 $REFERENCE_COUPLINGS_SPIN0 Unweighted=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/qq_ZH_llbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0 ghz1=0.0,0.0 ghz4=1.0,0.0"
 
       #don't use WW separate in VBF.  In any case, there is interference
-      - run: ./JHUGen Seed=$SEED PDFSet=3 Process=60 VegasNc0=5000000 VegasNc2=100 DataFile=compare_to_reference/VBF $REFERENCE_COUPLINGS_SPIN0
-      - run: ./JHUGen Seed=$SEED VegasNc0=100000 ReadLHE=compare_to_reference/VBF.lhe DataFile=compare_to_reference/VBF_ZZ DecayMode1=9 DecayMode2=9 $REFERENCE_COUPLINGS_SPIN0
-      - run: ./JHUGen Seed=$SEED PDFSet=3 Process=61 VegasNc0=5000000 VegasNc2=100 DataFile=compare_to_reference/HJJ $REFERENCE_COUPLINGS_SPIN0
-      - run: ./JHUGen Seed=$SEED VegasNc0=100000 ReadLHE=compare_to_reference/HJJ.lhe DataFile=compare_to_reference/HJJ_WW DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS_SPIN0
-      - run: ./JHUGen Seed=$SEED PDFSet=3 Process=62 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/HJ $REFERENCE_COUPLINGS_SPIN0
-      - run: ./JHUGen Seed=$SEED VegasNc0=100000 ReadLHE=compare_to_reference/HJ.lhe DataFile=compare_to_reference/HJ_gammagamma DecayMode1=7 DecayMode2=7 $REFERENCE_COUPLINGS_SPIN0
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=60 VegasNc0=5000000 VegasNc2=100 DataFile=compare_to_reference/VBF $REFERENCE_COUPLINGS_SPIN0"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED VegasNc0=100000 ReadLHE=compare_to_reference/VBF.lhe DataFile=compare_to_reference/VBF_ZZ DecayMode1=9 DecayMode2=9 $REFERENCE_COUPLINGS_SPIN0"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=61 VegasNc0=5000000 VegasNc2=100 DataFile=compare_to_reference/HJJ $REFERENCE_COUPLINGS_SPIN0"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED VegasNc0=100000 ReadLHE=compare_to_reference/HJJ.lhe DataFile=compare_to_reference/HJJ_WW DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS_SPIN0"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=62 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/HJ $REFERENCE_COUPLINGS_SPIN0"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED VegasNc0=100000 ReadLHE=compare_to_reference/HJ.lhe DataFile=compare_to_reference/HJ_gammagamma DecayMode1=7 DecayMode2=7 $REFERENCE_COUPLINGS_SPIN0"
 
-      #- run: ./JHUGen Seed=$SEED PDFSet=3 Process=66 VegasNc0=10000 VegasNc2=1 m4l_min=100 m4l_max=200 DataFile=compare_to_reference/VBFoffshell_66
+      #- run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=66 VegasNc0=10000 VegasNc2=1 m4l_min=100 m4l_max=200 DataFile=compare_to_reference/VBFoffshell_66"
 
-      - run: ./JHUGen Seed=$SEED PDFSet=3 Process=80 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ttH TopDK=1 DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS_SPIN0
-      - run: ./JHUGen Seed=$SEED VegasNc0=100000 ReadLHE=compare_to_reference/ttH.lhe DataFile=compare_to_reference/ttH_tautau DecayMode1=11 DecayMode2=11 TauDK=1 $REFERENCE_COUPLINGS_SPIN0
-      - run: ./JHUGen Seed=$SEED PDFSet=3 Process=90 VegasNc0=100000 VegasNc2=10 DataFile=compare_to_reference/gg_bbH PChannel=0 $REFERENCE_COUPLINGS_SPIN0
-      - run: ./JHUGen Seed=$SEED VegasNc0=100000 ReadLHE=compare_to_reference/gg_bbH.lhe DataFile=compare_to_reference/gg_bbH_tautau TauDK=0 $REFERENCE_COUPLINGS_SPIN0
-      - run: ./JHUGen Seed=$SEED PDFSet=3 Process=90 VegasNc0=100000 VegasNc2=10 DataFile=compare_to_reference/qq_bbH PChannel=1 $REFERENCE_COUPLINGS_SPIN0
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=80 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ttH TopDK=1 DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS_SPIN0"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED VegasNc0=100000 ReadLHE=compare_to_reference/ttH.lhe DataFile=compare_to_reference/ttH_tautau DecayMode1=11 DecayMode2=11 TauDK=1 $REFERENCE_COUPLINGS_SPIN0"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=90 VegasNc0=100000 VegasNc2=10 DataFile=compare_to_reference/gg_bbH PChannel=0 $REFERENCE_COUPLINGS_SPIN0"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED VegasNc0=100000 ReadLHE=compare_to_reference/gg_bbH.lhe DataFile=compare_to_reference/gg_bbH_tautau TauDK=0 $REFERENCE_COUPLINGS_SPIN0"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=90 VegasNc0=100000 VegasNc2=10 DataFile=compare_to_reference/qq_bbH PChannel=1 $REFERENCE_COUPLINGS_SPIN0"
 
-      - run: ./JHUGen Seed=$SEED PDFSet=3 Process=110 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_110 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS_SPIN0
-      - run: ./JHUGen Seed=$SEED PDFSet=3 Process=111 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_111 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS_SPIN0
-      - run: ./JHUGen Seed=$SEED PDFSet=3 Process=112 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_112 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS_SPIN0
-      - run: ./JHUGen Seed=$SEED PDFSet=3 Process=113 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_113 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS_SPIN0
-      - run: ./JHUGen Seed=$SEED PDFSet=3 Process=114 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_114 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS_SPIN0
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=110 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_110 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS_SPIN0"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=111 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_111 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS_SPIN0"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=112 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_112 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS_SPIN0"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=113 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_113 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS_SPIN0"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=114 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_114 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS_SPIN0"
 
       #now compare to reference
       - run:
           name: "download reference lhes"
           command: |
             echo 0 > reference_check/exit_status
+            if ! $DOREFERENCE; then exit 0; fi
             mkdir reference
             cd reference
             JHUGEN_VERSION=$(grep -i JHUGen_Version ~/JHUGen/JHUGenerator/mod_Parameters.F90 | sed -r 's|.*"(.*)".*|\1|g')
@@ -193,6 +215,10 @@ jobs:
           name: "compare to reference"
           command: |
             {
+              if ! $DOREFERENCE; then
+                echo "The generator is unchanged from $(cat no-need-for-generator-reference) when the last reference test was done."
+                exit 0
+              fi
               for filename in $REFERENCE_FILENAMES; do
                 echo "================"
                 echo $filename
@@ -221,6 +247,7 @@ jobs:
       - run:
           name: "save reference"
           command: |
+            if ! $DOREFERENCE; then exit 0; fi
             if ! (cat reference_check/exit_status && exit $(cat reference_check/exit_status)); then
               mkdir -p ~/artifacts/
               mv compare_to_reference ~/artifacts/reference_lhes
@@ -233,6 +260,11 @@ jobs:
           paths:
             - JHUGenerator/reference_check
 
+      - run: echo "$CIRCLE_BUILD_URL" > no-need-for-generator-reference
+      - save_cache:
+          key: v1-do-i-need-to-test-generator-reference-{{ checksum "generator-md5sum" }}
+          paths:  ~/JHUGen/JHUGenerator/no-need-for-generator-reference
+
   generator_syntax:
     <<: *env
     working_directory: ~/JHUGen/JHUGenerator
@@ -244,51 +276,73 @@ jobs:
       - run: echo "export LHEDIR=$HOME/artifacts/syntax_check" >> $BASH_ENV
       - run: mkdir -p $LHEDIR/
 
+      - run:
+          name: "md5sum of files relevant for the generator"
+          command: |
+            cd ..
+            md5sum $(
+              git ls-files \
+                JHUGenerator/ \
+                JHUGenMELA/MELA/COLLIER \
+              | sort
+            ) > JHUGenerator/generator-md5sum
+      - restore_cache:
+          key: v1-do-i-need-to-test-generator-syntax-{{ checksum "generator-md5sum" }}
+      - run:
+          name: "see if we need to test the generator"
+          command: |
+            DOSYNTAX=true
+            if [ "$(cat no-need-for-generator-syntax)" ]; then
+              DOSYNTAX=false
+            fi
+            echo "export DOSYNTAX=$DOSYNTAX" >> $BASH_ENV
+
       #gg/qqbar -> spin0/1/2
-      - run: ./JHUGen PDFSet=3 Process=0  VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/spin0_Zgamma     DecayMode1=9  DecayMode2=7 ghzgs2=1,0
-      - run: ./JHUGen PDFSet=3 Process=0  VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/spin0_gammagamma DecayMode1=7  DecayMode2=7 ghgsgs2=1,0
-      - run: ./JHUGen PDFSet=3 Process=1  VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/spin1_WW         DecayMode1=11 DecayMode2=11 zprime_zz_1=1,0
-      - run: ./JHUGen PDFSet=3 Process=2  VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/spin2_ZZ         DecayMode1=9  DecayMode2=9 a1=1,0 b1=1,0 b5=1,0
-      - run: ./JHUGen PDFSet=3 Process=2  VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/spin2_Zgamma     DecayMode1=9  DecayMode2=7 a1=1,0 bzgs1=1,0
-      - run: ./JHUGen PDFSet=3 Process=2  VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/spin2_gammagamma DecayMode1=7  DecayMode2=7 a1=1,0 bgsgs1=1,0
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=0  VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/spin0_Zgamma     DecayMode1=9  DecayMode2=7 ghzgs2=1,0"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=0  VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/spin0_gammagamma DecayMode1=7  DecayMode2=7 ghgsgs2=1,0"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=1  VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/spin1_WW         DecayMode1=11 DecayMode2=11 zprime_zz_1=1,0"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=2  VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/spin2_ZZ         DecayMode1=9  DecayMode2=9 a1=1,0 b1=1,0 b5=1,0"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=2  VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/spin2_Zgamma     DecayMode1=9  DecayMode2=7 a1=1,0 bzgs1=1,0"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=2  VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/spin2_gammagamma DecayMode1=7  DecayMode2=7 a1=1,0 bgsgs1=1,0"
       #WH, ZH, gammaH
-      - run: ./JHUGen PDFSet=3   Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/WH DecayMode1=11
-      - run: ./JHUGen PDFSet=3   Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/ZH DecayMode1=9 HbbDK
-      - run: ./JHUGen PDFSet=3   Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/gammaH DecayMode1=7 ghz1=0,0 ghzgs2=1,0
-      - run: ./JHUGen PDFSet=3   Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/gammaH_bb DecayMode1=7 ghz1=0,0 ghgsgs2=1,0 HbbDK
-      - run: ./JHUGen Collider=0 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/ee_ZH DecayMode1=9
-      - run: ./JHUGen VegasNc0=100000 TauDK=0 ReadLHE=$LHEDIR/ee_ZH.lhe DataFile=$LHEDIR/ee_ZH_tautau
-      - run: ./JHUGen Collider=0 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/ee_gammaH_bb DecayMode1=7 HbbDK ghz1=0,0 ghgsgs2=1,0 epPolarization=100 emPolarization=-100
-      - run: ./JHUGen PDFSet=2 Collider=1 Process=51 VH_PC=gg HbbDK=1 DecayMode1=9 ghz1=0.0,0.0 ghz2=1.0,0.0 Unweighted=1 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/gg_ZH_llbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0
-      - run: ./JHUGen Collider=0 Process=51 VH_PC=ee HbbDK=1 DecayMode1=9 ghz1=0.0,0.0 ghz2=1.0,0.0 ghz4=0.0,1.0 Unweighted=1 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/ee_ZH_llbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0
-      #- run: ./JHUGen PDFSet=2 Collider=1 Process=52 Unweighted=1 VegasNc1=100000 VegasNc2=1000000 DataFile=$LHEDIR/gg_HH_bbbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0 Interf=0 Seed=1
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3   Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/WH DecayMode1=11"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3   Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/ZH DecayMode1=9 HbbDK"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3   Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/gammaH DecayMode1=7 ghz1=0,0 ghzgs2=1,0"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3   Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/gammaH_bb DecayMode1=7 ghz1=0,0 ghgsgs2=1,0 HbbDK"
+      - run: "! $DOSYNTAX || ./JHUGen Collider=0 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/ee_ZH DecayMode1=9"
+      - run: "! $DOSYNTAX || ./JHUGen VegasNc0=100000 TauDK=0 ReadLHE=$LHEDIR/ee_ZH.lhe DataFile=$LHEDIR/ee_ZH_tautau"
+      - run: "! $DOSYNTAX || ./JHUGen Collider=0 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/ee_gammaH_bb DecayMode1=7 HbbDK ghz1=0,0 ghgsgs2=1,0 epPolarization=100 emPolarization=-100"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=2 Collider=1 Process=51 VH_PC=gg HbbDK=1 DecayMode1=9 ghz1=0.0,0.0 ghz2=1.0,0.0 Unweighted=1 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/gg_ZH_llbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0"
+      - run: "! $DOSYNTAX || ./JHUGen Collider=0 Process=51 VH_PC=ee HbbDK=1 DecayMode1=9 ghz1=0.0,0.0 ghz2=1.0,0.0 ghz4=0.0,1.0 Unweighted=1 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/ee_ZH_llbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0"
+      #- run: "! $DOSYNTAX || ./JHUGen PDFSet=2 Collider=1 Process=52 Unweighted=1 VegasNc1=100000 VegasNc2=1000000 DataFile=$LHEDIR/gg_HH_bbbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0 Interf=0 Seed=1"
       #H+J
-      - run: ./JHUGen PDFSet=3 Process=62 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/HJ
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=62 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/HJ"
       #ttH, bbH, tH
-      - run: ./JHUGen PDFSet=3 Process=80  VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/ttH DecayMode1=11 DecayMode2=11 TopDK=1
-      - run: ./JHUGen PDFSet=3 Process=90  VegasNc0=100000 VegasNc2=10  DataFile=$LHEDIR/gg_bbH PChannel=0
-      - run: ./JHUGen PDFSet=3 Process=90  VegasNc0=100000 VegasNc2=10  DataFile=$LHEDIR/qq_bbH PChannel=1
-      - run: ./JHUGen PDFSet=3 Process=110 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tH_t    DecayMode1=11 TopDK=1
-      - run: ./JHUGen PDFSet=3 Process=111 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tbarH_t DecayMode1=11 TopDK=1 MReso=750 GaReso=247
-      - run: ./JHUGen PDFSet=3 Process=112 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tH_s    DecayMode1=11 TopDK=1
-      - run: ./JHUGen PDFSet=3 Process=113 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tbarH_s DecayMode1=11 TopDK=1
-      - run: ./JHUGen PDFSet=3 Process=114 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tH_all  DecayMode1=11 TopDK=1
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=80  VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/ttH DecayMode1=11 DecayMode2=11 TopDK=1"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=90  VegasNc0=100000 VegasNc2=10  DataFile=$LHEDIR/gg_bbH PChannel=0"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=90  VegasNc0=100000 VegasNc2=10  DataFile=$LHEDIR/qq_bbH PChannel=1"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=110 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tH_t    DecayMode1=11 TopDK=1"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=111 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tbarH_t DecayMode1=11 TopDK=1 MReso=750 GaReso=247"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=112 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tH_s    DecayMode1=11 TopDK=1"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=113 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tbarH_s DecayMode1=11 TopDK=1"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=114 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tH_all  DecayMode1=11 TopDK=1"
       #Decays for t(t)H which have complicated quarks, to check colors
-      - run: ./JHUGen PDFSet=3 VegasNc0=100000            DecayMode1=1 DecayMode2=1 ReadLHE=$LHEDIR/ttH.lhe DataFile=$LHEDIR/ttH_ZZ
-      - run: ./JHUGen PDFSet=3 VegasNc0=100000 TauDK=1    DecayMode1=5 DecayMode2=5 ReadLHE=$LHEDIR/ttH.lhe DataFile=$LHEDIR/ttH_tautau
-      - run: ./JHUGen PDFSet=3 VegasNc0=100000            DecayMode1=5 DecayMode2=5 ReadLHE=$LHEDIR/tH_t.lhe DataFile=$LHEDIR/tH_t_WW
-      - run: ./JHUGen PDFSet=3 VegasNc0=100000            DecayMode1=1 DecayMode2=1 ReadLHE=$LHEDIR/tbarH_t.lhe DataFile=$LHEDIR/tbarH_t_ZZ
-      - run: ./JHUGen PDFSet=3 VegasNc0=100000 TauDK=1    DecayMode1=5 DecayMode2=5 ReadLHE=$LHEDIR/tH_s.lhe DataFile=$LHEDIR/tH_s_tautau
-      - run: ./JHUGen PDFSet=3 VegasNc0=100000 ghzgs2=1,0 DecayMode1=0 DecayMode2=7 ReadLHE=$LHEDIR/tH_all.lhe DataFile=$LHEDIR/tH_all_Zgamma.lhe
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 VegasNc0=100000            DecayMode1=1 DecayMode2=1 ReadLHE=$LHEDIR/ttH.lhe DataFile=$LHEDIR/ttH_ZZ"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 VegasNc0=100000 TauDK=1    DecayMode1=5 DecayMode2=5 ReadLHE=$LHEDIR/ttH.lhe DataFile=$LHEDIR/ttH_tautau"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 VegasNc0=100000            DecayMode1=5 DecayMode2=5 ReadLHE=$LHEDIR/tH_t.lhe DataFile=$LHEDIR/tH_t_WW"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 VegasNc0=100000            DecayMode1=1 DecayMode2=1 ReadLHE=$LHEDIR/tbarH_t.lhe DataFile=$LHEDIR/tbarH_t_ZZ"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 VegasNc0=100000 TauDK=1    DecayMode1=5 DecayMode2=5 ReadLHE=$LHEDIR/tH_s.lhe DataFile=$LHEDIR/tH_s_tautau"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 VegasNc0=100000 ghzgs2=1,0 DecayMode1=0 DecayMode2=7 ReadLHE=$LHEDIR/tH_all.lhe DataFile=$LHEDIR/tH_all_Zgamma.lhe"
       #make sure that the mass was read correctly and the interference determined
-      - run: "grep -q 'Interference: T' $LHEDIR/ttH_ZZ.lhe"
-      - run: "grep -q 'Interference: F' $LHEDIR/tbarH_t_ZZ.lhe"
+      - run: "! $DOSYNTAX || grep -q 'Interference: T' $LHEDIR/ttH_ZZ.lhe"
+      - run: "! $DOSYNTAX || grep -q 'Interference: F' $LHEDIR/tbarH_t_ZZ.lhe"
 
       #test syntax for VBF offshell, use a trick to make it faster and physically nonsense
       #but it doesn't always work so disabling it
 #      - run:
 #          name: "test syntax for VBF offshell with a hack to make it faster"
 #          command: |
+#            if ! $DOSYNTAX; then exit 0; fi
 #            line=$(grep -in "subroutine EvalAmp_qqVVqq(" mod_MCFMWrapper.F90 | head -1 | sed "s/:.*//")
 #            while sed -n ${line}p mod_MCFMWrapper.F90 | grep -iE '(subroutine|::|use|implicit)'; do
 #              line=$(expr $line + 1)
@@ -316,11 +370,20 @@ jobs:
       - run:
           name: checklhe
           command: |
+            if ! $DOSYNTAX; then
+              echo "The generator is unchanged from $(cat no-need-for-generator-syntax) when the last syntax test was done."
+              exit 0
+            fi
             ../.circleci/checklhe/checklhe.py $(find $LHEDIR -name *.lhe) | tee checklheoutput.txt
             ! grep -q '!' checklheoutput.txt
           when: always
       - store_artifacts:
           path: ~/artifacts/syntax_check
+
+      - run: echo "$CIRCLE_BUILD_URL" > no-need-for-generator-syntax
+      - save_cache:
+          key: v1-do-i-need-to-test-generator-syntax-{{ checksum "generator-md5sum" }}
+          paths:  ~/JHUGen/JHUGenerator/no-need-for-generator-syntax
 
   plots_ggH:
     <<: *env
