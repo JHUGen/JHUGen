@@ -77,46 +77,28 @@ SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
 AQCDUP=alphas
 
-ISTUP(1) = -1
-ISTUP(2) = -1
-ISTUP(3) = 2
-ISTUP(4) = 2
-ISTUP(5) = 2
-ISTUP(6) = 1
-ISTUP(7) = 1
-ISTUP(8) = 1
-ISTUP(9) = 1
+ISTUP(1:2) = -1 ! Mother status
+ISTUP(3:5) = 2 ! Intermediate particle status
+ISTUP(6:9) = 1 ! Final hard process particle status
 
 if ( LHE_IDUP(4).eq.22 .and. LHE_IDUP(5).eq.22 ) then! photon+photon FS
-    ISTUP(4) = 1
-    ISTUP(5) = 1
+    ISTUP(4:5) = 1
 elseif ( LHE_IDUP(4).ne.22 .and. LHE_IDUP(5).eq.22 ) then! Z+photon FS
     ISTUP(4) = 2
-    ISTUP(5) = 1
-    ISTUP(6) = 1
-    ISTUP(7) = 1
+    ISTUP(5:7) = 1
 endif
 
 
 
-MOTHUP(1,1) = 0
-MOTHUP(2,1) = 0
-MOTHUP(1,2) = 0
-MOTHUP(2,2) = 0
-MOTHUP(1,3) = 1
-MOTHUP(2,3) = 2
-MOTHUP(1,4) = 3
-MOTHUP(2,4) = 3
-MOTHUP(1,5) = 3
-MOTHUP(2,5) = 3
-MOTHUP(1,6) = 4
-MOTHUP(2,6) = 4
-MOTHUP(1,7) = 4
-MOTHUP(2,7) = 4
-MOTHUP(1,8) = 5
-MOTHUP(2,8) = 5
-MOTHUP(1,9) = 5
-MOTHUP(2,9) = 5
+MOTHUP(1:2,1) = 0
+MOTHUP(1:2,2) = 0
+MOTHUP(1,3) = 1;MOTHUP(2,3) = 2
+MOTHUP(1:2,4) = 3
+MOTHUP(1:2,5) = 3
+MOTHUP(1:2,6) = 4
+MOTHUP(1:2,7) = 4
+MOTHUP(1:2,8) = 5
+MOTHUP(1:2,9) = 5
 
 
 
@@ -193,10 +175,10 @@ if( (IsAZDecay(DecayMode1)).and.(IsAZDecay(DecayMode2)) .and. abs(LHE_IDUP(7)).e
      s45 = Get_MInv( Mom(1:4,4)+Mom(1:4,5) )
      smallestInv = minloc((/dabs(s34-M_V),dabs(s56-M_V),dabs(s36-M_V),dabs(s45-M_V)/),1)
      if( smallestInv.eq.3 .or. smallestInv.eq.4 ) then
-        call swapi(MOTHUP(1,6),MOTHUP(1,8))
-        call swapi(MOTHUP(2,6),MOTHUP(2,8))
-        call swapi(ICOLUP(1,6),ICOLUP(1,8))
-        call swapi(ICOLUP(2,6),ICOLUP(2,8))
+        call swapi(MOTHUP(1,7),MOTHUP(1,9))
+        call swapi(MOTHUP(2,7),MOTHUP(2,9))
+        call swapi(ICOLUP(1,7),ICOLUP(1,9))
+        call swapi(ICOLUP(2,7),ICOLUP(2,9))
         Z1FV(1:4) = MomDummy(1:4,3)+MomDummy(1:4,6)
         Z2FV(1:4) = MomDummy(1:4,5)+MomDummy(1:4,4)
      endif
@@ -207,54 +189,55 @@ endif
 
 
 ! calculating and checking masses
-tmp = (MomDummy(1:4,1)).dot.(MomDummy(1:4,1))
+tmp = Get_MInv2(MomDummy(1:4,1))
 if( tmp.lt. -1d-3 ) print *, "Error 1: large negative mass!",tmp
 Part1Mass = dSQRT(dabs(tmp))
 
-tmp = (MomDummy(1:4,2)).dot.(MomDummy(1:4,2))
+tmp = Get_MInv2(MomDummy(1:4,2))
 if( tmp.lt. -1d-3 ) print *, "Error 2: large negative mass!",tmp
 Part2Mass = dSQRT(dabs(tmp))
 
-tmp = (XFV(1:4)).dot.(XFV(1:4))
+tmp = Get_MInv2(XFV(1:4))
 if( tmp.lt. -1d-3 ) print *, "Error 3: large negative mass!",tmp
 XMass = dSQRT(dabs(tmp))
 
-tmp = (Z1FV(1:4)).dot.(Z1FV(1:4))
+tmp = Get_MInv2(Z1FV(1:4))
 if( tmp.lt. -1d-3 ) print *, "Error 4: large negative mass!",tmp
 V1Mass = dSQRT(dabs(tmp))
 if( V1Mass.lt.1d-5 ) V1Mass=0d0
 
-tmp = (Z2FV(1:4)).dot.(Z2FV(1:4))
+tmp = Get_MInv2(Z2FV(1:4))
 if( tmp.lt. -1d-3 ) print *, "Error 5: large negative mass!",tmp
 V2Mass = dSQRT(dabs(tmp))
 if( V2Mass.lt.1d-5 ) V2Mass=0d0
 
-tmp = (MomDummy(1:4,3)).dot.(MomDummy(1:4,3))
+tmp = Get_MInv2(MomDummy(1:4,3))
 if( tmp.lt. -1d-3 ) print *, "Error 6: large negative mass!",tmp
-L12Mass = dSQRT(dABS(tmp))
-if( L12Mass.lt.1d-6 ) L12Mass=0d0
-if( tmp.lt.0d0 ) MomDummy(1,3) = MomDummy(1,3) + 1d-7
-
-tmp = (MomDummy(1:4,4)).dot.(MomDummy(1:4,4))
-if( tmp.lt. -1d-3 ) print *, "Error 7: large negative mass!",tmp
 L11Mass = dSQRT(dABS(tmp))
 if( L11Mass.lt.1d-6 ) L11Mass=0d0
+if( tmp.lt.0d0 ) MomDummy(1,3) = MomDummy(1,3) + 1d-7
+
+tmp = Get_MInv2(MomDummy(1:4,4))
+if( tmp.lt. -1d-3 ) print *, "Error 7: large negative mass!",tmp
+L12Mass = dSQRT(dABS(tmp))
+if( L12Mass.lt.1d-6 ) L12Mass=0d0
 if( tmp.lt.0d0 ) MomDummy(1,4) = MomDummy(1,4) + 1d-7
 
-tmp = (MomDummy(1:4,5)).dot.(MomDummy(1:4,5))
+tmp = Get_MInv2(MomDummy(1:4,5))
 if( tmp.lt. -1d-3 ) print *, "Error 8: large negative mass!",tmp
-L22Mass = dSQRT(dABS(tmp))
-if( L22Mass.lt.1d-6 ) L22Mass=0d0
-if( tmp.lt.0d0 ) MomDummy(1,5) = MomDummy(1,5) + 1d-7
-
-tmp = (MomDummy(1:4,6)).dot.(MomDummy(1:4,6))
-if( tmp.lt. -1d-3 ) print *, "Error 9: large negative mass!",tmp
 L21Mass = dSQRT(dABS(tmp))
 if( L21Mass.lt.1d-6 ) L21Mass=0d0
+if( tmp.lt.0d0 ) MomDummy(1,5) = MomDummy(1,5) + 1d-7
+
+tmp = Get_MInv2(MomDummy(1:4,6))
+if( tmp.lt. -1d-3 ) print *, "Error 9: large negative mass!",tmp
+L22Mass = dSQRT(dABS(tmp))
+if( L22Mass.lt.1d-6 ) L22Mass=0d0
 if( tmp.lt.0d0 ) MomDummy(1,6) = MomDummy(1,6) + 1d-7
 
 do a=1,NumFSPartons
-    tmp = (MomDummy(1:4,6+a)).dot.(MomDummy(1:4,6+a))
+    tmp = Get_MInv2(MomDummy(1:4,6+a))
+    if( tmp.lt. -1d-3 ) print *, "Error: large negative mass",tmp,"for particle",6+a
     PartonMass(a) = dSQRT(dabs(tmp))
 enddo
 
@@ -459,10 +442,10 @@ logical :: IsEmpty
         s45 = Get_MInv( HiggsDK_Mom(1:4,4)+HiggsDK_Mom(1:4,5) )
         smallestInv = minloc((/dabs(s34-M_V),dabs(s56-M_V),dabs(s36-M_V),dabs(s45-M_V)/),1)
         if( smallestInv.eq.3 .or. smallestInv.eq.4 ) then
-            call swapi(HiggsDK_MOTHUP(1,6),HiggsDK_MOTHUP(1,8))
-            call swapi(HiggsDK_MOTHUP(2,6),HiggsDK_MOTHUP(2,8))
-            call swapi(HiggsDK_ICOLUP(1,6),HiggsDK_ICOLUP(1,8))
-            call swapi(HiggsDK_ICOLUP(2,6),HiggsDK_ICOLUP(2,8))
+            call swapi(HiggsDK_MOTHUP(1,7),HiggsDK_MOTHUP(1,9))
+            call swapi(HiggsDK_MOTHUP(2,7),HiggsDK_MOTHUP(2,9))
+            call swapi(HiggsDK_ICOLUP(1,7),HiggsDK_ICOLUP(1,9))
+            call swapi(HiggsDK_ICOLUP(2,7),HiggsDK_ICOLUP(2,9))
             HiggsDK_Mom(1:4,1) = HiggsDK_Mom(1:4,3)+ HiggsDK_Mom(1:4,6)
             HiggsDK_Mom(1:4,2) = HiggsDK_Mom(1:4,4)+ HiggsDK_Mom(1:4,5)
         endif
