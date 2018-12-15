@@ -117,6 +117,7 @@ void angularDistributions_spin0_HVV(string cinput, string strcouplings, string d
   for (auto& opt:strcouplingsList) extractCoupling(opt, *someHiggs);
   someHiggs->makeParamsConst(true);
   someHiggs->makeCouplingsConst(true);
+  someHiggs->getPDF()->printParameters();
 
   if (coutput==""){
     size_t lastSlash = cinput.find_last_of("/\\");
