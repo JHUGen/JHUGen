@@ -736,19 +736,21 @@ jobs:
             ! ./JHUGen Process=50 PDFSet=231 DataFile=VH_readcsmax.lhe MReso=250 VegasNc2=500 pTjetcut=30.0d0 Interf GaReso=10 $REFERENCE_COUPLINGS_SPIN0 ReadCSmax
 
             #same for process that has a grid rather than CSmax.bin
-            ./JHUGen Process=0 VegasNc0=100000 VegasNc2=1 MReso=250 GaReso=10 $REFERENCE_COUPLINGS_SPIN0 pTjetcut=30 NoInterf $REFERENCE_COUPLINGS_SPIN0_ZP PDFSet=231 DataFile=ggH_firstrun.lhe $REFERENCE_COUPLINGS_CONTACT
-            cp ggH_firstrun_commandlineinfo.txt ggH_readcsmax_commandlineinfo.txt
-            cp ggH_firstrun.grid ggH_readcsmax.grid
-            cp ggH_firstrun_step2.grid ggH_readcsmax_step2.grid
-            cp ggH_firstrun_gridinfo.txt ggH_readcsmax_gridinfo.txt
+            #using HJJ here.  Most of the options don't do anything but are still checked.
+            #if we used ggHZZ, the contact terms make it really slow.
+            ./JHUGen Process=61 VegasNc0=100000 VegasNc2=1 MReso=250 GaReso=10 $REFERENCE_COUPLINGS_SPIN0 pTjetcut=30 NoInterf $REFERENCE_COUPLINGS_SPIN0_ZP PDFSet=231 DataFile=HJJ_firstrun.lhe $REFERENCE_COUPLINGS_CONTACT
+            cp HJJ_firstrun_commandlineinfo.txt HJJ_readcsmax_commandlineinfo.txt
+            cp HJJ_firstrun.grid HJJ_readcsmax.grid
+            cp HJJ_firstrun_step2.grid HJJ_readcsmax_step2.grid
+            cp HJJ_firstrun_gridinfo.txt HJJ_readcsmax_gridinfo.txt
             #change filename, order, boolean syntax, real syntax, VegasNc2, remove VegasNc0 - should still work
-            ./JHUGen Process=0 PDFSet=231 DataFile=ggH_readcsmax.lhe MReso=250 $REFERENCE_COUPLINGS_CONTACT VegasNc2=2 pTjetcut=30.0d0 Interf=0 $REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0 ReadCSmax
+            ./JHUGen Process=61 PDFSet=231 DataFile=HJJ_readcsmax.lhe MReso=250 $REFERENCE_COUPLINGS_CONTACT VegasNc2=2 pTjetcut=30.0d0 Interf=0 $REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0 ReadCSmax
             #change or remove stuff - shouldn't work
-            ! ./JHUGen Process=50 PDFSet=231 DataFile=ggH_readcsmax.lhe MReso=250 $REFERENCE_COUPLINGS_CONTACT VegasNc2=500 pTjetcut=30.0d0 Interf=0 $REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0 ReadCSmax
-            ! ./JHUGen Process=0 PDFSet=3 DataFile=ggH_readcsmax.lhe MReso=250 $REFERENCE_COUPLINGS_CONTACT VegasNc2=500 pTjetcut=30.0d0 Interf=0 $REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0 ReadCSmax
-            ! ./JHUGen Process=0 PDFSet=231 DataFile=ggH_readcsmax.lhe MReso=250 $REFERENCE_COUPLINGS_CONTACT VegasNc2=500 pTjetcut=30.0d0 Interf=0 $REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 ReadCSmax
-            ! ./JHUGen Process=0 PDFSet=231 DataFile=ggH_readcsmax.lhe MReso=250 $REFERENCE_COUPLINGS_CONTACT VegasNc2=500 pTjetcut=20.0d0 Interf=0 $REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0 ReadCSmax
-            ! ./JHUGen Process=0 PDFSet=231 DataFile=ggH_readcsmax.lhe MReso=250 $REFERENCE_COUPLINGS_CONTACT VegasNc2=500 pTjetcut=30.0d0 Interf $REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0 ReadCSmax
+            ! ./JHUGen Process=50 PDFSet=231 DataFile=HJJ_readcsmax.lhe MReso=250 $REFERENCE_COUPLINGS_CONTACT VegasNc2=500 pTjetcut=30.0d0 Interf=0 $REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0 ReadCSmax
+            ! ./JHUGen Process=61 PDFSet=3 DataFile=HJJ_readcsmax.lhe MReso=250 $REFERENCE_COUPLINGS_CONTACT VegasNc2=500 pTjetcut=30.0d0 Interf=0 $REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0 ReadCSmax
+            ! ./JHUGen Process=61 PDFSet=231 DataFile=HJJ_readcsmax.lhe MReso=250 $REFERENCE_COUPLINGS_CONTACT VegasNc2=500 pTjetcut=30.0d0 Interf=0 $REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 ReadCSmax
+            ! ./JHUGen Process=61 PDFSet=231 DataFile=HJJ_readcsmax.lhe MReso=250 $REFERENCE_COUPLINGS_CONTACT VegasNc2=500 pTjetcut=20.0d0 Interf=0 $REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0 ReadCSmax
+            ! ./JHUGen Process=61 PDFSet=231 DataFile=HJJ_readcsmax.lhe MReso=250 $REFERENCE_COUPLINGS_CONTACT VegasNc2=500 pTjetcut=30.0d0 Interf $REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0 ReadCSmax
       - run:
           name: "check that linkMELA is turned on"
           command: "grep 'linkMELA *= *Yes' JHUGenerator/makefile"
