@@ -131,7 +131,7 @@ jobs:
               | sort
             ) > JHUGenerator/generator-md5sum
       - restore_cache:
-          key: v2-do-i-need-to-test-generator-reference-{{ checksum "generator-md5sum" }}
+          key: v3-do-i-need-to-test-generator-reference-{{ checksum "generator-md5sum" }}
       - run:
           name: "see if we need to test the generator"
           command: |
@@ -220,11 +220,11 @@ jobs:
       - run:
           name: "compare to reference"
           command: |
+            if ! $DOREFERENCE; then
+              echo "The generator is unchanged from $(cat no-need-for-generator-reference) when the last reference test was done."
+              exit 0
+            fi
             {
-              if ! $DOREFERENCE; then
-                echo "The generator is unchanged from $(cat no-need-for-generator-reference) when the last reference test was done."
-                exit 0
-              fi
               for filename in $REFERENCE_FILENAMES; do
                 echo "================"
                 echo $filename
@@ -253,7 +253,10 @@ jobs:
       - run:
           name: "reference LHEs md5sum"
           command: |
-            md5sum compare_to_reference/*.lhe | sort > reference-lhes-md5sum
+            if $DOREFERENCE; then
+              md5sum compare_to_reference/*.lhe | sort > reference-lhes-md5sum
+            #else it was in the do-i-need-to-test-generator-reference cache
+            fi
           when: always
       - run:
           name: "save reference"
@@ -272,6 +275,14 @@ jobs:
             - JHUGenerator/reference_check
             - JHUGenerator/generator-md5sum
             - JHUGenerator/reference-lhes-md5sum
+
+      - run: echo "$CIRCLE_BUILD_URL" > no-need-for-generator-reference
+      - save_cache:
+          key: v3-do-i-need-to-test-generator-reference-{{ checksum "generator-md5sum" }}
+          paths:
+            - ~/JHUGen/JHUGenerator/no-need-for-generator-reference
+            - ~/JHUGen/JHUGenerator/reference-lhes-md5sum
+            - ~/JHUGen/JHUGenerator/reference_check
 
   generator_syntax:
     <<: *env
@@ -862,10 +873,6 @@ jobs:
           at: ~/JHUGen
       - run: cat reference_check/output
       - run: exit $(cat reference_check/exit_status)
-      - run: echo "$CIRCLE_BUILD_URL" > no-need-for-generator-reference
-      - save_cache:
-          key: v2-do-i-need-to-test-generator-reference-{{ checksum "generator-md5sum" }}
-          paths:  ~/JHUGen/JHUGenerator/no-need-for-generator-reference
 
 workflows:
   version: 2
