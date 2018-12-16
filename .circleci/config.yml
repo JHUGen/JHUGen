@@ -253,7 +253,7 @@ jobs:
       - run:
           name: "reference LHEs md5sum"
           command: |
-            md5sum compare_to_reference/* | sort > reference-lhes-md5sum
+            md5sum compare_to_reference/*.lhe | sort > reference-lhes-md5sum
           when: always
       - run:
           name: "save reference"
