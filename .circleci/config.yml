@@ -36,7 +36,7 @@ env: &env
         #3: g1-g2 real and imaginary mixtures
         #4: g1 g2 g4 at 120 degree angles, left CT, vector CT
         #if you change this, you probably also want to update older-ggH-plots below
-        WHICHPLOTS: 3
+        WHICHPLOTS: 4
 
 cmsrelcmsenv: &cmsrelcmsenv
   name: "cmsrel, cmsenv"
@@ -554,19 +554,17 @@ jobs:
               echo "- https://circleci.com/gh/JHUGen/JHUGen/788 (pure SM, a2, a3)" >> older-ggH-plots
             fi
             if [ $WHICHPLOTS -ne 2 ]; then
-              #change this to
-              #echo "- put url here (g1=1 g4=g4mix, g1=1 g4=g4mix*i) >> older-ggH-plots
-              echo "- https://circleci.com/gh/hroskes/JHUGen/1776 (g1=1 g4=i - buggy)" >> older-ggH-plots
+              echo "- https://circleci.com/gh/JHUGen/JHUGen/796 (g1=1 g4=g4mix, g1=1 g4=g4mix*i)" >> older-ggH-plots
             fi
             if [ $WHICHPLOTS -ne 3 ]; then
-              : #remove this when you uncomment the next line
-              #echo "- put url here (g1=1 g2=g2mix, g1=1 g2=g2mix*i) >> older-ggH-plots
+              echo "- https://circleci.com/gh/JHUGen/JHUGen/806 (g1=1 g2=g2mix, g1=1 g2=g2mix*i)" >> older-ggH-plots
             fi
             if [ $WHICHPLOTS -ne 4 ]; then
               #change this to
-              #echo "- put url here (g1=1 g2=g2mix(-1+i sqrt(3))/2 g4=2.55052*(-1-i sqrt(3))/2, left CT, vector CT) >> older-ggH-plots
+              #echo "- put url here (g1=1 g2=g2mix(-1+i sqrt(3))/2 g4=2.55052*(-1-i sqrt(3))/2, left CT, vector CT)" >> older-ggH-plots
               echo "- https://circleci.com/gh/hroskes/JHUGen/1759 (g1=g2=1 g4=i, left CT, vector CT - all buggy)" >> older-ggH-plots
             fi
+            cat older-ggH-plots
       - save_cache:
           key: v1-ggH-do-i-need-analytic-plots-{{ .Environment.WHICHPLOTS }}-{{ checksum "analytical-md5sum" }}
           paths: ~/JHUGen/JHUGenerator/no-need-for-ggH-plots
