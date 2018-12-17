@@ -35,7 +35,8 @@ env: &env
         #2: g1-g4 real and imaginary mixtures
         #3: g1-g2 real and imaginary mixtures
         #4: g1 g2 g4 at 120 degree angles, left CT, vector CT
-        WHICHPLOTS: 1
+        #if you change this, you probably also want to update older-ggH-plots below
+        WHICHPLOTS: 2
 
 cmsrelcmsenv: &cmsrelcmsenv
   name: "cmsrel, cmsenv"
@@ -550,7 +551,7 @@ jobs:
             echo "other versions at:" > older-ggH-plots
             #don't use elif here!
             if [ $WHICHPLOTS -ne 1 ]; then
-              echo "- https://circleci.com/gh/JHUGen/JHUGen/743 (pure SM, a2, a3)" >> older-ggH-plots
+              echo "- https://circleci.com/gh/JHUGen/JHUGen/788 (pure SM, a2, a3)" >> older-ggH-plots
             fi
             if [ $WHICHPLOTS -ne 2 ]; then
               #change this to
