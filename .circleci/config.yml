@@ -36,7 +36,7 @@ env: &env
         #3: g1-g2 real and imaginary mixtures
         #4: g1 g2 g4 at 120 degree angles, left CT, vector CT
         #if you change this, you probably also want to update older-ggH-plots below
-        WHICHPLOTS: 2
+        WHICHPLOTS: 3
 
 cmsrelcmsenv: &cmsrelcmsenv
   name: "cmsrel, cmsenv"
@@ -192,8 +192,8 @@ jobs:
       - run:
           name: "download reference lhes"
           command: |
-            echo 0 > reference_check/exit_status
             if ! $DOREFERENCE; then exit 0; fi
+            echo 0 > reference_check/exit_status
             mkdir reference
             cd reference
             JHUGEN_VERSION=$(grep -i JHUGen_Version ~/JHUGen/JHUGenerator/mod_Parameters.F90 | sed -r 's|.*"(.*)".*|\1|g')
