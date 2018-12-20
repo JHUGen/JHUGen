@@ -18,9 +18,10 @@ Function EvalWeighted_VH(yRnd,VgsWgt)
   use ModVHLO
   use ModVHreal
   use ModVHdipole
+  use ModVHIKP
+  use ModVHvirtual
 #if useCollier==1  
   use ModVHgg
-  use ModVHvirtual
 #endif
   use ModVHqg
   use ModPhasespace
@@ -38,31 +39,33 @@ Function EvalWeighted_VH(yRnd,VgsWgt)
 ! yRnd(12): inv_mass(4)
 ! yRnd(13): inv_mass(5)
 ! yRnd(14:16): real emission phase space
-! yRnd(17): NLO integration for + distribution for PDF renormalization
+! x: NLO integration for + distribution for PDF renormalization
 ! yrnd(18:19): PDF mapping
 ! yrnd(20): flavor of j in gq > WH+j
 ! yrnd(21): partonic channel in unweighted events
 ! yRnd(22): accept or reject in unweighted events
   real(8) :: yRnd(1:19),VgsWgt, EvalWeighted_VH
-  real(8) :: pdf(-6:6,1:2), pdf_ren(-6:6,1:2,1:2), pdf_dip(-6:6,1:2,1:2), pdf_real(-6:6,1:2)
-  real(8) :: eta1, eta2, eta1_ren(1:2), eta2_ren(1:2), FluxFac, FluxFac_ren, Ehat, Ehat_ren, shat, shat_ren, sHatJacobi, sHatJacobi_ren
-  real(8) :: Mom(1:4,1:10), Mom_real(1:4,1:10), PSWgt, PSWgt_ren, PSWgt_tilde(1:2), PSWgt2
-  complex(8) :: amp_dummy,amp_dummy_dummy,amp_tri,amp_box,amp_virture_finite
-  real(8) :: me2real,me2lo,dip(1:2),me2gg,me2gq,me2sub,me2sup,me2_dummy,me2_dummy_dummy,me2_virture_finite,me2_PDF_ren(1:2)!, lheweight(-6:6,-6:6)
-  integer :: i_dipole, i_PDF_ren
-  real(8) :: ptilde(1:4,1:9,1:2),p_PDF_ren(1:4,1:9,1:2)
+  real(8) :: pdf(-6:6,1:2), pdf_dip(-6:6,1:2,1:2), pdf_real(-6:6,1:2), pdf_x(-6:6,1:2,1:2)
+  real(8) :: eta1, eta2, eta1_x(1:2), eta2_x(1:2), FluxFac, FluxFac_x, Ehat, Ehat_x, shat, shat_x, sHatJacobi, sHatJacobi_x
+  real(8) :: Mom(1:4,1:10), Mom_real(1:4,1:10), PSWgt, PSWgt_x, PSWgt_tilde(1:2), PSWgt2
+  complex(8) :: amp_dummy,amp_dummy_x,amp_tri,amp_box,amp_virture_finite
+  real(8) :: me2qqreal,me2qgreal,me2lo,qqdip(1:2),qgdip,me2gg,me2qg,me2gq,me2sub,me2sup,me2_dummy,me2_dummy_x,me2_virture_finite,me2_I,me2_x_qq(1:2),me2_1_qq(1:2),me2_x_gq
+  integer :: i_dipole, i_x
+  real(8) :: ptilde(1:4,1:9,1:2),p_x(1:4,1:9,1:2)
   integer :: i,j,k,l,p,q,NBin(1:NumHistograms),NHisto
-  real(8) :: PreFac, PreFac_ren, PostFac, Mu_Fact_ren(1:2)
-  real(8) :: alphas_ren(1:2), alphas_dip(1:2)
-  logical :: applyPSCut, applyPSCut_ren(1:2)
+  real(8) :: PreFac, PreFac_x, PostFac
+  real(8) :: alphas_dip(1:2), alphas_x(1:2), Mu_Fact_x(1:2) ,x, EhatxMin
+  logical :: applyPSCut, applyPSCut_x(1:2),applyPSCut_dip(1:2)
   real(8) :: mass(1:10,1:2)
   real(8) :: helicity(10)
   integer id(10), id2(10)
   real(8) :: finite_factor
   real(8) :: Mu_Fact_real, Mu_ren_real, alphas_real, PSWgt_real, PreFac_real
   real(8) :: Mom_save(1:4,1:9)
+  real(8) :: mu_Ren_save,mu_Fact_save,alphas_save
+  integer :: qin,gin,itemp
 ! for tests!!!!!!!!!!!!!!
-real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:10),MomExt1t(1:4,1:9),MomExt2t(1:4,1:9),MomExt3t(1:4,1:9)
+!real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:10),MomExt1t(1:4,1:9),MomExt2t(1:4,1:9),MomExt3t(1:4,1:9),dummy
 ! for tests!!!!!!!!!!!!!!
 
   EvalWeighted_VH=0d0
@@ -70,7 +73,12 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
   me2gg=0d0
   me2sub=0d0
   me2sup=0d0
+  me2qg=0d0
   me2gq=0d0
+  qqdip(:)=0d0
+  qgdip=0d0
+  me2qqreal=0d0
+  me2qgreal=0d0
   EvalCounter = EvalCounter+1
 
 ! initialization and decaying mode related
@@ -101,8 +109,6 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
     id(8)=Not_a_particle_
     id(9)=Not_a_particle_
   endif
-
-  id(10)=convertLHE(Glu_)!This may need to be overwritten later for gq/qg!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 !toss coin and decide beam A helicity
   if (yRnd(1).lt.(0.5d0+POL_A/200d0))then
@@ -363,7 +369,7 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
        VH_PC.ne."sb".and. &! "sb" ( = real - dipoles, for development only)
        VH_PC.ne."gq".and. &! "qg" or "gq" ( = qg + gq)
        VH_PC.ne."qg".and. &! "qg" or "gq" ( = qg + gq)
-       VH_PC.ne."nl")then  !"nl" ( = full oneloop = q qbar @LO + NLO + gg + gq)
+       VH_PC.ne."nl")then  ! "nl" ( = full oneloop = q qbar @LO + NLO + gg + gq)
       print*,"invalid VH_PC ", VH_PC
       stop
     endif
@@ -378,25 +384,44 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
   endif
 
 !if e+ e- collider
-  if(Collider.eq.0.and.VH_PC.eq."ee")then  
+  if(Collider.eq.0.and.VH_PC.eq."ee")then
     call EvalPhasespace_VH(yRnd(6:13),ILC_Energy,Mom(:,1:9),id(6:9),PSWgt,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
     Mom_save(1:4,1:9)=Mom(1:4,1:9)
-    call kinematics_VH(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
-    if( applyPSCut .or. PSWgt.eq.zero ) return    
+    call kinematics_eeVH(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+    if( applyPSCut .or. PSWgt.le.zero ) return    
     FluxFac = 1d0/(2d0*ILC_Energy**2)
     PreFac = fbGeV2 * FluxFac * PSWgt
     EvalWeighted_VH=0d0
     id(1:2)=(/convertLHE(ElP_),convertLHE(ElM_)/)
     call amp_VH_LO(Mom(:,1:9),mass(3:5,:),helicity(1:9),id(1:9),amp_dummy)
     me2lo = dble(amp_dummy*dconjg(amp_dummy)) *PreFac *PostFac
+    do NHisto = 1,NumHistograms
+      call intoHisto(NHisto,NBin(NHisto),me2lo*VgsWgt)
+    enddo
+
 
 !if pp/ppbar collider
   elseif(Collider.eq.1.or.Collider.eq.2)then
     !PDFMapping
-    call PDFMapping(1,yrnd(18:19),eta1,eta2,Ehat,sHatJacobi)!Z/W
+    if( (.not.HbbDecays) .and. IsAPhoton(DecayMode1) )then! H, V=gamma (not implemented)
+      call PDFMapping(2,yrnd(18:19),eta1,eta2,Ehat,sHatJacobi,EhatMin=(M_reso+M_V))
+    elseif( HbbDecays .and. (IsAZDecay(DecayMode1) .or. IsAWDecay(DecayMode1)) )then ! if H > bb, V > ff
+      call PDFMapping(1,yrnd(18:19),eta1,eta2,Ehat,sHatJacobi,EhatMin=(M_reso+M_V-5d0*Ga_Reso-5d0*Ga_V))!Z/W
+    elseif( (.not.HbbDecays) .and. (IsAZDecay(DecayMode1) .or. IsAWDecay(DecayMode1)))then ! if H, V > ff
+      call PDFMapping(2,yrnd(18:19),eta1,eta2,Ehat,sHatJacobi,EhatMin=M_reso)!Z/W
+    elseif( HbbDecays .and. IsAPhoton(DecayMode1) )then ! if H > bb, V=gamma (not implemented)
+      call PDFMapping(2,yrnd(18:19),eta1,eta2,Ehat,sHatJacobi,EhatMin=M_V)
+    endif
+
+
+!----------- this removes all cuts ---
+!   applyPSCut=.false.                !  for debugging only 
+!-------------------------------------
+    
 !print*,Ehat
     !needed for PDFMapping=1
-    if(Ehat.le.(M_Z+M_Reso))return!!!!may be improved
+!if(Ehat.le.(M_Z+M_Reso))return!!!!may be improved
+!if(Ehat*dsqrt(x).le.M_Reso)return!!!!may be improved
 !marginally more efficient
 !    if( IsAZDecay(DecayMode1) )then
 !      call PDFMapping(14,yrnd(18:19),eta1,eta2,Ehat,sHatJacobi)!Z      
@@ -407,14 +432,19 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
 !    endif
 !marginally more efficient
 
-    !Phase space, scales, and PDF's
+    !Phase space, scales, alpha_S and PDF's
     if(VH_PC.eq."qq".or.VH_PC.eq."lo".or.VH_PC.eq."tr".or.VH_PC.eq."bo".or.VH_PC.eq."gg".or.VH_PC.eq."in".or.VH_PC.eq."sp".or.VH_PC.eq."gq".or.VH_PC.eq."qg".or.VH_PC.eq."nl")then
       call EvalPhasespace_VH(yRnd(6:13),Ehat,Mom(:,1:9),id(6:9),PSWgt,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+!if(Ehat_x.le.(M_Z+M_Reso))return!!!!may be improved
+!if(Ehat.le.(M_Reso))return!!!!may be improved
       Mom(:,10)=0d0 ! no QCD particle emitted
       Mom_save(:,1:9)=Mom(:,1:9)
       !boost from center of mass frame to lab frame
-call boost2Lab(eta1,eta2,10,Mom)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!Set running scales
+      call boost2Lab(eta1,eta2,10,Mom)
+      !Kinematics and cuts
+      call kinematics_ppvh(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+      if( applyPSCut .or. PSWgt.le.zero )return
+      !Set running scales
       if( IsAZDecay(DecayMode1) .or. IsAWDecay(DecayMode1) )then
         call SetRunningScales( (/ Mom(1:4,5),Mom(1:4,6),Mom(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
       elseif( IsAPhoton(DecayMode1) )then
@@ -422,54 +452,55 @@ call boost2Lab(eta1,eta2,10,Mom)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       endif
       ! do not forget to set scales in command lines
       call EvalAlphaS()
-      !Kinematics and cuts
-      call kinematics_VH(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
-!call boost2Lab(eta1,eta2,10,Mom)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      if( applyPSCut .or. PSWgt.eq.zero )return
+      mu_Ren_save = mu_Ren
+      mu_Fact_save = mu_Fact
+      alphas_save = alphas
       
       call setPDFs(eta1,eta2,pdf)
-      if(VH_PC.eq."sp".or.VH_PC.eq."gq".or.VH_PC.eq."qg".or.VH_PC.eq."nl")then
-        Ehat_ren = Ehat * dsqrt(yRnd(17))
-        if(Ehat_ren.le.(M_Z+M_Reso))return!!!!may be improved
+
+      if(VH_PC.eq."sp".or.VH_PC.eq."gq".or.VH_PC.eq."nl")then
+        x = yrnd(17)
+        Ehat_x = Ehat * dsqrt(x)
         shat = Ehat**2
-        shat_ren = shat * yRnd(17)
-        call EvalPhasespace_VH(yRnd(6:13),Ehat_ren,p_PDF_ren(:,:,1),id(6:9),PSWgt_ren,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
-        p_PDF_ren(:,:,2)=p_PDF_ren(:,:,1)
-        eta1_ren(1) = yRnd(17)*eta1
-        eta2_ren(1) = eta2
-        eta1_ren(2) = eta1
-        eta2_ren(2) = yRnd(17)*eta2
-        do i_PDF_ren=1,2
-          call boost2Lab(eta1_ren(i_PDF_ren),eta2_ren(i_PDF_ren),9,p_PDF_ren(:,:,i_PDF_ren))
-          call kinematics_VH(id,p_PDF_ren(:,:,i_PDF_ren),NBin,applyPSCut_ren(i_PDF_ren),HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+        shat_x = shat * x
+        call EvalPhasespace_VH(yRnd(6:13),Ehat_x,p_x(:,:,1),id(6:9),PSWgt_x,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+        p_x(:,:,2)=p_x(:,:,1)
+        eta1_x(1) = eta1*x
+        eta2_x(1) = eta2
+        eta1_x(2) = eta1
+        eta2_x(2) = eta2*x
+        do i_x=1,2
+          call boost2Lab(eta1_x(i_x),eta2_x(i_x),9,p_x(1:4,1:9,i_x))
+          call kinematics_ppvh(id,p_x(:,:,i_x),NBin,applyPSCut_x(i_x),HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+          if(PSWgt_x.le.0d0)cycle
           !Set running scales
           if( IsAZDecay(DecayMode1) .or. IsAWDecay(DecayMode1) )then
-            call SetRunningScales( (/ p_PDF_ren(1:4,5,i_PDF_ren),p_PDF_ren(1:4,6,i_PDF_ren),p_PDF_ren(1:4,7,i_PDF_ren) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
+            call SetRunningScales( (/ p_x(1:4,5,i_x),p_x(1:4,6,i_x),p_x(1:4,7,i_x) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
           elseif( IsAPhoton(DecayMode1) )then
-            call SetRunningScales( (/ p_PDF_ren(1:4,5,i_PDF_ren),p_PDF_ren(1:4,6,i_PDF_ren),Mom_Not_a_particle(1:4) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),Not_a_particle_,convertLHEreverse(id(4)) /) )
+            call SetRunningScales( (/ p_x(1:4,5,i_x),p_x(1:4,6,i_x),Mom_Not_a_particle(1:4) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),Not_a_particle_,convertLHEreverse(id(4)) /) )
           endif
-          Mu_Fact_ren(i_PDF_ren)=Mu_Fact
+          Mu_Fact_x(i_x)=Mu_Fact
           ! do not forget to set scales in command lines
+!  if(mu_Fact.le.0d0)return
           call EvalAlphaS()
-          alphas_ren(i_PDF_ren) = alphas
-          call setPDFs(eta1_ren(i_PDF_ren),eta2_ren(i_PDF_ren),pdf_ren(:,:,i_PDF_ren))
-        enddo!i_PDF_ren
-        FluxFac_ren = 1d0/(2d0*Ehat_ren**2)
-        sHatJacobi_ren = sHatJacobi * 1d0!!!!may change if PDFMapping gets improved.
-        PreFac_ren = fbGeV2 * FluxFac_ren * sHatJacobi_ren * PSWgt_ren            
+          alphas_x(i_x) = alphas
+          call setPDFs(eta1,eta2,pdf_x(:,:,i_x))
+        enddo!i_x
+        FluxFac_x = 1d0/(2d0*shat_x)
+        sHatJacobi_x = sHatJacobi * 1d0!!!!may change if PDFMapping gets improved.
+        PreFac_x = fbGeV2 * FluxFac_x * sHatJacobi_x * PSWgt_x 
       endif
     endif
 
-    if(VH_PC.eq."sb".or.VH_PC.eq."nl")then
+    if(VH_PC.eq."sb".or.VH_PC.eq."qg".or.VH_PC.eq."nl")then
       call EvalPhasespace_VHglu(yRnd(6:16),Ehat,Mom_real,id(6:9),PSWgt_real,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
-
       if( ((Mom_real(:,1).dot.Mom_real(:,10))/Ehat**2 .lt. IRmin) .or. ((Mom_real(:,2).dot.Mom_real(:,10))/Ehat**2 .lt. IRmin) )return !for numerical stibility, should not be physical
       !boost from center of mass frame to lab frame
       call boost2Lab(eta1,eta2,10,Mom_real)
       !Kinematics and cuts
-      call kinematics_VH(id,Mom_real,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
-      if( applyPSCut .or. PSWgt_real.eq.zero )return
-!if(Get_PT(Mom_real(:,10)).le.20d0*GeV)return !jet pt cut such that real contribution .is finite
+      call kinematics_ppvh(id,Mom_real,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+      if( applyPSCut .or. PSWgt_real.le.zero )return
+!if(Get_PT(Mom_real(:,10)).le.20d0*GeV)return !jet pt cut such that real contribution .is finite. for tests
       !Set running scales
       if( IsAZDecay(DecayMode1) .or. IsAWDecay(DecayMode1) )then
         call SetRunningScales( (/ Mom_real(1:4,5),Mom_real(1:4,6),Mom_real(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
@@ -482,10 +513,9 @@ call boost2Lab(eta1,eta2,10,Mom)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       call EvalAlphaS()
       alphas_real = alphas
       call setPDFs(eta1,eta2,pdf_real)
-      call p_tilde(Mom_real,ptilde)
-      ptilde(:,3,:) = ptilde(:,1,:)+ptilde(:,2,:)
-      ptilde(:,4,:) = ptilde(:,6,:)+ptilde(:,7,:)
+      call p_tilde(mom_real,ptilde) 
       do i_dipole=1,2
+        call kinematics_ppvh(id,Mom_real,NBin,applyPSCut_dip(i_dipole),HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
         if( IsAZDecay(DecayMode1) .or. IsAWDecay(DecayMode1) )then
           call SetRunningScales( (/ ptilde(1:4,5,i_dipole),ptilde(1:4,6,i_dipole),ptilde(1:4,7,i_dipole) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
         elseif( IsAPhoton(DecayMode1) )then
@@ -497,25 +527,88 @@ call boost2Lab(eta1,eta2,10,Mom)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       enddo
       FluxFac = 1d0/(2d0*Ehat**2)
       PreFac_real = fbGeV2 * FluxFac * sHatJacobi * PSWgt_real
+
     endif
 
     !Set running scales BACK. Everything needed has been stored... (I hope so!)
-    if(VH_PC.ne."sb")then
-      if( IsAZDecay(DecayMode1) .or. IsAWDecay(DecayMode1) )then
-        call SetRunningScales( (/ Mom(1:4,5),Mom(1:4,6),Mom(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
-      elseif( IsAPhoton(DecayMode1) )then
-        call SetRunningScales( (/ Mom(1:4,5),Mom(1:4,6),Mom_Not_a_particle(1:4) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),Not_a_particle_,convertLHEreverse(id(4)) /) )
-      endif
-      call EvalAlphaS()
-      ! do not forget to set scales in command lines
-      FluxFac = 1d0/(2d0*EHat**2)
-      PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt
-    endif
+
+    mu_Ren = mu_Ren_save
+    mu_Fact = mu_Fact_save
+    alphas = alphas_save
+
+    FluxFac = 1d0/(2d0*EHat**2)
+    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt
 
     EvalWeighted_VH=0d0
 
+
+
+!----------- this removes all cuts ---
+!   applyPSCut=.false.                !  for debugging only 
+!-------------------------------------
+!----------- this removes all cuts ---
+!   applyPSCut_x=.false.                !  for debugging only 
+!-------------------------------------
+
+
+!MomExt1t(:,1) = (/  1.4612636158434757d0  ,        0.0000000000000000d0,        0.0000000000000000d0     ,   1.4612636158434757d0     /)
+!MomExt1t(:,2) = (/  1.4612636158434757d0  ,        0.0000000000000000d0,        0.0000000000000000d0     ,  -1.4612636158434757d0     /)
+!MomExt1t(:,3) = (/  2.9225272316869515d0  ,        0.0000000000000000d0,        0.0000000000000000d0     ,   0.0000000000000000d0     /)
+!MomExt1t(:,4) = (/  1.3351579764951791d0  ,       0.23912248810916401d0,      -0.49887803363686017d0     , -0.80695867029432466d0     /)
+!MomExt1t(:,5) = (/  1.5873692551917724d0  ,      -0.23912248810916401d0,       0.49887803363686017d0     ,  0.80695867029432466d0     /)
+!MomExt1t(:,6) = (/ 0.32428361334240258d0  ,      -0.30847990233180261d0,       -4.0824295707895482d-002  ,  -9.1287395733039817d-002  /)
+!MomExt1t(:,7) = (/  1.0108743631527766d0  ,       0.54760239044096659d0,      -0.45805373792896470d0     , -0.71567127456128488d0     /)
+!MomExt1t(:,8) = (/  0.0000000000000000d0  ,        0.0000000000000000d0,        0.0000000000000000d0     ,   0.0000000000000000d0     /)
+!MomExt1t(:,9) = (/  0.0000000000000000d0  ,        0.0000000000000000d0,        0.0000000000000000d0     ,   0.0000000000000000d0     /)
+!! ======================
+!MomExt2t(:,1) = (/   1.4993889013229147d0,        0.0000000000000000d0     ,   0.0000000000000000d0,        1.4993889013229147d0     /)
+!MomExt2t(:,2) = (/   1.4993889013229147d0,        0.0000000000000000d0     ,   0.0000000000000000d0,       -1.4993889013229147d0     /)
+!MomExt2t(:,3) = (/   2.9987778026458294d0,        0.0000000000000000d0     ,   0.0000000000000000d0,        0.0000000000000000d0     /)
+!MomExt2t(:,4) = (/   1.3795905093925491d0,       0.37240043559138541d0     , -0.90237656049098836d0,      -0.32603979708109893d0     /)
+!MomExt2t(:,5) = (/   1.6191872932532803d0,      -0.37240043559138541d0     ,  0.90237656049098836d0,       0.32603979708109893d0     /)
+!MomExt2t(:,6) = (/  0.69987628038380456d0,       0.41499286401781232d0     , -0.51432374828037830d0,       0.23038839513522705d0     /)
+!MomExt2t(:,7) = (/  0.67971422900874456d0,       -4.2592428426426909d-002  , -0.38805281221061005d0,      -0.55642819221632600d0     /)
+!MomExt2t(:,8) = (/   0.0000000000000000d0,        0.0000000000000000d0     ,   0.0000000000000000d0,        0.0000000000000000d0     /)
+!MomExt2t(:,9) = (/   0.0000000000000000d0,        0.0000000000000000d0     ,   0.0000000000000000d0,        0.0000000000000000d0     /)
+!! ======================
+!
+!
+!
+!print*,"========================="
+!do l=0,1
+!do p=0,1
+!do q=0,1
+!print*,"helicities",(l*2-1),(p*2-1),(q*2-1)
+!call SetRunningScales( (/ MomExt1t(1:4,5),MomExt1t(1:4,6),MomExt1t(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
+!call EvalAlphaS()
+!print *, "alphas = ",alphas
+!call amp_VH_gg(MomExt1t(:,1:9),mass(3:5,:),(/dble(l*2-1),dble(p*2-1),helicity(3:5),dble(q*2-1),-dble(q*2-1),helicity(8:9)/),id(1:9),"tr",amp_dummy)
+!me2gg = dble(amp_dummy*dconjg(amp_dummy)) *GluonColAvg**2 *8d0 !8 = summing delta(a,b)*delta(a,b)
+!print*,"MomExt1t amptd = ",amp_dummy
+!print*,"MomExt1t me2gg = ",me2gg
+!enddo
+!enddo
+!enddo
+!do l=0,1
+!do p=0,1
+!do q=0,1
+!print*,"helicities",(l*2-1),(p*2-1),(q*2-1)
+!call SetRunningScales( (/ MomExt2t(1:4,5),MomExt2t(1:4,6),MomExt2t(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
+!call EvalAlphaS()
+!print *, "alphas = ",alphas
+!call amp_VH_gg(MomExt2t(:,1:9),mass(3:5,:),(/dble(l*2-1),dble(p*2-1),helicity(3:5),dble(q*2-1),-dble(q*2-1),helicity(8:9)/),id(1:9),"tr",amp_dummy)
+!me2gg = dble(amp_dummy*dconjg(amp_dummy)) *GluonColAvg**2 *8d0 !8 = summing delta(a,b)*delta(a,b)
+!print*,"MomExt2t amptd = ",amp_dummy
+!print*,"MomExt2t me2gg = ",me2gg
+!enddo
+!enddo
+!enddo
+!pause
+
+
     !gg
     me2gg=0d0
+    !if(VH_PC.eq."gg".or.VH_PC.eq."bo".or.VH_PC.eq."tr".or.VH_PC.eq."in".or.VH_PC.eq."nl")then
     if(VH_PC.eq."gg".or.VH_PC.eq."bo".or.VH_PC.eq."tr".or.VH_PC.eq."in")then
 #if useCollier==1
       if(DecayMode1.eq.4.or.DecayMode1.eq.5.or.DecayMode1.eq.6.or.DecayMode1.eq.10.or.DecayMode1.eq.11)then
@@ -528,8 +621,8 @@ call boost2Lab(eta1,eta2,10,Mom)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !do l=0,1
 !do p=0,1
 !do q=0,1
-!  call amp_VH_gg(Mom(:,1:9),mass(3:5,1:2),(/dble(l*2-1),dble(p*2-1),helicity(3:5),dble(q*2-1),-dble(q*2-1),helicity(8:9)/),id(1:9),amp_dummy_dummy)
-!  me2_dummy=me2_dummy+dble(amp_dummy_dummy*dconjg(amp_dummy_dummy))
+!  call amp_VH_gg(Mom(:,1:9),mass(3:5,1:2),(/dble(l*2-1),dble(p*2-1),helicity(3:5),dble(q*2-1),-dble(q*2-1),helicity(8:9)/),id(1:9),amp_dummy_x)
+!  me2_dummy=me2_dummy+dble(amp_dummy_x*dconjg(amp_dummy_x))
 !enddo
 !enddo
 !enddo
@@ -541,6 +634,7 @@ call boost2Lab(eta1,eta2,10,Mom)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         call amp_VH_gg(Mom(:,1:9),mass(3:5,1:2),helicity,id(1:9),VH_PC,amp_dummy)
 !print*, dble(amp_dummy*dconjg(amp_dummy)),"xssssss"
         me2gg = dble(amp_dummy*dconjg(amp_dummy)) *pdf(0,1)*pdf(0,2) *PreFac *PostFac *GluonColAvg**2 *8d0
+!print*,"gg = ", me2gg
       else
         call amp_VH_gg(Mom(:,1:9),mass(3:5,1:2),helicity,id(1:9),"tr",amp_tri)
         call amp_VH_gg(Mom(:,1:9),mass(3:5,1:2),helicity,id(1:9),"bo",amp_box)
@@ -554,28 +648,40 @@ print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in t
 print *, "specified in the makefile."
 stop 1
 #endif
+      call kinematics_ppvh(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+      do NHisto = 1,NumHistograms
+        call intoHisto(NHisto,NBin(NHisto),me2gg*VgsWgt)
+      enddo
+
     endif
+
+
+
 
 
     !lo/qq
     me2lo=0d0
     if(VH_PC.eq."qq".or.VH_PC.eq."lo".or.VH_PC.eq."nl")then
+    !if(VH_PC.eq."qq".or.VH_PC.eq."lo")then
       !Z/gamma
       if( IsAZDecay(DecayMode1).or.IsAPhoton(DecayMode1) )then
         do i = -5,5
           j = -i
+
           id(1:2) = (/i,j/)
           if (i.ne.0)then
             call amp_VH_LO(Mom(:,1:9),mass(3:5,:),helicity(1:9),id(1:9),amp_dummy)
-!print*,dble(amp_dummy*dconjg(amp_dummy))
           else
             amp_dummy=0d0
           endif
           me2lo = me2lo + dble(amp_dummy*dconjg(amp_dummy)) *pdf(LHA2M_PDF(i),1)*pdf(LHA2M_PDF(j),2)
         enddo! parton
         me2lo = me2lo *PreFac *PostFac * QuarkColAvg**2 * 3d0
-        !summing 3 colors in intial qq, no factor from spins because they are casted randomly, not summed.
-
+        !summing 3 colors in intial qq~, no factor from spins because they are casted randomly, not summed.
+        call kinematics_ppvh(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+        do NHisto = 1,NumHistograms
+          call intoHisto(NHisto,NBin(NHisto),me2lo*VgsWgt)
+        enddo
       !W
       elseif( IsAWDecay(DecayMode1) )then
         do i = -5,5 !gluon = 0, otherwise PDG codes
@@ -606,72 +712,82 @@ stop 1
         me2lo = me2lo *PreFac *PostFac *QuarkColAvg**2 *3d0
         !summing 3 colors in intial qq, no factor from spins because they are casted randomly, not summed.
 
+        call kinematics_ppvh(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+        do NHisto = 1,NumHistograms
+          call intoHisto(NHisto,NBin(NHisto),me2lo*VgsWgt)
+        enddo
+
       endif
     endif
+
+
 
 
 !for checking cancellation approaching singularities, set FacScheme=-1 RenScheme=-1 for this test
 !call EvalPhasespace_VHglu_singular(yRnd(6:16),Ehat,Mom_real,id(6:9),PSWgt_real,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
 !alphas_real=alphas
-!call p_tilde(Mom_real,ptilde)
-!print*,"IR",(Mom_real(:,1).dot.Mom_real(:,10))/Ehat**2,(Mom_real(:,2).dot.Mom_real(:,10))/Ehat**2!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
+!call p_tilde(mom_real,ptilde)
+!print*,"IR",(Mom_real(:,1).dot.Mom_real(:,10))/ehat**2,(Mom_real(:,2).dot.Mom_real(:,10))/ehat**2!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!print*,Mom_real(:,2)
+!print*,Mom_real(:,10)
     !NLO: real - dipoles
     me2sub=0d0
-    if(VH_PC.eq."nl".or.VH_PC.eq."sb")then
+    if((VH_PC.eq."nl".or.VH_PC.eq."sb").and.(PSWgt_real.gt.0d0))then
       !Z/gamma
-      if( IsAZDecay(DecayMode1).or.IsAPhoton(DecayMode1) )then
+      if( IsAZDecay(DecayMode1).or.IsAPhoton(DecayMode1) )then ! ZH  qq~  real - dipoles ============
         do i = -5,5
-        !i=1
           j = -i
 
           id(1:2) = (/i,j/)
-          me2real=0d0
+          me2qqreal=0d0
           if (i.eq.0)cycle !skip gg
           do l=0,1
           do p=0,1
-          do q=0,1
-            call amp_VH_real(Mom_real,mass(3:5,1:2),(/dble(l*2-1),-dble(l*2-1),helicity(3:5),dble(p*2-1),-dble(p*2-1),helicity(8:9),dble(q*2-1)/),id,amp_dummy)
-            me2real = me2real + dble(amp_dummy*dconjg(amp_dummy))
+          !do q=0,1
+            !call amp_VH_real(Mom_real,mass(3:5,1:2),(/dble(l*2-1),-dble(l*2-1),helicity(3:5),dble(p*2-1),-dble(p*2-1),helicity(8:9),dble(q*2-1)/),id,amp_dummy)
+            call amp_VH_real(Mom_real,mass(3:5,1:2),(/dble(l*2-1),-dble(l*2-1),helicity(3:9),dble(p*2-1)/),id,amp_dummy)
+            me2qqreal = me2qqreal + dble(amp_dummy*dconjg(amp_dummy))
+          !enddo
           enddo
           enddo
-          enddo
-          me2real = me2real *pdf_real(LHA2M_PDF(i),1)*pdf_real(LHA2M_PDF(j),2) *PreFac_real *PostFac *aveqq *3d0 !I think I understand now.
-          me2real = me2real * Cf * (4d0 * pi * alphas_real)! gs^2
+          me2qqreal = me2qqreal *pdf_real(LHA2M_PDF(i),1)*pdf_real(LHA2M_PDF(j),2) *PreFac_real *PostFac *aveqq *3d0 !I think I understand now.
+          me2qqreal = me2qqreal * Cf * (4d0 * pi * alphas_real)! gs^2
 
-          call kinematics_VH(id,Mom_real,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+          call kinematics_ppvh(id,Mom_real,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
           do NHisto = 1,NumHistograms
-            call intoHisto(NHisto,NBin(NHisto),me2real*VgsWgt)
+            call intoHisto(NHisto,NBin(NHisto),me2qqreal*VgsWgt)
           enddo
 
-          dip=0d0
+          qqdip=0d0
           do i_dipole=1,2
+            if(applyPSCut_dip(i_dipole).eqv..true.)cycle
+
             me2_dummy=0d0
             do p=0,1
-            do q=0,1
-              call amp_VH_LO(ptilde(:,:,i_dipole),mass(3:5,1:2),(/dble(p*2-1),-dble(p*2-1),helicity(3:5),dble(q*2-1),-dble(q*2-1),helicity(8:9)/),id,amp_dummy)
+            !do q=0,1
+              !call amp_VH_LO(ptilde(:,:,i_dipole),mass(3:5,1:2),(/dble(p*2-1),-dble(p*2-1),helicity(3:5),dble(q*2-1),-dble(q*2-1),helicity(8:9)/),id,amp_dummy)
+              call amp_VH_LO(ptilde(:,:,i_dipole),mass(3:5,1:2),(/dble(p*2-1),-dble(p*2-1),helicity(3:9)/),id,amp_dummy)
               me2_dummy = me2_dummy + dble(amp_dummy*dconjg(amp_dummy))
-            enddo
+            !enddo
             enddo
             me2_dummy = me2_dummy *pdf_dip(LHA2M_PDF(i),1,i_dipole)*pdf_dip(LHA2M_PDF(j),2,i_dipole) *PreFac_real *PostFac * aveqq * 3d0
-            dip(i_dipole) = me2_dummy * (-1d0) / (2d0*Mom_real(:,i_dipole).dot.Mom_real(:,10)) * (-1d0) & !-1 for color (arXiv:0709.2881 EQ. 5.136)
-                                      * split_qiqi(alphas_dip(i_dipole),Mom_real(:,1),Mom_real(:,2),Mom_real(:,10))
+            qqdip(i_dipole) = me2_dummy * (-1d0) / (2d0*Mom_real(:,i_dipole).dot.Mom_real(:,10)) * (-1d0) & !-1 for color (arXiv:0709.2881 EQ. 5.136)
+                                      * split_qqg(alphas_dip(i_dipole),Mom_real(:,i_dipole),Mom_real(:,3-i_dipole),Mom_real(:,10))
 
-            call kinematics_VH(id,ptilde(:,:,i_dipole),NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+            call kinematics_ppvh(id,ptilde(:,:,i_dipole),NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
             do NHisto = 1,NumHistograms
-              call intoHisto(NHisto,NBin(NHisto),-dip(i_dipole)*VgsWgt)
+              call intoHisto(NHisto,NBin(NHisto),-qqdip(i_dipole)*VgsWgt)
             enddo
 
           enddo!i_dipole
-          me2sub = me2sub + me2real - dip(1) - dip(2)
-
+          me2sub = me2sub + me2qqreal - qqdip(1) - qqdip(2)
         enddo! parton
 
       !W
-      elseif( IsAWDecay(DecayMode1) )then
-        do i = -5,5 !gluon = 0, otherwise PDG codes
-        do j = -5,5
+      elseif( IsAWDecay(DecayMode1) )then ! WH  qq~  real - dipoles =============================
+
+        do i=-5,5
+        do j=-5,5
 
           id2=id
           id2(1:2) = (/i,j/)
@@ -688,148 +804,518 @@ stop 1
             helicity(6)=sign(1d0,-dble(id2(6)))
             helicity(7)=-helicity(6)
           else
-            cycle !skip this i,j combination
+            cycle !skip non-W+/- combinations
           endif
 
-          me2real=0d0
+          me2qqreal=0d0
           do l=0,1
           do p=0,1
-          do q=0,1
-            call amp_VH_real(Mom,mass(3:5,1:2),(/dble(l*2-1),-dble(l*2-1),helicity(3:5),dble(p*2-1),-dble(p*2-1),helicity(8:9),dble(q*2-1)/),id,amp_dummy)
-            me2real = me2real + dble(amp_dummy*dconjg(amp_dummy))
+            call amp_VH_real(Mom_real,mass(3:5,1:2),(/dble(l*2-1),-dble(l*2-1),helicity(3:9),dble(p*2-1)/),id2,amp_dummy)
+            me2qqreal = me2qqreal + dble(amp_dummy*dconjg(amp_dummy))
           enddo
           enddo
-          enddo
-          me2real = me2real *pdf_real(LHA2M_PDF(i),1)*pdf_real(LHA2M_PDF(j),2) *PreFac_real *PostFac *aveqq *Cf *3d0 !I think I understand now.
-          me2real = me2real * (4d0 * pi * alphas_real)! gs^2
 
-          !call kinematics_VH(id,Mom_real,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+          me2qqreal = me2qqreal *pdf_real(LHA2M_PDF(i),1)*pdf_real(LHA2M_PDF(j),2) *PreFac_real *PostFac *aveqq *3d0 !I think I understand now.
+          me2qqreal = me2qqreal * Cf * (4d0 * pi * alphas_real)! gs^2
+!if(isnan(me2qqreal))cycle
+          call kinematics_ppvh(id,Mom_real,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
           do NHisto = 1,NumHistograms
-            call intoHisto(NHisto,NBin(NHisto),me2real*VgsWgt)
+            call intoHisto(NHisto,NBin(NHisto),me2qqreal*VgsWgt)
           enddo
 
-          dip=0d0
+          qqdip=0d0
           do i_dipole=1,2
+            if(applyPSCut_dip(i_dipole).eqv..true.)cycle
             me2_dummy=0d0
             do p=0,1
-            do q=0,1
-              call amp_VH_LO(ptilde(:,:,i_dipole),mass(3:5,1:2),(/dble(p*2-1),-dble(p*2-1),helicity(3:5),dble(q*2-1),-dble(q*2-1),helicity(8:9)/),id,amp_dummy)
+              call amp_VH_LO(ptilde(:,:,i_dipole),mass(3:5,1:2),(/dble(p*2-1),-dble(p*2-1),helicity(3:9)/),id2,amp_dummy)
               me2_dummy = me2_dummy + dble(amp_dummy*dconjg(amp_dummy))
             enddo
-            enddo
             me2_dummy = me2_dummy *pdf_dip(LHA2M_PDF(i),1,i_dipole)*pdf_dip(LHA2M_PDF(j),2,i_dipole) *PreFac_real *PostFac * aveqq * 3d0
-            dip(i_dipole) = me2_dummy * (-1d0) / (2d0*Mom_real(:,i_dipole).dot.Mom_real(:,10)) * (-1d0) & !-1 for color (arXiv:0709.2881 EQ. 5.136)
-                                      * split_qiqi(alphas_dip(i_dipole),Mom_real(:,1),Mom_real(:,2),Mom_real(:,10))
+            qqdip(i_dipole) = me2_dummy * (-1d0) / (2d0*Mom_real(:,i_dipole).dot.Mom_real(:,10)) * (-1d0) & !-1 for color (arXiv:0709.2881 EQ. 5.136)
+                                      * split_qqg(alphas_dip(i_dipole),Mom_real(:,i_dipole),Mom_real(:,3-i_dipole),Mom_real(:,10))
 
-            call kinematics_VH(id,ptilde(:,:,i_dipole),NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+!if(isnan(qqdip(i_dipole)))cycle
+            call kinematics_ppvh(id,ptilde(:,:,i_dipole),NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
             do NHisto = 1,NumHistograms
-              call intoHisto(NHisto,NBin(NHisto),-dip(i_dipole)*VgsWgt)
+              call intoHisto(NHisto,NBin(NHisto),-qqdip(i_dipole)*VgsWgt)
             enddo
-
+!if(isnan(me2qqreal))print*,"me2qqreal = ",me2qqreal
+!if(isnan(qqdip(1)))print*,"qqdip(1) = ", qqdip(1)
+!if(isnan(qqdip(2)))print*,"qqdip(2) = ", qqdip(2)
           enddo!i_dipole
-          me2sub = me2sub + me2real - dip(1) - dip(2)
-         
-        enddo! parton
-        enddo! parton
+          me2sub = me2sub + me2qqreal - qqdip(1) - qqdip(2)
+
+        enddo!parton j
+        enddo!parton i
+        
       endif
 
     endif
 
+
+
+!----------- this removes all cuts ---
+!   applyPSCut=.false.                !  for debugging only 
+!-------------------------------------
+!----------- this removes all cuts ---
+!   applyPSCut_x=.false.                !  for debugging only 
+!-------------------------------------
+
     !NLO: virtual + dipoles + PDF renormalization
-    !interference of virtual and LO, plus "I bit" "K bit" and "P bit" from arXiv:0709.2881
+    !finite part of interference of virtual and LO, plus "I bit" "K bit" and "P bit" from arXiv:0709.2881
     me2sup=0d0
-    if(VH_PC.eq."nl".or.VH_PC.eq."sp")then
-      if( IsAZDecay(DecayMode1).or.IsAPhoton(DecayMode1) )then
+    if((VH_PC.eq."nl".or.VH_PC.eq."sp").and.((1d0-x.gt.yRndmin).and.(x.gt.yRndmin).and.(PSWgt.gt.0d0)))then
+      if( IsAZDecay(DecayMode1).or.IsAPhoton(DecayMode1) )then !!!!!! Z qq~  virtual + IKP ======sp=========
         do i = -5,5
           j = -i
   
           id(1:2) = (/i,j/)
   
-          if (i.eq.0)cycle !skip gg
+          if (i*j.eq.0)cycle !skip gg
+
           !the finite part of the virtual diagram + other finite parts from I, K, and P bits of arXiv:0709.2881
           me2_dummy=0d0
           do p=0,1
-          do q=0,1
-            call amp_VH_LO(Mom(:,1:9),mass(3:5,1:2),(/dble(p*2-1),-dble(p*2-1),helicity(3:5),dble(q*2-1),-dble(q*2-1),helicity(8:9)/),id,amp_dummy)
+            call amp_VH_LO(Mom(:,1:9),mass(3:5,1:2),(/dble(p*2-1),-dble(p*2-1),helicity(3:9)/),id,amp_dummy)
             me2_dummy = me2_dummy + dble(amp_dummy*dconjg(amp_dummy))
           enddo
-          enddo
-#if useCollier==1
-          me2_virture_finite = me2_dummy * fac_ZH_virtual(Ehat)
-#else
-print *, "Need to link COLLIER for this process."
-print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
-print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
-print *, "specified in the makefile."
-stop 1
-#endif
-          me2_virture_finite = me2_virture_finite*pdf(LHA2M_PDF(i),1)*pdf(LHA2M_PDF(j),2) * PreFac * PostFac * aveqq * 3d0
+          me2_dummy = me2_dummy*pdf(LHA2M_PDF(i),1)*pdf(LHA2M_PDF(j),2) * PreFac * PostFac * aveqq * 3d0
 
-          call kinematics_VH(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+          me2_virture_finite = me2_dummy * fac_VH_virtual(Ehat**2) 
+!if(isNaN(me2_virture_finite))cycle
+          me2_I = me2_dummy * i_qq_vhg(ehat**2)
+!if(isNaN(me2_I))cycle
+          call kinematics_ppvh(id,mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
           do NHisto = 1,NumHistograms
-            call intoHisto(NHisto,NBin(NHisto),me2_virture_finite*VgsWgt)
+            call intoHisto(NHisto,NBin(NHisto),(me2_virture_finite+me2_I)*VgsWgt)
           enddo
 
-          if(1d0-yRnd(17).le.yRndmin) return!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
           !integration over x for PDF renormalization, except for the parts included in the above (due to Dirac delta function)
-          me2_PDF_ren=0d0
-          do i_PDF_ren=1,2
-
-            me2_dummy_dummy=0d0
-            amp_dummy_dummy=0d0
-            !print*,Ehat - M_Reso - M_V, applyPSCut
-            if(applyPSCut_ren(i_PDF_ren) .or. PSWgt.eq.0d0 .or. PSWgt_ren.eq.0d0)then!may need a guard against Ehat < m_H+m_V
-              cycle
-            else
+          me2_x_qq=0d0
+          me2_1_qq=0d0
+          do i_x=1,2
+!if(applyPSCut_x(i_x).eqv..true..or. PSWgt_x.eq.0d0)then
+!print*,i_x,applyPSCut_x(i_x),PSWgt_x
+!endif
+            if(applyPSCut_x(i_x) .or. (.not.(PSWgt_x.gt.0d0)))cycle
+            me2_dummy_x=0d0
+            amp_dummy_x=0d0
+            !if(PSWgt_x.ne.0d0)then
               do p=0,1
-              do q=0,1
-                call amp_VH_LO(p_PDF_ren(1:4,1:9,i_PDF_ren),mass(3:5,1:2),(/dble(p*2-1),-dble(p*2-1),helicity(3:5),dble(q*2-1),-dble(q*2-1),helicity(8:9)/),id,amp_dummy_dummy)
-                me2_dummy_dummy = me2_dummy_dummy + dble(amp_dummy_dummy*dconjg(amp_dummy_dummy))
+                call amp_VH_LO(p_x(1:4,1:9,i_x),mass(3:5,1:2),(/dble(p*2-1),-dble(p*2-1),helicity(3:9)/),id,amp_dummy_x)
+                me2_dummy_x = me2_dummy_x + dble(amp_dummy_x*dconjg(amp_dummy_x))
               enddo
-              enddo
-#if useCollier==1
-              me2_PDF_ren(i_PDF_ren) = IPK_ZH(Mu_Fact_ren(i_PDF_ren),alphas_ren(i_PDF_ren),me2_dummy,me2_dummy_dummy,shat,shat_ren,pdf(LHA2M_PDF(i),1:2),pdf_ren(LHA2M_PDF(i),1:2,i_PDF_ren),PreFac,PreFac_ren,yRnd(17))
-#else
-print *, "Need to link COLLIER for this process."
-print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
-print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
-print *, "specified in the makefile."
-stop 1
-#endif
-              me2_PDF_ren(i_PDF_ren) = me2_PDF_ren(i_PDF_ren) * PostFac * aveqq * 3d0
+              me2_dummy_x = me2_dummy_x *pdf_x(LHA2M_PDF(i),1,i_x)*pdf_x(LHA2M_PDF(j),2,i_x) * PreFac_x * PostFac * aveqq * 3d0
 
-              do NHisto = 1,NumHistograms
-                call intoHisto(NHisto,NBin(NHisto),me2_PDF_ren(i_PDF_ren)*VgsWgt)
-              enddo
+            me2_x_qq(i_x) = kx_qq_vhg(me2_dummy_x,alphas_x(i_x),x) &
+                          + px_qq_vhg(me2_dummy_x,alphas_x(i_x),Mu_Fact_x(i_x),shat,x)
+!if(isNaN(me2_x_qq(i_x)))cycle
+            call kinematics_ppvh(id,p_x(1:4,1:9,i_x),NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+            do NHisto = 1,NumHistograms
+              call intoHisto(NHisto,NBin(NHisto),me2_x_qq(i_x)*VgsWgt)
+            enddo
 
-            endif
-            
-          enddo! x*p1 or x*p2 i_PDF_ren
-          me2sup = me2sup + me2_virture_finite + me2_PDF_ren(1) + me2_PDF_ren(2)
+            me2_1_qq(i_x) = k1_qq_vhg(me2_dummy,x) &
+                          + p1_qq_vhg(me2_dummy,shat,x)
+!if(isNaN(me2_1_qq(i_x)))cycle            
+            call kinematics_ppvh(id,mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+            do NHisto = 1,NumHistograms
+              call intoHisto(NHisto,NBin(NHisto),me2_1_qq(i_x)*VgsWgt)
+            enddo
 
-
+          enddo! x*p1 or x*p2 i_x
+!if(isNaN(me2_virture_finite))print*,"me2_virture_finite = ",me2_virture_finite
+!if(isNaN(me2_I))print*,"me2_I = ",me2_I    
+!if(isNaN(me2_x_qq(1)))then
+!print*,"me2_x_qq(1) = ",me2_x_qq(1),me2_dummy_x,PreFac_x,alphas_x,x
+!print*,pdf_x
+!print*,p_x
+!endif
+!if(isNaN(me2_x_qq(2)))then
+!print*,"me2_x_qq(2) = ",me2_x_qq(2),me2_dummy_x,PreFac_x,alphas_x,x
+!print*,pdf_x
+!print*,p_x
+!endif
+!if(isNaN(me2_1_qq(1)))print*,"me2_1_qq(1) = ",me2_1_qq(1)
+!if(isNaN(me2_1_qq(2)))print*,"me2_1_qq(2) = ",me2_1_qq(2)
+          me2sup = me2sup + me2_virture_finite + me2_I + me2_1_qq(1) + me2_1_qq(2) + me2_x_qq(1) + me2_x_qq(2)
+          !me2sup = me2sup + me2_I + me2_x_qq(1) + me2_x_qq(2) + me2_1_qq(1) + me2_1_qq(2)
+          !me2sup = me2sup + me2_x_qq(1) + me2_x_qq(2) + me2_1_qq(1) + me2_1_qq(2)
+          !me2sup = me2sup + me2_I
+          !me2sup = me2sup + me2_virture_finite
 
         enddo! parton
 
-      elseif( IsAWDecay(DecayMode1) )then
+      elseif( IsAWDecay(DecayMode1) )then !!!!! W  qq~ virtual + IKP    ===========sp===========
+
+        do i=-5,5
+        do j=-5,5
+
+          id2=id
+          id2(1:2) = (/i,j/)
+          !W+
+          if( CouplToLHEWp(id2(1:2)) )then
+            helicity(6)=sign(1d0,-dble(id2(6)))
+            helicity(7)=-helicity(6)
+          !W-
+          elseif( CouplToLHEWm(id2(1:2)) )then
+            id2(3)=-id2(3)
+            id2(4)=-id2(4)
+            id2(6)=-id2(6)
+            id2(7)=-id2(7)
+            helicity(6)=sign(1d0,-dble(id2(6)))
+            helicity(7)=-helicity(6)
+          else
+            cycle !skip non-W+/- combinations
+          endif
+
+          !the finite part of the virtual diagram + other finite parts from I, K, and P bits of arXiv:0709.2881
+          me2_dummy=0d0
+          do p=0,1
+            call amp_VH_LO(Mom(:,1:9),mass(3:5,1:2),(/dble(p*2-1),-dble(p*2-1),helicity(3:9)/),id2,amp_dummy)
+            me2_dummy = me2_dummy + dble(amp_dummy*dconjg(amp_dummy))
+          enddo
+          me2_dummy = me2_dummy*pdf(LHA2M_PDF(i),1)*pdf(LHA2M_PDF(j),2) * PreFac * PostFac * aveqq * 3d0
+
+          me2_virture_finite = me2_dummy * fac_VH_virtual(Ehat**2) 
+
+          me2_I = me2_dummy * i_qq_vhg(ehat**2)! *pdf(LHA2M_PDF(i),1)*pdf(LHA2M_PDF(j),2) * PreFac * PostFac * aveqq * 3d0
+
+          call kinematics_ppvh(id,mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+          do NHisto = 1,NumHistograms
+            call intoHisto(NHisto,NBin(NHisto),(me2_virture_finite+me2_I)*VgsWgt)
+          enddo
+
+          !integration over x for PDF renormalization, except for the parts included in the above (due to Dirac delta function)
+
+          !!!!!!!!!!!!!!!!!!!!!!!!!!
+          !!!  /  /  /  /  /  /  !!!
+          !!! Under Construction !!!
+          !!!/  /  /  /  /  /  / !!!
+          !!!!!!!!!!!!!!!!!!!!!!!!!!
+
+        enddo!parton j
+        enddo!parton i
 
       endif
 
     endif
 
 
-    !gq/qg
-    me2gq=0d0
-    if(VH_PC.eq."qg".or.VH_PC.eq."gq".or.VH_PC.eq."nl")then
-      do l=0,1
-      do p=0,1
-      do q=0,1
-        call amp_VH_qg(Mom_real,mass(3:5,1:2),(/dble(l*2-1),-dble(l*2-1),helicity(3:5),dble(p*2-1),-dble(p*2-1),helicity(8:9),dble(q*2-1)/),id,amp_dummy)
-        print*,amp_dummy
-      enddo
-      enddo
-      enddo
+!for checking cancellation approaching singularities, set FacScheme=-1 RenScheme=-1 for this test
+!call EvalPhasespace_VHglu_singular(yRnd(6:16),Ehat,Mom_real,id(6:9),PSWgt_real,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+!alphas_real=alphas
+!alphas_dip=alphas
+!call p_tilde(mom_real,ptilde)
+!print*,"IR",(Mom_real(:,1).dot.Mom_real(:,10))/Ehat**2,(Mom_real(:,2).dot.Mom_real(:,10))/Ehat**2!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!pause
+    !"qg" ( = real - dipoles, for g q/q~ > VH + q/q~)
+    me2qg=0d0
+    if((VH_PC.eq."qg".or.VH_PC.eq."nl").and.(PSWgt_real.gt.0d0))then
+      if( IsAZDecay(DecayMode1).or.IsAPhoton(DecayMode1) )then !!!! Z gq/qg real - dipoles ==============
+        do i = -5,5
+        do j = -5,5
+          if (i+j.eq.0)cycle !skip gg and qq~
+          if (i*j.ne.0)cycle !skip qq~
+
+          id(1:2) = (/i,j/)
+          if(i.eq.0)then
+            id(10) = j
+          else
+            id(10) = i
+          endif
+
+          me2qgreal=0d0
+          do l=0,1
+          do p=0,1
+          !do q=0,1
+            if(i.eq.0)then
+              helicity(1)=dble(l*2-1)
+              helicity(2)=dble(p*2-1)
+              helicity(10)=dble(p*2-1)
+            else
+              helicity(1)=dble(p*2-1)
+              helicity(2)=dble(l*2-1)
+              helicity(10)=dble(p*2-1)
+            endif
+            call amp_VH_qg(Mom_real,mass(3:5,1:2),helicity,id,amp_dummy)
+            me2qgreal = me2qgreal + dble(amp_dummy*dconjg(amp_dummy))
+          enddo
+          enddo
+
+          me2qgreal = me2qgreal *pdf_real(LHA2M_PDF(i),1)*pdf_real(LHA2M_PDF(j),2) *PreFac_real *PostFac *3d0 !3 for test
+          me2qgreal = me2qgreal * aveqg * (4d0 * pi * alphas_real) * Cf
+
+          call kinematics_ppvh(id,Mom_real,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+          do NHisto = 1,NumHistograms
+            call intoHisto(NHisto,NBin(NHisto),me2qgreal*VgsWgt)
+          enddo
+
+          if(i.eq.0)then!i=g
+            id(1:2) = (/-j,j/)
+            i_dipole=1
+          else          !j=g
+            id(1:2) = (/i,-i/)
+            i_dipole=2
+          endif
+
+          if(applyPSCut_dip(i_dipole))cycle
+
+          me2_dummy=0d0
+          do p=0,1
+            call amp_VH_LO(ptilde(:,:,i_dipole),mass(3:5,1:2),(/dble(p*2-1),-dble(p*2-1),helicity(3:5),helicity(6:7),helicity(8:9)/),id,amp_dummy)
+            me2_dummy = me2_dummy + dble(amp_dummy*dconjg(amp_dummy))
+          enddo
+                          
+          me2_dummy = me2_dummy *pdf_dip(LHA2M_PDF(i),1,i_dipole)*pdf_dip(LHA2M_PDF(j),2,i_dipole) *PreFac_real *PostFac * aveqq *3d0 !/2d0 !1/2 because PostFac assumed 2 Z>ff
+          qgdip = me2_dummy * (-1d0) / (2d0*Mom_real(:,i_dipole).dot.Mom_real(:,10)) * (-1d0) & !-1 for color (arXiv:0709.2881 EQ. 5.136)
+                            * split_qgq(alphas_dip(i_dipole),Mom_real(:,i_dipole),Mom_real(:,3-i_dipole),Mom_real(:,10))
+
+          call kinematics_ppvh(id,ptilde(:,:,i_dipole),NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+          do NHisto = 1,NumHistograms
+            call intoHisto(NHisto,NBin(NHisto),-qgdip*VgsWgt)
+          enddo
+
+          me2qg = me2qg + me2qgreal - qgdip
+
+        enddo! parton 
+        enddo! parton  
+
+      elseif( IsAWDecay(DecayMode1) )then !!!!!! W   gq/qg   real - dipoles   =====================
+
+        id2=id
+        do i = -5,5 ! incoming parton 1
+        do j = -5,5 ! incoming parton 2
+        do k = -5,5 ! outgoing jet
+          if (i+j.eq.0)cycle !skip gg and qq~
+          if (i*j.ne.0)cycle !skip qq~
+
+          id2(10) = k ! jet id
+          if(i.eq.0)then  ! gluon quark
+            gin = 1
+            qin = 2
+            id2(1:2)=(/0,j/)
+            if(CouplToLHEWp((/j,-k/)))then!this secton decides if it is a W+ or W- process, and skips othersise.
+              helicity(2)=sign(1d0,-dble(id(2)))
+              helicity(10)=helicity(2)
+              helicity(6)=sign(1d0,-dble(id2(6)))
+              helicity(7)=-helicity(6)
+            elseif(CouplToLHEWm((/j,-k/)))then
+              helicity(2)=sign(1d0,-dble(id(2)))
+              helicity(10)=helicity(2)
+              id2(3)=-id2(3)
+              id2(4)=-id2(4)
+              id2(6)=-id2(6)
+              id2(7)=-id2(7)
+              helicity(6)=sign(1d0,-dble(id2(6)))
+              helicity(7)=-helicity(6)
+            else
+              cycle
+            endif!this secton decides if it is a W+ or W- process, and skips othersise.
+          else            ! quark gluon
+            gin = 2
+            qin = 1
+            id2(1:2)=(/i,0/)
+            if(CouplToLHEWp((/i,-k/)))then!this secton decides if it is a W+ or W- process, and skips othersise.
+              helicity(1)=sign(1d0,-dble(id(1)))
+              helicity(10)=helicity(i)
+              helicity(6)=sign(1d0,-dble(id2(6)))
+              helicity(7)=-helicity(6)
+            elseif(CouplToLHEWm((/i,-k/)))then
+              helicity(1)=sign(1d0,-dble(id(1)))
+              helicity(10)=helicity(i)
+              id2(3)=-id2(3)
+              id2(4)=-id2(4)
+              id2(6)=-id2(6)
+              id2(7)=-id2(7)
+              helicity(6)=sign(1d0,-dble(id2(6)))
+              helicity(7)=-helicity(6)
+            else
+              cycle
+            endif!this secton decides if it is a W+ or W- process, and skips othersise.
+          endif
+
+!this secton decides if it is a W+ or W- process, and skips othersise.
+! It seems to be more elegant to do it once here with gin and qin, but Fortran is weird...
+!            if(CouplToLHEWp((/itemp,-k/)))then
+!              helicity(itemp)=sign(1d0,-dble(itemp))
+!              helicity(10)=helicity(itemp)
+!              helicity(6)=sign(1d0,-dble(id2(6)))
+!              helicity(7)=-helicity(6)
+!            elseif(CouplToLHEWm((/itemp,-k/)))then
+!              helicity(itemp)=sign(1d0,-dble(itemp))
+!              helicity(10)=helicity(itemp)
+!              id2(3)=-id2(3)
+!              id2(4)=-id2(4)
+!              id2(6)=-id2(6)
+!              id2(7)=-id2(7)
+!              helicity(6)=sign(1d0,-dble(id2(6)))
+!              helicity(7)=-helicity(6)
+!            else
+!              cycle
+!            endif
+!this secton decides if it is a W+ or W- process, and skips othersise.
+
+          me2qgreal=0d0
+          do l=0,1
+            helicity(gin)=dble(l*2-1)
+            call amp_VH_qg(Mom_real,mass(3:5,1:2),helicity,id2,amp_dummy)
+            me2qgreal = me2qgreal + dble(amp_dummy*dconjg(amp_dummy))
+          enddo
+
+          me2qgreal = me2qgreal *pdf_real(LHA2M_PDF(i),1)*pdf_real(LHA2M_PDF(j),2) *PreFac_real *PostFac *3d0 !3 for test
+          me2qgreal = me2qgreal * aveqg * (4d0 * pi * alphas_real) * Cf
+
+          call kinematics_ppvh(id,Mom_real,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+          do NHisto = 1,NumHistograms
+            call intoHisto(NHisto,NBin(NHisto),me2qgreal*VgsWgt)
+          enddo
+
+          i_dipole=gin ! the interested index is with the gluon
+          if(i.eq.0)then!i=g
+            id2(1:2) = (/-k,j/)
+          else          !j=g
+            id2(1:2) = (/i,-k/)
+          endif
+
+          helicity(1)=sign(1d0,-dble(id2(1)))! W couples to left current only
+          helicity(2)=-helicity(1)
+
+          if(applyPSCut_dip(i_dipole))cycle
+
+          me2_dummy=0d0
+          call amp_VH_LO(ptilde(:,:,i_dipole),mass(3:5,1:2),helicity(1:9),id2,amp_dummy)
+          me2_dummy = dble(amp_dummy*dconjg(amp_dummy))
+                          
+          me2_dummy = me2_dummy *pdf_dip(LHA2M_PDF(i),1,i_dipole)*pdf_dip(LHA2M_PDF(j),2,i_dipole) *PreFac_real *PostFac * aveqq *3d0 !/2d0 !1/2 because PostFac assumed 2 Z>ff
+          qgdip = me2_dummy * (-1d0) / (2d0*Mom_real(:,i_dipole).dot.Mom_real(:,10)) * (-1d0) & !-1 for color (arXiv:0709.2881 EQ. 5.136)
+                            * split_qgq(alphas_dip(i_dipole),Mom_real(:,i_dipole),Mom_real(:,3-i_dipole),Mom_real(:,10))
+
+          call kinematics_ppvh(id,ptilde(:,:,i_dipole),NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+          do NHisto = 1,NumHistograms
+            call intoHisto(NHisto,NBin(NHisto),-qgdip*VgsWgt)
+          enddo
+
+          me2qg = me2qg + me2qgreal - qgdip
+
+        enddo! parton 
+        enddo! parton  
+        enddo! parton  
+
+      endif
+
     endif
+
+    !"gq" ( = K + P, for g q/q~ > VH + q/q~)
+    me2gq=0d0
+    if((VH_PC.eq."gq".or.VH_PC.eq."nl").and.((x.gt.yRndmin).and.(PSWgt.gt.0d0)))then
+      if( IsAZDecay(DecayMode1).or.IsAPhoton(DecayMode1) )then !Z/gamma K + P =====================
+        do i = -5,5
+        do j = -5,5
+          if (i+j.eq.0)cycle !skip gg and qq~
+          if (i*j.ne.0)cycle !skip qq~
+
+          if(i.eq.0)then
+            id(1:2) = (/-j,j/)
+            i_x=1
+          else
+            id(1:2) = (/i,-i/)
+            i_x=2
+          endif
+!if(applyPSCut_x(i_x))print*,"gq","applyPSCut_x",i_x
+!if(PSWgt_x.le.0d0)print*,"gq","PSWgt_x = ",PSWgt_x
+          if(applyPSCut_x(i_x).or.(.not.(PSWgt_x.gt.0d0)))cycle!may need a guard against Ehat < m_H+m_V
+              
+          me2_dummy_x=0d0
+          if(PSWgt_x.gt.0d0)then
+            do p=0,1
+              call amp_VH_LO(p_x(1:4,1:9,i_x),mass(3:5,1:2),(/dble(p*2-1),-dble(p*2-1),helicity(3:9)/),id,amp_dummy_x)
+              me2_dummy_x = me2_dummy_x + dble(amp_dummy_x*dconjg(amp_dummy_x))
+            enddo
+          else
+            me2_dummy_x = 0d0
+          endif
+          me2_x_gq = k_gq_vhq(alphas_x(i_x),x) + p_gq_vhq(alphas_x(i_x),Mu_Fact_x(i_x),shat,x)
+
+          me2_x_gq = me2_x_gq * me2_dummy_x * aveqq * 3d0 * PreFac_x * PostFac * pdf_x(LHA2M_PDF(i),1,i_x) * pdf_x(LHA2M_PDF(j),2,i_x)
+
+          me2gq = me2gq + me2_x_gq
+
+          call kinematics_ppvh(id,p_x(1:4,1:9,i_x),NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+          do NHisto = 1,NumHistograms
+            call intoHisto(NHisto,NBin(NHisto),me2_x_gq*VgsWgt)
+          enddo
+
+        enddo! parton
+        enddo! parton
+
+      elseif( IsAWDecay(DecayMode1) )then   !W    K + P       =====================
+
+        id2=id
+        do i = -5,5 !incoming parton 1
+        do j = -5,5 !incoming parton 2
+        do k = -5,5 !outgoing jet
+          if (i+j.eq.0)cycle !skip gg and qq~
+          if (i*j.ne.0)cycle !skip qq~
+
+          if(i.eq.0)then! gluon quark
+            id2(1:2) = (/-k,j/)
+            i_x=1
+          else! quark gluon
+            id2(1:2) = (/i,-k/)
+            i_x=2
+          endif
+
+!this secton decides if it is a W+ or W- process, and skips othersise.
+          if(CouplToLHEWp(id2(1:2)))then
+            helicity(1)=sign(1d0,-dble(id2(1)))
+            helicity(2)=-helicity(1)
+            helicity(6)=sign(1d0,-dble(id2(6)))
+            helicity(7)=-helicity(6)
+          elseif(CouplToLHEWm(id(1:2)))then
+            helicity(1)=sign(1d0,-dble(id2(1)))
+            helicity(2)=-helicity(1)
+            id2(3)=-id2(3)
+            id2(4)=-id2(4)
+            id2(6)=-id2(6)
+            id2(7)=-id2(7)
+            helicity(6)=sign(1d0,-dble(id2(6)))
+            helicity(7)=-helicity(6)
+          else
+            cycle
+          endif
+!this secton decides if it is a W+ or W- process, and skips othersise.
+          
+          if(applyPSCut_x(i_x) .or. (.not.(PSWgt_x.gt.0d0)))cycle!may need a guard against Ehat < m_H+m_V
+              
+          me2_dummy_x=0d0
+          if(PSWgt_x.gt.0d0)then
+            call amp_VH_LO(p_x(1:4,1:9,i_x),mass(3:5,1:2),helicity(1:9),id2,amp_dummy_x)
+            me2_dummy_x = me2_dummy_x + dble(amp_dummy_x*dconjg(amp_dummy_x))
+          else
+            me2_dummy_x = 0d0
+          endif
+          me2_x_gq = k_gq_vhq(alphas_x(i_x),x) + p_gq_vhq(alphas_x(i_x),Mu_Fact_x(i_x),shat,x)
+
+          me2_x_gq = me2_x_gq * me2_dummy_x * aveqq * 3d0 * PreFac_x * PostFac * pdf_x(LHA2M_PDF(i),1,i_x) * pdf_x(LHA2M_PDF(j),2,i_x)
+
+          me2gq = me2gq + me2_x_gq
+
+          call kinematics_ppvh(id,p_x(1:4,1:9,i_x),NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+          do NHisto = 1,NumHistograms
+            call intoHisto(NHisto,NBin(NHisto),me2_x_gq*VgsWgt)
+          enddo
+
+        enddo! parton
+        enddo! parton
+        enddo! parton
+
+
+      endif
+
+    endif
+      
 
   endif
   !if(EvalWeighted_VH.lt.1d-12)return
@@ -853,15 +1339,17 @@ stop 1
 !  if(Collider.eq.1.or.Collider.eq.2)then
 !    call boost2Lab(eta1,eta2,10,Mom)
 !  endif
-  EvalWeighted_VH = me2lo + me2sub + me2sup + me2gg + me2gq
-  
-  do NHisto = 1,NumHistograms
-    call intoHisto(NHisto,NBin(NHisto),(me2lo+me2gg+me2sub+me2sup+me2gq)*VgsWgt)
-    !me2sub was filled on the run.
-  enddo
+  EvalWeighted_VH = me2gg + me2lo + me2sub + me2sup + me2qg + me2gq
+!print*, me2gg, me2lo, me2sub, me2sup, me2qg, me2gq, EvalWeighted_VH
+!print*,"------"
+!pause  
+!  do NHisto = 1,NumHistograms
+!    call intoHisto(NHisto,NBin(NHisto),(me2lo+me2gg+me2sub+me2sup+me2qg+me2gq)*VgsWgt)
+!    !me2sub was filled on the run.
+!  enddo
 
   !write events
-  if(writeWeightedLHE .and. EvalWeighted_VH.gt.1d-12)then
+  if(writeWeightedLHE .and. dabs(EvalWeighted_VH).gt.1d-12)then
     !consult Markus and Ulascan how id(1:2) and jet information are written!!!!!!!!!!!!!!!!!!!!!!!
     call WriteOutEvent_VH(id,helicity,Mom(:,1:9),EventWeight=EvalWeighted_VH*VgsWgt)
     !events with a jet raidated by partons may carry negative or large weight...
@@ -881,9 +1369,9 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
   use ModVHLO
   use ModVHreal
   use ModVHdipole
+  use ModVHvirtual
 #if useCollier==1
   use ModVHgg
-  use ModVHvirtual
 #endif
   use ModVHqg
   use ModPhasespace
@@ -901,7 +1389,7 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
 ! yRnd(12): inv_mass(4)
 ! yRnd(13): inv_mass(5)
 ! yRnd(14:16): real emission phase space
-! yRnd(17): NLO integration for + distribution for PDF renormalization
+! x: NLO integration for + distribution for PDF renormalization
 ! yrnd(18:19): PDF mapping
 ! yrnd(20): flavor of j in gq > WH+j
 ! yrnd(21): partonic channel in unweighted events
@@ -911,7 +1399,7 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
   real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
   real(8) :: Mom(1:4,1:10), Mom_save(1:4,1:10), PSWgt, PSWgt2
   complex(8) :: amp_dummy
-  real(8) :: me2real,me2lo,dip(1:2),me2gg,me2gq,me2sub,me2sup,me2_dummy!, lheweight(-6:6,-6:6)
+  real(8) :: me2qqreal,me2lo,dip(1:2),me2gg,me2qg,me2sub,me2sup,me2_dummy!, lheweight(-6:6,-6:6)
   real(8) :: bound(0:121)
   integer :: i_dipole
   real(8) :: ptilde(1:4,1:9,1:2)
@@ -1223,8 +1711,8 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
   if(Collider.eq.0.and.VH_PC.eq."ee")then
     call EvalPhasespace_VH(yRnd(6:13),ILC_Energy,Mom(:,1:9),id(6:9),PSWgt,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
     Mom_save=Mom
-    call kinematics_VH(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
-    if( applyPSCut .or. PSWgt.eq.zero ) return    
+    call kinematics_eeVH(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+    if( applyPSCut .or. PSWgt.le.zero ) return    
 
     FluxFac = 1d0/(2d0*ILC_Energy**2)
     PreFac = fbGeV2 * FluxFac * PSWgt
@@ -1254,10 +1742,10 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
     !endif
 
     !Kinematics and cuts
-    call kinematics_VH(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+    call kinematics_ppvh(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
     !p~ will have their own runs of the fuction
 
-    if( applyPSCut .or. PSWgt.eq.zero ) return
+    if( applyPSCut .or. PSWgt.le.zero ) return
 
     !Set running scales
     if( IsAZDecay(DecayMode1) .or. IsAWDecay(DecayMode1) )then
@@ -1372,7 +1860,7 @@ stop 1
       AlertCounter = AlertCounter + 1
       Res = 0d0
     elseif( EvalUnWeighted_VH .gt. yRnd(22)*CS_max ) then
-      call kinematics_VH(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+      call kinematics_ppvh(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
       do NHisto=1,NumHistograms
         call intoHisto(NHisto,NBin(NHisto),1d0)  ! CS_Max is the integration volume
       enddo

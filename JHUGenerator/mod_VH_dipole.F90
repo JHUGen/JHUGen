@@ -3,8 +3,11 @@ module ModVHdipole
   implicit none
 
   public :: p_tilde
+  public :: split_qqg
+  public :: split_qgq
 
 contains
+
 
 subroutine p_tilde(pin,ptilde)
   use ModMisc
@@ -16,13 +19,14 @@ subroutine p_tilde(pin,ptilde)
   real(8) :: x
   real(8) :: K(1:4), Ktilde(1:4), KpKtilde(1:4)
 
+  x = ( (pin(:,1).dot.pin(:,2)) - (pin(:,10).dot.pin(:,1)) - (pin(:,10).dot.pin(:,2)) ) / (pin(:,1).dot.pin(:,2))
+
   K = pin(:,1) + pin(:,2) - pin(:,10)
 
   do i=1,2
 
     ptilde(:,i,3-i)=pin(:,i)
 
-    x = ( (pin(:,1).dot.pin(:,2)) - (pin(:,10).dot.pin(:,1)) - (pin(:,10).dot.pin(:,2)) ) / (pin(:,1).dot.pin(:,2))
     ptilde(:,i,i) = pin(:,i) * x
 
     Ktilde = ptilde(:,i,i) + pin(:,3-i) !if i=1, pin(:,2); if i=2, pin(:,1)
@@ -38,29 +42,53 @@ subroutine p_tilde(pin,ptilde)
   return
 end subroutine p_tilde
 
-
-real(8) function split_qiqi(alphas_dip,pq1,pq2,pg)
+real(8) function split_qqg(alphas_dip,pa,pb,pr)
   use ModMisc
   use ModParameters
   use ModVHaux
   implicit none
     real(8), intent(in) :: alphas_dip
-    real(8), intent(in) :: pq1(1:4)
-    real(8), intent(in) :: pq2(1:4)
-    real(8), intent(in) :: pg(1:4)
-    real(8) :: x
+    real(8), intent(in) :: pa(1:4)!emitter
+    real(8), intent(in) :: pb(1:4)!the other incoming
+    real(8), intent(in) :: pr(1:4)!radiated
+    real(8) :: x,v
 
-    x = ( (pq1.dot.pq2) - (pg.dot.pq1) - (pg.dot.pq2) ) / (pq1.dot.pq2)
+    v = (pr.dot.pa) / (pa.dot.pb)
 
-    if(x.gt.alpha_dip)then
-      split_qiqi = 0d0
+    x = ( (pa.dot.pb) - (pr.dot.pa) - (pr.dot.pb) ) / (pa.dot.pb)
+
+    if(v.gt.alpha_dip)then
+      split_qqg = 0d0
     else
-      split_qiqi = 8d0*pi*cF*alphas_dip*( 2d0/(1d0-x) - (1d0+x) ) / x !1/x from first line of arXiv:0709.2881 EQ. 5.136
+      split_qqg = 8d0*pi*cF*alphas_dip*( 2d0/(1d0-x) - (1d0+x) ) / x !1/x from first line of arXiv:0709.2881 EQ. 5.136
     endif
 
   return
-end function split_qiqi
+end function split_qqg
 
+
+real(8) function split_qgq(alphas_dip,pa,pb,pr)
+  use ModMisc
+  use ModParameters
+  use ModVHaux
+  implicit none
+    real(8), intent(in) :: alphas_dip
+    real(8), intent(in) :: pa(1:4)!emitter
+    real(8), intent(in) :: pb(1:4)!the other incoming
+    real(8), intent(in) :: pr(1:4)!radiated
+    real(8) :: x,v
+
+    v = (pr.dot.pa) / (pa.dot.pb)
+    x = ( (pa.dot.pb) - (pr.dot.pa) - (pr.dot.pb) ) / (pa.dot.pb)
+
+    if(v.gt.alpha_dip)then
+      split_qgq = 0d0
+    else
+      split_qgq = 8d0*pi*Tr*alphas_dip*( 1d0 - 2d0*x*(1d0-x) ) / x !1/x from first line of arXiv:0709.2881 EQ. 5.136
+    endif
+
+  return
+end function split_qgq
 
 
 end module ModVHdipole

@@ -396,6 +396,7 @@ AmpDep = mod_TopDecay.F90 \
          mod_VH_qg.F90 \
          mod_VH_dipole.F90 \
          mod_VH_virtual.F90 \
+         mod_VH_IKP.F90 \
 		 mod_VH_gg.F90 \
 		 mod_HH.F90 \
 		 mod_TTBHiggs.F90 \
@@ -412,6 +413,8 @@ AmpDep = mod_TopDecay.F90 \
          mod_VH_real.F90 \
          mod_VH_qg.F90 \
          mod_VH_dipole.F90 \
+         mod_VH_virtual.F90 \
+         mod_VH_IKP.F90 \
          mod_TTBHiggs.F90 \
          mod_THiggs.F90
 endif
@@ -447,9 +450,10 @@ AmpObj =  $(ObjectDir)/mod_TopDecay.o \
           $(ObjectDir)/mod_VH_LO.o \
           $(ObjectDir)/mod_VH_real.o \
           $(ObjectDir)/mod_VH_qg.o \
+          $(ObjectDir)/mod_VH_IKP.o \
           $(ObjectDir)/mod_VH_dipole.o \
+          $(ObjectDir)/mod_VH_virtual.o \
           $(ObjectDir)/mod_VH_gg.o \
-		  $(ObjectDir)/mod_VH_virtual.o \
 		  $(ObjectDir)/mod_HH.o \
           $(ObjectDir)/mod_TTBHiggs.o \
           $(ObjectDir)/mod_THiggs.o
@@ -464,7 +468,9 @@ AmpObj =  $(ObjectDir)/mod_TopDecay.o \
           $(ObjectDir)/mod_VH_LO.o \
           $(ObjectDir)/mod_VH_real.o \
           $(ObjectDir)/mod_VH_qg.o \
+          $(ObjectDir)/mod_VH_IKP.o \
           $(ObjectDir)/mod_VH_dipole.o \
+          $(ObjectDir)/mod_VH_virtual.o \
           $(ObjectDir)/mod_TTBHiggs.o \
           $(ObjectDir)/mod_THiggs.o
 endif

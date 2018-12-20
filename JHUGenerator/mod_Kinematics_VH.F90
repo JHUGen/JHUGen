@@ -469,7 +469,7 @@ SUBROUTINE EvalPhasespace_VH(xRnd,Energy,Mom,id,Jac,HDecays,PhoOnshell)
   if(present(PhoOnshell)) then
     hasAonshell=PhoOnshell
   endif
-!Energy=9.85d0
+
   Mom(:,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/) ! beam 1
   Mom(:,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/) ! beam 2
   Mom(:,3) = Energy * (/1d0,0d0,0d0,0d0/) ! V*
@@ -477,9 +477,6 @@ SUBROUTINE EvalPhasespace_VH(xRnd,Energy,Mom,id,Jac,HDecays,PhoOnshell)
 ! masses
 ! 555555555 Higgs
   if(HDecays)then
-    !Jac3 = s_channel_propagator(M_Reso**2,Ga_Reso,(getMass(convertLHEreverse(id(8)))+getMass(convertLHEreverse(id(9))))**2,(Energy-M_V+5d0*Ga_V)**2,xRnd(13),s89) ! H --> 89
-    !Jac3 = s_channel_propagator(M_Reso**2,Ga_Reso,0d0,Energy**2,xRnd(13),s89) ! H --> 89
-    !Jac3 = s_channel_propagator(M_Reso**2,Ga_Reso,(M_Reso-5d0*Ga_Reso)**2,(Energy-M_V+5d0*Ga_V)**2,xRnd(13),s89) ! H --> 89
     Jac3 = s_channel_propagator(M_Reso**2,Ga_Reso,(getMass(convertLHEreverse(id(8)))+getMass(convertLHEreverse(id(9))))**2,Energy**2,xRnd(13),s89) ! H --> 89
   else
     s89 = M_Reso**2 ! if H onshell
@@ -492,7 +489,6 @@ SUBROUTINE EvalPhasespace_VH(xRnd,Energy,Mom,id,Jac,HDecays,PhoOnshell)
     Jac2 = 1d0
   else ! if V decays
     Jac2 = s_channel_propagator(M_V**2,Ga_V,(getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7))))**2,(Energy-dsqrt(s89))**2,xRnd(12),s67) ! V --> 67
-    !Jac2 = s_channel_propagator(M_V**2,Ga_V,0d0,(Energy-dsqrt(s89))**2,xRnd(12),s67) ! V --> 67
   endif
 
 ! splittings
@@ -521,201 +517,30 @@ SUBROUTINE EvalPhasespace_VH(xRnd,Energy,Mom,id,Jac,HDecays,PhoOnshell)
     Jac = Jac * PSNorm2
   elseif(HbbDecays.and.(.not.hasAonshell))then ! if 4 particle final state
     Jac = Jac * PSNorm4
-!print*,Jac1,Jac2,Jac3,Jac4,Jac5,PSNorm4
   else                                       ! if 3 particle final state
     Jac = Jac * PSNorm3
-!print*,Jac1,Jac2,Jac3,Jac4,Jac5,PSNorm3
   endif
-!print*,PSNorm3,"3"
-!print*,PSNorm4*s_channel_decay(Mom(:,5),0d0,0d0,xRnd(10:11),Mom(:,8),Mom(:,9)) !  H --> 89
 
-!print*,Jac
-!print*,dsqrt(s67),dsqrt(s89)
-! in case of error, hopefully not needed.
-  if( isNan(jac) ) then
-     print *, "EvalPhasespace_VH NaN"
-     print *, Energy
-     print *, s67,s89
-     print *, Jac1,Jac2,Jac3,Jac4,Jac5
-     print *, xRnd
+
+  if( isNan(jac).or.(Jac.le.0d0).or.(Jac5.le.0d0) .or.isNan(mom(1,8)) ) then
      Jac = 0d0
-     print*,Mom(:,1)
-     print*,Mom(:,2)
-     print*,Mom(:,3)
-     print*,Mom(:,4)
-     print*,Mom(:,5)
-     print*,Mom(:,6)
-     print*,Mom(:,7)
-     print*,Mom(:,8)
-     print*,Mom(:,9)
-     pause
+     Mom=0d0
   endif
-!print *,"===================="
-!print*,Mom(:,1)
-!print*,Mom(:,2)
-!print*,Mom(:,3)
-!print*,Mom(:,4)
-!print*,Mom(:,5)
-!print*,Mom(:,6)
-!print*,Mom(:,7)
-!print*,Mom(:,8)
-!print*,Mom(:,9)
-!print *,"===================="
+
+  if(HDecays.and.((Jac5.le.0d0).or.isnan(Jac5).or.isNan(mom(1,8)).or.(mom(1,8).le.0d0)).or.isNan(mom(1,5)).or.(mom(1,5).le.0d0) )then
+    Jac = 0d0
+    Mom=0d0
+  endif
+
+
 RETURN
 END SUBROUTINE
 
 
 
-!!! !!! !!! 
-!!! !!! !!! SUBROUTINE EvalPhasespace_VHglu(xRnd,Energy,Mom,id,Jac,HDecays,PhoOnshell)
-!!! !!! !!!   use ModParameters
-!!! !!! !!!   use ModPhasespace
-!!! !!! !!!   use ModMisc
-!!! !!! !!!   implicit none
-!!! !!! !!!   real(8) :: Mom(1:4,1:10)
-!!! !!! !!!   real(8), intent(in) :: xRnd(6:16),Energy
-!!! !!! !!!   integer, intent(in) :: id(6:9)
-!!! !!! !!!   real(8), intent(out) :: Jac
-!!! !!! !!!   real(8) :: Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7
-!!! !!! !!!   real(8) :: s6789,s67,s89
-!!! !!! !!!   logical, intent(in), optional :: PhoOnshell
-!!! !!! !!!   logical, intent(in) :: HDecays
-!!! !!! !!!   logical :: hasAonshell
-!!! !!! !!!   real(8) :: Momab(1:4)  
-!!! !!! !!! 
-!!! !!! !!!   hasAonshell = .false.
-!!! !!! !!!   if(present(PhoOnshell)) then
-!!! !!! !!!     hasAonshell=PhoOnshell
-!!! !!! !!!   endif
-!!! !!! !!! 
-!!! !!! !!!   Mom(:,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/) ! beam 1
-!!! !!! !!!   Mom(:,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/) ! beam 2
-!!! !!! !!!   Momab = Energy * (/1d0,0d0,0d0,0d0/) ! 678910
-!!! !!! !!! 
-!!! !!! !!! ! masses
-!!! !!! !!! ! p3 = p1 + p2 - p10 = p6 + p7 + p8 + p9
-!!! !!! !!!   if((.not.HbbDecays).and.hasAonshell)then   ! if H, V
-!!! !!! !!!     Jac1 = s_channel_propagator(M_V**2,Ga_V,M_Reso**2,Energy**2,xRnd(14),s6789) ! 1+2 ---> 10+V*(6789)
-!!! !!! !!!   elseif(HbbDecays.and.(.not.hasAonshell))then ! if H > bb, V > ff
-!!! !!! !!!     Jac1 = s_channel_propagator(M_V**2,Ga_V,(getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7)))+getMass(convertLHEreverse(id(8)))+getMass(convertLHEreverse(id(9))))**2,Energy**2,xRnd(14),s6789) ! 1+2 ---> 10+V*(6789)
-!!! !!! !!!     !Jac1 = s_channel_propagator(M_V**2,Ga_V,(M_V+M_Reso+getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7)))+getMass(convertLHEreverse(id(8)))+getMass(convertLHEreverse(id(9))))**2,Energy**2,xRnd(14),s6789) ! 1+2 ---> 10+V*(6789)
-!!! !!! !!!   elseif((.not.HbbDecays).and.(.not.hasAonshell))then  ! if H, V > ff
-!!! !!! !!!     Jac1 = s_channel_propagator(M_V**2,Ga_V,(M_V+getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7))))**2,Energy**2,xRnd(14),s6789) ! 1+2 ---> 10+V*(6789)
-!!! !!! !!!     !Jac1 = s_channel_propagator(M_V**2,Ga_V,(M_V+M_Reso+getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7))))**2,Energy**2,xRnd(14),s6789) ! 1+2 ---> 10+V*(6789)
-!!! !!! !!!   else                                                 ! if H > bb, V
-!!! !!! !!!     Jac1 = s_channel_propagator(M_V**2,Ga_V,(M_Reso+getMass(convertLHEreverse(id(8)))+getMass(convertLHEreverse(id(9))))**2,Energy**2,xRnd(14),s6789) ! 1+2 ---> 10+V*(6789)
-!!! !!! !!!     !Jac1 = s_channel_propagator(M_V**2,Ga_V,(M_Z+M_Reso+getMass(convertLHEreverse(id(8)))+getMass(convertLHEreverse(id(9))))**2,Energy**2,xRnd(14),s6789) ! 1+2 ---> 10+V*(6789)
-!!! !!! !!!   endif
-!!! !!! !!! 
-!!! !!! !!!   Jac4 = s_channel_decay(Momab,s6789,0d0,xRnd(15:16),Mom(:,3),Mom(:,10)) ! 1+2 ---> 10+V*(6789)
-!!! !!! !!! 
-!!! !!! !!! !  if((.not.HbbDecays).and.hasAonshell)then   ! if H, V
-!!! !!! !!! !    Jac1 = s_channel_prop_decay(Momab,(/0d0,0d0,0d0,0d0/),(/M_V,Ga_V,M_Reso,Energy/),xRnd(14:16),Mom(:,10),Mom(:,3))
-!!! !!! !!! !  elseif(HbbDecays.and.(.not.hasAonshell))then ! if H > bb, V > ff
-!!! !!! !!! !    Jac1 = s_channel_prop_decay(Momab,(/0d0,0d0,0d0,0d0/),(/M_V,Ga_V,(getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7)))+getMass(convertLHEreverse(id(8)))+getMass(convertLHEreverse(id(9)))),Energy/),xRnd(14:16),Mom(:,10),Mom(:,3))
-!!! !!! !!! !  elseif((.not.HbbDecays).and.(.not.hasAonshell))then  ! if H, V > ff
-!!! !!! !!! !    Jac1 = s_channel_prop_decay(Momab,(/0d0,0d0,0d0,0d0/),(/M_V,Ga_V,(M_V+getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7)))),Energy/),xRnd(14:16),Mom(:,10),Mom(:,3))
-!!! !!! !!! !  else                                                 ! if H > bb, V
-!!! !!! !!! !    Jac1 = s_channel_prop_decay(Momab,(/0d0,0d0,0d0,0d0/),(/M_V,Ga_V,(M_Reso+getMass(convertLHEreverse(id(8)))+getMass(convertLHEreverse(id(9)))),Energy/),xRnd(14:16),Mom(:,10),Mom(:,3))
-!!! !!! !!! !  endif
-!!! !!! !!! 
-!!! !!! !!! !  s6789 = Mom(:,3).dot.Mom(:,3)
-!!! !!! !!! 
-!!! !!! !!! ! 555555555 Higgs
-!!! !!! !!!   if(HDecays)then
-!!! !!! !!!     Jac3 = s_channel_propagator(M_Reso**2,Ga_Reso,(getMass(convertLHEreverse(id(8)))+getMass(convertLHEreverse(id(9))))**2,s6789,xRnd(13),s89) ! H --> 89
-!!! !!! !!!     !Jac3 = s_channel_propagator(M_Reso**2,Ga_Reso,M_Reso**2,s6789,xRnd(13),s89) ! H --> 89
-!!! !!! !!!   else
-!!! !!! !!!     s89 = M_Reso**2 ! if H onshell
-!!! !!! !!!     Jac3 = 1d0
-!!! !!! !!!   endif
-!!! !!! !!! ! 444444444 V on-shell
-!!! !!! !!!   if(hasAonshell) then
-!!! !!! !!!     s67 = 0d0 ! if photon in the final state
-!!! !!! !!!     Jac2 = 1d0
-!!! !!! !!!   else ! if V decays
-!!! !!! !!!     Jac2 = s_channel_propagator(M_V**2,Ga_V,(getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7))))**2,(dsqrt(s6789)-dsqrt(s89))**2,xRnd(12),s67) ! V --> 67
-!!! !!! !!!   endif
-!!! !!! !!! 
-!!! !!! !!! ! splittings
-!!! !!! !!! !  Jac4 = s_channel_decay(Momab,s6789,0d0,xRnd(15:16),Mom(:,3),Mom(:,10)) ! 1+2 ---> 10+V*(6789)
-!!! !!! !!! !print*,"m6789 = ",dsqrt(s6789)!!!!!!!!!!!!!!!!!!!
-!!! !!! !!! !print*,"m67 = ",dsqrt(s67)!!!!!!!!!!!!!!!!!!!
-!!! !!! !!!   Jac5 = s_channel_decay(Mom(:,3),s67,s89,xRnd(6:7),Mom(:,4),Mom(:,5)) ! V* --> VH
-!!! !!! !!! !print*,Get_MInv(Mom(:,3)),dsqrt(s67+s89)
-!!! !!! !!! !print*,"m89 = ",dsqrt(s89)!!!!!!!!!!!!!!!!!!!
-!!! !!! !!! 
-!!! !!! !!! ! 444444444 V on-shell
-!!! !!! !!!   if(hasAonshell) then
-!!! !!! !!!     Jac6 = 1d0
-!!! !!! !!!     Mom(:,7) = 0d0
-!!! !!! !!!     Mom(:,6) = Mom(:,4)!for JHUGen, if associated photo does not decay, its "decay product 6" carrys the same info as the photon.
-!!! !!! !!!   else ! if V decays
-!!! !!! !!!     Jac6 = s_channel_decay(Mom(:,4),  0d0,0d0,xRnd(8:9),  Mom(:,6),Mom(:,7)) !  V --> 67
-!!! !!! !!!   endif
-!!! !!! !!! ! 555555555 Higgs
-!!! !!! !!!   if(HDecays)then
-!!! !!! !!!     Jac7 = s_channel_decay(Mom(:,5),  0d0,0d0,xRnd(10:11),Mom(:,8),Mom(:,9)) !  H --> 89
-!!! !!! !!!   else
-!!! !!! !!!     Jac7 = 1d0
-!!! !!! !!!     Mom(:,8:9)=0d0
-!!! !!! !!!   endif
-!!! !!! !!! 
-!!! !!! !!!   Jac = Jac1*Jac2*Jac3*Jac4*Jac5*Jac6*Jac7
-!!! !!! !!!   !Jac = Jac1*Jac2*Jac3*Jac5*Jac6*Jac7
-!!! !!! !!! 
-!!! !!! !!!   if((.not.HbbDecays).and.hasAonshell)then   ! if 3 particle final state
-!!! !!! !!!     Jac = Jac * PSNorm3
-!!! !!! !!!   elseif(HbbDecays.and.(.not.hasAonshell))then ! if 5 particle final state
-!!! !!! !!!     Jac = Jac * PSNorm5
-!!! !!! !!!   else                                       ! if 4 particle final state
-!!! !!! !!!     Jac = Jac * PSNorm4
-!!! !!! !!!   endif
-!!! !!! !!! 
-!!! !!! !!!   ! in case of error, hopefully not needed.
-!!! !!! !!!   if( isNan(jac) ) then
-!!! !!! !!!      print *, "EvalPhasespace_VHglu NaN"
-!!! !!! !!!      print *, Energy
-!!! !!! !!!      print *, s67,s89,s6789
-!!! !!! !!!      print *, Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7
-!!! !!! !!!      print *, "xRnd(6:16) = ",xRnd(6:16)
-!!! !!! !!! print *,"===================="
-!!! !!! !!! print*,Mom(:,1)
-!!! !!! !!! print*,Mom(:,2)
-!!! !!! !!! print*,Mom(:,3)
-!!! !!! !!! print*,Mom(:,4)
-!!! !!! !!! print*,Mom(:,5)
-!!! !!! !!! print*,Mom(:,6)
-!!! !!! !!! print*,Mom(:,7)
-!!! !!! !!! print*,Mom(:,8)
-!!! !!! !!! print*,Mom(:,9)
-!!! !!! !!! print*,Mom(:,10)
-!!! !!! !!! print *,"===================="
-!!! !!! !!!      Jac = 0d0
-!!! !!! !!!   endif
-!!! !!! !!! !print*,Mom(:,1)
-!!! !!! !!! !print*,Mom(:,2)
-!!! !!! !!! !print*,Mom(:,3)
-!!! !!! !!! !print*,Mom(:,4)
-!!! !!! !!! !print*,Mom(:,5)
-!!! !!! !!! !print*,Mom(:,6)
-!!! !!! !!! !print*,Mom(:,7)
-!!! !!! !!! !print*,Mom(:,8)
-!!! !!! !!! !print*,Mom(:,9)
-!!! !!! !!! !print*,Mom(:,10)
-!!! !!! !!! !
-!!! !!! !!! !print *,"===================="
-!!! !!! !!! 
-!!! !!! !!!   RETURN
-!!! !!! !!! END SUBROUTINE
 
 
-
-
-
-
-
-SUBROUTINE EvalPhasespace_VHglu(xRnd,Energy,Mom,id,Jac,HDecays,PhoOnshell)! ordering 1,2:in  3,4:Higgs  56:Z  7:glu
+SUBROUTINE EvalPhasespace_VHglu(xRnd,Energy,Mom,id,Jac,HDecays,PhoOnshell)! ordering 1,2:in  3:Z*  4:Z   5:Higgs  67:l-l+   89:bb~  10:glu
   use ModParameters
   use ModPhasespace
   use ModMisc
@@ -741,44 +566,39 @@ SUBROUTINE EvalPhasespace_VHglu(xRnd,Energy,Mom,id,Jac,HDecays,PhoOnshell)! orde
   Momab = Energy * (/1d0,0d0,0d0,0d0/) ! 678910
 
 ! masses
-  !Jac1 = s_channel_propagator(M_V**2,0d0,M_Reso**2,Energy**2,xRnd(14),s6789) ! Z+H
   if((.not.HbbDecays).and.hasAonshell)then   ! if H, V
-    Jac1 = s_channel_propagator(0d0,0d0,(M_Reso+M_V-5d0*Ga_V-5d0*Ga_Reso)**2,Energy**2,xRnd(14),s6789)
+    Jac1 = s_channel_propagator(m_V**2,0d0,(M_Reso+M_V)**2,Energy**2,xRnd(14),s6789)
   elseif(HbbDecays.and.(.not.hasAonshell))then ! if H > bb, V > ff
-    !Jac1 = s_channel_propagator(0d0,0d0,(getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7)))+getMass(convertLHEreverse(id(8)))+getMass(convertLHEreverse(id(9))))**2,Energy**2,xRnd(14),s6789)
-    Jac1 = s_channel_propagator(0d0,0d0,(M_Reso+M_V-5d0*Ga_V-5d0*Ga_Reso)**2,Energy**2,xRnd(14),s6789)
-!print*,"s6789 = ", dsqrt(s6789)*100d0,energy*100d0
+    Jac1 = s_channel_propagator(m_V**2,0d0,(M_Reso+M_V-5d0*Ga_V-5d0*Ga_Reso)**2,Energy**2,xRnd(14),s6789)
   elseif((.not.HbbDecays).and.(.not.hasAonshell))then  ! if H, V > ff
-    Jac1 = s_channel_propagator(0d0,0d0,(M_Reso+M_V-5d0*Ga_V-5d0*Ga_Reso)**2,Energy**2,xRnd(14),s6789)
+    Jac1 = s_channel_propagator(m_V*2,0d0,(M_Reso+M_V-5d0*Ga_V+getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7))))**2,Energy**2,xRnd(14),s6789)
   else                                                 ! if H > bb, V
-    Jac1 = s_channel_propagator(0d0,0d0,(M_Reso+M_V-5d0*Ga_V-5d0*Ga_Reso)**2,Energy**2,xRnd(14),s6789)
+    Jac1 = s_channel_propagator(m_V**2,0d0,(M_Reso+M_V-5d0*Ga_V-5d0*Ga_Reso+getMass(convertLHEreverse(id(8)))+getMass(convertLHEreverse(id(9))))**2,Energy**2,xRnd(14),s6789)
   endif
 
   if((.not.HbbDecays).and.hasAonshell)then   ! if H, V
-    Jac2 = s_channel_propagator(M_V**2,Ga_V,0d0,(dsqrt(s6789)-m_Reso)**2,xRnd(12),s67)
-  elseif(HbbDecays.and.(.not.hasAonshell))then ! if H > bb, V > ff
-    !Jac2 = s_channel_propagator(M_V**2,Ga_V,(getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7))))**2,(dsqrt(s6789)-getMass(convertLHEreverse(id(8)))-getMass(convertLHEreverse(id(9))))**2,xRnd(12),s67)
-    !Jac2 = s_channel_propagator(M_V**2,Ga_V,(M_V-5d0*Ga_V)**2,(dsqrt(s6789)-getMass(convertLHEreverse(id(8)))-getMass(convertLHEreverse(id(9))))**2,xRnd(12),s67)
-    Jac2 = s_channel_propagator(M_V**2,Ga_V,(M_V-5d0*Ga_V)**2,(dsqrt(s6789)-M_Reso+5d0*Ga_Reso)**2,xRnd(12),s67)
-  elseif((.not.HbbDecays).and.(.not.hasAonshell))then  ! if H, V > ff
-    !Jac2 = s_channel_propagator(M_V**2,Ga_V,(getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7))))**2,(dsqrt(s6789)-m_Reso)**2,xRnd(12),s67)
-    Jac2 = s_channel_propagator(M_V**2,Ga_V,(M_V-5d0*Ga_V)**2,(dsqrt(s6789)-m_Reso)**2,xRnd(12),s67)
-  else                                                 ! if H > bb, V
-    Jac2 = s_channel_propagator(M_V**2,Ga_V,0d0,(dsqrt(s6789)-getMass(convertLHEreverse(id(8)))-getMass(convertLHEreverse(id(9))))**2,xRnd(12),s67)
-  endif
-
-  if(HDecays)then
-    !Jac3 = s_channel_propagator(M_Reso**2,Ga_Reso,(getMass(convertLHEreverse(id(8)))+getMass(convertLHEreverse(id(9))))**2,(dsqrt(s6789)-dsqrt(s67)),xRnd(13),s89)
-    Jac3 = s_channel_propagator(M_Reso**2,Ga_Reso,(M_Reso-5d0*Ga_Reso)**2,(dsqrt(s6789)-dsqrt(s67))**2,xRnd(13),s89)
-  else
-    s89 = M_Reso**2 ! if H onshell
+    s67 = m_V**2
+    s89 = M_Reso**2
+    Jac2 = 1d0
     Jac3 = 1d0
+  elseif(HbbDecays.and.(.not.hasAonshell))then ! if H > bb, V > ff
+    Jac3 = s_channel_propagator(M_Reso**2,Ga_Reso,(getMass(convertLHEreverse(id(8)))+getMass(convertLHEreverse(id(9))))**2,s6789,xRnd(13),s89)
+    Jac2 = s_channel_propagator(M_V**2,Ga_V,(M_V-5d0*Ga_V)**2,(dsqrt(s6789)-dsqrt(s89))**2,xRnd(12),s67)
+  elseif((.not.HbbDecays).and.(.not.hasAonshell))then  ! if H, V > ff
+    Jac2 = s_channel_propagator(M_V**2,Ga_V,(getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7))))**2,(dsqrt(s6789)-m_Reso)**2,xRnd(12),s67)
+    s89 = M_Reso**2
+    Jac3 = 1d0
+  else                                                 ! if H > bb, V
+    s67 = m_V**2
+    Jac2 = 1d0
+    Jac3 = s_channel_propagator(M_Reso**2,Ga_Reso,(M_Reso-5d0*Ga_Reso)**2,(dsqrt(s6789)-dsqrt(s67))**2,xRnd(13),s89)
   endif
+
 
 !  splittings
   Jac4 = s_channel_decay(Momab,s6789,0d0,xRnd(15:16),Mom(:,3),Mom(:,10)) ! Z* + glu
   Jac5 = s_channel_decay(Mom(:,3),s67,s89,xRnd(6:7),Mom(:,4),Mom(:,5)) ! Z + H
-  
+
   if(hasAonshell) then
     Jac6 = 1d0
     Mom(:,6) = Mom(:,4)!for JHUGen, if associated photo does not decay, its "decay product 6" carrys the same info as the photon.
@@ -803,32 +623,109 @@ SUBROUTINE EvalPhasespace_VHglu(xRnd,Energy,Mom,id,Jac,HDecays,PhoOnshell)! orde
     Jac = Jac * PSNorm4
   endif
 
-!print*,dsqrt(s6789),dsqrt(s67),dsqrt(s89)
-  if( isNan(jac).or.jac.lt.0d0 ) then
-     print *, "EvalPhasespace_VHglu NaN"
-     print *, Energy
-     print *, s6789,s67,s89
-     print *, Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7
-     print*,Mom(:,1)
-print*,Mom(:,2)
-print*,Mom(:,3)
-print*,Mom(:,4)
-print*,Mom(:,5)
-print*,Mom(:,6)
-print*,Mom(:,7)
-print*,Mom(:,8)
-print*,Mom(:,9)
-print*,Mom(:,10)
-print*,dsqrt(s67),dsqrt(s89)
-print *,"===================="
-     !print *, xRnd
-     Jac = 0d0
-     Mom=0d0
+
+  if( isNan(jac).or.(jac.le.0d0)) then
+    Jac = 0d0
+    Mom=0d0
+  endif
+
+  if(HDecays.and.((jac7.le.0d0).or.isnan(jac7).or.isNan(mom(1,8)).or.(mom(1,8).le.0d0)).or.isNan(mom(1,5)).or.(mom(1,5).le.0d0) )then
+    Jac = 0d0
+    Mom=0d0
   endif
 
 
 RETURN
 END SUBROUTINE
+
+
+
+
+
+
+
+!SUBROUTINE EvalPhasespace_VHglu(xRnd,Energy,Mom,id,Jac,HDecays,PhoOnshell)! ordering 1,2:in  3,4:Higgs  56:Z  7:glu
+!use ModParameters
+!use ModPhasespace
+!use ModMisc
+!implicit none
+!real(8) :: xchannel
+!real(8) :: s45,s345,Mom_DummyX(1:4),Mom_DummyZ(1:4),Mom_DummyZ2(1:4)
+!real(8) :: SingDepth
+!integer :: Pcol1,Pcol2,Steps
+!real(8) :: Mom(1:4,1:10)
+!real(8), intent(in) :: xRnd(6:16),Energy
+!integer, intent(in) :: id(6:9)
+!real(8), intent(out) :: Jac
+!real(8) :: Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7
+!real(8) :: s6789,s67,s89
+!logical, intent(in), optional :: PhoOnshell
+!logical, intent(in) :: HDecays
+!logical :: hasAonshell
+!real(8) :: Momab(1:4)  
+!
+!
+!   Mom(1:4,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
+!   Mom(1:4,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
+!
+!!  stable Higgs,  decay not yet implemented but momenta 3+4 are allocated 
+!   ! masses
+!   Jac1 = s_channel_propagator(M_V**2,0d0,M_Reso**2,Energy**2,xRnd(14),s345)     ! Z*+H
+!!print*,M_V**2,M_Reso**2,Energy**2,xRnd(14),s345
+!   Jac2 = s_channel_propagator(M_V**2,Ga_V,(getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7))))**2,(dsqrt(s345)-m_Reso)**2,xRnd(12),s45)  ! Z-->56
+!
+!
+!!  splittings
+!   Mom_DummyX(1:4) = (/Energy,0d0,0d0,0d0/)   
+!   Jac3 = s_channel_decay(Mom_DummyX(1:4),s345,0d0,xRnd(15:16),Mom(:,3),Mom(:,10)) ! Z* + glu
+!   Jac4 = s_channel_decay(Mom(:,3),s45,M_Reso**2,xRnd(6:7),Mom(:,4),Mom(:,5)) ! Z + H
+!   !Mom(1:4,4) = 0d0
+!   Jac5 = s_channel_decay(Mom(:,4),0d0,0d0,xRnd(8:9),Mom(:,6),Mom(:,7)) !  Z --> 56
+!   Mom(:,8)=0d0
+!   Mom(:,9)=0d0
+!   Jac = Jac1*Jac2*Jac3*Jac4*Jac5* PSNorm4
+!
+!
+!   !this is for the soft/collinear limit checks only!!
+!!         Pcol1= 2 -1
+!!         Pcol2= 6 -1
+!!         SingDepth = 1e-13
+!!         Steps = 10
+!!         call gensing(4,Energy,(/M_Reso,0d0,0d0,0d0/),Mom(1:4,4:7),Pcol1,Pcol2,SingDepth,Steps)
+!!         Mom(1:4,3) = Mom(1:4,4)
+!!         Mom(1:4,4) = 0d0
+!!         print *, "generating singular phase space"
+!!         Jac=1d0        
+!   !end check
+!
+!!print*,dsqrt(s345),dsqrt(s45),m_reso
+!!Print*,Jac1
+!!print*,Mom(:,1)
+!!print*,Mom(:,2)
+!!print*,Mom(:,3)
+!!print*,Mom(:,4)
+!!print*,Mom(:,5)
+!!print*,Mom(:,6)
+!!print*,Mom(:,7)
+!!print*,Mom(:,8)
+!!print*,Mom(:,9)
+!!print*,Mom(:,10)
+!!pause
+!
+!!   if( isNan(jac) ) then
+!!      print *, "EvalPhasespace_VHglu NaN"
+!!      print *, Energy
+!!      print *, s345,s45
+!!      print *, Jac1,Jac2,Jac3,Jac4,Jac5
+!!      print *, xRnd  
+!!      Jac = 0d0
+!!   endif   
+!
+!RETURN
+!END SUBROUTINE
+
+
+
 
 
 
@@ -861,15 +758,17 @@ SUBROUTINE EvalPhasespace_VHglu_singular(xRnd,Energy,Mom,id,Jac,HDecays,PhoOnshe
 
   print *, "generating singular phase space"
   print *, "Energy = ", Energy
-  Pcol1= 1 -1  !6 6 is soft glu, 1 6 = glu // p1, 2 6 = glu // p2
+  Pcol1= 6 -1  !6 6 is soft glu, 1 6 = glu // p1, 2 6 = glu // p2
   Pcol2= 6 -1
   SingDepth = 1e-13
-  Steps = 10
+  Steps = 30
+
+  Mom(1:4,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
+  Mom(1:4,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
 
   Mom(1:4,8) = 0d0
   Mom(1:4,9) = 0d0
 
-  !call gensing(4,Energy,(/M_Reso,0d0,0d0,0d0/),(/Mom(1:4,5),Mom(1:4,6),Mom(1:4,7),Mom(1:4,10)/),Pcol1,Pcol2,SingDepth,Steps)
   call gensing(4,Energy,(/M_Reso,0d0,0d0,0d0/),MomC,Pcol1,Pcol2,SingDepth,Steps)
 
   Mom(1:4,5)=MomC(1:4,1)
@@ -881,18 +780,18 @@ SUBROUTINE EvalPhasespace_VHglu_singular(xRnd,Energy,Mom,id,Jac,HDecays,PhoOnshe
   Mom(1:4,3) = Mom(1:4,4) + Mom(1:4,5)
   Jac=1d0
 
-print *,"===================="
-print*,Mom(:,1)
-print*,Mom(:,2)
-print*,Mom(:,3)
-print*,Mom(:,4)
-print*,Mom(:,5)
-print*,Mom(:,6)
-print*,Mom(:,7)
-print*,Mom(:,8)
-print*,Mom(:,9)
-print*,Mom(:,10)
-print *,"===================="
+!print *,"===================="
+!print*,Mom(:,1)
+!print*,Mom(:,2)
+!print*,Mom(:,3)
+!print*,Mom(:,4)
+!print*,Mom(:,5)
+!print*,Mom(:,6)
+!print*,Mom(:,7)
+!print*,Mom(:,8)
+!print*,Mom(:,9)
+!print*,Mom(:,10)
+!print *,"===================="
 
   RETURN
 END SUBROUTINE

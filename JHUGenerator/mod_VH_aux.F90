@@ -5,8 +5,7 @@ module ModVHaux
   implicit none
 
   real(8), public :: yRndmin = 1d-8 ! for numerical stibility of integration for + distribution for PDF renormalization
-  real(8), public :: IRmin = 1d-8 ! min( s(patron,jet)/shat )
-  real(8), public, parameter :: alpha_dip = 1.0d0 !extra non physical degree of freedom for dipoles. Vary to check indepedence (of alpha_dip).
+  real(8), public :: IRmin = 1d-7 ! min( s(patron,jet)/shat )
 
   public :: PROPAGATOR
   public :: spinoru2

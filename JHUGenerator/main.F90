@@ -294,6 +294,7 @@ SUBROUTINE SetJHUGenDefaults()
    HbbDecays = .false.
    H_DK = .false.
    VH_PC="gg"
+   alpha_dip=1d0
    Unweighted =.true.
    MuFacMultiplier = 1d0
    MuRenMultiplier = 1d0
@@ -464,6 +465,7 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "VegasNc2", success, VegasNc2)
     call ReadCommandLineArgument(arg, "PChannel", success, PChannel, tosave=tosave)
     call ReadCommandLineArgument(arg, "VH_PC", success, VH_PC, tosave=tosave)
+    call ReadCommandLineArgument(arg, "alpha_dip", success, alpha_dip, tosave=tosave)
     call ReadCommandLineArgument(arg, "DataFile", success, DataFile)
     call ReadCommandLineArgument(arg, "CSmaxFile", success, CSmaxFile, success2=SetCSmaxFile)
     call ReadCommandLineArgument(arg, "Process", success, Process, tosave=tosave)
@@ -2305,9 +2307,9 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
       call vegas(EvalWeighted_HJ,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.50) then
       call vegas(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
+#if useCollier==1
     elseif (Process.eq.51) then
       call vegas(EvalWeighted_VH,VG_Result,VG_Error,VG_Chi2)
-#if useCollier==1
     elseif (Process.eq.52) then
       call vegas(EvalWeighted_HH,VG_Result,VG_Error,VG_Chi2)
 #else
@@ -2339,7 +2341,7 @@ stop 1
 
     avgcs = 0d0
 
-    itmx = 1
+    itmx = 1!!!!!!!!!!!!!!!!!!!!
     ncall= VegasNc2
     if (process.eq.60 .or. process.eq.61) then
       call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
@@ -2347,9 +2349,9 @@ stop 1
       call vegas1(EvalWeighted_HJ,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.50) then
       call vegas1(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
+#if useCollier==1
     elseif (Process.eq.51) then
       call vegas1(EvalWeighted_VH,VG_Result,VG_Error,VG_Chi2)
-#if useCollier==1
     elseif (Process.eq.52) then
       call vegas1(EvalWeighted_HH,VG_Result,VG_Error,VG_Chi2)
 #else
@@ -2395,11 +2397,11 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                 RES = 0d0
                 dum = EvalUnWeighted_VHiggs(yRnd,.false.,RES)
                 VG = VG + RES
+#if useCollier==1
             elseif (Process.eq.51) then
                 RES = 0d0
                 dum = EvalUnWeighted_VH(yRnd,.false.,RES)
                 VG = VG + RES
-#if useCollier==1
             elseif (Process.eq.52) then
                 RES = 0d0
                 dum = EvalUnWeighted_HH(yRnd,.false.,RES)
@@ -2479,9 +2481,9 @@ stop 1
                       dum = EvalUnWeighted_HJ(yRnd,.true.,RES)! RES is a dummy here
             elseif (Process.eq.50) then
                       dum = EvalUnWeighted_VHiggs(yRnd,.true.,RES)! RES is a dummy here
+#if useCollier==1
             elseif (Process.eq.51) then
                       dum = EvalUnWeighted_VH(yRnd,.true.,RES)! RES is a dummy here
-#if useCollier==1
             elseif (Process.eq.52) then
                       dum = EvalUnWeighted_HH(yRnd,.true.,RES)! RES is a dummy here
 #else
@@ -6414,19 +6416,21 @@ implicit none
         print *, "                      according to DecayModes1,2."
         print *, "   HbbDK:             For VH production, decay H->bb"
         print *, "   VH_PC:             VH partonic channel and mode selection"
-        print *, "                      ee = lo = e- e+ @LO (beta)"
-        print *, "                      qq = lo = q qbar @LO (beta)"
-        print *, "                      gg = triangles + boxes of gg (set as default)"
-        print *, "                      tr = triangles of gg"
-        print *, "                      bo = boxes of gg"
-        print *, "                      in = interference = 2*dble(box*dconjg(triangle)) of gg"
-        print *, "                      sb = for NLO development (in development)"
-        print *, "                      sp = for NLO development (in development)"
-        print *, "                      qg = gq = qg + gq (in development)"
-        print *, "                      nl = full oneloop = q qbar @LO + NLO + gg + gq (indevelopment)"
-        print *, "                      VH_PC overrides Pchannel,"
-        print *, "                      but Pchannel applies to VH_PC = nl,"
-        print *, "                      where 0 = gg, 1 = qq, and 2 = both + gq"
+        print *, "                      ee ( = e+ e- @LO)"
+        print *, "                      gg ( = triangles + boxes of gg)"
+        print *, "                      qq ( = q q~ @LO)"
+        print *, "                      lo ( = q q~ @LO)"
+        print *, "                      tr ( = triangles of gg)"
+        print *, "                      bo ( = boxes of gg)"
+        print *, "                      in ( = interference = 2*dble(box*dconjg(triangle)) of gg)"
+        print *, "                      qg ( = real - dipoles, for g q/q~ > VH + q/q~, for development only)"
+        print *, "                      gq ( = virtual + I + K + P, for g q/q~ > VH + q/q~, for development only)"
+        print *, "                      sb ( = real - dipoles, for q q~ @NLO, for development only)"
+        print *, "                      sp ( = virtual + I + K + P, for q q~ @NLO, for development only)"
+        print *, "                      nl ( = full oneloop = q ~ @LO + NLO + gg + gq)"
+        print *, "                      VH_PC overrides Pchannel."
+        print *, "                      extra non physical degree of freedom for dipoles."
+        print *, "                      Vary to check indepedence (of alpha_dip)."
         print *, "   VBFoffsh_run:      For VBF offshell production, set this to a number from 1-5"
         print *, "                      for each of the 5 jobs.  See manual for more details."
         print *, " Resonance parameters:"
