@@ -175,9 +175,8 @@ class Version(object):
 def create_Download(mostrecentversion, *olderversions):
     if not mostrecentversion.visible:
         raise ValueError("The most recent version has to be visible")
-    if not os.path.exists(os.path.join(Webdir, "Manual.pdf")):
-        mostrecentversion.createtarball(force=True)
-        check_call(["cp", os.path.join(gitdir, mostrecentversion.manualname), os.path.join(Webdir, "Manual.pdf")])
+    mostrecentversion.createtarball(force=True)
+    check_call(["cp", os.path.join(gitdir, mostrecentversion.manualname), os.path.join(Webdir, "Manual.pdf")])
     for version in [mostrecentversion] + list(olderversions) + list(reallyold):
         version.createtarball()
     Download = Download_template.format(
@@ -255,6 +254,11 @@ Download_template = """
 #   - melacommit, name of the commit to checkout for the JHUGenMELA folder.  Default is the same
 #       as the generator
 versions = (
+            Version("v7.2.4"),
+            Version("v7.2.3", visible=False),
+            Version("v7.2.2", visible=False),
+            Version("v7.2.1", visible=False),
+            Version("v7.2.0", manualcommit="cfb61347ffbb2391a4834f7dd803e4d533efa072", visible=False),
             Version("v7.1.4", manualcommit="e58a25479c1a16b73b657a0a6f660a27be9cd130"),
             Version("v7.1.2"),
             Version("v7.1.0", visible=False),
@@ -298,7 +302,7 @@ dontupload = [
               "[.]gitignore$",
               "[.]git$",
              ]
-MCFMprecompiledcommit = "46a2987319695e802914b45141b7acebf8108b5d"
+MCFMprecompiledcommit = "2d21a124764751c589ffcfc1ace2326ece6ebe6a"
 websitebase = "http://spin.pha.jhu.edu"
 #end of inputs
 ########################################################################################

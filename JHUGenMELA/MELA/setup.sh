@@ -11,8 +11,18 @@ DATA_LIB_DIR="slc6_amd64_gcc530"
 export SCRAM_ARCH=$DATA_LIB_DIR
 
 printenv () {
-    echo "export LD_LIBRARY_PATH=$(readlink -f $MELADIR)/data/$DATA_LIB_DIR"':$LD_LIBRARY_PATH'
-    echo "export PYTHONPATH=$(readlink -f $MELADIR)/python"':$PYTHONPATH'
+    if [ -z "${LD_LIBRARY_PATH+x}" ]; then
+      end=''
+    else
+      end=':$LD_LIBRARY_PATH'
+    fi
+    echo "export LD_LIBRARY_PATH=$(readlink -f $MELADIR)/data/$DATA_LIB_DIR$end"
+    if [ -z "${PYTHONPATH+x}" ]; then
+      end=''
+    else
+      end=':$PYTHONPATH'
+    fi
+    echo "export PYTHONPATH=$(readlink -f $MELADIR)/python$end"
 }
 
 if [[ "$#" -ge 1 ]] && [[ "$1" == "env" ]]; then

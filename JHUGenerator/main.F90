@@ -1098,24 +1098,24 @@ type(SaveValues) :: tosave, oldsavevalues
     endif
     call system('mkdir -p ./data')! -p is suppressing error messages if directory already exists
 
-    if( VBFoffsh_run.eq.1 ) DataFile = trim(DataFile)//"1"
-    if( VBFoffsh_run.eq.2 ) DataFile = trim(DataFile)//"2"
-    if( VBFoffsh_run.eq.3 ) DataFile = trim(DataFile)//"3"
-    if( VBFoffsh_run.eq.4 ) DataFile = trim(DataFile)//"4"
-    if( VBFoffsh_run.eq.5 ) DataFile = trim(DataFile)//"5"
-    if( VBFoffsh_run.eq.0 ) DataFile = trim(DataFile)//"0"    
-    
+    if( VBFoffsh_run.eq.1 ) DataFile = trim(DataFile)//"_1"
+    if( VBFoffsh_run.eq.2 ) DataFile = trim(DataFile)//"_2"
+    if( VBFoffsh_run.eq.3 ) DataFile = trim(DataFile)//"_3"
+    if( VBFoffsh_run.eq.4 ) DataFile = trim(DataFile)//"_4"
+    if( VBFoffsh_run.eq.5 ) DataFile = trim(DataFile)//"_5"
+    if( VBFoffsh_run.eq.0 ) DataFile = trim(DataFile)//"_0"
+
     if( SetCSmaxFile ) then
       i = len(trim(CSmaxFile))
       if( CSmaxFile(i-3:i).eq.".lhe" ) then
           CSmaxFile = CSmaxFile(1:i-4)
       endif
-      if( VBFoffsh_run.eq.1 ) CSmaxFile = trim(CSmaxFile)//"1"
-      if( VBFoffsh_run.eq.2 ) CSmaxFile = trim(CSmaxFile)//"2"
-      if( VBFoffsh_run.eq.3 ) CSmaxFile = trim(CSmaxFile)//"3"
-      if( VBFoffsh_run.eq.4 ) CSmaxFile = trim(CSmaxFile)//"4"
-      if( VBFoffsh_run.eq.5 ) CSmaxFile = trim(CSmaxFile)//"5"
-      if( VBFoffsh_run.eq.0 ) CSmaxFile = trim(CSmaxFile)//"0"
+      if( VBFoffsh_run.eq.1 ) CSmaxFile = trim(CSmaxFile)//"_1"
+      if( VBFoffsh_run.eq.2 ) CSmaxFile = trim(CSmaxFile)//"_2"
+      if( VBFoffsh_run.eq.3 ) CSmaxFile = trim(CSmaxFile)//"_3"
+      if( VBFoffsh_run.eq.4 ) CSmaxFile = trim(CSmaxFile)//"_4"
+      if( VBFoffsh_run.eq.5 ) CSmaxFile = trim(CSmaxFile)//"_5"
+      if( VBFoffsh_run.eq.0 ) CSmaxFile = trim(CSmaxFile)//"_0"
     else
       CSmaxFile = DataFile
     endif
@@ -2903,6 +2903,7 @@ IF( .NOT. (Process.ge.66 .and. Process.le.69) ) THEN! special treatment for offs
     print *, "Rescale CrossSecMax by ",calls_rescale
 
     PreviousSum = 0
+    if( sum(RequEvents(:,:)).eq.0 ) StatusPercent = 100d0
     do while( StatusPercent.lt.100d0  )
 !     do while( AccepCounter_part(iPart_sel,jPart_sel).lt.RequEvents(iPart_sel,jPart_sel) )
         call cpu_time(time_start)
@@ -2968,7 +2969,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 
     write(io_stdout,"(2X,A)")  "Scanning the integrand"
     warmup = .true.
-    
+
     if( ReadCSmax ) then
         i=len(trim(CSmaxFile))
         open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'1_gridinfo.txt',form='formatted',status='old',iostat=ios)
@@ -3007,7 +3008,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         close(unit=io_TmpFile)
         if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'4_gridinfo.txt'
 
-        open(unit=io_TmpFile,file=trim(DataFile(1:i-1))//'5_gridinfo.txt',form='formatted',status='old',iostat=ios)
+        open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'5_gridinfo.txt',form='formatted',status='old',iostat=ios)
         read(io_TmpFile,fmt=*) calls1_in(5)
         read(io_TmpFile,fmt=*) CrossSec2_in(5,:)
         read(io_TmpFile,fmt=*) CrossSecMax2_in(5,:)
@@ -3019,7 +3020,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         if( calls1_in(1).ne.calls1_in(2) .or. calls1_in(1).ne.calls1_in(3) .or. calls1_in(2).ne.calls1_in(3) .or. calls1_in(1).ne.calls1_in(4) .or. calls1_in(1).ne.calls1_in(5) ) call Error("Mismatch in calls1")
         calls1 = calls1_in(1)
 
-        CrossSec2(:) = -1d0        
+        CrossSec2(:) = -1d0
         do i=1,Hash_MCFM_qqVVqq_Size
             if( CrossSec2_in(1,i).ne.0d0 .and. CrossSec2(i).eq.-1d0 ) CrossSec2(i) = CrossSec2_in(1,i)
             if( CrossSec2_in(2,i).ne.0d0 .and. CrossSec2(i).eq.-1d0 ) CrossSec2(i) = CrossSec2_in(2,i)
@@ -3030,12 +3031,12 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
                 print *, "WARNING: CrossSec2(i) has not been filled",i,CrossSec2_in(1:5,i)
                 CrossSec2(i) = 0d0
             endif
-        enddo        
+        enddo
 
-        CrossSecMax2(:) = -1d0        
+        CrossSecMax2(:) = -1d0
         do i=1,Hash_MCFM_qqVVqq_Size
             CrossSecMax2(i) = CrossSecMax2_in( max(1,VBFoffsh_run),i)
-        enddo        
+        enddo
 
         VG_Result = VG_Result_in(1)+VG_Result_in(2)+VG_Result_in(3)+VG_Result_in(4)+VG_Result_in(5)
         VG_Error  = dsqrt(VG_Error_in(1)**2+VG_Error_in(2)**2+VG_Error_in(3)**2+VG_Error_in(4)**2+VG_Error_in(5)**2)
@@ -3086,10 +3087,10 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
     do i=1,Hash_MCFM_qqVVqq_Size
          i1 = convertToPartIndex(ijSel(i,1))
          j1 = convertToPartIndex(ijSel(i,2))
-         if( RequEvents2(i).ne.0 ) write(*,"(I4,I4,I4,F18.8,I10,I10)") i, i1,j1,CrossSec2(i),RequEvents2(i)         
+         if( RequEvents2(i).ne.0 ) write(*,"(I4,I4,I4,F18.8,I10,I10)") i, i1,j1,CrossSec2(i),RequEvents2(i)
     enddo
-    
-    
+
+
     write(io_stdout,"(2X,A,F18.3,I10)") "Sum        partonic xsec:",sum(CrossSec2(:))/VG_Result,sum(RequEvents2(:))
 
 
@@ -3103,18 +3104,18 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
          RequEvents2(3:164) = 0
 
          NumPartonicChannels = 2
-!          call BubleSort(NumPartonicChannels,RequEvents2(1:),SortedHash)   
+!          call BubleSort(NumPartonicChannels,RequEvents2(1:),SortedHash)
 !          call ReOrder(NumPartonicChannels,SortedHash,CrossSec2(1:))
 !          call ReOrder(NumPartonicChannels,SortedHash,CrossSecMax2(1:))
 !          call ReOrder(NumPartonicChannels,SortedHash,ijSel(1:,1))
 !          call ReOrder(NumPartonicChannels,SortedHash,ijSel(1:,2))
 
-    elseif( VBFoffsh_run.eq.2 ) then 
+    elseif( VBFoffsh_run.eq.2 ) then
          RequEvents2(1:2) = 0
          RequEvents2(10:164) = 0
 
          NumPartonicChannels = 7
-!          call BubleSort(NumPartonicChannels,RequEvents2(3:),SortedHash)   
+!          call BubleSort(NumPartonicChannels,RequEvents2(3:),SortedHash)
 !          call ReOrder(NumPartonicChannels,SortedHash,CrossSec2(3:))
 !          call ReOrder(NumPartonicChannels,SortedHash,CrossSecMax2(3:))
 !          call ReOrder(NumPartonicChannels,SortedHash,ijSel(3:,1))
@@ -3122,22 +3123,22 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 
     elseif( VBFoffsh_run.eq.3 ) then
          RequEvents2(1:9) = 0
-         RequEvents2(41:164) = 0 
-  
+         RequEvents2(41:164) = 0
+
          NumPartonicChannels = 31
-!          call BubleSort(NumPartonicChannels,RequEvents2(10:),SortedHash)   
+!          call BubleSort(NumPartonicChannels,RequEvents2(10:),SortedHash)
 !          call ReOrder(NumPartonicChannels,SortedHash,CrossSec2(10:))
 !          call ReOrder(NumPartonicChannels,SortedHash,CrossSecMax2(10:))
 !          call ReOrder(NumPartonicChannels,SortedHash,ijSel(10:,1))
 !          call ReOrder(NumPartonicChannels,SortedHash,ijSel(10:,2))
 
-      
+
     elseif( VBFoffsh_run.eq.4 ) then
          RequEvents2(1:40) = 0
          RequEvents2(104:164) = 0
-   
+
          NumPartonicChannels = 63
-!          call BubleSort(NumPartonicChannels,RequEvents2(41:),SortedHash)   
+!          call BubleSort(NumPartonicChannels,RequEvents2(41:),SortedHash)
 !          call ReOrder(NumPartonicChannels,SortedHash,CrossSec2(41:))
 !          call ReOrder(NumPartonicChannels,SortedHash,CrossSecMax2(41:))
 !          call ReOrder(NumPartonicChannels,SortedHash,ijSel(41:,1))
@@ -3145,9 +3146,9 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 
     elseif( VBFoffsh_run.eq.5 ) then
          RequEvents2(1:103) = 0
-  
+
          NumPartonicChannels = 61
-!          call BubleSort(NumPartonicChannels,RequEvents2(104:),SortedHash)   
+!          call BubleSort(NumPartonicChannels,RequEvents2(104:),SortedHash)
 !          call ReOrder(NumPartonicChannels,SortedHash,CrossSec2(104:))
 !          call ReOrder(NumPartonicChannels,SortedHash,CrossSecMax2(104:))
 !          call ReOrder(NumPartonicChannels,SortedHash,ijSel(104:,1))
@@ -3163,7 +3164,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 !          j1 = convertToPartIndex(ijSel(i,2))
 !          if( RequEvents2(i).ne.0 ) write(*,"(I4,I4,I4,I4,F18.8,I10,I10)") i,SortedHash(i), i1,j1,CrossSec2(i)/VG_Result,RequEvents2(i)
 ! !         write(*,"(I4,I4,I4,I4,F18.8,I10,I10)") i, SortedHash(i), i1,j1,CrossSec2(i)/VG_Result,RequEvents2(i)
-!     enddo  
+!     enddo
 
 
 !--------------------------------------------------------------------
@@ -3197,6 +3198,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
     print *, "Rescale CrossSecMax2 by ",calls_rescale
 
     PreviousSum = 0
+    if( sum(RequEvents2(:)).eq.0 ) StatusPercent = 100d0
     do while( StatusPercent.lt.100d0  )
         call cpu_time(time_start)
         readin=.true.  ! this prevents adapting the grid during this while-loop
@@ -3234,8 +3236,8 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 
 
 
-    
-    
+
+
 
 ENDIF
 
@@ -3974,7 +3976,7 @@ call InitReadLHE(BeginEventLine)
     write(io_stdout,*) "Alert  Counter: ",AlertCounter
     if( dble(AlertCounter)/dble(AccepCounter) .gt. 1d0*percent ) then
         write(io_stdout,*) "ALERT: The number of rejected events exceeds 1%."
-        write(io_stdout,*) "       Increase CSMAX in main.F90 or VegasNc1."
+        write(io_stdout,*) "       Increase CSMAX in main.F90 or VegasNc0."
     endif
    write(io_stdout,*)  "Event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
    if( RequestNLeptons.gt.0 .or. RequestNJets.gt.0 ) write(io_stdout,"(A,1F6.2,A)") " Filter efficiency:",dble(AccepCounter)/dble(NEvent)*100d0," %"
@@ -3987,7 +3989,7 @@ call InitReadLHE(BeginEventLine)
     write(io_LogFile,*) "Alert  Counter: ",AlertCounter
     if( dble(AlertCounter)/dble(AccepCounter) .gt. 1d0*percent ) then
         write(io_LogFile,*) "ALERT: The number of rejected events exceeds 1%."
-        write(io_LogFile,*) "       Increase CSMAX in main.F90 or VegasNc1."
+        write(io_LogFile,*) "       Increase CSMAX in main.F90 or VegasNc0."
     endif
    write(io_LogFile,*)  "Event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
    if( RequestNLeptons.gt.0 .or. RequestNJets.gt.0 ) write(io_LogFile,"(A,1F6.2,A)") " Filter efficiency:",dble(AccepCounter)/dble(NEvent)*100d0," %"
@@ -5253,7 +5255,7 @@ implicit none
 integer :: AllocStatus,NHisto
 
           it_sav = 1
-          NumHistograms = 9
+          NumHistograms = 10
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -5751,7 +5753,7 @@ character :: arg*(500)
     if( Process.eq.69 ) write(TheUnit,"(4X,A,L)") "Intermediate off-shell gluons: ",includeGammaStar
 
     write(TheUnit,"(4X,A)") ""
-    if( Process.eq.0 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.62 .or. Process.eq.66 .or. Process.eq.68 .or. Process.eq.50 ) then
+    if( (Process.eq.0 .and. TauDecays.lt.0) .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.62 .or. Process.eq.66 .or. Process.eq.68 .or. Process.eq.50 .or. (Process.eq.51 .and. VH_PC.ne."bo") ) then
         write(TheUnit,"(4X,A)") "spin-0-VV couplings: "
         write(TheUnit,"(6X,A,L)") "generate_as=",generate_as
         if( generate_as ) then
@@ -6056,13 +6058,20 @@ character :: arg*(500)
                 if( cdabs(ewp_Top_right).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_Top_right=",ewp_Top_right,"i"
             endif
         endif
-    elseif( Process.eq.1 ) then
+    endif
+    if( (Process.eq.0 .and. TauDecays.ge.0) .or. Process.eq.80 .or. Process.eq.90 .or. (Process.eq.51 .and. VH_PC.ne."tr" .and. VH_PC.ne."ee" .and. VH_PC.ne."qq") ) then
+        write(TheUnit,"(4X,A)") "spin-0-ff couplings: "
+        if( cdabs(kappa ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "kappa=",kappa,"i"
+        if( cdabs(kappa_tilde ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "kappa_tilde=",kappa_tilde,"i"
+    endif
+    if( Process.eq.1 ) then
         write(TheUnit,"(4X,A)") "spin-1-VV couplings: "
         write(TheUnit,"(6X,A,2E16.8,A1)") "zprime_qq_left =",zprime_qq_left,"i"
         write(TheUnit,"(6X,A,2E16.8,A1)") "zprime_qq_right=",zprime_qq_right,"i"
         write(TheUnit,"(6X,A,2E16.8,A1)") "zprime_zz_1=",zprime_zz_1,"i"
         write(TheUnit,"(6X,A,2E16.8,A1)") "zprime_zz_2=",zprime_zz_2,"i"
-    elseif( Process.eq.2 ) then
+    endif
+    if( Process.eq.2 ) then
         write(TheUnit,"(4X,A)") "spin-2-VV couplings: "
         write(TheUnit,"(6X,A,L)") "generate_bis=",generate_bis
         write(TheUnit,"(6X,A,L)") "use_dynamic_MG=",use_dynamic_MG
@@ -6376,10 +6385,10 @@ implicit none
         print *, "   ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,"
         print *, "                      250 GeV for e+e-"
         print *, "   Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance,"
-        print *, "                      50=old =pp/ee->VH, 51=pp/ee->VH, 52=gg->HH,"
+        print *, "                      50=qq/ee->VH, 51=gg->ZH,"
         print *, "                      60=weakVBF, 61=pp->Hjj, 62=pp->Hj,"
         print *, "                      66=VVHVV offshell, 67=VVVVbkg, 68=VVHVV+VVVV,"
-        print *, "                      69=QCD JJVV bkg, 80=ttH, 90=bbH,"
+        print *, "                      80=ttH, 90=bbH,"
         print *, "                      110=t+H t channel, 111=tbar+H t channel,"
         print *, "                      112=t+H s channel, 113=tbar+H s channel"
         print *, "                      114=t/tbar+H t/s channels"
@@ -6424,12 +6433,12 @@ implicit none
         print *, "                      bo ( = boxes of gg)"
         print *, "                      in ( = interference = 2*dble(box*dconjg(triangle)) of gg)"
         print *, "                      qg ( = real - dipoles, for g q/q~ > VH + q/q~, for development only)"
-        print *, "                      gq ( = virtual + I + K + P, for g q/q~ > VH + q/q~, for development only)"
+        print *, "                      gq ( = K + P, for g q/q~ > VH + q/q~, for development only)"
         print *, "                      sb ( = real - dipoles, for q q~ @NLO, for development only)"
         print *, "                      sp ( = virtual + I + K + P, for q q~ @NLO, for development only)"
-        print *, "                      nl ( = full oneloop = q ~ @LO + NLO + gg + gq)"
+        print *, "                      nl ( = NLO = q q~ @LO + NLO + gq)"
         print *, "                      VH_PC overrides Pchannel."
-        print *, "                      extra non physical degree of freedom for dipoles."
+        print *, "   alpha_dip          extra non-physical degree of freedom for Process=51 & VH_PC=nl, defaulted at 1."
         print *, "                      Vary to check indepedence (of alpha_dip)."
         print *, "   VBFoffsh_run:      For VBF offshell production, set this to a number from 1-5"
         print *, "                      for each of the 5 jobs.  See manual for more details."
