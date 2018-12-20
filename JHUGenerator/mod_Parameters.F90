@@ -202,7 +202,7 @@ real(dp), public           :: esq ! = 4.0d0 * pi * alpha_QED  ! Fundamental char
 real(8), public            :: xw = 0.23119d0                ! sin**2(Theta_Weinberg) (PDG-2008)
 real(8), public            :: sitW ! = dsqrt(xw)            ! sin(Theta_Weinberg) (PDG-2008)
 real(8), public            :: twosc ! = sqrt(4.0_dp*xw*(1.0_dp-xw))
-real(8), public, parameter :: LHC_Energy=14000d0  *GeV      ! LHC hadronic center of mass energy
+real(8), public, parameter :: LHC_Energy=13000d0  *GeV      ! LHC hadronic center of mass energy
 real(8), public, parameter :: TEV_Energy=1960d0  *GeV       ! Tevatron hadronic center of mass energy
 real(8), public, parameter :: ILC_Energy=250d0  *GeV        ! Linear collider center of mass energy
 !command line: epPolarization, emPolarization
@@ -378,10 +378,10 @@ real(8), public, parameter :: Lambda2 = 1000d0    *GeV      ! for second resonan
    integer,    public :: cz_q2sq = 0
    integer,    public :: cz_q12sq = 0
    ! These Lambdas all have a numerical value of 1d0
-   real(8),    public :: Lambda_z11 = 1000d0*GeV ! For Z1
-   real(8),    public :: Lambda_z21 = 1000d0*GeV
-   real(8),    public :: Lambda_z31 = 1000d0*GeV
-   real(8),    public :: Lambda_z41 = 1000d0*GeV
+   real(8),    public :: Lambda_z11 = 100d0*GeV ! For Z1
+   real(8),    public :: Lambda_z21 = 100d0*GeV
+   real(8),    public :: Lambda_z31 = 100d0*GeV
+   real(8),    public :: Lambda_z41 = 100d0*GeV
    real(8),    public :: Lambda_z12 = 100d0*GeV ! For Z2
    real(8),    public :: Lambda_z22 = 100d0*GeV
    real(8),    public :: Lambda_z32 = 100d0*GeV
