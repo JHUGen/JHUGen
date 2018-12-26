@@ -474,9 +474,9 @@ jobs:
               elif [ $WHICHPLOTS -eq 4 ]; then
                 #want real and imaginary interference between all three components
                 #g1 = 1, g2 = 1.65684 * (-1 + i sqrt(3)) / 2, g4 = 2.55052 * (-1 - i sqrt(3)) / 2
-                ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/SMa2a3 ghz1=1,0 ghz2=-0.82842,1.43486553 ghz4=-1.27526,2.20881511
-                ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/CT_left ghz1=0,0 ghzzp1=1,0 ezp_Ta_left=1,0
-                ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/CT_leftright ghz1=0,0 ghzzp1=1,0 ezp_Ta_left=1,0 ezp_Ta_right=1,0
+                ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 DecayMode2=2 DataFile=$LHEDIR/SMa2a3 ghz1=1,0 ghz2=-0.82842,1.43486553 ghz4=-1.27526,2.20881511
+                ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 DecayMode2=2 DataFile=$LHEDIR/CT_left ghz1=0,0 ghzzp1=1,0 ezp_Ta_left=1,0
+                ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 DecayMode2=2 DataFile=$LHEDIR/CT_leftright ghz1=0,0 ghzzp1=1,0 ezp_Ta_left=1,0 ezp_Ta_right=1,0
               else
                 echo "Unknown WHICHPLOTS value: $WHICHPLOTS"
                 exit 1
@@ -599,7 +599,7 @@ jobs:
             cd ..
             md5sum JHUGenerator/reference-lhes-md5sum-VBF $(
               git ls-files \
-                .circleci/VBFplots.C
+                .circleci/VBFplots.C \
               | sort
             ) > JHUGenerator/VBF-plots-md5sum
       - restore_cache:
