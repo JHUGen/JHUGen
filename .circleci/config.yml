@@ -132,7 +132,7 @@ jobs:
               | sort
             ) > JHUGenerator/generator-md5sum
       - restore_cache:
-          key: v3-do-i-need-to-test-generator-reference-{{ checksum "generator-md5sum" }}
+          key: v4-do-i-need-to-test-generator-reference-{{ checksum "generator-md5sum" }}
       - run:
           name: "see if we need to test the generator"
           command: |
@@ -255,7 +255,11 @@ jobs:
           name: "reference LHEs md5sum"
           command: |
             if $DOREFERENCE; then
-              md5sum compare_to_reference/*.lhe | sort > reference-lhes-md5sum
+              cd compare_to_reference/
+              md5sum $REFERENCE_FILENAMES > ../reference-lhes-md5sum
+              md5sum $REFERENCE_FILENAME_GGH > ../reference-lhes-md5sum-ggH
+              md5sum $REFERENCE_FILENAME_VBF $REFERENCE_FILENAME_HJJ > ../reference-lhes-md5sum-VBF
+              md5sum $REFERENCE_FILENAME_ZH > ../reference-lhes-md5sum-VH
             #else it was in the do-i-need-to-test-generator-reference cache
             fi
           when: always
@@ -275,14 +279,14 @@ jobs:
           paths:
             - JHUGenerator/reference_check
             - JHUGenerator/generator-md5sum
-            - JHUGenerator/reference-lhes-md5sum
+            - JHUGenerator/reference-lhes-md5sum*
 
       - run: echo "$CIRCLE_BUILD_URL" > no-need-for-generator-reference
       - save_cache:
-          key: v3-do-i-need-to-test-generator-reference-{{ checksum "generator-md5sum" }}
+          key: v4-do-i-need-to-test-generator-reference-{{ checksum "generator-md5sum" }}
           paths:
             - ~/JHUGen/JHUGenerator/no-need-for-generator-reference
-            - ~/JHUGen/JHUGenerator/reference-lhes-md5sum
+            - ~/JHUGen/JHUGenerator/reference-lhes-md5sum*
             - ~/JHUGen/JHUGenerator/reference_check
 
   generator_syntax:
@@ -436,7 +440,7 @@ jobs:
             cd ..
             #take the whole MELA C++ code because of interdependencies (TCouplingsBase etc.), too complicated to sort out
             #but no need for fortran or python
-            md5sum JHUGenerator/reference-lhes-md5sum $(
+            md5sum JHUGenerator/reference-lhes-md5sum-ggH $(
               git ls-files \
                 .circleci/angularDistributions_spin0_HVV.cc \
                 JHUGenMELA/MELA/src/ \
@@ -471,8 +475,8 @@ jobs:
                 #want real and imaginary interference between all three components
                 #g1 = 1, g2 = 1.65684 * (-1 + i sqrt(3)) / 2, g4 = 2.55052 * (-1 - i sqrt(3)) / 2
                 ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/SMa2a3 ghz1=1,0 ghz2=-0.82842,1.43486553 ghz4=-1.27526,2.20881511
-                ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/CT_left ghz1=0,0 ghzzp1=1,0 ezp_El_left=1,0 ezp_Mu_left=1,0
-                ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/CT_leftright ghz1=0,0 ghzzp1=1,0 ezp_El_left=1,0 ezp_Mu_left=1,0 ezp_El_right=1,0 ezp_Mu_right=1,0
+                ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/CT_left ghz1=0,0 ghzzp1=1,0 ezp_Ta_left=1,0
+                ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/CT_leftright ghz1=0,0 ghzzp1=1,0 ezp_Ta_left=1,0 ezp_Ta_right=1,0
               else
                 echo "Unknown WHICHPLOTS value: $WHICHPLOTS"
                 exit 1
@@ -525,15 +529,8 @@ jobs:
                 #g1 = 1, g2 = 1.65684 * (-1 + i sqrt(3)) / 2, g4 = 2.55052 * (-1 - i sqrt(3)) / 2
                 root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/SMa2a3.root", "ghv1=1,0;ghv2=-0.82842,1.43486553;ghv4=-1.27526,2.20881511", "ZZ4l", "$LHEDIR/SMa2a3/")'
 
-                #from plugging this into mathematica:
-                #formula and constants come from MELA/test/testME_more.py
-                #formula = Solve[ghz1CT == ghz1 + 2 ghz1prime2 + (mZ^2 - I mZ GaZ)/L1^2 && ghzzp1L == mZ^2/L1^2 aL ghz1prime2 + e ghzgs1prime2 && ghzzp1R == mZ^2/L1^2 aR ghz1prime2 + e ghzgs1prime2, {ghz1, ghz1prime2, ghzgs1prime2}]
-                #constants = {mZ -> 91.1876, GaZ -> 2.4952, aL -> -0.53762, aR -> 0.46238, e -> 0.8431872482432357, L1 -> 10000}
-                #formula /. constants /. {ghz1CT -> 0, ghzzp1L -> 1, ghzzp1R -> 0}
-                root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/CT_left.root", "ghv1=24052.4,2.27531e-6;ghv1_prime2=-12026.2,0;ghzgs1_prime2=0.548372,0", "ZZ4l", "$LHEDIR/CT_left/")'
-
-                #formula /. constants /. {ghz1CT -> 0, ghzzp1L -> 1, ghzzp1R -> 1}
-                root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/CT_leftright.root", "ghv1=-0.0000831518,2.27531e-6;ghv1_prime2=0,0;ghzgs1_prime2=1.18598,0", "ZZ4l", "$LHEDIR/CT_leftright/")'
+                root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/CT_left.root", "ghvvp1=1,0;gVprimeff_decay2_left=1", "ZZ4l", "$LHEDIR/CT_left/")'
+                root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/CT_leftright.root", "ghvvp1=1,0;gVprimeff_decay2_left=1;gVprimeff_decay2_right=1", "ZZ4l", "$LHEDIR/CT_leftright/")'
               else
                 echo "Unknown WHICHPLOTS value: $WHICHPLOTS"
                 exit 1
@@ -594,40 +591,69 @@ jobs:
           key: v1_analyzer
           paths: ~/CMSJHU_AnalysisMacros/
 
-      - run: '! [ -f reference_check/reference_failed_VBF ]'
+      - run: echo "export LHEDIR=$HOME/artifacts/VBF" >> $BASH_ENV
+      - run: mkdir -p $LHEDIR/
       - run:
-          command: echo "export LHEDIR=$HOME/artifacts/VBF" >> $BASH_ENV
-          when: on_fail
+          name: "md5sum of files relevant for VBF plots"
+          command: |
+            cd ..
+            md5sum JHUGenerator/reference-lhes-md5sum-VBF $(
+              git ls-files \
+                .circleci/VBFplots.C
+              | sort
+            ) > JHUGenerator/VBF-plots-md5sum
+      - restore_cache:
+          key: v1-VBF-do-i-need-plots-{{ .Environment.WHICHPLOTS }}-{{ checksum "VBF-plots-md5sum" }}
       - run:
-          command: mkdir -p $LHEDIR/
-          when: on_fail
+          name: "see if we need VBF plots"
+          command: |
+            DOPLOTS=true
+            if [ "$(cat no-need-for-VBF-plots)" ]; then
+              DOPLOTS=false
+            fi
+            echo "export DOPLOTS=$DOPLOTS" >> $BASH_ENV
       - run:
           name: generate
-          when: on_fail
           command: |
-            ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$LHEDIR/SM pTjetcut=0 deltaRcut=0
-            ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$LHEDIR/SM.lhe DataFile=$LHEDIR/SM_decayed
-            ./JHUGen PDFSet=3 Process=61 VegasNc0=10000000 VegasNc2=10000 DataFile=$LHEDIR/HJJ_SM
-            ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$LHEDIR/HJJ_SM.lhe DataFile=$LHEDIR/HJJ_SM_decayed
-            ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$LHEDIR/PS ghz1=0,0 ghz4=1,0  pTjetcut=0 deltaRcut=0
-            ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$LHEDIR/PS.lhe DataFile=$LHEDIR/PS_decayed ghz1=0,0 ghz4=1,0
-            ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$LHEDIR/a2 ghz1=0,0 ghz2=1,0 pTjetcut=0 deltaRcut=0
-            ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$LHEDIR/a2.lhe DataFile=$LHEDIR/a2_decayed ghz1=0,0 ghz2=1,0
+            if $DOPLOTS; then
+              ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$LHEDIR/SM pTjetcut=0 deltaRcut=0
+              ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$LHEDIR/SM.lhe DataFile=$LHEDIR/SM_decayed
+              ./JHUGen PDFSet=3 Process=61 VegasNc0=10000000 VegasNc2=10000 DataFile=$LHEDIR/HJJ_SM
+              ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$LHEDIR/HJJ_SM.lhe DataFile=$LHEDIR/HJJ_SM_decayed
+              ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$LHEDIR/PS ghz1=0,0 ghz4=1,0  pTjetcut=0 deltaRcut=0
+              ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$LHEDIR/PS.lhe DataFile=$LHEDIR/PS_decayed ghz1=0,0 ghz4=1,0
+              ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$LHEDIR/a2 ghz1=0,0 ghz2=1,0 pTjetcut=0 deltaRcut=0
+              ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$LHEDIR/a2.lhe DataFile=$LHEDIR/a2_decayed ghz1=0,0 ghz2=1,0
+            else
+              echo "The LHE files can be found in the artifacts at $(cat no-need-for-VBF-plots)"
+            fi
       - run:
           name: analyzer
-          when: on_fail
           command: |
-            analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SM.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 SM_decayed.lhe
-            analyzer fileLevel=0 outdir=$LHEDIR/ outfile=HJJ_SM.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 HJJ_SM_decayed.lhe
-            analyzer fileLevel=0 outdir=$LHEDIR/ outfile=PS.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 PS_decayed.lhe
-            analyzer fileLevel=0 outdir=$LHEDIR/ outfile=a2.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 a2_decayed.lhe
+            if $DOPLOTS; then
+              analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SM.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 SM_decayed.lhe
+              analyzer fileLevel=0 outdir=$LHEDIR/ outfile=HJJ_SM.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 HJJ_SM_decayed.lhe
+              analyzer fileLevel=0 outdir=$LHEDIR/ outfile=PS.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 PS_decayed.lhe
+              analyzer fileLevel=0 outdir=$LHEDIR/ outfile=a2.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 a2_decayed.lhe
+            else
+              echo "The root files can be found in the artifacts at $(cat no-need-for-VBF-plots)"
+            fi
       - run:
           name: plots
-          when: on_fail
           command: |
-            cd ~/CMSJHU_AnalysisMacros/MCProductionValidation && root -b -q VBFplots.C+
+            if $DOPLOTS; then
+              cd ../.circleci
+              root -b -q VBFplots.C+
+            else
+              echo "The plots can be found in the artifacts at $(cat no-need-for-VBF-plots)"
+            fi
       - store_artifacts:
           path: ~/artifacts/VBF
+      - run: echo "$CIRCLE_BUILD_URL" > no-need-for-VBF-plots
+      - save_cache:
+          key: v1-VBF-do-i-need-analytic-plots-{{ checksum "VBF-plots-md5sum" }}
+          paths: ~/JHUGen/JHUGenerator/no-need-for-VBF-plots
+      - run: '! [ -f reference_check/reference_failed_VBF ]'
 
   MELA:
     <<: *env
