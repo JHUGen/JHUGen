@@ -132,7 +132,7 @@ jobs:
               | sort
             ) > JHUGenerator/generator-md5sum
       - restore_cache:
-          key: v4-do-i-need-to-test-generator-reference-{{ checksum "generator-md5sum" }}
+          key: v5-do-i-need-to-test-generator-reference-{{ checksum "generator-md5sum" }}
       - run:
           name: "see if we need to test the generator"
           command: |
@@ -279,14 +279,19 @@ jobs:
           paths:
             - JHUGenerator/reference_check
             - JHUGenerator/generator-md5sum
-            - JHUGenerator/reference-lhes-md5sum*
+            - JHUGenerator/reference-lhes-md5sum
+            - JHUGenerator/reference-lhes-md5sum-ggH
+            - JHUGenerator/reference-lhes-md5sum-VBF
+            - JHUGenerator/reference-lhes-md5sum-VH
 
       - run: echo "$CIRCLE_BUILD_URL" > no-need-for-generator-reference
       - save_cache:
-          key: v4-do-i-need-to-test-generator-reference-{{ checksum "generator-md5sum" }}
+          key: v5-do-i-need-to-test-generator-reference-{{ checksum "generator-md5sum" }}
           paths:
             - ~/JHUGen/JHUGenerator/no-need-for-generator-reference
-            - ~/JHUGen/JHUGenerator/reference-lhes-md5sum*
+            - JHUGenerator/reference-lhes-md5sum-ggH
+            - JHUGenerator/reference-lhes-md5sum-VBF
+            - JHUGenerator/reference-lhes-md5sum-VH
             - ~/JHUGen/JHUGenerator/reference_check
 
   generator_syntax:
