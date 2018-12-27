@@ -2,15 +2,15 @@ env: &env
   docker:
     - image: cmssw/cmssw:CMSSW_9_3_2
       environment:
-        PATH: "/home/cmsbld/dos2unix-7.4.0/:/home/cmsbld/githack/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        PATH: "/home/cmsbld/dos2unix-7.4.0/:/home/cmsbld/githack/:/home/cmsbld/CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
         LIBRARY_PATH: "/home/cmsbld/boost_1_61_0/stage/lib"
         CPATH: "/home/cmsbld/boost_1_61_0"
         LD_LIBRARY_PATH: "/home/cmsbld/JHUGen/JHUGenMELA/MELA/data/slc6_amd64_gcc530"
         PYTHONPATH: "/home/cmsbld/JHUGen/JHUGenMELA/MELA/python"
 
         REFERENCE_LHES_USERNAME: "hroskes"
-        REFERENCE_LHES_BUILD_NUMBER: "1056"
-        REFERENCE_JHUGEN_VERSION: "v7.1.2"
+        REFERENCE_LHES_BUILD_NUMBER: "1706"  #note this has to be the build number of generator_reference
+        REFERENCE_JHUGEN_VERSION: "v7.2.3"
 
         REFERENCE_COUPLINGS_SPIN0: "ghg2=0.383432074687728,0.918260989345657 ghg3=6294.49296087723,2253.12941717723 ghg4=0.335495485382528,0.17285803562226 ghz1=0.154934976270359,0.453918144016304 ghz2=0.469297059144414,0.745302300947002 ghz3=3947.40921062637,3597.4885961919 ghz4=0.177791270766536,0.920170534486048 ghzgs2=0.0240331049939919,0.232175381101053 ghzgs3=0.331962910170583,0.0450183240308457 ghzgs4=0.808286540247172,0.133184346613754 ghgsgs2=0.530394804029869,0.211218112389125 ghgsgs3=0.914978695198138,0.055650585081425 ghgsgs4=0.694524307167701,0.511424456076726 ghz1_prime=0.143354267833606,0.0910761280837012 ghz1_prime2=7416.7007267243,4861.35525489789 ghz1_prime3=4431.44656075298,4436.48625894176 ghz1_prime4=2441.69123517064,6946.16318931911 ghz1_prime5=78314042.889773,69465359.939181 ghz1_prime6=51233058.8130761,29537873.5850789 ghz1_prime7=47832192.9001564,59559649.9633293 ghz2_prime=0.574657934630028,0.419921909647711 ghz2_prime2=4385.45874563721,6176.12459852571 ghz2_prime3=4592.16963616924,7549.93910627412 ghz2_prime4=8471.59059254828,7199.72377618203 ghz2_prime5=19558280.2853878,94843889.2606103 ghz2_prime6=23209661.2997162,67617823.213967 ghz2_prime7=7005990.36881107,53660190.8462267 ghz3_prime=4045.70652084481,1969.31611860658 ghz3_prime2=33402456.1975735,3761591.91683341 ghz3_prime3=44855079.5072533,12184926.2142809 ghz3_prime4=27878602.2354225,78237523.9345265 ghz3_prime5=932464343314.011,631580849953.887 ghz3_prime6=358115623918.415,410777463003.642 ghz3_prime7=622981476674.746,618278567362.628 ghz4_prime=0.416533954328515,0.331155934531404 ghz4_prime2=7588.37556838387,3923.43274304607 ghz4_prime3=8956.07552332742,9302.03148380015 ghz4_prime4=3203.44114317821,2863.76747251504 ghz4_prime5=49012574.439022,74595800.8833662 ghz4_prime6=73323809.5808115,53968832.1189929 ghz4_prime7=68563876.4508939,43025213.6236445 ghzgs1_prime2=5668.9642840505,7017.67588606661 kappa=0.689310602032707,0.649791728597345 kappa_tilde=0.202059494758542,0.398401745337368 cz_q1sq=1 cz_q2sq=1 cz_q12sq=-1 Lambda_z11=138.878490490027 Lambda_z21=154.519403407032 Lambda_z31=119.983302253928 Lambda_z41=181.363668458552 Lambda_z12=136.665079759304 Lambda_z22=166.590821204599 Lambda_z32=138.840555064043 Lambda_z42=49.0635744690497 Lambda_z10=9.69729610745373 Lambda_z20=193.257456475821 Lambda_z30=89.2044521747102 Lambda_z40=161.673304321983"
         REFERENCE_COUPLINGS_SPIN1: "zprime_qq_left=0.159847991225521,0.324512374690709 zprime_qq_right=0.514696145793129,0.150317974674483 zprime_zz_1=0.4084476008646,0.289302928999951 zprime_zz_2=0.328820833481286,0.910335641048151"
@@ -25,7 +25,7 @@ env: &env
 
         SEED: "765543533"
 
-        REFERENCE_FILENAMES: "ggH_ZZ.lhe ggH_WW.lhe ggH_Zgamma.lhe ggH_gammagamma.lhe ggH_ZZ_contact.lhe ggH_ZZ_Zprime.lhe spin1_ZZ.lhe spin1_WW.lhe gg_spin2_ZZ.lhe qq_spin2_WW.lhe gg_spin2_Zgamma.lhe qq_spin2_gammagamma.lhe ZH_bb.lhe WH_Zgamma.lhe ee_gammaH_bb.lhe VBF_ZZ.lhe HJJ_WW.lhe HJ_gammagamma.lhe ttH_tautau.lhe gg_bbH_tautau.lhe qq_bbH.lhe tqH_110.lhe tqH_111.lhe tqH_112.lhe tqH_113.lhe tqH_114.lhe"
+        REFERENCE_FILENAMES: "ggH_ZZ.lhe ggH_WW.lhe ggH_Zgamma.lhe ggH_gammagamma.lhe ggH_ZZ_contact.lhe ggH_ZZ_Zprime.lhe spin1_ZZ.lhe spin1_WW.lhe gg_spin2_ZZ.lhe qq_spin2_WW.lhe gg_spin2_Zgamma.lhe qq_spin2_gammagamma.lhe ZH_bb.lhe WH_Zgamma.lhe ee_gammaH_bb.lhe VBF_ZZ.lhe HJJ_WW.lhe HJ_gammagamma.lhe ttH_tautau.lhe gg_bbH_tautau.lhe qq_bbH.lhe tqH_110.lhe tqH_111.lhe tqH_112.lhe tqH_113.lhe tqH_114.lhe gg_ZH_llbb.lhe ee_ZH_llbb.lhe qq_ZH_llbb.lhe"
         REFERENCE_FILENAME_GGH: "ggH_ZZ.lhe"
         REFERENCE_FILENAME_VBF: "VBF_ZZ.lhe"
         REFERENCE_FILENAME_HJJ: "HJJ_WW.lhe"
@@ -135,6 +135,9 @@ jobs:
       - run: ./JHUGen Seed=$SEED PDFSet=3 Process=50 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/WH DecayMode1=11 $REFERENCE_COUPLINGS_SPIN0
       - run: ./JHUGen Seed=$SEED VegasNc0=100000 ReadLHE=compare_to_reference/WH.lhe DataFile=compare_to_reference/WH_Zgamma DecayMode1=9 DecayMode2=7 $REFERENCE_COUPLINGS_SPIN0
       - run: ./JHUGen Seed=$SEED Collider=0 Process=50 VegasNc0=100000 VegasNc2=100 HbbDK DataFile=compare_to_reference/ee_gammaH_bb DecayMode1=7 $REFERENCE_COUPLINGS_SPIN0
+      - run: ./JHUGen Seed=$SEED Collider=1 Process=51 VH_PC=gg HbbDK=1 DecayMode1=0 $REFERENCE_COUPLINGS_SPIN0 Unweighted=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/gg_ZH_llbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0
+      - run: ./JHUGen Seed=$SEED Collider=0 Process=51 VH_PC=ee HbbDK=1 DecayMode1=0 $REFERENCE_COUPLINGS_SPIN0 Unweighted=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ee_ZH_llbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0 epPolarization=-100 emPolarization=100
+      - run: ./JHUGen Seed=$SEED Collider=1 Process=51 VH_PC=qq HbbDK=1 DecayMode1=0 $REFERENCE_COUPLINGS_SPIN0 Unweighted=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/qq_ZH_llbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0 ghz1=0.0,0.0 ghz4=1.0,0.0
 
       #don't use WW separate in VBF.  In any case, there is interference
       - run: ./JHUGen Seed=$SEED PDFSet=3 Process=60 VegasNc0=5000000 VegasNc2=100 DataFile=compare_to_reference/VBF $REFERENCE_COUPLINGS_SPIN0
@@ -162,7 +165,7 @@ jobs:
       - run:
           name: "download reference lhes"
           command: |
-            exitstatus=0
+            echo 0 > reference_check/exit_status
             mkdir reference
             cd reference
             JHUGEN_VERSION=$(grep -i JHUGen_Version ~/JHUGen/JHUGenerator/mod_Parameters.F90 | sed -r 's|.*"(.*)".*|\1|g')
@@ -173,21 +176,20 @@ jobs:
               fullname="$(grep $filename /tmp/artifacts.txt)" &&
               wget "$fullname" &&
               sed -i -r "s/(Output from the JHUGenerator )$REFERENCE_JHUGEN_VERSION/\1$JHUGEN_VERSION/" $filename || {
-                exitstatus=1
-                touch reference_check/reference_failed
+                echo 1 > ../reference_check/exit_status
+                touch ../reference_check/reference_failed
                 if [ $filename == $REFERENCE_FILENAME_GGH ]; then
-                  touch reference_check/reference_failed_ggH
+                  touch ../reference_check/reference_failed_ggH
                 fi
                 if [ $filename == $REFERENCE_FILENAME_VBF ] || [ $filename == $REFERENCE_FILENAME_HJJ ]; then
-                  touch reference_check/reference_failed_VBF
+                  touch ../reference_check/reference_failed_VBF
                 fi
               }
             done
-            exit $exitstatus
+          when: always
       - run:
           name: "compare to reference"
           command: |
-            exitstatus=0
             {
               for filename in $REFERENCE_FILENAMES; do
                 echo "================"
@@ -195,7 +197,7 @@ jobs:
                 echo "================"
                 echo
                 sdiff -s reference/$filename compare_to_reference/$filename && echo "no change" || {
-                  exitstatus=1
+                  echo 1 > reference_check/exit_status
                   touch reference_check/reference_failed
                   if [ $filename == $REFERENCE_FILENAME_GGH ]; then
                     touch reference_check/reference_failed_ggH
@@ -206,17 +208,19 @@ jobs:
                 }
               done
             } |& tee reference_check/output
-            echo $exitstatus > reference_check/exit_status
-            #do NOT exit $exitstatus
+            #do NOT exit $(cat reference_check/exit_status)
             #if the ggH or VBF files have changed, this job needs to succeed
             #so that the dependent jobs to make plots run
             #a separate job reference_check will actually exit $(cat reference_check/exit_status)
+          when: always
       - run:
           name: "save reference"
           command: |
-            mkdir -p ~/artifacts/
-            mv compare_to_reference ~/artifacts/reference_lhes
-          when: on_fail
+            if ! (cat reference_check/exit_status && exit $(cat reference_check/exit_status)); then
+              mkdir -p ~/artifacts/
+              mv compare_to_reference ~/artifacts/reference_lhes
+            fi
+          when: always
       - store_artifacts:
           path: ~/artifacts/reference_lhes
       - persist_to_workspace:
@@ -252,6 +256,9 @@ jobs:
       - run: ./JHUGen Collider=0 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/ee_ZH DecayMode1=9
       - run: ./JHUGen VegasNc0=100000 TauDK=0 ReadLHE=$LHEDIR/ee_ZH.lhe DataFile=$LHEDIR/ee_ZH_tautau
       - run: ./JHUGen Collider=0 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/ee_gammaH_bb DecayMode1=7 HbbDK ghz1=0,0 ghgsgs2=1,0 epPolarization=100 emPolarization=-100
+      - run: ./JHUGen PDFSet=2 Collider=1 Process=51 VH_PC=gg HbbDK=1 DecayMode1=9 ghz1=0.0,0.0 ghz2=1.0,0.0 Unweighted=1 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/gg_ZH_llbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0
+      - run: ./JHUGen Collider=0 Process=51 VH_PC=ee HbbDK=1 DecayMode1=9 ghz1=0.0,0.0 ghz2=1.0,0.0 ghz4=0.0,1.0 Unweighted=1 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/ee_ZH_llbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0
+      #- run: ./JHUGen PDFSet=2 Collider=1 Process=52 Unweighted=1 VegasNc1=100000 VegasNc2=1000000 DataFile=$LHEDIR/gg_HH_bbbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0 Interf=0 Seed=1
       #H+J
       - run: ./JHUGen PDFSet=3 Process=62 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/HJ
       #ttH, bbH, tH
@@ -275,25 +282,26 @@ jobs:
       - run: "grep -q 'Interference: F' $LHEDIR/tbarH_t_ZZ.lhe"
 
       #test syntax for VBF offshell, use a trick to make it faster and physically nonsense
-      - run:
-          name: "test syntax for VBF offshell with a hack to make it faster"
-          command: |
-            line=$(grep -in "subroutine EvalAmp_qqVVqq(" mod_MCFMWrapper.F90 | head -1 | sed "s/:.*//")
-            while sed -n ${line}p mod_MCFMWrapper.F90 | grep -iE '(subroutine|::|use|implicit)'; do
-              line=$(expr $line + 1)
-              if [ $line -gt $(wc -l < mod_MCFMWrapper.F90) ]; then exit 1; fi
-            done
-            sed -i "${line}ireturn" mod_MCFMWrapper.F90
-            sed -i "${line}imsq(0,:)=0d0" mod_MCFMWrapper.F90
-            sed -i "${line}imsq(:,0)=0d0" mod_MCFMWrapper.F90
-            sed -i "${line}imsq(:,:)=1d0" mod_MCFMWrapper.F90
-            make
-            for run in 1 2 3 4; do
-              ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=100 Process=66 DataFile=$LHEDIR/VBFoffshell_66_DONOTUSE.lhe CSmaxFile=$LHEDIR/VBFoffshell_66_DONOTUSE.lhe m4l_min=100 m4l_max=200 VBFoffsh_run=$run
-            done
-            for run in 1 2 3 4; do
-              ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=100 Process=66 DataFile=$LHEDIR/VBFoffshell_66_DONOTUSE.lhe m4l_min=100 m4l_max=200 VBFoffsh_run=$run ReadCSmax
-            done
+      #but it doesn't always work so disabling it
+#      - run:
+#          name: "test syntax for VBF offshell with a hack to make it faster"
+#          command: |
+#            line=$(grep -in "subroutine EvalAmp_qqVVqq(" mod_MCFMWrapper.F90 | head -1 | sed "s/:.*//")
+#            while sed -n ${line}p mod_MCFMWrapper.F90 | grep -iE '(subroutine|::|use|implicit)'; do
+#              line=$(expr $line + 1)
+#              if [ $line -gt $(wc -l < mod_MCFMWrapper.F90) ]; then exit 1; fi
+#            done
+#            sed -i "${line}ireturn" mod_MCFMWrapper.F90
+#            sed -i "${line}imsq(0,:)=0d0" mod_MCFMWrapper.F90
+#            sed -i "${line}imsq(:,0)=0d0" mod_MCFMWrapper.F90
+#            sed -i "${line}imsq(:,:)=1d0" mod_MCFMWrapper.F90
+#            make
+#            for run in 1 2 3 4 5; do
+#              ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=100 Process=66 DataFile=$LHEDIR/VBFoffshell_66_DONOTUSE.lhe CSmaxFile=$LHEDIR/VBFoffshell_66_DONOTUSE.lhe m4l_min=100 m4l_max=200 VBFoffsh_run=$run
+#            done
+#            for run in 1 2 3 4 5; do
+#              ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=100 Process=66 DataFile=$LHEDIR/VBFoffshell_66_DONOTUSE.lhe m4l_min=100 m4l_max=200 VBFoffsh_run=$run ReadCSmax
+#            done
       #not needed as long as VBF offshell is the last test of JHUGen in this workflow
       #- run:
       #    name: "undo VBF offshell hack"
@@ -336,43 +344,79 @@ jobs:
           key: v1_analyzer
           paths: ~/CMSJHU_AnalysisMacros/
 
-      - run: '! [ -f reference_check/reference_failed_ggH ]'
+      - run: echo "export LHEDIR=$HOME/artifacts/ggH" >> $BASH_ENV
+      - run: mkdir -p $LHEDIR/
       - run:
-          command: echo "export LHEDIR=$HOME/artifacts/ggH" >> $BASH_ENV
-          when: on_fail
+          name: "md5sum of files relevant for analytical plots"
+          command: |
+            cd ..
+            #take the whole MELA C++ code because of interdependencies (TCouplingsBase etc.), too complicated to sort out
+            #but no need for fortran or python
+            md5sum $(
+              git ls-files \
+                .circleci/angularDistributions_spin0_HVV.cc \
+                JHUGenMELA/MELA/src/ \
+                JHUGenMELA/MELA/interface/ \
+              | sort
+            ) > JHUGenerator/analytical-md5sum
+      - restore_cache:
+          key: v1-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum" }}
       - run:
-          command: mkdir -p $LHEDIR/
-          when: on_fail
+          name: "see if we need ggH analytical plots"
+          command: |
+            DOPLOTS=true
+            if [ "$(cat no-need-for-ggH-plots)" ]; then
+              DOPLOTS=false
+            fi
+            if [ -f reference_check/reference_failed_ggH ]; then
+              DOPLOTS=true
+            fi
+            echo "export DOPLOTS=$DOPLOTS" >> $BASH_ENV
       - run:
           name: generate
-          when: on_fail
           command: |
-            ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/SM
-            ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/PS ghz1=0,0 ghz4=1,0
-            #./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/fa30.5 ghz1=1,0 ghz4=2.55052,0
-            #./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/fa30.5i ghz1=1,0 ghz4=0,2.55052
-            ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/a2 ghz1=0,0 ghz2=1,0
+            if $DOPLOTS; then
+              ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/SM
+              ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/PS ghz1=0,0 ghz4=1,0
+              #./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/fa30.5 ghz1=1,0 ghz4=2.55052,0
+              #./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/fa30.5i ghz1=1,0 ghz4=0,2.55052
+              ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/a2 ghz1=0,0 ghz2=1,0
+            else
+              echo "The LHE files can be found in the artifacts at $(cat no-need-for-ggH-plots)"
+            fi
       - run:
           name: analyzer
-          when: on_fail
           command: |
-            analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SM.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 SM.lhe
-            analyzer fileLevel=0 outdir=$LHEDIR/ outfile=PS.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 PS.lhe
-            #analyzer fileLevel=0 outdir=$LHEDIR/ outfile=fa30.5.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 fa30.5.lhe
-            #analyzer fileLevel=0 outdir=$LHEDIR/ outfile=fa30.5i.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 fa30.5i.lhe
-            analyzer fileLevel=0 outdir=$LHEDIR/ outfile=a2.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 a2.lhe
+            if $DOPLOTS; then
+              analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SM.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 SM.lhe
+              analyzer fileLevel=0 outdir=$LHEDIR/ outfile=PS.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 PS.lhe
+              #analyzer fileLevel=0 outdir=$LHEDIR/ outfile=fa30.5.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 fa30.5.lhe
+              #analyzer fileLevel=0 outdir=$LHEDIR/ outfile=fa30.5i.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 fa30.5i.lhe
+              analyzer fileLevel=0 outdir=$LHEDIR/ outfile=a2.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 a2.lhe
+            else
+              echo "The root files can be found in the artifacts at $(cat no-need-for-ggH-plots)"
+            fi
       - run:
           name: plots
-          when: on_fail
           command: |
-            cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits
-            echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$LHEDIR/SM.root", "$LHEDIR/SM/", 1, 0, 0, 0, 0)' | root -b
-            echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$LHEDIR/PS.root", "$LHEDIR/PS/", 0, 0, 0, 1, 0)' | root -b
-            echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$LHEDIR/a2.root", "$LHEDIR/a2/", 0, 1, 0, 0, 0)' | root -b
-            #echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$LHEDIR/fa30.5.root", "$LHEDIR/fa30.5/", 1, 2.55052, 0, 0, 0)' | root -b
-            #echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$LHEDIR/fa30.5i.root", "$LHEDIR/fa30.5i/", 1, 0, 2.55052, 0, 0)' | root -b
+            if $DOPLOTS; then
+              cd ../.circleci
+              root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/SM.root", "ghv1=1,0", "ZZ4l", "$LHEDIR/SM/")'
+              root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/PS.root", "ghv1=0,0;ghv4=1,0", "ZZ4l", "$LHEDIR/PS/")'
+              #root -b -q '../JHUGenMELA/MELA/test/loadMELA.C angularDistributions_spin0_HVV.cc+("$LHEDIR/fa30.5.root", "ghv1=1,0;ghv4=2.55052,0", "ZZ4l", "$LHEDIR/fa30.5/")'
+              #root -b -q '../JHUGenMELA/MELA/test/loadMELA.C angularDistributions_spin0_HVV.cc+("$LHEDIR/fa30.5i.root", "ghv1=1,0;ghv4=0,2.55052", "ZZ4l", "$LHEDIR/fa30.5i/")'
+              root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/a2.root", "ghv1=0,0;ghv2=1,0", "ZZ4l", "$LHEDIR/a2/")'
+            else
+              echo "The plots can be found in the artifacts at $(cat no-need-for-ggH-plots)"
+            fi
+          no_output_timeout: 1h
       - store_artifacts:
           path: ~/artifacts/ggH
+      - run: echo "$CIRCLE_BUILD_URL" > no-need-for-ggH-plots
+      - save_cache:
+          key: v1-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum" }}
+          paths: ~/JHUGen/JHUGenerator/no-need-for-ggH-plots
+      - run: '! [ -f reference_check/reference_failed_ggH ]'
 
   plots_VBF:
     <<: *env
@@ -473,7 +517,7 @@ jobs:
               ./JHUGen PDFSet=3 Process=80  VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/ttH DecayMode1=11 DecayMode2=11 TopDK=1
             )
             python lhefile.py --lhefile-hwithdecay=tbarH_t_ZZ.lhe --lhefile-jhugenvbfvh=WH.lhe --lhefile-jhugentth=ttH.lhe ||
-            mv *.lhe ~/artifacts/MELA/
+            (mv *.lhe ~/artifacts/MELA/; exit 1)
       - store_artifacts:
           path:
             ~/artifacts/MELA/
@@ -635,8 +679,9 @@ jobs:
             git checkout -- makefile
             exit $exitcode
           when: always
-      - run: grep 'linkQCDLoopLib *= *No' JHUGenerator/makefile
-      - run: grep 'linkCollierLib *= *No' JHUGenerator/makefile
+      - run:
+          command: grep 'linkCollierLib *= *No' JHUGenerator/makefile
+          when: always
 
       - restore_cache:
           key: v1_dos2unix-7.4.0
@@ -651,11 +696,13 @@ jobs:
               sed -i -r "s/(ENABLE_NLS *=)/#\1/" Makefile
               make
             fi
+          when: always
       - run:
           name: "check that newlines are not annoying"
           command: |
             dos2unix $(git ls-files)
-            git diff --exit-code
+            git diff --exit-code --stat
+          when: always
       - save_cache:
           key: v1_dos2unix-7.4.0
           paths: ~/dos2unix-7.4.0

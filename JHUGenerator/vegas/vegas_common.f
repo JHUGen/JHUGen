@@ -5,7 +5,7 @@
       double precision xi(250,mxdim),si,si2,swgt,schi
       integer ndo,it,idum
       logical readin,writeout,stopvegas
-      character*(72) ingridfile,outgridfile
+      character*(500) ingridfile,outgridfile
       common/gridinfo_logic/readin,writeout,stopvegas
       common/gridinfo_char/ingridfile,outgridfile
       common/bveg1/xl,xu,acc,ndim,ncall,itmx,nprn
