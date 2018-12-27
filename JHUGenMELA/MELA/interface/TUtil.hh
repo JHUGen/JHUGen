@@ -62,17 +62,17 @@ namespace TUtil{
   void scaleMomentumToEnergy(const TLorentzVector& massiveJet, TLorentzVector& masslessJet, double mass=0);
   // Function that has generic removal features
   std::pair<TLorentzVector, TLorentzVector> removeMassFromPair(
-    TLorentzVector jet1, int jet1Id,
-    TLorentzVector jet2, int jet2Id,
+    TLorentzVector const& jet1, int const& jet1Id,
+    TLorentzVector const& jet2, int const& jet2Id,
     double m1=0, double m2=0
     );
   // Function that adjusts top daughter kinematics
   void adjustTopDaughters(SimpleParticleCollection_t& daughters); // Daughters are arranged as b, Wf, Wfb
   // Compute a fake jet from the massless jets
-  void computeFakeJet(TLorentzVector realJet, TLorentzVector others, TLorentzVector& fakeJet); // Input massive + higgs -> output massless fake jet
+  void computeFakeJet(TLorentzVector const& realJet, TLorentzVector const& others, TLorentzVector& fakeJet); // Input massive + higgs -> output massless fake jet
 
   // TLorentzVector::Boost in complex plane
-  std::pair<TLorentzVector, TLorentzVector> ComplexBoost(TVector3 beta, TLorentzVector p4);
+  std::pair<TLorentzVector, TLorentzVector> ComplexBoost(TVector3 const& beta, TLorentzVector const& p4);
 
   /// Compute decay angles from the lepton four-vectors and pdgIds.  
   /// Theta1 is the angle corresponding to Z1.
@@ -91,7 +91,7 @@ namespace TUtil{
     TLorentzVector Z2_lept2, int Z2_lept2Id
     );
   void computeAnglesCS(
-    float pbeam,
+    float const& pbeam,
     float& costhetastar,
     float& costheta1,
     float& costheta2,
@@ -252,7 +252,7 @@ namespace TUtil{
   double SumMEPDF(const TLorentzVector& p0, const TLorentzVector& p1, double msq[nmsq][nmsq], MelaIO* RcdME, const double& EBEAM, const TVar::VerbosityLevel& verbosity);
 
   // Propagator reweighting
-  double ResonancePropagator(double sqrts, TVar::ResonancePropagatorScheme scheme);
+  double ResonancePropagator(double const& sqrts, TVar::ResonancePropagatorScheme scheme);
 
   // Boost the particles with or without associated ones to pT=0 frame and return std::vectors filled with (id, momentum) pairs
   void GetBoostedParticleVectors(

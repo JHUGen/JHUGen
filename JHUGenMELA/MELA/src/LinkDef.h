@@ -4,6 +4,8 @@
 #include "MELANCSplineFactory_3D.h"
 #include "MELAFuncPdf.h"
 #include "Mela.h"
+#include "ZZMatrixElement.h"
+// Note that Mela.h does NOT contain ZZMatrixElement.h but it still declares that class. This is why you include ZZMatrixelement.h here, and AFTER Mela.h.
 
 #ifdef __CINT__
 

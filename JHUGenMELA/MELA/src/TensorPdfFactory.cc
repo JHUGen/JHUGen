@@ -5,7 +5,7 @@ using namespace std;
 using namespace MELAStreamHelpers;
 
 
-TensorPdfFactory::TensorPdfFactory(RooSpin::modelMeasurables measurables_, RooSpin::VdecayType V1decay_, RooSpin::VdecayType V2decay_, Bool_t OnshellH_) :
+TensorPdfFactory::TensorPdfFactory(RooSpin::modelMeasurables const& measurables_, RooSpin::VdecayType V1decay_, RooSpin::VdecayType V2decay_, Bool_t OnshellH_) :
 SpinPdfFactory(measurables_, V1decay_, V2decay_, OnshellH_)
 {
   initGVals();
@@ -89,5 +89,3 @@ void TensorPdfFactory::makeCouplingsConst(bool yesNo){
     }
   }
 }
-
-

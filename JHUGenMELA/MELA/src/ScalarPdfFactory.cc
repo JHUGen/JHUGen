@@ -5,7 +5,7 @@ using namespace std;
 using namespace MELAStreamHelpers;
 
 
-ScalarPdfFactory::ScalarPdfFactory(RooSpin::modelMeasurables measurables_, bool acceptance_, RooSpin::VdecayType V1decay_, RooSpin::VdecayType V2decay_, Bool_t OnshellH_) :
+ScalarPdfFactory::ScalarPdfFactory(RooSpin::modelMeasurables const& measurables_, bool acceptance_, RooSpin::VdecayType V1decay_, RooSpin::VdecayType V2decay_, Bool_t OnshellH_) :
 SpinPdfFactory(measurables_, V1decay_, V2decay_, OnshellH_),
 parameterization(0),
 pmf_applied(false),
@@ -14,7 +14,7 @@ acceptance(acceptance_)
   initGVals();
 }
 ScalarPdfFactory::ScalarPdfFactory(
-  RooSpin::modelMeasurables measurables_,
+  RooSpin::modelMeasurables const& measurables_,
   double gRatio_[4][8],
   double gZGsRatio_[4][1],
   double gGsGsRatio_[3][1],
@@ -513,7 +513,8 @@ void ScalarPdfFactory::initGVals(){
     for (int v=0; v<8; v++){
       for (int im=0; im<2; im++){
         TString strcore;
-        double initval = 0;
+        double initval = ((v==0 && im==0) ? 1 : 0);
+
         TString strapp = "Val";
         if (im==1) strapp.Append("Im");
         if (v>1) strapp.Prepend(Form("%i", v));
@@ -521,7 +522,6 @@ void ScalarPdfFactory::initGVals(){
 
         strcore = "g1";
         strcore.Append(strapp);
-        if (v==0 && im==0) initval = 1;
         RooRealVar* g1Val = new RooRealVar(strcore, strcore, initval, -1e15, 1e15);
         g1Val->removeMin();
         g1Val->removeMax();

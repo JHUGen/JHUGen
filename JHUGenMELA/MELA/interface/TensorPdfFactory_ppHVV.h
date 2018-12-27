@@ -8,7 +8,7 @@
 class TensorPdfFactory_ppHVV : public TensorPdfFactory{
 public:
 
-  TensorPdfFactory_ppHVV(RooSpin::modelMeasurables measurables_, RooSpin::VdecayType V1decay_=RooSpin::kVdecayType_Zll, RooSpin::VdecayType V2decay_=RooSpin::kVdecayType_Zll, Bool_t OnshellH_=true);
+  TensorPdfFactory_ppHVV(RooSpin::modelMeasurables const& measurables_, RooSpin::VdecayType V1decay_=RooSpin::kVdecayType_Zll, RooSpin::VdecayType V2decay_=RooSpin::kVdecayType_Zll, Bool_t OnshellH_=true);
   ~TensorPdfFactory_ppHVV();
 
   void setZZ4fOrdering(bool flag=true);

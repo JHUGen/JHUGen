@@ -55,7 +55,7 @@ namespace PDGHelpers{
     bool allowUnknown=false
     );
 
-  bool allEquivalent(std::vector<int> ids, bool allowUnknown=false);
+  bool allEquivalent(std::vector<int> const& ids, bool allowUnknown=false);
 
 
   void setCandidateDecayMode(TVar::CandidateDecayMode mode);
