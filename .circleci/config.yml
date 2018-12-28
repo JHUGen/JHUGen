@@ -35,7 +35,9 @@ env: &env
         #2: g1-g4 real and imaginary mixtures
         #3: g1-g2 real and imaginary mixtures
         #4: g1 g2 g4 at 120 degree angles, left CT, vector CT
-        #if you change this, you probably also want to update older-ggH-plots below
+        #if you add more, you also HAVE to update plots_ggH below
+        #to run JHUGen, convert to root files, and make the plots
+        #and also update the cache bookkeeping
         WHICHPLOTS: 4
 
 cmsrelcmsenv: &cmsrelcmsenv
@@ -255,7 +257,9 @@ jobs:
           name: "reference LHEs md5sum"
           command: |
             if $DOREFERENCE; then
-              cd compare_to_reference/
+              cp -r compare_to_reference/ tmp/
+              cd tmp/
+              sed -i "s/(Output from the JHUGenerator )$JHUGEN_VERSION/\1JHUGEN_VERSION/" *.lhe
               md5sum $REFERENCE_FILENAMES > ../reference-lhes-md5sum
               md5sum $REFERENCE_FILENAME_GGH > ../reference-lhes-md5sum-ggH
               md5sum $REFERENCE_FILENAME_VBF $REFERENCE_FILENAME_HJJ > ../reference-lhes-md5sum-VBF
@@ -452,13 +456,27 @@ jobs:
                 JHUGenMELA/MELA/interface/ \
               | sort
             ) > JHUGenerator/analytical-md5sum
+            for i in {1..4}; do
+              (
+                cat analytical-md5sum
+                echo $i
+              ) > analytical-md5sum-$i
+            done
+            cp analytical-md5sum-$WHICHPLOTS analytical-md5sum-theseplots
+      #https://discuss.circleci.com/t/cannot-use-circle-yml-environment-variables-in-cache-keys/10994
       - restore_cache:
-          key: v1-ggH-do-i-need-analytic-plots-{{ .Environment.WHICHPLOTS }}-{{ checksum "analytical-md5sum" }}
+          key: v1-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum-1" }}
+      - restore_cache:
+          key: v1-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum-2" }}
+      - restore_cache:
+          key: v1-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum-3" }}
+      - restore_cache:
+          key: v1-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum-4" }}
       - run:
           name: "see if we need ggH analytical plots"
           command: |
             DOPLOTS=true
-            if [ "$(cat no-need-for-ggH-plots)" ]; then
+            if [ "$(cat no-need-for-ggH-plots/$WHICHPLOTS)" ]; then
               DOPLOTS=false
             fi
             echo "export DOPLOTS=$DOPLOTS" >> $BASH_ENV
@@ -487,7 +505,7 @@ jobs:
                 exit 1
               fi
             else
-              echo "The LHE files can be found in the artifacts at $(cat no-need-for-ggH-plots)"
+              echo "The LHE files can be found in the artifacts at $(cat no-need-for-ggH-plots/$WHICHPLOTS)"
             fi
       - run:
           name: analyzer
@@ -512,7 +530,7 @@ jobs:
                 exit 1
               fi
             else
-              echo "The root files can be found in the artifacts at $(cat no-need-for-ggH-plots)"
+              echo "The root files can be found in the artifacts at $(cat no-need-for-ggH-plots/$WHICHPLOTS)"
             fi
       - run:
           name: plots
@@ -541,36 +559,35 @@ jobs:
                 exit 1
               fi
             else
-              echo "The plots can be found in the artifacts at $(cat no-need-for-ggH-plots older-ggH-plots)"
+              echo "The plots can be found in the artifacts at $(cat no-need-for-ggH-plots/$WHICHPLOTS)"
             fi
           no_output_timeout: 1h
+      - run:
+          name: other plot versions
+          command: |
+            echo "other versions at:"
+            echo
+            for i in {1..4}; do
+              if [ $i -ne $WHICHPLOTS ]; then
+                if [ -f no-need-for-ggH-plots/$i ]; then
+                  cat no-need-for-ggH-plots/$i
+                else
+                  echo "plot set #$i has not been made yet for this version of the generator/MELA/plotting script."
+                  echo "to make it, set WHICHPLOTS in .circleci/config.yml to $i"
+                fi
+                echo
+              fi
+            done
       - store_artifacts:
           path: ~/artifacts/ggH
-      - run: echo "$CIRCLE_BUILD_URL" > no-need-for-ggH-plots
       - run:
-          name: older plot versions
+          name: "save this url"
           command: |
-            echo "other versions at:" > older-ggH-plots
-            #don't use elif here!
-            if [ $WHICHPLOTS -ne 1 ]; then
-              echo "- https://circleci.com/gh/JHUGen/JHUGen/788 (pure SM, a2, a3)" >> older-ggH-plots
-            fi
-            if [ $WHICHPLOTS -ne 2 ]; then
-              echo "- https://circleci.com/gh/JHUGen/JHUGen/796 (g1=1 g4=g4mix, g1=1 g4=g4mix*i)" >> older-ggH-plots
-            fi
-            if [ $WHICHPLOTS -ne 3 ]; then
-              echo "- https://circleci.com/gh/JHUGen/JHUGen/806 (g1=1 g2=g2mix, g1=1 g2=g2mix*i)" >> older-ggH-plots
-            fi
-            if [ $WHICHPLOTS -ne 4 ]; then
-              #change this to
-              #echo "- put url here (g1=1 g2=g2mix(-1+i sqrt(3))/2 g4=2.55052*(-1-i sqrt(3))/2, left CT, vector CT)" >> older-ggH-plots
-              echo "- https://circleci.com/gh/hroskes/JHUGen/1759 (g1=g2=1 g4=i, left CT, vector CT - all buggy)" >> older-ggH-plots
-            fi
-            cat older-ggH-plots
+            mkdir -p no-need-for-ggH-plots
+            echo "$CIRCLE_BUILD_URL" > no-need-for-ggH-plots/$WHICHPLOTS
       - save_cache:
-          key: v1-ggH-do-i-need-analytic-plots-{{ .Environment.WHICHPLOTS }}-{{ checksum "analytical-md5sum" }}
-          paths: ~/JHUGen/JHUGenerator/no-need-for-ggH-plots
-          paths: ~/JHUGen/JHUGenerator/older-ggH-plots
+          key: v1-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum-theseplots" }}
+          paths: ~/JHUGen/JHUGenerator/no-need-for-ggH-plots/
       - run: '! [ -f reference_check/reference_failed_ggH ]'
 
   plots_VBF:
