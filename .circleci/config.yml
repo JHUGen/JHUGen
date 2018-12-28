@@ -456,6 +456,7 @@ jobs:
                 JHUGenMELA/MELA/interface/ \
               | sort
             ) > JHUGenerator/analytical-md5sum
+            cd JHUGenerator
             for i in {1..4}; do
               (
                 cat analytical-md5sum
