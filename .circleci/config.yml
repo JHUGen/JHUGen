@@ -479,7 +479,7 @@ jobs:
               elif [ $WHICHPLOTS -eq 4 ]; then
                 #want real and imaginary interference between all three components
                 #g1 = 1, g2 = 1.65684 * (-1 + i sqrt(3)) / 2, g4 = 2.55052 * (-1 - i sqrt(3)) / 2
-                ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 DecayMode2=2 DataFile=$LHEDIR/SMa2a3 ghz1=1,0 ghz2=-0.82842,1.43486553 ghz4=-1.27526,2.20881511
+                ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 DataFile=$LHEDIR/SMa2a3 ghz1=1,0 ghz2=-0.82842,1.43486553 ghz4=-1.27526,2.20881511
                 ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 DecayMode2=2 DataFile=$LHEDIR/CT_left ghz1=0,0 ghzzp1=1,0 ezp_Ta_left=1,0
                 ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 DecayMode2=2 DataFile=$LHEDIR/CT_leftright ghz1=0,0 ghzzp1=1,0 ezp_Ta_left=1,0 ezp_Ta_right=1,0
               else
@@ -534,8 +534,8 @@ jobs:
                 #g1 = 1, g2 = 1.65684 * (-1 + i sqrt(3)) / 2, g4 = 2.55052 * (-1 - i sqrt(3)) / 2
                 root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/SMa2a3.root", "ghv1=1,0;ghv2=-0.82842,1.43486553;ghv4=-1.27526,2.20881511", "ZZ4l", "$LHEDIR/SMa2a3/")'
 
-                root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/CT_left.root", "ghvvp1=1,0;gVprimeff_decay2_left=1", "ZZ4l", "$LHEDIR/CT_left/")'
-                root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/CT_leftright.root", "ghvvp1=1,0;gVprimeff_decay2_left=1;gVprimeff_decay2_right=1", "ZZ4l", "$LHEDIR/CT_leftright/")'
+                root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/CT_left.root", "ghvvp1=1,0;gVprimeff_decay2_left=1", "ZZ4l", "$LHEDIR/CT_left/", 125, 80, true)'
+                root -b -q '../JHUGenMELA/MELA/test/loadMELA.C' 'angularDistributions_spin0_HVV.cc+("$LHEDIR/CT_leftright.root", "ghvvp1=1,0;gVprimeff_decay2_left=1;gVprimeff_decay2_right=1", "ZZ4l", "$LHEDIR/CT_leftright/", 125, 80, true)'
               else
                 echo "Unknown WHICHPLOTS value: $WHICHPLOTS"
                 exit 1
