@@ -466,13 +466,13 @@ jobs:
             cp analytical-md5sum-$WHICHPLOTS analytical-md5sum-theseplots
       #https://discuss.circleci.com/t/cannot-use-circle-yml-environment-variables-in-cache-keys/10994
       - restore_cache:
-          key: v2-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum-1" }}
+          key: v3-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum-1" }}
       - restore_cache:
-          key: v2-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum-2" }}
+          key: v3-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum-2" }}
       - restore_cache:
-          key: v2-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum-3" }}
+          key: v3-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum-3" }}
       - restore_cache:
-          key: v2-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum-4" }}
+          key: v3-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum-4" }}
       - run:
           name: "see if we need ggH analytical plots"
           command: |
@@ -513,19 +513,19 @@ jobs:
           command: |
             if $DOPLOTS; then
               if [ $WHICHPLOTS -eq 1 ]; then
-                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SM.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 SM.lhe
-                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=PS.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 PS.lhe
-                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=a2.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 a2.lhe
+                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SM.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 genDecayMode=-1 SM.lhe
+                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=PS.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 genDecayMode=-1 PS.lhe
+                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=a2.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 genDecayMode=-1 a2.lhe
               elif [ $WHICHPLOTS -eq 2 ]; then
-                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SMa3.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 SMa3.lhe
-                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SMa3imag.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 SMa3imag.lhe
+                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SMa3.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 genDecayMode=-1 SMa3.lhe
+                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SMa3imag.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 genDecayMode=-1 SMa3imag.lhe
               elif [ $WHICHPLOTS -eq 3 ]; then
-                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SMa2.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 SMa2.lhe
-                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SMa2imag.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 SMa2imag.lhe
+                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SMa2.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 genDecayMode=-1 SMa2.lhe
+                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SMa2imag.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 genDecayMode=-1 SMa2imag.lhe
               elif [ $WHICHPLOTS -eq 4 ]; then
-                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SMa2a3.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 SMa2a3.lhe
-                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=CT_left.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 CT_left.lhe
-                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=CT_leftright.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 CT_leftright.lhe
+                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SMa2a3.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 genDecayMode=-1 SMa2a3.lhe
+                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=CT_left.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 genDecayMode=-1 CT_left.lhe
+                analyzer fileLevel=0 outdir=$LHEDIR/ outfile=CT_leftright.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 genDecayMode=-1 CT_leftright.lhe
               else
                 echo "Unknown WHICHPLOTS value: $WHICHPLOTS"
                 exit 1
@@ -587,7 +587,7 @@ jobs:
             mkdir -p no-need-for-ggH-plots
             echo "$CIRCLE_BUILD_URL" > no-need-for-ggH-plots/$WHICHPLOTS
       - save_cache:
-          key: v2-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum-theseplots" }}
+          key: v3-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum-theseplots" }}
           paths: ~/JHUGen/JHUGenerator/no-need-for-ggH-plots/
       - run: '! [ -f reference_check/reference_failed_ggH ]'
 
