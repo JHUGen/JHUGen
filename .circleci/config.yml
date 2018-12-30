@@ -144,7 +144,7 @@ jobs:
               | sort
             ) > JHUGenerator/generator-md5sum
       - restore_cache:
-          key: v6-do-i-need-to-test-generator-reference-{{ checksum "generator-md5sum" }}
+          key: v7-do-i-need-to-test-generator-reference-{{ checksum "generator-md5sum" }}
       - run:
           name: "see if we need to test the generator"
           command: |
@@ -204,7 +204,6 @@ jobs:
       - run:
           name: "download reference lhes"
           command: |
-            if ! $DOREFERENCE; then exit 0; fi
             echo 0 > reference_check/exit_status
             mkdir reference
             cd reference
@@ -232,10 +231,6 @@ jobs:
       - run:
           name: "compare to reference"
           command: |
-            if ! $DOREFERENCE; then
-              echo "The generator is unchanged from $(cat no-need-for-generator-reference) when the last reference test was done."
-              exit 0
-            fi
             {
               for filename in $REFERENCE_FILENAMES; do
                 echo "================"
@@ -265,24 +260,24 @@ jobs:
       - run:
           name: "reference LHEs md5sum"
           command: |
-            if $DOREFERENCE; then
-              cp -r compare_to_reference/ tmp/
-              cd tmp/
-              sed -i -r "s/(Output from the JHUGenerator )$JHUGEN_VERSION/\1JHUGEN_VERSION/" *.lhe
-              md5sum $REFERENCE_FILENAMES > ../reference-lhes-md5sum
-              md5sum $REFERENCE_FILENAME_GGH > ../reference-lhes-md5sum-ggH
-              md5sum $REFERENCE_FILENAME_VBF $REFERENCE_FILENAME_HJJ > ../reference-lhes-md5sum-VBF
-              md5sum $REFERENCE_FILENAME_ZH > ../reference-lhes-md5sum-VH
-            #else it was in the do-i-need-to-test-generator-reference cache
-            fi
+            cp -r compare_to_reference/ tmp/
+            cd tmp/
+            sed -i -r "s/(Output from the JHUGenerator )$JHUGEN_VERSION/\1JHUGEN_VERSION/" *.lhe
+            md5sum $REFERENCE_FILENAMES > ../reference-lhes-md5sum
+            md5sum $REFERENCE_FILENAME_GGH > ../reference-lhes-md5sum-ggH
+            md5sum $REFERENCE_FILENAME_VBF $REFERENCE_FILENAME_HJJ > ../reference-lhes-md5sum-VBF
+            md5sum $REFERENCE_FILENAME_ZH > ../reference-lhes-md5sum-VH
           when: always
       - run:
           name: "save reference"
           command: |
-            if ! $DOREFERENCE; then exit 0; fi
+            if ! $DOREFERENCE; then
+              echo "The generator is unchanged from $(cat no-need-for-generator-reference) when the last reference test was done."
+              exit 0
+            fi
             if ! (cat reference_check/exit_status && exit $(cat reference_check/exit_status)); then
               mkdir -p ~/artifacts/
-              mv compare_to_reference ~/artifacts/reference_lhes
+              cp -r compare_to_reference ~/artifacts/reference_lhes
             fi
           when: always
       - store_artifacts:
@@ -299,13 +294,10 @@ jobs:
 
       - run: echo "$CIRCLE_BUILD_URL" > no-need-for-generator-reference
       - save_cache:
-          key: v6-do-i-need-to-test-generator-reference-{{ checksum "generator-md5sum" }}
+          key: v7-do-i-need-to-test-generator-reference-{{ checksum "generator-md5sum" }}
           paths:
             - ~/JHUGen/JHUGenerator/no-need-for-generator-reference
-            - ~/JHUGen/JHUGenerator/reference-lhes-md5sum-ggH
-            - ~/JHUGen/JHUGenerator/reference-lhes-md5sum-VBF
-            - ~/JHUGen/JHUGenerator/reference-lhes-md5sum-VH
-            - ~/JHUGen/JHUGenerator/reference_check
+            - ~/JHUGen/JHUGenerator/compare_to_reference
 
   generator_syntax:
     <<: *env
