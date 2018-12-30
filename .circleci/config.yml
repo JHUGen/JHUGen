@@ -262,7 +262,7 @@ jobs:
           command: |
             cp -r compare_to_reference/ tmp/
             cd tmp/
-            sed -i -r "s/(Output from the JHUGenerator )$JHUGEN_VERSION/\1JHUGEN_VERSION/" *.lhe
+            sed -i -r "s/(Output from the JHUGenerator )v[0-9]*[.][0-9]*[.][0-9]*/\1JHUGEN_VERSION/" *.lhe
             md5sum $REFERENCE_FILENAMES > ../reference-lhes-md5sum
             md5sum $REFERENCE_FILENAME_GGH > ../reference-lhes-md5sum-ggH
             md5sum $REFERENCE_FILENAME_VBF $REFERENCE_FILENAME_HJJ > ../reference-lhes-md5sum-VBF
