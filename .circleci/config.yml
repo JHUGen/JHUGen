@@ -471,13 +471,13 @@ jobs:
             cp analytical-md5sum-$WHICHPLOTS analytical-md5sum-theseplots
       #https://discuss.circleci.com/t/cannot-use-circle-yml-environment-variables-in-cache-keys/10994
       - restore_cache:
-          key: v5-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum-1" }}
+          key: v6-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum-1" }}
       - restore_cache:
-          key: v5-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum-2" }}
+          key: v6-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum-2" }}
       - restore_cache:
-          key: v5-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum-3" }}
+          key: v6-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum-3" }}
       - restore_cache:
-          key: v5-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum-4" }}
+          key: v6-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum-4" }}
       - run:
           name: "see if we need ggH analytical plots"
           command: |
@@ -504,8 +504,8 @@ jobs:
                 #want real and imaginary interference between all three components
                 #g1 = 1, g2 = 1.65684 * (-1 + i sqrt(3)) / 2, g4 = 2.55052 * (-1 - i sqrt(3)) / 2
                 ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 DataFile=$LHEDIR/SMa2a3 ghz1=1,0 ghz2=-0.82842,1.43486553 ghz4=-1.27526,2.20881511
-                ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=30000 DataFile=$LHEDIR/CT_left ghz1=0,0 ghzzp1=1,0 ezp_Mu_left=1,0
-                ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=30000 DataFile=$LHEDIR/CT_leftright ghz1=0,0 ghzzp1=1,0 ezp_Mu_left=1,0 ezp_Mu_right=1,0
+                ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=100000 DataFile=$LHEDIR/CT_left ghz1=0,0 ghzzp1=1,0 ezp_Mu_left=1,0
+                ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=100000 DataFile=$LHEDIR/CT_leftright ghz1=0,0 ghzzp1=1,0 ezp_Mu_left=1,0 ezp_Mu_right=1,0
               else
                 echo "Unknown WHICHPLOTS value: $WHICHPLOTS"
                 exit 1
@@ -592,7 +592,7 @@ jobs:
             mkdir -p no-need-for-ggH-plots
             echo "$CIRCLE_BUILD_URL" > no-need-for-ggH-plots/$WHICHPLOTS
       - save_cache:
-          key: v5-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum-theseplots" }}
+          key: v6-ggH-do-i-need-analytic-plots-{{ checksum "analytical-md5sum-theseplots" }}
           paths: ~/JHUGen/JHUGenerator/no-need-for-ggH-plots/
       - run: '! [ -f reference_check/reference_failed_ggH ]'
 
