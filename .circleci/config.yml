@@ -633,7 +633,7 @@ jobs:
               | sort
             ) > JHUGenerator/VBF-plots-md5sum
       - restore_cache:
-          key: v1-VBF-do-i-need-plots-{{ .Environment.WHICHPLOTS }}-{{ checksum "VBF-plots-md5sum" }}
+          key: v1-VBF-do-i-need-plots-{{ checksum "VBF-plots-md5sum" }}
       - run:
           name: "see if we need VBF plots"
           command: |
@@ -681,7 +681,7 @@ jobs:
           path: ~/artifacts/VBF
       - run: echo "$CIRCLE_BUILD_URL" > no-need-for-VBF-plots
       - save_cache:
-          key: v1-VBF-do-i-need-analytic-plots-{{ checksum "VBF-plots-md5sum" }}
+          key: v1-VBF-do-i-need-plots-{{ checksum "VBF-plots-md5sum" }}
           paths: ~/JHUGen/JHUGenerator/no-need-for-VBF-plots
       - run: '! [ -f reference_check/reference_failed_VBF ]'
 
