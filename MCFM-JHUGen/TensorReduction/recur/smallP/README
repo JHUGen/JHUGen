@@ -1,0 +1,19 @@
+This subdirectory contains all files necessary for implementing a
+recursion scheme that is appropriate when all momenta are small, but
+the propagator differences ("f(k)") are not.
+
+It is based on:
+
+ A.~Denner and S.~Dittmaier,
+ %``Reduction schemes for one-loop tensor integrals,''
+ Nucl.\ Phys.\  B {\bf 734}, 62 (2006)
+ [arXiv:hep-ph/0509141].
+
+The scheme is described in section 5.6 and the recursion here is based
+on equations (5.64)-(5.70) and their extensions.
+
+The routines calculate triangle and box integrals up to:
+
+rank 4 (with at least one recursion)
+rank 5 (with no recursion)
+rank 6 (no recursion, 00iiii components only)

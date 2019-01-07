@@ -4,7 +4,7 @@ using namespace std;
 using namespace MELAStreamHelpers;
 
 
-void AnaMelaHelpers::multiplyComplexNumbers(std::vector<Double_t> reals, std::vector<Double_t> imags, Double_t& resRe, Double_t& resIm){
+void AnaMelaHelpers::multiplyComplexNumbers(std::vector<Double_t> const& reals, std::vector<Double_t> const& imags, Double_t& resRe, Double_t& resIm){
   resRe=0; resIm=0;
   const unsigned int nreals = reals.size();
   const unsigned int nimags = imags.size();
@@ -39,8 +39,8 @@ verbosity(TVar::ERROR)
 
 RooSpin::RooSpin(
   const char* name, const char* title,
-  modelMeasurables _measurables,
-  modelParameters _parameters,
+  modelMeasurables const& _measurables,
+  modelParameters const& _parameters,
   RooSpin::VdecayType _Vdecay1, RooSpin::VdecayType _Vdecay2,
   TVar::VerbosityLevel verbosity_
 ) : RooAbsPdf(name, title),
@@ -392,4 +392,23 @@ void RooSpin::setProxy(RooRealProxy& proxy, RooAbsReal* objectPtr){
 Bool_t RooSpin::checkFundamentalType(const RooRealProxy& proxy)const{
   RooAbsArg* arg = proxy.absArg();
   return (dynamic_cast<RooRealVar*>(arg)!=0);
+}
+
+void RooSpin::printParameters() const{
+  MELAout << "mX: " << mX << endl;
+  MELAout << "gamX: " << gamX << endl;
+  MELAout << "mW: " << mW << endl;
+  MELAout << "gamW: " << gamW << endl;
+  MELAout << "mZ: " << mZ << endl;
+  MELAout << "gamZ: " << gamZ << endl;
+  MELAout << "mWprime: " << mWprime << endl;
+  MELAout << "gamWprime: " << gamWprime << endl;
+  MELAout << "mZprime: " << mZprime << endl;
+  MELAout << "gamZprime: " << gamZprime << endl;
+  MELAout << "Sin2ThetaW: " << Sin2ThetaW << endl;
+  MELAout << "vev: " << vev << endl;
+  MELAout << "gVprimeff_decay1_left: " << gVprimeff_decay1_left << endl;
+  MELAout << "gVprimeff_decay1_right: " << gVprimeff_decay1_right << endl;
+  MELAout << "gVprimeff_decay2_left: " << gVprimeff_decay2_left << endl;
+  MELAout << "gVprimeff_decay2_right: " << gVprimeff_decay2_right << endl;
 }

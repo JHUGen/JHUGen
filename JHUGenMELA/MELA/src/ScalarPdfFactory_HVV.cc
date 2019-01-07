@@ -1,7 +1,7 @@
 #include "ScalarPdfFactory_HVV.h"
 
 
-ScalarPdfFactory_HVV::ScalarPdfFactory_HVV(RooSpinZero::modelMeasurables measurables_, bool acceptance_, RooSpin::VdecayType V1decay_, RooSpin::VdecayType V2decay_, Bool_t OnshellH_) :
+ScalarPdfFactory_HVV::ScalarPdfFactory_HVV(RooSpinZero::modelMeasurables const& measurables_, bool acceptance_, RooSpin::VdecayType V1decay_, RooSpin::VdecayType V2decay_, Bool_t OnshellH_) :
 ScalarPdfFactory(measurables_, acceptance_, V1decay_, V2decay_, OnshellH_)
 {
   measurables.Y=0;
@@ -10,7 +10,7 @@ ScalarPdfFactory(measurables_, acceptance_, V1decay_, V2decay_, OnshellH_)
   initPDF();
 }
 ScalarPdfFactory_HVV::ScalarPdfFactory_HVV(
-  RooSpinZero::modelMeasurables measurables_,
+  RooSpinZero::modelMeasurables const& measurables_,
   double gRatio_[4][8], double gZGsRatio_[4][1], double gGsGsRatio_[3][1], double gVVpRatio_[1][1], double gVpVpRatio_[1][1],
   bool pmf_applied_, bool acceptance_, RooSpin::VdecayType V1decay_, RooSpin::VdecayType V2decay_, Bool_t OnshellH_
 ) : ScalarPdfFactory(measurables_, gRatio_, gZGsRatio_, gGsGsRatio_, gVVpRatio_, gVpVpRatio_, pmf_applied_, acceptance_, V1decay_, V2decay_, OnshellH_)

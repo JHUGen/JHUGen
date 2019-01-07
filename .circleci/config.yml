@@ -98,6 +98,7 @@ jobs:
             - JHUGenerator
             - JHUGenMELA
             - lib
+            - MCFM-JHUGen
             - Manual
             - README.md
             - VH_NLO
