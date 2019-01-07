@@ -40,10 +40,12 @@ namespace TNumericUtil{
     bool operator != (const quadruplet<T>& other)const{ return !(*this==other); }
   };
 
+  typedef triplet<unsigned int> uintTriplet_t;
   typedef triplet<int> intTriplet_t;
   typedef triplet<float> floatTriplet_t;
   typedef triplet<double> doubleTriplet_t;
 
+  typedef quadruplet<unsigned int> uintQuad_t;
   typedef quadruplet<int> intQuad_t;
   typedef quadruplet<float> floatQuad_t;
   typedef quadruplet<double> doubleQuad_t;

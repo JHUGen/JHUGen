@@ -8,9 +8,9 @@ using namespace MELAStreamHelpers;
 RooSpinZero::RooSpinZero() : RooSpin(){}
 RooSpinZero::RooSpinZero(
   const char* name, const char* title,
-  modelMeasurables _measurables,
-  modelParameters _parameters,
-  modelCouplings _couplings,
+  modelMeasurables const& _measurables,
+  modelParameters const& _parameters,
+  modelCouplings const& _couplings,
   RooSpin::VdecayType _Vdecay1, RooSpin::VdecayType _Vdecay2,
   TVar::VerbosityLevel verbosity_
 ) : RooSpin(
@@ -696,3 +696,72 @@ Bool_t RooSpinZero::computeNeededAmplitude(int VGammaVpmode1, int VGammaVpmode2)
     );
 }
 
+void RooSpinZero::printParameters() const{
+  MELAout << "g1: (" << g1Val << ", " << g1ValIm << ")" << endl;
+  MELAout << "g2: (" << g2Val << ", " << g2ValIm << ")" << endl;
+  MELAout << "g3: (" << g3Val << ", " << g3ValIm << ")" << endl;
+  MELAout << "g4: (" << g4Val << ", " << g4ValIm << ")" << endl;
+  MELAout << "g1_prime: (" << g1_primeVal << ", " << g1_primeValIm << ")" << endl;
+  MELAout << "g2_prime: (" << g2_primeVal << ", " << g2_primeValIm << ")" << endl;
+  MELAout << "g3_prime: (" << g3_primeVal << ", " << g3_primeValIm << ")" << endl;
+  MELAout << "g4_prime: (" << g4_primeVal << ", " << g4_primeValIm << ")" << endl;
+  MELAout << "g1_prime2: (" << g1_prime2Val << ", " << g1_prime2ValIm << ")" << endl;
+  MELAout << "g2_prime2: (" << g2_prime2Val << ", " << g2_prime2ValIm << ")" << endl;
+  MELAout << "g3_prime2: (" << g3_prime2Val << ", " << g3_prime2ValIm << ")" << endl;
+  MELAout << "g4_prime2: (" << g4_prime2Val << ", " << g4_prime2ValIm << ")" << endl;
+  MELAout << "g1_prime3: (" << g1_prime3Val << ", " << g1_prime3ValIm << ")" << endl;
+  MELAout << "g2_prime3: (" << g2_prime3Val << ", " << g2_prime3ValIm << ")" << endl;
+  MELAout << "g3_prime3: (" << g3_prime3Val << ", " << g3_prime3ValIm << ")" << endl;
+  MELAout << "g4_prime3: (" << g4_prime3Val << ", " << g4_prime3ValIm << ")" << endl;
+  MELAout << "g1_prime4: (" << g1_prime4Val << ", " << g1_prime4ValIm << ")" << endl;
+  MELAout << "g2_prime4: (" << g2_prime4Val << ", " << g2_prime4ValIm << ")" << endl;
+  MELAout << "g3_prime4: (" << g3_prime4Val << ", " << g3_prime4ValIm << ")" << endl;
+  MELAout << "g4_prime4: (" << g4_prime4Val << ", " << g4_prime4ValIm << ")" << endl;
+  MELAout << "g1_prime5: (" << g1_prime5Val << ", " << g1_prime5ValIm << ")" << endl;
+  MELAout << "g2_prime5: (" << g2_prime5Val << ", " << g2_prime5ValIm << ")" << endl;
+  MELAout << "g3_prime5: (" << g3_prime5Val << ", " << g3_prime5ValIm << ")" << endl;
+  MELAout << "g4_prime5: (" << g4_prime5Val << ", " << g4_prime5ValIm << ")" << endl;
+  MELAout << "g1_prime6: (" << g1_prime6Val << ", " << g1_prime6ValIm << ")" << endl;
+  MELAout << "g2_prime6: (" << g2_prime6Val << ", " << g2_prime6ValIm << ")" << endl;
+  MELAout << "g3_prime6: (" << g3_prime6Val << ", " << g3_prime6ValIm << ")" << endl;
+  MELAout << "g4_prime6: (" << g4_prime6Val << ", " << g4_prime6ValIm << ")" << endl;
+  MELAout << "g1_prime7: (" << g1_prime7Val << ", " << g1_prime7ValIm << ")" << endl;
+  MELAout << "g2_prime7: (" << g2_prime7Val << ", " << g2_prime7ValIm << ")" << endl;
+  MELAout << "g3_prime7: (" << g3_prime7Val << ", " << g3_prime7ValIm << ")" << endl;
+  MELAout << "g4_prime7: (" << g4_prime7Val << ", " << g4_prime7ValIm << ")" << endl;
+  MELAout << "gzgs1_prime2: (" << gzgs1_prime2Val << ", " << gzgs1_prime2ValIm << ")" << endl;
+  MELAout << "gzgs2: (" << gzgs2Val << ", " << gzgs2ValIm << ")" << endl;
+  MELAout << "gzgs3: (" << gzgs3Val << ", " << gzgs3ValIm << ")" << endl;
+  MELAout << "gzgs4: (" << gzgs4Val << ", " << gzgs4ValIm << ")" << endl;
+  MELAout << "ggsgs2: (" << ggsgs2Val << ", " << ggsgs2ValIm << ")" << endl;
+  MELAout << "ggsgs3: (" << ggsgs3Val << ", " << ggsgs3ValIm << ")" << endl;
+  MELAout << "ggsgs4: (" << ggsgs4Val << ", " << ggsgs4ValIm << ")" << endl;
+
+  MELAout << "Lambda: " << Lambda << endl;
+  MELAout << "Lambda_zgs1: " << Lambda_zgs1 << endl;
+  MELAout << "Lambda_z1: " << Lambda_z1 << endl;
+  MELAout << "Lambda_z2: " << Lambda_z2 << endl;
+  MELAout << "Lambda_z3: " << Lambda_z3 << endl;
+  MELAout << "Lambda_z4: " << Lambda_z4 << endl;
+  MELAout << "Lambda_Q: " << Lambda_Q << endl;
+  MELAout << "Lambda_z11: " << Lambda_z11 << endl;
+  MELAout << "Lambda_z21: " << Lambda_z21 << endl;
+  MELAout << "Lambda_z31: " << Lambda_z31 << endl;
+  MELAout << "Lambda_z41: " << Lambda_z41 << endl;
+  MELAout << "Lambda_z12: " << Lambda_z12 << endl;
+  MELAout << "Lambda_z22: " << Lambda_z22 << endl;
+  MELAout << "Lambda_z32: " << Lambda_z32 << endl;
+  MELAout << "Lambda_z42: " << Lambda_z42 << endl;
+  MELAout << "Lambda_z10: " << Lambda_z10 << endl;
+  MELAout << "Lambda_z20: " << Lambda_z20 << endl;
+  MELAout << "Lambda_z30: " << Lambda_z30 << endl;
+  MELAout << "Lambda_z40: " << Lambda_z40 << endl;
+  MELAout << "cz_q1sq: " << cz_q1sq << endl;
+  MELAout << "cz_q2sq: " << cz_q2sq << endl;
+  MELAout << "cz_q12sq: " << cz_q12sq << endl;
+
+  MELAout << "gvvp1: (" << gvvp1Val << ", " << gvvp1ValIm << ")" << endl;
+  MELAout << "gvpvp1: (" << gvpvp1Val << ", " << gvpvp1ValIm << ")" << endl;
+
+  RooSpin::printParameters();
+}
