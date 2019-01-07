@@ -1849,16 +1849,23 @@ end subroutine
 
 ! Subroutines to check and pass the ordering for the associated particles
 subroutine Check_APartHash_MCFM_qqVVqq(idAPart,order) ! idAPart is in JHU convention
+use ModParameters
 use ModHashCollection
 implicit none
 integer, intent(in) :: idAPart(1:4)
 integer, intent(out) :: order(1:2) ! Final state ordering; initial state remains the same
-integer, parameter :: hashSize = Hash_MCFM_qqVVqq_Size
+integer :: hashSize
 integer, pointer :: hash(:,:)
 integer :: ih
 logical  :: outFound
 
-   hash => Hash_MCFM_qqVVqq
+   if (Process.eq.69) then
+     hashSize = Hash_MCFM_qqVVqqStrong_Size
+     hash => Hash_MCFM_qqVVqqStrong
+   else
+     hashSize = Hash_MCFM_qqVVqq_Size
+     hash => Hash_MCFM_qqVVqq
+   endif
 
    outFound=.false.
    order(:)=-1

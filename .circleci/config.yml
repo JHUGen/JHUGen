@@ -770,6 +770,9 @@ jobs:
           command: sdiff -s JHUGenerator/mod_Parameters.F90 JHUGenMELA/MELA/fortran/mod_Parameters.F90
           when: always
       - run:
+          command: sdiff -s JHUGenerator/mod_HashCollection.F90 JHUGenMELA/MELA/fortran/mod_HashCollection.F90
+          when: always
+      - run:
           command: sdiff -s JHUGenerator/mod_THiggs.F90 JHUGenMELA/MELA/fortran/mod_THiggs.F90
           when: always
       - run:
