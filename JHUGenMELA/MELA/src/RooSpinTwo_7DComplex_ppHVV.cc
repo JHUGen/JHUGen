@@ -8,9 +8,9 @@ using namespace MELAStreamHelpers;
 RooSpinTwo_7DComplex_ppHVV::RooSpinTwo_7DComplex_ppHVV() : RooSpinTwo(){}
 RooSpinTwo_7DComplex_ppHVV::RooSpinTwo_7DComplex_ppHVV(
   const char *name, const char *title,
-  modelMeasurables _measurables,
-  modelParameters _parameters,
-  modelCouplings _couplings,
+  modelMeasurables const& _measurables,
+  modelParameters const& _parameters,
+  modelCouplings const& _couplings,
   RooSpin::VdecayType _Vdecay1, RooSpin::VdecayType _Vdecay2,
   TVar::VerbosityLevel verbosity_
 ) : RooSpinTwo(
@@ -74,7 +74,7 @@ Double_t RooSpinTwo_7DComplex_ppHVV::evaluateH2Factor(Int_t i2, Int_t j2, Int_t 
 }
 Double_t RooSpinTwo_7DComplex_ppHVV::evaluateHSFactor(Int_t di, Int_t dj, Int_t code) const{
   Double_t f_spinz0 = 1. - f_spinz1 - f_spinz2;
-  if (f_spinz0<0) f_spinz0=0;
+  if (f_spinz0<0.) f_spinz0=0;
   Double_t hsneg = -hs; if (fabs(hsneg)>1.) hsneg *= 1./fabs(hsneg);
 
   Double_t AF200 = 0;
@@ -321,7 +321,7 @@ Double_t RooSpinTwo_7DComplex_ppHVV::evaluate() const{
   value *= term1Coeff*term2Coeff*betaVal;
 
   if (!(value==value)) MELAout << "Evaluate NaN=" << value << endl;
-  if (value<=0){
+  if (value<=0.){
     MELAout << "Evaluated value<=0: " << value << endl;
     value=epsilon;
   }
@@ -384,7 +384,7 @@ Double_t RooSpinTwo_7DComplex_ppHVV::analyticalIntegral(Int_t code, const char* 
       << "term2Coeff=" << term2Coeff << '\t'
       << endl;
   }
-  if (value<=0){
+  if (value<=0.){
     MELAout << "Evaluated integral<=0: " << value << endl;
     value=epsilon;
   }

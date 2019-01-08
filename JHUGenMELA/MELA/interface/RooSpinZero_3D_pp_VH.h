@@ -14,9 +14,9 @@ public:
   RooSpinZero_3D_pp_VH();
   RooSpinZero_3D_pp_VH(
     const char *name, const char *title,
-    modelMeasurables _measurables,
-    modelParameters _parameters,
-    modelCouplings _couplings,
+    modelMeasurables const& _measurables,
+    modelParameters const& _parameters,
+    modelCouplings const& _couplings,
     Double_t _sqrts,
     RooSpin::VdecayType _Vdecay1=RooSpin::kVdecayType_Zll, RooSpin::VdecayType _Vdecay2=RooSpin::kVdecayType_Zll,
     TVar::VerbosityLevel verbosity_=TVar::ERROR

@@ -116,6 +116,7 @@ jobs:
             - JHUGenerator
             - JHUGenMELA
             - lib
+            - MCFM-JHUGen
             - Manual
             - README.md
             - VH_NLO
@@ -769,6 +770,9 @@ jobs:
           command: sdiff -s JHUGenerator/mod_Parameters.F90 JHUGenMELA/MELA/fortran/mod_Parameters.F90
           when: always
       - run:
+          command: sdiff -s JHUGenerator/mod_HashCollection.F90 JHUGenMELA/MELA/fortran/mod_HashCollection.F90
+          when: always
+      - run:
           command: sdiff -s JHUGenerator/mod_THiggs.F90 JHUGenMELA/MELA/fortran/mod_THiggs.F90
           when: always
       - run:
@@ -913,7 +917,7 @@ jobs:
       - run:
           name: "check that newlines are not annoying"
           command: |
-            dos2unix $(git ls-files)
+            dos2unix $(git ls-files | grep -v MCFM-JHUGen/Bin/Pdfdata | grep -v ffperm5.dat)
             git diff --exit-code --stat
           when: always
       - save_cache:

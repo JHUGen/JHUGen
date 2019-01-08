@@ -1,0 +1,10 @@
+      DOUBLE PRECISION FUNCTION DOTKS(I,J)
+      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
+      COMMON/MOM/PLAB(4,10)
+!$omp threadprivate(/MOM/)  
+
+         DOTKS=PLAB(4,I)*PLAB(4,J)-PLAB(3,I)*PLAB(3,J)
+     1        -PLAB(2,I)*PLAB(2,J)-PLAB(1,I)*PLAB(1,J)
+      RETURN
+      END
+

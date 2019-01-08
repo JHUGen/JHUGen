@@ -184,18 +184,18 @@ void PDGHelpers::pairIdenticalParticles(
     }
   }
 }
-bool PDGHelpers::allEquivalent(std::vector<int> ids, bool allowUnknown){
+bool PDGHelpers::allEquivalent(std::vector<int> const& ids, bool allowUnknown){
   bool result=true;
   bool hasNonJet=false;
-  for (unsigned int ipart=0; ipart<ids.size(); ipart++){
-    int id_first = ids.at(ipart);
+  for (std::vector<int>::const_iterator it_first=ids.cbegin(); it_first!=ids.cend(); it_first++){
+    int const& id_first = *it_first;
     if (!PDGHelpers::isAJet(id_first)) hasNonJet=true;
     if (allowUnknown && PDGHelpers::isAnUnknownJet(id_first)){
       if (hasNonJet){ result = false; break; }
       else continue;
     }
-    for (unsigned int jpart=ipart+1; jpart<ids.size(); jpart++){
-      int id_second = ids.at(jpart);
+    for (std::vector<int>::const_iterator it_second=it_first; it_second!=ids.cend(); it_second++){
+      int const& id_second = *it_second;
       if (allowUnknown && PDGHelpers::isAnUnknownJet(id_second)){
         if (hasNonJet){ result = false; break; }
         else continue;
