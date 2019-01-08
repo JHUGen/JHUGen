@@ -152,12 +152,12 @@ jobs:
               git ls-files MCFM-JHUGen | sort
             ) > MCFM-md5sum
       - restore_cache:
-          key: v1-compiled-MCFM-{{ checksum MCFM-md5sum }}
+          key: v1-compiled-MCFM-{{ checksum "MCFM-md5sum" }}
       - run:
           name: compile MCFM
           command: MCFM-JHUGen/compile.sh
       - save_cache:
-          key: v1-compiled-MCFM-{{ checksum MCFM-md5sum }}
+          key: v1-compiled-MCFM-{{ checksum "MCFM-md5sum" }}
           paths:
             - ~/JHUGen/MCFM-JHUGen
       - run:
