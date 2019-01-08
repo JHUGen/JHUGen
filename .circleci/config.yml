@@ -132,6 +132,11 @@ jobs:
             mv data/$SCRAM_ARCH/libcollier.so data/slc6_amd64_gcc530/libcollier.so
       - run: cd JHUGenerator && make
       - run: cd JHUGenerator/pdfs && ./downloadNNPDF.sh
+      - persist_to_workspace:
+          root: ~/JHUGen
+          paths:
+            - JHUGenerator
+            - JHUGenMELA
 
   build-MCFM:
     <<: *env
