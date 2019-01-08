@@ -994,10 +994,10 @@ workflows:
       - checkout
       - build:
           requires:
-            checkout
+            - checkout
       - build-MCFM:
           requires:
-            checkout
+            - checkout
       - generator_reference:
           requires:
             - build
