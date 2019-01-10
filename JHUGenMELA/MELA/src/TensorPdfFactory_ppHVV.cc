@@ -1,7 +1,7 @@
 #include "TensorPdfFactory_ppHVV.h"
 
 
-TensorPdfFactory_ppHVV::TensorPdfFactory_ppHVV(RooSpin::modelMeasurables measurables_, RooSpin::VdecayType V1decay_, RooSpin::VdecayType V2decay_, Bool_t OnshellH_) :
+TensorPdfFactory_ppHVV::TensorPdfFactory_ppHVV(RooSpin::modelMeasurables const& measurables_, RooSpin::VdecayType V1decay_, RooSpin::VdecayType V2decay_, Bool_t OnshellH_) :
 TensorPdfFactory(measurables_, V1decay_, V2decay_, OnshellH_)
 {
   measurables.Y=0;
