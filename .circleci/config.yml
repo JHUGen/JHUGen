@@ -949,7 +949,8 @@ jobs:
             (
               sed -i -r -e "s/^(linkMELA *= *)Yes/\1No/" makefile
               make
-              ./JHUGen Process=50 VegasNc0=10000 VegasNc2=100
+              ./JHUGen Process=50 VegasNc0=10000 VegasNc2=100 TopDK=0
+              ./JHUGen Process=80 VegasNc0=10000 VegasNc2=1 TopDK=0
             ) || exitcode=$?
             git checkout -- makefile
             exit $exitcode

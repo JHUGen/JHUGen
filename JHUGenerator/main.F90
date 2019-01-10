@@ -2067,11 +2067,11 @@ include "vegas_common.f"
          call InitEvent_cll
          call setMode_cll(1)!1. use COLI branch; 2. use DD branch; 3. use both branches and compare.
 #else
-print *, "Need to link COLLIER for this process."
-print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
-print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
-print *, "specified in the makefile."
-stop 1
+         print *, "Need to link COLLIER for this process."
+         print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+         print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+         print *, "specified in the makefile."
+         stop 1
 #endif
 ! if Collier is used
          NDim = 19
@@ -2105,11 +2105,11 @@ stop 1
          call InitEvent_cll
          call setMode_cll(1)!1. use COLI branch; 2. use DD branch; 3. use both branches and compare.
 #else
-print *, "Need to link COLLIER for this process."
-print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
-print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
-print *, "specified in the makefile."
-stop 1
+         print *, "Need to link COLLIER for this process."
+         print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+         print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+         print *, "specified in the makefile."
+         stop 1
 #endif
 ! if Collier is used
          NDim = 15
@@ -2307,17 +2307,19 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
       call vegas(EvalWeighted_HJ,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.50) then
       call vegas(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
+    elseif (Process.eq.51 .or. Process.eq.52) then
 #if useCollier==1
-    elseif (Process.eq.51) then
-      call vegas(EvalWeighted_VH,VG_Result,VG_Error,VG_Chi2)
-    elseif (Process.eq.52) then
-      call vegas(EvalWeighted_HH,VG_Result,VG_Error,VG_Chi2)
+      if (Process.eq.51) then
+        call vegas(EvalWeighted_VH,VG_Result,VG_Error,VG_Chi2)
+      elseif (Process.eq.52) then
+        call vegas(EvalWeighted_HH,VG_Result,VG_Error,VG_Chi2)
+      endif
 #else
-print *, "Need to link COLLIER for this process."
-print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
-print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
-print *, "specified in the makefile."
-stop 1
+      print *, "Need to link COLLIER for this process."
+      print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+      print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+      print *, "specified in the makefile."
+      stop 1
 #endif
     elseif (Process.eq.80) then
       call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
@@ -2349,17 +2351,19 @@ stop 1
       call vegas1(EvalWeighted_HJ,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.50) then
       call vegas1(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
+    elseif (Process.eq.51 .or. Process.eq.52) then
 #if useCollier==1
-    elseif (Process.eq.51) then
-      call vegas1(EvalWeighted_VH,VG_Result,VG_Error,VG_Chi2)
-    elseif (Process.eq.52) then
-      call vegas1(EvalWeighted_HH,VG_Result,VG_Error,VG_Chi2)
+      if (Process.eq.51) then
+        call vegas1(EvalWeighted_VH,VG_Result,VG_Error,VG_Chi2)
+      elseif (Process.eq.52) then
+        call vegas1(EvalWeighted_HH,VG_Result,VG_Error,VG_Chi2)
+      endif
 #else
-print *, "Need to link COLLIER for this process."
-print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
-print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
-print *, "specified in the makefile."
-stop 1
+      print *, "Need to link COLLIER for this process."
+      print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+      print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+      print *, "specified in the makefile."
+      stop 1
 #endif
     elseif (Process.eq.80) then
       call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
@@ -2397,21 +2401,23 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                 RES = 0d0
                 dum = EvalUnWeighted_VHiggs(yRnd,.false.,RES)
                 VG = VG + RES
+            elseif (Process.eq.51 .or. Process.eq.52) then
 #if useCollier==1
-            elseif (Process.eq.51) then
-                RES = 0d0
-                dum = EvalUnWeighted_VH(yRnd,.false.,RES)
-                VG = VG + RES
-            elseif (Process.eq.52) then
-                RES = 0d0
-                dum = EvalUnWeighted_HH(yRnd,.false.,RES)
-                VG = VG + RES
+                if (Process.eq.51) then
+                    RES = 0d0
+                    dum = EvalUnWeighted_VH(yRnd,.false.,RES)
+                    VG = VG + RES
+                elseif (Process.eq.52) then
+                    RES = 0d0
+                    dum = EvalUnWeighted_HH(yRnd,.false.,RES)
+                    VG = VG + RES
+                endif
 #else
-print *, "Need to link COLLIER for this process."
-print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
-print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
-print *, "specified in the makefile."
-stop 1
+                print *, "Need to link COLLIER for this process."
+                print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+                print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+                print *, "specified in the makefile."
+                stop 1
 #endif
             else
                 if (PChannel_aux.eq.0.or.PChannel_aux.eq.2) then
@@ -2481,17 +2487,19 @@ stop 1
                       dum = EvalUnWeighted_HJ(yRnd,.true.,RES)! RES is a dummy here
             elseif (Process.eq.50) then
                       dum = EvalUnWeighted_VHiggs(yRnd,.true.,RES)! RES is a dummy here
+            elseif (Process.eq.51 .or. Process.eq.52) then
 #if useCollier==1
-            elseif (Process.eq.51) then
-                      dum = EvalUnWeighted_VH(yRnd,.true.,RES)! RES is a dummy here
-            elseif (Process.eq.52) then
-                      dum = EvalUnWeighted_HH(yRnd,.true.,RES)! RES is a dummy here
+                if (Process.eq.51) then
+                          dum = EvalUnWeighted_VH(yRnd,.true.,RES)! RES is a dummy here
+                elseif (Process.eq.52) then
+                          dum = EvalUnWeighted_HH(yRnd,.true.,RES)! RES is a dummy here
+                endif
 #else
-print *, "Need to link COLLIER for this process."
-print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
-print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
-print *, "specified in the makefile."
-stop 1
+                print *, "Need to link COLLIER for this process."
+                print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+                print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+                print *, "specified in the makefile."
+                stop 1
 #endif
             else
                 dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
@@ -2509,17 +2517,19 @@ stop 1
                 dum = EvalUnWeighted_HJ(yRnd,.true.,RES)! RES is a dummy here
               elseif (Process.eq.50) then
                   dum = EvalUnWeighted_VHiggs(yRnd,.true.,RES)! RES is a dummy here
-              elseif (Process.eq.51) then
-                  dum = EvalUnWeighted_VH(yRnd,.true.,RES)! RES is a dummy here
+              elseif (Process.eq.51 .or. Process.eq.52) then
 #if useCollier==1
-              elseif (Process.eq.52) then
-                  dum = EvalUnWeighted_HH(yRnd,.true.,RES)! RES is a dummy here
+                  if (Process.eq.51) then
+                      dum = EvalUnWeighted_VH(yRnd,.true.,RES)! RES is a dummy here
+                  elseif (Process.eq.52) then
+                      dum = EvalUnWeighted_HH(yRnd,.true.,RES)! RES is a dummy here
+                  endif
 #else
-print *, "Need to link COLLIER for this process."
-print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
-print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
-print *, "specified in the makefile."
-stop 1
+                  print *, "Need to link COLLIER for this process."
+                  print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+                  print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+                  print *, "specified in the makefile."
+                  stop 1
 #endif
               else
                   dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
