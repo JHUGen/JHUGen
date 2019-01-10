@@ -90,12 +90,12 @@ subroutine amp_VH_real(Mom,mass,helicity,id,amp)
     gVVP(4) = -2d0*ghz4_dyn
   endif
 
-  !gVVS1=ci*gVVS1/vev
-  !gVVS2=ci*gVVS2/vev
-  !gVVP=ci*gVVP/vev
-  gVVP=ci*gVVP * dsqrt(4d0*pi*alpha_QED) /sitW/2d0/M_W !i * gVVS1 / vev
-  gVVS1=ci*gVVS1 * dsqrt(4d0*pi*alpha_QED) /sitW/2d0/M_W !i * gVVS1 / vev
-  gVVS2=ci*gVVS2 * dsqrt(4d0*pi*alpha_QED) /sitW/2d0/M_W !i * gVVS1 / vev
+  gVVS1=ci*gVVS1/vev
+  gVVS2=ci*gVVS2/vev
+  gVVP=ci*gVVP/vev
+!gVVP=ci*gVVP * dsqrt(4d0*pi*alpha_QED) /sitW/2d0/M_W !i * gVVS1 / vev
+!gVVS1=ci*gVVS1 * dsqrt(4d0*pi*alpha_QED) /sitW/2d0/M_W !i * gVVS1 / vev
+!gVVS2=ci*gVVS2 * dsqrt(4d0*pi*alpha_QED) /sitW/2d0/M_W !i * gVVS1 / vev
 
   qqffbHa1=0d0
   qqffbHa2=0d0
@@ -127,6 +127,8 @@ subroutine amp_VH_real(Mom,mass,helicity,id,amp)
       call qqbffbHg4(Spaa,Spbb,sprod,id,helicity,qqffbHg4)
     endif
   else ! A is final state
+    print*,"gamma H not implemented for NLO calculations yet."
+    stop
     if(id(1).gt.0d0)then!q q~
       call spinoru2(5,(/Mom(1:4,1),Mom(1:4,2),Mom(1:4,1)+Mom(1:4,2),Mom(1:4,4),Mom(1:4,10)/),Spaa,Spbb,sprod)!!!!!!!!!!to be determined depending on reference momentum
     else!q~ q
@@ -151,8 +153,9 @@ subroutine amp_VH_real(Mom,mass,helicity,id,amp)
     else
       qqWW=0d0
     endif
+    PROP3 = PROPAGATOR(q3_q3,mass(3,1),mass(3,2))
     PROP4 = PROPAGATOR(q4_q4,mass(4,1),mass(4,2))
-    amp = qqWW * PROP4
+    amp = qqWW * PROP3 * PROP4
 
   else ! Z or A
   ! HVV vertex
@@ -210,11 +213,15 @@ subroutine amp_VH_real(Mom,mass,helicity,id,amp)
 
 ! assemble everything and get iM
   if(id(8).ne.Not_a_particle_) then
-    PROP5 = -PROPAGATOR(q5_q5,mass(5,1),mass(5,2))
-    amp=amp *PROP5 &
-    *(kappa*FFS(id(8), Mom(:,8), helicity(8), id(9), Mom(:,9), helicity(9)) &
-      +ci*kappa_tilde*FFP(id(8), Mom(:,8), helicity(8), id(9), Mom(:,9), helicity(9)))&
-    *(-ci/vev*massfrun(getMass(convertLHEreverse(id(8))),get_minv(Mom(:,5))))
+    if(get_minv(Mom(:,5)).gt.0d0)then
+      PROP5 = -PROPAGATOR(q5_q5,mass(5,1),mass(5,2))
+      amp=amp *PROP5 &
+      *(kappa*FFS(id(8), Mom(:,8), helicity(8), id(9), Mom(:,9), helicity(9)) &
+        +ci*kappa_tilde*FFP(id(8), Mom(:,8), helicity(8), id(9), Mom(:,9), helicity(9)))&
+      *(-ci/vev*massfrun(getMass(convertLHEreverse(id(8))),get_minv(Mom(:,5))))
+    else
+      amp=0d0
+    endif
   endif ! else H does not decay
 
   return
@@ -296,17 +303,707 @@ subroutine qqbffbHa2(Spaa,Spbb,sprod,id,helicity,qqffbHa2)
   real(8), intent(in) :: helicity(10)
   complex(8), intent(out) :: qqffbHa2
 
-  if(id(1)*helicity(1).lt.0d0)then!J1 is left
-    if(id(6)*helicity(6).lt.0d0)then!J2 is left
-      qqffbHa2 = 0d0!LL
-    else!J2 is right
-      qqffbHa2 = 0d0!LR
+  if(helicity(10).lt.0d0)then!g is -
+    if(id(1)*helicity(1).lt.0d0)then!J1 is left
+      if(id(6)*helicity(6).lt.0d0)then!J2 is left
+        qqffbHa2 = 2d0/(dsqrt(2d0))/(Spbb(2,5))*Spaa(1,3)*Spaa(1,5)*Spaa(2,5)*Spbb(1,&
+     & 2)*Spbb(1,4)*Spbb(1,5)*m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spbb(2,5))*&
+     & Spaa(1,3)*Spaa(2,5)**2*Spbb(1,2)*Spbb(1,4)*Spbb(2,5)*m_Z**(-2) + &
+     & 2d0/(dsqrt(2d0))/(Spbb(2,5))*Spaa(1,5)*Spaa(2,3)*Spaa(2,5)*Spbb(1,&
+     & 2)*Spbb(1,5)*Spbb(2,4)*m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spbb(2,5))*&
+     & Spaa(1,5)*Spaa(2,5)*Spaa(3,5)*Spbb(1,2)*Spbb(1,5)*Spbb(4,5)*&
+     & m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spbb(2,5))*Spaa(2,3)*Spaa(2,5)**2*&
+     & Spbb(1,2)*Spbb(2,4)*Spbb(2,5)*m_Z**(-2) + 2d0/(dsqrt(2d0))/(Spbb(2,&
+     & 5))*Spaa(2,5)**2*Spaa(3,5)*Spbb(1,2)*Spbb(2,5)*Spbb(4,5)*&
+     & m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,2)*Spaa(1,3)*Spaa(1,5)*Spaa(2,5)*Spbb(1,2)**2*Spbb(1,4)*&
+     & Spbb(1,5)*m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(&
+     & 1,5))*Spaa(1,2)*Spaa(1,5)*Spaa(2,3)*Spaa(2,5)*Spbb(1,2)**2*Spbb(&
+     & 1,5)*Spbb(2,4)*m_Z**(-2) + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,2)*Spaa(1,5)*Spaa(2,5)*Spaa(3,5)*Spbb(1,2)**2*&
+     & Spbb(1,5)*Spbb(4,5)*m_Z**(-2)
+      qqffbHa2 = qqffbHa2 + 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,3)**2*Spaa(1,5)*Spaa(2,5)*Spbb(1,2)*Spbb(1,3)*&
+     & Spbb(1,4)*Spbb(1,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1&
+     & ,5)*Spbb(1,5))*Spaa(1,3)*Spaa(1,4)*Spaa(1,5)*Spaa(2,5)*Spbb(1,2)&
+     & *Spbb(1,4)**2*Spbb(1,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(Spbb(2,5))/(&
+     & Spaa(1,5)*Spbb(1,5))*Spaa(1,3)*Spaa(1,5)*Spaa(2,3)*Spaa(2,5)*&
+     & Spbb(1,2)*Spbb(1,3)*Spbb(1,5)*Spbb(2,4)*m_Z**(-2) + 1/(dsqrt(2d0))&
+     & /(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,3)*Spaa(1,5)*Spaa(2,3)&
+     & *Spaa(2,5)*Spbb(1,2)*Spbb(1,4)*Spbb(1,5)*Spbb(2,3)*m_Z**(-2) - 2d0&
+     & /(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,3)*Spaa(1,&
+     & 5)*Spaa(2,3)*Spbb(1,2)*Spbb(1,3)*Spbb(1,4) + 1/(dsqrt(2d0))/(&
+     & Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,3)*Spaa(1,5)*Spaa(2,4)*&
+     & Spaa(2,5)*Spbb(1,2)*Spbb(1,4)*Spbb(1,5)*Spbb(2,4)*m_Z**(-2) - 2d0&
+     & /(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,3)*Spaa(1,&
+     & 5)*Spaa(2,4)*Spbb(1,2)*Spbb(1,4)**2 + 2d0/(dsqrt(2d0))/(Spbb(2,5))&
+     & /(Spaa(1,5)*Spbb(1,5))*Spaa(1,3)*Spaa(1,5)*Spaa(2,5)**2*Spbb(1,2&
+     & )*Spbb(1,4)*Spbb(1,5)*Spbb(2,5)*m_Z**(-2)
+      qqffbHa2 = qqffbHa2 - 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,3)*Spaa(1,5)*Spaa(2,5)*Spaa(3,5)*Spbb(1,2)*&
+     & Spbb(1,3)*Spbb(1,5)*Spbb(4,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spbb(2,5&
+     & ))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,3)*Spaa(1,5)*Spaa(2,5)*Spaa(3,5)&
+     & *Spbb(1,2)*Spbb(1,4)*Spbb(1,5)*Spbb(3,5)*m_Z**(-2) - 1/(dsqrt(2d0)&
+     & )/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,3)*Spaa(1,5)*Spaa(2,5&
+     & )*Spaa(4,5)*Spbb(1,2)*Spbb(1,4)*Spbb(1,5)*Spbb(4,5)*m_Z**(-2) - 2d0&
+     & /(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,3)*Spaa(1,&
+     & 5)*Spaa(2,5)*Spbb(1,2)*Spbb(1,4)*Spbb(1,5) + 1/(dsqrt(2d0))/(&
+     & Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,4)*Spaa(1,5)*Spaa(2,3)*&
+     & Spaa(2,5)*Spbb(1,2)*Spbb(1,4)*Spbb(1,5)*Spbb(2,4)*m_Z**(-2) - 1/(&
+     & dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,4)*Spaa(1,5)&
+     & *Spaa(2,5)*Spaa(3,5)*Spbb(1,2)*Spbb(1,4)*Spbb(1,5)*Spbb(4,5)*&
+     & m_Z**(-2) + 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(&
+     & 1,5)*Spaa(2,3)**2*Spaa(2,5)*Spbb(1,2)*Spbb(1,5)*Spbb(2,3)*Spbb(2&
+     & ,4)*m_Z**(-2)
+      qqffbHa2 = qqffbHa2 - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,5)*Spaa(2,3)**2*Spbb(1,2)*Spbb(1,3)*Spbb(2,4)&
+     &  + 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,5)*&
+     & Spaa(2,3)*Spaa(2,4)*Spaa(2,5)*Spbb(1,2)*Spbb(1,5)*Spbb(2,4)**2*&
+     & m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,5)*Spaa(2,3)*Spaa(2,4)*Spbb(1,2)*Spbb(1,4)*Spbb(2,4) + 2d0&
+     & /(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,5)*Spaa(2,&
+     & 3)*Spaa(2,5)**2*Spbb(1,2)*Spbb(1,5)*Spbb(2,4)*Spbb(2,5)*m_Z**(-2)&
+     &  - 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,5)*&
+     & Spaa(2,3)*Spaa(2,5)*Spaa(3,5)*Spbb(1,2)*Spbb(1,5)*Spbb(2,3)*&
+     & Spbb(4,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1&
+     & ,5))*Spaa(1,5)*Spaa(2,3)*Spaa(2,5)*Spaa(3,5)*Spbb(1,2)*Spbb(1,5)&
+     & *Spbb(2,4)*Spbb(3,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(&
+     & 1,5)*Spbb(1,5))*Spaa(1,5)*Spaa(2,3)*Spaa(2,5)*Spaa(4,5)*Spbb(1,2&
+     & )*Spbb(1,5)*Spbb(2,4)*Spbb(4,5)*m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spbb(&
+     & 2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,5)*Spaa(2,3)*Spaa(2,5)*Spbb(1&
+     & ,2)*Spbb(1,5)*Spbb(2,4)
+      qqffbHa2 = qqffbHa2 + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,5)*Spaa(2,3)*Spaa(3,5)*Spbb(1,2)*Spbb(1,3)*&
+     & Spbb(4,5) - 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,5)*Spaa(2,4)*Spaa(2,5)*Spaa(3,5)*Spbb(1,2)*Spbb(1,5)*&
+     & Spbb(2,4)*Spbb(4,5)*m_Z**(-2) + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(&
+     & 1,5)*Spbb(1,5))*Spaa(1,5)*Spaa(2,4)*Spaa(3,5)*Spbb(1,2)*Spbb(1,4&
+     & )*Spbb(4,5) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,5)*Spaa(2,5)**2*Spaa(3,5)*Spbb(1,2)*Spbb(1,5)*Spbb(2,5)*&
+     & Spbb(4,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1&
+     & ,5))*Spaa(1,5)*Spaa(2,5)*Spaa(3,5)**2*Spbb(1,2)*Spbb(1,5)*Spbb(3&
+     & ,5)*Spbb(4,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,5)*Spaa(2,5)*Spaa(3,5)*Spaa(4,5)*Spbb(1,2)*&
+     & Spbb(1,5)*Spbb(4,5)**2*m_Z**(-2) + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(&
+     & Spaa(1,5)*Spbb(1,5))*Spaa(1,5)*Spaa(2,5)*Spaa(3,5)*Spbb(1,2)*&
+     & Spbb(1,5)*Spbb(4,5) + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,2)*Spaa(1,3)*Spaa(2,5)**2*Spbb(1,2)**2*Spbb(1,&
+     & 4)*Spbb(2,5)*m_Z**(-2)
+      qqffbHa2 = qqffbHa2 + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,2)*Spaa(2,3)*Spaa(2,5)**2*Spbb(1,2)**2*Spbb(2,&
+     & 4)*Spbb(2,5)*m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,2)*Spaa(2,5)**2*Spaa(3,5)*Spbb(1,2)**2*Spbb(2,&
+     & 5)*Spbb(4,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,3)**2*Spaa(2,5)**2*Spbb(1,2)*Spbb(1,3)*Spbb(1,&
+     & 4)*Spbb(2,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,3)*Spaa(1,4)*Spaa(2,5)**2*Spbb(1,2)*Spbb(1,4)&
+     & **2*Spbb(2,5)*m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,3)*Spaa(1,5)*Spaa(2,5)**2*Spbb(1,2)*Spbb(1,4)*&
+     & Spbb(1,5)*Spbb(2,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2&
+     & ,5)*Spbb(2,5))*Spaa(1,3)*Spaa(2,3)*Spaa(2,5)**2*Spbb(1,2)*Spbb(1&
+     & ,3)*Spbb(2,4)*Spbb(2,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spbb(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(1,3)*Spaa(2,3)*Spaa(2,5)**2*Spbb(1,2)*&
+     & Spbb(1,4)*Spbb(2,3)*Spbb(2,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spbb(2,5&
+     & ))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,3)*Spaa(2,4)*Spaa(2,5)**2*Spbb(1&
+     & ,2)*Spbb(1,4)*Spbb(2,4)*Spbb(2,5)*m_Z**(-2)
+      qqffbHa2 = qqffbHa2 + 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,3)*Spaa(2,5)**2*Spaa(3,5)*Spbb(1,2)*Spbb(1,3)*&
+     & Spbb(2,5)*Spbb(4,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2&
+     & ,5)*Spbb(2,5))*Spaa(1,3)*Spaa(2,5)**2*Spaa(3,5)*Spbb(1,2)*Spbb(1&
+     & ,4)*Spbb(2,5)*Spbb(3,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(Spbb(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(1,3)*Spaa(2,5)**2*Spaa(4,5)*Spbb(1,2)*&
+     & Spbb(1,4)*Spbb(2,5)*Spbb(4,5)*m_Z**(-2) + 2d0/(dsqrt(2d0))/(Spbb(2,&
+     & 5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,3)*Spaa(2,5)**2*Spbb(1,2)*Spbb(&
+     & 1,4)*Spbb(2,5) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*Spbb(2,5)&
+     & )*Spaa(1,3)*Spaa(2,5)*Spaa(3,5)*Spbb(1,3)*Spbb(1,4)*Spbb(2,5) - &
+     & 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,3)*Spaa(&
+     & 2,5)*Spaa(4,5)*Spbb(1,4)**2*Spbb(2,5) - 1/(dsqrt(2d0))/(Spbb(2,5)&
+     & )/(Spaa(2,5)*Spbb(2,5))*Spaa(1,4)*Spaa(2,3)*Spaa(2,5)**2*Spbb(1,&
+     & 2)*Spbb(1,4)*Spbb(2,4)*Spbb(2,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(Spbb(&
+     & 2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,4)*Spaa(2,5)**2*Spaa(3,5)*&
+     & Spbb(1,2)*Spbb(1,4)*Spbb(2,5)*Spbb(4,5)*m_Z**(-2)
+      qqffbHa2 = qqffbHa2 - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,5)*Spaa(2,3)*Spaa(2,5)**2*Spbb(1,2)*Spbb(1,5)*&
+     & Spbb(2,4)*Spbb(2,5)*m_Z**(-2) + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(&
+     & 2,5)*Spbb(2,5))*Spaa(1,5)*Spaa(2,5)**2*Spaa(3,5)*Spbb(1,2)*Spbb(&
+     & 1,5)*Spbb(2,5)*Spbb(4,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spbb(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(2,3)**2*Spaa(2,5)**2*Spbb(1,2)*Spbb(2,&
+     & 3)*Spbb(2,4)*Spbb(2,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spbb(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(2,3)*Spaa(2,4)*Spaa(2,5)**2*Spbb(1,2)*&
+     & Spbb(2,4)**2*Spbb(2,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(Spbb(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(2,3)*Spaa(2,5)**2*Spaa(3,5)*Spbb(1,2)*&
+     & Spbb(2,3)*Spbb(2,5)*Spbb(4,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(Spbb(2,5&
+     & ))/(Spaa(2,5)*Spbb(2,5))*Spaa(2,3)*Spaa(2,5)**2*Spaa(3,5)*Spbb(1&
+     & ,2)*Spbb(2,4)*Spbb(2,5)*Spbb(3,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(&
+     & Spbb(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(2,3)*Spaa(2,5)**2*Spaa(4,5&
+     & )*Spbb(1,2)*Spbb(2,4)*Spbb(2,5)*Spbb(4,5)*m_Z**(-2) + 2d0/(dsqrt(&
+     & 2d0))/(Spbb(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(2,3)*Spaa(2,5)**2*&
+     & Spbb(1,2)*Spbb(2,4)*Spbb(2,5)
+      qqffbHa2 = qqffbHa2 - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(2,3)*Spaa(2,5)*Spaa(3,5)*Spbb(1,3)*Spbb(2,4)*&
+     & Spbb(2,5) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*Spbb(2,5))*&
+     & Spaa(2,3)*Spaa(2,5)*Spaa(4,5)*Spbb(1,4)*Spbb(2,4)*Spbb(2,5) + &
+     & 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(2,4)*Spaa(2&
+     & ,5)**2*Spaa(3,5)*Spbb(1,2)*Spbb(2,4)*Spbb(2,5)*Spbb(4,5)*&
+     & m_Z**(-2) - 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(&
+     & 2,5)**2*Spaa(3,5)**2*Spbb(1,2)*Spbb(2,5)*Spbb(3,5)*Spbb(4,5)*&
+     & m_Z**(-2) - 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(&
+     & 2,5)**2*Spaa(3,5)*Spaa(4,5)*Spbb(1,2)*Spbb(2,5)*Spbb(4,5)**2*&
+     & m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*Spbb(2,5))*&
+     & Spaa(2,5)**2*Spaa(3,5)*Spbb(1,2)*Spbb(2,5)*Spbb(4,5) + 2d0/(&
+     & dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(2,5)*Spaa(3,5)&
+     & **2*Spbb(1,3)*Spbb(2,5)*Spbb(4,5) + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(2,5)*Spaa(3,5)*Spaa(4,5)*Spbb(1,4)*&
+     & Spbb(2,5)*Spbb(4,5)
+      else!J2 is right
+        qqffbHa2 = 2d0/(dsqrt(2d0))/(Spbb(2,5))*Spaa(1,4)*Spaa(1,5)*Spaa(2,5)*Spbb(1,&
+     & 2)*Spbb(1,3)*Spbb(1,5)*m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spbb(2,5))*&
+     & Spaa(1,4)*Spaa(2,5)**2*Spbb(1,2)*Spbb(1,3)*Spbb(2,5)*m_Z**(-2) + &
+     & 2d0/(dsqrt(2d0))/(Spbb(2,5))*Spaa(1,5)*Spaa(2,4)*Spaa(2,5)*Spbb(1,&
+     & 2)*Spbb(1,5)*Spbb(2,3)*m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spbb(2,5))*&
+     & Spaa(1,5)*Spaa(2,5)*Spaa(4,5)*Spbb(1,2)*Spbb(1,5)*Spbb(3,5)*&
+     & m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spbb(2,5))*Spaa(2,4)*Spaa(2,5)**2*&
+     & Spbb(1,2)*Spbb(2,3)*Spbb(2,5)*m_Z**(-2) + 2d0/(dsqrt(2d0))/(Spbb(2,&
+     & 5))*Spaa(2,5)**2*Spaa(4,5)*Spbb(1,2)*Spbb(2,5)*Spbb(3,5)*&
+     & m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,2)*Spaa(1,4)*Spaa(1,5)*Spaa(2,5)*Spbb(1,2)**2*Spbb(1,3)*&
+     & Spbb(1,5)*m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(&
+     & 1,5))*Spaa(1,2)*Spaa(1,5)*Spaa(2,4)*Spaa(2,5)*Spbb(1,2)**2*Spbb(&
+     & 1,5)*Spbb(2,3)*m_Z**(-2) + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,2)*Spaa(1,5)*Spaa(2,5)*Spaa(4,5)*Spbb(1,2)**2*&
+     & Spbb(1,5)*Spbb(3,5)*m_Z**(-2)
+      qqffbHa2 = qqffbHa2 + 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,3)*Spaa(1,4)*Spaa(1,5)*Spaa(2,5)*Spbb(1,2)*&
+     & Spbb(1,3)**2*Spbb(1,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(Spbb(2,5))/(&
+     & Spaa(1,5)*Spbb(1,5))*Spaa(1,3)*Spaa(1,5)*Spaa(2,4)*Spaa(2,5)*&
+     & Spbb(1,2)*Spbb(1,3)*Spbb(1,5)*Spbb(2,3)*m_Z**(-2) - 1/(dsqrt(2d0))&
+     & /(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,3)*Spaa(1,5)*Spaa(2,5)&
+     & *Spaa(4,5)*Spbb(1,2)*Spbb(1,3)*Spbb(1,5)*Spbb(3,5)*m_Z**(-2) + &
+     & 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,4)**2*&
+     & Spaa(1,5)*Spaa(2,5)*Spbb(1,2)*Spbb(1,3)*Spbb(1,4)*Spbb(1,5)*&
+     & m_Z**(-2) + 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(&
+     & 1,4)*Spaa(1,5)*Spaa(2,3)*Spaa(2,5)*Spbb(1,2)*Spbb(1,3)*Spbb(1,5)&
+     & *Spbb(2,3)*m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,4)*Spaa(1,5)*Spaa(2,3)*Spbb(1,2)*Spbb(1,3)**2&
+     &  + 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,4)*&
+     & Spaa(1,5)*Spaa(2,4)*Spaa(2,5)*Spbb(1,2)*Spbb(1,3)*Spbb(1,5)*&
+     & Spbb(2,4)*m_Z**(-2)
+      qqffbHa2 = qqffbHa2 + 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,4)*Spaa(1,5)*Spaa(2,4)*Spaa(2,5)*Spbb(1,2)*&
+     & Spbb(1,4)*Spbb(1,5)*Spbb(2,3)*m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spbb(2,&
+     & 5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,4)*Spaa(1,5)*Spaa(2,4)*Spbb(1,2&
+     & )*Spbb(1,3)*Spbb(1,4) + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,4)*Spaa(1,5)*Spaa(2,5)**2*Spbb(1,2)*Spbb(1,3)*&
+     & Spbb(1,5)*Spbb(2,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1&
+     & ,5)*Spbb(1,5))*Spaa(1,4)*Spaa(1,5)*Spaa(2,5)*Spaa(3,5)*Spbb(1,2)&
+     & *Spbb(1,3)*Spbb(1,5)*Spbb(3,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spbb(2,&
+     & 5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,4)*Spaa(1,5)*Spaa(2,5)*Spaa(4,5&
+     & )*Spbb(1,2)*Spbb(1,3)*Spbb(1,5)*Spbb(4,5)*m_Z**(-2) - 1/(dsqrt(2d0&
+     & ))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,4)*Spaa(1,5)*Spaa(2,&
+     & 5)*Spaa(4,5)*Spbb(1,2)*Spbb(1,4)*Spbb(1,5)*Spbb(3,5)*m_Z**(-2) - &
+     & 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,4)*Spaa(&
+     & 1,5)*Spaa(2,5)*Spbb(1,2)*Spbb(1,3)*Spbb(1,5) + 1/(dsqrt(2d0))/(&
+     & Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,5)*Spaa(2,3)*Spaa(2,4)*&
+     & Spaa(2,5)*Spbb(1,2)*Spbb(1,5)*Spbb(2,3)**2*m_Z**(-2)
+      qqffbHa2 = qqffbHa2 - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,5)*Spaa(2,3)*Spaa(2,4)*Spbb(1,2)*Spbb(1,3)*&
+     & Spbb(2,3) - 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,5)*Spaa(2,3)*Spaa(2,5)*Spaa(4,5)*Spbb(1,2)*Spbb(1,5)*&
+     & Spbb(2,3)*Spbb(3,5)*m_Z**(-2) + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(&
+     & 1,5)*Spbb(1,5))*Spaa(1,5)*Spaa(2,3)*Spaa(4,5)*Spbb(1,2)*Spbb(1,3&
+     & )*Spbb(3,5) + 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,5)*Spaa(2,4)**2*Spaa(2,5)*Spbb(1,2)*Spbb(1,5)*Spbb(2,3)*&
+     & Spbb(2,4)*m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(&
+     & 1,5))*Spaa(1,5)*Spaa(2,4)**2*Spbb(1,2)*Spbb(1,4)*Spbb(2,3) + 2d0&
+     & /(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,5)*Spaa(2,&
+     & 4)*Spaa(2,5)**2*Spbb(1,2)*Spbb(1,5)*Spbb(2,3)*Spbb(2,5)*m_Z**(-2)&
+     &  - 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,5)*&
+     & Spaa(2,4)*Spaa(2,5)*Spaa(3,5)*Spbb(1,2)*Spbb(1,5)*Spbb(2,3)*&
+     & Spbb(3,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1&
+     & ,5))*Spaa(1,5)*Spaa(2,4)*Spaa(2,5)*Spaa(4,5)*Spbb(1,2)*Spbb(1,5)&
+     & *Spbb(2,3)*Spbb(4,5)*m_Z**(-2)
+      qqffbHa2 = qqffbHa2 - 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,5)*Spaa(2,4)*Spaa(2,5)*Spaa(4,5)*Spbb(1,2)*&
+     & Spbb(1,5)*Spbb(2,4)*Spbb(3,5)*m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spbb(2,&
+     & 5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,5)*Spaa(2,4)*Spaa(2,5)*Spbb(1,2&
+     & )*Spbb(1,5)*Spbb(2,3) + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,5)*Spaa(2,4)*Spaa(4,5)*Spbb(1,2)*Spbb(1,4)*&
+     & Spbb(3,5) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,5)*Spaa(2,5)**2*Spaa(4,5)*Spbb(1,2)*Spbb(1,5)*Spbb(2,5)*&
+     & Spbb(3,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1&
+     & ,5))*Spaa(1,5)*Spaa(2,5)*Spaa(3,5)*Spaa(4,5)*Spbb(1,2)*Spbb(1,5)&
+     & *Spbb(3,5)**2*m_Z**(-2) + 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,5)*Spaa(2,5)*Spaa(4,5)**2*Spbb(1,2)*Spbb(1,5)*&
+     & Spbb(3,5)*Spbb(4,5)*m_Z**(-2) + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(&
+     & 1,5)*Spbb(1,5))*Spaa(1,5)*Spaa(2,5)*Spaa(4,5)*Spbb(1,2)*Spbb(1,5&
+     & )*Spbb(3,5) + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*Spbb(2,5))*&
+     & Spaa(1,2)*Spaa(1,4)*Spaa(2,5)**2*Spbb(1,2)**2*Spbb(1,3)*Spbb(2,5&
+     & )*m_Z**(-2)
+      qqffbHa2 = qqffbHa2 + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,2)*Spaa(2,4)*Spaa(2,5)**2*Spbb(1,2)**2*Spbb(2,&
+     & 3)*Spbb(2,5)*m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,2)*Spaa(2,5)**2*Spaa(4,5)*Spbb(1,2)**2*Spbb(2,&
+     & 5)*Spbb(3,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,3)*Spaa(1,4)*Spaa(2,5)**2*Spbb(1,2)*Spbb(1,3)&
+     & **2*Spbb(2,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,3)*Spaa(2,4)*Spaa(2,5)**2*Spbb(1,2)*Spbb(1,3)*&
+     & Spbb(2,3)*Spbb(2,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2&
+     & ,5)*Spbb(2,5))*Spaa(1,3)*Spaa(2,5)**2*Spaa(4,5)*Spbb(1,2)*Spbb(1&
+     & ,3)*Spbb(2,5)*Spbb(3,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spbb(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(1,4)**2*Spaa(2,5)**2*Spbb(1,2)*Spbb(1,&
+     & 3)*Spbb(1,4)*Spbb(2,5)*m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(1,4)*Spaa(1,5)*Spaa(2,5)**2*Spbb(1,2)*&
+     & Spbb(1,3)*Spbb(1,5)*Spbb(2,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spbb(2,5&
+     & ))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,4)*Spaa(2,3)*Spaa(2,5)**2*Spbb(1&
+     & ,2)*Spbb(1,3)*Spbb(2,3)*Spbb(2,5)*m_Z**(-2)
+      qqffbHa2 = qqffbHa2 - 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,4)*Spaa(2,4)*Spaa(2,5)**2*Spbb(1,2)*Spbb(1,3)*&
+     & Spbb(2,4)*Spbb(2,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2&
+     & ,5)*Spbb(2,5))*Spaa(1,4)*Spaa(2,4)*Spaa(2,5)**2*Spbb(1,2)*Spbb(1&
+     & ,4)*Spbb(2,3)*Spbb(2,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(Spbb(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(1,4)*Spaa(2,5)**2*Spaa(3,5)*Spbb(1,2)*&
+     & Spbb(1,3)*Spbb(2,5)*Spbb(3,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(Spbb(2,5&
+     & ))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,4)*Spaa(2,5)**2*Spaa(4,5)*Spbb(1&
+     & ,2)*Spbb(1,3)*Spbb(2,5)*Spbb(4,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(&
+     & Spbb(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,4)*Spaa(2,5)**2*Spaa(4,5&
+     & )*Spbb(1,2)*Spbb(1,4)*Spbb(2,5)*Spbb(3,5)*m_Z**(-2) + 2d0/(dsqrt(&
+     & 2d0))/(Spbb(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,4)*Spaa(2,5)**2*&
+     & Spbb(1,2)*Spbb(1,3)*Spbb(2,5) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(1,4)*Spaa(2,5)*Spaa(3,5)*Spbb(1,3)**2*&
+     & Spbb(2,5) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*Spbb(2,5))*&
+     & Spaa(1,4)*Spaa(2,5)*Spaa(4,5)*Spbb(1,3)*Spbb(1,4)*Spbb(2,5)
+      qqffbHa2 = qqffbHa2 - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,5)*Spaa(2,4)*Spaa(2,5)**2*Spbb(1,2)*Spbb(1,5)*&
+     & Spbb(2,3)*Spbb(2,5)*m_Z**(-2) + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(&
+     & 2,5)*Spbb(2,5))*Spaa(1,5)*Spaa(2,5)**2*Spaa(4,5)*Spbb(1,2)*Spbb(&
+     & 1,5)*Spbb(2,5)*Spbb(3,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spbb(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(2,3)*Spaa(2,4)*Spaa(2,5)**2*Spbb(1,2)*&
+     & Spbb(2,3)**2*Spbb(2,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(Spbb(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(2,3)*Spaa(2,5)**2*Spaa(4,5)*Spbb(1,2)*&
+     & Spbb(2,3)*Spbb(2,5)*Spbb(3,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spbb(2,5&
+     & ))/(Spaa(2,5)*Spbb(2,5))*Spaa(2,4)**2*Spaa(2,5)**2*Spbb(1,2)*&
+     & Spbb(2,3)*Spbb(2,4)*Spbb(2,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(Spbb(2,5&
+     & ))/(Spaa(2,5)*Spbb(2,5))*Spaa(2,4)*Spaa(2,5)**2*Spaa(3,5)*Spbb(1&
+     & ,2)*Spbb(2,3)*Spbb(2,5)*Spbb(3,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(&
+     & Spbb(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(2,4)*Spaa(2,5)**2*Spaa(4,5&
+     & )*Spbb(1,2)*Spbb(2,3)*Spbb(2,5)*Spbb(4,5)*m_Z**(-2) + 1/(dsqrt(2d0&
+     & ))/(Spbb(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(2,4)*Spaa(2,5)**2*&
+     & Spaa(4,5)*Spbb(1,2)*Spbb(2,4)*Spbb(2,5)*Spbb(3,5)*m_Z**(-2)
+      qqffbHa2 = qqffbHa2 + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(2,4)*Spaa(2,5)**2*Spbb(1,2)*Spbb(2,3)*Spbb(2,5)&
+     &  - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(2,4)*&
+     & Spaa(2,5)*Spaa(3,5)*Spbb(1,3)*Spbb(2,3)*Spbb(2,5) - 2d0/(dsqrt(2d0&
+     & ))/(Spbb(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(2,4)*Spaa(2,5)*Spaa(4,&
+     & 5)*Spbb(1,4)*Spbb(2,3)*Spbb(2,5) - 1/(dsqrt(2d0))/(Spbb(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(2,5)**2*Spaa(3,5)*Spaa(4,5)*Spbb(1,2)*&
+     & Spbb(2,5)*Spbb(3,5)**2*m_Z**(-2) - 1/(dsqrt(2d0))/(Spbb(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(2,5)**2*Spaa(4,5)**2*Spbb(1,2)*Spbb(2,&
+     & 5)*Spbb(3,5)*Spbb(4,5)*m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(2,5)**2*Spaa(4,5)*Spbb(1,2)*Spbb(2,5)*&
+     & Spbb(3,5) + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*Spbb(2,5))*&
+     & Spaa(2,5)*Spaa(3,5)*Spaa(4,5)*Spbb(1,3)*Spbb(2,5)*Spbb(3,5) + 2d0&
+     & /(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(2,5)*Spaa(4,&
+     & 5)**2*Spbb(1,4)*Spbb(2,5)*Spbb(3,5)
+      endif
+    else!J1 is right
+      if(id(6)*helicity(6).lt.0d0)then!J2 is left
+        qqffbHa2 = - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,3)**2&
+     & *Spaa(1,5)*Spbb(1,2)*Spbb(1,4)*Spbb(2,3) - 2d0/(dsqrt(2d0))/(Spbb(&
+     & 2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,3)*Spaa(1,4)*Spaa(1,5)*Spbb(1&
+     & ,2)*Spbb(1,4)*Spbb(2,4) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,3)*Spaa(1,5)*Spaa(2,3)*Spbb(1,2)*Spbb(2,3)*&
+     & Spbb(2,4) + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,3)*Spaa(1,5)*Spaa(3,5)*Spbb(1,2)*Spbb(2,3)*Spbb(4,5) + 2d0&
+     & /(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,3)*Spaa(1,&
+     & 5)*Spaa(3,5)*Spbb(1,4)*Spbb(2,3)*Spbb(2,5) + 2d0/(dsqrt(2d0))/(&
+     & Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,3)*Spaa(1,5)*Spaa(4,5)*&
+     & Spbb(1,4)*Spbb(2,4)*Spbb(2,5) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(&
+     & Spaa(1,5)*Spbb(1,5))*Spaa(1,4)*Spaa(1,5)*Spaa(2,3)*Spbb(1,2)*&
+     & Spbb(2,4)**2 + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,4)*Spaa(1,5)*Spaa(3,5)*Spbb(1,2)*Spbb(2,4)*Spbb(4,5) + 2d0&
+     & /(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,5)*Spaa(2,&
+     & 3)*Spaa(3,5)*Spbb(2,3)*Spbb(2,4)*Spbb(2,5)
+      qqffbHa2 = qqffbHa2 + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,5)*Spaa(2,3)*Spaa(4,5)*Spbb(2,4)**2*Spbb(2,5)&
+     &  - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,5)*&
+     & Spaa(3,5)**2*Spbb(2,3)*Spbb(2,5)*Spbb(4,5) - 2d0/(dsqrt(2d0))/(&
+     & Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,5)*Spaa(3,5)*Spaa(4,5)*&
+     & Spbb(2,4)*Spbb(2,5)*Spbb(4,5)
+      else!J2 is right
+        qqffbHa2 = - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,3)*&
+     & Spaa(1,4)*Spaa(1,5)*Spbb(1,2)*Spbb(1,3)*Spbb(2,3) - 2d0/(dsqrt(2d0&
+     & ))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,3)*Spaa(1,5)*Spaa(2,&
+     & 4)*Spbb(1,2)*Spbb(2,3)**2 + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5&
+     & )*Spbb(1,5))*Spaa(1,3)*Spaa(1,5)*Spaa(4,5)*Spbb(1,2)*Spbb(2,3)*&
+     & Spbb(3,5) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,4)**2*Spaa(1,5)*Spbb(1,2)*Spbb(1,3)*Spbb(2,4) - 2d0/(&
+     & dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,4)*Spaa(1,5)&
+     & *Spaa(2,4)*Spbb(1,2)*Spbb(2,3)*Spbb(2,4) + 2d0/(dsqrt(2d0))/(Spbb(&
+     & 2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,4)*Spaa(1,5)*Spaa(3,5)*Spbb(1&
+     & ,3)*Spbb(2,3)*Spbb(2,5) + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,4)*Spaa(1,5)*Spaa(4,5)*Spbb(1,2)*Spbb(2,4)*&
+     & Spbb(3,5) + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,4)*Spaa(1,5)*Spaa(4,5)*Spbb(1,3)*Spbb(2,4)*Spbb(2,5) + 2d0&
+     & /(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,5)*Spaa(2,&
+     & 4)*Spaa(3,5)*Spbb(2,3)**2*Spbb(2,5)
+      qqffbHa2 = qqffbHa2 + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,5)*Spaa(2,4)*Spaa(4,5)*Spbb(2,3)*Spbb(2,4)*&
+     & Spbb(2,5) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,5)*Spaa(3,5)*Spaa(4,5)*Spbb(2,3)*Spbb(2,5)*Spbb(3,5) - 2d0&
+     & /(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,5)*Spaa(4,&
+     & 5)**2*Spbb(2,4)*Spbb(2,5)*Spbb(3,5)
+      endif
     endif
-  else!J1 is right
-    if(id(6)*helicity(6).lt.0d0)then!J2 is left
-      qqffbHa2 = 0d0!RL
-    else!J2 is right
-      qqffbHa2 = 0d0!RR
+  else!g is +
+    if(id(1)*helicity(1).lt.0d0)then!J1 is left
+      if(id(6)*helicity(6).lt.0d0)then!J2 is left
+        qqffbHa2 = - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*&
+     & Spaa(1,3)*Spaa(2,3)*Spbb(1,3)*Spbb(1,4)*Spbb(1,5) - 2d0/(dsqrt(2d0&
+     & ))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,3)*Spaa(2,&
+     & 4)*Spbb(1,4)**2*Spbb(1,5) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5&
+     & )*Spbb(1,5))*Spaa(1,2)*Spaa(2,3)**2*Spbb(1,3)*Spbb(1,5)*Spbb(2,4&
+     & ) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*&
+     & Spaa(2,3)*Spaa(2,4)*Spbb(1,4)*Spbb(1,5)*Spbb(2,4) + 2d0/(dsqrt(2d0&
+     & ))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(2,3)*Spaa(3,&
+     & 5)*Spbb(1,3)*Spbb(1,5)*Spbb(4,5) + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(2,4)*Spaa(3,5)*Spbb(1,4)*&
+     & Spbb(1,5)*Spbb(4,5) + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,3)*Spaa(2,3)*Spaa(2,5)*Spbb(1,4)*Spbb(1,5)*&
+     & Spbb(3,5) + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,3)*Spaa(2,4)*Spaa(2,5)*Spbb(1,4)*Spbb(1,5)*Spbb(4,5) + 2d0&
+     & /(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(2,3)**2*&
+     & Spaa(2,5)*Spbb(1,5)*Spbb(2,4)*Spbb(3,5)
+      qqffbHa2 = qqffbHa2 + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(2,3)*Spaa(2,4)*Spaa(2,5)*Spbb(1,5)*Spbb(2,4)*&
+     & Spbb(4,5) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(2,3)*Spaa(2,5)*Spaa(3,5)*Spbb(1,5)*Spbb(3,5)*Spbb(4,5) - 2d0&
+     & /(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(2,4)*Spaa(2,&
+     & 5)*Spaa(3,5)*Spbb(1,5)*Spbb(4,5)**2
+      else!J2 is right
+        qqffbHa2 = - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*&
+     & Spaa(1,4)*Spaa(2,3)*Spbb(1,3)**2*Spbb(1,5) - 2d0/(dsqrt(2d0))/(&
+     & Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,4)*Spaa(2,4)*&
+     & Spbb(1,3)*Spbb(1,4)*Spbb(1,5) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(2,3)*Spaa(2,4)*Spbb(1,3)*&
+     & Spbb(1,5)*Spbb(2,3) + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,2)*Spaa(2,3)*Spaa(4,5)*Spbb(1,3)*Spbb(1,5)*&
+     & Spbb(3,5) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,2)*Spaa(2,4)**2*Spbb(1,4)*Spbb(1,5)*Spbb(2,3) + 2d0/(&
+     & dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(2,4)&
+     & *Spaa(4,5)*Spbb(1,4)*Spbb(1,5)*Spbb(3,5) + 2d0/(dsqrt(2d0))/(Spaa(&
+     & 2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,4)*Spaa(2,3)*Spaa(2,5)*Spbb(1&
+     & ,3)*Spbb(1,5)*Spbb(3,5) + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,4)*Spaa(2,4)*Spaa(2,5)*Spbb(1,3)*Spbb(1,5)*&
+     & Spbb(4,5)
+      qqffbHa2 = qqffbHa2 + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(2,3)*Spaa(2,4)*Spaa(2,5)*Spbb(1,5)*Spbb(2,3)*&
+     & Spbb(3,5) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(2,3)*Spaa(2,5)*Spaa(4,5)*Spbb(1,5)*Spbb(3,5)**2 + 2d0/(&
+     & dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(2,4)**2*Spaa(2&
+     & ,5)*Spbb(1,5)*Spbb(2,3)*Spbb(4,5) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(1,5)*Spbb(1,5))*Spaa(2,4)*Spaa(2,5)*Spaa(4,5)*Spbb(1,5)*&
+     & Spbb(3,5)*Spbb(4,5)
+      endif
+    else!J1 is right
+      if(id(6)*helicity(6).lt.0d0)then!J2 is left
+        qqffbHa2 = 2d0/(dsqrt(2d0))/(Spaa(2,5))*Spaa(1,2)*Spaa(1,3)*Spaa(1,5)*Spbb(1,&
+     & 4)*Spbb(1,5)*Spbb(2,5)*m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spaa(2,5))*&
+     & Spaa(1,2)*Spaa(1,3)*Spaa(2,5)*Spbb(1,4)*Spbb(2,5)**2*m_Z**(-2) + &
+     & 2d0/(dsqrt(2d0))/(Spaa(2,5))*Spaa(1,2)*Spaa(1,5)*Spaa(2,3)*Spbb(1,&
+     & 5)*Spbb(2,4)*Spbb(2,5)*m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spaa(2,5))*&
+     & Spaa(1,2)*Spaa(1,5)*Spaa(3,5)*Spbb(1,5)*Spbb(2,5)*Spbb(4,5)*&
+     & m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spaa(2,5))*Spaa(1,2)*Spaa(2,3)*Spaa(2&
+     & ,5)*Spbb(2,4)*Spbb(2,5)**2*m_Z**(-2) + 2d0/(dsqrt(2d0))/(Spaa(2,5))&
+     & *Spaa(1,2)*Spaa(2,5)*Spaa(3,5)*Spbb(2,5)**2*Spbb(4,5)*m_Z**(-2)&
+     &  - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)**2&
+     & *Spaa(1,3)*Spaa(1,5)*Spbb(1,2)*Spbb(1,4)*Spbb(1,5)*Spbb(2,5)*&
+     & m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,2)**2*Spaa(1,5)*Spaa(2,3)*Spbb(1,2)*Spbb(1,5)*Spbb(2,4)*&
+     & Spbb(2,5)*m_Z**(-2) + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(&
+     & 1,5))*Spaa(1,2)**2*Spaa(1,5)*Spaa(3,5)*Spbb(1,2)*Spbb(1,5)*Spbb(&
+     & 2,5)*Spbb(4,5)*m_Z**(-2)
+      qqffbHa2 = qqffbHa2 + 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,2)*Spaa(1,3)**2*Spaa(1,5)*Spbb(1,3)*Spbb(1,4)*&
+     & Spbb(1,5)*Spbb(2,5)*m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(&
+     & 1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,3)**2*Spbb(1,4)*Spbb(1,5)*Spbb(&
+     & 2,3) + 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)&
+     & *Spaa(1,3)*Spaa(1,4)*Spaa(1,5)*Spbb(1,4)**2*Spbb(1,5)*Spbb(2,5)*&
+     & m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,2)*Spaa(1,3)*Spaa(1,4)*Spbb(1,4)*Spbb(1,5)*Spbb(2,4) + &
+     & 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1&
+     & ,3)*Spaa(1,5)*Spaa(2,3)*Spbb(1,3)*Spbb(1,5)*Spbb(2,4)*Spbb(2,5)*&
+     & m_Z**(-2) + 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(&
+     & 1,2)*Spaa(1,3)*Spaa(1,5)*Spaa(2,3)*Spbb(1,4)*Spbb(1,5)*Spbb(2,3)&
+     & *Spbb(2,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(&
+     & 1,5))*Spaa(1,2)*Spaa(1,3)*Spaa(1,5)*Spaa(2,4)*Spbb(1,4)*Spbb(1,5&
+     & )*Spbb(2,4)*Spbb(2,5)*m_Z**(-2) + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,3)*Spaa(1,5)*Spaa(2,5)*&
+     & Spbb(1,4)*Spbb(1,5)*Spbb(2,5)**2*m_Z**(-2)
+      qqffbHa2 = qqffbHa2 - 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,2)*Spaa(1,3)*Spaa(1,5)*Spaa(3,5)*Spbb(1,3)*&
+     & Spbb(1,5)*Spbb(2,5)*Spbb(4,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spaa(2,5&
+     & ))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,3)*Spaa(1,5)*Spaa(3,5)&
+     & *Spbb(1,4)*Spbb(1,5)*Spbb(2,5)*Spbb(3,5)*m_Z**(-2) - 1/(dsqrt(2d0)&
+     & )/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,3)*Spaa(1,5&
+     & )*Spaa(4,5)*Spbb(1,4)*Spbb(1,5)*Spbb(2,5)*Spbb(4,5)*m_Z**(-2) - 2d0&
+     & /(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,&
+     & 3)*Spaa(1,5)*Spbb(1,4)*Spbb(1,5)*Spbb(2,5) - 2d0/(dsqrt(2d0))/(&
+     & Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,3)*Spaa(2,3)*&
+     & Spbb(1,5)*Spbb(2,3)*Spbb(2,4) + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,3)*Spaa(3,5)*Spbb(1,5)*&
+     & Spbb(2,3)*Spbb(4,5) + 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(&
+     & 1,5))*Spaa(1,2)*Spaa(1,4)*Spaa(1,5)*Spaa(2,3)*Spbb(1,4)*Spbb(1,5&
+     & )*Spbb(2,4)*Spbb(2,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,4)*Spaa(1,5)*Spaa(3,5)*&
+     & Spbb(1,4)*Spbb(1,5)*Spbb(2,5)*Spbb(4,5)*m_Z**(-2)
+      qqffbHa2 = qqffbHa2 - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,2)*Spaa(1,4)*Spaa(2,3)*Spbb(1,5)*Spbb(2,4)**2&
+     &  + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*&
+     & Spaa(1,4)*Spaa(3,5)*Spbb(1,5)*Spbb(2,4)*Spbb(4,5) + 1/(dsqrt(2d0)&
+     & )/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,5)*Spaa(2,3&
+     & )**2*Spbb(1,5)*Spbb(2,3)*Spbb(2,4)*Spbb(2,5)*m_Z**(-2) + 1/(&
+     & dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,5)&
+     & *Spaa(2,3)*Spaa(2,4)*Spbb(1,5)*Spbb(2,4)**2*Spbb(2,5)*m_Z**(-2)&
+     &  + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*&
+     & Spaa(1,5)*Spaa(2,3)*Spaa(2,5)*Spbb(1,5)*Spbb(2,4)*Spbb(2,5)**2*&
+     & m_Z**(-2) - 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(&
+     & 1,2)*Spaa(1,5)*Spaa(2,3)*Spaa(3,5)*Spbb(1,5)*Spbb(2,3)*Spbb(2,5)&
+     & *Spbb(4,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(&
+     & 1,5))*Spaa(1,2)*Spaa(1,5)*Spaa(2,3)*Spaa(3,5)*Spbb(1,5)*Spbb(2,4&
+     & )*Spbb(2,5)*Spbb(3,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,5)*Spaa(2,3)*Spaa(4,5)*&
+     & Spbb(1,5)*Spbb(2,4)*Spbb(2,5)*Spbb(4,5)*m_Z**(-2)
+      qqffbHa2 = qqffbHa2 - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,2)*Spaa(1,5)*Spaa(2,3)*Spbb(1,5)*Spbb(2,4)*&
+     & Spbb(2,5) - 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,2)*Spaa(1,5)*Spaa(2,4)*Spaa(3,5)*Spbb(1,5)*Spbb(2,4)*&
+     & Spbb(2,5)*Spbb(4,5)*m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(&
+     & 1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,5)*Spaa(2,5)*Spaa(3,5)*Spbb(1,5&
+     & )*Spbb(2,5)**2*Spbb(4,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,5)*Spaa(3,5)**2*Spbb(1,5)*&
+     & Spbb(2,5)*Spbb(3,5)*Spbb(4,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(Spaa(2,5&
+     & ))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,5)*Spaa(3,5)*Spaa(4,5)&
+     & *Spbb(1,5)*Spbb(2,5)*Spbb(4,5)**2*m_Z**(-2) + 2d0/(dsqrt(2d0))/(&
+     & Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,5)*Spaa(3,5)*&
+     & Spbb(1,5)*Spbb(2,5)*Spbb(4,5) + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(1,2)**2*Spaa(1,3)*Spaa(2,5)*Spbb(1,2)*&
+     & Spbb(1,4)*Spbb(2,5)**2*m_Z**(-2) + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(1,2)**2*Spaa(2,3)*Spaa(2,5)*Spbb(1,2)*&
+     & Spbb(2,4)*Spbb(2,5)**2*m_Z**(-2)
+      qqffbHa2 = qqffbHa2 - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,2)**2*Spaa(2,5)*Spaa(3,5)*Spbb(1,2)*Spbb(2,5)&
+     & **2*Spbb(4,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,2)*Spaa(1,3)**2*Spaa(2,5)*Spbb(1,3)*Spbb(1,4)*&
+     & Spbb(2,5)**2*m_Z**(-2) - 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,2)*Spaa(1,3)*Spaa(1,4)*Spaa(2,5)*Spbb(1,4)**2*&
+     & Spbb(2,5)**2*m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,2)*Spaa(1,3)*Spaa(1,5)*Spaa(2,5)*Spbb(1,4)*&
+     & Spbb(1,5)*Spbb(2,5)**2*m_Z**(-2) - 1/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(1,3)*Spaa(2,3)*Spaa(2,5)*&
+     & Spbb(1,3)*Spbb(2,4)*Spbb(2,5)**2*m_Z**(-2) - 1/(dsqrt(2d0))/(Spaa(&
+     & 2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(1,3)*Spaa(2,3)*Spaa(2&
+     & ,5)*Spbb(1,4)*Spbb(2,3)*Spbb(2,5)**2*m_Z**(-2) - 1/(dsqrt(2d0))/(&
+     & Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(1,3)*Spaa(2,4)*&
+     & Spaa(2,5)*Spbb(1,4)*Spbb(2,4)*Spbb(2,5)**2*m_Z**(-2) + 1/(dsqrt(&
+     & 2d0))/(Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(1,3)*Spaa(&
+     & 2,5)*Spaa(3,5)*Spbb(1,3)*Spbb(2,5)**2*Spbb(4,5)*m_Z**(-2)
+      qqffbHa2 = qqffbHa2 + 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,2)*Spaa(1,3)*Spaa(2,5)*Spaa(3,5)*Spbb(1,4)*&
+     & Spbb(2,5)**2*Spbb(3,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(1,3)*Spaa(2,5)*Spaa(4,5)*&
+     & Spbb(1,4)*Spbb(2,5)**2*Spbb(4,5)*m_Z**(-2) + 2d0/(dsqrt(2d0))/(&
+     & Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(1,3)*Spaa(2,5)*&
+     & Spbb(1,4)*Spbb(2,5)**2 - 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,2)*Spaa(1,4)*Spaa(2,3)*Spaa(2,5)*Spbb(1,4)*&
+     & Spbb(2,4)*Spbb(2,5)**2*m_Z**(-2) + 1/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(1,4)*Spaa(2,5)*Spaa(3,5)*&
+     & Spbb(1,4)*Spbb(2,5)**2*Spbb(4,5)*m_Z**(-2) - 2d0/(dsqrt(2d0))/(&
+     & Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(1,5)*Spaa(2,3)*&
+     & Spaa(2,5)*Spbb(1,5)*Spbb(2,4)*Spbb(2,5)**2*m_Z**(-2) + 2d0/(dsqrt(&
+     & 2d0))/(Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(1,5)*Spaa(&
+     & 2,5)*Spaa(3,5)*Spbb(1,5)*Spbb(2,5)**2*Spbb(4,5)*m_Z**(-2) - 1/(&
+     & dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(2,3)&
+     & **2*Spaa(2,5)*Spbb(2,3)*Spbb(2,4)*Spbb(2,5)**2*m_Z**(-2)
+      qqffbHa2 = qqffbHa2 - 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,2)*Spaa(2,3)*Spaa(2,4)*Spaa(2,5)*Spbb(2,4)**2*&
+     & Spbb(2,5)**2*m_Z**(-2) + 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,2)*Spaa(2,3)*Spaa(2,5)*Spaa(3,5)*Spbb(2,3)*&
+     & Spbb(2,5)**2*Spbb(4,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(2,3)*Spaa(2,5)*Spaa(3,5)*&
+     & Spbb(2,4)*Spbb(2,5)**2*Spbb(3,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(Spaa(&
+     & 2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(2,3)*Spaa(2,5)*Spaa(4&
+     & ,5)*Spbb(2,4)*Spbb(2,5)**2*Spbb(4,5)*m_Z**(-2) + 2d0/(dsqrt(2d0))/(&
+     & Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(2,3)*Spaa(2,5)*&
+     & Spbb(2,4)*Spbb(2,5)**2 + 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,2)*Spaa(2,4)*Spaa(2,5)*Spaa(3,5)*Spbb(2,4)*&
+     & Spbb(2,5)**2*Spbb(4,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(2,5)*Spaa(3,5)**2*Spbb(2,5)&
+     & **2*Spbb(3,5)*Spbb(4,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(2,5)*Spaa(3,5)*Spaa(4,5)*&
+     & Spbb(2,5)**2*Spbb(4,5)**2*m_Z**(-2)
+      qqffbHa2 = qqffbHa2 - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,2)*Spaa(2,5)*Spaa(3,5)*Spbb(2,5)**2*Spbb(4,5)&
+     &  - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,3)**2&
+     & *Spaa(2,5)*Spbb(1,4)*Spbb(2,5)*Spbb(3,5) - 2d0/(dsqrt(2d0))/(Spaa(&
+     & 2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,3)*Spaa(1,4)*Spaa(2,5)*Spbb(1&
+     & ,4)*Spbb(2,5)*Spbb(4,5) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,3)*Spaa(2,3)*Spaa(2,5)*Spbb(2,4)*Spbb(2,5)*&
+     & Spbb(3,5) + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*&
+     & Spaa(1,3)*Spaa(2,5)*Spaa(3,5)*Spbb(2,5)*Spbb(3,5)*Spbb(4,5) - 2d0&
+     & /(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,4)*Spaa(2,&
+     & 3)*Spaa(2,5)*Spbb(2,4)*Spbb(2,5)*Spbb(4,5) + 2d0/(dsqrt(2d0))/(&
+     & Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,4)*Spaa(2,5)*Spaa(3,5)*&
+     & Spbb(2,5)*Spbb(4,5)**2
+      else!J2 is right
+        qqffbHa2 = 2d0/(dsqrt(2d0))/(Spaa(2,5))*Spaa(1,2)*Spaa(1,4)*Spaa(1,5)*Spbb(1,&
+     & 3)*Spbb(1,5)*Spbb(2,5)*m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spaa(2,5))*&
+     & Spaa(1,2)*Spaa(1,4)*Spaa(2,5)*Spbb(1,3)*Spbb(2,5)**2*m_Z**(-2) + &
+     & 2d0/(dsqrt(2d0))/(Spaa(2,5))*Spaa(1,2)*Spaa(1,5)*Spaa(2,4)*Spbb(1,&
+     & 5)*Spbb(2,3)*Spbb(2,5)*m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spaa(2,5))*&
+     & Spaa(1,2)*Spaa(1,5)*Spaa(4,5)*Spbb(1,5)*Spbb(2,5)*Spbb(3,5)*&
+     & m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spaa(2,5))*Spaa(1,2)*Spaa(2,4)*Spaa(2&
+     & ,5)*Spbb(2,3)*Spbb(2,5)**2*m_Z**(-2) + 2d0/(dsqrt(2d0))/(Spaa(2,5))&
+     & *Spaa(1,2)*Spaa(2,5)*Spaa(4,5)*Spbb(2,5)**2*Spbb(3,5)*m_Z**(-2)&
+     &  - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)**2&
+     & *Spaa(1,4)*Spaa(1,5)*Spbb(1,2)*Spbb(1,3)*Spbb(1,5)*Spbb(2,5)*&
+     & m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,2)**2*Spaa(1,5)*Spaa(2,4)*Spbb(1,2)*Spbb(1,5)*Spbb(2,3)*&
+     & Spbb(2,5)*m_Z**(-2) + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(&
+     & 1,5))*Spaa(1,2)**2*Spaa(1,5)*Spaa(4,5)*Spbb(1,2)*Spbb(1,5)*Spbb(&
+     & 2,5)*Spbb(3,5)*m_Z**(-2)
+      qqffbHa2 = qqffbHa2 + 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,2)*Spaa(1,3)*Spaa(1,4)*Spaa(1,5)*Spbb(1,3)**2*&
+     & Spbb(1,5)*Spbb(2,5)*m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(&
+     & 1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,3)*Spaa(1,4)*Spbb(1,3)*Spbb(1,5&
+     & )*Spbb(2,3) + 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,2)*Spaa(1,3)*Spaa(1,5)*Spaa(2,4)*Spbb(1,3)*Spbb(1,5)*&
+     & Spbb(2,3)*Spbb(2,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1&
+     & ,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,3)*Spaa(1,5)*Spaa(4,5)*Spbb(1,3)&
+     & *Spbb(1,5)*Spbb(2,5)*Spbb(3,5)*m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spaa(2&
+     & ,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,3)*Spaa(2,4)*Spbb(1,&
+     & 5)*Spbb(2,3)**2 + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5&
+     & ))*Spaa(1,2)*Spaa(1,3)*Spaa(4,5)*Spbb(1,5)*Spbb(2,3)*Spbb(3,5)&
+     &  + 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*&
+     & Spaa(1,4)**2*Spaa(1,5)*Spbb(1,3)*Spbb(1,4)*Spbb(1,5)*Spbb(2,5)*&
+     & m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,2)*Spaa(1,4)**2*Spbb(1,3)*Spbb(1,5)*Spbb(2,4)
+      qqffbHa2 = qqffbHa2 + 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,2)*Spaa(1,4)*Spaa(1,5)*Spaa(2,3)*Spbb(1,3)*&
+     & Spbb(1,5)*Spbb(2,3)*Spbb(2,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(Spaa(2,5&
+     & ))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,4)*Spaa(1,5)*Spaa(2,4)&
+     & *Spbb(1,3)*Spbb(1,5)*Spbb(2,4)*Spbb(2,5)*m_Z**(-2) + 1/(dsqrt(2d0)&
+     & )/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,4)*Spaa(1,5&
+     & )*Spaa(2,4)*Spbb(1,4)*Spbb(1,5)*Spbb(2,3)*Spbb(2,5)*m_Z**(-2) + 2d0&
+     & /(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,&
+     & 4)*Spaa(1,5)*Spaa(2,5)*Spbb(1,3)*Spbb(1,5)*Spbb(2,5)**2*m_Z**(-2)&
+     &  - 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*&
+     & Spaa(1,4)*Spaa(1,5)*Spaa(3,5)*Spbb(1,3)*Spbb(1,5)*Spbb(2,5)*&
+     & Spbb(3,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1&
+     & ,5))*Spaa(1,2)*Spaa(1,4)*Spaa(1,5)*Spaa(4,5)*Spbb(1,3)*Spbb(1,5)&
+     & *Spbb(2,5)*Spbb(4,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(&
+     & 1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,4)*Spaa(1,5)*Spaa(4,5)*Spbb(1,4&
+     & )*Spbb(1,5)*Spbb(2,5)*Spbb(3,5)*m_Z**(-2)
+      qqffbHa2 = qqffbHa2 - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,2)*Spaa(1,4)*Spaa(1,5)*Spbb(1,3)*Spbb(1,5)*&
+     & Spbb(2,5) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,2)*Spaa(1,4)*Spaa(2,4)*Spbb(1,5)*Spbb(2,3)*Spbb(2,4) + 2d0&
+     & /(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,&
+     & 4)*Spaa(4,5)*Spbb(1,5)*Spbb(2,4)*Spbb(3,5) + 1/(dsqrt(2d0))/(&
+     & Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,5)*Spaa(2,3)*&
+     & Spaa(2,4)*Spbb(1,5)*Spbb(2,3)**2*Spbb(2,5)*m_Z**(-2) - 1/(dsqrt(&
+     & 2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,5)*Spaa(&
+     & 2,3)*Spaa(4,5)*Spbb(1,5)*Spbb(2,3)*Spbb(2,5)*Spbb(3,5)*m_Z**(-2)&
+     &  + 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*&
+     & Spaa(1,5)*Spaa(2,4)**2*Spbb(1,5)*Spbb(2,3)*Spbb(2,4)*Spbb(2,5)*&
+     & m_Z**(-2) + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,2)*Spaa(1,5)*Spaa(2,4)*Spaa(2,5)*Spbb(1,5)*Spbb(2,3)*&
+     & Spbb(2,5)**2*m_Z**(-2) - 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,2)*Spaa(1,5)*Spaa(2,4)*Spaa(3,5)*Spbb(1,5)*&
+     & Spbb(2,3)*Spbb(2,5)*Spbb(3,5)*m_Z**(-2)
+      qqffbHa2 = qqffbHa2 - 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,2)*Spaa(1,5)*Spaa(2,4)*Spaa(4,5)*Spbb(1,5)*&
+     & Spbb(2,3)*Spbb(2,5)*Spbb(4,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spaa(2,5&
+     & ))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,5)*Spaa(2,4)*Spaa(4,5)&
+     & *Spbb(1,5)*Spbb(2,4)*Spbb(2,5)*Spbb(3,5)*m_Z**(-2) - 2d0/(dsqrt(2d0&
+     & ))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,5)*Spaa(2,&
+     & 4)*Spbb(1,5)*Spbb(2,3)*Spbb(2,5) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,5)*Spaa(2,5)*Spaa(4,5)*&
+     & Spbb(1,5)*Spbb(2,5)**2*Spbb(3,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(Spaa(&
+     & 2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,5)*Spaa(3,5)*Spaa(4&
+     & ,5)*Spbb(1,5)*Spbb(2,5)*Spbb(3,5)**2*m_Z**(-2) + 1/(dsqrt(2d0))/(&
+     & Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,5)*Spaa(4,5)**&
+     & 2*Spbb(1,5)*Spbb(2,5)*Spbb(3,5)*Spbb(4,5)*m_Z**(-2) + 2d0/(dsqrt(&
+     & 2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,5)*Spaa(&
+     & 4,5)*Spbb(1,5)*Spbb(2,5)*Spbb(3,5) + 2d0/(dsqrt(2d0))/(Spaa(2,5))&
+     & /(Spaa(2,5)*Spbb(2,5))*Spaa(1,2)**2*Spaa(1,4)*Spaa(2,5)*Spbb(1,2&
+     & )*Spbb(1,3)*Spbb(2,5)**2*m_Z**(-2)
+      qqffbHa2 = qqffbHa2 + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,2)**2*Spaa(2,4)*Spaa(2,5)*Spbb(1,2)*Spbb(2,3)*&
+     & Spbb(2,5)**2*m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,2)**2*Spaa(2,5)*Spaa(4,5)*Spbb(1,2)*Spbb(2,5)&
+     & **2*Spbb(3,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,2)*Spaa(1,3)*Spaa(1,4)*Spaa(2,5)*Spbb(1,3)**2*&
+     & Spbb(2,5)**2*m_Z**(-2) - 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,2)*Spaa(1,3)*Spaa(2,4)*Spaa(2,5)*Spbb(1,3)*&
+     & Spbb(2,3)*Spbb(2,5)**2*m_Z**(-2) + 1/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(1,3)*Spaa(2,5)*Spaa(4,5)*&
+     & Spbb(1,3)*Spbb(2,5)**2*Spbb(3,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spaa(&
+     & 2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(1,4)**2*Spaa(2,5)*&
+     & Spbb(1,3)*Spbb(1,4)*Spbb(2,5)**2*m_Z**(-2) - 2d0/(dsqrt(2d0))/(&
+     & Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(1,4)*Spaa(1,5)*&
+     & Spaa(2,5)*Spbb(1,3)*Spbb(1,5)*Spbb(2,5)**2*m_Z**(-2) - 1/(dsqrt(&
+     & 2d0))/(Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(1,4)*Spaa(&
+     & 2,3)*Spaa(2,5)*Spbb(1,3)*Spbb(2,3)*Spbb(2,5)**2*m_Z**(-2)
+      qqffbHa2 = qqffbHa2 - 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,2)*Spaa(1,4)*Spaa(2,4)*Spaa(2,5)*Spbb(1,3)*&
+     & Spbb(2,4)*Spbb(2,5)**2*m_Z**(-2) - 1/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(1,4)*Spaa(2,4)*Spaa(2,5)*&
+     & Spbb(1,4)*Spbb(2,3)*Spbb(2,5)**2*m_Z**(-2) + 1/(dsqrt(2d0))/(Spaa(&
+     & 2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(1,4)*Spaa(2,5)*Spaa(3&
+     & ,5)*Spbb(1,3)*Spbb(2,5)**2*Spbb(3,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(&
+     & Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(1,4)*Spaa(2,5)*&
+     & Spaa(4,5)*Spbb(1,3)*Spbb(2,5)**2*Spbb(4,5)*m_Z**(-2) + 1/(dsqrt(&
+     & 2d0))/(Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(1,4)*Spaa(&
+     & 2,5)*Spaa(4,5)*Spbb(1,4)*Spbb(2,5)**2*Spbb(3,5)*m_Z**(-2) + 2d0/(&
+     & dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(1,4)&
+     & *Spaa(2,5)*Spbb(1,3)*Spbb(2,5)**2 - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(1,5)*Spaa(2,4)*Spaa(2,5)*&
+     & Spbb(1,5)*Spbb(2,3)*Spbb(2,5)**2*m_Z**(-2) + 2d0/(dsqrt(2d0))/(&
+     & Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(1,5)*Spaa(2,5)*&
+     & Spaa(4,5)*Spbb(1,5)*Spbb(2,5)**2*Spbb(3,5)*m_Z**(-2)
+      qqffbHa2 = qqffbHa2 - 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,2)*Spaa(2,3)*Spaa(2,4)*Spaa(2,5)*Spbb(2,3)**2*&
+     & Spbb(2,5)**2*m_Z**(-2) + 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,2)*Spaa(2,3)*Spaa(2,5)*Spaa(4,5)*Spbb(2,3)*&
+     & Spbb(2,5)**2*Spbb(3,5)*m_Z**(-2) - 1/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(2,4)**2*Spaa(2,5)*Spbb(2,3)*&
+     & Spbb(2,4)*Spbb(2,5)**2*m_Z**(-2) + 1/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(2,4)*Spaa(2,5)*Spaa(3,5)*&
+     & Spbb(2,3)*Spbb(2,5)**2*Spbb(3,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(Spaa(&
+     & 2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(2,4)*Spaa(2,5)*Spaa(4&
+     & ,5)*Spbb(2,3)*Spbb(2,5)**2*Spbb(4,5)*m_Z**(-2) + 1/(dsqrt(2d0))/(&
+     & Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(2,4)*Spaa(2,5)*&
+     & Spaa(4,5)*Spbb(2,4)*Spbb(2,5)**2*Spbb(3,5)*m_Z**(-2) + 2d0/(dsqrt(&
+     & 2d0))/(Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,2)*Spaa(2,4)*Spaa(&
+     & 2,5)*Spbb(2,3)*Spbb(2,5)**2 - 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,&
+     & 5)*Spbb(2,5))*Spaa(1,2)*Spaa(2,5)*Spaa(3,5)*Spaa(4,5)*Spbb(2,5)&
+     & **2*Spbb(3,5)**2*m_Z**(-2)
+      qqffbHa2 = qqffbHa2 - 1/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,2)*Spaa(2,5)*Spaa(4,5)**2*Spbb(2,5)**2*Spbb(3,&
+     & 5)*Spbb(4,5)*m_Z**(-2) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,2)*Spaa(2,5)*Spaa(4,5)*Spbb(2,5)**2*Spbb(3,5)&
+     &  - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,3)*&
+     & Spaa(1,4)*Spaa(2,5)*Spbb(1,3)*Spbb(2,5)*Spbb(3,5) - 2d0/(dsqrt(2d0&
+     & ))/(Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,3)*Spaa(2,4)*Spaa(2,&
+     & 5)*Spbb(2,3)*Spbb(2,5)*Spbb(3,5) + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(1,3)*Spaa(2,5)*Spaa(4,5)*Spbb(2,5)*&
+     & Spbb(3,5)**2 - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*&
+     & Spaa(1,4)**2*Spaa(2,5)*Spbb(1,3)*Spbb(2,5)*Spbb(4,5) - 2d0/(&
+     & dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,4)*Spaa(2,4)&
+     & *Spaa(2,5)*Spbb(2,3)*Spbb(2,5)*Spbb(4,5) + 2d0/(dsqrt(2d0))/(Spaa(&
+     & 2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,4)*Spaa(2,5)*Spaa(4,5)*Spbb(2&
+     & ,5)*Spbb(3,5)*Spbb(4,5)
+      endif
     endif
   endif
 
@@ -322,17 +1019,208 @@ subroutine qqbffbHg4(Spaa,Spbb,sprod,id,helicity,qqffbHg4)
   real(8), intent(in) :: helicity(10)
   complex(8), intent(out) :: qqffbHg4
 
-  if(id(1)*helicity(1).lt.0d0)then!J1 is left
-    if(id(6)*helicity(6).lt.0d0)then!J2 is left
-      qqffbHg4 = 0d0!LL
-    else!J2 is right
-      qqffbHg4 = 0d0!LR
+  if(helicity(10).lt.0d0)then!g is -
+    if(id(1)*helicity(1).lt.0d0)then!J1 is left
+      if(id(6)*helicity(6).lt.0d0)then!J2 is left
+        qqffbHg4 = - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,3)*&
+     & Spaa(1,5)*Spaa(2,4)*Spbb(1,2)*Spbb(1,4)**2 + 2d0/(dsqrt(2d0))/(&
+     & Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,4)*Spaa(1,5)*Spaa(2,3)*&
+     & Spbb(1,2)*Spbb(1,4)**2 + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,5)*Spaa(2,3)**2*Spbb(1,2)*Spbb(1,3)*Spbb(2,4)&
+     &  - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,5)*&
+     & Spaa(2,3)**2*Spbb(1,2)*Spbb(1,4)*Spbb(2,3) + 2d0/(dsqrt(2d0))/(&
+     & Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,5)*Spaa(2,3)*Spaa(3,5)*&
+     & Spbb(1,2)*Spbb(1,5)*Spbb(3,4) + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(&
+     & Spaa(1,5)*Spbb(1,5))*Spaa(1,5)*Spaa(2,5)*Spaa(3,4)*Spbb(1,2)*&
+     & Spbb(1,4)*Spbb(4,5) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,3)*Spaa(2,5)*Spaa(4,5)*Spbb(1,4)**2*Spbb(2,5)&
+     &  + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,4)*&
+     & Spaa(2,5)*Spaa(3,5)*Spbb(1,4)**2*Spbb(2,5) + 2d0/(dsqrt(2d0))/(&
+     & Spbb(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(2,3)*Spaa(2,5)*Spaa(3,5)*&
+     & Spbb(1,3)*Spbb(2,4)*Spbb(2,5)
+      qqffbHg4 = qqffbHg4 - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(2,3)*Spaa(2,5)*Spaa(3,5)*Spbb(1,4)*Spbb(2,3)*&
+     & Spbb(2,5) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*Spbb(2,5))*&
+     & Spaa(2,3)*Spaa(2,5)*Spaa(4,5)*Spbb(1,4)*Spbb(2,4)*Spbb(2,5) + 2d0&
+     & /(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(2,4)*Spaa(2,&
+     & 5)*Spaa(3,5)*Spbb(1,4)*Spbb(2,4)*Spbb(2,5) + 2d0/(dsqrt(2d0))/(&
+     & Spbb(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(2,5)*Spaa(3,5)**2*Spbb(1,5&
+     & )*Spbb(2,5)*Spbb(3,4)
+      else!J2 is right
+        qqffbHg4 = 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,3)*Spaa(&
+     & 1,5)*Spaa(2,4)*Spbb(1,2)*Spbb(1,3)**2 - 2d0/(dsqrt(2d0))/(Spbb(2,5&
+     & ))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,4)*Spaa(1,5)*Spaa(2,3)*Spbb(1,2)&
+     & *Spbb(1,3)**2 - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))&
+     & *Spaa(1,5)*Spaa(2,4)**2*Spbb(1,2)*Spbb(1,3)*Spbb(2,4) + 2d0/(&
+     & dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,5)*Spaa(2,4)&
+     & **2*Spbb(1,2)*Spbb(1,4)*Spbb(2,3) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(&
+     & Spaa(1,5)*Spbb(1,5))*Spaa(1,5)*Spaa(2,4)*Spaa(4,5)*Spbb(1,2)*&
+     & Spbb(1,5)*Spbb(3,4) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,5)*Spaa(2,5)*Spaa(3,4)*Spbb(1,2)*Spbb(1,3)*&
+     & Spbb(3,5) + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*Spbb(2,5))*&
+     & Spaa(1,3)*Spaa(2,5)*Spaa(4,5)*Spbb(1,3)**2*Spbb(2,5) - 2d0/(&
+     & dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,4)*Spaa(2,5)&
+     & *Spaa(3,5)*Spbb(1,3)**2*Spbb(2,5) + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(&
+     & Spaa(2,5)*Spbb(2,5))*Spaa(2,3)*Spaa(2,5)*Spaa(4,5)*Spbb(1,3)*&
+     & Spbb(2,3)*Spbb(2,5)
+      qqffbHg4 = qqffbHg4 - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(2,4)*Spaa(2,5)*Spaa(3,5)*Spbb(1,3)*Spbb(2,3)*&
+     & Spbb(2,5) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*Spbb(2,5))*&
+     & Spaa(2,4)*Spaa(2,5)*Spaa(4,5)*Spbb(1,3)*Spbb(2,4)*Spbb(2,5) + 2d0&
+     & /(dsqrt(2d0))/(Spbb(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(2,4)*Spaa(2,&
+     & 5)*Spaa(4,5)*Spbb(1,4)*Spbb(2,3)*Spbb(2,5) - 2d0/(dsqrt(2d0))/(&
+     & Spbb(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(2,5)*Spaa(4,5)**2*Spbb(1,5&
+     & )*Spbb(2,5)*Spbb(3,4)
+      endif
+    else!J1 is right
+      if(id(6)*helicity(6).lt.0d0)then!J2 is left
+        qqffbHg4 = 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(&
+     & 1,5)*Spaa(3,4)*Spbb(1,2)*Spbb(2,4)**2 - 2d0/(dsqrt(2d0))/(Spbb(2,5&
+     & ))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,3)**2*Spaa(1,5)*Spbb(1,2)**2*&
+     & Spbb(3,4) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,3)*Spaa(1,5)*Spaa(3,5)*Spbb(1,2)*Spbb(2,3)*Spbb(4,5) + 2d0&
+     & /(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,3)*Spaa(1,&
+     & 5)*Spaa(3,5)*Spbb(1,2)*Spbb(2,4)*Spbb(3,5) + 2d0/(dsqrt(2d0))/(&
+     & Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,3)*Spaa(1,5)*Spaa(3,5)*&
+     & Spbb(1,2)*Spbb(2,5)*Spbb(3,4) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(&
+     & Spaa(1,5)*Spbb(1,5))*Spaa(1,3)*Spaa(1,5)*Spaa(4,5)*Spbb(1,2)*&
+     & Spbb(2,4)*Spbb(4,5) + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,4)*Spaa(1,5)*Spaa(3,5)*Spbb(1,2)*Spbb(2,4)*&
+     & Spbb(4,5) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,5)**2*Spaa(3,4)*Spbb(1,4)*Spbb(2,4)*Spbb(2,5) - 2d0/(&
+     & dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,5)*Spaa(2,5)&
+     & *Spaa(3,4)*Spbb(2,4)**2*Spbb(2,5)
+      qqffbHg4 = qqffbHg4 + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,5)*Spaa(3,5)**2*Spbb(2,3)*Spbb(2,5)*Spbb(4,5)&
+     &  - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,5)*&
+     & Spaa(3,5)**2*Spbb(2,4)*Spbb(2,5)*Spbb(3,5)
+      else!J2 is right
+        qqffbHg4 = - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,3)*&
+     & Spaa(1,5)*Spaa(2,4)*Spbb(1,2)*Spbb(2,3)**2 - 2d0/(dsqrt(2d0))/(&
+     & Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,3)*Spaa(1,5)*Spaa(4,5)*&
+     & Spbb(1,3)*Spbb(2,3)*Spbb(2,5) + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(&
+     & Spaa(1,5)*Spbb(1,5))*Spaa(1,4)**2*Spaa(1,5)*Spbb(1,2)*Spbb(1,3)*&
+     & Spbb(2,4) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,4)**2*Spaa(1,5)*Spbb(1,2)*Spbb(1,4)*Spbb(2,3) + 2d0/(&
+     & dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,4)*Spaa(1,5)&
+     & *Spaa(2,3)*Spbb(1,2)*Spbb(2,3)**2 + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(&
+     & Spaa(1,5)*Spbb(1,5))*Spaa(1,4)*Spaa(1,5)*Spaa(3,5)*Spbb(1,3)*&
+     & Spbb(2,3)*Spbb(2,5) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,4)*Spaa(1,5)*Spaa(4,5)*Spbb(1,2)*Spbb(2,5)*&
+     & Spbb(3,4) - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,4)*Spaa(1,5)*Spaa(4,5)*Spbb(1,3)*Spbb(2,4)*Spbb(2,5) + 2d0&
+     & /(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,4)*Spaa(1,&
+     & 5)*Spaa(4,5)*Spbb(1,4)*Spbb(2,3)*Spbb(2,5)
+      qqffbHg4 = qqffbHg4 - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,5)**2*Spaa(3,4)*Spbb(1,2)*Spbb(2,3)*Spbb(3,5)&
+     &  - 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,5)*&
+     & Spaa(2,3)*Spaa(4,5)*Spbb(2,3)**2*Spbb(2,5) + 2d0/(dsqrt(2d0))/(&
+     & Spbb(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,5)*Spaa(2,4)*Spaa(3,5)*&
+     & Spbb(2,3)**2*Spbb(2,5) + 2d0/(dsqrt(2d0))/(Spbb(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,5)*Spaa(4,5)**2*Spbb(2,5)**2*Spbb(3,4)
+      endif
     endif
-  else!J1 is right
-    if(id(6)*helicity(6).lt.0d0)then!J2 is left
-      qqffbHg4 = 0d0!RL
-    else!J2 is right
-      qqffbHg4 = 0d0!RR
+  else!g is +
+    if(id(1)*helicity(1).lt.0d0)then!J1 is left
+      if(id(6)*helicity(6).lt.0d0)then!J2 is left
+        qqffbHg4 = - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*&
+     & Spaa(1,3)*Spaa(2,4)*Spbb(1,4)**2*Spbb(1,5) + 2d0/(dsqrt(2d0))/(&
+     & Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,4)*Spaa(2,3)*&
+     & Spbb(1,4)**2*Spbb(1,5) + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,2)*Spaa(2,3)**2*Spbb(1,3)*Spbb(1,5)*Spbb(2,4)&
+     &  - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*&
+     & Spaa(2,3)**2*Spbb(1,4)*Spbb(1,5)*Spbb(2,3) + 2d0/(dsqrt(2d0))/(&
+     & Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(2,3)*Spaa(3,5)*&
+     & Spbb(1,5)**2*Spbb(3,4) + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,2)*Spaa(2,5)*Spaa(3,4)*Spbb(1,4)*Spbb(1,5)*&
+     & Spbb(4,5) + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,3)*Spaa(2,3)*Spaa(2,5)*Spbb(1,3)*Spbb(1,5)*Spbb(4,5) - 2d0&
+     & /(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,3)*Spaa(2,&
+     & 3)*Spaa(2,5)*Spbb(1,4)*Spbb(1,5)*Spbb(3,5) + 2d0/(dsqrt(2d0))/(&
+     & Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,3)*Spaa(2,4)*Spaa(2,5)*&
+     & Spbb(1,4)*Spbb(1,5)*Spbb(4,5)
+      qqffbHg4 = qqffbHg4 - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,4)*Spaa(2,3)*Spaa(2,5)*Spbb(1,4)*Spbb(1,5)*&
+     & Spbb(4,5) + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(2,3)**2*Spaa(2,5)*Spbb(1,5)*Spbb(2,3)*Spbb(4,5) - 2d0/(&
+     & dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(2,3)**2*Spaa(2&
+     & ,5)*Spbb(1,5)*Spbb(2,4)*Spbb(3,5) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(1,5)*Spbb(1,5))*Spaa(2,5)**2*Spaa(3,4)*Spbb(1,5)*Spbb(4,5)&
+     & **2
+      else!J2 is right
+        qqffbHg4 = 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(&
+     & 1,3)*Spaa(2,4)*Spbb(1,3)**2*Spbb(1,5) - 2d0/(dsqrt(2d0))/(Spaa(2,5&
+     & ))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,4)*Spaa(2,3)*Spbb(1,3)&
+     & **2*Spbb(1,5) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))&
+     & *Spaa(1,2)*Spaa(2,4)**2*Spbb(1,3)*Spbb(1,5)*Spbb(2,4) + 2d0/(&
+     & dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(2,4)&
+     & **2*Spbb(1,4)*Spbb(1,5)*Spbb(2,3) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(2,4)*Spaa(4,5)*Spbb(1,5)**2*&
+     & Spbb(3,4) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,2)*Spaa(2,5)*Spaa(3,4)*Spbb(1,3)*Spbb(1,5)*Spbb(3,5) - 2d0&
+     & /(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,3)*Spaa(2,&
+     & 4)*Spaa(2,5)*Spbb(1,3)*Spbb(1,5)*Spbb(3,5) + 2d0/(dsqrt(2d0))/(&
+     & Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,4)*Spaa(2,3)*Spaa(2,5)*&
+     & Spbb(1,3)*Spbb(1,5)*Spbb(3,5) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(1,5)*Spbb(1,5))*Spaa(1,4)*Spaa(2,4)*Spaa(2,5)*Spbb(1,3)*&
+     & Spbb(1,5)*Spbb(4,5)
+      qqffbHg4 = qqffbHg4 + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,4)*Spaa(2,4)*Spaa(2,5)*Spbb(1,4)*Spbb(1,5)*&
+     & Spbb(3,5) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(2,4)**2*Spaa(2,5)*Spbb(1,5)*Spbb(2,3)*Spbb(4,5) + 2d0/(&
+     & dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(2,4)**2*Spaa(2&
+     & ,5)*Spbb(1,5)*Spbb(2,4)*Spbb(3,5) + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(1,5)*Spbb(1,5))*Spaa(2,5)**2*Spaa(3,4)*Spbb(1,5)*Spbb(3,5)&
+     & **2
+      endif
+    else!J1 is right
+      if(id(6)*helicity(6).lt.0d0)then!J2 is left
+        qqffbHg4 = 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)**2*&
+     & Spaa(3,4)*Spbb(1,5)*Spbb(2,4)**2 - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,3)**2*Spbb(1,2)*Spbb(1,5)*&
+     & Spbb(3,4) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*&
+     & Spaa(1,2)*Spaa(1,3)*Spaa(3,5)*Spbb(1,5)*Spbb(2,3)*Spbb(4,5) + 2d0&
+     & /(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,&
+     & 3)*Spaa(3,5)*Spbb(1,5)*Spbb(2,4)*Spbb(3,5) - 2d0/(dsqrt(2d0))/(&
+     & Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,3)*Spaa(4,5)*&
+     & Spbb(1,5)*Spbb(2,4)*Spbb(4,5) + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,4)*Spaa(3,5)*Spbb(1,5)*&
+     & Spbb(2,4)*Spbb(4,5) + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,2)*Spaa(2,5)*Spaa(3,4)*Spbb(2,4)*Spbb(2,5)*&
+     & Spbb(4,5) + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*&
+     & Spaa(1,3)**2*Spaa(2,5)*Spbb(1,5)*Spbb(2,5)*Spbb(3,4) + 2d0/(&
+     & dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,3)*Spaa(2,3)&
+     & *Spaa(2,5)*Spbb(2,5)**2*Spbb(3,4)
+      qqffbHg4 = qqffbHg4 - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,3)*Spaa(2,5)*Spaa(4,5)*Spbb(2,5)*Spbb(4,5)**2&
+     &  + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,4)*&
+     & Spaa(2,5)*Spaa(3,5)*Spbb(2,5)*Spbb(4,5)**2
+      else!J2 is right
+        qqffbHg4 = - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*&
+     & Spaa(1,3)*Spaa(2,4)*Spbb(1,5)*Spbb(2,3)**2 + 2d0/(dsqrt(2d0))/(&
+     & Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,4)**2*Spbb(1,3&
+     & )*Spbb(1,5)*Spbb(2,4) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*&
+     & Spbb(1,5))*Spaa(1,2)*Spaa(1,4)**2*Spbb(1,4)*Spbb(1,5)*Spbb(2,3)&
+     &  + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*&
+     & Spaa(1,4)*Spaa(2,3)*Spbb(1,5)*Spbb(2,3)**2 - 2d0/(dsqrt(2d0))/(&
+     & Spaa(2,5))/(Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,4)*Spaa(4,5)*&
+     & Spbb(1,5)*Spbb(2,5)*Spbb(3,4) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(&
+     & Spaa(1,5)*Spbb(1,5))*Spaa(1,2)*Spaa(1,5)*Spaa(3,4)*Spbb(1,5)*&
+     & Spbb(2,3)*Spbb(3,5) - 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,3)*Spaa(2,4)*Spaa(2,5)*Spbb(2,3)*Spbb(2,5)*&
+     & Spbb(3,5) + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*&
+     & Spaa(1,4)**2*Spaa(2,5)*Spbb(1,3)*Spbb(2,5)*Spbb(4,5) - 2d0/(&
+     & dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,4)**2*Spaa(2&
+     & ,5)*Spbb(1,4)*Spbb(2,5)*Spbb(3,5)
+      qqffbHg4 = qqffbHg4 + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*&
+     & Spbb(2,5))*Spaa(1,4)*Spaa(2,3)*Spaa(2,5)*Spbb(2,3)*Spbb(2,5)*&
+     & Spbb(3,5) + 2d0/(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*&
+     & Spaa(1,4)*Spaa(2,4)*Spaa(2,5)*Spbb(2,3)*Spbb(2,5)*Spbb(4,5) - 2d0&
+     & /(dsqrt(2d0))/(Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,4)*Spaa(2,&
+     & 4)*Spaa(2,5)*Spbb(2,4)*Spbb(2,5)*Spbb(3,5) - 2d0/(dsqrt(2d0))/(&
+     & Spaa(2,5))/(Spaa(2,5)*Spbb(2,5))*Spaa(1,5)*Spaa(2,5)*Spaa(3,4)*&
+     & Spbb(2,5)*Spbb(3,5)**2
+      endif
     endif
   endif
 

@@ -56,20 +56,22 @@ command line parameter quick reference:
                        stable; if it is 1, they decay to Wnu, with the W's decaying
                        according to DecayModes1,2.
     HbbDK:             For VH production, decay H->bb
-    VH_PC:             VH partonic channel and mode selection for Process=51
-                       ee = lo = e- e+ @LO (beta)
-                       qq = lo = q qbar @LO (beta)
-                       gg = triangles + boxes of gg (set as default)
-                       tr = triangles of gg
-                       bo = boxes of gg
-                       in = interference = 2*dble(box*dconjg(triangle)) of gg
-                       sb = for NLO development (in development)
-                       sp = for NLO development (in development)
-                       qg = gq = qg + gq (in development)
-                       nl = full oneloop = q qbar @LO + NLO + gg + gq (in development)
-                       VH_PC overrides Pchannel,
-                       but Pchannel applies to VH_PC = nl,
-                       where 0 = gg, 1 = qq, and 2 = both + gq
+    VH_PC:             VH partonic channel and mode selection
+                       ee ( = e+ e- @LO)
+                       gg ( = triangles + boxes of gg)
+                       qq ( = q q~ @LO)
+                       lo ( = q q~ @LO)
+                       tr ( = triangles of gg)
+                       bo ( = boxes of gg)
+                       in ( = interference = 2*dble(box*dconjg(triangle)) of gg)
+                       qg ( = real - dipoles, for g q/q~ > VH + q/q~, for development only)
+                       gq ( = K + P, for g q/q~ > VH + q/q~, for development only)
+                       sb ( = real - dipoles, for q q~ @NLO, for development only)
+                       sp ( = virtual + I + K + P, for q q~ @NLO, for development only)
+                       nl ( = NLO = q q~ @LO + NLO + gq)
+                       VH_PC overrides Pchannel.
+    alpha_dip          extra non-physical degree of freedom for Process=51 & VH_PC=nl, defaulted at 1.
+                       Vary to check indepedence (of alpha_dip).
     VBFoffsh_run:      For VBF offshell production, set this to a number from 1-5
                        for each of the 5 jobs.  See manual for more details.
   Resonance parameters:

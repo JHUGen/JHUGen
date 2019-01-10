@@ -2558,7 +2558,7 @@ END SUBROUTINE Kinematics_VHiggs
 
 
 
-SUBROUTINE Kinematics_VH(id,MomExt,NBin,applyPSCut,HDecays,PhoOnshell)
+SUBROUTINE Kinematics_eeVH(id,MomExt,NBin,applyPSCut,HDecays,PhoOnshell)
 use ModMisc
 use ModParameters
 use ModVHLO
@@ -2574,12 +2574,11 @@ logical, intent(in), optional :: PhoOnshell
 logical :: applyPSCut
 integer :: NBin(:)
 integer :: i,j,k,l,idME2(1:9)
-real(8) :: m_jj,y_j1,y_j2,dphi_jj, m_ll, pt_V, pt_H, pt1, pt2, deltaR, m_Vstar, m_inv_H, m_inv_V, costheta1, costheta2, phistar1, phi
-double precision MomBoost(1:4), MomFerm(1:4), MomLeptX(1:4,1:4), ScatteringAxis(1:4), MomReso(1:4), MomZ(1:4), MomFerm1(1:4), MomFerm2(1:4)
-double precision MomLeptPlane1(2:4), MomLeptPlane2(2:4), dummy(2:4), signPhi, EHat
+real(8) :: m_jj,y_j1,y_j2,dphi_jj, m_ll, pt_V, pt_H, pt1, pt2, deltaR, m_Vstar, m_inv_H, m_inv_V, costheta1, costheta2, phistar1, phi, eta_Higgs
+double precision MomBoost(1:4), MomFerm(1:4), MomLeptX(1:4,1:4), ScatteringAxis(1:4), MomReso(1:4), MomZ(1:4), MomFerm1(1:4), MomFerm2(1:4), MomVStar(1:4)
+double precision MomLeptPlane1(2:4), MomLeptPlane2(2:4), dummy(2:4), signPhi
 double precision, intent(in) :: MomExt(1:4,1:10)
 logical :: hasAonshell
-real(8) :: MomBoostCOM(1:4)
 
      hasAonshell = .false.
       if(present(PhoOnshell)) then
@@ -2597,10 +2596,6 @@ real(8) :: MomBoostCOM(1:4)
      pt_H = get_PT(MomExt(1:4,5))
      pt_V = get_PT(MomExt(1:4,4))
 
-     EHat = MomExt(1,1)+MomExt(1,2)
-
-MomBoostCOM(1)   = +MomExt(1,3)
-MomBoostCOM(2:4) = -MomExt(2:4,3)
 
      if(m_Vstar.gt.mVH_minmax(2))applyPSCut=.true.
      if(m_Vstar.lt.mVH_minmax(1))applyPSCut=.true.
@@ -2614,8 +2609,10 @@ MomBoostCOM(2:4) = -MomExt(2:4,3)
         enddo
         if(m_jj.lt.mJJcut)applyPSCut=.true.
         if(deltaR.lt.Rjet)applyPSCut=.true.
-     else
-        if(dabs(m_jj-M_Reso).gt.10d0*Ga_Reso)applyPSCut=.true.
+!     else
+!        if(dabs(m_jj-M_Reso).gt.10d0*Ga_Reso)then
+!            applyPSCut=.true.
+!        endif
      endif
 
      do i=6,7
@@ -2650,10 +2647,291 @@ MomBoostCOM(2:4) = -MomExt(2:4,3)
 !-- FIND PLOTTING BINS
 !costheta1 - production angle
       MomZ = MomExt(:,4)
+      !MomBoost(1)   = +MomExt(1,3)
+      !MomBoost(2:4) = -MomExt(2:4,3)
+      !if( (MomExt(2,3)**2+MomExt(3,3)**2+MomExt(4,3)**2).gt.1d-8 )then
+        !ScatteringAxis = MomExt(:,1) + MomExt(:,2)
+      !  ScatteringAxis = MomExt(:,3)
+      !  call boost(MomZ(1:4),MomBoost(1:4),m_Vstar)! boost Z into Z* rest frame
+      !else
+        ScatteringAxis(1:4) = (/0d0,0d0,0d0,1d0/)
+      !endif
+      costheta1 = Get_CosAlpha( ScatteringAxis, MomZ )
+
+
+!costheta2 - Z2 decay angle
+         MomZ(1:4) = MomExt(1:4,3)
+         MomBoost(1)   = +MomExt(1,4)
+         MomBoost(2:4) = -MomExt(2:4,4)
+         
+         if(id(6).gt.0) then
+            MomFerm1(1:4)  = MomExt(1:4,6)
+            MomFerm2(1:4)  = MomExt(1:4,7)
+         else
+            MomFerm1(1:4)  = MomExt(1:4,7)
+            MomFerm2(1:4)  = MomExt(1:4,6)
+         endif
+
+         call boost(MomFerm1(1:4),MomBoost(1:4),m_inv_V)! boost fermion from Z2 into Z2 rest frame
+         call boost(MomZ(1:4),MomBoost(1:4),m_inv_V)
+         costheta2 = Get_CosAlpha( MomFerm1(1:4),MomZ(1:4) )
+
+
+       
+!phistar1, which is really phi1 in arXiv:1309.4819 [hep-ph] FIG.1 middle
+      MomReso(1:4)  = -MomExt(1:4,5)
+      MomBoost(1)   = +MomReso(1)
+      MomBoost(2:4) = -MomReso(2:4)
+      !if(id(2).lt.0) then
+      !   MomLeptX(1:4,1) = -MomExt(1:4,2)
+      !   MomLeptX(1:4,2) = -MomExt(1:4,1)
+      !else
+         MomLeptX(1:4,1) = -MomExt(1:4,1)
+         MomLeptX(1:4,2) = -MomExt(1:4,2)
+      !endif
+      !if(id(8).gt.0) then
+         MomLeptX(1:4,3) = MomExt(1:4,8)
+         MomLeptX(1:4,4) = MomExt(1:4,9)
+      !else
+      !   MomLeptX(1:4,3) = MomExt(1:4,9)
+      !   MomLeptX(1:4,4) = MomExt(1:4,8)
+      !endif
+      call boost(MomLeptX(1:4,1),MomBoost(1:4),m_inv_H)! boost all fermions into the resonance frame
+      call boost(MomLeptX(1:4,2),MomBoost(1:4),m_inv_H)
+      call boost(MomLeptX(1:4,3),MomBoost(1:4),m_inv_H)
+      call boost(MomLeptX(1:4,4),MomBoost(1:4),m_inv_H)
+      ScatteringAxis(1:4) = MomLeptX(1:4,3)-MomLeptX(1:4,4)
+      ScatteringAxis(1:4) = ScatteringAxis(1:4) / dsqrt(dabs(ScatteringAxis(2)**2+ScatteringAxis(3)**2+ScatteringAxis(4)**2 +1d-15 ))
+!     orthogonal vectors defined as p(fermion) x p(antifermion)
+      MomLeptPlane1(2:4) = (MomLeptX(2:4,1)).cross.(MomLeptX(2:4,2))! orthogonal vector to lepton plane
+      MomLeptPlane1(2:4) = MomLeptPlane1(2:4)/dsqrt(dabs(MomLeptPlane1(2)**2+MomLeptPlane1(3)**2+MomLeptPlane1(4)**2 +1d-15) )! normalize
+      MomLeptPlane2(2:4) = (ScatteringAxis(2:4)).cross.(MomLeptX(2:4,1)+MomLeptX(2:4,2))
+      MomLeptPlane2(2:4) = MomLeptPlane2(2:4)/dsqrt(dabs(MomLeptPlane2(2)**2+MomLeptPlane2(3)**2+MomLeptPlane2(4)**2 +1d-15 ))! normalize
+!     get the sign
+      dummy(2:4) = (MomLeptPlane1(2:4)).cross.(MomLeptPlane2(2:4))
+      signPhi = sign(1d0,  (dummy(2)*(MomLeptX(2,1)+MomLeptX(2,2))+dummy(3)*(MomLeptX(3,1)+MomLeptX(3,2))+dummy(4)*(MomLeptX(4,1)+MomLeptX(4,2)))  )! use q1
+      Phistar1 = signPhi * acos(MomLeptPlane1(2)*MomLeptPlane2(2) + MomLeptPlane1(3)*MomLeptPlane2(3) + MomLeptPlane1(4)*MomLeptPlane2(4))
+
+
+!phi
+         MomReso(1:4)  = -MomExt(1:4,5)
+         MomBoost(1)   = +MomReso(1)
+         MomBoost(2:4) = -MomReso(2:4)
+         !if(id(2).lt.0) then
+         !   MomLeptX(1:4,1) = -MomExt(1:4,2)
+         !   MomLeptX(1:4,2) = -MomExt(1:4,1)
+         !else
+            MomLeptX(1:4,1) = -MomExt(1:4,1)
+            MomLeptX(1:4,2) = -MomExt(1:4,2)
+         !endif
+         if(id(6).gt.0) then
+            MomLeptX(1:4,3) = MomExt(1:4,6)
+            MomLeptX(1:4,4) = MomExt(1:4,7)
+         else
+            MomLeptX(1:4,3) = MomExt(1:4,7)
+            MomLeptX(1:4,4) = MomExt(1:4,6)
+         endif
+
+         call boost(MomLeptX(1:4,1),MomBoost(1:4),m_inv_H)! boost all fermions into the resonance frame
+         call boost(MomLeptX(1:4,2),MomBoost(1:4),m_inv_H)
+         call boost(MomLeptX(1:4,3),MomBoost(1:4),m_inv_H)
+         call boost(MomLeptX(1:4,4),MomBoost(1:4),m_inv_H)
+!     orthogonal vectors defined as p(fermion) x p(antifermion)
+         MomLeptPlane1(2:4) = (MomLeptX(2:4,1)).cross.(MomLeptX(2:4,2))! orthogonal vector to lepton plane
+         MomLeptPlane1(2:4) = MomLeptPlane1(2:4)/dsqrt( MomLeptPlane1(2)**2+MomLeptPlane1(3)**2+MomLeptPlane1(4)**2 +1d-15  )! normalize
+         MomLeptPlane2(2:4) = (MomLeptX(2:4,3)).cross.(MomLeptX(2:4,4))! orthogonal vector to lepton plane
+         MomLeptPlane2(2:4) = MomLeptPlane2(2:4)/dsqrt( MomLeptPlane2(2)**2+MomLeptPlane2(3)**2+MomLeptPlane2(4)**2 +1d-15  )! normalize
+!     get the sign
+         dummy(2:4) = (MomLeptPlane1(2:4)).cross.(MomLeptPlane2(2:4))
+         signPhi = sign(1d0,  (dummy(2)*(MomLeptX(2,1)+MomLeptX(2,2))+dummy(3)*(MomLeptX(3,1)+MomLeptX(3,2))+dummy(4)*(MomLeptX(4,1)+MomLeptX(4,2)))  )! use q1
+         !phi = signPhi * acos(-1d0*(MomLeptPlane1(2)*MomLeptPlane2(2) + MomLeptPlane1(3)*MomLeptPlane2(3) + MomLeptPlane1(4)*MomLeptPlane2(4)))
+         phi = signPhi * acos(1d0*(MomLeptPlane1(2)*MomLeptPlane2(2) + MomLeptPlane1(3)*MomLeptPlane2(3) + MomLeptPlane1(4)*MomLeptPlane2(4)))
+
+!      endif
+
+! eta(H)
+     eta_Higgs = get_eta(MomExt(1:4,5))
+
+
+!     binning
+     NBin(1)  = WhichBin(1,m_jj)
+     NBin(2)  = WhichBin(2,m_ll)
+     NBin(3)  = WhichBin(3,pt_V)
+     NBin(4)  = WhichBin(4,pt_H)
+     NBin(5)  = WhichBin(5,m_Vstar)
+     Nbin(6)  = WhichBin(6,costheta1)
+     Nbin(7)  = WhichBin(7,costheta2)
+     Nbin(8)  = WhichBin(8,phistar1)
+     Nbin(9)  = WhichBin(9,phi)
+     Nbin(10)  = WhichBin(10,eta_Higgs)
+
+RETURN
+END SUBROUTINE Kinematics_eeVH
+
+
+
+
+
+
+
+
+
+
+SUBROUTINE Kinematics_ppVH(id,Mom,NBin,applyPSCut,HDecays,PhoOnshell)
+use ModMisc
+use ModParameters
+use ModVHLO
+#if useCollier==1
+use ModVHgg
+#endif
+implicit none
+
+real(8) :: helicity(1:9)
+integer, intent(in) :: id(:)
+logical, intent(in) :: HDecays
+logical, intent(in), optional :: PhoOnshell
+logical :: applyPSCut
+integer :: NBin(:)
+integer :: i,j,k,l,idME2(1:9)
+real(8) :: m_jj,y_j1,y_j2,dphi_jj, m_ll, pt_V, pt_H, pt1, pt2, deltaR, m_Vstar, m_inv_H, m_inv_V, costheta1, costheta2, phistar1, phi, eta_Higgs
+real(8) :: MomBoost(1:4), MomFerm(1:4), MomLeptX(1:4,1:4), ScatteringAxis(1:4), MomReso(1:4), MomZ(1:4), MomFerm1(1:4), MomFerm2(1:4), MomVStar(1:4)
+real(8) :: MomLeptPlane1(2:4), MomLeptPlane2(2:4), dummy(2:4), signPhi
+real(8), intent(in) :: Mom(1:4,1:10)
+real(8) :: MomExt(1:4,1:10)
+logical :: hasAonshell
+real(8) :: x1,x2,momx1x2(1:4,1:3),momab(1:4,1:2),momb(1:4),ehat
+real(8) :: MomBoostT(1:4),m_Vstar_L,m_Vstar_T
+!real(8) :: eta_Vstar
+
+     MomExt=Mom!keep original copy of Mom.
+
+     hasAonshell = .false.
+      if(present(PhoOnshell)) then
+         hasAonshell=PhoOnshell
+      endif
+
+     applyPSCut = .false.
+     m_jj = get_MInv(MomExt(1:4,5))
+     m_ll = get_MInv(MomExt(1:4,4))
+!print*, "m_ll", m_ll
+     m_Vstar = get_MInv(MomExt(1:4,3))
+     m_inv_H = m_jj
+     m_inv_V = m_ll
+!print*, "m_inv_V", m_inv_V
+     pt_H = get_PT(MomExt(1:4,5))
+     pt_V = get_PT(MomExt(1:4,4))
+
+     if(m_Vstar.gt.mVH_minmax(2))applyPSCut=.true.
+     if(m_Vstar.lt.mVH_minmax(1))applyPSCut=.true.
+
+     if(pt_H.lt.pTHcut)applyPSCut=.true.
+
+     if(HDecays)then
+        do i=8,9
+            if(get_PT(MomExt(:,i)).lt.pTjetcut)applyPSCut=.true.
+            if(dabs(get_eta(MomExt(:,i))).gt.etajetcut)applyPSCut=.true.
+        enddo
+        if(m_jj.lt.mJJcut)applyPSCut=.true.
+        if(deltaR.lt.Rjet)applyPSCut=.true.
+!     else
+!        if(dabs(m_jj-M_Reso).gt.10d0*Ga_Reso)then
+!            applyPSCut=.true.
+!        endif
+     endif
+
+     do i=6,7
+        if(IsALHELepton(id(i)))then
+            if(get_PT(MomExt(:,i)).lt.pTlepcut)applyPSCut=.true.
+            !if(get_PT(MomExt(:,i)).lt.5d0*GeV)applyPSCut=.true.
+            if(dabs(get_eta(MomExt(:,i))).gt.etalepcut)applyPSCut=.true.
+        endif
+     enddo
+
+     if(IsALHEQuark(id(6)))then
+        do i=6,7
+            if(get_PT(MomExt(:,i)).lt.pTjetcut)applyPSCut=.true.
+            if(etajetcut.ge.0d0)then
+                if(dabs(get_eta(MomExt(:,i))).gt.etajetcut)applyPSCut=.true.
+            endif
+        enddo
+        if(m_ll.lt.mJJcut)applyPSCut=.true.
+        if(get_R(MomExt(1:4,6), MomExt(1:4,7)).lt.Rjet)applyPSCut=.true.
+     endif
+
+     if(m_ll.lt.m2l_minmax(1))applyPSCut=.true.
+     if(m_ll.gt.m2l_minmax(2))applyPSCut=.true.
+
+!     if(.not.hasAonshell) then
+!        if(m_ll.le.getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7))))applyPSCut=.true.
+!        if(includeGammaStar .and. .not.IsAWDecay(DecayMode1) .and. (m_ll.lt.MPhotonCutoff .or. m_Vstar.lt.MPhotonCutoff))applyPSCut=.true.
+!     else
+!        if(includeGammaStar .and. m_Vstar.lt.MPhotonCutoff)applyPSCut=.true.
+!     endif
+      
+      m_Vstar_T=dsqrt(mom(1,3)**2-mom(2,3)**2-mom(3,3)**2)
+
+      if(Get_PT2(momext(:,3)).gt.1d-8)then
+        MomBoostT(1:4)=(/mom(1,3),-mom(2,3),-mom(3,3),0d0/)!momentum/vector used to boost away the transverse moment of VH
+        call boost(momext(1:4,3),MomBoostT(1:4),m_Vstar_T)
+      endif
+
+!print*,"---------"
+!print*,mom(1:4,3)
+!print*,momext(1:4,3)
+
+      m_Vstar_L=get_Minv(momext(1:4,3))
+
+      call x1x2(1,momext(1:4,3),x1,x2)
+
+!print*,m_Vstar_L
+
+      momext(:,1)=0.5d0*m_Vstar_L * (/+1d0,0d0,0d0,+1d0/)
+      momext(:,2)=0.5d0*m_Vstar_L * (/+1d0,0d0,0d0,-1d0/)  
+      call boost2lab(x1,x2,2,momext(1:4,1:2))
+
+!print*,momext(1:4,1),"1"
+!print*,momext(4,3),x1-x2
+!print*,momext(1:4,1)+momext(1:4,2)-momext(1:4,3)
+
+      if(Get_PT2(mom(:,3)).gt.1d-8)then
+
+        MomBoostT(1:4)=(/mom(1,3),-mom(2,3),-mom(3,3),0d0/)!momentum/vector used to boost away the transverse moment of VH
+  
+        if((.not.HbbDecays).and.hasAonshell)then   ! if H, V
+          call boost(momext(1:4,4),MomBoostT(1:4),m_Vstar_T)
+          call boost(momext(1:4,5),MomBoostT(1:4),m_Vstar_T)
+        elseif(HbbDecays.and.(.not.hasAonshell))then ! if H > bb, V > ff
+          call boost(momext(1:4,6),MomBoostT(1:4),m_Vstar_T)
+          call boost(momext(1:4,7),MomBoostT(1:4),m_Vstar_T)
+          call boost(momext(1:4,8),MomBoostT(1:4),m_Vstar_T)
+          call boost(momext(1:4,9),MomBoostT(1:4),m_Vstar_T)
+          momext(:,4)=momext(:,6)+momext(:,7)
+          momext(:,5)=momext(:,8)+momext(:,9)
+        elseif((.not.HbbDecays).and.(.not.hasAonshell))then  ! if H, V > ff
+          call boost(momext(1:4,5),MomBoostT(1:4),m_Vstar_T)
+          call boost(momext(1:4,6),MomBoostT(1:4),m_Vstar_T)
+          call boost(momext(1:4,7),MomBoostT(1:4),m_Vstar_T)
+          momext(:,4)=momext(:,6)+momext(:,7)
+        else                                       ! if H > bb, V
+          call boost(momext(1:4,4),MomBoostT(1:4),m_Vstar_T)
+          call boost(momext(1:4,8),MomBoostT(1:4),m_Vstar_T)
+          call boost(momext(1:4,9),MomBoostT(1:4),m_Vstar_T)
+          momext(:,5)=momext(:,8)+momext(:,9)
+        endif
+
+      endif
+
+!print*,-momext(:,6)-momext(:,7)-momext(:,8)-momext(:,9)
+!print*,momext(:,1)+momext(:,2)-momext(:,6)-momext(:,7)-momext(:,8)-momext(:,9)
+
+!-- FIND PLOTTING BINS
+!costheta1 - production angle
+      MomZ = MomExt(:,4)
       MomBoost(1)   = +MomExt(1,3)
       MomBoost(2:4) = -MomExt(2:4,3)
-      if( (MomExt(2,3)**2+MomExt(3,3)**2+MomExt(4,3)**2).gt.1d-15 )then
-        ScatteringAxis = MomExt(:,1) + MomExt(:,2)
+      if( (MomExt(2,3)**2+MomExt(3,3)**2+MomExt(4,3)**2).gt.1d-8 )then
+        !ScatteringAxis = MomExt(:,1) + MomExt(:,2)
+        ScatteringAxis = MomExt(:,3)
         call boost(MomZ(1:4),MomBoost(1:4),m_Vstar)! boost Z into Z* rest frame
       else
         ScatteringAxis(1:4) = (/0d0,0d0,0d0,1d0/)
@@ -2684,20 +2962,20 @@ MomBoostCOM(2:4) = -MomExt(2:4,3)
       MomReso(1:4)  = -MomExt(1:4,5)
       MomBoost(1)   = +MomReso(1)
       MomBoost(2:4) = -MomReso(2:4)
-      if(id(2).lt.0) then
-         MomLeptX(1:4,1) = -MomExt(1:4,2)
-         MomLeptX(1:4,2) = -MomExt(1:4,1)
-      else
+      !if(id(2).lt.0) then
+      !   MomLeptX(1:4,1) = -MomExt(1:4,2)
+      !   MomLeptX(1:4,2) = -MomExt(1:4,1)
+      !else
          MomLeptX(1:4,1) = -MomExt(1:4,1)
          MomLeptX(1:4,2) = -MomExt(1:4,2)
-      endif
-      if(id(8).gt.0) then
+      !endif
+      !if(id(8).gt.0) then
          MomLeptX(1:4,3) = MomExt(1:4,8)
          MomLeptX(1:4,4) = MomExt(1:4,9)
-      else
-         MomLeptX(1:4,3) = MomExt(1:4,9)
-         MomLeptX(1:4,4) = MomExt(1:4,8)
-      endif
+      !else
+      !   MomLeptX(1:4,3) = MomExt(1:4,9)
+      !   MomLeptX(1:4,4) = MomExt(1:4,8)
+      !endif
       call boost(MomLeptX(1:4,1),MomBoost(1:4),m_inv_H)! boost all fermions into the resonance frame
       call boost(MomLeptX(1:4,2),MomBoost(1:4),m_inv_H)
       call boost(MomLeptX(1:4,3),MomBoost(1:4),m_inv_H)
@@ -2719,13 +2997,13 @@ MomBoostCOM(2:4) = -MomExt(2:4,3)
          MomReso(1:4)  = -MomExt(1:4,5)
          MomBoost(1)   = +MomReso(1)
          MomBoost(2:4) = -MomReso(2:4)
-         if(id(2).lt.0) then
-            MomLeptX(1:4,1) = -MomExt(1:4,2)
-            MomLeptX(1:4,2) = -MomExt(1:4,1)
-         else
+         !if(id(2).lt.0) then
+         !   MomLeptX(1:4,1) = -MomExt(1:4,2)
+         !   MomLeptX(1:4,2) = -MomExt(1:4,1)
+         !else
             MomLeptX(1:4,1) = -MomExt(1:4,1)
             MomLeptX(1:4,2) = -MomExt(1:4,2)
-         endif
+         !endif
          if(id(6).gt.0) then
             MomLeptX(1:4,3) = MomExt(1:4,6)
             MomLeptX(1:4,4) = MomExt(1:4,7)
@@ -2751,6 +3029,12 @@ MomBoostCOM(2:4) = -MomExt(2:4,3)
 
 !      endif
 
+! eta(H)
+     eta_Higgs = get_eta(Mom(1:4,5))
+
+! eta(V*)
+!     eta_Vstar = get_eta(Mom(1:4,3))
+
 
 !     binning
      NBin(1)  = WhichBin(1,m_jj)
@@ -2762,10 +3046,48 @@ MomBoostCOM(2:4) = -MomExt(2:4,3)
      Nbin(7)  = WhichBin(7,costheta2)
      Nbin(8)  = WhichBin(8,phistar1)
      Nbin(9)  = WhichBin(9,phi)
-     Nbin(10) = WhichBin(10,EHat)
+     Nbin(10)  = WhichBin(10,eta_Higgs)
+!     Nbin(11)  = WhichBin(11,eta_Vstar)
 
 RETURN
-END SUBROUTINE Kinematics_VH
+END SUBROUTINE Kinematics_ppVH
+
+
+
+
+
+
+
+
+
+subroutine x1x2(NumPart,p_final,x1,x2)
+use modParameters
+implicit none
+integer, intent(in) :: NumPart
+real(8), intent(in) :: p_final(1:4,1:NumPart)
+real(8), intent(out) :: x1,x2
+real(8) :: Etot, pztot
+integer :: i
+!print*, p_final
+Etot=0d0
+pztot=0d0
+do i=1,NumPart
+    Etot=Etot+p_final(1,i)
+    pztot=pztot+p_final(4,i)
+enddo
+
+x1 = (Etot+Pztot)/Collider_Energy
+x2 = (Etot-Pztot)/Collider_Energy
+!print*,x1,x2
+
+end subroutine x1x2
+
+
+
+
+
+
+
 
 
 

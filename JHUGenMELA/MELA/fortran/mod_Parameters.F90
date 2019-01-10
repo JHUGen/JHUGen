@@ -3,7 +3,7 @@ implicit none
 save
 !
 !
-character(len=*),parameter :: JHUGen_Version="v7.2.4"
+character(len=*),parameter :: JHUGen_Version="v7.2.5"
 !
 !
 !=====================================================
@@ -135,17 +135,21 @@ logical, public :: H_DK =.false.                 ! default to false so H in V* >
 
 ! new VH
 character(len=2), public :: VH_PC = "lo"                ! VH partonic channel and mode selection, in development.
-                                                            ! "ee" ( = e+ e- @LO)
-                                                            ! "gg" ( = triangles + boxes of gg)
-                                                            ! "qq" ( = q qbar @LO)
-                                                            ! "lo" ( = q qbar @LO)
-                                                            ! "tr" ( = triangles of gg)
-                                                            ! "bo" ( = boxes of gg)
-                                                            ! "in" ( = interference = 2*dble(box*dconjg(triangle)) of gg)
-                                                            ! "qg" or "gq" ( = qg + gq)
-                                                            ! "nl" ( = full oneloop = q qbar @LO + NLO + gg + gq)
-                                                            ! "sb" ( = real - dipoles, for development only)
-                                                            ! "sp" ( = virtual + dipoles, for development only)
+                                                        ! "ee" ( = e+ e- @LO)
+                                                        ! "gg" ( = triangles + boxes of gg)
+                                                        ! "qq" ( = q q~ @LO)
+                                                        ! "lo" ( = q q~ @LO)
+                                                        ! "tr" ( = triangles of gg)
+                                                        ! "bo" ( = boxes of gg)
+                                                        ! "in" ( = interference = 2*dble(box*dconjg(triangle)) of gg)
+                                                        ! "qg" ( = real - dipoles, for g q/q~ > VH + q/q~, for development only)
+                                                        ! "gq" ( = virtual + I + K + P, for g q/q~ > VH + q/q~, for development only)
+                                                        ! "sb" ( = real - dipoles, for q q~ @NLO, for development only)
+                                                        ! "sp" ( = virtual + I + K + P, for q q~ @NLO, for development only)
+                                                        ! "nl" ( = full oneloop = q ~ @LO + NLO + gg + gq)
+                                                        ! VH_PC overrides Pchannel.
+
+real(8), public :: alpha_dip = 1d0 !extra non physical degree of freedom for dipoles. Vary to check indepedence (of alpha_dip).
 ! new VH
 !=====================================================
 
@@ -902,6 +906,7 @@ real(dp), public, parameter :: nf = 5.0_dp
 real(dp), public, parameter :: xn = 3.0_dp
 real(dp), public, parameter :: Ca = 3.0_dp
 real(dp), public, parameter :: Cf = 4.0_dp/3.0_dp
+real(dp), public, parameter :: Tr = 0.5_dp
 real(dp), public, parameter :: avegg = 1.0_dp/4.0_dp/64.0_dp
 real(dp), public, parameter :: aveqg = 1.0_dp/4.0_dp/24.0_dp
 real(dp), public, parameter :: aveqq = 1.0_dp/4.0_dp/9.0_dp
@@ -1535,7 +1540,7 @@ id2 = abs(id2in)
     if((id1in*h1).lt.0d0)then
       ZFFbare = aL_neu
     else
-      print*,"Noright-handed neutrino here!",id1in,h1
+      print*,"No right-handed neutrino here!",id1in,h1
       stop
     endif
   else

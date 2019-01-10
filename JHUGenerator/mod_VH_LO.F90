@@ -173,12 +173,7 @@ subroutine amp_VH_LO(Mom,mass,helicity,id,amp)
       if(qqZZ.ne.0d0)then
         PROP3 = PROPAGATOR(q3_q3,mass(3,1),mass(3,2))
         PROP4 = PROPAGATOR(q4_q4,mass(4,1),mass(4,2))
-        !if(id(1).gt.0)then
-          qqZZ=qqZZ*ZFFbare(id(1),id(2),helicity(1),helicity(2))
-        !else
-          !qqZZ=qqZZ*ZFFbare(id(2),id(1),helicity(2),helicity(1))
-        !endif
-        qqZZ=qqZZ*ZFF(id(6),id(7),helicity(6),helicity(7))
+        qqZZ=qqZZ*ZFFbare(id(1),id(2),helicity(1),helicity(2))*ZFF(id(6),id(7),helicity(6),helicity(7))
         qqZZ=qqZZ*PROP3*PROP4*gFFZ**2
       endif
       if(qqZA.ne.0d0)then
@@ -220,33 +215,18 @@ subroutine amp_VH_LO(Mom,mass,helicity,id,amp)
 
   endif
 
+
 ! assemble everything and get iM
   if(id(8).ne.Not_a_particle_) then
-    PROP5 = -PROPAGATOR(q5_q5,mass(5,1),mass(5,2))
-    amp=amp *PROP5 &
-    *(kappa*FFS(id(8), Mom(:,8), helicity(8), id(9), Mom(:,9), helicity(9)) &
-      +ci*kappa_tilde*FFP(id(8), Mom(:,8), helicity(8), id(9), Mom(:,9), helicity(9)))&
-    *(-ci/vev*massfrun(getMass(convertLHEreverse(id(8))),get_minv(Mom(:,5))))
-
-!print*,massfrun(getMass(convertLHEreverse(id(8))),Mu_Ren)
-
-!call spinoru2(2,Mom(:,8:9),za_bb,zb_bb,s_bb)
-!print*,za_bb
-!print*,zb_bb
-!print*,FFS(id(8), Mom(:,8), helicity(8), id(9), Mom(:,9), helicity(9))
-!print*,FFP(id(8), Mom(:,8), helicity(8), id(9), Mom(:,9), helicity(9))
-!print*,"=================="
-
-!print*, 1d0/vev*getMass(convertLHEreverse(id(8)))
-
-!print*,"|M|^2 = ",dble(dconjg(PROP5 &
-!    *(kappa*FFS(id(8), Mom(:,8), helicity(8), id(9), Mom(:,9), helicity(9)) &
-!      +ci*kappa_tilde*FFP(id(8), Mom(:,8), helicity(8), id(9), Mom(:,9), helicity(9)))&
-!    *(-ci/vev*getMass(convertLHEreverse(id(8)))))*(PROP5 &
-!    *(kappa*FFS(id(8), Mom(:,8), helicity(8), id(9), Mom(:,9), helicity(9)) &
-!      +ci*kappa_tilde*FFP(id(8), Mom(:,8), helicity(8), id(9), Mom(:,9), helicity(9)))&
-!    *(-ci/vev*getMass(convertLHEreverse(id(8))))))
-
+    if(get_minv(Mom(:,5)).gt.0d0)then
+      PROP5 = -PROPAGATOR(q5_q5,mass(5,1),mass(5,2))
+      amp=amp *PROP5 &
+      *(kappa*FFS(id(8), Mom(:,8), helicity(8), id(9), Mom(:,9), helicity(9)) &
+        +ci*kappa_tilde*FFP(id(8), Mom(:,8), helicity(8), id(9), Mom(:,9), helicity(9)))&
+      *(-ci/vev*massfrun(getMass(convertLHEreverse(id(8))),get_minv(Mom(:,5))))
+    else
+      amp=0d0
+    endif
   endif ! else H does not decay
 
   return
