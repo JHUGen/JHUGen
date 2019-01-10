@@ -57,7 +57,7 @@ jhugenversion: &jhugenversion
 
 version: 2
 jobs:
-  build:
+  checkout:
     <<: *env
     working_directory: ~/JHUGen
     steps:
@@ -78,8 +78,6 @@ jobs:
       - run:
           name: "undo git checkout -B hack"
           command: rm -r $HOME/githack
-      - run:
-          <<: *jhugenversion
       - restore_cache:
           key: v2_boost_1_61_0
       - run:
@@ -93,20 +91,9 @@ jobs:
               ./bootstrap.sh &&
               (./b2 || true)
             fi
-      - run:
-          name: compile mela
-          command: |
-            cd JHUGenMELA/MELA/
-            ./setup.sh
-            #this is needed because cmsenv happens in $BASH_ENV,
-            #so $SCRAM_ARCH is overwritten for MELA/COLLIER/setup.sh
-            #after being set in MELA/setup.sh
-            mv data/$SCRAM_ARCH/libcollier.so data/slc6_amd64_gcc530/libcollier.so
       - save_cache:
           key: v2_boost_1_61_0
           paths: ~/boost_1_61_0
-      - run: cd JHUGenerator && make
-      - run: cd JHUGenerator/pdfs && ./downloadNNPDF.sh
       - persist_to_workspace:
           root: ~/JHUGen
           paths:
@@ -121,6 +108,77 @@ jobs:
             - README.md
             - VH_NLO
             - Web
+
+  build:
+    <<: *env
+    working_directory: ~/JHUGen
+    steps:
+      - attach_workspace:
+          at: ~/JHUGen
+      - run:
+          <<: *cmsrelcmsenv
+      - run:
+          <<: *jhugenversion
+      - restore_cache:
+          key: v2_boost_1_61_0
+      - run:
+          name: compile mela
+          command: |
+            cd JHUGenMELA/MELA/
+            ./setup.sh
+            #this is needed because cmsenv happens in $BASH_ENV,
+            #so $SCRAM_ARCH is overwritten for MELA/COLLIER/setup.sh
+            #after being set in MELA/setup.sh
+            mv data/$SCRAM_ARCH/libcollier.so data/slc6_amd64_gcc530/libcollier.so
+      - run: cd JHUGenerator && make
+      - run: cd JHUGenerator/pdfs && ./downloadNNPDF.sh
+      - persist_to_workspace:
+          root: ~/JHUGen
+          paths:
+            - JHUGenerator
+            - JHUGenMELA
+
+  build-MCFM:
+    <<: *env
+    working_directory: ~/JHUGen
+    steps:
+      - attach_workspace:
+          at: ~/JHUGen
+      - run:
+          <<: *cmsrelcmsenv
+      - run:
+          <<: *jhugenversion
+      - restore_cache:
+          key: v2_boost_1_61_0
+      - run:
+          name: "md5sum of MCFM files"
+          command: |
+            md5sum $(
+              git ls-files MCFM-JHUGen | sort
+            ) > MCFM-md5sum
+      - restore_cache:
+          key: v1-compiled-MCFM-{{ checksum "MCFM-md5sum" }}
+      - run:
+          name: compile MCFM
+          command: MCFM-JHUGen/compile.sh
+      - save_cache:
+          key: v1-compiled-MCFM-{{ checksum "MCFM-md5sum" }}
+          paths:
+            - ~/JHUGen/MCFM-JHUGen
+      - run:
+          name: compile mela
+          command: |
+            cd JHUGenMELA/MELA/
+            ./setup.sh
+            #this is needed because cmsenv happens in $BASH_ENV,
+            #so $SCRAM_ARCH is overwritten for MELA/COLLIER/setup.sh
+            #after being set in MELA/setup.sh
+            mv data/$SCRAM_ARCH/libcollier.so data/slc6_amd64_gcc530/libcollier.so
+      - run: cd JHUGenerator && make
+      - run: cd JHUGenerator/pdfs && ./downloadNNPDF.sh
+      - run:
+          name: "test the MELA reference with the compiled MCFM"
+          command: cd JHUGenMELA/MELA/test; ./testME_all.py
 
   generator_reference:
     <<: *env
@@ -917,7 +975,7 @@ jobs:
       - run:
           name: "check that newlines are not annoying"
           command: |
-            dos2unix $(git ls-files | grep -v MCFM-JHUGen/Bin/Pdfdata | grep -v ffperm5.dat)
+            dos2unix $(git ls-files | grep -v 'MCFM-JHUGen/Bin/Pdfdata.*[.]dat$' | grep -v 'ffperm5[.]dat$')
             git diff --exit-code --stat
           when: always
       - save_cache:
@@ -941,7 +999,13 @@ workflows:
   version: 2
   all-tests:
     jobs:
-      - build
+      - checkout
+      - build:
+          requires:
+            - checkout
+      - build-MCFM:
+          requires:
+            - checkout
       - generator_reference:
           requires:
             - build
