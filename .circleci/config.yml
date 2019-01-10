@@ -982,6 +982,21 @@ jobs:
       - save_cache:
           key: v1_dos2unix-7.4.0
           paths: ~/dos2unix-7.4.0
+      - run: git checkout -- .
+
+      - run:
+          name: "check that permissions are not annoying"
+          command: |
+            for filename in $(git ls-files); do
+              if sed -n 1p $filename | grep '^#!'; then
+                chmod u+x $filename
+              else
+                chmod u-x $filename
+              fi
+            done
+            git diff --exit-code
+          when: always
+      - run: git checkout -- .
 
       - store_artifacts:
           path:
