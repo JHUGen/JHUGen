@@ -117,6 +117,7 @@ void angularDistributions_spin0_HVV(string cinput, string strcouplings, string d
   for (auto& opt:strcouplingsList) extractCoupling(opt, *someHiggs);
   someHiggs->makeParamsConst(true);
   someHiggs->makeCouplingsConst(true);
+  someHiggs->getPDF()->printParameters();
 
   if (coutput==""){
     size_t lastSlash = cinput.find_last_of("/\\");
@@ -265,6 +266,8 @@ void extractCoupling(string opt, ScalarPdfFactory_HVV& factory){
   }
   else valRe = atof(strVal.c_str());
 
+  bool setanomalous, setghv1;
+
   // Here we go again, sillions of couplings
   if (wish=="cv_q1sq"){ ((RooRealVar*)couplings.cLambda_qsq[cLambdaHIGGS_VV_QSQ1])->setVal((int) valRe); }
   else if (wish=="cv_q2sq"){ ((RooRealVar*)couplings.cLambda_qsq[cLambdaHIGGS_VV_QSQ2])->setVal((int) valRe); }
@@ -286,53 +289,53 @@ void extractCoupling(string opt, ScalarPdfFactory_HVV& factory){
   else if (wish=="Lambda_v42"){ ((RooRealVar*) couplings.Lambda_z4qsq[cLambdaHIGGS_VV_QSQ2])->setVal(valRe); }
   else if (wish=="Lambda_v40"){ ((RooRealVar*) couplings.Lambda_z4qsq[cLambdaHIGGS_VV_QSQ12])->setVal(valRe); }
 
-  else if (wish=="ghv1"){ ((RooRealVar*) couplings.g1List[0][0])->setVal(valRe); ((RooRealVar*) couplings.g1List[0][1])->setVal(valIm); }
-  else if (wish=="ghv1_prime"){ ((RooRealVar*) couplings.g1List[1][0])->setVal(valRe); ((RooRealVar*) couplings.g1List[1][1])->setVal(valIm); }
-  else if (wish=="ghv1_prime2"){ ((RooRealVar*) couplings.g1List[2][0])->setVal(valRe); ((RooRealVar*) couplings.g1List[2][1])->setVal(valIm); }
-  else if (wish=="ghv1_prime3"){ ((RooRealVar*) couplings.g1List[3][0])->setVal(valRe); ((RooRealVar*) couplings.g1List[3][1])->setVal(valIm); }
-  else if (wish=="ghv1_prime4"){ ((RooRealVar*) couplings.g1List[4][0])->setVal(valRe); ((RooRealVar*) couplings.g1List[4][1])->setVal(valIm); }
-  else if (wish=="ghv1_prime5"){ ((RooRealVar*) couplings.g1List[5][0])->setVal(valRe); ((RooRealVar*) couplings.g1List[5][1])->setVal(valIm); }
-  else if (wish=="ghv1_prime6"){ ((RooRealVar*) couplings.g1List[6][0])->setVal(valRe); ((RooRealVar*) couplings.g1List[6][1])->setVal(valIm); }
-  else if (wish=="ghv1_prime7"){ ((RooRealVar*) couplings.g1List[7][0])->setVal(valRe); ((RooRealVar*) couplings.g1List[7][1])->setVal(valIm); }
+  else if (wish=="ghv1"){ ((RooRealVar*) couplings.g1List[0][0])->setVal(valRe); ((RooRealVar*) couplings.g1List[0][1])->setVal(valIm); setghv1 = true; }
+  else if (wish=="ghv1_prime"){ ((RooRealVar*) couplings.g1List[1][0])->setVal(valRe); ((RooRealVar*) couplings.g1List[1][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghv1_prime2"){ ((RooRealVar*) couplings.g1List[2][0])->setVal(valRe); ((RooRealVar*) couplings.g1List[2][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghv1_prime3"){ ((RooRealVar*) couplings.g1List[3][0])->setVal(valRe); ((RooRealVar*) couplings.g1List[3][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghv1_prime4"){ ((RooRealVar*) couplings.g1List[4][0])->setVal(valRe); ((RooRealVar*) couplings.g1List[4][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghv1_prime5"){ ((RooRealVar*) couplings.g1List[5][0])->setVal(valRe); ((RooRealVar*) couplings.g1List[5][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghv1_prime6"){ ((RooRealVar*) couplings.g1List[6][0])->setVal(valRe); ((RooRealVar*) couplings.g1List[6][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghv1_prime7"){ ((RooRealVar*) couplings.g1List[7][0])->setVal(valRe); ((RooRealVar*) couplings.g1List[7][1])->setVal(valIm); setanomalous = true; }
 
-  else if (wish=="ghv2"){ ((RooRealVar*) couplings.g2List[0][0])->setVal(valRe); ((RooRealVar*) couplings.g2List[0][1])->setVal(valIm); }
-  else if (wish=="ghv2_prime"){ ((RooRealVar*) couplings.g2List[1][0])->setVal(valRe); ((RooRealVar*) couplings.g2List[1][1])->setVal(valIm); }
-  else if (wish=="ghv2_prime2"){ ((RooRealVar*) couplings.g2List[2][0])->setVal(valRe); ((RooRealVar*) couplings.g2List[2][1])->setVal(valIm); }
-  else if (wish=="ghv2_prime3"){ ((RooRealVar*) couplings.g2List[3][0])->setVal(valRe); ((RooRealVar*) couplings.g2List[3][1])->setVal(valIm); }
-  else if (wish=="ghv2_prime4"){ ((RooRealVar*) couplings.g2List[4][0])->setVal(valRe); ((RooRealVar*) couplings.g2List[4][1])->setVal(valIm); }
-  else if (wish=="ghv2_prime5"){ ((RooRealVar*) couplings.g2List[5][0])->setVal(valRe); ((RooRealVar*) couplings.g2List[5][1])->setVal(valIm); }
-  else if (wish=="ghv2_prime6"){ ((RooRealVar*) couplings.g2List[6][0])->setVal(valRe); ((RooRealVar*) couplings.g2List[6][1])->setVal(valIm); }
-  else if (wish=="ghv2_prime7"){ ((RooRealVar*) couplings.g2List[7][0])->setVal(valRe); ((RooRealVar*) couplings.g2List[7][1])->setVal(valIm); }
+  else if (wish=="ghv2"){ ((RooRealVar*) couplings.g2List[0][0])->setVal(valRe); ((RooRealVar*) couplings.g2List[0][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghv2_prime"){ ((RooRealVar*) couplings.g2List[1][0])->setVal(valRe); ((RooRealVar*) couplings.g2List[1][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghv2_prime2"){ ((RooRealVar*) couplings.g2List[2][0])->setVal(valRe); ((RooRealVar*) couplings.g2List[2][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghv2_prime3"){ ((RooRealVar*) couplings.g2List[3][0])->setVal(valRe); ((RooRealVar*) couplings.g2List[3][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghv2_prime4"){ ((RooRealVar*) couplings.g2List[4][0])->setVal(valRe); ((RooRealVar*) couplings.g2List[4][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghv2_prime5"){ ((RooRealVar*) couplings.g2List[5][0])->setVal(valRe); ((RooRealVar*) couplings.g2List[5][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghv2_prime6"){ ((RooRealVar*) couplings.g2List[6][0])->setVal(valRe); ((RooRealVar*) couplings.g2List[6][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghv2_prime7"){ ((RooRealVar*) couplings.g2List[7][0])->setVal(valRe); ((RooRealVar*) couplings.g2List[7][1])->setVal(valIm); setanomalous = true; }
 
-  else if (wish=="ghv3"){ ((RooRealVar*) couplings.g3List[0][0])->setVal(valRe); ((RooRealVar*) couplings.g3List[0][1])->setVal(valIm); }
-  else if (wish=="ghv3_prime"){ ((RooRealVar*) couplings.g3List[1][0])->setVal(valRe); ((RooRealVar*) couplings.g3List[1][1])->setVal(valIm); }
-  else if (wish=="ghv3_prime2"){ ((RooRealVar*) couplings.g3List[2][0])->setVal(valRe); ((RooRealVar*) couplings.g3List[2][1])->setVal(valIm); }
-  else if (wish=="ghv3_prime3"){ ((RooRealVar*) couplings.g3List[3][0])->setVal(valRe); ((RooRealVar*) couplings.g3List[3][1])->setVal(valIm); }
-  else if (wish=="ghv3_prime4"){ ((RooRealVar*) couplings.g3List[4][0])->setVal(valRe); ((RooRealVar*) couplings.g3List[4][1])->setVal(valIm); }
-  else if (wish=="ghv3_prime5"){ ((RooRealVar*) couplings.g3List[5][0])->setVal(valRe); ((RooRealVar*) couplings.g3List[5][1])->setVal(valIm); }
-  else if (wish=="ghv3_prime6"){ ((RooRealVar*) couplings.g3List[6][0])->setVal(valRe); ((RooRealVar*) couplings.g3List[6][1])->setVal(valIm); }
-  else if (wish=="ghv3_prime7"){ ((RooRealVar*) couplings.g3List[7][0])->setVal(valRe); ((RooRealVar*) couplings.g3List[7][1])->setVal(valIm); }
+  else if (wish=="ghv3"){ ((RooRealVar*) couplings.g3List[0][0])->setVal(valRe); ((RooRealVar*) couplings.g3List[0][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghv3_prime"){ ((RooRealVar*) couplings.g3List[1][0])->setVal(valRe); ((RooRealVar*) couplings.g3List[1][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghv3_prime2"){ ((RooRealVar*) couplings.g3List[2][0])->setVal(valRe); ((RooRealVar*) couplings.g3List[2][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghv3_prime3"){ ((RooRealVar*) couplings.g3List[3][0])->setVal(valRe); ((RooRealVar*) couplings.g3List[3][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghv3_prime4"){ ((RooRealVar*) couplings.g3List[4][0])->setVal(valRe); ((RooRealVar*) couplings.g3List[4][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghv3_prime5"){ ((RooRealVar*) couplings.g3List[5][0])->setVal(valRe); ((RooRealVar*) couplings.g3List[5][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghv3_prime6"){ ((RooRealVar*) couplings.g3List[6][0])->setVal(valRe); ((RooRealVar*) couplings.g3List[6][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghv3_prime7"){ ((RooRealVar*) couplings.g3List[7][0])->setVal(valRe); ((RooRealVar*) couplings.g3List[7][1])->setVal(valIm); setanomalous = true; }
 
-  else if (wish=="ghv4"){ ((RooRealVar*) couplings.g4List[0][0])->setVal(valRe); ((RooRealVar*) couplings.g4List[0][1])->setVal(valIm); }
-  else if (wish=="ghv4_prime"){ ((RooRealVar*) couplings.g4List[1][0])->setVal(valRe); ((RooRealVar*) couplings.g4List[1][1])->setVal(valIm); }
-  else if (wish=="ghv4_prime2"){ ((RooRealVar*) couplings.g4List[2][0])->setVal(valRe); ((RooRealVar*) couplings.g4List[2][1])->setVal(valIm); }
-  else if (wish=="ghv4_prime3"){ ((RooRealVar*) couplings.g4List[3][0])->setVal(valRe); ((RooRealVar*) couplings.g4List[3][1])->setVal(valIm); }
-  else if (wish=="ghv4_prime4"){ ((RooRealVar*) couplings.g4List[4][0])->setVal(valRe); ((RooRealVar*) couplings.g4List[4][1])->setVal(valIm); }
-  else if (wish=="ghv4_prime5"){ ((RooRealVar*) couplings.g4List[5][0])->setVal(valRe); ((RooRealVar*) couplings.g4List[5][1])->setVal(valIm); }
-  else if (wish=="ghv4_prime6"){ ((RooRealVar*) couplings.g4List[6][0])->setVal(valRe); ((RooRealVar*) couplings.g4List[6][1])->setVal(valIm); }
-  else if (wish=="ghv4_prime7"){ ((RooRealVar*) couplings.g4List[7][0])->setVal(valRe); ((RooRealVar*) couplings.g4List[7][1])->setVal(valIm); }
+  else if (wish=="ghv4"){ ((RooRealVar*) couplings.g4List[0][0])->setVal(valRe); ((RooRealVar*) couplings.g4List[0][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghv4_prime"){ ((RooRealVar*) couplings.g4List[1][0])->setVal(valRe); ((RooRealVar*) couplings.g4List[1][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghv4_prime2"){ ((RooRealVar*) couplings.g4List[2][0])->setVal(valRe); ((RooRealVar*) couplings.g4List[2][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghv4_prime3"){ ((RooRealVar*) couplings.g4List[3][0])->setVal(valRe); ((RooRealVar*) couplings.g4List[3][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghv4_prime4"){ ((RooRealVar*) couplings.g4List[4][0])->setVal(valRe); ((RooRealVar*) couplings.g4List[4][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghv4_prime5"){ ((RooRealVar*) couplings.g4List[5][0])->setVal(valRe); ((RooRealVar*) couplings.g4List[5][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghv4_prime6"){ ((RooRealVar*) couplings.g4List[6][0])->setVal(valRe); ((RooRealVar*) couplings.g4List[6][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghv4_prime7"){ ((RooRealVar*) couplings.g4List[7][0])->setVal(valRe); ((RooRealVar*) couplings.g4List[7][1])->setVal(valIm); setanomalous = true; }
 
-  else if (wish=="ghzgs1_prime2"){ ((RooRealVar*) couplings.gzgs1List[0][0])->setVal(valRe); ((RooRealVar*) couplings.gzgs1List[0][1])->setVal(valIm); }
-  else if (wish=="ghzgs2"){ ((RooRealVar*) couplings.gzgs2List[0][0])->setVal(valRe); ((RooRealVar*) couplings.gzgs2List[0][1])->setVal(valIm); }
-  else if (wish=="ghzgs3"){ ((RooRealVar*) couplings.gzgs3List[0][0])->setVal(valRe); ((RooRealVar*) couplings.gzgs3List[0][1])->setVal(valIm); }
-  else if (wish=="ghzgs4"){ ((RooRealVar*) couplings.gzgs4List[0][0])->setVal(valRe); ((RooRealVar*) couplings.gzgs4List[0][1])->setVal(valIm); }
+  else if (wish=="ghzgs1_prime2"){ ((RooRealVar*) couplings.gzgs1List[0][0])->setVal(valRe); ((RooRealVar*) couplings.gzgs1List[0][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghzgs2"){ ((RooRealVar*) couplings.gzgs2List[0][0])->setVal(valRe); ((RooRealVar*) couplings.gzgs2List[0][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghzgs3"){ ((RooRealVar*) couplings.gzgs3List[0][0])->setVal(valRe); ((RooRealVar*) couplings.gzgs3List[0][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghzgs4"){ ((RooRealVar*) couplings.gzgs4List[0][0])->setVal(valRe); ((RooRealVar*) couplings.gzgs4List[0][1])->setVal(valIm); setanomalous = true; }
 
-  else if (wish=="ghgsgs2"){ ((RooRealVar*) couplings.ggsgs2List[0][0])->setVal(valRe); ((RooRealVar*) couplings.ggsgs2List[0][1])->setVal(valIm); }
-  else if (wish=="ghgsgs3"){ ((RooRealVar*) couplings.ggsgs3List[0][0])->setVal(valRe); ((RooRealVar*) couplings.ggsgs3List[0][1])->setVal(valIm); }
-  else if (wish=="ghgsgs4"){ ((RooRealVar*) couplings.ggsgs4List[0][0])->setVal(valRe); ((RooRealVar*) couplings.ggsgs4List[0][1])->setVal(valIm); }
+  else if (wish=="ghgsgs2"){ ((RooRealVar*) couplings.ggsgs2List[0][0])->setVal(valRe); ((RooRealVar*) couplings.ggsgs2List[0][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghgsgs3"){ ((RooRealVar*) couplings.ggsgs3List[0][0])->setVal(valRe); ((RooRealVar*) couplings.ggsgs3List[0][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghgsgs4"){ ((RooRealVar*) couplings.ggsgs4List[0][0])->setVal(valRe); ((RooRealVar*) couplings.ggsgs4List[0][1])->setVal(valIm); setanomalous = true; }
 
-  else if (wish=="ghvvp1"){ ((RooRealVar*) couplings.gvvp1List[0][0])->setVal(valRe); ((RooRealVar*) couplings.gvvp1List[0][1])->setVal(valIm); }
-  else if (wish=="ghvpvp1"){ ((RooRealVar*) couplings.gvpvp1List[0][0])->setVal(valRe); ((RooRealVar*) couplings.gvpvp1List[0][1])->setVal(valIm); }
+  else if (wish=="ghvvp1"){ ((RooRealVar*) couplings.gvvp1List[0][0])->setVal(valRe); ((RooRealVar*) couplings.gvvp1List[0][1])->setVal(valIm); setanomalous = true; }
+  else if (wish=="ghvpvp1"){ ((RooRealVar*) couplings.gvpvp1List[0][0])->setVal(valRe); ((RooRealVar*) couplings.gvpvp1List[0][1])->setVal(valIm); setanomalous = true; }
 
   else if (wish=="mW") ((RooRealVar*) parameters.mW)->setVal(valRe);
   else if (wish=="mZ") ((RooRealVar*) parameters.mZ)->setVal(valRe);
@@ -349,6 +352,11 @@ void extractCoupling(string opt, ScalarPdfFactory_HVV& factory){
   else if (wish=="gVprimeff_decay2_right") ((RooRealVar*) parameters.gVprimeff_decay2_right)->setVal(valRe);
 
   else cerr << "extractCoupling: Coupling " << wish << " is not supported!" << endl;
+
+  if (setanomalous && !setghv1){
+    cerr << "set an anomalous HVV coupling, but didn't set ghv1!" << endl;
+    assert(0);
+  }
 }
 
 void splitOption(const string rawoption, string& wish, string& value, char delimiter){

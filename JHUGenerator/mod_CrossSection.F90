@@ -139,8 +139,8 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
     !endif
 
     if(.not.IsAPhoton(DecayMode1)) then
-       ML1 = getMass(MY_IDUP(7))
-       ML2 = getMass(MY_IDUP(6))
+       ML1 = getMass(MY_IDUP(6))
+       ML2 = getMass(MY_IDUP(7))
        MZ1 = get_MInv(MomExt(1:4,5)+MomExt(1:4,6))
        if( MZ1.lt.(ML1+ML2) ) then
           EvalWeighted = 0d0
@@ -148,8 +148,8 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
        endif
     endif
     if(.not.IsAPhoton(DecayMode2)) then
-       ML3 = getMass(MY_IDUP(9))
-       ML4 = getMass(MY_IDUP(8))
+       ML3 = getMass(MY_IDUP(8))
+       ML4 = getMass(MY_IDUP(9))
        MZ2 = get_MInv(MomExt(1:4,7)+MomExt(1:4,8))
        if( MZ2.lt.(ML3+ML4) ) then
           EvalWeighted = 0d0
@@ -220,14 +220,14 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
    endif
 
    if(.not.IsAPhoton(DecayMode1)) then
-      call ShiftMass(MomExt(1:4,5),MomExt(1:4,6), GetMass(MY_IDUP(7)),GetMass(MY_IDUP(6)),  MomDK(1:4,1),MomDK(1:4,2), MassWeight=m1ffwgt)
+      call ShiftMass(MomExt(1:4,5),MomExt(1:4,6), GetMass(MY_IDUP(6)),GetMass(MY_IDUP(7)),  MomDK(1:4,1),MomDK(1:4,2), MassWeight=m1ffwgt)
       PreFac = PreFac*m1ffwgt
    else
       MomDK(:,1)=MomExt(:,5)
       MomDK(:,2)=MomExt(:,6)
    endif
    if(.not.IsAPhoton(DecayMode2)) then
-      call ShiftMass(MomExt(1:4,7),MomExt(1:4,8), GetMass(MY_IDUP(9)),GetMass(MY_IDUP(8)),  MomDK(1:4,3),MomDK(1:4,4), MassWeight=m2ffwgt)
+      call ShiftMass(MomExt(1:4,7),MomExt(1:4,8), GetMass(MY_IDUP(8)),GetMass(MY_IDUP(9)),  MomDK(1:4,3),MomDK(1:4,4), MassWeight=m2ffwgt)
       PreFac = PreFac*m2ffwgt
    else
       MomDK(:,3)=MomExt(:,7)
@@ -487,10 +487,10 @@ include 'csmaxvalue.f'
 
    call EvalPhaseSpace_2to2(EHat,(/MZ1,MZ2/),yRnd(3:4),MomExt(1:4,1:4),PSWgt)
    if( .not.IsAPhoton(DecayMode1) .and. .not.IsAPhoton(DecayMode2) ) then ! don't decay the photon
-      ML1 = getMass(MY_IDUP(7))
-      ML2 = getMass(MY_IDUP(6))
-      ML3 = getMass(MY_IDUP(9))
-      ML4 = getMass(MY_IDUP(8))
+      ML1 = getMass(MY_IDUP(6))
+      ML2 = getMass(MY_IDUP(7))
+      ML3 = getMass(MY_IDUP(8))
+      ML4 = getMass(MY_IDUP(9))
       if( (MZ1.lt.ML1+ML2) .or. (MZ2.lt.ML3+ML4) ) then
           EvalUnWeighted_DecayToVV = 0d0
           RejeCounter = RejeCounter + 1
@@ -511,8 +511,8 @@ include 'csmaxvalue.f'
         MomDK(1:4,3) = MomExt(1:4,4)
         MomDK(1:4,4) = 0d0
     elseif( .not.IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
-        ML1 = getMass(MY_IDUP(7))
-        ML2 = getMass(MY_IDUP(6))
+        ML1 = getMass(MY_IDUP(6))
+        ML2 = getMass(MY_IDUP(7))
         ML3=0d0; ML4=0d0
         if( (MZ1.lt.ML1+ML2) ) then
             EvalUnWeighted_DecayToVV = 0d0
@@ -1192,10 +1192,10 @@ include 'csmaxvalue.f'
    call EvalPhaseSpace_2to2(EHat,(/MZ1,MZ2/),yRnd(3:4),MomExt(1:4,1:4),PSWgt)
    call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
     if( .not.IsAPhoton(DecayMode1) .and. .not.IsAPhoton(DecayMode2) ) then ! don't decay the photon
-      ML1 = getMass(MY_IDUP(7))  !*0d0
-      ML2 = getMass(MY_IDUP(6))  !*0d0
-      ML3 = getMass(MY_IDUP(9))  !*0d0
-      ML4 = getMass(MY_IDUP(8))  !*0d0
+      ML1 = getMass(MY_IDUP(6))  !*0d0
+      ML2 = getMass(MY_IDUP(7))  !*0d0
+      ML3 = getMass(MY_IDUP(8))  !*0d0
+      ML4 = getMass(MY_IDUP(9))  !*0d0
       if( (MZ1.lt.ML1+ML2) .or. (MZ2.lt.ML3+ML4) ) then
           EvalUnWeighted = 0d0
           RejeCounter = RejeCounter + 1
@@ -1216,8 +1216,8 @@ include 'csmaxvalue.f'
         MomDK(1:4,3) = MomExt(1:4,4)
         MomDK(1:4,4) = 0d0
     elseif( .not.IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
-        ML1 = getMass(MY_IDUP(7))
-        ML2 = getMass(MY_IDUP(6))
+        ML1 = getMass(MY_IDUP(6))
+        ML2 = getMass(MY_IDUP(7))
         ML3=0d0; ML4=0d0
         if( (MZ1.lt.ML1+ML2) ) then
             EvalUnWeighted = 0d0
@@ -2231,18 +2231,18 @@ if( IsAZDecay(DecayMode1) ) then
         id(1:2) = (/LHA2M_PDF(i),LHA2M_PDF(j)/)
         if (abs(LHA2M_PDF(i)).ne.6   .and.   abs(LHA2M_PDF(j)).ne.6.  .and.  i.ne.0)then
           call EvalAmp_VHiggs(id,helicity,MomExt,me2)
-          
-          
+
+
 !     if( me2.lt.1d-8 ) cycle
 !     NewME2(1:6) = cdabs(TreeAmp_qqb_ZH((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,8),MomExt(1:4,9),MomExt(1:4,6),MomExt(1:4,7)/),int((/helicity(1),helicity(2),helicity(6),helicity(7)/))))**2
 !     print *, "heli",helicity(1),helicity(2),helicity(6),helicity(7)
 !     print *, "Mes", me2,NewME2(up_)
 !     print *, "ratio", me2/NewME2(up_)
 !     pause
-      
-              
-                  
-          
+
+
+
+
         else
           me2=0d0
         endif
