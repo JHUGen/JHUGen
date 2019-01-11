@@ -3,7 +3,7 @@ implicit none
 save
 !
 !
-character(len=*),parameter :: JHUGen_Version="v7.2.5"
+character(len=*),parameter :: JHUGen_Version="v7.2.6"
 !
 !
 !=====================================================
@@ -35,7 +35,8 @@ integer, public, parameter :: kRenFacScheme_mj_mj=6
 integer, public, parameter :: kRenFacScheme_mjhstar=7
 integer, public, parameter :: kRenFacScheme_mj_mhstar=8
 integer, public, parameter :: kRenFacScheme_mj=9
-integer, public, parameter :: nRenFacSchemes=10
+integer, public, parameter :: kRenFacScheme_pTj=10
+integer, public, parameter :: nRenFacSchemes=11
 integer, public, parameter :: maxpart = 30
 integer(8), public :: EvalCounter=0
 integer(8), public :: RejeCounter=0
