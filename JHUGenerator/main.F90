@@ -88,6 +88,8 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
             Process.eq. 1 .or.  &
             Process.eq. 2 .or.  &
             Process.eq.50 .or.  &
+            Process.eq.51 .or.  &
+            Process.eq.52 .or.  &
             Process.eq.60 .or.  &
             Process.eq.61 .or.  &
             Process.eq.62 .or.  &
@@ -119,7 +121,9 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
          Process.eq.60 .or. & !- HVBF without decays
          Process.eq.61 .or. & !- Hjj, gluon fusion
          Process.eq.62 .or. & !- Hj, gluon fusion
-         Process.eq.50 & !- VHiggs
+         Process.eq.50 .or. & !- VHiggs
+         Process.eq.51 .or. & !- VH
+         Process.eq.52      & !- HH
          ) then
             FacScheme = -kRenFacScheme_mhstar
             MuFacMultiplier = 1d0
@@ -161,7 +165,9 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
          Process.eq.60 .or. & !- HVBF without decays
          Process.eq.61 .or. & !- Hjj, gluon fusion
          Process.eq.62 .or. & !- Hj, gluon fusion
-         Process.eq.50 & !- VHiggs
+         Process.eq.50 .or. & !- VHiggs
+         Process.eq.51 .or. & !- VH
+         Process.eq.52      & !- HH
          ) then
             RenScheme = -kRenFacScheme_mhstar
             MuRenMultiplier = 1d0
@@ -195,6 +201,8 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
       if( &
          (                     &
             Process.eq.50 .or. &
+            Process.eq.51 .or. &
+            Process.eq.52 .or. &
             Process.eq.60 .or. &
             Process.eq.61 .or. &
             Process.eq.66 .or. &
@@ -212,6 +220,8 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
       if( &
          (                     &
             Process.eq.50 .or. &
+            Process.eq.51 .or. &
+            Process.eq.52 .or. &
             Process.eq.60 .or. &
             Process.eq.61 .or. &
             Process.eq.66 .or. &
@@ -248,17 +258,6 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
       ) call Error("Invalid scheme for the H+0J processes. Choose a different renormalization or factorization scheme.")
 
 
-   if( Process.eq.50 ) then
-#if useCollier==1
-     Nmax = 4
-     rmax = 4
-     call Init_cll(Nmax,rmax,"output_collier")
-     call InitCacheSystem_cll(1,Nmax)
-     call InitEvent_cll
-#endif
-   endif
-
-
    return
 end subroutine
 
@@ -292,7 +291,10 @@ SUBROUTINE SetJHUGenDefaults()
 ! !       DecayMode=11: W --> anything
    TopDecays=-1
    TauDecays=-1
+   HbbDecays = .false.
    H_DK = .false.
+   VH_PC="gg"
+   alpha_dip=1d0
    Unweighted =.true.
    MuFacMultiplier = 1d0
    MuRenMultiplier = 1d0
@@ -345,6 +347,7 @@ logical :: SetCKM,SetCKMub,SetCKMcb,SetCKMtd
 logical :: SetpTjetcut, Setetajetcut, Setdetajetcut, SetdeltaRcut
 logical :: SetpTlepcut, Setetalepcut, SetMPhotonCutoff
 logical :: SetColliderEnergy
+logical :: Setm2l_min,Setm2l_max,SetmVH_min,SetmVH_max,SetpTHcut
 logical :: SetCSmaxFile, SetVBFoffsh_run
 integer :: i
 type(SaveValues) :: tosave, oldsavevalues
@@ -461,6 +464,8 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "VegasNc1", success, VegasNc1)
     call ReadCommandLineArgument(arg, "VegasNc2", success, VegasNc2)
     call ReadCommandLineArgument(arg, "PChannel", success, PChannel, tosave=tosave)
+    call ReadCommandLineArgument(arg, "VH_PC", success, VH_PC, tosave=tosave)
+    call ReadCommandLineArgument(arg, "alpha_dip", success, alpha_dip, tosave=tosave)
     call ReadCommandLineArgument(arg, "DataFile", success, DataFile)
     call ReadCommandLineArgument(arg, "CSmaxFile", success, CSmaxFile, success2=SetCSmaxFile)
     call ReadCommandLineArgument(arg, "Process", success, Process, tosave=tosave)
@@ -473,6 +478,7 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "TopDK", success, TopDecays, tosave=tosave)
     call ReadCommandLineArgument(arg, "TauDK", success, TauDecays, tosave=tosave)
     call ReadCommandLineArgument(arg, "HbbDK", success, H_DK, tosave=tosave)
+    call ReadCommandLineArgument(arg, "HbbDK", success, HbbDecays, tosave=tosave)
     call ReadCommandLineArgument(arg, "ReweightDecay", success, ReweightDecay)
     call ReadCommandLineArgument(arg, "WidthScheme", success, WidthScheme, tosave=tosave)
     call ReadCommandLineArgument(arg, "WidthSchemeIn", success, WidthSchemeIn)
@@ -1062,10 +1068,15 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "mJJcut", success, mJJcut, multiply=GeV, tosave=tosave)
     call ReadCommandLineArgument(arg, "m4l_min", success, m4l_minmax(1), multiply=GeV, tosave=tosave)
     call ReadCommandLineArgument(arg, "m4l_max", success, m4l_minmax(2), multiply=GeV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "m2l_min", success, m2l_minmax(1), multiply=GeV, success2=Setm2l_min, tosave=tosave)
+    call ReadCommandLineArgument(arg, "m2l_max", success, m2l_minmax(2), multiply=GeV, success2=Setm2l_max, tosave=tosave)
+    call ReadCommandLineArgument(arg, "mVH_min", success, mVH_minmax(1), multiply=GeV, success2=SetmVH_min, tosave=tosave)
+    call ReadCommandLineArgument(arg, "mVH_max", success, mVH_minmax(2), multiply=GeV, success2=SetmVH_max, tosave=tosave)
     call ReadCommandLineArgument(arg, "MPhotonCutoff", success, MPhotonCutoff, multiply=GeV, success2=SetMPhotonCutoff, tosave=tosave)
     call ReadCommandLineArgument(arg, "pTlepcut", success, pTlepcut, multiply=GeV, success2=SetpTlepcut, tosave=tosave)
     call ReadCommandLineArgument(arg, "etalepcut", success, etalepcut, success2=Setetalepcut, tosave=tosave)
     call ReadCommandLineArgument(arg, "JetsOppositeEta", success, JetsOppositeEta, tosave=tosave)
+    call ReadCommandLineArgument(arg, "pTHcut", success, pTHcut, success2=SetpTHcut, tosave=tosave)
 
     if( .not.success ) then
         call Error("Unknown command line argument: " // trim(arg))
@@ -1087,24 +1098,24 @@ type(SaveValues) :: tosave, oldsavevalues
     endif
     call system('mkdir -p ./data')! -p is suppressing error messages if directory already exists
 
-    if( VBFoffsh_run.eq.1 ) DataFile = trim(DataFile)//"1"
-    if( VBFoffsh_run.eq.2 ) DataFile = trim(DataFile)//"2"
-    if( VBFoffsh_run.eq.3 ) DataFile = trim(DataFile)//"3"
-    if( VBFoffsh_run.eq.4 ) DataFile = trim(DataFile)//"4"
-    if( VBFoffsh_run.eq.5 ) DataFile = trim(DataFile)//"5"
-    if( VBFoffsh_run.eq.0 ) DataFile = trim(DataFile)//"0"    
-    
+    if( VBFoffsh_run.eq.1 ) DataFile = trim(DataFile)//"_1"
+    if( VBFoffsh_run.eq.2 ) DataFile = trim(DataFile)//"_2"
+    if( VBFoffsh_run.eq.3 ) DataFile = trim(DataFile)//"_3"
+    if( VBFoffsh_run.eq.4 ) DataFile = trim(DataFile)//"_4"
+    if( VBFoffsh_run.eq.5 ) DataFile = trim(DataFile)//"_5"
+    if( VBFoffsh_run.eq.0 ) DataFile = trim(DataFile)//"_0"
+
     if( SetCSmaxFile ) then
       i = len(trim(CSmaxFile))
       if( CSmaxFile(i-3:i).eq.".lhe" ) then
           CSmaxFile = CSmaxFile(1:i-4)
       endif
-      if( VBFoffsh_run.eq.1 ) CSmaxFile = trim(CSmaxFile)//"1"
-      if( VBFoffsh_run.eq.2 ) CSmaxFile = trim(CSmaxFile)//"2"
-      if( VBFoffsh_run.eq.3 ) CSmaxFile = trim(CSmaxFile)//"3"
-      if( VBFoffsh_run.eq.4 ) CSmaxFile = trim(CSmaxFile)//"4"
-      if( VBFoffsh_run.eq.5 ) CSmaxFile = trim(CSmaxFile)//"5"
-      if( VBFoffsh_run.eq.0 ) CSmaxFile = trim(CSmaxFile)//"0"
+      if( VBFoffsh_run.eq.1 ) CSmaxFile = trim(CSmaxFile)//"_1"
+      if( VBFoffsh_run.eq.2 ) CSmaxFile = trim(CSmaxFile)//"_2"
+      if( VBFoffsh_run.eq.3 ) CSmaxFile = trim(CSmaxFile)//"_3"
+      if( VBFoffsh_run.eq.4 ) CSmaxFile = trim(CSmaxFile)//"_4"
+      if( VBFoffsh_run.eq.5 ) CSmaxFile = trim(CSmaxFile)//"_5"
+      if( VBFoffsh_run.eq.0 ) CSmaxFile = trim(CSmaxFile)//"_0"
     else
       CSmaxFile = DataFile
     endif
@@ -1123,8 +1134,9 @@ type(SaveValues) :: tosave, oldsavevalues
 
     !PChannel
     if (Process.eq.0) PChannel = 0   !only gluons
+!Yaofu Zhou ggZH
+    !if (Process.eq.1 .or. Process.eq.51 .or. Process.eq.60 .or. Process.eq.66 .or. Process.eq.67 .or. Process.eq.68) PChannel = 1   !only quarks
     if (Process.eq.1 .or. Process.eq.60 .or. Process.eq.66 .or. Process.eq.67 .or. Process.eq.68) PChannel = 1   !only quarks
-
 
     !LHAPDF
 
@@ -1163,6 +1175,12 @@ type(SaveValues) :: tosave, oldsavevalues
 
     if( Process.eq.50 ) then
         DecayMode2=DecayMode1
+        if( Collider.eq.2 ) call Error("Collider 2 not available for VHiggs")
+        if( (IsAWDecay(DecayMode1) ) .and. (Collider.ne.1) ) call Error("WHiggs with Collider 1 only")
+    endif
+
+    if( Process.eq.51 ) then
+        DecayMode2=DecayMode1
         if( Collider.eq.2 ) call Error("Collider 2 not available for VH")
         if( (IsAWDecay(DecayMode1) ) .and. (Collider.ne.1) ) call Error("WH with Collider 1 only")
     endif
@@ -1183,6 +1201,17 @@ type(SaveValues) :: tosave, oldsavevalues
        DecayMode1 = DecayMode1 + DecayMode2
        DecayMode2 = DecayMode1 - DecayMode2
        DecayMode1 = DecayMode1 - DecayMode2
+    endif
+
+    if( IsAZDecay(DecayMode1) .or. (Process.eq.51.and.IsAPhoton(DecayMode1)) ) then
+       M_V = M_Z
+       Ga_V= Ga_Z
+    elseif( IsAWDecay(DecayMode1) ) then
+       M_V = M_W
+       Ga_V= Ga_W
+    elseif( IsAPhoton(DecayMode1) ) then
+       M_V = 0d0
+       Ga_V= 0d0
     endif
 
     if( IsAZDecay(DecayMode1) .or. (Process.eq.50.and.IsAPhoton(DecayMode1)) ) then
@@ -1265,9 +1294,9 @@ type(SaveValues) :: tosave, oldsavevalues
     endif
 
     !decay mode checks
-    if( (IsAZDecay(DecayMode1) .and. IsAZDecay(DecayMode2) .and. (Process.eq.0 .or. Process.eq.2) .and. TauDecays.lt.0) .or. (Process.eq.50 .and. IsAZDecay(DecayMode1)) .or. Process.eq.60 .or. Process.eq.66 ) then
+    if( (IsAZDecay(DecayMode1) .and. IsAZDecay(DecayMode2) .and. (Process.eq.0 .or. Process.eq.2) .and. TauDecays.lt.0) .or. (Process.ge.50 .and. Process.le.51 .and. IsAZDecay(DecayMode1)) .or. Process.eq.60 .or. Process.eq.66 ) then
         includeGammaStar = (SetZgammacoupling .or. Setgammagammacoupling .or. SetZprimegammacoupling)
-    elseif( (IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. (Process.eq.0 .or. Process.eq.2) .and. TauDecays.lt.0) .or. (Process.eq.50 .and. IsAPhoton(DecayMode1)) ) then
+    elseif( (IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. (Process.eq.0 .or. Process.eq.2) .and. TauDecays.lt.0) .or. (Process.ge.50 .and. Process.le.51 .and. IsAPhoton(DecayMode1)) ) then
         includeGammaStar = Setgammagammacoupling
     else if (Process.eq.67 .or. Process.eq.68 .or. Process.eq.69) then
         includeGammaStar = .true. ! Not really gamma*, but rather gamma* or gluon, set to true to manipulate phasespace generation
@@ -1305,14 +1334,14 @@ type(SaveValues) :: tosave, oldsavevalues
         stop 1
     endif
 
-    if( Process.eq.50 .and. IsAPhoton(DecayMode1) .and. .not.SetZgammacoupling .and. .not.Setgammagammacoupling .and. .not.SetZprimegammacoupling ) then
+    if( Process.ge.50 .and. Process.le.51 .and. IsAPhoton(DecayMode1) .and. .not.SetZgammacoupling .and. .not.Setgammagammacoupling ) then
         print *, "To produce gammaH, you need to set one of the HZgamma (ghzgs*) or Hgammagamma(ghgsgs*) couplings."
         stop 1
     endif
 
     !cut checks
     if(.not.SetpTjetcut) then
-        if(Process.eq.50) then
+        if(Process.eq.50 .or. Process.eq.51) then
             pTjetcut = 0d0*GeV
         else
             pTjetcut = 15d0*GeV
@@ -1333,7 +1362,7 @@ type(SaveValues) :: tosave, oldsavevalues
         endif
     endif
     if(.not.SetdeltaRcut) then
-        if(Process.eq.50) then
+        if(Process.eq.50 .or. Process.eq.51) then
             Rjet = 0d0
         else
             Rjet = 0.3d0
@@ -1361,6 +1390,41 @@ type(SaveValues) :: tosave, oldsavevalues
         else
             MPhotonCutoff = 0d0
         endif
+    endif
+    if(.not.Setm2l_min)then
+      if(Process.eq.51)then
+         m2l_minmax(1) = 0d0 * GeV
+      else
+         m2l_minmax(1) = 0d0 * GeV
+      endif
+    endif
+    if(.not.Setm2l_max)then
+      if(Process.eq.51)then
+         m2l_minmax(2) = infinity()
+      else
+         m2l_minmax(2) = infinity()
+      endif
+    endif
+    if(.not.SetmVH_min)then
+      if(Process.eq.51)then
+         mVH_minmax(1) = 0d0 * GeV
+      else
+         mVH_minmax(1) = 0d0 * GeV
+      endif
+    endif
+    if(.not.SetmVH_max)then
+      if(Process.eq.51)then
+         mVH_minmax(2) = infinity()
+      else
+         mVH_minmax(2) = infinity()
+      endif
+    endif
+    if(.not.SetpTHcut)then
+      if(Process.eq.51)then
+         pTHcut = 0d0 * GeV
+      else
+         pTHcut = 0d0 * GeV
+      endif
     endif
     if((Process.eq.60 .or. Process.eq.66 .or. Process.eq.67 .or. Process.eq.68 .or. Process.eq.69) .and. includeGammaStar .and. pTjetcut.le.0d0) then
        print *, " Process=",Process," with offshell photons requires a non-zero pT cut. Current setting cut ",pTjetcut/GeV," GeV is not allowed."
@@ -1481,6 +1545,36 @@ type(SaveValues) :: tosave, oldsavevalues
         call Error("If you set an anomalous Hff coupling, you need to explicitly set kappa as well. This coupling is initialized to a non-zero value.")
     endif
 
+    ! Contact terms
+    if (Process.le.2 .or. Process.eq.50) then
+        if (IsAZDecay(DecayMode1) .or. (Process.eq.50 .and. IsAPhoton(DecayMode1))) then
+            if ((SetHZprime .and. .not.SetZprimeff) .or. (.not.SetHZprime .and. SetZprimeff)) then
+                call Error("To use Z' contact terms, you have to set both HVZ' and Z'ff couplings")
+            endif
+            if ((SetMZprime.or.SetGaZprime) .and. .not.SetHZprime) then
+                call Error("Setting the mass and width of Z' doesn't do anything if you don't set HVZ' couplings")
+            endif
+            if (SetMWprime .or. SetGaWprime) then
+                call Error("Don't set the W' mass and width in ZZ decay")
+            endif
+        elseif (IsAWDecay(DecayMode1)) then
+            if ((SetHZprime .and. .not.SetWprimeff) .or. (.not.SetHZprime .and. SetWprimeff)) then
+                call Error("To use W' contact terms, you have to set both HZZ'/HZ'Z' (which are used for HWW'/HW'W') and W'ff couplings")
+            endif
+            if ((SetMWprime.or.SetGaWprime) .and. .not.SetHZprime) then
+                call Error("Setting the mass and width of W' doesn't do anything if you don't set HZZ'/HZ'Z' couplings (which are used for HWW'/HW'W')")
+            endif
+            if (SetMZprime .or. SetGaZprime) then
+                call Error("Don't set the Z' mass and width in WW decay")
+            endif
+        endif
+    endif
+
+    if( (Process.eq.50 .or. Process.eq.60) .and. SetZprimegammacoupling ) then
+        call Error("Z'gamma couplings are not implemented for VBF or VH")
+        !If you implement them and remove this error, also edit the Vprimekwargs function
+        !in MELA/test/testME_more.py to not remove the Z'gamma couplings for process = 50 or 60
+    endif
 
     ! Contact terms
     if (Process.le.2 .or. Process.eq.50) then
@@ -1860,7 +1954,12 @@ SUBROUTINE InitProcess()
 use ModParameters
 use ModMisc
 use ModCrossSection
+use ModCrossSection_VH
 use ModTTBHiggs
+#if useCollier==1
+use ModCrossSection_HH
+use Collier
+#endif
 implicit none
 include "vegas_common.f"
 
@@ -1955,6 +2054,78 @@ include "vegas_common.f"
          NDim = NDim + 2 ! sHat integration
          if( unweighted ) NDim = NDim + 1  ! random number which decides if event is accepted
 
+         VegasIt1_default = 5
+         VegasNc0_default = 10000000
+         VegasNc1_default = 500000
+         VegasNc2_default = 10000
+      endif
+      !- VH
+      if(Process.eq.51) then
+#if useCollier==1
+         call Init_cll(4,3,trim(DataFile)//"_collierfiles")
+         call InitCacheSystem_cll(1,4)
+         call InitEvent_cll
+         call setMode_cll(1)!1. use COLI branch; 2. use DD branch; 3. use both branches and compare.
+#else
+         print *, "Need to link COLLIER for this process."
+         print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+         print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+         print *, "specified in the makefile."
+         stop 1
+#endif
+! if Collier is used
+         NDim = 19
+         if( unweighted ) NDim = NDim + 3  ! partonic channel and acceptance
+! yrnd(1:2): helicity of parton 1:2
+! yrnd(3): helicities of parton 6,7
+! yrnd(4): helicities of parton 8,9
+! yrnd(5): flavor in Z/W decay mode
+! yrnd(6:7): phi_4 and cos(theta_4) in the CM frame of Z*(3)
+! yrnd(8:9): phi_6 and cos(theta_6) in the CM frame of decay product of Z(4)
+! yrnd(10:11): phi_8 and cos(theta_8) in the CM frame of decay product of H(5)
+! yRnd(12): inv_mass(4)
+! yRnd(13): inv_mass(5)
+! yRnd(14:16): real emission phase space
+! yRnd(17): NLO integration for + distribution for PDF renormalization
+! yrnd(18:19): PDF mapping
+! yrnd(20): flavor of j in gq > WH+j
+! yrnd(21): partonic channel in unweighted events
+! yRnd(22): accept or reject in unweighted events
+
+         VegasIt1_default = 5
+         VegasNc0_default = 10000000
+         VegasNc1_default = 500000
+         VegasNc2_default = 10000
+      endif
+      !- HH
+      if(Process.eq.52) then
+#if useCollier==1
+         call Init_cll(4,4,trim(DataFile)//"_collierfiles")
+         call InitCacheSystem_cll(1,4)
+         call InitEvent_cll
+         call setMode_cll(1)!1. use COLI branch; 2. use DD branch; 3. use both branches and compare.
+#else
+         print *, "Need to link COLLIER for this process."
+         print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+         print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+         print *, "specified in the makefile."
+         stop 1
+#endif
+! if Collier is used
+         NDim = 15
+         if( unweighted ) NDim = NDim + 2  ! partonic channel and acceptance
+! yrnd(1:2): helicity of parton 1:2
+! yrnd(3): helicities of parton 6,7
+! yrnd(4): helicities of parton 8,9
+! yrnd(5:6): phi_4 and cos(theta_4) in the CM frame of 1+2(3)
+! yrnd(7:8): phi_6 and cos(theta_6) in the CM frame of decay product of H(4)
+! yrnd(9:10): phi_8 and cos(theta_8) in the CM frame of decay product of H(5)
+! yRnd(11): inv_mass(4)
+! yRnd(12): inv_mass(5)
+! yRnd(13): swap momenta in PS for stability
+! yrnd(14:15): PDF mapping
+! yrnd(16): partonic channel in unweighted events
+! yRnd(17): accept or reject in unweighted events
          VegasIt1_default = 5
          VegasNc0_default = 10000000
          VegasNc1_default = 500000
@@ -2077,6 +2248,10 @@ end subroutine
 
 SUBROUTINE StartVegas(VG_Result,VG_Error)
 use ModCrossSection
+use ModCrossSection_VH
+#if useCollier==1
+use ModCrossSection_HH
+#endif
 use ModCrossSection_HJJ
 use ModCrossSection_TTBH
 use ModCrossSection_BBBH
@@ -2131,14 +2306,21 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     elseif (Process.eq.62) then
       call vegas(EvalWeighted_HJ,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.50) then
-      if( PChannel.eq.0 ) then
-#if 0
-!until this amplitude is moved to its new home in Yaofu's module
-            call vegas(EvalWeighted_ggVH,VG_Result,VG_Error,VG_Chi2)
-#endif
-      else
-            call vegas(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
+      call vegas(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
+    elseif (Process.eq.51 .or. Process.eq.52) then
+#if useCollier==1
+      if (Process.eq.51) then
+        call vegas(EvalWeighted_VH,VG_Result,VG_Error,VG_Chi2)
+      elseif (Process.eq.52) then
+        call vegas(EvalWeighted_HH,VG_Result,VG_Error,VG_Chi2)
       endif
+#else
+      print *, "Need to link COLLIER for this process."
+      print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+      print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+      print *, "specified in the makefile."
+      stop 1
+#endif
     elseif (Process.eq.80) then
       call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.90) then
@@ -2161,21 +2343,28 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
 
     avgcs = 0d0
 
-    itmx = 1
+    itmx = 1!!!!!!!!!!!!!!!!!!!!
     ncall= VegasNc2
     if (process.eq.60 .or. process.eq.61) then
       call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
     elseif (process.eq.62 .or. process.eq.61) then
       call vegas1(EvalWeighted_HJ,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.50) then
-      if( PChannel.eq.0 ) then
-#if 0
-!until this amplitude is moved to its new home in Yaofu's module
-           call vegas1(EvalWeighted_ggVH,VG_Result,VG_Error,VG_Chi2)
-#endif
-      else
-           call vegas1(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
+      call vegas1(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
+    elseif (Process.eq.51 .or. Process.eq.52) then
+#if useCollier==1
+      if (Process.eq.51) then
+        call vegas1(EvalWeighted_VH,VG_Result,VG_Error,VG_Chi2)
+      elseif (Process.eq.52) then
+        call vegas1(EvalWeighted_HH,VG_Result,VG_Error,VG_Chi2)
       endif
+#else
+      print *, "Need to link COLLIER for this process."
+      print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+      print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+      print *, "specified in the makefile."
+      stop 1
+#endif
     elseif (Process.eq.80) then
       call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.90) then
@@ -2212,6 +2401,24 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                 RES = 0d0
                 dum = EvalUnWeighted_VHiggs(yRnd,.false.,RES)
                 VG = VG + RES
+            elseif (Process.eq.51 .or. Process.eq.52) then
+#if useCollier==1
+                if (Process.eq.51) then
+                    RES = 0d0
+                    dum = EvalUnWeighted_VH(yRnd,.false.,RES)
+                    VG = VG + RES
+                elseif (Process.eq.52) then
+                    RES = 0d0
+                    dum = EvalUnWeighted_HH(yRnd,.false.,RES)
+                    VG = VG + RES
+                endif
+#else
+                print *, "Need to link COLLIER for this process."
+                print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+                print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+                print *, "specified in the makefile."
+                stop 1
+#endif
             else
                 if (PChannel_aux.eq.0.or.PChannel_aux.eq.2) then
                     PChannel= 0
@@ -2280,6 +2487,20 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                       dum = EvalUnWeighted_HJ(yRnd,.true.,RES)! RES is a dummy here
             elseif (Process.eq.50) then
                       dum = EvalUnWeighted_VHiggs(yRnd,.true.,RES)! RES is a dummy here
+            elseif (Process.eq.51 .or. Process.eq.52) then
+#if useCollier==1
+                if (Process.eq.51) then
+                          dum = EvalUnWeighted_VH(yRnd,.true.,RES)! RES is a dummy here
+                elseif (Process.eq.52) then
+                          dum = EvalUnWeighted_HH(yRnd,.true.,RES)! RES is a dummy here
+                endif
+#else
+                print *, "Need to link COLLIER for this process."
+                print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+                print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+                print *, "specified in the makefile."
+                stop 1
+#endif
             else
                 dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
             endif
@@ -2296,6 +2517,20 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                 dum = EvalUnWeighted_HJ(yRnd,.true.,RES)! RES is a dummy here
               elseif (Process.eq.50) then
                   dum = EvalUnWeighted_VHiggs(yRnd,.true.,RES)! RES is a dummy here
+              elseif (Process.eq.51 .or. Process.eq.52) then
+#if useCollier==1
+                  if (Process.eq.51) then
+                      dum = EvalUnWeighted_VH(yRnd,.true.,RES)! RES is a dummy here
+                  elseif (Process.eq.52) then
+                      dum = EvalUnWeighted_HH(yRnd,.true.,RES)! RES is a dummy here
+                  endif
+#else
+                  print *, "Need to link COLLIER for this process."
+                  print *, "Please set either linkMELA or linkCollierLib to Yes in the makefile and recompile"
+                  print *, "You will have to have a compiled JHUGenMELA or a compiled COLLIER in the directories"
+                  print *, "specified in the makefile."
+                  stop 1
+#endif
               else
                   dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
               endif
@@ -2388,6 +2623,10 @@ END SUBROUTINE
 
 SUBROUTINE StartVegas_NEW(VG_Result,VG_Error)
 use ModCrossSection
+use ModCrossSection_VH
+#if useCollier==1
+use ModCrossSection_HH
+#endif
 use ModCrossSection_BBBH
 use ModCrossSection_HJJ
 use ModCrossSection_TH
@@ -2674,6 +2913,7 @@ IF( .NOT. (Process.ge.66 .and. Process.le.69) ) THEN! special treatment for offs
     print *, "Rescale CrossSecMax by ",calls_rescale
 
     PreviousSum = 0
+    if( sum(RequEvents(:,:)).eq.0 ) StatusPercent = 100d0
     do while( StatusPercent.lt.100d0  )
 !     do while( AccepCounter_part(iPart_sel,jPart_sel).lt.RequEvents(iPart_sel,jPart_sel) )
         call cpu_time(time_start)
@@ -2739,7 +2979,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 
     write(io_stdout,"(2X,A)")  "Scanning the integrand"
     warmup = .true.
-    
+
     if( ReadCSmax ) then
         i=len(trim(CSmaxFile))
         open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'1_gridinfo.txt',form='formatted',status='old',iostat=ios)
@@ -2778,7 +3018,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         close(unit=io_TmpFile)
         if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'4_gridinfo.txt'
 
-        open(unit=io_TmpFile,file=trim(DataFile(1:i-1))//'5_gridinfo.txt',form='formatted',status='old',iostat=ios)
+        open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'5_gridinfo.txt',form='formatted',status='old',iostat=ios)
         read(io_TmpFile,fmt=*) calls1_in(5)
         read(io_TmpFile,fmt=*) CrossSec2_in(5,:)
         read(io_TmpFile,fmt=*) CrossSecMax2_in(5,:)
@@ -2790,7 +3030,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         if( calls1_in(1).ne.calls1_in(2) .or. calls1_in(1).ne.calls1_in(3) .or. calls1_in(2).ne.calls1_in(3) .or. calls1_in(1).ne.calls1_in(4) .or. calls1_in(1).ne.calls1_in(5) ) call Error("Mismatch in calls1")
         calls1 = calls1_in(1)
 
-        CrossSec2(:) = -1d0        
+        CrossSec2(:) = -1d0
         do i=1,Hash_MCFM_qqVVqq_Size
             if( CrossSec2_in(1,i).ne.0d0 .and. CrossSec2(i).eq.-1d0 ) CrossSec2(i) = CrossSec2_in(1,i)
             if( CrossSec2_in(2,i).ne.0d0 .and. CrossSec2(i).eq.-1d0 ) CrossSec2(i) = CrossSec2_in(2,i)
@@ -2801,12 +3041,12 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
                 print *, "WARNING: CrossSec2(i) has not been filled",i,CrossSec2_in(1:5,i)
                 CrossSec2(i) = 0d0
             endif
-        enddo        
+        enddo
 
-        CrossSecMax2(:) = -1d0        
+        CrossSecMax2(:) = -1d0
         do i=1,Hash_MCFM_qqVVqq_Size
             CrossSecMax2(i) = CrossSecMax2_in( max(1,VBFoffsh_run),i)
-        enddo        
+        enddo
 
         VG_Result = VG_Result_in(1)+VG_Result_in(2)+VG_Result_in(3)+VG_Result_in(4)+VG_Result_in(5)
         VG_Error  = dsqrt(VG_Error_in(1)**2+VG_Error_in(2)**2+VG_Error_in(3)**2+VG_Error_in(4)**2+VG_Error_in(5)**2)
@@ -2857,10 +3097,10 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
     do i=1,Hash_MCFM_qqVVqq_Size
          i1 = convertToPartIndex(ijSel(i,1))
          j1 = convertToPartIndex(ijSel(i,2))
-         if( RequEvents2(i).ne.0 ) write(*,"(I4,I4,I4,F18.8,I10,I10)") i, i1,j1,CrossSec2(i),RequEvents2(i)         
+         if( RequEvents2(i).ne.0 ) write(*,"(I4,I4,I4,F18.8,I10,I10)") i, i1,j1,CrossSec2(i),RequEvents2(i)
     enddo
-    
-    
+
+
     write(io_stdout,"(2X,A,F18.3,I10)") "Sum        partonic xsec:",sum(CrossSec2(:))/VG_Result,sum(RequEvents2(:))
 
 
@@ -2874,18 +3114,18 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
          RequEvents2(3:164) = 0
 
          NumPartonicChannels = 2
-!          call BubleSort(NumPartonicChannels,RequEvents2(1:),SortedHash)   
+!          call BubleSort(NumPartonicChannels,RequEvents2(1:),SortedHash)
 !          call ReOrder(NumPartonicChannels,SortedHash,CrossSec2(1:))
 !          call ReOrder(NumPartonicChannels,SortedHash,CrossSecMax2(1:))
 !          call ReOrder(NumPartonicChannels,SortedHash,ijSel(1:,1))
 !          call ReOrder(NumPartonicChannels,SortedHash,ijSel(1:,2))
 
-    elseif( VBFoffsh_run.eq.2 ) then 
+    elseif( VBFoffsh_run.eq.2 ) then
          RequEvents2(1:2) = 0
          RequEvents2(10:164) = 0
 
          NumPartonicChannels = 7
-!          call BubleSort(NumPartonicChannels,RequEvents2(3:),SortedHash)   
+!          call BubleSort(NumPartonicChannels,RequEvents2(3:),SortedHash)
 !          call ReOrder(NumPartonicChannels,SortedHash,CrossSec2(3:))
 !          call ReOrder(NumPartonicChannels,SortedHash,CrossSecMax2(3:))
 !          call ReOrder(NumPartonicChannels,SortedHash,ijSel(3:,1))
@@ -2893,22 +3133,22 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 
     elseif( VBFoffsh_run.eq.3 ) then
          RequEvents2(1:9) = 0
-         RequEvents2(41:164) = 0 
-  
+         RequEvents2(41:164) = 0
+
          NumPartonicChannels = 31
-!          call BubleSort(NumPartonicChannels,RequEvents2(10:),SortedHash)   
+!          call BubleSort(NumPartonicChannels,RequEvents2(10:),SortedHash)
 !          call ReOrder(NumPartonicChannels,SortedHash,CrossSec2(10:))
 !          call ReOrder(NumPartonicChannels,SortedHash,CrossSecMax2(10:))
 !          call ReOrder(NumPartonicChannels,SortedHash,ijSel(10:,1))
 !          call ReOrder(NumPartonicChannels,SortedHash,ijSel(10:,2))
 
-      
+
     elseif( VBFoffsh_run.eq.4 ) then
          RequEvents2(1:40) = 0
          RequEvents2(104:164) = 0
-   
+
          NumPartonicChannels = 63
-!          call BubleSort(NumPartonicChannels,RequEvents2(41:),SortedHash)   
+!          call BubleSort(NumPartonicChannels,RequEvents2(41:),SortedHash)
 !          call ReOrder(NumPartonicChannels,SortedHash,CrossSec2(41:))
 !          call ReOrder(NumPartonicChannels,SortedHash,CrossSecMax2(41:))
 !          call ReOrder(NumPartonicChannels,SortedHash,ijSel(41:,1))
@@ -2916,9 +3156,9 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 
     elseif( VBFoffsh_run.eq.5 ) then
          RequEvents2(1:103) = 0
-  
+
          NumPartonicChannels = 61
-!          call BubleSort(NumPartonicChannels,RequEvents2(104:),SortedHash)   
+!          call BubleSort(NumPartonicChannels,RequEvents2(104:),SortedHash)
 !          call ReOrder(NumPartonicChannels,SortedHash,CrossSec2(104:))
 !          call ReOrder(NumPartonicChannels,SortedHash,CrossSecMax2(104:))
 !          call ReOrder(NumPartonicChannels,SortedHash,ijSel(104:,1))
@@ -2934,7 +3174,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 !          j1 = convertToPartIndex(ijSel(i,2))
 !          if( RequEvents2(i).ne.0 ) write(*,"(I4,I4,I4,I4,F18.8,I10,I10)") i,SortedHash(i), i1,j1,CrossSec2(i)/VG_Result,RequEvents2(i)
 ! !         write(*,"(I4,I4,I4,I4,F18.8,I10,I10)") i, SortedHash(i), i1,j1,CrossSec2(i)/VG_Result,RequEvents2(i)
-!     enddo  
+!     enddo
 
 
 !--------------------------------------------------------------------
@@ -2968,6 +3208,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
     print *, "Rescale CrossSecMax2 by ",calls_rescale
 
     PreviousSum = 0
+    if( sum(RequEvents2(:)).eq.0 ) StatusPercent = 100d0
     do while( StatusPercent.lt.100d0  )
         call cpu_time(time_start)
         readin=.true.  ! this prevents adapting the grid during this while-loop
@@ -3005,8 +3246,8 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 
 
 
-    
-    
+
+
 
 ENDIF
 
@@ -3745,7 +3986,7 @@ call InitReadLHE(BeginEventLine)
     write(io_stdout,*) "Alert  Counter: ",AlertCounter
     if( dble(AlertCounter)/dble(AccepCounter) .gt. 1d0*percent ) then
         write(io_stdout,*) "ALERT: The number of rejected events exceeds 1%."
-        write(io_stdout,*) "       Increase CSMAX in main.F90 or VegasNc1."
+        write(io_stdout,*) "       Increase CSMAX in main.F90 or VegasNc0."
     endif
    write(io_stdout,*)  "Event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
    if( RequestNLeptons.gt.0 .or. RequestNJets.gt.0 ) write(io_stdout,"(A,1F6.2,A)") " Filter efficiency:",dble(AccepCounter)/dble(NEvent)*100d0," %"
@@ -3758,7 +3999,7 @@ call InitReadLHE(BeginEventLine)
     write(io_LogFile,*) "Alert  Counter: ",AlertCounter
     if( dble(AlertCounter)/dble(AccepCounter) .gt. 1d0*percent ) then
         write(io_LogFile,*) "ALERT: The number of rejected events exceeds 1%."
-        write(io_LogFile,*) "       Increase CSMAX in main.F90 or VegasNc1."
+        write(io_LogFile,*) "       Increase CSMAX in main.F90 or VegasNc0."
     endif
    write(io_LogFile,*)  "Event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
    if( RequestNLeptons.gt.0 .or. RequestNJets.gt.0 ) write(io_LogFile,"(A,1F6.2,A)") " Filter efficiency:",dble(AccepCounter)/dble(NEvent)*100d0," %"
@@ -4233,6 +4474,10 @@ implicit none
      call InitHisto_HJ()
   elseif (Process.eq.50) then
      call InitHisto_VHiggs()
+  elseif (Process.eq.51) then
+     call InitHisto_VH()
+  elseif (Process.eq.52) then
+     call InitHisto_HH()
   elseif (Process.eq.80) then
      call InitHisto_TTBH()
   elseif (Process.eq.90) then
@@ -4923,6 +5168,8 @@ END SUBROUTINE
 
 
 
+
+
 SUBROUTINE InitHisto_VHiggs()
 use ModMisc
 use ModKinematics
@@ -5009,6 +5256,181 @@ END SUBROUTINE
 
 
 
+
+SUBROUTINE InitHisto_VH()
+use ModMisc
+use ModKinematics
+use ModParameters
+implicit none
+integer :: AllocStatus,NHisto
+
+          it_sav = 1
+          NumHistograms = 10
+          if( .not.allocated(Histo) ) then
+                allocate( Histo(1:NumHistograms), stat=AllocStatus  )
+                if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
+          endif
+
+          Histo(1)%Info   = "m(jj)"
+          Histo(1)%NBins  = 80
+          Histo(1)%BinSize= 20d0*GeV/80d0
+          Histo(1)%LowVal = 115d0*GeV
+          Histo(1)%SetScale= 1d0/GeV
+
+          Histo(2)%Info   = "m(ll)"
+          Histo(2)%NBins  = 80
+          Histo(2)%BinSize= 20d0*GeV/80d0
+          Histo(2)%LowVal = 75d0*GeV
+          Histo(2)%SetScale= 1d0/GeV
+
+          Histo(3)%Info   = "pt(V)"
+          Histo(3)%NBins  = 80
+          Histo(3)%BinSize= 300d0*GeV/80d0
+          Histo(3)%LowVal = 0d0*GeV
+          Histo(3)%SetScale= 1d0/GeV
+
+          Histo(4)%Info   = "pt(H)"
+          Histo(4)%NBins  = 100
+          Histo(4)%BinSize= 5d0*GeV
+          Histo(4)%LowVal = 0d0*GeV
+          Histo(4)%SetScale= 1d0/GeV
+
+          Histo(5)%Info   = "m(V*)"   ! scattering angle of Z in resonance rest frame
+          Histo(5)%NBins  = 80
+          Histo(5)%BinSize= 1000d0*GeV/80d0
+          Histo(5)%LowVal = 200d0*GeV
+          Histo(5)%SetScale= 1d0/GeV
+
+          Histo(6)%Info   = "costheta1"
+          Histo(6)%NBins  = 80
+          Histo(6)%BinSize= 2d0/80d0
+          Histo(6)%LowVal = -1d0
+          Histo(6)%SetScale= 1d0
+
+          Histo(7)%Info   = "costheta2"
+          Histo(7)%NBins  = 80
+          Histo(7)%BinSize= 2d0/80d0
+          Histo(7)%LowVal = -1d0
+          Histo(7)%SetScale= 1d0
+
+          Histo(8)%Info   = "phistar1"
+          Histo(8)%NBins  = 80
+          Histo(8)%BinSize= 6.4d0/80d0
+          Histo(8)%LowVal = -3.2d0
+          Histo(8)%SetScale= 1d0
+
+          Histo(9)%Info   = "phi"
+          Histo(9)%NBins  = 80
+          Histo(9)%BinSize= 6.4d0/80d0
+          Histo(9)%LowVal = -3.2d0
+          Histo(9)%SetScale= 1d0
+
+          Histo(10)%Info   = "EHat"
+          Histo(10)%NBins  = 80
+          Histo(10)%BinSize= 10d0*GeV
+          Histo(10)%LowVal = 200d0*GeV
+          Histo(10)%SetScale= 1d0/GeV
+
+  do NHisto=1,NumHistograms
+      Histo(NHisto)%Value(:) = 0d0
+      Histo(NHisto)%Value2(:)= 0d0
+      Histo(NHisto)%Hits(:)  = 0
+  enddo
+
+
+RETURN
+END SUBROUTINE
+
+
+
+
+
+
+
+
+SUBROUTINE InitHisto_HH()
+use ModMisc
+use ModKinematics
+use ModParameters
+implicit none
+integer :: AllocStatus,NHisto
+
+          it_sav = 1
+          NumHistograms = 10
+          if( .not.allocated(Histo) ) then
+                allocate( Histo(1:NumHistograms), stat=AllocStatus  )
+                if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
+          endif
+
+          Histo(1)%Info   = "m(H1)"
+          Histo(1)%NBins  = 80
+          Histo(1)%BinSize= 20d0*GeV/80d0
+          Histo(1)%LowVal = 115d0*GeV
+          Histo(1)%SetScale= 1d0/GeV
+
+          Histo(2)%Info   = "m(H2)"
+          Histo(2)%NBins  = 80
+          Histo(2)%BinSize= 20d0*GeV/80d0
+          Histo(2)%LowVal = 75d0*GeV
+          Histo(2)%SetScale= 1d0/GeV
+
+          Histo(3)%Info   = "pt(H1)"
+          Histo(3)%NBins  = 80
+          Histo(3)%BinSize= 300d0*GeV/80d0
+          Histo(3)%LowVal = 0d0*GeV
+          Histo(3)%SetScale= 1d0/GeV
+
+          Histo(4)%Info   = "pt(H2)"
+          Histo(4)%NBins  = 80
+          Histo(4)%BinSize= 300d0*GeV/80d0
+          Histo(4)%LowVal = 0d0*GeV
+          Histo(4)%SetScale= 1d0/GeV
+
+          Histo(5)%Info   = "m(HH)"
+          Histo(5)%NBins  = 80
+          Histo(5)%BinSize= 1000d0*GeV/80d0
+          Histo(5)%LowVal = 200d0*GeV
+          Histo(5)%SetScale= 1d0/GeV
+
+          Histo(6)%Info   = "costheta*"
+          Histo(6)%NBins  = 80
+          Histo(6)%BinSize= 2d0/80d0
+          Histo(6)%LowVal = -1d0
+          Histo(6)%SetScale= 1d0
+
+          Histo(7)%Info   = "costheta1"
+          Histo(7)%NBins  = 80
+          Histo(7)%BinSize= 2d0/80d0
+          Histo(7)%LowVal = -1d0
+          Histo(7)%SetScale= 1d0
+
+          Histo(8)%Info   = "costheta2"
+          Histo(8)%NBins  = 80
+          Histo(8)%BinSize= 2d0/80d0
+          Histo(8)%LowVal = -1d0
+          Histo(8)%SetScale= 1d0
+
+          Histo(9)%Info   = "phi1"
+          Histo(9)%NBins  = 80
+          Histo(9)%BinSize= 6.4d0/80d0
+          Histo(9)%LowVal = -3.2d0
+          Histo(9)%SetScale= 1d0
+
+          Histo(10)%Info   = "phi"
+          Histo(10)%NBins  = 80
+          Histo(10)%BinSize= 6.4d0/80d0
+          Histo(10)%LowVal = -3.2d0
+          Histo(10)%SetScale= 1d0
+
+  do NHisto=1,NumHistograms
+      Histo(NHisto)%Value(:) = 0d0
+      Histo(NHisto)%Value2(:)= 0d0
+      Histo(NHisto)%Hits(:)  = 0
+  enddo
+
+
+RETURN
+END SUBROUTINE
 
 
 
@@ -5199,6 +5621,7 @@ character :: arg*(500)
     if( (Process.eq.66 .or. Process.eq.68) .and. M_Reso.ge.0d0  ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "1st Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( (Process.eq.66 .or. Process.eq.68) .and. M_Reso2.ge.0d0 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "2nd Resonance: spin=0, mass=",M_Reso2*100d0," width=",Ga_Reso2*100d0
     if( Process.eq.50) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.51) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.80) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.90) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.110) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
@@ -5340,7 +5763,7 @@ character :: arg*(500)
     if( Process.eq.69 ) write(TheUnit,"(4X,A,L)") "Intermediate off-shell gluons: ",includeGammaStar
 
     write(TheUnit,"(4X,A)") ""
-    if( Process.eq.0 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.62 .or. Process.eq.66 .or. Process.eq.68 .or. Process.eq.50 ) then
+    if( (Process.eq.0 .and. TauDecays.lt.0) .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.62 .or. Process.eq.66 .or. Process.eq.68 .or. Process.eq.50 .or. (Process.eq.51 .and. VH_PC.ne."bo") ) then
         write(TheUnit,"(4X,A)") "spin-0-VV couplings: "
         write(TheUnit,"(6X,A,L)") "generate_as=",generate_as
         if( generate_as ) then
@@ -5645,13 +6068,20 @@ character :: arg*(500)
                 if( cdabs(ewp_Top_right).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_Top_right=",ewp_Top_right,"i"
             endif
         endif
-    elseif( Process.eq.1 ) then
+    endif
+    if( (Process.eq.0 .and. TauDecays.ge.0) .or. Process.eq.80 .or. Process.eq.90 .or. (Process.eq.51 .and. VH_PC.ne."tr" .and. VH_PC.ne."ee" .and. VH_PC.ne."qq") ) then
+        write(TheUnit,"(4X,A)") "spin-0-ff couplings: "
+        if( cdabs(kappa ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "kappa=",kappa,"i"
+        if( cdabs(kappa_tilde ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "kappa_tilde=",kappa_tilde,"i"
+    endif
+    if( Process.eq.1 ) then
         write(TheUnit,"(4X,A)") "spin-1-VV couplings: "
         write(TheUnit,"(6X,A,2E16.8,A1)") "zprime_qq_left =",zprime_qq_left,"i"
         write(TheUnit,"(6X,A,2E16.8,A1)") "zprime_qq_right=",zprime_qq_right,"i"
         write(TheUnit,"(6X,A,2E16.8,A1)") "zprime_zz_1=",zprime_zz_1,"i"
         write(TheUnit,"(6X,A,2E16.8,A1)") "zprime_zz_2=",zprime_zz_2,"i"
-    elseif( Process.eq.2 ) then
+    endif
+    if( Process.eq.2 ) then
         write(TheUnit,"(4X,A)") "spin-2-VV couplings: "
         write(TheUnit,"(6X,A,L)") "generate_bis=",generate_bis
         write(TheUnit,"(6X,A,L)") "use_dynamic_MG=",use_dynamic_MG
@@ -5964,10 +6394,11 @@ implicit none
         print *, "   Collider:          1=LHC (default), 2=Tevatron, 0=e+e-"
         print *, "   ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,"
         print *, "                      250 GeV for e+e-"
-        print *, "   Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH,"
+        print *, "   Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance,"
+        print *, "                      50=qq/ee->VH, 51=gg->ZH,"
         print *, "                      60=weakVBF, 61=pp->Hjj, 62=pp->Hj,"
         print *, "                      66=VVHVV offshell, 67=VVVVbkg, 68=VVHVV+VVVV,"
-        print *, "                      69=QCD JJVV bkg, 80=ttH, 90=bbH,"
+        print *, "                      80=ttH, 90=bbH,"
         print *, "                      110=t+H t channel, 111=tbar+H t channel,"
         print *, "                      112=t+H s channel, 113=tbar+H s channel"
         print *, "                      114=t/tbar+H t/s channels"
@@ -6003,6 +6434,22 @@ implicit none
         print *, "                      stable; if it is 1, they decay to Wnu, with the W's decaying"
         print *, "                      according to DecayModes1,2."
         print *, "   HbbDK:             For VH production, decay H->bb"
+        print *, "   VH_PC:             VH partonic channel and mode selection"
+        print *, "                      ee ( = e+ e- @LO)"
+        print *, "                      gg ( = triangles + boxes of gg)"
+        print *, "                      qq ( = q q~ @LO)"
+        print *, "                      lo ( = q q~ @LO)"
+        print *, "                      tr ( = triangles of gg)"
+        print *, "                      bo ( = boxes of gg)"
+        print *, "                      in ( = interference = 2*dble(box*dconjg(triangle)) of gg)"
+        print *, "                      qg ( = real - dipoles, for g q/q~ > VH + q/q~, for development only)"
+        print *, "                      gq ( = K + P, for g q/q~ > VH + q/q~, for development only)"
+        print *, "                      sb ( = real - dipoles, for q q~ @NLO, for development only)"
+        print *, "                      sp ( = virtual + I + K + P, for q q~ @NLO, for development only)"
+        print *, "                      nl ( = NLO = q q~ @LO + NLO + gq)"
+        print *, "                      VH_PC overrides Pchannel."
+        print *, "   alpha_dip          extra non-physical degree of freedom for Process=51 & VH_PC=nl, defaulted at 1."
+        print *, "                      Vary to check indepedence (of alpha_dip)."
         print *, "   VBFoffsh_run:      For VBF offshell production, set this to a number from 1-5"
         print *, "                      for each of the 5 jobs.  See manual for more details."
         print *, " Resonance parameters:"
@@ -6035,6 +6482,10 @@ implicit none
         print *, "   pTlepcut:          Minimum pT for leptons in offshell VBF, in GeV (default: 3)"
         print *, "   etalepcut:         Maximum |eta| for leptons in offshell VBF (default: 2.7)"
         print *, "   m4l_min, m4l_max:  Minimum and maximum four-lepton mass in offshell VBF"
+        print *, "   m2l_min:    Minimum invariant mass of V (onshell) in new VH (\texttt{Process=51}) (default: 0)"
+        print *, "   m2l_max:   Maximum invariant mass of V (onshell) in newVH (\texttt{Process=51}) (default: infinity)"
+        print *, "   mVH_min:   Minimum invariant mass of VH in new VH (\texttt{Process=51}) (default: 0)"
+        print *, "   mVH_max:   Maximum invariant mass of VH in new VH (\texttt{Process=51}) (default: infinity)"
         print *, " Renormalization and factorization scales:"
         print *, "   FacScheme:         PDF factorization scale scheme"
         print *, "   MuFacMultiplier:   Multiplier for the factorization scale chosen by FacScheme"

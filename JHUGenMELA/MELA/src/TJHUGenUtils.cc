@@ -12,27 +12,27 @@ namespace TJHUGenUtils{
 }
 
 std::vector<intTriplet_t> TJHUGenUtils::Hash_OnshellHJJHash(){
-  std::vector<intTriplet_t> pcfg;
   int ijsel[3][121];
   int nijchannels=77;
   __modhashcollection_MOD_get_hjjchannelhash_nosplit(ijsel, &nijchannels);
-  for (int ic=0; ic<nijchannels; ic++) pcfg.push_back(intTriplet_t(ijsel[0][ic], ijsel[1][ic], ijsel[2][ic]));
+  std::vector<intTriplet_t> pcfg; pcfg.reserve(nijchannels);
+  for (int ic=0; ic<nijchannels; ic++) pcfg.emplace_back(ijsel[0][ic], ijsel[1][ic], ijsel[2][ic]);
   return pcfg;
 }
 std::vector<intTriplet_t> TJHUGenUtils::Hash_OnshellVBFHash(){
-  std::vector<intTriplet_t> pcfg;
   int ijsel[3][121];
   int nijchannels=68;
   __modhashcollection_MOD_get_vbfchannelhash_nosplit(ijsel, &nijchannels);
-  for (int ic=0; ic<nijchannels; ic++) pcfg.push_back(intTriplet_t(ijsel[0][ic], ijsel[1][ic], ijsel[2][ic]));
+  std::vector<intTriplet_t> pcfg; pcfg.reserve(nijchannels);
+  for (int ic=0; ic<nijchannels; ic++) pcfg.emplace_back(ijsel[0][ic], ijsel[1][ic], ijsel[2][ic]);
   return pcfg;
 }
 std::vector<intTriplet_t> TJHUGenUtils::Hash_OnshellTQHHash(){
-  std::vector<intTriplet_t> pcfg;
   int ijsel[3][121];
   __modhashcollection_MOD_get_thchannelhash(ijsel);
+  std::vector<intTriplet_t> pcfg; pcfg.reserve(121);
   for (int ic=0; ic<121; ic++){
-    if (ijsel[2][ic]>=0) pcfg.push_back(intTriplet_t(ijsel[0][ic], ijsel[1][ic], ijsel[2][ic]));
+    if (ijsel[2][ic]>=0) pcfg.emplace_back(ijsel[0][ic], ijsel[1][ic], ijsel[2][ic]);
     else break;
   }
   return pcfg;

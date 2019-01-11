@@ -4,9 +4,14 @@ implicit none
 save
 public
 
+
 ! MCFM qq_VVqq hash - JHU conventions
 integer, parameter :: Hash_MCFM_qqVVqq_Size = 164
 integer, target :: Hash_MCFM_qqVVqq(1:Hash_MCFM_qqVVqq_Size,1:4)
+
+! MCFM qq_VVqqStrong hash - JHU conventions
+integer, parameter :: Hash_MCFM_qqVVqqStrong_Size = 35
+integer, target :: Hash_MCFM_qqVVqqStrong(1:Hash_MCFM_qqVVqqStrong_Size,1:4)
 
 ! MCFM qq_VVqq hash (generation) - PDF/PDG conventions
 integer, parameter :: Hash_MCFM_qqVVqq_Gen_Size = 121 ! Maximum size
@@ -45,57 +50,64 @@ logical, private :: hashcoll_hashes_initialized = .false.
 
 contains
 
+
+
+
 subroutine Init_Hash_MCFM_qqVVqq()
 implicit none
-   Hash_MCFM_qqVVqq(1,:) = (/ Up_ , Chm_ , Up_ , Chm_ /)
-   Hash_MCFM_qqVVqq(2,:) = (/ Dn_ , Str_ , Dn_ , Str_ /)
-   Hash_MCFM_qqVVqq(3,:) = (/ Dn_ , Bot_ , Dn_ , Bot_ /)
-   Hash_MCFM_qqVVqq(4,:) = (/ Str_ , Bot_ , Str_ , Bot_ /)
-   Hash_MCFM_qqVVqq(5,:) = (/ Up_ , Str_ , Up_ , Str_ /)
-   Hash_MCFM_qqVVqq(6,:) = (/ Up_ , Bot_ , Up_ , Bot_ /)
-   Hash_MCFM_qqVVqq(7,:) = (/ Chm_ , Bot_ , Chm_ , Bot_ /)
-   Hash_MCFM_qqVVqq(8,:) = (/ Dn_ , Chm_ , Dn_ , Chm_ /)
-   Hash_MCFM_qqVVqq(9,:) = (/ Dn_ , Up_ , Dn_ , Up_ /)
-   Hash_MCFM_qqVVqq(10,:) = (/ Str_ , Chm_ , Str_ , Chm_ /)
-   Hash_MCFM_qqVVqq(11,:) = (/ Dn_ , Chm_ , Up_ , Str_ /)
-   Hash_MCFM_qqVVqq(12,:) = (/ Up_ , Str_ , Dn_ , Chm_ /)
-   Hash_MCFM_qqVVqq(13,:) = (/ Up_ , Up_ , Up_ , Up_ /)
-   Hash_MCFM_qqVVqq(14,:) = (/ Chm_ , Chm_ , Chm_ , Chm_ /)
-   Hash_MCFM_qqVVqq(15,:) = (/ Dn_ , Dn_ , Dn_ , Dn_ /)
-   Hash_MCFM_qqVVqq(16,:) = (/ Str_ , Str_ , Str_ , Str_ /)
-   Hash_MCFM_qqVVqq(17,:) = (/ Bot_ , Bot_ , Bot_ , Bot_ /)
-   Hash_MCFM_qqVVqq(18,:) = (/ Chm_ , Up_ , Up_ , Chm_ /)
-   Hash_MCFM_qqVVqq(19,:) = (/ Str_ , Dn_ , Dn_ , Str_ /)
-   Hash_MCFM_qqVVqq(20,:) = (/ Bot_ , Dn_ , Dn_ , Bot_ /)
-   Hash_MCFM_qqVVqq(21,:) = (/ Bot_ , Str_ , Str_ , Bot_ /)
-   Hash_MCFM_qqVVqq(22,:) = (/ Str_ , Up_ , Up_ , Str_ /)
-   Hash_MCFM_qqVVqq(23,:) = (/ Bot_ , Up_ , Up_ , Bot_ /)
-   Hash_MCFM_qqVVqq(24,:) = (/ Bot_ , Chm_ , Chm_ , Bot_ /)
+integer :: i
 
-   Hash_MCFM_qqVVqq(25,:) = (/ Chm_ , Dn_ , Dn_ , Chm_ /)
-   Hash_MCFM_qqVVqq(26,:) = (/ Up_ , Dn_ , Dn_ , Up_ /)
-   Hash_MCFM_qqVVqq(27,:) = (/ Chm_ , Str_ , Str_ , Chm_ /)
-   Hash_MCFM_qqVVqq(28,:) = (/ Chm_ , Dn_ , Up_ , Str_ /)
-   Hash_MCFM_qqVVqq(29,:) = (/ Str_ , Up_ , Dn_ , Chm_ /)
+   Hash_MCFM_qqVVqq(  1,:) = (/ Dn_ , Up_ , Dn_ , Up_ /)
+   Hash_MCFM_qqVVqq(  2,:) = (/ Up_ , Dn_ , Dn_ , Up_ /)
 
-   Hash_MCFM_qqVVqq(30,:) = (/ AChm_ , AUp_ , AChm_ , AUp_ /)
-   Hash_MCFM_qqVVqq(31,:) = (/ AStr_ , ADn_ , AStr_ , ADn_ /)
-   Hash_MCFM_qqVVqq(32,:) = (/ ABot_ , ADn_ , ABot_ , ADn_ /)
-   Hash_MCFM_qqVVqq(33,:) = (/ ABot_ , AStr_ , ABot_ , AStr_ /)
-   Hash_MCFM_qqVVqq(34,:) = (/ AStr_ , AUp_ , AStr_ , AUp_ /)
-   Hash_MCFM_qqVVqq(35,:) = (/ ABot_ , AUp_ , ABot_ , AUp_ /)
-   Hash_MCFM_qqVVqq(36,:) = (/ ABot_ , AChm_ , ABot_ , AChm_ /)
-   Hash_MCFM_qqVVqq(37,:) = (/ AChm_ , ADn_ , AChm_ , ADn_ /)
-   Hash_MCFM_qqVVqq(38,:) = (/ AUp_ , ADn_ , AUp_ , ADn_ /)
-   Hash_MCFM_qqVVqq(39,:) = (/ AChm_ , AStr_ , AChm_ , AStr_ /)
-   Hash_MCFM_qqVVqq(40,:) = (/ AStr_ , AUp_ , AChm_ , ADn_ /)
-   Hash_MCFM_qqVVqq(41,:) = (/ AChm_ , ADn_ , AStr_ , AUp_ /)
+
+   Hash_MCFM_qqVVqq(  3,:) = (/ Up_ , AUp_ , ADn_ , Dn_ /)
+   Hash_MCFM_qqVVqq(  4,:) = (/ AUp_ , Up_ , ADn_ , Dn_ /)
+   Hash_MCFM_qqVVqq(  5,:) = (/ Str_ , Up_ , Dn_ , Chm_ /)
+   Hash_MCFM_qqVVqq(  6,:) = (/ Up_ , Str_ , Dn_ , Chm_ /)
+   Hash_MCFM_qqVVqq(  7,:) = (/ Dn_ , ADn_ , AUp_ , Up_ /)
+   Hash_MCFM_qqVVqq(  8,:) = (/ ADn_ , Dn_ , AUp_ , Up_ /)
+   Hash_MCFM_qqVVqq(  9,:) = (/ Up_ , Up_ , Up_ , Up_ /)
+
+
+   Hash_MCFM_qqVVqq( 10,:) = (/ Up_ , ADn_ , ADn_ , Up_ /)
+   Hash_MCFM_qqVVqq( 11,:) = (/ ADn_ , Up_ , ADn_ , Up_ /)
+   Hash_MCFM_qqVVqq( 12,:) = (/ Up_ , ADn_ , AStr_ , Chm_ /)
+   Hash_MCFM_qqVVqq( 13,:) = (/ AUp_ , Dn_ , AChm_ , Str_ /)
+   Hash_MCFM_qqVVqq( 14,:) = (/ ADn_ , Up_ , AStr_ , Chm_ /)
+   Hash_MCFM_qqVVqq( 15,:) = (/ AUp_ , Dn_ , AUp_ , Dn_ /)
+   Hash_MCFM_qqVVqq( 16,:) = (/ Up_ , AChm_ , AStr_ , Dn_ /)
+   Hash_MCFM_qqVVqq( 17,:) = (/ AChm_ , Up_ , AStr_ , Dn_ /)
+   Hash_MCFM_qqVVqq( 18,:) = (/ Dn_ , AStr_ , AChm_ , Up_ /)
+   Hash_MCFM_qqVVqq( 19,:) = (/ Dn_ , AUp_ , AUp_ , Dn_ /)
+   Hash_MCFM_qqVVqq( 20,:) = (/ Dn_ , AUp_ , AChm_ , Str_ /)
+   Hash_MCFM_qqVVqq( 21,:) = (/ Dn_ , Chm_ , Up_ , Str_ /)
+   Hash_MCFM_qqVVqq( 22,:) = (/ Chm_ , Dn_ , Up_ , Str_ /)
+   Hash_MCFM_qqVVqq( 23,:) = (/ ADn_ , AUp_ , AUp_ , ADn_ /)
+   Hash_MCFM_qqVVqq( 24,:) = (/ AUp_ , ADn_ , AUp_ , ADn_ /)
+   Hash_MCFM_qqVVqq( 25,:) = (/ AChm_ , ADn_ , AStr_ , AUp_ /)
+   Hash_MCFM_qqVVqq( 26,:) = (/ ADn_ , AChm_ , AStr_ , AUp_ /)
+   Hash_MCFM_qqVVqq( 27,:) = (/ ADn_ , Str_ , AUp_ , Chm_ /)
+   Hash_MCFM_qqVVqq( 28,:) = (/ Str_ , ADn_ , AUp_ , Chm_ /)
+   Hash_MCFM_qqVVqq( 29,:) = (/ AUp_ , AStr_ , AChm_ , ADn_ /)
+   Hash_MCFM_qqVVqq( 30,:) = (/ AStr_ , AUp_ , AChm_ , ADn_ /)
+   Hash_MCFM_qqVVqq( 31,:) = (/ AStr_ , Str_ , AChm_ , Chm_ /)
+   Hash_MCFM_qqVVqq( 32,:) = (/ Str_ , AStr_ , AChm_ , Chm_ /)
+   Hash_MCFM_qqVVqq( 33,:) = (/ AUp_ , Up_ , AUp_ , Up_ /)
+   Hash_MCFM_qqVVqq( 34,:) = (/ Up_ , AUp_ , AUp_ , Up_ /)
+   Hash_MCFM_qqVVqq( 35,:) = (/ Dn_ , ADn_ , ADn_ , Dn_ /)
+   Hash_MCFM_qqVVqq( 36,:) = (/ ADn_ , Dn_ , ADn_ , Dn_ /)
+   Hash_MCFM_qqVVqq( 37,:) = (/ Chm_ , AUp_ , ADn_ , Str_ /)
+   Hash_MCFM_qqVVqq( 38,:) = (/ Str_ , Up_ , Up_ , Str_ /)
+   Hash_MCFM_qqVVqq( 39,:) = (/ ADn_ , Dn_ , AStr_ , Str_ /)
+   Hash_MCFM_qqVVqq( 40,:) = (/ Dn_ , ADn_ , AStr_ , Str_ /)
+
+   Hash_MCFM_qqVVqq(41,:) = (/ AChm_ , ADn_ , AChm_ , ADn_ /)
    Hash_MCFM_qqVVqq(42,:) = (/ AUp_ , AUp_ , AUp_ , AUp_ /)
    Hash_MCFM_qqVVqq(43,:) = (/ AChm_ , AChm_ , AChm_ , AChm_ /)
    Hash_MCFM_qqVVqq(44,:) = (/ ADn_ , ADn_ , ADn_ , ADn_ /)
    Hash_MCFM_qqVVqq(45,:) = (/ AStr_ , AStr_ , AStr_ , AStr_ /)
    Hash_MCFM_qqVVqq(46,:) = (/ ABot_ , ABot_ , ABot_ , ABot_ /)
-
    Hash_MCFM_qqVVqq(47,:) = (/ AUp_ , AChm_ , AChm_ , AUp_ /)
    Hash_MCFM_qqVVqq(48,:) = (/ ADn_ , AStr_ , AStr_ , ADn_ /)
    Hash_MCFM_qqVVqq(49,:) = (/ ADn_ , ABot_ , ABot_ , ADn_ /)
@@ -104,11 +116,10 @@ implicit none
    Hash_MCFM_qqVVqq(52,:) = (/ AUp_ , ABot_ , ABot_ , AUp_ /)
    Hash_MCFM_qqVVqq(53,:) = (/ AChm_ , ABot_ , ABot_ , AChm_ /)
    Hash_MCFM_qqVVqq(54,:) = (/ ADn_ , AChm_ , AChm_ , ADn_ /)
-   Hash_MCFM_qqVVqq(55,:) = (/ ADn_ , AUp_ , AUp_ , ADn_ /)
-   Hash_MCFM_qqVVqq(56,:) = (/ AStr_ , AChm_ , AChm_ , AStr_ /)
-   Hash_MCFM_qqVVqq(57,:) = (/ AUp_ , AStr_ , AChm_ , ADn_ /)
-   Hash_MCFM_qqVVqq(58,:) = (/ ADn_ , AChm_ , AStr_ , AUp_ /)
-
+   Hash_MCFM_qqVVqq(55,:) = (/ Up_ , Chm_ , Up_ , Chm_ /)
+   Hash_MCFM_qqVVqq(56,:) = (/ Dn_ , Str_ , Dn_ , Str_ /)
+   Hash_MCFM_qqVVqq(57,:) = (/ Dn_ , Bot_ , Dn_ , Bot_ /)
+   Hash_MCFM_qqVVqq(58,:) = (/ Str_ , Bot_ , Str_ , Bot_ /)
    Hash_MCFM_qqVVqq(59,:) = (/ AUp_ , Chm_ , AUp_ , Chm_ /)
    Hash_MCFM_qqVVqq(60,:) = (/ ADn_ , Str_ , ADn_ , Str_ /)
    Hash_MCFM_qqVVqq(61,:) = (/ ADn_ , Bot_ , ADn_ , Bot_ /)
@@ -117,16 +128,15 @@ implicit none
    Hash_MCFM_qqVVqq(64,:) = (/ AUp_ , Bot_ , AUp_ , Bot_ /)
    Hash_MCFM_qqVVqq(65,:) = (/ AChm_ , Bot_ , AChm_ , Bot_ /)
    Hash_MCFM_qqVVqq(66,:) = (/ ADn_ , Chm_ , ADn_ , Chm_ /)
-   Hash_MCFM_qqVVqq(67,:) = (/ ADn_ , Up_ , ADn_ , Up_ /)
+   Hash_MCFM_qqVVqq(67,:) = (/ Up_ , Bot_ , Up_ , Bot_ /)
    Hash_MCFM_qqVVqq(68,:) = (/ AStr_ , Chm_ , AStr_ , Chm_ /)
-   Hash_MCFM_qqVVqq(69,:) = (/ AUp_ , Chm_ , ADn_ , Str_ /)
-   Hash_MCFM_qqVVqq(70,:) = (/ ADn_ , Str_ , AUp_ , Chm_ /)
-   Hash_MCFM_qqVVqq(71,:) = (/ AUp_ , Up_ , AUp_ , Up_ /)
+   Hash_MCFM_qqVVqq(69,:) = (/ Chm_ , Bot_ , Chm_ , Bot_ /)
+   Hash_MCFM_qqVVqq(70,:) = (/ Dn_ , Chm_ , Dn_ , Chm_ /)
+   Hash_MCFM_qqVVqq(71,:) = (/ Str_ , Chm_ , Str_ , Chm_ /)
    Hash_MCFM_qqVVqq(72,:) = (/ AChm_ , Chm_ , AChm_ , Chm_ /)
-   Hash_MCFM_qqVVqq(73,:) = (/ ADn_ , Dn_ , ADn_ , Dn_ /)
+   Hash_MCFM_qqVVqq(73,:) = (/ Chm_ , Chm_ , Chm_ , Chm_ /)
    Hash_MCFM_qqVVqq(74,:) = (/ AStr_ , Str_ , AStr_ , Str_ /)
    Hash_MCFM_qqVVqq(75,:) = (/ ABot_ , Bot_ , ABot_ , Bot_ /)
-
    Hash_MCFM_qqVVqq(76,:) = (/ AChm_ , Up_ , AChm_ , Up_ /)
    Hash_MCFM_qqVVqq(77,:) = (/ AStr_ , Dn_ , AStr_ , Dn_ /)
    Hash_MCFM_qqVVqq(78,:) = (/ ABot_ , Dn_ , ABot_ , Dn_ /)
@@ -135,11 +145,10 @@ implicit none
    Hash_MCFM_qqVVqq(81,:) = (/ ABot_ , Up_ , ABot_ , Up_ /)
    Hash_MCFM_qqVVqq(82,:) = (/ ABot_ , Chm_ , ABot_ , Chm_ /)
    Hash_MCFM_qqVVqq(83,:) = (/ AChm_ , Dn_ , AChm_ , Dn_ /)
-   Hash_MCFM_qqVVqq(84,:) = (/ AUp_ , Dn_ , AUp_ , Dn_ /)
+   Hash_MCFM_qqVVqq(84,:) = (/ Dn_ , Dn_ , Dn_ , Dn_ /)
    Hash_MCFM_qqVVqq(85,:) = (/ AChm_ , Str_ , AChm_ , Str_ /)
-   Hash_MCFM_qqVVqq(86,:) = (/ AStr_ , Dn_ , AChm_ , Up_ /)
-   Hash_MCFM_qqVVqq(87,:) = (/ AChm_ , Up_ , AStr_ , Dn_ /)
-
+   Hash_MCFM_qqVVqq(86,:) = (/ Str_ , Str_ , Str_ , Str_ /)
+   Hash_MCFM_qqVVqq(87,:) = (/ Bot_ , Bot_ , Bot_ , Bot_ /)
    Hash_MCFM_qqVVqq(88,:) = (/ Chm_ , AUp_ , AUp_ , Chm_ /)
    Hash_MCFM_qqVVqq(89,:) = (/ Str_ , ADn_ , ADn_ , Str_ /)
    Hash_MCFM_qqVVqq(90,:) = (/ Bot_ , ADn_ , ADn_ , Bot_ /)
@@ -148,16 +157,16 @@ implicit none
    Hash_MCFM_qqVVqq(93,:) = (/ Bot_ , AUp_ , AUp_ , Bot_ /)
    Hash_MCFM_qqVVqq(94,:) = (/ Bot_ , AChm_ , AChm_ , Bot_ /)
    Hash_MCFM_qqVVqq(95,:) = (/ Chm_ , ADn_ , ADn_ , Chm_ /)
-   Hash_MCFM_qqVVqq(96,:) = (/ Up_ , ADn_ , ADn_ , Up_ /)
+   Hash_MCFM_qqVVqq(96,:) = (/ Chm_ , Up_ , Up_ , Chm_ /)
    Hash_MCFM_qqVVqq(97,:) = (/ Chm_ , AStr_ , AStr_ , Chm_ /)
-   Hash_MCFM_qqVVqq(98,:) = (/ Chm_ , AUp_ , ADn_ , Str_ /)
-   Hash_MCFM_qqVVqq(99,:) = (/ Str_ , ADn_ , AUp_ , Chm_ /)
-   Hash_MCFM_qqVVqq(100,:) = (/ Up_ , AUp_ , AUp_ , Up_ /)
+   Hash_MCFM_qqVVqq(98,:) = (/ Str_ , Dn_ , Dn_ , Str_ /)
+   Hash_MCFM_qqVVqq(99,:) = (/ Bot_ , Dn_ , Dn_ , Bot_ /)
+   Hash_MCFM_qqVVqq(100,:) = (/ Bot_ , Str_ , Str_ , Bot_ /)
    Hash_MCFM_qqVVqq(101,:) = (/ Chm_ , AChm_ , AChm_ , Chm_ /)
-   Hash_MCFM_qqVVqq(102,:) = (/ Dn_ , ADn_ , ADn_ , Dn_ /)
+   Hash_MCFM_qqVVqq(102,:) = (/ Bot_ , Up_ , Up_ , Bot_ /)
    Hash_MCFM_qqVVqq(103,:) = (/ Str_ , AStr_ , AStr_ , Str_ /)
-   Hash_MCFM_qqVVqq(104,:) = (/ Bot_ , ABot_ , ABot_ , Bot_ /)
 
+   Hash_MCFM_qqVVqq(104,:) = (/ Bot_ , ABot_ , ABot_ , Bot_ /)
    Hash_MCFM_qqVVqq(105,:) = (/ Up_ , AChm_ , AChm_ , Up_ /)
    Hash_MCFM_qqVVqq(106,:) = (/ Dn_ , AStr_ , AStr_ , Dn_ /)
    Hash_MCFM_qqVVqq(107,:) = (/ Dn_ , ABot_ , ABot_ , Dn_ /)
@@ -166,48 +175,46 @@ implicit none
    Hash_MCFM_qqVVqq(110,:) = (/ Up_ , ABot_ , ABot_ , Up_ /)
    Hash_MCFM_qqVVqq(111,:) = (/ Chm_ , ABot_ , ABot_ , Chm_ /)
    Hash_MCFM_qqVVqq(112,:) = (/ Dn_ , AChm_ , AChm_ , Dn_ /)
-   Hash_MCFM_qqVVqq(113,:) = (/ Dn_ , AUp_ , AUp_ , Dn_ /)
+   Hash_MCFM_qqVVqq(113,:) = (/ AStr_ , AChm_ , AChm_ , AStr_ /)
    Hash_MCFM_qqVVqq(114,:) = (/ Str_ , AChm_ , AChm_ , Str_ /)
-   Hash_MCFM_qqVVqq(115,:) = (/ Dn_ , AStr_ , AChm_ , Up_ /)
-   Hash_MCFM_qqVVqq(116,:) = (/ Up_ , AChm_ , AStr_ , Dn_ /)
+   Hash_MCFM_qqVVqq(115,:) = (/ Bot_ , Chm_ , Chm_ , Bot_ /)
+   Hash_MCFM_qqVVqq(116,:) = (/ AStr_ , ADn_ , AStr_ , ADn_ /)
    Hash_MCFM_qqVVqq(117,:) = (/ Up_ , AUp_ , AChm_ , Chm_ /)
-   Hash_MCFM_qqVVqq(118,:) = (/ Dn_ , ADn_ , AStr_ , Str_ /)
+   Hash_MCFM_qqVVqq(118,:) = (/ ABot_ , ADn_ , ABot_ , ADn_ /)
    Hash_MCFM_qqVVqq(119,:) = (/ Dn_ , ADn_ , ABot_ , Bot_ /)
    Hash_MCFM_qqVVqq(120,:) = (/ Str_ , AStr_ , ABot_ , Bot_ /)
    Hash_MCFM_qqVVqq(121,:) = (/ Up_ , AUp_ , AStr_ , Str_ /)
    Hash_MCFM_qqVVqq(122,:) = (/ Up_ , AUp_ , ABot_ , Bot_ /)
    Hash_MCFM_qqVVqq(123,:) = (/ Chm_ , AChm_ , ABot_ , Bot_ /)
-
    Hash_MCFM_qqVVqq(124,:) = (/ Dn_ , ADn_ , AChm_ , Chm_ /)
-   Hash_MCFM_qqVVqq(125,:) = (/ Dn_ , ADn_ , AUp_ , Up_ /)
-   Hash_MCFM_qqVVqq(126,:) = (/ Str_ , AStr_ , AChm_ , Chm_ /)
-   Hash_MCFM_qqVVqq(127,:) = (/ Dn_ , AUp_ , AChm_ , Str_ /)
-   Hash_MCFM_qqVVqq(128,:) = (/ Up_ , ADn_ , AStr_ , Chm_ /)
-   Hash_MCFM_qqVVqq(129,:) = (/ Chm_ , AChm_ , AUp_ , Up_ /)
-   Hash_MCFM_qqVVqq(130,:) = (/ Str_ , AStr_ , ADn_ , Dn_ /)
-   Hash_MCFM_qqVVqq(131,:) = (/ Bot_ , ABot_ , ADn_ , Dn_ /)
-   Hash_MCFM_qqVVqq(132,:) = (/ Bot_ , ABot_ , AStr_ , Str_ /)
-   Hash_MCFM_qqVVqq(133,:) = (/ Str_ , AStr_ , AUp_ , Up_ /)
-   Hash_MCFM_qqVVqq(134,:) = (/ Bot_ , ABot_ , AUp_ , Up_ /)
-   Hash_MCFM_qqVVqq(135,:) = (/ Bot_ , ABot_ , AChm_ , Chm_ /)
-   Hash_MCFM_qqVVqq(136,:) = (/ Chm_ , AChm_ , ADn_ , Dn_ /)
-   Hash_MCFM_qqVVqq(137,:) = (/ Up_ , AUp_ , ADn_ , Dn_ /)
-   Hash_MCFM_qqVVqq(138,:) = (/ Chm_ , AChm_ , AStr_ , Str_ /)
-   Hash_MCFM_qqVVqq(139,:) = (/ Chm_ , AStr_ , ADn_ , Up_ /)
-   Hash_MCFM_qqVVqq(140,:) = (/ Str_ , AChm_ , AUp_ , Dn_ /)
-
-   Hash_MCFM_qqVVqq(141,:) = (/ AUp_ , Up_ , AChm_ , Chm_ /)
-   Hash_MCFM_qqVVqq(142,:) = (/ ADn_ , Dn_ , AStr_ , Str_ /)
-   Hash_MCFM_qqVVqq(143,:) = (/ ADn_ , Dn_ , ABot_ , Bot_ /)
-   Hash_MCFM_qqVVqq(144,:) = (/ AStr_ , Str_ , ABot_ , Bot_ /)
-   Hash_MCFM_qqVVqq(145,:) = (/ AUp_ , Up_ , AStr_ , Str_ /)
-   Hash_MCFM_qqVVqq(146,:) = (/ AUp_ , Up_ , ABot_ , Bot_ /)
-   Hash_MCFM_qqVVqq(147,:) = (/ AChm_ , Chm_ , ABot_ , Bot_ /)
-   Hash_MCFM_qqVVqq(148,:) = (/ ADn_ , Dn_ , AChm_ , Chm_ /)
-   Hash_MCFM_qqVVqq(149,:) = (/ ADn_ , Dn_ , AUp_ , Up_ /)
-   Hash_MCFM_qqVVqq(150,:) = (/ AStr_ , Str_ , AChm_ , Chm_ /)
-   Hash_MCFM_qqVVqq(151,:) = (/ AUp_ , Dn_ , AChm_ , Str_ /)
-   Hash_MCFM_qqVVqq(152,:) = (/ ADn_ , Up_ , AStr_ , Chm_ /)
+   Hash_MCFM_qqVVqq(125,:) = (/ Chm_ , Dn_ , Dn_ , Chm_ /)
+   Hash_MCFM_qqVVqq(126,:) = (/ ABot_ , AStr_ , ABot_ , AStr_ /)
+   Hash_MCFM_qqVVqq(127,:) = (/ Chm_ , AChm_ , AUp_ , Up_ /)
+   Hash_MCFM_qqVVqq(128,:) = (/ Str_ , AStr_ , ADn_ , Dn_ /)
+   Hash_MCFM_qqVVqq(129,:) = (/ AStr_ , Dn_ , AChm_ , Up_ /)
+   Hash_MCFM_qqVVqq(130,:) = (/ AUp_ , Chm_ , ADn_ , Str_ /)
+   Hash_MCFM_qqVVqq(131,:) = (/ Up_ , Str_ , Up_ , Str_ /)
+   Hash_MCFM_qqVVqq(132,:) = (/ AChm_ , AStr_ , AChm_ , AStr_ /)
+   Hash_MCFM_qqVVqq(133,:) = (/ Bot_ , ABot_ , ADn_ , Dn_ /)
+   Hash_MCFM_qqVVqq(134,:) = (/ Bot_ , ABot_ , AStr_ , Str_ /)
+   Hash_MCFM_qqVVqq(135,:) = (/ Str_ , AStr_ , AUp_ , Up_ /)
+   Hash_MCFM_qqVVqq(136,:) = (/ Bot_ , ABot_ , AUp_ , Up_ /)
+   Hash_MCFM_qqVVqq(137,:) = (/ Bot_ , ABot_ , AChm_ , Chm_ /)
+   Hash_MCFM_qqVVqq(138,:) = (/ Chm_ , AChm_ , ADn_ , Dn_ /)
+   Hash_MCFM_qqVVqq(139,:) = (/ Chm_ , Str_ , Str_ , Chm_ /)
+   Hash_MCFM_qqVVqq(140,:) = (/ Chm_ , AChm_ , AStr_ , Str_ /)
+   Hash_MCFM_qqVVqq(141,:) = (/ Chm_ , AStr_ , ADn_ , Up_ /)
+   Hash_MCFM_qqVVqq(142,:) = (/ Str_ , AChm_ , AUp_ , Dn_ /)
+   Hash_MCFM_qqVVqq(143,:) = (/ AUp_ , Up_ , AChm_ , Chm_ /)
+   Hash_MCFM_qqVVqq(144,:) = (/ ABot_ , AChm_ , ABot_ , AChm_ /)
+   Hash_MCFM_qqVVqq(145,:) = (/ ADn_ , Dn_ , ABot_ , Bot_ /)
+   Hash_MCFM_qqVVqq(146,:) = (/ AStr_ , Str_ , ABot_ , Bot_ /)
+   Hash_MCFM_qqVVqq(147,:) = (/ AUp_ , Up_ , AStr_ , Str_ /)
+   Hash_MCFM_qqVVqq(148,:) = (/ AUp_ , Up_ , ABot_ , Bot_ /)
+   Hash_MCFM_qqVVqq(149,:) = (/ AChm_ , Chm_ , ABot_ , Bot_ /)
+   Hash_MCFM_qqVVqq(150,:) = (/ ADn_ , Dn_ , AChm_ , Chm_ /)
+   Hash_MCFM_qqVVqq(151,:) = (/ AStr_ , AUp_ , AStr_ , AUp_ /)
+   Hash_MCFM_qqVVqq(152,:) = (/ ABot_ , AUp_ , ABot_ , AUp_ /)
    Hash_MCFM_qqVVqq(153,:) = (/ AChm_ , Chm_ , AUp_ , Up_ /)
    Hash_MCFM_qqVVqq(154,:) = (/ AStr_ , Str_ , ADn_ , Dn_ /)
    Hash_MCFM_qqVVqq(155,:) = (/ ABot_ , Bot_ , ADn_ , Dn_ /)
@@ -216,10 +223,59 @@ implicit none
    Hash_MCFM_qqVVqq(158,:) = (/ ABot_ , Bot_ , AUp_ , Up_ /)
    Hash_MCFM_qqVVqq(159,:) = (/ ABot_ , Bot_ , AChm_ , Chm_ /)
    Hash_MCFM_qqVVqq(160,:) = (/ AChm_ , Chm_ , ADn_ , Dn_ /)
-   Hash_MCFM_qqVVqq(161,:) = (/ AUp_ , Up_ , ADn_ , Dn_ /)
+   Hash_MCFM_qqVVqq(161,:) = (/ AChm_ , AUp_ , AChm_ , AUp_ /)
    Hash_MCFM_qqVVqq(162,:) = (/ AChm_ , Chm_ , AStr_ , Str_ /)
    Hash_MCFM_qqVVqq(163,:) = (/ AStr_ , Chm_ , ADn_ , Up_ /)
    Hash_MCFM_qqVVqq(164,:) = (/ AChm_ , Str_ , AUp_ , Dn_ /)
+
+end subroutine
+
+subroutine Init_Hash_MCFM_qqVVqqStrong()
+implicit none
+integer :: i
+
+   Hash_MCFM_qqVVqqStrong(  1,:)  = (/ Dn_, ADn_, Glu_, Glu_ /)
+   Hash_MCFM_qqVVqqStrong(  2,:)  = (/ Up_, AUp_, Glu_, Glu_ /)
+   Hash_MCFM_qqVVqqStrong(  3,:)  = (/ Str_, AStr_, Glu_, Glu_ /)
+   Hash_MCFM_qqVVqqStrong(  4,:)  = (/ Chm_, AChm_, Glu_, Glu_ /)
+   Hash_MCFM_qqVVqqStrong(  5,:)  = (/ Bot_, ABot_, Glu_, Glu_ /)
+
+   Hash_MCFM_qqVVqqStrong(  6,:)  = (/ ADn_, Dn_, Glu_, Glu_ /)
+   Hash_MCFM_qqVVqqStrong(  7,:)  = (/ AUp_, Up_, Glu_, Glu_ /)
+   Hash_MCFM_qqVVqqStrong(  8,:)  = (/ AStr_, Str_, Glu_, Glu_ /)
+   Hash_MCFM_qqVVqqStrong(  9,:)  = (/ AChm_, Chm_, Glu_, Glu_ /)
+   Hash_MCFM_qqVVqqStrong( 10,:)  = (/ ABot_, Bot_, Glu_, Glu_ /)
+
+   Hash_MCFM_qqVVqqStrong( 11,:)  = (/ Glu_, Glu_, ADn_, Dn_ /)
+   Hash_MCFM_qqVVqqStrong( 12,:)  = (/ Glu_, Glu_, AUp_, Up_ /)
+   Hash_MCFM_qqVVqqStrong( 13,:)  = (/ Glu_, Glu_, AStr_, Str_ /)
+   Hash_MCFM_qqVVqqStrong( 14,:)  = (/ Glu_, Glu_, AChm_, Chm_ /)
+   Hash_MCFM_qqVVqqStrong( 15,:)  = (/ Glu_, Glu_, ABot_, Bot_ /)
+
+   Hash_MCFM_qqVVqqStrong( 16,:)  = (/ Glu_, ADn_, ADn_, Glu_ /)
+   Hash_MCFM_qqVVqqStrong( 17,:)  = (/ Glu_, AUp_, AUp_, Glu_ /)
+   Hash_MCFM_qqVVqqStrong( 18,:)  = (/ Glu_, AStr_, AStr_, Glu_ /)
+   Hash_MCFM_qqVVqqStrong( 19,:)  = (/ Glu_, AChm_, AChm_, Glu_ /)
+   Hash_MCFM_qqVVqqStrong( 20,:)  = (/ Glu_, ABot_, ABot_, Glu_ /)
+
+   Hash_MCFM_qqVVqqStrong( 21,:)  = (/ ADn_, Glu_, ADn_, Glu_ /)
+   Hash_MCFM_qqVVqqStrong( 22,:)  = (/ AUp_, Glu_, AUp_, Glu_ /)
+   Hash_MCFM_qqVVqqStrong( 23,:)  = (/ AStr_, Glu_, AStr_, Glu_ /)
+   Hash_MCFM_qqVVqqStrong( 24,:)  = (/ AChm_, Glu_, AChm_, Glu_ /)
+   Hash_MCFM_qqVVqqStrong( 25,:)  = (/ ABot_, Glu_, ABot_, Glu_ /)
+
+   Hash_MCFM_qqVVqqStrong( 26,:)  = (/ Glu_, Dn_, Glu_, Dn_ /)
+   Hash_MCFM_qqVVqqStrong( 27,:)  = (/ Glu_, Up_, Glu_, Up_ /)
+   Hash_MCFM_qqVVqqStrong( 28,:)  = (/ Glu_, Str_, Glu_, Str_ /)
+   Hash_MCFM_qqVVqqStrong( 29,:)  = (/ Glu_, Chm_, Glu_, Chm_ /)
+   Hash_MCFM_qqVVqqStrong( 30,:)  = (/ Glu_, Bot_, Glu_, Bot_ /)
+
+   Hash_MCFM_qqVVqqStrong( 31,:)  = (/ Dn_, Glu_, Glu_, Dn_ /)
+   Hash_MCFM_qqVVqqStrong( 32,:)  = (/ Up_, Glu_, Glu_, Up_ /)
+   Hash_MCFM_qqVVqqStrong( 33,:)  = (/ Str_, Glu_, Glu_, Str_ /)
+   Hash_MCFM_qqVVqqStrong( 34,:)  = (/ Chm_, Glu_, Glu_, Chm_ /)
+   Hash_MCFM_qqVVqqStrong( 35,:)  = (/ Bot_, Glu_, Glu_, Bot_ /)
+
 end subroutine
 
 subroutine Init_Hash_MCFM_qqVVqq_Generation()
@@ -764,6 +820,7 @@ subroutine SetupHashes()
 implicit none
    if (.not. hashcoll_hashes_initialized) then
       call Init_Hash_MCFM_qqVVqq()
+      call Init_Hash_MCFM_qqVVqqStrong()
       call Init_Hash_MCFM_qqVVqq_Generation()
       call Init_Hash_OnshellVBF()
       call Init_Hash_OnshellVBF_nosplit()
@@ -785,6 +842,16 @@ integer, pointer, intent(out) :: ijSel(:,:)
       call SetupHashes()
    endif
    ijSel=Hash_MCFM_qqVVqq
+return
+end subroutine
+
+subroutine get_MCFM_qqVVqqStrong_Hash(ijSel)
+implicit none
+integer, pointer, intent(out) :: ijSel(:,:)
+   if (.not. hashcoll_hashes_initialized) then
+      call SetupHashes()
+   endif
+   ijSel=Hash_MCFM_qqVVqqStrong
 return
 end subroutine
 
@@ -881,6 +948,16 @@ integer, pointer, intent(out) :: ijSel(:,:)
       call SetupHashes()
    endif
    ijSel => Hash_MCFM_qqVVqq
+return
+end subroutine
+
+subroutine getRef_MCFM_qqVVqqStrong_Hash(ijSel)
+implicit none
+integer, pointer, intent(out) :: ijSel(:,:)
+   if (.not. hashcoll_hashes_initialized) then
+      call SetupHashes()
+   endif
+   ijSel => Hash_MCFM_qqVVqqStrong
 return
 end subroutine
 

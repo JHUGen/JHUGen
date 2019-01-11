@@ -5,7 +5,7 @@ using namespace std;
 using namespace MELAStreamHelpers;
 
 
-SpinPdfFactory::SpinPdfFactory(RooSpin::modelMeasurables measurables_, RooSpin::VdecayType V1decay_, RooSpin::VdecayType V2decay_, Bool_t OnshellH_) :
+SpinPdfFactory::SpinPdfFactory(RooSpin::modelMeasurables const& measurables_, RooSpin::VdecayType V1decay_, RooSpin::VdecayType V2decay_, Bool_t OnshellH_) :
 V1decay(V1decay_),
 V2decay(V2decay_),
 OnshellH(OnshellH_)
@@ -19,7 +19,7 @@ SpinPdfFactory::~SpinPdfFactory(){
   destroyVdecayParams();
   destroyMassPole();
 }
-void SpinPdfFactory::initMeasurables(RooSpin::modelMeasurables measurables_){
+void SpinPdfFactory::initMeasurables(RooSpin::modelMeasurables const& measurables_){
   measurables.h1 = (RooAbsReal*)measurables_.h1;
   measurables.h2 = (RooAbsReal*)measurables_.h2;
   measurables.Phi = (RooAbsReal*)measurables_.Phi;

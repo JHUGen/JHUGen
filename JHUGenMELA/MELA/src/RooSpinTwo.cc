@@ -7,9 +7,9 @@ using namespace MELAStreamHelpers;
 RooSpinTwo::RooSpinTwo() : RooSpin(){}
 RooSpinTwo::RooSpinTwo(
   const char* name, const char* title,
-  modelMeasurables _measurables,
-  modelParameters _parameters,
-  modelCouplings _couplings,
+  modelMeasurables const& _measurables,
+  modelParameters const& _parameters,
+  modelCouplings const& _couplings,
   RooSpin::VdecayType _Vdecay1, RooSpin::VdecayType _Vdecay2,
   TVar::VerbosityLevel verbosity_
 ) : RooSpin(
@@ -499,3 +499,20 @@ void RooSpinTwo::calculateAmplitudes(
   return;
 }
 
+void RooSpinTwo::printParameters() const{
+  MELAout << "b1: (" << b1Val << ", " << b1ValIm << ")" << endl;
+  MELAout << "b2: (" << b2Val << ", " << b2ValIm << ")" << endl;
+  MELAout << "b3: (" << b3Val << ", " << b3ValIm << ")" << endl;
+  MELAout << "b4: (" << b4Val << ", " << b4ValIm << ")" << endl;
+  MELAout << "b5: (" << b5Val << ", " << b5ValIm << ")" << endl;
+  MELAout << "b6: (" << b6Val << ", " << b6ValIm << ")" << endl;
+  MELAout << "b7: (" << b7Val << ", " << b7ValIm << ")" << endl;
+  MELAout << "b8: (" << b8Val << ", " << b8ValIm << ")" << endl;
+  MELAout << "b9: (" << b9Val << ", " << b9ValIm << ")" << endl;
+  MELAout << "b10: (" << b10Val << ", " << b10ValIm << ")" << endl;
+  MELAout << "Lambda: " << Lambda << endl;
+  MELAout << "f_spinz1: " << f_spinz1 << endl;
+  MELAout << "f_spinz2: " << f_spinz2 << endl;
+
+  RooSpin::printParameters();
+}
