@@ -5755,7 +5755,7 @@ character :: arg*(500)
     if( ReweightDecay ) then
         write(TheUnit,"(4X,A,I1)") "Reweighting events using the decay matrix element, using input WidthScheme ", WidthSchemeIn
     endif
-    if( Process.le.2 .or. ReadLHEFile ) write(TheUnit,"(4X,A,L)") "Interference: ",includeInterference
+    if( Process.le.2 .or. (Process.ge.66 .and. Process.le.68) .or. ReadLHEFile ) write(TheUnit,"(4X,A,L)") "Interference: ",includeInterference
     if( &
         ( (Process.le.2 .or. ReadLHEFile) .and. (IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2)) ) .or. &
         Process.eq.60 .or. (Process.ge.66 .and. Process.le.68)                                            &
