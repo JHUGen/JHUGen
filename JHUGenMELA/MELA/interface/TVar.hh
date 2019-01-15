@@ -210,7 +210,7 @@ namespace TVar{
     Dynamic_qJJ_qH,
     Dynamic_qJ_qJ_qH,
     Dynamic_HT,
-    Dynamic_pTJ,
+    Dynamic_Leading_pTJ,
 
     nEventScaleSchemes
   };
