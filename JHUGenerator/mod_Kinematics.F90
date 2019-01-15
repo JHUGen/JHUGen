@@ -4704,7 +4704,7 @@ integer :: scheme
 
         !print *, dsqrt(dabs(sHat))/GeV, gabarH/GeV, BigGamma/GeV
     elseif( scheme.eq.0 ) then  !remove the propagator completely
-        GetBWPropagator = 1
+        GetBWPropagator = 1d0
     else
         print *, "Invalid scheme: ", scheme
         stop 1
@@ -6868,7 +6868,6 @@ integer idx,ip
    ! Never ever allow the scales to go negative
    Mu_Fact = abs(Mu_Fact) * MuFacMultiplier
    Mu_Ren = abs(Mu_Ren) * MuRenMultiplier
-
 
 return
 end subroutine SetRunningScales

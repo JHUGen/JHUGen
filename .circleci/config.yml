@@ -846,6 +846,48 @@ jobs:
           command: sdiff -s JHUGenerator/mod_Zprime.F90 JHUGenMELA/MELA/fortran/mod_Zprime.F90
           when: always
       - run:
+          name: "diff the common parts of mod_Kinematics"
+          command: |
+            JHUGensubroutines="$(
+                grep -E -i '^\s*(subroutine|function)' JHUGenerator/mod_Kinematics.F90 \
+              | tr '[:upper:]' '[:lower:]' \
+              | sed -r -e 's/^\s*(subroutine|function)\s*//' -e 's/[(].*//'
+            )"
+            MELAsubroutines="$(
+                grep -E -i '^\s*(subroutine|function)' JHUGenMELA/MELA/fortran/mod_Kinematics.F90 \
+              | tr '[:upper:]' '[:lower:]' \
+              | sed -r -e 's/^\s*(subroutine|function)\s*//' -e 's/[(].*//'
+            )"
+
+            commonsubroutines=$(
+              for subroutine in $JHUGensubroutines; do
+                echo "$MELAsubroutines" | grep "^$subroutine$"
+              done
+            )
+            echo "Common subroutines and functions:"
+            echo "$commonsubroutines"
+            echo
+            echo "================================="
+            echo
+
+            exitcode=0
+            for subroutine in $commonsubroutines; do
+              JHUGenstartline=$(grep -E -n -i "^\s*(subroutine|function) $subroutine\s*[(]" JHUGenerator/mod_Kinematics.F90 | sed -r "s/:.*//")
+              JHUGenendline=$(expr $(tail -n +$JHUGenstartline JHUGenerator/mod_Kinematics.F90 | grep -E -n -i "^\s*end\s*(subroutine|function)" | head -1  | sed -r "s/:.*//") + $JHUGenstartline - 1)
+              MELAstartline=$(grep -E -n -i "^\s*(subroutine|function) $subroutine\s*[(]" JHUGenMELA/MELA/fortran/mod_Kinematics.F90 | sed -r "s/:.*//")
+              MELAendline=$(expr $(tail -n +$MELAstartline JHUGenMELA/MELA/fortran/mod_Kinematics.F90 | grep -E -n -i "^\s*end\s*(subroutine|function)" | head -1  | sed -r "s/:.*//") + $MELAstartline - 1)
+              echo $JHUGenstartline $JHUGenendline $MELAstartline $MELAendline
+
+              echo "Comparing $subroutine:"
+              echo
+              sdiff -s <(sed -r -n $JHUGenstartline,${JHUGenendline}p JHUGenerator/mod_Kinematics.F90) <(sed -r -n $MELAstartline,${MELAendline}p JHUGenMELA/MELA/fortran/mod_Kinematics.F90) && echo "no change" || exitcode=$?
+              echo
+              echo "================================="
+              echo
+            done
+            exit $exitcode
+          when: always
+      - run:
           name: "check sync between manual and README"
           when: always
           command: |
