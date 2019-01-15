@@ -69,6 +69,7 @@ END PROGRAM
 ! !       Scheme=+-kRenFacScheme_mj_mj_mhstar: Scale ~ m_J + m_J + m_Hstar (or m_J+m_J+m_VV in bkg.); + for running, - for fixed
 ! !       Scheme=+-kRenFacScheme_mjj: Scale ~ m_JJ; + for running, - for fixed
 ! !       Scheme=+-kRenFacScheme_mj_mj: Scale ~ m_J + m_J; + for running, - for fixed
+! !       Scheme=+ kRenScheme_pTj: Scale ~ pT of the hardest associated jet
 ! !       Below, J stands for either the top in JJ associated production (e.g. tqH), or the single jet (Hj)
 ! !       Scheme=+-kRenFacScheme_mjhstar: Scale ~ m_JHstar (or m_JVV in bkg.); + for running, - for fixed
 ! !       Scheme=+-kRenFacScheme_mj_mhstar: Scale ~ m_J + m_Hstar (or m_J+m_VV in bkg.); + for running, - for fixed
@@ -233,6 +234,17 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
             (abs(RenScheme).eq.kRenFacScheme_mj_mj_mhstar) .or. (abs(RenScheme).eq.kRenFacScheme_mj_mj)      &
          )                     &
       ) call Error("HJJ, JJQCD, VBF and VH processes outgoing partons are mostly massless, and alpha_S at a scale ~0 GeV is very unstable. Choose a different renormalization or factorization scheme (e.g. kRenFacScheme_mhstar).")
+
+      if( &
+         (                     &
+            Process.eq.50 .or. &
+            Process.eq.51      &
+         ) .and. (             &
+            (abs(FacScheme).eq.kRenFacScheme_pTj) .or. (abs(RenScheme).eq.kRenFacScheme_pTj)                 &
+         ) .and. (             &
+            DecayMode1.ne.1 .and. DecayMode2.ne.5 &
+         )                     &
+      ) call Error("For VH with V decay to something other than qq, can't base the scale on the pT of the leading jet.  Choose a different renormalization or factorization scheme.")
 
       ! H+1j Me
       if( &
@@ -1163,7 +1175,7 @@ type(SaveValues) :: tosave, oldsavevalues
 
     !Renormalization/factorization schemes
 
-    if((abs(FacScheme) .ge. nRenFacSchemes) .or. (abs(RenScheme) .ge. nRenFacSchemes) .or. (MuFacMultiplier.le.0d0) .or. (MuRenMultiplier.le.0d0)) call Error("The renormalization or factorization scheme is invalid, or the scale multiplier to either is not positive.")
+    if((abs(FacScheme) .ge. nRenFacSchemes) .or. (abs(RenScheme) .ge. nRenFacSchemes) .or. (FacScheme .eq. -kRenFacScheme_pTj) .or. (RenScheme .eq. -kRenFacScheme_pTj) .or. (MuFacMultiplier.le.0d0) .or. (MuRenMultiplier.le.0d0)) call Error("The renormalization or factorization scheme is invalid, or the scale multiplier to either is not positive.")
     if( SetFacScheme.neqv.SetMuFacMultiplier ) call Error("If you want to set the factorization scale, please set both the scheme (FacScheme) and the multiplier (MuFacMultiplier)")
     if( SetRenScheme.neqv.SetMuRenMultiplier ) call Error("If you want to set the renormalization scale, please set both the scheme (RenScheme) and the multiplier (MuRenMultiplier)")
 
