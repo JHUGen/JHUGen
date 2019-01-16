@@ -1161,7 +1161,7 @@ integer idx,ip
       endif
    enddo
    maxpTjet = maxval(pTjet)
-   minpTjet = minval(pTjet)
+   minpTjet = minval(pTjet, mask=.not.all(p(1:4,5:6).eq.0d0, 1))
    polemass(7) = getMass(id(7)) ! Pole mass of the JJ system
 
    pJJHstar = pJJ + pHstar
