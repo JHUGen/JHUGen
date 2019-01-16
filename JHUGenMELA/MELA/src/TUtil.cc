@@ -1291,6 +1291,10 @@ double TUtil::InterpretScaleScheme(const TVar::Production& production, const TVa
   else if (scheme == TVar::Dynamic_HT){
     for (int c=2; c<mxpart; c++) Q += p[c].Pt(); // Scalar sum of all pTs
   }
+  else if (scheme == TVar::Dynamic_Leading_pTJ){
+    // pT of the hardest jet, should be just p[6].Pt() if jets are already ordered in pT
+    for (int c=6; c<mxpart; c++) Q = std::max(Q, p[c].Pt());
+  }
   else if (scheme == TVar::DefaultScaleScheme){
     // Defaults are dynamic scales except in ttH and bbH.
     if (matrixElement==TVar::JHUGen){
