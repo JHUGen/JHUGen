@@ -5,6 +5,7 @@
 #include <utility>
 #include <algorithm>
 #include <cassert>
+#include <limits>
 #include "MELAStreamHelpers.hh"
 #include "TJHUGenUtils.hh"
 #include "TUtilHelpers.hh"
@@ -1294,6 +1295,12 @@ double TUtil::InterpretScaleScheme(const TVar::Production& production, const TVa
   else if (scheme == TVar::Dynamic_Leading_pTJ){
     // pT of the hardest jet, should be just p[6].Pt() if jets are already ordered in pT
     for (int c=6; c<mxpart; c++) Q = std::max(Q, p[c].Pt());
+  }
+  else if (scheme == TVar::Dynamic_Softest_pTJ){
+    // pT of the softest jet, should be just p[6].Pt() if jets are already ordered in pT
+    Q = std::numeric_limits<decltype(Q)>::infinity();
+    for (int c=6; c<mxpart; c++) Q = std::min(Q, p[c].Pt());
+    if (std::isinf(Q)) Q = 0;
   }
   else if (scheme == TVar::DefaultScaleScheme){
     // Defaults are dynamic scales except in ttH and bbH.

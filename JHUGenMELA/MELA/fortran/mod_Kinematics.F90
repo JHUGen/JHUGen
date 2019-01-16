@@ -1139,7 +1139,7 @@ implicit none
 real(dp), intent(in) :: p(1:4,4:6) ! No need to run the second index from 3 to 7: pH, pJ1, pJ2
 integer, intent(in) :: id(4:7) ! id_JJH/id_JJVV, id_J1, id_J2, id_JJ (if applicable)
 real(8) :: polemass(3:7) ! mJJH, mH, mJ1, mJ2, mJJ (if applicable)
-real(8) :: pJJHstar(4),pHstar(4),pJ(4,2),pJJ(4),pJHstar(4),pTjet(5:6),maxpTjet
+real(8) :: pJJHstar(4),pHstar(4),pJ(4,2),pJJ(4),pJHstar(4),pTjet(5:6),maxpTjet,minpTjet
 integer idx,ip
 
    pHstar(:) = 0d0
@@ -1161,6 +1161,7 @@ integer idx,ip
       endif
    enddo
    maxpTjet = maxval(pTjet)
+   minpTjet = minval(pTjet)
    polemass(7) = getMass(id(7)) ! Pole mass of the JJ system
 
    pJJHstar = pJJ + pHstar
@@ -1214,8 +1215,10 @@ integer idx,ip
       Mu_Fact = Get_MInv(pJ(1:4,1))
    elseif(FacScheme .eq. -kRenFacScheme_mj) then
       Mu_Fact = polemass(5)
-   elseif(FacScheme .eq. kRenFacScheme_pTj) then
+   elseif(FacScheme .eq. kRenFacScheme_maxpTj) then
       Mu_Fact = maxpTjet
+   elseif(FacScheme .eq. kRenFacScheme_minpTj) then
+      Mu_Fact = minpTjet
    else
       call Error("This should never be able to happen.")
    endif
@@ -1260,8 +1263,10 @@ integer idx,ip
       Mu_Ren = Get_MInv(pJ(1:4,1))
    elseif(RenScheme .eq. -kRenFacScheme_mj) then
       Mu_Ren = polemass(5)
-   elseif(RenScheme .eq. kRenFacScheme_pTj) then
+   elseif(RenScheme .eq. kRenFacScheme_maxpTj) then
       Mu_Ren = maxpTjet
+   elseif(RenScheme .eq. kRenFacScheme_minpTj) then
+      Mu_Ren = minpTjet
    else
       call Error("This should never be able to happen.")
    endif
