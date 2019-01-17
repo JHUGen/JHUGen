@@ -1262,7 +1262,7 @@ void TUtil::GetMassWidth(const MELAParticle* part, double& m, double& ga){
   return GetMassWidth(part->id, m, ga);
 }
 
-double TUtil::InterpretScaleScheme(const TVar::Production& production, const TVar::MatrixElement& matrixElement, const TVar::EventScaleScheme& scheme, TLorentzVector p[mxpart]){
+double TUtil::InterpretScaleScheme(const TVar::Production& production, const TVar::MatrixElement& matrixElement, const TVar::EventScaleScheme& scheme, TLorentzVector p[mxpart], const TVar::VerbosityLevel& verbosity){
   double Q=0;
   TLorentzVector nullFourVector(0, 0, 0, 0);
   if (scheme == TVar::Fixed_mH) Q = masses_mcfm_.hmass;
@@ -1382,6 +1382,9 @@ double TUtil::InterpretScaleScheme(const TVar::Production& production, const TVa
     TLorentzVector pTotal = p[2]+p[3]+p[4]+p[5];
     Q = fabs(pTotal.M());
   }
+
+  if (verbosity >= TVar::DEBUG) MELAout << "Scale scheme " << scheme << ", scale is " << Q << endl;
+
   return Q;
 }
 void TUtil::SetAlphaS(double& Q_ren, double& Q_fac, double multiplier_ren, double multiplier_fac, int mynloop, int mynflav, string mypartons){
@@ -3754,8 +3757,8 @@ double TUtil::SumMatrixElementPDF(
     int defaultNloop = nlooprun_.nlooprun;
     int defaultNflav = nflav_.nflav;
     string defaultPdflabel = pdlabel_.pdlabel;
-    double renQ = InterpretScaleScheme(production, matrixElement, event_scales->renomalizationScheme, MomStore);
-    double facQ = InterpretScaleScheme(production, matrixElement, event_scales->factorizationScheme, MomStore);
+    double renQ = InterpretScaleScheme(production, matrixElement, event_scales->renomalizationScheme, MomStore, verbosity);
+    double facQ = InterpretScaleScheme(production, matrixElement, event_scales->factorizationScheme, MomStore, verbosity);
     SetAlphaS(renQ, facQ, event_scales->ren_scale_factor, event_scales->fac_scale_factor, 1, 5, "cteq6_l");
     double alphasVal, alphasmzVal;
     GetAlphaS(&alphasVal, &alphasmzVal);
@@ -4373,8 +4376,8 @@ double TUtil::JHUGenMatEl(
   int defaultNloop = nlooprun_.nlooprun;
   int defaultNflav = nflav_.nflav;
   string defaultPdflabel = pdlabel_.pdlabel;
-  double renQ = InterpretScaleScheme(production, matrixElement, event_scales->renomalizationScheme, MomStore);
-  double facQ = InterpretScaleScheme(production, matrixElement, event_scales->factorizationScheme, MomStore);
+  double renQ = InterpretScaleScheme(production, matrixElement, event_scales->renomalizationScheme, MomStore, verbosity);
+  double facQ = InterpretScaleScheme(production, matrixElement, event_scales->factorizationScheme, MomStore, verbosity);
   SetAlphaS(renQ, facQ, event_scales->ren_scale_factor, event_scales->fac_scale_factor, 1, 5, "cteq6_l"); // Set AlphaS(|Q|/2, mynloop, mynflav, mypartonPDF)
   double alphasVal, alphasmzVal;
   GetAlphaS(&alphasVal, &alphasmzVal);
@@ -4710,8 +4713,8 @@ double TUtil::HJJMatEl(
   int defaultNloop = nlooprun_.nlooprun;
   int defaultNflav = nflav_.nflav;
   string defaultPdflabel = pdlabel_.pdlabel;
-  double renQ = InterpretScaleScheme(production, matrixElement, event_scales->renomalizationScheme, MomStore);
-  double facQ = InterpretScaleScheme(production, matrixElement, event_scales->factorizationScheme, MomStore);
+  double renQ = InterpretScaleScheme(production, matrixElement, event_scales->renomalizationScheme, MomStore, verbosity);
+  double facQ = InterpretScaleScheme(production, matrixElement, event_scales->factorizationScheme, MomStore, verbosity);
   SetAlphaS(renQ, facQ, event_scales->ren_scale_factor, event_scales->fac_scale_factor, 1, 5, "cteq6_l");
   double alphasVal, alphasmzVal;
   GetAlphaS(&alphasVal, &alphasmzVal);
@@ -6274,8 +6277,8 @@ double TUtil::VHiggsMatEl(
   int defaultNloop = nlooprun_.nlooprun;
   int defaultNflav = nflav_.nflav;
   string defaultPdflabel = pdlabel_.pdlabel;
-  double renQ = InterpretScaleScheme(production, matrixElement, event_scales->renomalizationScheme, MomStore);
-  double facQ = InterpretScaleScheme(production, matrixElement, event_scales->factorizationScheme, MomStore);
+  double renQ = InterpretScaleScheme(production, matrixElement, event_scales->renomalizationScheme, MomStore, verbosity);
+  double facQ = InterpretScaleScheme(production, matrixElement, event_scales->factorizationScheme, MomStore, verbosity);
   SetAlphaS(renQ, facQ, event_scales->ren_scale_factor, event_scales->fac_scale_factor, 1, 5, "cteq6_l");
   double alphasVal, alphasmzVal;
   GetAlphaS(&alphasVal, &alphasmzVal);
@@ -6884,8 +6887,8 @@ double TUtil::TTHiggsMatEl(
   int defaultNloop = nlooprun_.nlooprun;
   int defaultNflav = nflav_.nflav;
   string defaultPdflabel = pdlabel_.pdlabel;
-  double renQ = InterpretScaleScheme(production, matrixElement, event_scales->renomalizationScheme, MomStore);
-  double facQ = InterpretScaleScheme(production, matrixElement, event_scales->factorizationScheme, MomStore);
+  double renQ = InterpretScaleScheme(production, matrixElement, event_scales->renomalizationScheme, MomStore, verbosity);
+  double facQ = InterpretScaleScheme(production, matrixElement, event_scales->factorizationScheme, MomStore, verbosity);
   SetAlphaS(renQ, facQ, event_scales->ren_scale_factor, event_scales->fac_scale_factor, 1, 5, "cteq6_l");
   double alphasVal, alphasmzVal;
   GetAlphaS(&alphasVal, &alphasmzVal);
@@ -7161,8 +7164,8 @@ double TUtil::BBHiggsMatEl(
   int defaultNloop = nlooprun_.nlooprun;
   int defaultNflav = nflav_.nflav;
   string defaultPdflabel = pdlabel_.pdlabel;
-  double renQ = InterpretScaleScheme(production, matrixElement, event_scales->renomalizationScheme, MomStore);
-  double facQ = InterpretScaleScheme(production, matrixElement, event_scales->factorizationScheme, MomStore);
+  double renQ = InterpretScaleScheme(production, matrixElement, event_scales->renomalizationScheme, MomStore, verbosity);
+  double facQ = InterpretScaleScheme(production, matrixElement, event_scales->factorizationScheme, MomStore, verbosity);
   SetAlphaS(renQ, facQ, event_scales->ren_scale_factor, event_scales->fac_scale_factor, 1, 5, "cteq6_l");
   double alphasVal, alphasmzVal;
   GetAlphaS(&alphasVal, &alphasmzVal);

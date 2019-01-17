@@ -76,6 +76,8 @@ p[2] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -217,6 +219,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -365,6 +369,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -513,6 +519,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -661,6 +669,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -809,6 +819,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -957,6 +969,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -1105,6 +1119,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -1253,6 +1269,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -1401,6 +1419,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -1549,6 +1569,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -1697,6 +1719,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -1845,6 +1869,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -1993,6 +2019,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -2141,6 +2169,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -2289,6 +2319,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -2437,6 +2469,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -2585,6 +2619,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -2733,6 +2769,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -2881,6 +2919,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -2985,6 +3025,8 @@ MYIDUP_tmp[0]=12
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=11
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -3069,6 +3111,8 @@ MYIDUP_tmp[0]=12
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=11
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -3153,6 +3197,8 @@ MYIDUP_tmp[0]=12
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=11
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -3237,6 +3283,8 @@ MYIDUP_tmp[0]=12
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=11
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -3321,6 +3369,8 @@ MYIDUP_tmp[0]=12
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=11
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -3405,6 +3455,8 @@ MYIDUP_tmp[0]=12
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=11
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -3489,6 +3541,8 @@ MYIDUP_tmp[0]=12
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=11
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -3573,6 +3627,8 @@ MYIDUP_tmp[0]=12
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=11
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -3657,6 +3713,8 @@ MYIDUP_tmp[0]=12
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=11
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -3741,6 +3799,8 @@ MYIDUP_tmp[0]=12
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=11
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -3883,6 +3943,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -4031,6 +4093,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -4179,6 +4243,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -4327,6 +4393,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -4475,6 +4543,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -4623,6 +4693,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -4771,6 +4843,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -4919,6 +4993,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -5067,6 +5143,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -5215,6 +5293,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -5363,6 +5443,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -5511,6 +5593,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -5659,6 +5743,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -5807,6 +5893,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -5955,6 +6043,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -6103,6 +6193,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -6251,6 +6343,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -6399,6 +6493,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -6547,6 +6643,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -6695,6 +6793,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -6843,6 +6943,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -6991,6 +7093,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -7139,6 +7243,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -7287,6 +7393,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -7435,6 +7543,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -7583,6 +7693,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -7731,6 +7843,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -7879,6 +7993,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -8027,6 +8143,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -8175,6 +8293,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -8323,6 +8443,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[4] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -8427,6 +8549,8 @@ MYIDUP_tmp[0]=11
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=12
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -8511,6 +8635,8 @@ MYIDUP_tmp[0]=11
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=12
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -8595,6 +8721,8 @@ MYIDUP_tmp[0]=11
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=12
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -8679,6 +8807,8 @@ MYIDUP_tmp[0]=11
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=12
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -8763,6 +8893,8 @@ MYIDUP_tmp[0]=11
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=12
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -8847,6 +8979,8 @@ MYIDUP_tmp[0]=11
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=12
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -8931,6 +9065,8 @@ MYIDUP_tmp[0]=11
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=12
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -9015,6 +9151,8 @@ MYIDUP_tmp[0]=11
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=12
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -9099,6 +9237,8 @@ MYIDUP_tmp[0]=11
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=12
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -9183,6 +9323,8 @@ MYIDUP_tmp[0]=11
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=12
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -9267,6 +9409,8 @@ MYIDUP_tmp[0]=11
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=12
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -9351,6 +9495,8 @@ MYIDUP_tmp[0]=11
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=12
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -9435,6 +9581,8 @@ MYIDUP_tmp[0]=11
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=12
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -9519,6 +9667,8 @@ MYIDUP_tmp[0]=11
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=12
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -9603,6 +9753,8 @@ MYIDUP_tmp[0]=11
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=12
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -9687,6 +9839,8 @@ MYIDUP_tmp[0]=11
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=12
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -9771,6 +9925,8 @@ MYIDUP_tmp[0]=11
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=12
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -9855,6 +10011,8 @@ MYIDUP_tmp[0]=11
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=12
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -9939,6 +10097,8 @@ MYIDUP_tmp[0]=11
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=12
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -10023,6 +10183,8 @@ MYIDUP_tmp[0]=11
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=12
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -10107,6 +10269,8 @@ MYIDUP_tmp[0]=11
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=12
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -10191,6 +10355,8 @@ MYIDUP_tmp[0]=11
 MYIDUP_tmp[1]=-11
 MYIDUP_tmp[2]=12
 MYIDUP_tmp[3]=-12
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::JHUGenMatEl: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -10347,6 +10513,8 @@ p[2] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[3] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[4] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -10493,6 +10661,8 @@ p[2] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[3] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[4] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -10639,6 +10809,8 @@ p[2] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[3] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[4] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -10800,6 +10972,8 @@ p[2] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[3] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[4] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -10954,6 +11128,8 @@ p[2] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[3] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[4] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -11109,6 +11285,8 @@ p[2] (Px, Py, Pz, E):	25.8378	-28.8219	-1895.36	1895.76
 p[3] (Px, Py, Pz, E):	-35.9763	4.51697	-470.324	471.719
 p[4] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[5] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
@@ -11258,6 +11436,8 @@ p[2] (Px, Py, Pz, E):	10.2898	25.2057	-1365.23	1365.5
 p[3] (Px, Py, Pz, E):	-0.151363	-0.900776	-22.7679	22.7862
 p[4] (Px, Py, Pz, E):	-10.1385	-24.3049	-2365.68	2367.48
 p[5] (Px, Py, Pz, E):	0	0	0	0
+Scale scheme 0, scale is 124.995
+Scale scheme 0, scale is 124.995
 TUtil::SumMatrixElementPDF: Set AlphaS:
 	Before set, alphas scale: 91.2, PDF scale: 91.2
 	renQ: 62.4973 ( x 0.5), facQ: 62.4973 ( x 0.5)
