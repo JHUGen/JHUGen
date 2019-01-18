@@ -197,7 +197,7 @@ namespace TVar{
     SMSyst_ResDown   = 4
   };
   enum EventScaleScheme{
-    DefaultScaleScheme,
+    DefaultScaleScheme = 0,
     Fixed_mH,
     Fixed_mW,
     Fixed_mZ,
