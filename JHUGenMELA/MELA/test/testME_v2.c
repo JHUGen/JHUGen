@@ -6248,6 +6248,72 @@ void testME_Dec_JHUGenMCFM_Ping(int flavor=2, shared_ptr<Mela> melaptr=nullptr){
   mela.setVerbosity(bkpverbosity);
 }
 
+void testME_JHUGen_RenFacScales_Ping(shared_ptr<Mela> melaptr=nullptr){
+  ofstream tout(TString("testME_JHUGen_RenFacScales_Ping.out"));
+  streambuf* coutbuf = cout.rdbuf();
+  cout.rdbuf(tout.rdbuf());
+
+  int erg_tev=13;
+  float mPOLE=125.;
+  float wPOLE=4.07e-3;
+
+  TVar::VerbosityLevel verbosity = TVar::DEBUG;
+  if (!melaptr) melaptr.reset(new Mela(erg_tev, mPOLE, verbosity));
+  Mela& mela = *melaptr;
+  TVar::VerbosityLevel bkpverbosity = mela.getVerbosity();
+  mela.setVerbosity(verbosity);
+  if (verbosity>=TVar::DEBUG) cout << "Mela is initialized" << endl;
+
+  //momenta are copied from testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping
+  SimpleParticleCollection_t mothers = {
+    {1, {0, 0, 865.37881546721542, 865.37881546721542}},
+    {2, {0, 0, -624.03396598421773, 624.03396598421773}}
+  };
+  SimpleParticleCollection_t daughters = {
+    {11, {7.6145299215002638, -17.259247740062808, 9.4660586470659975, 21.106135714241464}},
+    {-11, {90.901719112641416, -69.683681833050798, 32.066319224729980, 118.94194752090492}},
+    {13, {78.476352131782917, -35.264818847819797, -8.8615639484695272, 86.490881645951262}},
+    {-13, {191.68369742375290, -197.85205601463366, 100.99437243828194, 293.40746273989180}}
+  };
+  SimpleParticleCollection_t associated = {
+    {1, {-131.59521398083137, 330.56000090294270, 437.01695094737875, 563.53440884737279}},
+    {2, {-237.08108460884614, -10.500196467375645, -329.33728782598945, 405.93194498307093}}
+  };
+
+  mela.setInputEvent(&daughters, &associated, &mothers, true);
+
+  vector<TVar::EventScaleScheme> eventscaleschemes = {
+    TVar::DefaultScaleScheme,
+    TVar::Fixed_mH,
+    TVar::Fixed_mW,
+    TVar::Fixed_mZ,
+    TVar::Fixed_mWPlusmH,
+    TVar::Fixed_mZPlusmH,
+    TVar::Fixed_TwomtPlusmH,
+    TVar::Fixed_mtPlusmH,
+    TVar::Dynamic_qH,
+    TVar::Dynamic_qJJH,
+    TVar::Dynamic_qJJ_qH,
+    TVar::Dynamic_qJ_qJ_qH,
+    TVar::Dynamic_HT,
+    TVar::Dynamic_Leading_pTJ,
+    TVar::Dynamic_Softest_pTJ,
+  };
+  if (eventscaleschemes.size() != TVar::nEventScaleSchemes) cout << "You're missing at lease one scale scheme" << endl;
+  for (auto scheme : eventscaleschemes){
+    cout << "Using scale scheme: " << scheme << endl;
+    mela.setProcess(TVar::HSMHiggs, TVar::JHUGen, TVar::JJVBF);
+    mela.setRenFacScaleMode(scheme, scheme, 1, 1);
+    float dummy;
+    mela.computeProdP(dummy);
+  }
+  mela.resetInputEvent();
+
+  cout.rdbuf(coutbuf);
+  tout.close();
+  mela.setVerbosity(bkpverbosity);
+}
+
 void testME_ProdDec_JHUGen_SpinTwo_Ping(int flavor=2, shared_ptr<Mela> melaptr=nullptr){
   ofstream tout(TString("testME_ProdDec_JHUGen_SpinTwo_Ping_")+long(flavor)+".out");
   streambuf* coutbuf = cout.rdbuf();
