@@ -178,7 +178,7 @@ jobs:
       - run: cd JHUGenerator/pdfs && ./downloadNNPDF.sh
       - run:
           name: "test the MELA reference with the compiled MCFM"
-          command: cd JHUGenMELA/MELA/test; ./testME_all.py
+          command: cd JHUGenMELA/MELA/test; ./testME_all.py "$(expr $SEED + $CIRCLE_BUILD_NUM)"
       - run:
           name: "save .out files"
           command: |
@@ -768,7 +768,7 @@ jobs:
           <<: *jhugenversion
       - run:
           name: "testME_all"
-          command: cd test; ./testME_all.py
+          command: cd test; ./testME_all.py "$(expr $SEED + $CIRCLE_BUILD_NUM)"
       - run:
           name: "save .out files"
           command: |
