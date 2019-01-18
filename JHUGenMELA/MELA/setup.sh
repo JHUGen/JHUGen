@@ -40,6 +40,8 @@ elif [[ "$#" -eq 1 ]] && [[ "$1" == *"clean"* ]]; then
     exit
 elif [[ "$#" -eq 0 ]]; then
     : ok
+elif [[ "$#" -eq 2 ]] && [[ "$1" == *"-j"* ]]; then
+    : ok
 else
     echo "Unknown arguments:"
     echo "  $@"
@@ -57,7 +59,7 @@ if mv libjhugenmela.so "../data/"$DATA_LIB_DIR"/"; then
     echo "...and you are running setup.sh, so this was just done."
     echo
     popd
-    make
+    make "$@"
     echo
     echo "remember to:"
     echo
