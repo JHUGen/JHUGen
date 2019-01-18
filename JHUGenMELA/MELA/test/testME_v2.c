@@ -6279,6 +6279,7 @@ void testME_JHUGen_RenFacScales_Ping(shared_ptr<Mela> melaptr=nullptr){
     {1, {-131.59521398083137, 330.56000090294270, 437.01695094737875, 563.53440884737279}},
     {2, {-237.08108460884614, -10.500196467375645, -329.33728782598945, 405.93194498307093}}
   };
+  mela.setCandidateDecayMode(TVar::CandidateDecay_ZZ);
 
   mela.setInputEvent(&daughters, &associated, &mothers, true);
 
