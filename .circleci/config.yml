@@ -179,6 +179,18 @@ jobs:
       - run:
           name: "test the MELA reference with the compiled MCFM"
           command: cd JHUGenMELA/MELA/test; ./testME_all.py
+      - run:
+          name: "save .out files"
+          command: |
+            cd JHUGenMELA/MELA/test
+            if ls *.out > /dev/null; then
+              mkdir -p ~/artifacts/MELA-with-MCFM/
+              mv *.out ~/artifacts/MELA-with-MCFM/
+            fi
+          when: on_fail
+      - store_artifacts:
+          path:
+            ~/artifacts/MELA-with-MCFM/
 
   generator_reference:
     <<: *env
