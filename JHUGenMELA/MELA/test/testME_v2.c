@@ -474,6 +474,84 @@ void testME_Dec_ANALYTICAL_FullSim(int erg_tev=13, bool useConstants=false, shar
   cout.precision(bkpprecision);
 }
 
+void testME_RenFacScales_Ping(shared_ptr<Mela> melaptr=nullptr){
+  ofstream tout(TString("testME_RenFacScales_Ping.out"));
+  streambuf* coutbuf = cout.rdbuf();
+  cout.rdbuf(tout.rdbuf());
+
+  int erg_tev=13;
+  float mPOLE=125.;
+  float wPOLE=4.07e-3;
+
+  TVar::VerbosityLevel verbosity = TVar::ERROR;
+  if (!melaptr) melaptr.reset(new Mela(erg_tev, mPOLE, verbosity));
+  Mela& mela = *melaptr;
+  TVar::VerbosityLevel bkpverbosity = mela.getVerbosity();
+  mela.setVerbosity(verbosity);
+  if (verbosity>=TVar::DEBUG) cout << "Mela is initialized" << endl;
+
+  float pingMom[8][4]={
+    { 0, 0, 865.37881546721542, 865.37881546721542 },
+    { 0, 0, -624.03396598421773, 624.03396598421773 },
+    { 7.6145299215002638, -17.259247740062808, 9.4660586470659975, 21.106135714241464 },
+    { 90.901719112641416, -69.683681833050798, 32.066319224729980, 118.94194752090492 },
+    { 78.476352131782917, -35.264818847819797, -8.8615639484695272, 86.490881645951262 },
+    { 191.68369742375290, -197.85205601463366, 100.99437243828194, 293.40746273989180 },
+    { -131.59521398083137, 330.56000090294270, 437.01695094737875, 563.53440884737279 },
+    { -237.08108460884614, -10.500196467375645, -329.33728782598945, 405.93194498307093 }
+  };
+  int idOrdered[8] ={ 1, 2, 11, -11, 13, -13, 1, 2 };
+  SimpleParticleCollection_t mothers; mothers.reserve(2);
+  for (unsigned int ip=0; ip<2; ip++){
+    mothers.emplace_back(
+      idOrdered[ip],
+      TLorentzVector(pingMom[ip][0], pingMom[ip][1], pingMom[ip][2], pingMom[ip][3])
+    );
+  }
+  SimpleParticleCollection_t daughters; daughters.reserve(4);
+  for (unsigned int ip=2; ip<6; ip++){
+    daughters.emplace_back(
+      idOrdered[ip],
+      TLorentzVector(pingMom[ip][0], pingMom[ip][1], pingMom[ip][2], pingMom[ip][3])
+    );
+  }
+  SimpleParticleCollection_t associated; associated.reserve(2);
+  for (unsigned int ip=6; ip<8; ip++){
+    associated.emplace_back(
+      idOrdered[ip],
+      TLorentzVector(pingMom[ip][0], pingMom[ip][1], pingMom[ip][2], pingMom[ip][3])
+    );
+  }
+  mela.setCandidateDecayMode(TVar::CandidateDecay_ZZ);
+  mela.setInputEvent(&daughters, &associated, &mothers, true);
+
+  std::vector<TVar::EventScaleScheme> eventscaleschemes;
+  for (int is=0; is<(int) TVar::nEventScaleSchemes; is++) eventscaleschemes.push_back((TVar::EventScaleScheme) is);
+
+  float meval_init;
+  mela.setProcess(TVar::HSMHiggs, TVar::JHUGen, TVar::JJVBF);
+  mela.computeProdP(meval_init);
+  cout << "MELA default scheme setting gives ME val: " << meval_init << endl;
+  for (auto const& scheme : eventscaleschemes){
+    cout << "Using scale scheme: " << scheme << endl;
+    mela.setRenFacScaleMode(scheme, scheme, 1, 1); // Default is 0.5, 0.5, so even default scheme won't be the same.
+    float meval;
+    mela.computeProdP(meval);
+    cout << "\t- ME val: " << meval << endl;
+    if (meval==meval_init) cout << "\t- ERROR: meval==meval_init!" << endl;
+  }
+  float meval_final;
+  mela.computeProdP(meval_final);
+  cout << "Is MELA default scheme setting restored? " << (meval_final==meval_init) << endl;
+  if (meval_final!=meval_init) cout << "\t- ERROR: meval_final!=meval_init!" << endl;
+
+  mela.resetInputEvent();
+
+  cout.rdbuf(coutbuf);
+  tout.close();
+  mela.setVerbosity(bkpverbosity);
+}
+
 
 void testME_Dec_MCFM_Ping(int flavor=2, int useMothers=0, bool useConstants=false, shared_ptr<Mela> melaptr=nullptr){
   ofstream tout(TString("testME_Dec_MCFM_Ping_")+long(flavor)+"_"+long(useMothers)+"_"+long(useConstants)+".out");
@@ -2894,7 +2972,7 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
         TLorentzVector(pingMom[ip][0], pingMom[ip][1], pingMom[ip][2], pingMom[ip][3])
         )
         );
-    };
+    }
     SimpleParticleCollection_t daughters;
     for (unsigned int ip=2; ip<6; ip++){
       daughters.push_back(
@@ -2903,7 +2981,7 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
         TLorentzVector(pingMom[ip][0], pingMom[ip][1], pingMom[ip][2], pingMom[ip][3])
         )
         );
-    };
+    }
     SimpleParticleCollection_t associated;
     for (unsigned int ip=6; ip<8; ip++){
       associated.push_back(
@@ -2912,7 +2990,7 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
         TLorentzVector(pingMom[ip][0], pingMom[ip][1], pingMom[ip][2], pingMom[ip][3])
         )
         );
-    };
+    }
     mjj = (associated.at(0).second+associated.at(1).second).M();
     mzz = (daughters.at(0).second+daughters.at(1).second+daughters.at(2).second+daughters.at(3).second).M();
 
