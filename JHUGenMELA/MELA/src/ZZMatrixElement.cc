@@ -42,7 +42,7 @@ void ZZMatrixElement::build(){
   // Set default parameters explicitly
   set_PrimaryHiggsMass(125.);
   set_mHiggs(125., 0); set_wHiggs(-1., 0);
-  set_mHiggs(-1., 1); set_wHiggs(0., 1);
+  set_mHiggs(-1., 1); set_wHiggs(-1, 1);
 
   selfD_SpinZeroCouplings = Xcal2.GetSelfDSpinZeroCouplings();
   selfD_SpinOneCouplings = Xcal2.GetSelfDSpinOneCouplings();
