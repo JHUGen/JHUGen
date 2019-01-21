@@ -28,7 +28,7 @@ real(8) :: yRnd(1:18),VgsWgt, EvalWeighted_HJJ_fulldecay
 real(8) :: pdf(-6:6,1:2),me2(-5:5,-5:5)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
 real(8) :: MomExt(1:4,1:10),PSWgt
-real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5),msq_VgsWgt(-5:5,-5:5)
+real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5),msq_VgsWgt(-5:5,-5:5),msq_MCFM_interf(-5:5,-5:5),Wgt_Ratio_Interf
 integer :: id_MCFM(mxpart),MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),NHisto,ipart,jpart
 integer, pointer :: ijSel(:,:)
 integer :: iPartChannel,PartChannelAvg,NumPartonicChannels,iflip,i,j,k
@@ -151,7 +151,17 @@ EvalWeighted_HJJ_fulldecay = 0d0
 
 
 #if linkMELA==1
+
    call EvalAmp_qqVVqq(id_MCFM, p_MCFM, msq_MCFM) ! 1 for ZZ decay, 2 for WW decay, 3 for ZZ+WW mixture
+
+   Wgt_Ratio_Interf = 1d0
+   if( (unweighted) .and. (.not.warmup) .and. (MY_IDUP(7).eq.MY_IDUP(9)) .and. (.not. includeInterference) ) then
+       includeInterference=.true.
+       call EvalAmp_qqVVqq(id_MCFM, p_MCFM, msq_MCFM_interf)
+       includeInterference=.false.
+       Wgt_Ratio_Interf = msq_MCFM_interf(iPart_sel,jPart_sel)/msq_MCFM(iPart_sel,jPart_sel)
+   endif
+
 #else
    print *, "To use this process, please set linkMELA=Yes in the makefile and recompile."
    print *, "You will also need to have a compiled JHUGenMELA in the directory specified by JHUGenMELADir in the makefile."
@@ -207,7 +217,7 @@ EvalWeighted_HJJ_fulldecay = 0d0
 
           MY_IDUP(1:2)= id_MCFM(1:2)
           MY_IDUP(3:4)= id_MCFM(7:8)
-          call WriteOutEvent_HJJ_fulldecay(MomExt,MY_IDUP,ICOLUP)
+          call WriteOutEvent_HJJ_fulldecay(MomExt,MY_IDUP,ICOLUP,EventWeight=Wgt_Ratio_Interf)
 
           do NHisto=1,NumHistograms
             call intoHisto(NHisto,NBin(NHisto),1d0)
