@@ -1355,20 +1355,20 @@ void Mela::computeProdP(
 
           ctr_iter++;
 
-          xGrid = new double[nGrid];
-          yGrid = new double[nGrid];
+          vector<double> xGrid(nGrid);
+          vector<double> yGrid(nGrid);
           for (int iter=0; iter<nGrid; iter++){ // Fill the arrays
-            xGrid[iter] = (double)etaArray[iter];
-            yGrid[iter] = (double)pArray[iter];
+            xGrid[iter] = etaArray[iter];
+            yGrid[iter] = pArray[iter];
           }
 
-          TGraph* interpolator = new TGraph(nGrid, xGrid, yGrid);
+          TGraph interpolator(nGrid, xGrid.data(), yGrid.data());
           double derivative_first = (yGrid[1]-yGrid[0])/(xGrid[1]-xGrid[0]);
           double derivative_last = (yGrid[nGrid-1]-yGrid[nGrid-2])/(xGrid[nGrid-1]-xGrid[nGrid-2]);
-          TSpline3* spline = new TSpline3("spline", interpolator, "b1e1", derivative_first, derivative_last);
+          TSpline3 spline("spline", &interpolator, "b1e1", derivative_first, derivative_last);
           double x_middle = (xGrid[iG]+xGrid[iG+1])*0.5;
           double y_middle = (yGrid[iG]+yGrid[iG+1])*0.5;
-          double y_sp = spline->Eval(x_middle);
+          double y_sp = spline.Eval(x_middle);
           if (y_sp<0) y_sp = 0;
 
           std::vector<double>::iterator gridIt;
@@ -1404,11 +1404,6 @@ void Mela::computeProdP(
             iG--; // Do not pass to next bin, repeat until precision is achieved.
           }
           nGrid++;
-
-          delete spline;
-          delete interpolator;
-          delete xGrid;
-          delete yGrid;
         }
 
         if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela::computeProdP: Number of iterations for JVBF eta integration: " << ctr_iter << endl;
