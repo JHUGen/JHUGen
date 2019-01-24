@@ -1,0 +1,1194 @@
+Mela is initialized
+Mela: Begin computeProdP
+TEvtProb::SetCurrentCandidate: The current candidate is not in the list of candidates. It is the users' responsibility to delete this candidate and all of its associated particles.
+Begin XsecCalc_XJJ
+Begin GetBoostedParticleVectors
+TUtil::GetBoostedParticleVectors: code=5
+TUtil::GetBoostedParticleVectors: nRequestedLeps=0
+TUtil::GetBoostedParticleVectors: nRequestedJets=2
+TUtil::GetBoostedParticleVectors: nRequestedPhotons=0
+TUtil::GetBoostedParticleVectors: aVhypo==0 case begin
+TUtil::GetBoostedParticleVectors: aVhypo==0 jet case associated_tmp.size=2
+TUtil::GetBoostedParticleVectors: Removing mass from jet pair 0	1
+TUtil::GetBoostedParticleVectors: associated.size=2
+TUtil::GetBoostedParticleVectors: stableTops.size=0
+TUtil::GetBoostedParticleVectors: stableAntitops.size=0
+TUtil::GetBoostedParticleVectors: topDaughters.size=0
+TUtil::GetBoostedParticleVectors: antitopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.intermediateVid.size=2
+TUtil::GetBoostedParticleVectors mela_event.pMothers.size=2
+TUtil::GetBoostedParticleVectors mela_event.pDaughters.size=4
+TUtil::GetBoostedParticleVectors mela_event.pAssociated.size=2
+TUtil::GetBoostedParticleVectors mela_event.pStableTops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pStableAntitops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pTopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.pAntitopDaughters.size=0
+End GetBoostedParticleVectors
+p[0] (Px, Py, Pz, E, M):	0	0	850.769	850.769	0
+p[1] (Px, Py, Pz, E, M):	0	0	-850.769	850.769	0
+p[2] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	1.19209e-05
+p[3] (Px, Py, Pz, E, M):	-237.081	-10.5002	-570.682	618.058	1.19209e-05
+p[4] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+One-jet momenta: 
+pOneJet[0] (Px, Py, Pz, E, M):	0	0	850.769	850.769	0
+pOneJet[1] (Px, Py, Pz, E, M):	0	0	-850.769	850.769	0
+pOneJet[2] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+pOneJet[3] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	1.19209e-05
+TUtil::HJJMatEl: Set AlphaS:
+	Before set, alphas scale: 91.2, PDF scale: 91.2
+	renQ: 59.4084 ( x 0.5), facQ: 59.4084 ( x 0.5)
+	After set, alphas scale: 59.4084, PDF scale: 59.4084, alphas(Qren): 0.139483, alphas(MZ): 0.13
+MatElsq:
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	7.78212e-08	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+Begin TUtil::SumMEPDF
+Begin TUtil::ComputePDF
+TUtil::CheckPartonMomFraction: xx[0]: 0.130888, xx[1] = 0.130888, xmin = 1e-08
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.130888, xx[1] = 0.130888
+TUtil::ComputePDF: called
+End TUtil::ComputePDF:
+(fx1, fx2)[-5] = (0.0842491 , 0.0842491)
+(fx1, fx2)[-4] = (0.161129 , 0.161129)
+(fx1, fx2)[-3] = (0.216343 , 0.216343)
+(fx1, fx2)[-2] = (0.529064 , 0.529064)
+(fx1, fx2)[-1] = (0.700906 , 0.700906)
+(fx1, fx2)[0] = (4.38528 , 4.38528)
+(fx1, fx2)[1] = (2.45775 , 2.45775)
+(fx1, fx2)[2] = (4.29983 , 4.29983)
+(fx1, fx2)[3] = (0.313649 , 0.313649)
+(fx1, fx2)[4] = (0.161129 , 0.161129)
+(fx1, fx2)[5] = (0.0842491 , 0.0842491)
+TUtil::SumMEPDF: Setting RcdME
+End TUtil::SumMEPDF
+TUtil::HJJMatEl: Reset AlphaS:
+	Before reset, alphas scale: 59.4084, PDF scale: 59.4084
+TUtil::HJJMatEl: Reset AlphaS result:
+	After reset, alphas scale: 91.2, PDF scale: 91.2, alphas(Qren): 0.13, alphas(MZ): 0.13
+TEvtProb::XsecCalc_XJJ: Process HSMHiggs dXsec=8.22409e-07
+End XsecCalc_XJJ
+TEvtProb::SetHiggsMass(125, -1, -1):
+	hmass: 125, 0.00407
+	h2mass: -1, 0
+	MCFM hmass: 125, 0.00407
+	MCFM h2mass: -1, 0
+Begin XsecCalc_XJJ
+Begin GetBoostedParticleVectors
+TUtil::GetBoostedParticleVectors: code=5
+TUtil::GetBoostedParticleVectors: nRequestedLeps=0
+TUtil::GetBoostedParticleVectors: nRequestedJets=2
+TUtil::GetBoostedParticleVectors: nRequestedPhotons=0
+TUtil::GetBoostedParticleVectors: aVhypo==0 case begin
+TUtil::GetBoostedParticleVectors: aVhypo==0 jet case associated_tmp.size=2
+TUtil::GetBoostedParticleVectors: Removing mass from jet pair 0	1
+TUtil::GetBoostedParticleVectors: associated.size=2
+TUtil::GetBoostedParticleVectors: stableTops.size=0
+TUtil::GetBoostedParticleVectors: stableAntitops.size=0
+TUtil::GetBoostedParticleVectors: topDaughters.size=0
+TUtil::GetBoostedParticleVectors: antitopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.intermediateVid.size=2
+TUtil::GetBoostedParticleVectors mela_event.pMothers.size=2
+TUtil::GetBoostedParticleVectors mela_event.pDaughters.size=4
+TUtil::GetBoostedParticleVectors mela_event.pAssociated.size=2
+TUtil::GetBoostedParticleVectors mela_event.pStableTops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pStableAntitops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pTopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.pAntitopDaughters.size=0
+End GetBoostedParticleVectors
+p[0] (Px, Py, Pz, E, M):	0	0	843.14	843.14	0
+p[1] (Px, Py, Pz, E, M):	0	0	-1133.16	1133.16	0
+p[2] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	2.52881e-05
+p[3] (Px, Py, Pz, E, M):	-237.081	-10.5002	-860.703	892.82	2.38419e-05
+p[4] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+One-jet momenta: 
+pOneJet[0] (Px, Py, Pz, E, M):	0	0	843.14	843.14	0
+pOneJet[1] (Px, Py, Pz, E, M):	0	0	-1133.16	1133.16	0
+pOneJet[2] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+pOneJet[3] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	2.52881e-05
+TUtil::HJJMatEl: Set AlphaS:
+	Before set, alphas scale: 91.2, PDF scale: 91.2
+	renQ: 59.4084 ( x 0.5), facQ: 59.4084 ( x 0.5)
+	After set, alphas scale: 59.4084, PDF scale: 59.4084, alphas(Qren): 0.139483, alphas(MZ): 0.13
+MatElsq:
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	1.87862e-07	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+Begin TUtil::SumMEPDF
+Begin TUtil::ComputePDF
+TUtil::CheckPartonMomFraction: xx[0]: 0.129714, xx[1] = 0.174332, xmin = 1e-08
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.129714, xx[1] = 0.174332
+TUtil::ComputePDF: called
+End TUtil::ComputePDF:
+(fx1, fx2)[-5] = (0.0865229 , 0.0338949)
+(fx1, fx2)[-4] = (0.165302 , 0.0671598)
+(fx1, fx2)[-3] = (0.221322 , 0.0974727)
+(fx1, fx2)[-2] = (0.540521 , 0.259073)
+(fx1, fx2)[-1] = (0.715295 , 0.335616)
+(fx1, fx2)[0] = (4.49317 , 1.92148)
+(fx1, fx2)[1] = (2.49171 , 1.53957)
+(fx1, fx2)[2] = (4.3445 , 3.031)
+(fx1, fx2)[3] = (0.319951 , 0.156058)
+(fx1, fx2)[4] = (0.165302 , 0.0671598)
+(fx1, fx2)[5] = (0.0865229 , 0.0338949)
+TUtil::SumMEPDF: Setting RcdME
+End TUtil::SumMEPDF
+TUtil::HJJMatEl: Reset AlphaS:
+	Before reset, alphas scale: 59.4084, PDF scale: 59.4084
+TUtil::HJJMatEl: Reset AlphaS result:
+	After reset, alphas scale: 91.2, PDF scale: 91.2, alphas(Qren): 0.13, alphas(MZ): 0.13
+TEvtProb::XsecCalc_XJJ: Process HSMHiggs dXsec=1.4188e-06
+End XsecCalc_XJJ
+TEvtProb::SetHiggsMass(125, -1, -1):
+	hmass: 125, 0.00407
+	h2mass: -1, 0
+	MCFM hmass: 125, 0.00407
+	MCFM h2mass: -1, 0
+Begin XsecCalc_XJJ
+Begin GetBoostedParticleVectors
+TUtil::GetBoostedParticleVectors: code=5
+TUtil::GetBoostedParticleVectors: nRequestedLeps=0
+TUtil::GetBoostedParticleVectors: nRequestedJets=2
+TUtil::GetBoostedParticleVectors: nRequestedPhotons=0
+TUtil::GetBoostedParticleVectors: aVhypo==0 case begin
+TUtil::GetBoostedParticleVectors: aVhypo==0 jet case associated_tmp.size=2
+TUtil::GetBoostedParticleVectors: Removing mass from jet pair 0	1
+TUtil::GetBoostedParticleVectors: associated.size=2
+TUtil::GetBoostedParticleVectors: stableTops.size=0
+TUtil::GetBoostedParticleVectors: stableAntitops.size=0
+TUtil::GetBoostedParticleVectors: topDaughters.size=0
+TUtil::GetBoostedParticleVectors: antitopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.intermediateVid.size=2
+TUtil::GetBoostedParticleVectors mela_event.pMothers.size=2
+TUtil::GetBoostedParticleVectors mela_event.pDaughters.size=4
+TUtil::GetBoostedParticleVectors mela_event.pAssociated.size=2
+TUtil::GetBoostedParticleVectors mela_event.pStableTops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pStableAntitops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pTopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.pAntitopDaughters.size=0
+End GetBoostedParticleVectors
+p[0] (Px, Py, Pz, E, M):	0	0	945.738	945.738	0
+p[1] (Px, Py, Pz, E, M):	0	0	-375.056	375.056	0
+p[2] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	1.03238e-05
+p[3] (Px, Py, Pz, E, M):	-237.081	-10.5002	1.19982e-13	237.313	8.0137e-06
+p[4] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+One-jet momenta: 
+pOneJet[0] (Px, Py, Pz, E, M):	0	0	945.738	945.738	0
+pOneJet[1] (Px, Py, Pz, E, M):	0	0	-375.056	375.056	0
+pOneJet[2] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+pOneJet[3] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	1.03238e-05
+TUtil::HJJMatEl: Set AlphaS:
+	Before set, alphas scale: 91.2, PDF scale: 91.2
+	renQ: 59.4084 ( x 0.5), facQ: 59.4084 ( x 0.5)
+	After set, alphas scale: 59.4084, PDF scale: 59.4084, alphas(Qren): 0.139483, alphas(MZ): 0.13
+MatElsq:
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	1.23551e-09	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+Begin TUtil::SumMEPDF
+Begin TUtil::ComputePDF
+TUtil::CheckPartonMomFraction: xx[0]: 0.145498, xx[1] = 0.0577009, xmin = 1e-08
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.145498, xx[1] = 0.0577009
+TUtil::ComputePDF: called
+End TUtil::ComputePDF:
+(fx1, fx2)[-5] = (0.061084 , 0.685036)
+(fx1, fx2)[-4] = (0.118317 , 1.19748)
+(fx1, fx2)[-3] = (0.16417 , 1.44585)
+(fx1, fx2)[-2] = (0.409601 , 3.02513)
+(fx1, fx2)[-1] = (0.546333 , 3.46596)
+(fx1, fx2)[0] = (3.27289 , 30.6824)
+(fx1, fx2)[1] = (2.08348 , 7.4513)
+(fx1, fx2)[2] = (3.79878 , 10.3895)
+(fx1, fx2)[3] = (0.245995 , 1.55915)
+(fx1, fx2)[4] = (0.118317 , 1.19748)
+(fx1, fx2)[5] = (0.061084 , 0.685036)
+TUtil::SumMEPDF: Setting RcdME
+End TUtil::SumMEPDF
+TUtil::HJJMatEl: Reset AlphaS:
+	Before reset, alphas scale: 59.4084, PDF scale: 59.4084
+TUtil::HJJMatEl: Reset AlphaS result:
+	After reset, alphas scale: 91.2, PDF scale: 91.2, alphas(Qren): 0.13, alphas(MZ): 0.13
+TEvtProb::XsecCalc_XJJ: Process HSMHiggs dXsec=2.67441e-08
+End XsecCalc_XJJ
+TEvtProb::SetHiggsMass(125, -1, -1):
+	hmass: 125, 0.00407
+	h2mass: -1, 0
+	MCFM hmass: 125, 0.00407
+	MCFM h2mass: -1, 0
+Begin XsecCalc_XJJ
+Begin GetBoostedParticleVectors
+TUtil::GetBoostedParticleVectors: code=5
+TUtil::GetBoostedParticleVectors: nRequestedLeps=0
+TUtil::GetBoostedParticleVectors: nRequestedJets=2
+TUtil::GetBoostedParticleVectors: nRequestedPhotons=0
+TUtil::GetBoostedParticleVectors: aVhypo==0 case begin
+TUtil::GetBoostedParticleVectors: aVhypo==0 jet case associated_tmp.size=2
+TUtil::GetBoostedParticleVectors: Removing mass from jet pair 0	1
+TUtil::GetBoostedParticleVectors: associated.size=2
+TUtil::GetBoostedParticleVectors: stableTops.size=0
+TUtil::GetBoostedParticleVectors: stableAntitops.size=0
+TUtil::GetBoostedParticleVectors: topDaughters.size=0
+TUtil::GetBoostedParticleVectors: antitopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.intermediateVid.size=2
+TUtil::GetBoostedParticleVectors mela_event.pMothers.size=2
+TUtil::GetBoostedParticleVectors mela_event.pDaughters.size=4
+TUtil::GetBoostedParticleVectors mela_event.pAssociated.size=2
+TUtil::GetBoostedParticleVectors mela_event.pStableTops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pStableAntitops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pTopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.pAntitopDaughters.size=0
+End GetBoostedParticleVectors
+p[0] (Px, Py, Pz, E, M):	0	0	1703.84	1703.84	0
+p[1] (Px, Py, Pz, E, M):	0	0	-272.458	272.458	0
+p[2] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	1.46001e-05
+p[3] (Px, Py, Pz, E, M):	-237.081	-10.5002	860.703	892.82	1.19209e-05
+p[4] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+One-jet momenta: 
+pOneJet[0] (Px, Py, Pz, E, M):	0	0	1703.84	1703.84	0
+pOneJet[1] (Px, Py, Pz, E, M):	0	0	-272.458	272.458	0
+pOneJet[2] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+pOneJet[3] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	1.46001e-05
+TUtil::HJJMatEl: Set AlphaS:
+	Before set, alphas scale: 91.2, PDF scale: 91.2
+	renQ: 59.4084 ( x 0.5), facQ: 59.4084 ( x 0.5)
+	After set, alphas scale: 59.4084, PDF scale: 59.4084, alphas(Qren): 0.139483, alphas(MZ): 0.13
+MatElsq:
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	2.5662e-09	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+Begin TUtil::SumMEPDF
+Begin TUtil::ComputePDF
+TUtil::CheckPartonMomFraction: xx[0]: 0.26213, xx[1] = 0.0419166, xmin = 1e-08
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.26213, xx[1] = 0.0419166
+TUtil::ComputePDF: called
+End TUtil::ComputePDF:
+(fx1, fx2)[-5] = (0.00693398 , 1.36264)
+(fx1, fx2)[-4] = (0.01481 , 2.30249)
+(fx1, fx2)[-3] = (0.0221298 , 2.8176)
+(fx1, fx2)[-2] = (0.0750754 , 5.40702)
+(fx1, fx2)[-1] = (0.0685382 , 6.01384)
+(fx1, fx2)[0] = (0.474475 , 59.0481)
+(fx1, fx2)[1] = (0.670519 , 11.0445)
+(fx1, fx2)[2] = (1.63003 , 14.5574)
+(fx1, fx2)[3] = (0.0417274 , 2.83478)
+(fx1, fx2)[4] = (0.01481 , 2.30249)
+(fx1, fx2)[5] = (0.00693397 , 1.36264)
+TUtil::SumMEPDF: Setting RcdME
+End TUtil::SumMEPDF
+TUtil::HJJMatEl: Reset AlphaS:
+	Before reset, alphas scale: 59.4084, PDF scale: 59.4084
+TUtil::HJJMatEl: Reset AlphaS result:
+	After reset, alphas scale: 91.2, PDF scale: 91.2, alphas(Qren): 0.13, alphas(MZ): 0.13
+TEvtProb::XsecCalc_XJJ: Process HSMHiggs dXsec=2.50486e-08
+End XsecCalc_XJJ
+TEvtProb::SetHiggsMass(125, -1, -1):
+	hmass: 125, 0.00407
+	h2mass: -1, 0
+	MCFM hmass: 125, 0.00407
+	MCFM h2mass: -1, 0
+Begin XsecCalc_XJJ
+Begin GetBoostedParticleVectors
+TUtil::GetBoostedParticleVectors: code=5
+TUtil::GetBoostedParticleVectors: nRequestedLeps=0
+TUtil::GetBoostedParticleVectors: nRequestedJets=2
+TUtil::GetBoostedParticleVectors: nRequestedPhotons=0
+TUtil::GetBoostedParticleVectors: aVhypo==0 case begin
+TUtil::GetBoostedParticleVectors: aVhypo==0 jet case associated_tmp.size=2
+TUtil::GetBoostedParticleVectors: Removing mass from jet pair 0	1
+TUtil::GetBoostedParticleVectors: associated.size=2
+TUtil::GetBoostedParticleVectors: stableTops.size=0
+TUtil::GetBoostedParticleVectors: stableAntitops.size=0
+TUtil::GetBoostedParticleVectors: topDaughters.size=0
+TUtil::GetBoostedParticleVectors: antitopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.intermediateVid.size=2
+TUtil::GetBoostedParticleVectors mela_event.pMothers.size=2
+TUtil::GetBoostedParticleVectors mela_event.pDaughters.size=4
+TUtil::GetBoostedParticleVectors mela_event.pAssociated.size=2
+TUtil::GetBoostedParticleVectors mela_event.pStableTops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pStableAntitops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pTopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.pAntitopDaughters.size=0
+End GetBoostedParticleVectors
+p[0] (Px, Py, Pz, E, M):	0	0	832.989	832.989	0
+p[1] (Px, Py, Pz, E, M):	0	0	-2639.68	2639.68	0
+p[2] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	4.61696e-05
+p[3] (Px, Py, Pz, E, M):	-237.081	-10.5002	-2377.38	2389.19	0
+p[4] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+One-jet momenta: 
+pOneJet[0] (Px, Py, Pz, E, M):	0	0	832.989	832.989	0
+pOneJet[1] (Px, Py, Pz, E, M):	0	0	-2639.68	2639.68	0
+pOneJet[2] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+pOneJet[3] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	4.61696e-05
+TUtil::HJJMatEl: Set AlphaS:
+	Before set, alphas scale: 91.2, PDF scale: 91.2
+	renQ: 59.4084 ( x 0.5), facQ: 59.4084 ( x 0.5)
+	After set, alphas scale: 59.4084, PDF scale: 59.4084, alphas(Qren): 0.139483, alphas(MZ): 0.13
+MatElsq:
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	1.61089e-06	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+Begin TUtil::SumMEPDF
+Begin TUtil::ComputePDF
+TUtil::CheckPartonMomFraction: xx[0]: 0.128152, xx[1] = 0.406105, xmin = 1e-08
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.128152, xx[1] = 0.406105
+TUtil::ComputePDF: called
+End TUtil::ComputePDF:
+(fx1, fx2)[-5] = (0.089665 , 0.000546199)
+(fx1, fx2)[-4] = (0.171061 , 0.00137519)
+(fx1, fx2)[-3] = (0.228171 , 0.00157996)
+(fx1, fx2)[-2] = (0.556279 , 0.0130631)
+(fx1, fx2)[-1] = (0.734976 , 0.00117618)
+(fx1, fx2)[0] = (4.64191 , 0.0532009)
+(fx1, fx2)[1] = (2.5379 , 0.171546)
+(fx1, fx2)[2] = (4.4051 , 0.577777)
+(fx1, fx2)[3] = (0.328574 , 0.0142968)
+(fx1, fx2)[4] = (0.171061 , 0.00137519)
+(fx1, fx2)[5] = (0.089665 , 0.0005462)
+TUtil::SumMEPDF: Setting RcdME
+End TUtil::SumMEPDF
+TUtil::HJJMatEl: Reset AlphaS:
+	Before reset, alphas scale: 59.4084, PDF scale: 59.4084
+TUtil::HJJMatEl: Reset AlphaS result:
+	After reset, alphas scale: 91.2, PDF scale: 91.2, alphas(Qren): 0.13, alphas(MZ): 0.13
+TEvtProb::XsecCalc_XJJ: Process HSMHiggs dXsec=2.36212e-06
+End XsecCalc_XJJ
+TEvtProb::SetHiggsMass(125, -1, -1):
+	hmass: 125, 0.00407
+	h2mass: -1, 0
+	MCFM hmass: 125, 0.00407
+	MCFM h2mass: -1, 0
+Begin XsecCalc_XJJ
+Begin GetBoostedParticleVectors
+TUtil::GetBoostedParticleVectors: code=5
+TUtil::GetBoostedParticleVectors: nRequestedLeps=0
+TUtil::GetBoostedParticleVectors: nRequestedJets=2
+TUtil::GetBoostedParticleVectors: nRequestedPhotons=0
+TUtil::GetBoostedParticleVectors: aVhypo==0 case begin
+TUtil::GetBoostedParticleVectors: aVhypo==0 jet case associated_tmp.size=2
+TUtil::GetBoostedParticleVectors: Removing mass from jet pair 0	1
+TUtil::GetBoostedParticleVectors: associated.size=2
+TUtil::GetBoostedParticleVectors: stableTops.size=0
+TUtil::GetBoostedParticleVectors: stableAntitops.size=0
+TUtil::GetBoostedParticleVectors: topDaughters.size=0
+TUtil::GetBoostedParticleVectors: antitopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.intermediateVid.size=2
+TUtil::GetBoostedParticleVectors mela_event.pMothers.size=2
+TUtil::GetBoostedParticleVectors mela_event.pDaughters.size=4
+TUtil::GetBoostedParticleVectors mela_event.pAssociated.size=2
+TUtil::GetBoostedParticleVectors mela_event.pStableTops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pStableAntitops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pTopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.pAntitopDaughters.size=0
+End GetBoostedParticleVectors
+p[0] (Px, Py, Pz, E, M):	0	0	836.821	836.821	0
+p[1] (Px, Py, Pz, E, M):	0	0	-1701.93	1701.93	0
+p[2] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	2.85854e-05
+p[3] (Px, Py, Pz, E, M):	-237.081	-10.5002	-1435.8	1455.28	3.76973e-05
+p[4] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+One-jet momenta: 
+pOneJet[0] (Px, Py, Pz, E, M):	0	0	836.821	836.821	0
+pOneJet[1] (Px, Py, Pz, E, M):	0	0	-1701.93	1701.93	0
+pOneJet[2] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+pOneJet[3] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	2.85854e-05
+TUtil::HJJMatEl: Set AlphaS:
+	Before set, alphas scale: 91.2, PDF scale: 91.2
+	renQ: 59.4084 ( x 0.5), facQ: 59.4084 ( x 0.5)
+	After set, alphas scale: 59.4084, PDF scale: 59.4084, alphas(Qren): 0.139483, alphas(MZ): 0.13
+MatElsq:
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	5.59353e-07	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+Begin TUtil::SumMEPDF
+Begin TUtil::ComputePDF
+TUtil::CheckPartonMomFraction: xx[0]: 0.128742, xx[1] = 0.261836, xmin = 1e-08
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.128742, xx[1] = 0.261836
+TUtil::ComputePDF: called
+End TUtil::ComputePDF:
+(fx1, fx2)[-5] = (0.0884627 , 0.00696935)
+(fx1, fx2)[-4] = (0.168859 , 0.0148809)
+(fx1, fx2)[-3] = (0.225555 , 0.022226)
+(fx1, fx2)[-2] = (0.550259 , 0.0753899)
+(fx1, fx2)[-1] = (0.727472 , 0.06893)
+(fx1, fx2)[0] = (4.58504 , 0.476534)
+(fx1, fx2)[1] = (2.52032 , 0.672343)
+(fx1, fx2)[2] = (4.38206 , 1.63331)
+(fx1, fx2)[3] = (0.325286 , 0.0419012)
+(fx1, fx2)[4] = (0.168859 , 0.0148809)
+(fx1, fx2)[5] = (0.0884627 , 0.00696935)
+TUtil::SumMEPDF: Setting RcdME
+End TUtil::SumMEPDF
+TUtil::HJJMatEl: Reset AlphaS:
+	Before reset, alphas scale: 59.4084, PDF scale: 59.4084
+TUtil::HJJMatEl: Reset AlphaS result:
+	After reset, alphas scale: 91.2, PDF scale: 91.2, alphas(Qren): 0.13, alphas(MZ): 0.13
+TEvtProb::XsecCalc_XJJ: Process HSMHiggs dXsec=2.30256e-06
+End XsecCalc_XJJ
+TEvtProb::SetHiggsMass(125, -1, -1):
+	hmass: 125, 0.00407
+	h2mass: -1, 0
+	MCFM hmass: 125, 0.00407
+	MCFM h2mass: -1, 0
+Begin XsecCalc_XJJ
+Begin GetBoostedParticleVectors
+TUtil::GetBoostedParticleVectors: code=5
+TUtil::GetBoostedParticleVectors: nRequestedLeps=0
+TUtil::GetBoostedParticleVectors: nRequestedJets=2
+TUtil::GetBoostedParticleVectors: nRequestedPhotons=0
+TUtil::GetBoostedParticleVectors: aVhypo==0 case begin
+TUtil::GetBoostedParticleVectors: aVhypo==0 jet case associated_tmp.size=2
+TUtil::GetBoostedParticleVectors: Removing mass from jet pair 0	1
+TUtil::GetBoostedParticleVectors: associated.size=2
+TUtil::GetBoostedParticleVectors: stableTops.size=0
+TUtil::GetBoostedParticleVectors: stableAntitops.size=0
+TUtil::GetBoostedParticleVectors: topDaughters.size=0
+TUtil::GetBoostedParticleVectors: antitopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.intermediateVid.size=2
+TUtil::GetBoostedParticleVectors mela_event.pMothers.size=2
+TUtil::GetBoostedParticleVectors mela_event.pDaughters.size=4
+TUtil::GetBoostedParticleVectors mela_event.pAssociated.size=2
+TUtil::GetBoostedParticleVectors mela_event.pStableTops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pStableAntitops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pTopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.pAntitopDaughters.size=0
+End GetBoostedParticleVectors
+p[0] (Px, Py, Pz, E, M):	0	0	870.733	870.733	0
+p[1] (Px, Py, Pz, E, M):	0	0	-578.942	578.942	0
+p[2] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	1.19209e-05
+p[3] (Px, Py, Pz, E, M):	-237.081	-10.5002	-278.891	366.194	1.03238e-05
+p[4] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+One-jet momenta: 
+pOneJet[0] (Px, Py, Pz, E, M):	0	0	870.733	870.733	0
+pOneJet[1] (Px, Py, Pz, E, M):	0	0	-578.942	578.942	0
+pOneJet[2] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+pOneJet[3] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	1.19209e-05
+TUtil::HJJMatEl: Set AlphaS:
+	Before set, alphas scale: 91.2, PDF scale: 91.2
+	renQ: 59.4084 ( x 0.5), facQ: 59.4084 ( x 0.5)
+	After set, alphas scale: 59.4084, PDF scale: 59.4084, alphas(Qren): 0.139483, alphas(MZ): 0.13
+MatElsq:
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	1.79285e-08	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+Begin TUtil::SumMEPDF
+Begin TUtil::ComputePDF
+TUtil::CheckPartonMomFraction: xx[0]: 0.133959, xx[1] = 0.089068, xmin = 1e-08
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.133959, xx[1] = 0.089068
+TUtil::ComputePDF: called
+End TUtil::ComputePDF:
+(fx1, fx2)[-5] = (0.0786338 , 0.242819)
+(fx1, fx2)[-4] = (0.150799 , 0.444855)
+(fx1, fx2)[-3] = (0.203956 , 0.545602)
+(fx1, fx2)[-2] = (0.500563 , 1.2637)
+(fx1, fx2)[-1] = (0.664813 , 1.55171)
+(fx1, fx2)[0] = (4.11788 , 11.6199)
+(fx1, fx2)[1] = (2.3719 , 4.25799)
+(fx1, fx2)[2] = (4.18633 , 6.56538)
+(fx1, fx2)[3] = (0.297848 , 0.688721)
+(fx1, fx2)[4] = (0.150799 , 0.444855)
+(fx1, fx2)[5] = (0.0786338 , 0.242819)
+TUtil::SumMEPDF: Setting RcdME
+End TUtil::SumMEPDF
+TUtil::HJJMatEl: Reset AlphaS:
+	Before reset, alphas scale: 59.4084, PDF scale: 59.4084
+TUtil::HJJMatEl: Reset AlphaS result:
+	After reset, alphas scale: 91.2, PDF scale: 91.2, alphas(Qren): 0.13, alphas(MZ): 0.13
+TEvtProb::XsecCalc_XJJ: Process HSMHiggs dXsec=2.7919e-07
+End XsecCalc_XJJ
+TEvtProb::SetHiggsMass(125, -1, -1):
+	hmass: 125, 0.00407
+	h2mass: -1, 0
+	MCFM hmass: 125, 0.00407
+	MCFM h2mass: -1, 0
+Begin XsecCalc_XJJ
+Begin GetBoostedParticleVectors
+TUtil::GetBoostedParticleVectors: code=5
+TUtil::GetBoostedParticleVectors: nRequestedLeps=0
+TUtil::GetBoostedParticleVectors: nRequestedJets=2
+TUtil::GetBoostedParticleVectors: nRequestedPhotons=0
+TUtil::GetBoostedParticleVectors: aVhypo==0 case begin
+TUtil::GetBoostedParticleVectors: aVhypo==0 jet case associated_tmp.size=2
+TUtil::GetBoostedParticleVectors: Removing mass from jet pair 0	1
+TUtil::GetBoostedParticleVectors: associated.size=2
+TUtil::GetBoostedParticleVectors: stableTops.size=0
+TUtil::GetBoostedParticleVectors: stableAntitops.size=0
+TUtil::GetBoostedParticleVectors: topDaughters.size=0
+TUtil::GetBoostedParticleVectors: antitopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.intermediateVid.size=2
+TUtil::GetBoostedParticleVectors mela_event.pMothers.size=2
+TUtil::GetBoostedParticleVectors mela_event.pDaughters.size=4
+TUtil::GetBoostedParticleVectors mela_event.pAssociated.size=2
+TUtil::GetBoostedParticleVectors mela_event.pStableTops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pStableAntitops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pTopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.pAntitopDaughters.size=0
+End GetBoostedParticleVectors
+p[0] (Px, Py, Pz, E, M):	0	0	853.557	853.557	0
+p[1] (Px, Py, Pz, E, M):	0	0	-788.182	788.182	0
+p[2] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	1.19209e-05
+p[3] (Px, Py, Pz, E, M):	-237.081	-10.5002	-505.307	558.259	1.68587e-05
+p[4] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+One-jet momenta: 
+pOneJet[0] (Px, Py, Pz, E, M):	0	0	853.557	853.557	0
+pOneJet[1] (Px, Py, Pz, E, M):	0	0	-788.182	788.182	0
+pOneJet[2] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+pOneJet[3] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	1.19209e-05
+TUtil::HJJMatEl: Set AlphaS:
+	Before set, alphas scale: 91.2, PDF scale: 91.2
+	renQ: 59.4084 ( x 0.5), facQ: 59.4084 ( x 0.5)
+	After set, alphas scale: 59.4084, PDF scale: 59.4084, alphas(Qren): 0.139483, alphas(MZ): 0.13
+MatElsq:
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	6.00664e-08	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+Begin TUtil::SumMEPDF
+Begin TUtil::ComputePDF
+TUtil::CheckPartonMomFraction: xx[0]: 0.131317, xx[1] = 0.121259, xmin = 1e-08
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.131317, xx[1] = 0.121259
+TUtil::ComputePDF: called
+End TUtil::ComputePDF:
+(fx1, fx2)[-5] = (0.0834364 , 0.105313)
+(fx1, fx2)[-4] = (0.159636 , 0.199615)
+(fx1, fx2)[-3] = (0.214559 , 0.261819)
+(fx1, fx2)[-2] = (0.524958 , 0.633582)
+(fx1, fx2)[-1] = (0.695733 , 0.829921)
+(fx1, fx2)[0] = (4.34666 , 5.37727)
+(fx1, fx2)[1] = (2.44551 , 2.7569)
+(fx1, fx2)[2] = (4.28369 , 4.68974)
+(fx1, fx2)[3] = (0.311384 , 0.370207)
+(fx1, fx2)[4] = (0.159636 , 0.199615)
+(fx1, fx2)[5] = (0.0834364 , 0.105313)
+TUtil::SumMEPDF: Setting RcdME
+End TUtil::SumMEPDF
+TUtil::HJJMatEl: Reset AlphaS:
+	Before reset, alphas scale: 59.4084, PDF scale: 59.4084
+TUtil::HJJMatEl: Reset AlphaS result:
+	After reset, alphas scale: 91.2, PDF scale: 91.2, alphas(Qren): 0.13, alphas(MZ): 0.13
+TEvtProb::XsecCalc_XJJ: Process HSMHiggs dXsec=6.88889e-07
+End XsecCalc_XJJ
+TEvtProb::SetHiggsMass(125, -1, -1):
+	hmass: 125, 0.00407
+	h2mass: -1, 0
+	MCFM hmass: 125, 0.00407
+	MCFM h2mass: -1, 0
+Begin XsecCalc_XJJ
+Begin GetBoostedParticleVectors
+TUtil::GetBoostedParticleVectors: code=5
+TUtil::GetBoostedParticleVectors: nRequestedLeps=0
+TUtil::GetBoostedParticleVectors: nRequestedJets=2
+TUtil::GetBoostedParticleVectors: nRequestedPhotons=0
+TUtil::GetBoostedParticleVectors: aVhypo==0 case begin
+TUtil::GetBoostedParticleVectors: aVhypo==0 jet case associated_tmp.size=2
+TUtil::GetBoostedParticleVectors: Removing mass from jet pair 0	1
+TUtil::GetBoostedParticleVectors: associated.size=2
+TUtil::GetBoostedParticleVectors: stableTops.size=0
+TUtil::GetBoostedParticleVectors: stableAntitops.size=0
+TUtil::GetBoostedParticleVectors: topDaughters.size=0
+TUtil::GetBoostedParticleVectors: antitopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.intermediateVid.size=2
+TUtil::GetBoostedParticleVectors mela_event.pMothers.size=2
+TUtil::GetBoostedParticleVectors mela_event.pDaughters.size=4
+TUtil::GetBoostedParticleVectors mela_event.pAssociated.size=2
+TUtil::GetBoostedParticleVectors mela_event.pStableTops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pStableAntitops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pTopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.pAntitopDaughters.size=0
+End GetBoostedParticleVectors
+p[0] (Px, Py, Pz, E, M):	0	0	899.05	899.05	0
+p[1] (Px, Py, Pz, E, M):	0	0	-452.031	452.031	0
+p[2] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	1.46001e-05
+p[3] (Px, Py, Pz, E, M):	-237.081	-10.5002	-123.663	267.601	9.88431e-06
+p[4] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+One-jet momenta: 
+pOneJet[0] (Px, Py, Pz, E, M):	0	0	899.05	899.05	0
+pOneJet[1] (Px, Py, Pz, E, M):	0	0	-452.031	452.031	0
+pOneJet[2] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+pOneJet[3] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	1.46001e-05
+TUtil::HJJMatEl: Set AlphaS:
+	Before set, alphas scale: 91.2, PDF scale: 91.2
+	renQ: 59.4084 ( x 0.5), facQ: 59.4084 ( x 0.5)
+	After set, alphas scale: 59.4084, PDF scale: 59.4084, alphas(Qren): 0.139483, alphas(MZ): 0.13
+MatElsq:
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	4.90058e-09	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+Begin TUtil::SumMEPDF
+Begin TUtil::ComputePDF
+TUtil::CheckPartonMomFraction: xx[0]: 0.138315, xx[1] = 0.0695433, xmin = 1e-08
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.138315, xx[1] = 0.0695433
+TUtil::ComputePDF: called
+End TUtil::ComputePDF:
+(fx1, fx2)[-5] = (0.0714024 , 0.445965)
+(fx1, fx2)[-4] = (0.137453 , 0.795435)
+(fx1, fx2)[-3] = (0.187781 , 0.960368)
+(fx1, fx2)[-2] = (0.463448 , 2.10587)
+(fx1, fx2)[-1] = (0.617115 , 2.47464)
+(fx1, fx2)[0] = (3.77151 , 20.4838)
+(fx1, fx2)[1] = (2.25701 , 5.888)
+(fx1, fx2)[2] = (4.03319 , 8.5353)
+(fx1, fx2)[3] = (0.276965 , 1.10146)
+(fx1, fx2)[4] = (0.137453 , 0.795435)
+(fx1, fx2)[5] = (0.0714024 , 0.445965)
+TUtil::SumMEPDF: Setting RcdME
+End TUtil::SumMEPDF
+TUtil::HJJMatEl: Reset AlphaS:
+	Before reset, alphas scale: 59.4084, PDF scale: 59.4084
+TUtil::HJJMatEl: Reset AlphaS result:
+	After reset, alphas scale: 91.2, PDF scale: 91.2, alphas(Qren): 0.13, alphas(MZ): 0.13
+TEvtProb::XsecCalc_XJJ: Process HSMHiggs dXsec=9.44062e-08
+End XsecCalc_XJJ
+TEvtProb::SetHiggsMass(125, -1, -1):
+	hmass: 125, 0.00407
+	h2mass: -1, 0
+	MCFM hmass: 125, 0.00407
+	MCFM h2mass: -1, 0
+Begin XsecCalc_XJJ
+Begin GetBoostedParticleVectors
+TUtil::GetBoostedParticleVectors: code=5
+TUtil::GetBoostedParticleVectors: nRequestedLeps=0
+TUtil::GetBoostedParticleVectors: nRequestedJets=2
+TUtil::GetBoostedParticleVectors: nRequestedPhotons=0
+TUtil::GetBoostedParticleVectors: aVhypo==0 case begin
+TUtil::GetBoostedParticleVectors: aVhypo==0 jet case associated_tmp.size=2
+TUtil::GetBoostedParticleVectors: Removing mass from jet pair 0	1
+TUtil::GetBoostedParticleVectors: associated.size=2
+TUtil::GetBoostedParticleVectors: stableTops.size=0
+TUtil::GetBoostedParticleVectors: stableAntitops.size=0
+TUtil::GetBoostedParticleVectors: topDaughters.size=0
+TUtil::GetBoostedParticleVectors: antitopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.intermediateVid.size=2
+TUtil::GetBoostedParticleVectors mela_event.pMothers.size=2
+TUtil::GetBoostedParticleVectors mela_event.pDaughters.size=4
+TUtil::GetBoostedParticleVectors mela_event.pAssociated.size=2
+TUtil::GetBoostedParticleVectors mela_event.pStableTops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pStableAntitops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pTopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.pAntitopDaughters.size=0
+End GetBoostedParticleVectors
+p[0] (Px, Py, Pz, E, M):	0	0	1149.62	1149.62	0
+p[1] (Px, Py, Pz, E, M):	0	0	-300.051	300.051	0
+p[2] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	5.96046e-06
+p[3] (Px, Py, Pz, E, M):	-237.081	-10.5002	278.891	366.194	8.42937e-06
+p[4] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+One-jet momenta: 
+pOneJet[0] (Px, Py, Pz, E, M):	0	0	1149.62	1149.62	0
+pOneJet[1] (Px, Py, Pz, E, M):	0	0	-300.051	300.051	0
+pOneJet[2] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+pOneJet[3] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	5.96046e-06
+TUtil::HJJMatEl: Set AlphaS:
+	Before set, alphas scale: 91.2, PDF scale: 91.2
+	renQ: 59.4084 ( x 0.5), facQ: 59.4084 ( x 0.5)
+	After set, alphas scale: 59.4084, PDF scale: 59.4084, alphas(Qren): 0.139483, alphas(MZ): 0.13
+MatElsq:
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	2.92037e-10	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+Begin TUtil::SumMEPDF
+Begin TUtil::ComputePDF
+TUtil::CheckPartonMomFraction: xx[0]: 0.176865, xx[1] = 0.0461617, xmin = 1e-08
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.176865, xx[1] = 0.0461617
+TUtil::ComputePDF: called
+End TUtil::ComputePDF:
+(fx1, fx2)[-5] = (0.0322577 , 1.11314)
+(fx1, fx2)[-4] = (0.0640392 , 1.89992)
+(fx1, fx2)[-3] = (0.0931595 , 2.31259)
+(fx1, fx2)[-2] = (0.249423 , 4.55838)
+(fx1, fx2)[-1] = (0.321364 , 5.10759)
+(fx1, fx2)[0] = (1.83778 , 48.657)
+(fx1, fx2)[1] = (1.50089 , 9.81608)
+(fx1, fx2)[2] = (2.97398 , 13.1449)
+(fx1, fx2)[3] = (0.150137 , 2.36395)
+(fx1, fx2)[4] = (0.0640392 , 1.89992)
+(fx1, fx2)[5] = (0.0322577 , 1.11314)
+TUtil::SumMEPDF: Setting RcdME
+End TUtil::SumMEPDF
+TUtil::HJJMatEl: Reset AlphaS:
+	Before reset, alphas scale: 59.4084, PDF scale: 59.4084
+TUtil::HJJMatEl: Reset AlphaS result:
+	After reset, alphas scale: 91.2, PDF scale: 91.2, alphas(Qren): 0.13, alphas(MZ): 0.13
+TEvtProb::XsecCalc_XJJ: Process HSMHiggs dXsec=5.76159e-09
+End XsecCalc_XJJ
+TEvtProb::SetHiggsMass(125, -1, -1):
+	hmass: 125, 0.00407
+	h2mass: -1, 0
+	MCFM hmass: 125, 0.00407
+	MCFM h2mass: -1, 0
+Begin XsecCalc_XJJ
+Begin GetBoostedParticleVectors
+TUtil::GetBoostedParticleVectors: code=5
+TUtil::GetBoostedParticleVectors: nRequestedLeps=0
+TUtil::GetBoostedParticleVectors: nRequestedJets=2
+TUtil::GetBoostedParticleVectors: nRequestedPhotons=0
+TUtil::GetBoostedParticleVectors: aVhypo==0 case begin
+TUtil::GetBoostedParticleVectors: aVhypo==0 jet case associated_tmp.size=2
+TUtil::GetBoostedParticleVectors: Removing mass from jet pair 0	1
+TUtil::GetBoostedParticleVectors: associated.size=2
+TUtil::GetBoostedParticleVectors: stableTops.size=0
+TUtil::GetBoostedParticleVectors: stableAntitops.size=0
+TUtil::GetBoostedParticleVectors: topDaughters.size=0
+TUtil::GetBoostedParticleVectors: antitopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.intermediateVid.size=2
+TUtil::GetBoostedParticleVectors mela_event.pMothers.size=2
+TUtil::GetBoostedParticleVectors mela_event.pDaughters.size=4
+TUtil::GetBoostedParticleVectors mela_event.pAssociated.size=2
+TUtil::GetBoostedParticleVectors mela_event.pStableTops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pStableAntitops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pTopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.pAntitopDaughters.size=0
+End GetBoostedParticleVectors
+p[0] (Px, Py, Pz, E, M):	0	0	1022.71	1022.71	0
+p[1] (Px, Py, Pz, E, M):	0	0	-328.368	328.368	0
+p[2] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	1.57699e-05
+p[3] (Px, Py, Pz, E, M):	-237.081	-10.5002	123.663	267.601	3.332e-06
+p[4] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+One-jet momenta: 
+pOneJet[0] (Px, Py, Pz, E, M):	0	0	1022.71	1022.71	0
+pOneJet[1] (Px, Py, Pz, E, M):	0	0	-328.368	328.368	0
+pOneJet[2] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+pOneJet[3] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	1.57699e-05
+TUtil::HJJMatEl: Set AlphaS:
+	Before set, alphas scale: 91.2, PDF scale: 91.2
+	renQ: 59.4084 ( x 0.5), facQ: 59.4084 ( x 0.5)
+	After set, alphas scale: 59.4084, PDF scale: 59.4084, alphas(Qren): 0.139483, alphas(MZ): 0.13
+MatElsq:
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	3.57508e-10	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+Begin TUtil::SumMEPDF
+Begin TUtil::ComputePDF
+TUtil::CheckPartonMomFraction: xx[0]: 0.157341, xx[1] = 0.0505182, xmin = 1e-08
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.157341, xx[1] = 0.0505182
+TUtil::ComputePDF: called
+End TUtil::ComputePDF:
+(fx1, fx2)[-5] = (0.0476575 , 0.91771)
+(fx1, fx2)[-4] = (0.0932015 , 1.58141)
+(fx1, fx2)[-3] = (0.132237 , 1.91705)
+(fx1, fx2)[-2] = (0.337199 , 3.8726)
+(fx1, fx2)[-1] = (0.447599 , 4.3744)
+(fx1, fx2)[0] = (2.61355 , 40.4813)
+(fx1, fx2)[1] = (1.83413 , 8.78637)
+(fx1, fx2)[2] = (3.45399 , 11.9515)
+(fx1, fx2)[3] = (0.203249 , 1.99683)
+(fx1, fx2)[4] = (0.0932015 , 1.58141)
+(fx1, fx2)[5] = (0.0476575 , 0.91771)
+TUtil::SumMEPDF: Setting RcdME
+End TUtil::SumMEPDF
+TUtil::HJJMatEl: Reset AlphaS:
+	Before reset, alphas scale: 59.4084, PDF scale: 59.4084
+TUtil::HJJMatEl: Reset AlphaS result:
+	After reset, alphas scale: 91.2, PDF scale: 91.2, alphas(Qren): 0.13, alphas(MZ): 0.13
+TEvtProb::XsecCalc_XJJ: Process HSMHiggs dXsec=7.8368e-09
+End XsecCalc_XJJ
+TEvtProb::SetHiggsMass(125, -1, -1):
+	hmass: 125, 0.00407
+	h2mass: -1, 0
+	MCFM hmass: 125, 0.00407
+	MCFM h2mass: -1, 0
+Begin XsecCalc_XJJ
+Begin GetBoostedParticleVectors
+TUtil::GetBoostedParticleVectors: code=5
+TUtil::GetBoostedParticleVectors: nRequestedLeps=0
+TUtil::GetBoostedParticleVectors: nRequestedJets=2
+TUtil::GetBoostedParticleVectors: nRequestedPhotons=0
+TUtil::GetBoostedParticleVectors: aVhypo==0 case begin
+TUtil::GetBoostedParticleVectors: aVhypo==0 jet case associated_tmp.size=2
+TUtil::GetBoostedParticleVectors: Removing mass from jet pair 0	1
+TUtil::GetBoostedParticleVectors: associated.size=2
+TUtil::GetBoostedParticleVectors: stableTops.size=0
+TUtil::GetBoostedParticleVectors: stableAntitops.size=0
+TUtil::GetBoostedParticleVectors: topDaughters.size=0
+TUtil::GetBoostedParticleVectors: antitopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.intermediateVid.size=2
+TUtil::GetBoostedParticleVectors mela_event.pMothers.size=2
+TUtil::GetBoostedParticleVectors mela_event.pDaughters.size=4
+TUtil::GetBoostedParticleVectors mela_event.pAssociated.size=2
+TUtil::GetBoostedParticleVectors mela_event.pStableTops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pStableAntitops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pTopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.pAntitopDaughters.size=0
+End GetBoostedParticleVectors
+p[0] (Px, Py, Pz, E, M):	0	0	979.44	979.44	0
+p[1] (Px, Py, Pz, E, M):	0	0	-348.809	348.809	0
+p[2] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	5.96046e-06
+p[3] (Px, Py, Pz, E, M):	-237.081	-10.5002	59.9483	244.768	9.00257e-06
+p[4] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+One-jet momenta: 
+pOneJet[0] (Px, Py, Pz, E, M):	0	0	979.44	979.44	0
+pOneJet[1] (Px, Py, Pz, E, M):	0	0	-348.809	348.809	0
+pOneJet[2] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+pOneJet[3] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	5.96046e-06
+TUtil::HJJMatEl: Set AlphaS:
+	Before set, alphas scale: 91.2, PDF scale: 91.2
+	renQ: 59.4084 ( x 0.5), facQ: 59.4084 ( x 0.5)
+	After set, alphas scale: 59.4084, PDF scale: 59.4084, alphas(Qren): 0.139483, alphas(MZ): 0.13
+MatElsq:
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	6.2923e-10	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+Begin TUtil::SumMEPDF
+Begin TUtil::ComputePDF
+TUtil::CheckPartonMomFraction: xx[0]: 0.150683, xx[1] = 0.053663, xmin = 1e-08
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.150683, xx[1] = 0.053663
+TUtil::ComputePDF: called
+End TUtil::ComputePDF:
+(fx1, fx2)[-5] = (0.0547257 , 0.804542)
+(fx1, fx2)[-4] = (0.106456 , 1.39541)
+(fx1, fx2)[-3] = (0.149246 , 1.68794)
+(fx1, fx2)[-2] = (0.375689 , 3.46518)
+(fx1, fx2)[-1] = (0.500643 , 3.9381)
+(fx1, fx2)[0] = (2.96229 , 35.7263)
+(fx1, fx2)[1] = (1.96915 , 8.15456)
+(fx1, fx2)[2] = (3.64199 , 11.2145)
+(fx1, fx2)[3] = (0.226106 , 1.78429)
+(fx1, fx2)[4] = (0.106456 , 1.39541)
+(fx1, fx2)[5] = (0.0547257 , 0.804542)
+TUtil::SumMEPDF: Setting RcdME
+End TUtil::SumMEPDF
+TUtil::HJJMatEl: Reset AlphaS:
+	Before reset, alphas scale: 59.4084, PDF scale: 59.4084
+TUtil::HJJMatEl: Reset AlphaS result:
+	After reset, alphas scale: 91.2, PDF scale: 91.2, alphas(Qren): 0.13, alphas(MZ): 0.13
+TEvtProb::XsecCalc_XJJ: Process HSMHiggs dXsec=1.38953e-08
+End XsecCalc_XJJ
+TEvtProb::SetHiggsMass(125, -1, -1):
+	hmass: 125, 0.00407
+	h2mass: -1, 0
+	MCFM hmass: 125, 0.00407
+	MCFM h2mass: -1, 0
+Begin XsecCalc_XJJ
+Begin GetBoostedParticleVectors
+TUtil::GetBoostedParticleVectors: code=5
+TUtil::GetBoostedParticleVectors: nRequestedLeps=0
+TUtil::GetBoostedParticleVectors: nRequestedJets=2
+TUtil::GetBoostedParticleVectors: nRequestedPhotons=0
+TUtil::GetBoostedParticleVectors: aVhypo==0 case begin
+TUtil::GetBoostedParticleVectors: aVhypo==0 jet case associated_tmp.size=2
+TUtil::GetBoostedParticleVectors: Removing mass from jet pair 0	1
+TUtil::GetBoostedParticleVectors: associated.size=2
+TUtil::GetBoostedParticleVectors: stableTops.size=0
+TUtil::GetBoostedParticleVectors: stableAntitops.size=0
+TUtil::GetBoostedParticleVectors: topDaughters.size=0
+TUtil::GetBoostedParticleVectors: antitopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.intermediateVid.size=2
+TUtil::GetBoostedParticleVectors mela_event.pMothers.size=2
+TUtil::GetBoostedParticleVectors mela_event.pDaughters.size=4
+TUtil::GetBoostedParticleVectors mela_event.pAssociated.size=2
+TUtil::GetBoostedParticleVectors mela_event.pStableTops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pStableAntitops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pTopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.pAntitopDaughters.size=0
+End GetBoostedParticleVectors
+p[0] (Px, Py, Pz, E, M):	0	0	1078.28	1078.28	0
+p[1] (Px, Py, Pz, E, M):	0	0	-312.449	312.449	0
+p[2] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	1.03238e-05
+p[3] (Px, Py, Pz, E, M):	-237.081	-10.5002	195.147	307.246	4.21468e-06
+p[4] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+One-jet momenta: 
+pOneJet[0] (Px, Py, Pz, E, M):	0	0	1078.28	1078.28	0
+pOneJet[1] (Px, Py, Pz, E, M):	0	0	-312.449	312.449	0
+pOneJet[2] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+pOneJet[3] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	1.03238e-05
+TUtil::HJJMatEl: Set AlphaS:
+	Before set, alphas scale: 91.2, PDF scale: 91.2
+	renQ: 59.4084 ( x 0.5), facQ: 59.4084 ( x 0.5)
+	After set, alphas scale: 59.4084, PDF scale: 59.4084, alphas(Qren): 0.139483, alphas(MZ): 0.13
+MatElsq:
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	2.66667e-10	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+Begin TUtil::SumMEPDF
+Begin TUtil::ComputePDF
+TUtil::CheckPartonMomFraction: xx[0]: 0.165889, xx[1] = 0.0480691, xmin = 1e-08
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.165889, xx[1] = 0.0480691
+TUtil::ComputePDF: called
+End TUtil::ComputePDF:
+(fx1, fx2)[-5] = (0.0400576 , 1.02123)
+(fx1, fx2)[-4] = (0.0788656 , 1.75051)
+(fx1, fx2)[-3] = (0.113349 , 2.12658)
+(fx1, fx2)[-2] = (0.294688 , 4.23844)
+(fx1, fx2)[-1] = (0.387411 , 4.76567)
+(fx1, fx2)[0] = (2.2339 , 44.8168)
+(fx1, fx2)[1] = (1.67779 , 9.34041)
+(fx1, fx2)[2] = (3.23182 , 12.5948)
+(fx1, fx2)[3] = (0.177748 , 2.19119)
+(fx1, fx2)[4] = (0.0788656 , 1.75051)
+(fx1, fx2)[5] = (0.0400576 , 1.02123)
+TUtil::SumMEPDF: Setting RcdME
+End TUtil::SumMEPDF
+TUtil::HJJMatEl: Reset AlphaS:
+	Before reset, alphas scale: 59.4084, PDF scale: 59.4084
+TUtil::HJJMatEl: Reset AlphaS result:
+	After reset, alphas scale: 91.2, PDF scale: 91.2, alphas(Qren): 0.13, alphas(MZ): 0.13
+TEvtProb::XsecCalc_XJJ: Process HSMHiggs dXsec=5.63503e-09
+End XsecCalc_XJJ
+TEvtProb::SetHiggsMass(125, -1, -1):
+	hmass: 125, 0.00407
+	h2mass: -1, 0
+	MCFM hmass: 125, 0.00407
+	MCFM h2mass: -1, 0
+Begin XsecCalc_XJJ
+Begin GetBoostedParticleVectors
+TUtil::GetBoostedParticleVectors: code=5
+TUtil::GetBoostedParticleVectors: nRequestedLeps=0
+TUtil::GetBoostedParticleVectors: nRequestedJets=2
+TUtil::GetBoostedParticleVectors: nRequestedPhotons=0
+TUtil::GetBoostedParticleVectors: aVhypo==0 case begin
+TUtil::GetBoostedParticleVectors: aVhypo==0 jet case associated_tmp.size=2
+TUtil::GetBoostedParticleVectors: Removing mass from jet pair 0	1
+TUtil::GetBoostedParticleVectors: associated.size=2
+TUtil::GetBoostedParticleVectors: stableTops.size=0
+TUtil::GetBoostedParticleVectors: stableAntitops.size=0
+TUtil::GetBoostedParticleVectors: topDaughters.size=0
+TUtil::GetBoostedParticleVectors: antitopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.intermediateVid.size=2
+TUtil::GetBoostedParticleVectors mela_event.pMothers.size=2
+TUtil::GetBoostedParticleVectors mela_event.pDaughters.size=4
+TUtil::GetBoostedParticleVectors mela_event.pAssociated.size=2
+TUtil::GetBoostedParticleVectors mela_event.pStableTops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pStableAntitops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pTopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.pAntitopDaughters.size=0
+End GetBoostedParticleVectors
+p[0] (Px, Py, Pz, E, M):	0	0	3210.37	3210.37	0
+p[1] (Px, Py, Pz, E, M):	0	0	-262.307	262.307	0
+p[2] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	3.76973e-05
+p[3] (Px, Py, Pz, E, M):	-237.081	-10.5002	2377.38	2389.19	3.37175e-05
+p[4] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+One-jet momenta: 
+pOneJet[0] (Px, Py, Pz, E, M):	0	0	3210.37	3210.37	0
+pOneJet[1] (Px, Py, Pz, E, M):	0	0	-262.307	262.307	0
+pOneJet[2] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+pOneJet[3] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	3.76973e-05
+TUtil::HJJMatEl: Set AlphaS:
+	Before set, alphas scale: 91.2, PDF scale: 91.2
+	renQ: 59.4084 ( x 0.5), facQ: 59.4084 ( x 0.5)
+	After set, alphas scale: 59.4084, PDF scale: 59.4084, alphas(Qren): 0.139483, alphas(MZ): 0.13
+MatElsq:
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	2.90947e-08	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+Begin TUtil::SumMEPDF
+Begin TUtil::ComputePDF
+TUtil::CheckPartonMomFraction: xx[0]: 0.493902, xx[1] = 0.0403549, xmin = 1e-08
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.493902, xx[1] = 0.0403549
+TUtil::ComputePDF: called
+End TUtil::ComputePDF:
+(fx1, fx2)[-5] = (0.000110971 , 1.47387)
+(fx1, fx2)[-4] = (0.00029956 , 2.48074)
+(fx1, fx2)[-3] = (0.00040488 , 3.04281)
+(fx1, fx2)[-2] = (0.00410962 , 5.77717)
+(fx1, fx2)[-1] = (0.00161193 , 6.40899)
+(fx1, fx2)[0] = (0.0118523 , 63.6684)
+(fx1, fx2)[1] = (0.0701181 , 11.5676)
+(fx1, fx2)[2] = (0.277978 , 15.1555)
+(fx1, fx2)[3] = (0.010785 , 3.04586)
+(fx1, fx2)[4] = (0.00029956 , 2.48074)
+(fx1, fx2)[5] = (0.000110971 , 1.47387)
+TUtil::SumMEPDF: Setting RcdME
+End TUtil::SumMEPDF
+TUtil::HJJMatEl: Reset AlphaS:
+	Before reset, alphas scale: 59.4084, PDF scale: 59.4084
+TUtil::HJJMatEl: Reset AlphaS result:
+	After reset, alphas scale: 91.2, PDF scale: 91.2, alphas(Qren): 0.13, alphas(MZ): 0.13
+TEvtProb::XsecCalc_XJJ: Process HSMHiggs dXsec=3.09181e-08
+End XsecCalc_XJJ
+TEvtProb::SetHiggsMass(125, -1, -1):
+	hmass: 125, 0.00407
+	h2mass: -1, 0
+	MCFM hmass: 125, 0.00407
+	MCFM h2mass: -1, 0
+Begin XsecCalc_XJJ
+Begin GetBoostedParticleVectors
+TUtil::GetBoostedParticleVectors: code=5
+TUtil::GetBoostedParticleVectors: nRequestedLeps=0
+TUtil::GetBoostedParticleVectors: nRequestedJets=2
+TUtil::GetBoostedParticleVectors: nRequestedPhotons=0
+TUtil::GetBoostedParticleVectors: aVhypo==0 case begin
+TUtil::GetBoostedParticleVectors: aVhypo==0 jet case associated_tmp.size=2
+TUtil::GetBoostedParticleVectors: Removing mass from jet pair 0	1
+TUtil::GetBoostedParticleVectors: associated.size=2
+TUtil::GetBoostedParticleVectors: stableTops.size=0
+TUtil::GetBoostedParticleVectors: stableAntitops.size=0
+TUtil::GetBoostedParticleVectors: topDaughters.size=0
+TUtil::GetBoostedParticleVectors: antitopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.intermediateVid.size=2
+TUtil::GetBoostedParticleVectors mela_event.pMothers.size=2
+TUtil::GetBoostedParticleVectors mela_event.pDaughters.size=4
+TUtil::GetBoostedParticleVectors mela_event.pAssociated.size=2
+TUtil::GetBoostedParticleVectors mela_event.pStableTops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pStableAntitops.size=0
+TUtil::GetBoostedParticleVectors mela_event.pTopDaughters.size=0
+TUtil::GetBoostedParticleVectors mela_event.pAntitopDaughters.size=0
+End GetBoostedParticleVectors
+p[0] (Px, Py, Pz, E, M):	0	0	2272.62	2272.62	0
+p[1] (Px, Py, Pz, E, M):	0	0	-266.139	266.139	0
+p[2] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	2.06477e-05
+p[3] (Px, Py, Pz, E, M):	-237.081	-10.5002	1435.8	1455.28	2.38419e-05
+p[4] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+One-jet momenta: 
+pOneJet[0] (Px, Py, Pz, E, M):	0	0	2272.62	2272.62	0
+pOneJet[1] (Px, Py, Pz, E, M):	0	0	-266.139	266.139	0
+pOneJet[2] (Px, Py, Pz, E, M):	368.676	-320.06	133.665	519.946	118.817
+pOneJet[3] (Px, Py, Pz, E, M):	-131.595	330.56	437.017	563.534	2.06477e-05
+TUtil::HJJMatEl: Set AlphaS:
+	Before set, alphas scale: 91.2, PDF scale: 91.2
+	renQ: 59.4084 ( x 0.5), facQ: 59.4084 ( x 0.5)
+	After set, alphas scale: 59.4084, PDF scale: 59.4084, alphas(Qren): 0.139483, alphas(MZ): 0.13
+MatElsq:
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	8.89126e-09	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0	0	0	0	
+Begin TUtil::SumMEPDF
+Begin TUtil::ComputePDF
+TUtil::CheckPartonMomFraction: xx[0]: 0.349633, xx[1] = 0.0409445, xmin = 1e-08
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.349633, xx[1] = 0.0409445
+TUtil::ComputePDF: called
+End TUtil::ComputePDF:
+(fx1, fx2)[-5] = (0.00147173 , 1.43045)
+(fx1, fx2)[-4] = (0.00348523 , 2.41124)
+(fx1, fx2)[-3] = (0.00573045 , 2.95489)
+(fx1, fx2)[-2] = (0.0219235 , 5.63322)
+(fx1, fx2)[-1] = (0.00785525 , 6.25532)
+(fx1, fx2)[0] = (0.131473 , 61.8656)
+(fx1, fx2)[1] = (0.294549 , 11.365)
+(fx1, fx2)[2] = (0.885205 , 14.924)
+(fx1, fx2)[3] = (0.0169981 , 2.96336)
+(fx1, fx2)[4] = (0.00348523 , 2.41124)
+(fx1, fx2)[5] = (0.00147173 , 1.43045)
+TUtil::SumMEPDF: Setting RcdME
+End TUtil::SumMEPDF
+TUtil::HJJMatEl: Reset AlphaS:
+	Before reset, alphas scale: 59.4084, PDF scale: 59.4084
+TUtil::HJJMatEl: Reset AlphaS result:
+	After reset, alphas scale: 91.2, PDF scale: 91.2, alphas(Qren): 0.13, alphas(MZ): 0.13
+TEvtProb::XsecCalc_XJJ: Process HSMHiggs dXsec=3.90847e-08
+End XsecCalc_XJJ
+TEvtProb::SetHiggsMass(125, -1, -1):
+	hmass: 125, 0.00407
+	h2mass: -1, 0
+	MCFM hmass: 125, 0.00407
+	MCFM h2mass: -1, 0
+Mela::computeProdP: Number of iterations for JVBF eta integration: 26
+Begin MelaPConstant::Eval
+Mela::getConstant: Constant is 1
+Mela: End computeProdP
+Probability = 8.22409e-07
+Auxiliary probability = 0.659116
