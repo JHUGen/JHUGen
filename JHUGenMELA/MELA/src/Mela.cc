@@ -1345,8 +1345,6 @@ void Mela::computeProdP(
           pArray.push_back((double)prob_temp);
         }
 
-        double* xGrid;
-        double* yGrid;
         const double grid_precision = 0.15;
         int ctr_iter=0;
         for (int iG=0; iG<nGrid-1; iG++){ // For each spacing, first compare the average of end points to spline value
@@ -1355,25 +1353,18 @@ void Mela::computeProdP(
 
           ctr_iter++;
 
-          xGrid = new double[nGrid];
-          yGrid = new double[nGrid];
-          for (int iter=0; iter<nGrid; iter++){ // Fill the arrays
-            xGrid[iter] = (double)etaArray[iter];
-            yGrid[iter] = (double)pArray[iter];
-          }
-
-          TGraph* interpolator = new TGraph(nGrid, xGrid, yGrid);
-          double derivative_first = (yGrid[1]-yGrid[0])/(xGrid[1]-xGrid[0]);
-          double derivative_last = (yGrid[nGrid-1]-yGrid[nGrid-2])/(xGrid[nGrid-1]-xGrid[nGrid-2]);
-          TSpline3* spline = new TSpline3("spline", interpolator, "b1e1", derivative_first, derivative_last);
-          double x_middle = (xGrid[iG]+xGrid[iG+1])*0.5;
-          double y_middle = (yGrid[iG]+yGrid[iG+1])*0.5;
-          double y_sp = spline->Eval(x_middle);
+          TGraph interpolator(nGrid, etaArray.data(), pArray.data());
+          double derivative_first = (pArray[1]-pArray[0])/(etaArray[1]-etaArray[0]);
+          double derivative_last = (pArray[nGrid-1]-pArray[nGrid-2])/(etaArray[nGrid-1]-etaArray[nGrid-2]);
+          TSpline3 spline("spline", &interpolator, "b1e1", derivative_first, derivative_last);
+          double x_middle = (etaArray[iG]+etaArray[iG+1])*0.5;
+          double y_middle = (pArray[iG]+pArray[iG+1])*0.5;
+          double y_sp = spline.Eval(x_middle);
           if (y_sp<0) y_sp = 0;
 
           std::vector<double>::iterator gridIt;
 
-          if (fabs(y_sp-y_middle)<grid_precision*fabs(y_middle) || fabs(xGrid[iG+1]-xGrid[iG])<1e-3){
+          if (fabs(y_sp-y_middle)<grid_precision*fabs(y_middle) || fabs(etaArray[iG+1]-etaArray[iG])<1e-3){
             gridIt = pArray.begin()+iG+1;
             pArray.insert(gridIt, y_sp);
             gridIt = etaArray.begin()+iG+1;
@@ -1404,11 +1395,6 @@ void Mela::computeProdP(
             iG--; // Do not pass to next bin, repeat until precision is achieved.
           }
           nGrid++;
-
-          delete spline;
-          delete interpolator;
-          delete xGrid;
-          delete yGrid;
         }
 
         if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela::computeProdP: Number of iterations for JVBF eta integration: " << ctr_iter << endl;
