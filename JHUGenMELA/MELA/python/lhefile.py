@@ -91,7 +91,7 @@ class LHEEvent_StableHiggs(LHEEvent):
         if status != 1:
           raise ValueError("Higgs has status {}, expected it to be 1\n\n".format(status) + "\n".join(lines))
         daughters.append(line)
-      if abs(id) in (0, 1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16) and status == 1:
+      if abs(id) in (0, 1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16, 21) and status == 1:
         associated.append(line)
 
     if len(daughters) != 1:
@@ -111,6 +111,33 @@ class LHEEvent_JHUGenVBFVH(LHEEvent_StableHiggs):
 
 class LHEEvent_JHUGenttH(LHEEvent_StableHiggs):
   nassociatedparticles = 6
+
+class LHEEvent_Offshell4l(LHEEvent):
+  @classmethod
+  def extracteventparticles(cls, lines, isgen):
+    daughters, mothers, associated = [], [], []
+    for line in lines:
+      id, status, mother1, mother2 = (int(_) for _ in line.split()[0:4])
+      if (1 <= abs(id) <= 6 or abs(id) == 21) and not isgen:
+        line = line.replace(str(id), "0", 1)  #replace the first instance of the jet id with 0, which means unknown jet
+      if status == -1:
+        mothers.append(line)
+      if abs(id) in (11, 12, 13, 14, 15, 16) and status == 1:
+        daughters.append(line)
+      if abs(id) in (0, 1, 2, 3, 4, 5, 21) and status == 1:
+        associated.append(line)
+
+    if len(daughters) != 4:
+      raise ValueError("Wrong number of daughters (expected {}, found {})\n\n".format(4, len(daughters))+"\n".join(lines))
+    if cls.nassociatedparticles is not None and len(associated) != cls.nassociatedparticles:
+      raise ValueError("Wrong number of associated particles (expected {}, found {})\n\n".format(cls.nassociatedparticles, len(associated))+"\n".join(lines))
+    if len(mothers) != 2:
+      raise ValueError("{} mothers in the event??\n\n".format(len(mothers))+"\n".join(lines))
+
+    if not isgen: mothers = None
+    return daughters, associated, mothers
+
+  nassociatedparticles = None
 
 class LHEFileBase(object):
   """
@@ -203,6 +230,8 @@ class LHEFile_JHUGenVBFVH(LHEFileBase):
   lheeventclass = LHEEvent_JHUGenVBFVH
 class LHEFile_JHUGenttH(LHEFileBase):
   lheeventclass = LHEEvent_JHUGenttH
+class LHEFile_Offshell4l(LHEFileBase):
+  lheeventclass = LHEEvent_Offshell4l
 
 if __name__ == '__main__':
   class TestLHEFiles(unittest.TestCase):
