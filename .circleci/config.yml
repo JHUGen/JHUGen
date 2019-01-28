@@ -938,6 +938,12 @@ jobs:
             done
             exit $exitstatus
       - run:
+          name: "check running with a short DataFile"
+          command: |
+            cd JHUGenerator
+            ./JHUGen Process=50 VegasNc0=10000 VegasNc2=1 DataFile=a
+          when: always
+      - run:
           name: "check that the compiler is gfortran"
           command: "! grep 'Comp *= *ifort' JHUGenerator/makefile"
           when: always
