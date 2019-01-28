@@ -184,7 +184,7 @@ void Mela::build(double mh_){
   if (myVerbosity_>=TVar::DEBUG) MELAout << "Set ZZMatrixElement masses" << endl;
   setMelaPrimaryHiggsMass(mh_);
   setMelaHiggsMass(mh_, 0); setMelaHiggsMass(-1., 1);
-  setMelaHiggsWidth(-1., 0); setMelaHiggsWidth(0., 1);
+  setMelaHiggsWidth(-1., 0); setMelaHiggsWidth(-1., 1);
   setMelaLeptonInterference(TVar::DefaultLeptonInterf);
   setCandidateDecayMode(TVar::CandidateDecay_ZZ); // Default decay mode is ZZ at the start
 
