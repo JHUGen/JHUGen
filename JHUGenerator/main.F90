@@ -2669,7 +2669,7 @@ integer :: VegasSeed,PreviousSum,ios,NumPartonicChannels
 character :: ProcessStr*(3)
 logical :: UseBetaVersion=.false.
 real(8) :: VG_Result_in(1:5),VG_Error_in(1:5),calls1_in(1:5),calls2_in(1:5)
-real(8) :: CrossSec2_in(1:5,1:164),CrossSecMax2_in(1:5,164)
+real(8) :: CrossSec2_in(1:5,1:164),CrossSecMax2_in(1:5,164),CrossSectionWithWeights_in(1:5),CrossSectionWithWeightsErrorSquared_in(1:5)
 
 
     VG_Result = -13d0
@@ -3007,6 +3007,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         read(io_TmpFile,fmt=*) CrossSecMax2_in(1,:)
         read(io_TmpFile,fmt=*) VG_Result_in(1)
         read(io_TmpFile,fmt=*) VG_Error_in(1)
+        read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(1), CrossSectionWithWeightsErrorSquared_in(1)
         close(unit=io_TmpFile)
         if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'1_gridinfo.txt'
 
@@ -3016,6 +3017,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         read(io_TmpFile,fmt=*) CrossSecMax2_in(2,:)
         read(io_TmpFile,fmt=*) VG_Result_in(2)
         read(io_TmpFile,fmt=*) VG_Error_in(2)
+        read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(2), CrossSectionWithWeightsErrorSquared_in(2)
         close(unit=io_TmpFile)
         if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'2_gridinfo.txt'
 
@@ -3025,6 +3027,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         read(io_TmpFile,fmt=*) CrossSecMax2_in(3,:)
         read(io_TmpFile,fmt=*) VG_Result_in(3)
         read(io_TmpFile,fmt=*) VG_Error_in(3)
+        read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(3), CrossSectionWithWeightsErrorSquared_in(3)
         close(unit=io_TmpFile)
         if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'3_gridinfo.txt'
 
@@ -3034,6 +3037,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         read(io_TmpFile,fmt=*) CrossSecMax2_in(4,:)
         read(io_TmpFile,fmt=*) VG_Result_in(4)
         read(io_TmpFile,fmt=*) VG_Error_in(4)
+        read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(4), CrossSectionWithWeightsErrorSquared_in(4)
         close(unit=io_TmpFile)
         if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'4_gridinfo.txt'
 
@@ -3043,6 +3047,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         read(io_TmpFile,fmt=*) CrossSecMax2_in(5,:)
         read(io_TmpFile,fmt=*) VG_Result_in(5)
         read(io_TmpFile,fmt=*) VG_Error_in(5)
+        read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(5), CrossSectionWithWeightsErrorSquared_in(5)
         close(unit=io_TmpFile)
         if( ios.eq.0 ) print *, "read ",trim(DataFile(1:i-1))//'5_gridinfo.txt'
 
@@ -3070,6 +3075,9 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         VG_Result = VG_Result_in(1)+VG_Result_in(2)+VG_Result_in(3)+VG_Result_in(4)+VG_Result_in(5)
         VG_Error  = dsqrt(VG_Error_in(1)**2+VG_Error_in(2)**2+VG_Error_in(3)**2+VG_Error_in(4)**2+VG_Error_in(5)**2)
 
+        CrossSectionWithWeights = CrossSectionWithWeights_in(1) + CrossSectionWithWeights_in(2) + CrossSectionWithWeights_in(3) + CrossSectionWithWeights_in(4) + CrossSectionWithWeights_in(5)
+        CrossSectionWithWeightsErrorSquared = CrossSectionWithWeightsErrorSquared_in(1) + CrossSectionWithWeightsErrorSquared_in(2) + CrossSectionWithWeightsErrorSquared_in(3) + CrossSectionWithWeightsErrorSquared_in(4) + CrossSectionWithWeightsErrorSquared_in(5)
+
     else
         itmx = 10
         ncall= VegasNc0
@@ -3088,7 +3096,11 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         print *, "resetting CrossSecMax2(:)"
         itmx = 1
         call ClearHisto()
+        FindCrossSectionWithWeights = .true.
+        CrossSectionWithWeights = 0d0
+        CrossSectionWithWeightsErrorSquared = 0d0
         if( Process.ge.66 .and. Process.le.69 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+        FindCrossSectionWithWeights = .false.
         writeout=.false.
         ingridfile=trim(outgridfile)
 
@@ -3101,12 +3113,14 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         write(io_TmpFile,fmt=*) CrossSecMax2
         write(io_TmpFile,fmt=*) VG_Result
         write(io_TmpFile,fmt=*) VG_Error
+        write(io_TmpFile,fmt=*) CrossSectionWithWeights, CrossSectionWithWeightsErrorSquared
         close(unit=io_TmpFile)
     endif
 
     write(io_stdout,"(A)")  ""
-    write(io_stdout,*) "Total xsec: ",VG_Result, " +/-",VG_Error, " fb    vs.",sum(CrossSec2(:))
-    call InitOutput(VG_Result, VG_Error)
+    write(io_stdout,*) "Total unweighted xsec (used by Vegas): ", VG_Result, " +/-", VG_Error, " fb    vs.",sum(CrossSec2(:))
+    write(io_stdout,*) "Total xsec with weights (use for physics): ", CrossSectionWithWeights, " +/-", sqrt(CrossSectionWithWeightsErrorSquared)
+    call InitOutput(CrossSectionWithWeights, sqrt(CrossSectionWithWeightsErrorSquared))
 
     RequEvents2(:) = 0
     call HouseOfRepresentatives2(CrossSec2, RequEvents2, VegasNc2)
