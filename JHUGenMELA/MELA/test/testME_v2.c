@@ -2413,6 +2413,73 @@ void testME_VBF_JHUGen_Ping(int erg_tev=13, bool useConstants=false, shared_ptr<
 }
 
 
+void testME_JVBF_JHUGen_Ping(shared_ptr<Mela> melaptr=nullptr){
+  ofstream tout(TString("testME_JVBF_JHUGen_Ping.out"));
+  streambuf* coutbuf = cout.rdbuf();
+  cout.rdbuf(tout.rdbuf());
+
+  int erg_tev=13;
+  float mPOLE=125.;
+  float wPOLE=4.07e-3;
+
+  TVar::VerbosityLevel verbosity = TVar::DEBUG;
+  if (!melaptr) melaptr.reset(new Mela(erg_tev, mPOLE, verbosity));
+  Mela& mela = *melaptr;
+  TVar::VerbosityLevel bkpverbosity = mela.getVerbosity();
+  mela.setVerbosity(verbosity);
+  if (verbosity>=TVar::DEBUG) cout << "Mela is initialized" << endl;
+
+  float pingMom[8][4]={
+    { 0, 0, 865.37881546721542, 865.37881546721542 },
+    { 0, 0, -624.03396598421773, 624.03396598421773 },
+    { 7.6145299215002638, -17.259247740062808, 9.4660586470659975, 21.106135714241464 },
+    { 90.901719112641416, -69.683681833050798, 32.066319224729980, 118.94194752090492 },
+    { 78.476352131782917, -35.264818847819797, -8.8615639484695272, 86.490881645951262 },
+    { 191.68369742375290, -197.85205601463366, 100.99437243828194, 293.40746273989180 },
+    { -131.59521398083137, 330.56000090294270, 437.01695094737875, 563.53440884737279 },
+    { -237.08108460884614, -10.500196467375645, -329.33728782598945, 405.93194498307093 }
+  };
+  int idOrdered[8] ={ 1, 2, 11, -11, 13, -13, 1, 2 };
+  SimpleParticleCollection_t mothers; mothers.reserve(2);
+  for (unsigned int ip=0; ip<2; ip++){
+    mothers.emplace_back(
+      idOrdered[ip],
+      TLorentzVector(pingMom[ip][0], pingMom[ip][1], pingMom[ip][2], pingMom[ip][3])
+    );
+  }
+  SimpleParticleCollection_t daughters; daughters.reserve(4);
+  for (unsigned int ip=2; ip<6; ip++){
+    daughters.emplace_back(
+      idOrdered[ip],
+      TLorentzVector(pingMom[ip][0], pingMom[ip][1], pingMom[ip][2], pingMom[ip][3])
+    );
+  }
+  SimpleParticleCollection_t associated; associated.reserve(1);
+  associated.emplace_back(
+    idOrdered[6],
+    TLorentzVector(pingMom[6][0], pingMom[6][1], pingMom[6][2], pingMom[6][3])
+  );
+  mela.setCandidateDecayMode(TVar::CandidateDecay_ZZ);
+  mela.setInputEvent(&daughters, &associated, &mothers, true);
+
+  std::vector<TVar::EventScaleScheme> eventscaleschemes;
+  for (int is=0; is<(int) TVar::nEventScaleSchemes; is++) eventscaleschemes.push_back((TVar::EventScaleScheme) is);
+
+  float meval_init;
+  mela.setProcess(TVar::HSMHiggs, TVar::JHUGen, TVar::JJVBF);
+  mela.computeProdP(meval_init);
+  cout << "Probability = " << meval_init << endl;
+  mela.getPAux(meval_init);
+  cout << "Auxiliary probability = " << meval_init << endl;
+
+  mela.resetInputEvent();
+
+  cout.rdbuf(coutbuf);
+  tout.close();
+  mela.setVerbosity(bkpverbosity);
+}
+
+
 void testME_Prop_Ping(int useMothers=0, shared_ptr<Mela> melaptr=nullptr){
   ofstream tout(TString("testME_Prop_Ping_")+(long)useMothers+".out");
   streambuf* coutbuf = cout.rdbuf();

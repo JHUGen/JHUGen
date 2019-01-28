@@ -1107,8 +1107,10 @@ type(SaveValues) :: tosave, oldsavevalues
     !output file
 
     i = len(trim(DataFile))
-    if( DataFile(i-3:i).eq.".lhe" ) then
-        DataFile = DataFile(1:i-4)
+    if( i.gt.3 ) then
+       if( DataFile(i-3:i).eq.".lhe" ) then
+          DataFile = DataFile(1:i-4)
+       endif
     endif
     call system('mkdir -p ./data')! -p is suppressing error messages if directory already exists
 
