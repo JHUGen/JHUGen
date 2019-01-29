@@ -1158,6 +1158,7 @@ END FUNCTION EvalUnWeighted_HJJ
 
 
 function ReweightLeptonInterference(id_MCFM, p_MCFM, originalprobability)
+use ModMisc
 use ModParameters
 #if linkMELA==1
 use ModMCFMWrapper
