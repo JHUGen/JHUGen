@@ -1172,7 +1172,12 @@ real(8) :: ReweightLeptonInterference
 
    ReweightLeptonInterference = 1d0
 
-   if( (id_MCFM(3).eq.id_MCFM(5)) .and. (.not. includeInterference) ) then
+   if( (id_MCFM(3).eq.id_MCFM(5)) .and. (ReweightInterference) ) then
+      if (includeInterference) then
+        print *, "This shouldn't be able to happen"
+        stop 1
+      endif
+
       !a bit of explanation here:
       !Let's say this event is 4mu.
       !Label the muons 1, 2, 3, 4.  1 and 3 are positive, 2 and 4 are negative.
