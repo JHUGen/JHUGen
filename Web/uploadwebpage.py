@@ -254,6 +254,7 @@ Download_template = """
 #   - melacommit, name of the commit to checkout for the JHUGenMELA folder.  Default is the same
 #       as the generator
 versions = (
+            Version("v7.2.7", visible=False, gitcommit="05c4ea749698a25ccc789519f1dff84914b34411"),
             Version("v7.2.6", visible=False),
             Version("v7.2.4"),
             Version("v7.2.3", visible=False),
