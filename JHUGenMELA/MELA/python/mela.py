@@ -167,9 +167,9 @@ class Mela(object):
       mela.getConstant(result);
       return result;
     }
-    float computeDijetConvBW(Mela& mela) {
+    float computeDijetConvBW(Mela& mela, bool useTrueBW) {
       float result;
-      mela.computeDijetConvBW(result);
+      mela.computeDijetConvBW(result, useTrueBW);
       return result;
     }
   """
@@ -289,7 +289,7 @@ class Mela(object):
   def computeProdP_VH(self, includeHiggsDecay=False, useConstant=True): return ROOT.computeProdP_VH(self.__mela, includeHiggsDecay, useConstant)
   def computeProdP_ttH(self, topProcess=2, topDecay=0, useConstant=True): return ROOT.computeProdP_ttH(self.__mela, topProcess, topDecay, useConstant)
   def getConstant(self): return ROOT.getConstant(self.__mela)
-  def computeDijetConvBW(self): return ROOT.computeDijetConvBW(self.__mela)
+  def computeDijetConvBW(self, useTrueBW=False): return ROOT.computeDijetConvBW(self.__mela, useTrueBW)
 
   ghg2 = SelfDCoupling("selfDHggcoupl", 0, ROOT.py_gHIGGS_GG_2)
   ghg3 = SelfDCoupling("selfDHggcoupl", 0, ROOT.py_gHIGGS_GG_3)
