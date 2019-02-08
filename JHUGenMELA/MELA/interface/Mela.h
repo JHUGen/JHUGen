@@ -129,6 +129,15 @@ public:
     float& Phi1
   );
   void computeVHAngles(
+    float& mVstar,
+    float& mV,
+    float& costheta1,
+    float& costheta2,
+    float& Phi,
+    float& costhetastar,
+    float& Phi1
+  );
+  void computeVHAngles(
     float& costheta1,
     float& costheta2,
     float& Phi,

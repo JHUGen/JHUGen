@@ -705,6 +705,8 @@ void Mela::computeVBFAngles_ComplexBoost(
 
 // VH angles computation script of Mela to convert MELACandidates to production angles.
 void Mela::computeVHAngles(
+  float& mVstar,
+  float& mV,
   float& costheta1,
   float& costheta2,
   float& Phi,
@@ -714,7 +716,7 @@ void Mela::computeVHAngles(
   using TVar::simple_event_record;
   if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela: Begin computeVHAngles" << endl;
 
-  costheta1=0; costheta2=0; Phi=0; costhetastar=0; Phi1=0;
+  mVstar = 0; mV = 0; costheta1=0; costheta2=0; Phi=0; costhetastar=0; Phi1=0;
 
   melaCand = getCurrentCandidate();
   if (melaCand!=0){
@@ -791,7 +793,14 @@ void Mela::computeVHAngles(
       &(mothers.at(1).second), mothers.at(1).first
     );
 
+    const auto pV = aparts[0].second + aparts[1].second;
+    mV = pV.M();
+    const auto pVstar = pV + daughters[0].second + daughters[1].second + daughters[2].second + daughters[3].second;
+    mVstar = pVstar.M();
+
     // Protect against NaN
+    if (!(mVstar==mVstar)) mVstar=0;
+    if (!(mV==mV)) mV=0;
     if (!(costhetastar==costhetastar)) costhetastar=0;
     if (!(costheta1==costheta1)) costheta1=0;
     if (!(costheta2==costheta2)) costheta2=0;
@@ -799,14 +808,26 @@ void Mela::computeVHAngles(
     if (!(Phi1==Phi1)) Phi1=0;
 
     if (myVerbosity_>=TVar::DEBUG) MELAout
-      << "Mela::computeVHAngles: (h1, h2, Phi, hs, Phi1) = "
-      << costheta1 << ", " << costheta2 << ", " << Phi << ", "
+      << "Mela::computeVHAngles: (mVstar, mV, h1, h2, Phi, hs, Phi1) = "
+      << mVstar << ", " << mV << ", " << costheta1 << ", " << costheta2 << ", " << Phi << ", "
       << costhetastar << ", " << Phi1 << endl;
   }
   else if (myVerbosity_>=TVar::DEBUG) MELAerr << "Mela::computeVHAngles: No possible melaCand in TEvtProb to compute angles." << endl;
 
   reset_CandRef();
   if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela: End computeVHAngles" << endl;
+}
+
+//version without mVstar and mV, for backwards compatibility
+void Mela::computeVHAngles(
+  float& costheta1,
+  float& costheta2,
+  float& Phi,
+  float& costhetastar,
+  float& Phi1
+){
+  float mV, mVstar;
+  computeVHAngles(mVstar, mV, costheta1, costheta2, Phi, costhetastar, Phi1);
 }
 
 // Regular probabilities
