@@ -1853,7 +1853,7 @@ void testME_VH_JHUGen_Ping(int erg_tev=13, bool useConstants=false, shared_ptr<M
 
         cout << "*******************************************************" << endl;
 
-        float costhetastar = 0, costheta1 = 0, costheta2 = 0, Phi = 0, Phi1 = 0;
+        float mVstar = 0, mV = 0, costhetastar = 0, costheta1 = 0, costheta2 = 0, Phi = 0, Phi1 = 0;
         if (prod != TVar::GammaH) mela.computeVHAngles(
           mVstar,
           mV,
