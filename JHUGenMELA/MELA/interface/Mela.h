@@ -137,13 +137,6 @@ public:
     float& costhetastar,
     float& Phi1
   );
-  void computeVHAngles(
-    float& costheta1,
-    float& costheta2,
-    float& Phi,
-    float& costhetastar,
-    float& Phi1
-  );
 
   void computeP_selfDspin0(
     double selfDHvvcoupl_input[nSupportedHiggses][SIZE_HVV][2],

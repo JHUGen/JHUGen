@@ -818,18 +818,6 @@ void Mela::computeVHAngles(
   if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela: End computeVHAngles" << endl;
 }
 
-//version without mVstar and mV, for backwards compatibility
-void Mela::computeVHAngles(
-  float& costheta1,
-  float& costheta2,
-  float& Phi,
-  float& costhetastar,
-  float& Phi1
-){
-  float mV, mVstar;
-  computeVHAngles(mVstar, mV, costheta1, costheta2, Phi, costhetastar, Phi1);
-}
-
 // Regular probabilities
 void Mela::computeP_selfDspin0(
   double selfDHvvcoupl_input[nSupportedHiggses][SIZE_HVV][2],
