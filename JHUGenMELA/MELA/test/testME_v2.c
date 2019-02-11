@@ -1855,13 +1855,15 @@ void testME_VH_JHUGen_Ping(int erg_tev=13, bool useConstants=false, shared_ptr<M
 
         float costhetastar = 0, costheta1 = 0, costheta2 = 0, Phi = 0, Phi1 = 0;
         if (prod != TVar::GammaH) mela.computeVHAngles(
+          mVstar,
+          mV,
           costheta1,
           costheta2,
           Phi,
           costhetastar,
           Phi1
         );
-        cout << "VH (" << TVar::ProductionName(prod) << ") angles: " << costheta1 << " " << costheta2 << " " << Phi << " " << costhetastar << " " << Phi1 << endl;
+        cout << "VH (" << TVar::ProductionName(prod) << ") angles: " << mVstar << " " << mV << " " << costheta1 << " " << costheta2 << " " << Phi << " " << costhetastar << " " << Phi1 << endl;
 
       }
     }
