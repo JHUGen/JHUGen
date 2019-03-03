@@ -10,7 +10,7 @@ integer, parameter :: Hash_MCFM_qqVVqq_Size = 164
 integer, target :: Hash_MCFM_qqVVqq(1:Hash_MCFM_qqVVqq_Size,1:4)
 
 ! MCFM qq_VVqqStrong hash - JHU conventions
-integer, parameter :: Hash_MCFM_qqVVqqStrong_Size = 35
+integer, parameter :: Hash_MCFM_qqVVqqStrong_Size = 175
 integer, target :: Hash_MCFM_qqVVqqStrong(1:Hash_MCFM_qqVVqqStrong_Size,1:4)
 
 ! MCFM qq_VVqq hash (generation) - PDF/PDG conventions
@@ -232,49 +232,197 @@ end subroutine
 
 subroutine Init_Hash_MCFM_qqVVqqStrong()
 implicit none
-integer :: i
+integer :: ih
 
-   Hash_MCFM_qqVVqqStrong(  1,:)  = (/ Dn_, ADn_, Glu_, Glu_ /)
-   Hash_MCFM_qqVVqqStrong(  2,:)  = (/ Up_, AUp_, Glu_, Glu_ /)
-   Hash_MCFM_qqVVqqStrong(  3,:)  = (/ Str_, AStr_, Glu_, Glu_ /)
-   Hash_MCFM_qqVVqqStrong(  4,:)  = (/ Chm_, AChm_, Glu_, Glu_ /)
-   Hash_MCFM_qqVVqqStrong(  5,:)  = (/ Bot_, ABot_, Glu_, Glu_ /)
+   ih=1
+   ! 1-25
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Dn_, Up_, Dn_, Up_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Up_, Dn_, Dn_, Up_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Up_, Chm_, Up_, Chm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Dn_, Str_, Dn_, Str_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Dn_, Bot_, Dn_, Bot_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Str_, Bot_, Str_, Bot_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Up_, Str_, Up_, Str_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Up_, Bot_, Up_, Bot_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Chm_, Bot_, Chm_, Bot_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Dn_, Chm_, Dn_, Chm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Str_, Chm_, Str_, Chm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Up_, Up_, Up_, Up_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Chm_, Chm_, Chm_, Chm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Dn_, Dn_, Dn_, Dn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Str_, Str_, Str_, Str_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Bot_, Bot_, Bot_, Bot_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Chm_, Up_, Up_, Chm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Str_, Dn_, Dn_, Str_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Bot_, Dn_, Dn_, Bot_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Bot_, Str_, Str_, Bot_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Str_, Up_, Up_, Str_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Bot_, Up_, Up_, Bot_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Bot_, Chm_, Chm_, Bot_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Chm_, Dn_, Dn_, Chm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Chm_, Str_, Str_, Chm_ /); ih=ih+1
+   !26-50
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AChm_, AUp_, AChm_, AUp_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AStr_, ADn_, AStr_, ADn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ABot_, ADn_, ABot_, ADn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ABot_, AStr_, ABot_, AStr_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AStr_, AUp_, AStr_, AUp_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ABot_, AUp_, ABot_, AUp_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ABot_, AChm_, ABot_, AChm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AChm_, ADn_, AChm_, ADn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AUp_, ADn_, AUp_, ADn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AChm_, AStr_, AChm_, AStr_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AUp_, AUp_, AUp_, AUp_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AChm_, AChm_, AChm_, AChm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ADn_, ADn_, ADn_, ADn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AStr_, AStr_, AStr_, AStr_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ABot_, ABot_, ABot_, ABot_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AUp_, AChm_, AChm_, AUp_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ADn_, AStr_, AStr_, ADn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ADn_, ABot_, ABot_, ADn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AStr_, ABot_, ABot_, AStr_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AUp_, AStr_, AStr_, AUp_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AUp_, ABot_, ABot_, AUp_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AChm_, ABot_, ABot_, AChm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ADn_, AChm_, AChm_, ADn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ADn_, AUp_, AUp_, ADn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AStr_, AChm_, AChm_, AStr_ /); ih=ih+1
+   !51-100
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AUp_, Chm_, AUp_, Chm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ADn_, Str_, ADn_, Str_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ADn_, Bot_, ADn_, Bot_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AStr_, Bot_, AStr_, Bot_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AUp_, Str_, AUp_, Str_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AUp_, Bot_, AUp_, Bot_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AChm_, Bot_, AChm_, Bot_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ADn_, Chm_, ADn_, Chm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ADn_, Up_, ADn_, Up_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AStr_, Chm_, AStr_, Chm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AUp_, Up_, AUp_, Up_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AChm_, Chm_, AChm_, Chm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ADn_, Dn_, ADn_, Dn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AStr_, Str_, AStr_, Str_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ABot_, Bot_, ABot_, Bot_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AChm_, Up_, AChm_, Up_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AStr_, Dn_, AStr_, Dn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ABot_, Dn_, ABot_, Dn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ABot_, Str_, ABot_, Str_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AStr_, Up_, AStr_, Up_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ABot_, Up_, ABot_, Up_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ABot_, Chm_, ABot_, Chm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AChm_, Dn_, AChm_, Dn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AUp_, Dn_, AUp_, Dn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AChm_, Str_, AChm_, Str_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Chm_, AUp_, AUp_, Chm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Str_, ADn_, ADn_, Str_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Bot_, ADn_, ADn_, Bot_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Bot_, AStr_, AStr_, Bot_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Str_, AUp_, AUp_, Str_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Bot_, AUp_, AUp_, Bot_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Bot_, AChm_, AChm_, Bot_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Chm_, ADn_, ADn_, Chm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Up_, ADn_, ADn_, Up_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Chm_, AStr_, AStr_, Chm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Up_, AUp_, AUp_, Up_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Chm_, AChm_, AChm_, Chm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Dn_, ADn_, ADn_, Dn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Str_, AStr_, AStr_, Str_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Bot_, ABot_, ABot_, Bot_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Up_, AChm_, AChm_, Up_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Dn_, AStr_, AStr_, Dn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Dn_, ABot_, ABot_, Dn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Str_, ABot_, ABot_, Str_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Up_, AStr_, AStr_, Up_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Up_, ABot_, ABot_, Up_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Chm_, ABot_, ABot_, Chm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Dn_, AChm_, AChm_, Dn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Dn_, AUp_, AUp_, Dn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Str_, AChm_, AChm_, Str_ /); ih=ih+1
+   !101-140
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Up_, AUp_, AChm_, Chm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Dn_, ADn_, AStr_, Str_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Dn_, ADn_, ABot_, Bot_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Str_, AStr_, ABot_, Bot_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Up_, AUp_, AStr_, Str_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Up_, AUp_, ABot_, Bot_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Chm_, AChm_, ABot_, Bot_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Dn_, ADn_, AChm_, Chm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Dn_, ADn_, AUp_, Up_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Str_, AStr_, AChm_, Chm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Chm_, AChm_, AUp_, Up_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Str_, AStr_, ADn_, Dn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Bot_, ABot_, ADn_, Dn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Bot_, ABot_, AStr_, Str_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Str_, AStr_, AUp_, Up_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Bot_, ABot_, AUp_, Up_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Bot_, ABot_, AChm_, Chm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Chm_, AChm_, ADn_, Dn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Up_, AUp_, ADn_, Dn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Chm_, AChm_, AStr_, Str_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AUp_, Up_, AChm_, Chm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ADn_, Dn_, AStr_, Str_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ADn_, Dn_, ABot_, Bot_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AStr_, Str_, ABot_, Bot_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AUp_, Up_, AStr_, Str_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AUp_, Up_, ABot_, Bot_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AChm_, Chm_, ABot_, Bot_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ADn_, Dn_, AChm_, Chm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ADn_, Dn_, AUp_, Up_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AStr_, Str_, AChm_, Chm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AChm_, Chm_, AUp_, Up_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AStr_, Str_, ADn_, Dn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ABot_, Bot_, ADn_, Dn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ABot_, Bot_, AStr_, Str_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AStr_, Str_, AUp_, Up_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ABot_, Bot_, AUp_, Up_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ABot_, Bot_, AChm_, Chm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AChm_, Chm_, ADn_, Dn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AUp_, Up_, ADn_, Dn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AChm_, Chm_, AStr_, Str_ /); ih=ih+1
+   !141-150
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Dn_, ADn_, Glu_, Glu_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Up_, AUp_, Glu_, Glu_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Str_, AStr_, Glu_, Glu_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Chm_, AChm_, Glu_, Glu_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Bot_, ABot_, Glu_, Glu_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ADn_, Dn_, Glu_, Glu_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AUp_, Up_, Glu_, Glu_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AStr_, Str_, Glu_, Glu_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AChm_, Chm_, Glu_, Glu_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ABot_, Bot_, Glu_, Glu_ /); ih=ih+1
+   !151-160
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Glu_, Dn_, Glu_, Dn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Glu_, Up_, Glu_, Up_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Glu_, Str_, Glu_, Str_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Glu_, Chm_, Glu_, Chm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Glu_, Bot_, Glu_, Bot_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Dn_, Glu_, Glu_, Dn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Up_, Glu_, Glu_, Up_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Str_, Glu_, Glu_, Str_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Chm_, Glu_, Glu_, Chm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Bot_, Glu_, Glu_, Bot_ /); ih=ih+1
+   !161-170
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Glu_, ADn_, ADn_, Glu_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Glu_, AUp_, AUp_, Glu_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Glu_, AStr_, AStr_, Glu_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Glu_, AChm_, AChm_, Glu_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Glu_, ABot_, ABot_, Glu_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ADn_, Glu_, ADn_, Glu_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AUp_, Glu_, AUp_, Glu_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AStr_, Glu_, AStr_, Glu_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ AChm_, Glu_, AChm_, Glu_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ ABot_, Glu_, ABot_, Glu_ /); ih=ih+1
+   !171-175
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Glu_, Glu_, ADn_, Dn_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Glu_, Glu_, AUp_, Up_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Glu_, Glu_, AStr_, Str_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Glu_, Glu_, AChm_, Chm_ /); ih=ih+1
+   Hash_MCFM_qqVVqqStrong(ih,:) =  (/ Glu_, Glu_, ABot_, Bot_ /); ih=ih+1
 
-   Hash_MCFM_qqVVqqStrong(  6,:)  = (/ ADn_, Dn_, Glu_, Glu_ /)
-   Hash_MCFM_qqVVqqStrong(  7,:)  = (/ AUp_, Up_, Glu_, Glu_ /)
-   Hash_MCFM_qqVVqqStrong(  8,:)  = (/ AStr_, Str_, Glu_, Glu_ /)
-   Hash_MCFM_qqVVqqStrong(  9,:)  = (/ AChm_, Chm_, Glu_, Glu_ /)
-   Hash_MCFM_qqVVqqStrong( 10,:)  = (/ ABot_, Bot_, Glu_, Glu_ /)
-
-   Hash_MCFM_qqVVqqStrong( 11,:)  = (/ Glu_, Glu_, ADn_, Dn_ /)
-   Hash_MCFM_qqVVqqStrong( 12,:)  = (/ Glu_, Glu_, AUp_, Up_ /)
-   Hash_MCFM_qqVVqqStrong( 13,:)  = (/ Glu_, Glu_, AStr_, Str_ /)
-   Hash_MCFM_qqVVqqStrong( 14,:)  = (/ Glu_, Glu_, AChm_, Chm_ /)
-   Hash_MCFM_qqVVqqStrong( 15,:)  = (/ Glu_, Glu_, ABot_, Bot_ /)
-
-   Hash_MCFM_qqVVqqStrong( 16,:)  = (/ Glu_, ADn_, ADn_, Glu_ /)
-   Hash_MCFM_qqVVqqStrong( 17,:)  = (/ Glu_, AUp_, AUp_, Glu_ /)
-   Hash_MCFM_qqVVqqStrong( 18,:)  = (/ Glu_, AStr_, AStr_, Glu_ /)
-   Hash_MCFM_qqVVqqStrong( 19,:)  = (/ Glu_, AChm_, AChm_, Glu_ /)
-   Hash_MCFM_qqVVqqStrong( 20,:)  = (/ Glu_, ABot_, ABot_, Glu_ /)
-
-   Hash_MCFM_qqVVqqStrong( 21,:)  = (/ ADn_, Glu_, ADn_, Glu_ /)
-   Hash_MCFM_qqVVqqStrong( 22,:)  = (/ AUp_, Glu_, AUp_, Glu_ /)
-   Hash_MCFM_qqVVqqStrong( 23,:)  = (/ AStr_, Glu_, AStr_, Glu_ /)
-   Hash_MCFM_qqVVqqStrong( 24,:)  = (/ AChm_, Glu_, AChm_, Glu_ /)
-   Hash_MCFM_qqVVqqStrong( 25,:)  = (/ ABot_, Glu_, ABot_, Glu_ /)
-
-   Hash_MCFM_qqVVqqStrong( 26,:)  = (/ Glu_, Dn_, Glu_, Dn_ /)
-   Hash_MCFM_qqVVqqStrong( 27,:)  = (/ Glu_, Up_, Glu_, Up_ /)
-   Hash_MCFM_qqVVqqStrong( 28,:)  = (/ Glu_, Str_, Glu_, Str_ /)
-   Hash_MCFM_qqVVqqStrong( 29,:)  = (/ Glu_, Chm_, Glu_, Chm_ /)
-   Hash_MCFM_qqVVqqStrong( 30,:)  = (/ Glu_, Bot_, Glu_, Bot_ /)
-
-   Hash_MCFM_qqVVqqStrong( 31,:)  = (/ Dn_, Glu_, Glu_, Dn_ /)
-   Hash_MCFM_qqVVqqStrong( 32,:)  = (/ Up_, Glu_, Glu_, Up_ /)
-   Hash_MCFM_qqVVqqStrong( 33,:)  = (/ Str_, Glu_, Glu_, Str_ /)
-   Hash_MCFM_qqVVqqStrong( 34,:)  = (/ Chm_, Glu_, Glu_, Chm_ /)
-   Hash_MCFM_qqVVqqStrong( 35,:)  = (/ Bot_, Glu_, Glu_, Bot_ /)
+   if (ih .ne. Hash_MCFM_qqVVqqStrong_Size+1) then
+      print *,"Init_Hash_MCFM_qqVVqqStrong: Hash size does not match compiled parameter!"
+      stop
+   endif
 
 end subroutine
 

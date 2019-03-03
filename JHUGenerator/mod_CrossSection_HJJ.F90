@@ -39,42 +39,68 @@ include 'vegas_common.f'
 include 'maxwt.f'
 EvalWeighted_HJJ_fulldecay = 0d0
 
- 
 
-   call getRef_MCFM_qqVVqq_Hash(ijSel) ! ijSel is in JHU convention
-   
-   
-   if( VBFoffsh_run.eq.1 ) then
-      NumPartonicChannels= 2
-      iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-      iPartChannel= iPartChannel  ! runs from 1..2   
-   elseif( VBFoffsh_run.eq.2 ) then
-      NumPartonicChannels= 7
-      iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-      iPartChannel= iPartChannel+2  ! runs from 3..9   
-   elseif( VBFoffsh_run.eq.3 ) then
-      NumPartonicChannels= 31
-      iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-      iPartChannel= iPartChannel+9  ! runs from 10..40   
-   elseif( VBFoffsh_run.eq.4 ) then
-      NumPartonicChannels= 63
-      iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-      iPartChannel= iPartChannel+40  ! runs from 41..103
-   elseif( VBFoffsh_run.eq.5 ) then
-      NumPartonicChannels= 61
-      iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-      iPartChannel= iPartChannel+103  ! runs from 104..164   
+   if (Process.eq.69) then
+      call getRef_MCFM_qqVVqqStrong_Hash(ijSel) ! ijSel is in JHU convention
+      if( VBFoffsh_run.eq.1 ) then
+         NumPartonicChannels= 2
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel  ! runs from 1..2
+      elseif( VBFoffsh_run.eq.2 ) then
+         NumPartonicChannels= 7
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel+2  ! runs from 3..9
+      elseif( VBFoffsh_run.eq.3 ) then
+         NumPartonicChannels= 31
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel+9  ! runs from 10..40
+      elseif( VBFoffsh_run.eq.4 ) then
+         NumPartonicChannels= 63
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel+40  ! runs from 41..103
+      elseif( VBFoffsh_run.eq.5 ) then
+         NumPartonicChannels= 61
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel+103  ! runs from 104..164
+      else
+         NumPartonicChannels= Hash_MCFM_qqVVqqStrong_Size
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel  ! runs from 1..164
+      endif
    else
-      NumPartonicChannels= 164
-      iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-      iPartChannel= iPartChannel  ! runs from 1..164   
+      call getRef_MCFM_qqVVqq_Hash(ijSel) ! ijSel is in JHU convention
+      if( VBFoffsh_run.eq.1 ) then
+         NumPartonicChannels= 2
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel  ! runs from 1..2
+      elseif( VBFoffsh_run.eq.2 ) then
+         NumPartonicChannels= 7
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel+2  ! runs from 3..9
+      elseif( VBFoffsh_run.eq.3 ) then
+         NumPartonicChannels= 31
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel+9  ! runs from 10..40
+      elseif( VBFoffsh_run.eq.4 ) then
+         NumPartonicChannels= 63
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel+40  ! runs from 41..103
+      elseif( VBFoffsh_run.eq.5 ) then
+         NumPartonicChannels= 61
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel+103  ! runs from 104..164
+      else
+         NumPartonicChannels= Hash_MCFM_qqVVqq_Size
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel  ! runs from 1..164
+      endif
    endif
-    
-  
+
+
    PartChannelAvg = NumPartonicChannels
    iPart_sel = convertToPartIndex(ijSel(iPartChannel,1))! convert to LHA convention
    jPart_sel = convertToPartIndex(ijSel(iPartChannel,2))
-      
+
    if(.not. warmup) then
        call random_number(xRnd)!   throwing random number for accept-reject
 !        if( (ThisDmax.gt.0d0) .and. (ThisDmax .lt. xRnd*CrossSecMax(iPart_sel,jPart_sel)) ) then  !   switching off for now
@@ -88,8 +114,8 @@ EvalWeighted_HJJ_fulldecay = 0d0
    if( (unweighted) .and. (.not. warmup) .and. (AccepCounter_part2(iPartChannel) .ge. RequEvents2(iPartChannel))  ) return
 
 
-   DecayMode1=0
-   DecayMode2=0
+   !DecayMode1=0
+   !DecayMode2=0
    call VVBranchings(MY_IDUP(5:10),ICOLUP(1:2,7:10),700)
    call swap(MY_IDUP(7),MY_IDUP(8))!   switch ordering ElP_,ElM_,MuP_,MuM_ --> ElM_,ElP_,MuM_,MuP_
    call swap(MY_IDUP(9),MY_IDUP(10))
@@ -97,7 +123,7 @@ EvalWeighted_HJJ_fulldecay = 0d0
 
    call PDFMapping(2,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi,EhatMin=dmax1(m4l_minmax(1),0d0)+mJJcut)
    call EvalPhasespace_VBF_H4f(yRnd(3),yRnd(4:17),EHat,MomExt(1:4,1:10),PSWgt,ijSel(iPartChannel,1:2),MY_IDUP(7)-MY_IDUP(9))
- 
+
 !       call genps(6,EHat,yRnd(3:16),(/0d0,0d0,0d0,0d0,0d0,0d0/),MomExt(1:4,3:8),PSWgt)
 !       MomExt(1:4,1)=(/Ehat,0d0,0d0,+Ehat/)/2d0
 !       MomExt(1:4,2)=(/Ehat,0d0,0d0,-Ehat/)/2d0
@@ -119,10 +145,10 @@ EvalWeighted_HJJ_fulldecay = 0d0
    if( applyPSCut .or. PSWgt.lt.1d-33 ) then
       return
    endif
-   
+
 !       EvalWeighted_HJJ_fulldecay=PSWgt *sHatJacobi  * ( MomExt(1:4,3).dot.MomExt(1:4,7) ) * ( MomExt(1:4,4).dot.MomExt(1:4,10) ) * ( MomExt(1:4,8).dot.MomExt(1:4,9) ) * ( MomExt(1:4,7).dot.MomExt(1:4,10) ) / EHat**8
 !       return
-   
+
    call SetRunningScales( (/MomExt(1:4,5)+MomExt(1:4,6),MomExt(1:4,3),MomExt(1:4,4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) )
    call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
@@ -195,7 +221,7 @@ EvalWeighted_HJJ_fulldecay = 0d0
          CrossSectionWithWeights = CrossSectionWithWeights + LeptonAndVegasWeighted_HJJ_fulldecay
          CrossSectionWithWeightsErrorSquared = CrossSectionWithWeightsErrorSquared + LeptonAndVegasWeighted_HJJ_fulldecay**2
        endif
-              
+
      else! not warmup
 
        EvalCounter = EvalCounter+1

@@ -3,7 +3,7 @@ implicit none
 save
 !
 !
-character(len=*),parameter :: JHUGen_Version="v7.2.7"
+character(len=*),parameter :: JHUGen_Version="v7.2.8"
 !
 !
 !=====================================================
@@ -39,14 +39,20 @@ integer, public, parameter :: kRenFacScheme_maxpTj=10
 integer, public, parameter :: kRenFacScheme_minpTj=11
 integer, public, parameter :: nRenFacSchemes=12
 integer, public, parameter :: maxpart = 30
+integer, public, parameter :: NMAXCHANNELS=200
+integer, public, parameter :: VBFoffsh_run_qqVVqq_size = 5
+integer, public, parameter :: VBFoffsh_run_qqVVqqStrong_size = 8
+integer, public, parameter :: NMAXPSPARTITIONS = VBFoffsh_run_qqVVqqStrong_size
 integer(8), public :: EvalCounter=0
 integer(8), public :: RejeCounter=0
 integer(8), public :: AccepCounter=0
 integer(8), public :: AlertCounter=0
-integer(8), public :: AccepCounter_part(-6:6,-6:6)=0,RejeCounter_part(-6:6,-6:6)=0,RequEvents(-6:+6,-6:+6)
-real(8), public :: CrossSecMax(-6:+6,-6:+6),CrossSec(-6:+6,-6:+6)
-integer(8), public :: RequEvents2(1:164),AccepCounter_part2(1:164)
-real(8), public :: CrossSec2(1:164),CrossSecMax2(164)
+integer(8), public :: AccepCounter_part(-6:6,-6:6)=0,RejeCounter_part(-6:6,-6:6)=0,RequEvents(-6:+6,-6:+6)=0
+real(8), public :: CrossSecMax(-6:+6,-6:+6)=0,CrossSec(-6:+6,-6:+6)=0
+integer(8), public :: RequEvents2(1:NMAXCHANNELS)=0
+integer(8), public :: AccepCounter_part2(1:NMAXCHANNELS)=0
+real(8), public :: CrossSec2(1:NMAXCHANNELS)=0
+real(8), public :: CrossSecMax2(1:NMAXCHANNELS)=0
 integer, public :: iPart_sel, jPart_sel, iChann_sel
 real(8) :: time_start,time_end,time_int
 logical, public :: warmup
@@ -2719,16 +2725,16 @@ end subroutine EvalAlphaS
 !       This function returns the 'nloop' value of a MSbar fermion mass
 !       at a given scale.
 !
-!       INPUT: mf    = MSbar mass of fermion at MSbar fermion mass scale 
+!       INPUT: mf    = MSbar mass of fermion at MSbar fermion mass scale
 !              scale = scale at which the running mass is evaluated
 !              asmz  = AS(MZ) : this is passed to alphas(scale,asmz,2)
-!              nloop = # of loops in the evolutionC       
+!              nloop = # of loops in the evolutionC
 !
 !       COMMON BLOCKS: COMMON/QMASS/CMASS,BMASS,TMASS
 !                      contains the MS-bar masses of the heavy quarks.
 !
 !       EXTERNAL:      double precision alphas(scale,asmz,2)
-!                      
+!
 !-----------------------------------------------------------------------------
 !
 !      use ModParameters
@@ -2762,7 +2768,7 @@ end subroutine EvalAlphaS
 !
 !      double precision  One, Two, Three, Pi
       !parameter( One = 1d0, Two = 2d0, Three = 3d0 )
-      !parameter( Pi = 3.14159265358979323846d0) 
+      !parameter( Pi = 3.14159265358979323846d0)
 
       if ( mf.gt.m_top ) then
          nfrun = 6
@@ -2783,7 +2789,7 @@ end subroutine EvalAlphaS
       call EvalAlphaS()
       asmf=alphas
       !l2    = (1d0+A1*as/Pi)/(one+A1*asmf/Pi)
-      
+
       massfrun = mf * (as/asmf)**(gamma0/beta0)
 
       !if(nloop.eq.2) massfrun=massfrun*l2
