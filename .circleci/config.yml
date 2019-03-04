@@ -218,7 +218,7 @@ jobs:
               echo $REFERENCE_FILENAMES
             ) > JHUGenerator/generator-md5sum
       - restore_cache:
-          key: v7-do-i-need-to-test-generator-reference-{{ checksum "generator-md5sum" }}
+          key: v8-do-i-need-to-test-generator-reference-{{ checksum "generator-md5sum" }}
       - run:
           name: "see if we need to test the generator"
           command: |
@@ -283,7 +283,7 @@ jobs:
             mkdir -p VBFoffshell_68/
             for i in {1..5}; do
               if ! [ -e VBFoffshell_68/${i}_step2.grid ]; then
-                ./JHUGen Seed=$SEED Process=68 VBFoffsh_run=$i DecayMode1=8 DecayMode2=8 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 detajetcut=0 JetsOppositeEta=1 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=VBFoffshell_68.lhe CSmaxfile=VBFoffshell_68/${i}
+                ./JHUGen Seed=$SEED Process=68 VBFoffsh_run=$i DecayMode1=8 DecayMode2=8 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 detajetcut=0 JetsOppositeEta=1 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=VBFoffshell_68.lhe CSmaxFile=VBFoffshell_68/${i}
               fi
             done
       - save_cache:
@@ -295,7 +295,7 @@ jobs:
           command: |
             if ! $DOREFERENCE ; then exit 0; fi
             for i in {1..5}; do
-              ./JHUGen Seed=$SEED Process=68 VBFoffsh_run=$i DecayMode1=8 DecayMode2=8 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 detajetcut=0 JetsOppositeEta=1 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=VBFoffshell_68.lhe CSmaxfile=VBFoffshell_68/${i} ReadCSmax VegasNc2=10
+              ./JHUGen Seed=$SEED Process=68 VBFoffsh_run=$i DecayMode1=8 DecayMode2=8 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 detajetcut=0 JetsOppositeEta=1 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=VBFoffshell_68.lhe CSmaxFile=VBFoffshell_68/${i} ReadCSmax VegasNc2=10
             done
 
       #now compare to reference
@@ -392,7 +392,7 @@ jobs:
 
       - run: echo "$CIRCLE_BUILD_URL" > no-need-for-generator-reference
       - save_cache:
-          key: v7-do-i-need-to-test-generator-reference-{{ checksum "generator-md5sum" }}
+          key: v8-do-i-need-to-test-generator-reference-{{ checksum "generator-md5sum" }}
           paths:
             - ~/JHUGen/JHUGenerator/no-need-for-generator-reference
             - ~/JHUGen/JHUGenerator/compare_to_reference
@@ -421,7 +421,7 @@ jobs:
               | sort
             ) > JHUGenerator/generator-md5sum
       - restore_cache:
-          key: v1-do-i-need-to-test-generator-syntax-{{ checksum "generator-md5sum" }}
+          key: v2-do-i-need-to-test-generator-syntax-{{ checksum "generator-md5sum" }}
       - run:
           name: "see if we need to test the generator"
           command: |
@@ -480,7 +480,7 @@ jobs:
             mkdir -p VBFoffshell_68/
             for i in {1..5}; do
               if ! [ -e VBFoffshell_68/${i}_step2.grid ]; then
-                ./JHUGen Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=68 VBFoffsh_run=$i DecayMode1=8 DecayMode2=8 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 detajetcut=0 JetsOppositeEta=1 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=VBFoffshell_68.lhe CSmaxfile=VBFoffshell_68/${i}
+                ./JHUGen Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=68 VBFoffsh_run=$i DecayMode1=8 DecayMode2=8 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 detajetcut=0 JetsOppositeEta=1 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=VBFoffshell_68.lhe CSmaxFile=VBFoffshell_68/${i}
               fi
             done
       - save_cache:
@@ -492,7 +492,7 @@ jobs:
           command: |
             if ! $DOSYNTAX ; then exit 0; fi
             for i in {1..5}; do
-              ./JHUGen Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=68 VBFoffsh_run=$i DecayMode1=8 DecayMode2=8 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 detajetcut=0 JetsOppositeEta=1 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=VBFoffshell_68.lhe CSmaxfile=VBFoffshell_68/${i} ReadCSmax VegasNc2=10
+              ./JHUGen Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=68 VBFoffsh_run=$i DecayMode1=8 DecayMode2=8 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 detajetcut=0 JetsOppositeEta=1 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=VBFoffshell_68.lhe CSmaxFile=VBFoffshell_68/${i} ReadCSmax VegasNc2=10
             done
 
       - run:
@@ -510,7 +510,7 @@ jobs:
 
       - run: echo "$CIRCLE_BUILD_URL" > no-need-for-generator-syntax
       - save_cache:
-          key: v1-do-i-need-to-test-generator-syntax-{{ checksum "generator-md5sum" }}
+          key: v2-do-i-need-to-test-generator-syntax-{{ checksum "generator-md5sum" }}
           paths:  ~/JHUGen/JHUGenerator/no-need-for-generator-syntax
 
   plots_ggH:
