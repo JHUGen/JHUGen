@@ -25,7 +25,7 @@ env: &env
 
         SEED: "765543533"
 
-        REFERENCE_FILENAMES: "ggH_ZZ.lhe ggH_WW.lhe ggH_Zgamma.lhe ggH_gammagamma.lhe ggH_ZZ_contact.lhe ggH_ZZ_Zprime.lhe spin1_ZZ.lhe spin1_WW.lhe gg_spin2_ZZ.lhe qq_spin2_WW.lhe gg_spin2_Zgamma.lhe qq_spin2_gammagamma.lhe ZH_bb.lhe WH_Zgamma.lhe ee_gammaH_bb.lhe VBF_ZZ.lhe HJJ_WW.lhe HJ_gammagamma.lhe ttH_tautau.lhe gg_bbH_tautau.lhe qq_bbH.lhe tqH_110.lhe tqH_111.lhe tqH_112.lhe tqH_113.lhe tqH_114.lhe gg_ZH_llbb.lhe ee_ZH_llbb.lhe qq_ZH_llbb.lhe"
+        REFERENCE_FILENAMES: "ggH_ZZ.lhe ggH_WW.lhe ggH_Zgamma.lhe ggH_gammagamma.lhe ggH_ZZ_contact.lhe ggH_ZZ_Zprime.lhe spin1_ZZ.lhe spin1_WW.lhe gg_spin2_ZZ.lhe qq_spin2_WW.lhe gg_spin2_Zgamma.lhe qq_spin2_gammagamma.lhe ZH_bb.lhe WH_Zgamma.lhe ee_gammaH_bb.lhe VBF_ZZ.lhe HJJ_WW.lhe HJ_gammagamma.lhe ttH_tautau.lhe gg_bbH_tautau.lhe qq_bbH.lhe tqH_110.lhe tqH_111.lhe tqH_112.lhe tqH_113.lhe tqH_114.lhe gg_ZH_llbb.lhe ee_ZH_llbb.lhe qq_ZH_llbb.lhe VBFoffshell_68_1.lhe VBFoffshell_68_2.lhe VBFoffshell_68_3.lhe VBFoffshell_68_4.lhe VBFoffshell_68_5.lhe"
         REFERENCE_FILENAME_GGH: "ggH_ZZ.lhe"
         REFERENCE_FILENAME_VBF: "VBF_ZZ.lhe"
         REFERENCE_FILENAME_HJJ: "HJJ_WW.lhe"
@@ -208,11 +208,14 @@ jobs:
           name: "md5sum of files relevant for the generator"
           command: |
             cd ..
-            md5sum $(
-              git ls-files \
-                JHUGenerator/ \
-                JHUGenMELA/MELA/COLLIER \
-              | sort
+            (
+              md5sum $(
+                git ls-files \
+                  JHUGenerator/ \
+                  JHUGenMELA/MELA/COLLIER \
+                | sort
+              )
+              echo $REFERENCE_FILENAMES
             ) > JHUGenerator/generator-md5sum
       - restore_cache:
           key: v7-do-i-need-to-test-generator-reference-{{ checksum "generator-md5sum" }}
@@ -270,6 +273,30 @@ jobs:
       - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=112 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_112 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS_SPIN0"
       - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=113 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_113 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS_SPIN0"
       - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=114 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_114 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS_SPIN0"
+
+      - restore_cache:
+          key: v1-VBF-offshell-grids-68-reference
+      - run:
+          name: VBF offshell grids
+          command: |
+            if ! $DOREFERENCE ; then exit 0; fi
+            mkdir -p VBFoffshell_68/
+            for i in {1..5}; do
+              if ! [ -e VBFoffshell_68/${i}_step2.grid ]; then
+                ./JHUGen Seed=$SEED Process=68 VBFoffsh_run=$i DecayMode1=8 DecayMode2=8 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 detajetcut=0 JetsOppositeEta=1 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=VBFoffshell_68.lhe CSmaxfile=VBFoffshell_68/${i}
+              fi
+            done
+      - save_cache:
+          key: v1-VBF-offshell-grids-68-reference
+          paths:
+            - ~/JHUGen/JHUGenerator/VBFoffshell_68/
+      - run:
+          name: VBF offshell
+          command: |
+            if ! $DOREFERENCE ; then exit 0; fi
+            for i in {1..5}; do
+              ./JHUGen Seed=$SEED Process=68 VBFoffsh_run=$i DecayMode1=8 DecayMode2=8 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 detajetcut=0 JetsOppositeEta=1 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=VBFoffshell_68.lhe CSmaxfile=VBFoffshell_68/${i} ReadCSmax VegasNc2=10
+            done
 
       #now compare to reference
       - run:
@@ -444,35 +471,29 @@ jobs:
       - run: "! $DOSYNTAX || grep -q 'Interference: T' $LHEDIR/ttH_ZZ.lhe"
       - run: "! $DOSYNTAX || grep -q 'Interference: F' $LHEDIR/tbarH_t_ZZ.lhe"
 
-      #test syntax for VBF offshell, use a trick to make it faster and physically nonsense
-      #but it doesn't always work so disabling it
-#      - run:
-#          name: "test syntax for VBF offshell with a hack to make it faster"
-#          command: |
-#            if ! $DOSYNTAX; then exit 0; fi
-#            line=$(grep -in "subroutine EvalAmp_qqVVqq(" mod_MCFMWrapper.F90 | head -1 | sed "s/:.*//")
-#            while sed -n ${line}p mod_MCFMWrapper.F90 | grep -iE '(subroutine|::|use|implicit)'; do
-#              line=$(expr $line + 1)
-#              if [ $line -gt $(wc -l < mod_MCFMWrapper.F90) ]; then exit 1; fi
-#            done
-#            sed -i "${line}ireturn" mod_MCFMWrapper.F90
-#            sed -i "${line}imsq(0,:)=0d0" mod_MCFMWrapper.F90
-#            sed -i "${line}imsq(:,0)=0d0" mod_MCFMWrapper.F90
-#            sed -i "${line}imsq(:,:)=1d0" mod_MCFMWrapper.F90
-#            make
-#            for run in 1 2 3 4 5; do
-#              ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=100 Process=66 DataFile=$LHEDIR/VBFoffshell_66_DONOTUSE.lhe CSmaxFile=$LHEDIR/VBFoffshell_66_DONOTUSE.lhe m4l_min=100 m4l_max=200 VBFoffsh_run=$run
-#            done
-#            for run in 1 2 3 4 5; do
-#              ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=100 Process=66 DataFile=$LHEDIR/VBFoffshell_66_DONOTUSE.lhe m4l_min=100 m4l_max=200 VBFoffsh_run=$run ReadCSmax
-#            done
-      #not needed as long as VBF offshell is the last test of JHUGen in this workflow
-      #- run:
-      #    name: "undo VBF offshell hack"
-      #    command: |
-      #      git checkout -- mod_MCFMWrapper.F90
-      #      make
-      #    when: always
+      - restore_cache:
+          key: v1-VBF-offshell-grids-68-syntax
+      - run:
+          name: VBF offshell grids
+          command: |
+            if ! $DOSYNTAX ; then exit 0; fi
+            mkdir -p VBFoffshell_68/
+            for i in {1..5}; do
+              if ! [ -e VBFoffshell_68/${i}_step2.grid ]; then
+                ./JHUGen Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=68 VBFoffsh_run=$i DecayMode1=8 DecayMode2=8 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 detajetcut=0 JetsOppositeEta=1 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=VBFoffshell_68.lhe CSmaxfile=VBFoffshell_68/${i}
+              fi
+            done
+      - save_cache:
+          key: v1-VBF-offshell-grids-68-syntax
+          paths:
+            - ~/JHUGen/JHUGenerator/VBFoffshell_68/
+      - run:
+          name: VBF offshell
+          command: |
+            if ! $DOSYNTAX ; then exit 0; fi
+            for i in {1..5}; do
+              ./JHUGen Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=68 VBFoffsh_run=$i DecayMode1=8 DecayMode2=8 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 detajetcut=0 JetsOppositeEta=1 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=VBFoffshell_68.lhe CSmaxfile=VBFoffshell_68/${i} ReadCSmax VegasNc2=10
+            done
 
       - run:
           name: checklhe
