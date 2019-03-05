@@ -3074,7 +3074,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         read(io_TmpFile,fmt=*) VG_Error_in(5)
         read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(5), CrossSectionWithWeightsErrorSquared_in(5)
         close(unit=io_TmpFile)
-        if( ios.eq.0 ) print *, "read ",trim(DataFile(1:i-1))//'5_gridinfo.txt'
+        if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'5_gridinfo.txt'
 
         if( calls1_in(1).ne.calls1_in(2) .or. calls1_in(1).ne.calls1_in(3) .or. calls1_in(2).ne.calls1_in(3) .or. calls1_in(1).ne.calls1_in(4) .or. calls1_in(1).ne.calls1_in(5) ) call Error("Mismatch in calls1")
         calls1 = calls1_in(1)
