@@ -360,7 +360,7 @@ void SuperMELA::SetPathToCards(string dirToCards){
   if (verbose_) MELAout << "New path to cards is " << pathToCards_ << endl;
 }
 
-void SuperMELA::splitLine(const string rawoption, vector<string>& splitoptions, char delimiter){
+void SuperMELA::splitLine(const string& rawoption, vector<string>& splitoptions, char delimiter){
   string suboption=rawoption, result=rawoption;
   string remnant;
   while (result!=""){
@@ -554,7 +554,7 @@ void SuperMELA::calc_mZZ_range(const double mHVal, double& low_M, double& high_M
   high_M = int(min((mHVal + 15.*windowVal), sqrts_*1000.)+0.5);
 }
 
-pair<double, double> SuperMELA::M4lProb(double m4l){
+std::pair<double, double> SuperMELA::M4lProb(double m4l){
   double Psig =-1.;
   double Pbkg =-1.;
   if (m4l<lowMH_ || m4l>highMH_){
@@ -575,7 +575,7 @@ pair<double, double> SuperMELA::M4lProb(double m4l){
 }
 
 
-pair<double, double> SuperMELA::M4lProb(pair<double, double> m4lPair){
+std::pair<double, double> SuperMELA::M4lProb(std::pair<double, double> const& m4lPair){
   double Psig =-1.;
   double Pbkg =-1.;
   if (

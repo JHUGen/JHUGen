@@ -139,8 +139,8 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
     !endif
 
     if(.not.IsAPhoton(DecayMode1)) then
-       ML1 = getMass(MY_IDUP(7))
-       ML2 = getMass(MY_IDUP(6))
+       ML1 = getMass(MY_IDUP(6))
+       ML2 = getMass(MY_IDUP(7))
        MZ1 = get_MInv(MomExt(1:4,5)+MomExt(1:4,6))
        if( MZ1.lt.(ML1+ML2) ) then
           EvalWeighted = 0d0
@@ -148,8 +148,8 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
        endif
     endif
     if(.not.IsAPhoton(DecayMode2)) then
-       ML3 = getMass(MY_IDUP(9))
-       ML4 = getMass(MY_IDUP(8))
+       ML3 = getMass(MY_IDUP(8))
+       ML4 = getMass(MY_IDUP(9))
        MZ2 = get_MInv(MomExt(1:4,7)+MomExt(1:4,8))
        if( MZ2.lt.(ML3+ML4) ) then
           EvalWeighted = 0d0
@@ -220,14 +220,14 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
    endif
 
    if(.not.IsAPhoton(DecayMode1)) then
-      call ShiftMass(MomExt(1:4,5),MomExt(1:4,6), GetMass(MY_IDUP(7)),GetMass(MY_IDUP(6)),  MomDK(1:4,1),MomDK(1:4,2), MassWeight=m1ffwgt)
+      call ShiftMass(MomExt(1:4,5),MomExt(1:4,6), GetMass(MY_IDUP(6)),GetMass(MY_IDUP(7)),  MomDK(1:4,1),MomDK(1:4,2), MassWeight=m1ffwgt)
       PreFac = PreFac*m1ffwgt
    else
       MomDK(:,1)=MomExt(:,5)
       MomDK(:,2)=MomExt(:,6)
    endif
    if(.not.IsAPhoton(DecayMode2)) then
-      call ShiftMass(MomExt(1:4,7),MomExt(1:4,8), GetMass(MY_IDUP(9)),GetMass(MY_IDUP(8)),  MomDK(1:4,3),MomDK(1:4,4), MassWeight=m2ffwgt)
+      call ShiftMass(MomExt(1:4,7),MomExt(1:4,8), GetMass(MY_IDUP(8)),GetMass(MY_IDUP(9)),  MomDK(1:4,3),MomDK(1:4,4), MassWeight=m2ffwgt)
       PreFac = PreFac*m2ffwgt
    else
       MomDK(:,3)=MomExt(:,7)
@@ -487,10 +487,10 @@ include 'csmaxvalue.f'
 
    call EvalPhaseSpace_2to2(EHat,(/MZ1,MZ2/),yRnd(3:4),MomExt(1:4,1:4),PSWgt)
    if( .not.IsAPhoton(DecayMode1) .and. .not.IsAPhoton(DecayMode2) ) then ! don't decay the photon
-      ML1 = getMass(MY_IDUP(7))
-      ML2 = getMass(MY_IDUP(6))
-      ML3 = getMass(MY_IDUP(9))
-      ML4 = getMass(MY_IDUP(8))
+      ML1 = getMass(MY_IDUP(6))
+      ML2 = getMass(MY_IDUP(7))
+      ML3 = getMass(MY_IDUP(8))
+      ML4 = getMass(MY_IDUP(9))
       if( (MZ1.lt.ML1+ML2) .or. (MZ2.lt.ML3+ML4) ) then
           EvalUnWeighted_DecayToVV = 0d0
           RejeCounter = RejeCounter + 1
@@ -511,8 +511,8 @@ include 'csmaxvalue.f'
         MomDK(1:4,3) = MomExt(1:4,4)
         MomDK(1:4,4) = 0d0
     elseif( .not.IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
-        ML1 = getMass(MY_IDUP(7))
-        ML2 = getMass(MY_IDUP(6))
+        ML1 = getMass(MY_IDUP(6))
+        ML2 = getMass(MY_IDUP(7))
         ML3=0d0; ML4=0d0
         if( (MZ1.lt.ML1+ML2) ) then
             EvalUnWeighted_DecayToVV = 0d0
@@ -1192,10 +1192,10 @@ include 'csmaxvalue.f'
    call EvalPhaseSpace_2to2(EHat,(/MZ1,MZ2/),yRnd(3:4),MomExt(1:4,1:4),PSWgt)
    call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
     if( .not.IsAPhoton(DecayMode1) .and. .not.IsAPhoton(DecayMode2) ) then ! don't decay the photon
-      ML1 = getMass(MY_IDUP(7))  !*0d0
-      ML2 = getMass(MY_IDUP(6))  !*0d0
-      ML3 = getMass(MY_IDUP(9))  !*0d0
-      ML4 = getMass(MY_IDUP(8))  !*0d0
+      ML1 = getMass(MY_IDUP(6))  !*0d0
+      ML2 = getMass(MY_IDUP(7))  !*0d0
+      ML3 = getMass(MY_IDUP(8))  !*0d0
+      ML4 = getMass(MY_IDUP(9))  !*0d0
       if( (MZ1.lt.ML1+ML2) .or. (MZ2.lt.ML3+ML4) ) then
           EvalUnWeighted = 0d0
           RejeCounter = RejeCounter + 1
@@ -1216,8 +1216,8 @@ include 'csmaxvalue.f'
         MomDK(1:4,3) = MomExt(1:4,4)
         MomDK(1:4,4) = 0d0
     elseif( .not.IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
-        ML1 = getMass(MY_IDUP(7))
-        ML2 = getMass(MY_IDUP(6))
+        ML1 = getMass(MY_IDUP(6))
+        ML2 = getMass(MY_IDUP(7))
         ML3=0d0; ML4=0d0
         if( (MZ1.lt.ML1+ML2) ) then
             EvalUnWeighted = 0d0
@@ -1896,6 +1896,10 @@ ENDIF! GENEVT
  END FUNCTION EvalUnWeighted_HJ
 
 
+
+
+
+
 Function EvalWeighted_VHiggs(yRnd,VgsWgt)
  use ModKinematics
  use ModParameters
@@ -2212,7 +2216,7 @@ if( IsAZDecay(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -2227,18 +2231,18 @@ if( IsAZDecay(DecayMode1) ) then
         id(1:2) = (/LHA2M_PDF(i),LHA2M_PDF(j)/)
         if (abs(LHA2M_PDF(i)).ne.6   .and.   abs(LHA2M_PDF(j)).ne.6.  .and.  i.ne.0)then
           call EvalAmp_VHiggs(id,helicity,MomExt,me2)
-          
-          
+
+
 !     if( me2.lt.1d-8 ) cycle
 !     NewME2(1:6) = cdabs(TreeAmp_qqb_ZH((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,8),MomExt(1:4,9),MomExt(1:4,6),MomExt(1:4,7)/),int((/helicity(1),helicity(2),helicity(6),helicity(7)/))))**2
 !     print *, "heli",helicity(1),helicity(2),helicity(6),helicity(7)
 !     print *, "Mes", me2,NewME2(up_)
 !     print *, "ratio", me2/NewME2(up_)
 !     pause
-      
-              
-                  
-          
+
+
+
+
         else
           me2=0d0
         endif
@@ -2263,7 +2267,7 @@ if( IsAZDecay(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -2296,7 +2300,7 @@ elseif( IsAWDecay(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -2356,7 +2360,7 @@ elseif( IsAPhoton(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell=.true.)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell=.true.)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell=.true.)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -2394,7 +2398,7 @@ elseif( IsAPhoton(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell=.true.)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell=.true.)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell=.true.)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -2755,7 +2759,7 @@ if( IsAZDecay(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -2780,7 +2784,7 @@ if( IsAZDecay(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -2805,7 +2809,7 @@ elseif( IsAWDecay(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -2833,7 +2837,7 @@ elseif( IsAPhoton(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell=.true.)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell=.true.)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell=.true.)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -2858,7 +2862,7 @@ elseif( IsAPhoton(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell=.true.)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell=.true.)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell=.true.)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -3036,491 +3040,6 @@ ENDIF! GENEVT
 
  RETURN
  end Function EvalUnWeighted_VHiggs
-
-
-
-
-
-
-
-#if 0
-!until the amplitudes called here are moved to their new home in Yaofu's module
- FUNCTION EvalWeighted_ggVH(yRnd,VgsWgt)
- use ModKinematics
- use ModParameters
- use ModVHiggs
- use ModMisc
-#if compiler==1
- use ifport
-#endif
- implicit none
- real(8) :: EvalWeighted_ggVH,LO_Res_Unpol,VI_Res_Unpol,yRnd(1:10),VgsWgt
- real(8) :: eta1,eta2,tau,x1,x2,sHatJacobi,PreFac,FluxFac,PDFFac
- real(8) :: pdf(-6:6,1:2)
- integer :: NBin(1:NumHistograms),NHisto,i,MY_IDUP(1:9), ICOLUP(1:2,1:9),xBin(1:4)
- integer :: NumPartonicChannels,iPartChannel,ijSel(1:121,1:3),PartChannelAvg,h12,h45
- real(8) :: EHat,PSWgt,PSWgt2,PSWgt3,ML1,ML2,ML3,ML4,MZ1,MZ2
- real(8) :: MomExt(1:4,1:6),MomDK(1:4,1:4),xRnd
- complex(8) :: FF1,LO_Res_Pol(1:6)
- logical :: applyPSCut
- include 'vegas_common.f'
-
-
-    MomExt(:,:)=0d0
-    MomDK(:,:)=0d0
-    EvalWeighted_ggVH = 0d0
-
-    call PDFMapping(2,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi,EhatMin=M_Reso+M_Z)
-    EvalCounter = EvalCounter+1
-
-    NumPartonicChannels = 1
-    iPart_sel = 0
-    jPart_sel = 0
-    MY_IDUP(1:2)=(/Glu_,Glu_/)
-    ICOLUP(1:2,1) = (/501,502/)
-    ICOLUP(1:2,2) = (/502,501/)
-    PartChannelAvg = NumPartonicChannels
-
-
-   if( unweighted .and. .not.warmup .and.  sum(AccepCounter_part(:,:)) .eq. sum(RequEvents(:,:)) ) then
-      stopvegas=.true.
-   endif
-   if( unweighted .and. .not. warmup .and. AccepCounter_part(iPart_sel,jPart_sel) .ge. RequEvents(iPart_sel,jPart_Sel)  ) return
-
-
-   if( EHat.lt.M_Reso+M_Z ) return
-
-   call EvalPhaseSpace_VH2(yRnd(3:10),EHat,MomExt(1:4,1:6),PSWgt)!  g1 g2 f(Z) fbar(Z) H Null        [f(H) fbar(H)]
-print *, "remove boost2Lab"
-!    call boost2Lab(eta1,eta2,6,MomExt(1:4,1:6))
-
-
-! call genps(2,EHat,yRnd(3:4),(/M_Z,M_Reso/),MomExt(1:4,3:4),PSWgt)
-! MomExt(1:4,5) = MomExt(1:4,4); MomExt(1:4,4)=0d0; MomExt(1:4,6)=0d0
-! PSWgt = PSWgt * (2d0*Pi)**(4-(2)*3) * (4d0*Pi)**((2)-1)
-
-
-! if( get_MInv(MomExt(1:4,3)+MomExt(1:4,4)) .lt. 20d0*GeV ) return
-! if( get_pT(MomExt(1:4,3)+MomExt(1:4,4)) .lt. 10d0*GeV ) return
-! if( get_pT(MomExt(1:4,5)+MomExt(1:4,6)) .lt. 10d0*GeV ) return
-
-! 1:in 2:in 3:V* 4:V 5:H 6,7: q(Z)q(Z) 8,9: q(h)q(H)
-   call Kinematics_VHiggs(  &
-      (/convertLHE(Glu_),convertLHE(Glu_),convertLHE(Z0_),convertLHE(Z0_),convertLHE(Hig_),convertLHE(ElM_),convertLHE(ElP_),convertLHE(Bot_),convertLHE(ABot_)/),&
-      (/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3)+MomExt(1:4,4)+MomExt(1:4,5),MomExt(1:4,3)+MomExt(1:4,4),&
-        MomExt(1:4,5),MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5),MomExt(1:4,6)/),&
-        (/1d0,1d0,1d0,1d0,1d0,1d0,1d0,1d0,1d0/),NBin,applyPSCut)  ! careful: invmass not set gives wrong angular distributions !! 
-   applyPSCut=.false.
-   if( applyPSCut .or. PSWgt.eq.zero ) return
-
-   Mu_Fact = EHat !M_Reso
-   Mu_Ren  = EHat !M_Reso
-   
-   Mu_Fact = M_Reso; print *, "fixing Mu scales for comparison"
-   Mu_Ren  = M_Reso
-
-   call EvalAlphaS()
-   call setPDFs(eta1,eta2,pdf)
-
-   FluxFac = 1d0/(2d0*EHat**2)
-   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
-
-   
-!    if( EvalCounter.eq.1   ) then 
-!       print *, "event 1"
-! MomExt(:,1) = (/  1.4612636158434757d0  ,        0.0000000000000000d0,        0.0000000000000000d0     ,   1.4612636158434757d0     /)
-! MomExt(:,2) = (/  1.4612636158434757d0  ,        0.0000000000000000d0,        0.0000000000000000d0     ,  -1.4612636158434757d0     /)
-! ! MomExt(:,3) = (/  2.9225272316869515d0  ,        0.0000000000000000d0,        0.0000000000000000d0     ,   0.0000000000000000d0     /)
-! ! MomExt(:,4) = (/  1.3351579764951791d0  ,       0.23912248810916401d0,      -0.49887803363686017d0     , -0.80695867029432466d0     /)
-! ! MomExt(:,5) = (/  1.5873692551917724d0  ,      -0.23912248810916401d0,       0.49887803363686017d0     ,  0.80695867029432466d0     /)
-! MomExt(:,3) = (/ 0.32428361334240258d0  ,      -0.30847990233180261d0,       -4.0824295707895482d-002  ,  -9.1287395733039817d-002  /)
-! MomExt(:,4) = (/  1.0108743631527766d0  ,       0.54760239044096659d0,      -0.45805373792896470d0     , -0.71567127456128488d0     /)
-!       
-!    elseif( EvalCounter.eq.2   ) then 
-!       print *, "event 2"
-! MomExt(:,1) = (/   1.4993889013229147d0,        0.0000000000000000d0     ,   0.0000000000000000d0,        1.4993889013229147d0     /)
-! MomExt(:,2) = (/   1.4993889013229147d0,        0.0000000000000000d0     ,   0.0000000000000000d0,       -1.4993889013229147d0     /)
-! ! MomExt(:,3) = (/   2.9987778026458294d0,        0.0000000000000000d0     ,   0.0000000000000000d0,        0.0000000000000000d0     /)
-! ! MomExt(:,4) = (/   1.3795905093925491d0,       0.37240043559138541d0     , -0.90237656049098836d0,      -0.32603979708109893d0     /)
-! ! MomExt(:,5) = (/   1.6191872932532803d0,      -0.37240043559138541d0     ,  0.90237656049098836d0,       0.32603979708109893d0     /)
-! MomExt(:,3) = (/  0.69987628038380456d0,       0.41499286401781232d0     , -0.51432374828037830d0,       0.23038839513522705d0     /)
-! MomExt(:,4) = (/  0.67971422900874456d0,       -4.2592428426426909d-002  , -0.38805281221061005d0,      -0.55642819221632600d0     /)
-!             
-!    elseif( EvalCounter.eq.3   ) then 
-!       print *, "event 3"
-! MomExt(:,1) = (/   1.4410822941131907d0,        0.0000000000000000d0,        0.0000000000000000d0,        1.4410822941131907d0     /)
-! MomExt(:,2) = (/   1.4410822941131907d0,        0.0000000000000000d0,        0.0000000000000000d0,       -1.4410822941131907d0     /)
-! ! MomExt(:,3) = (/   2.8821645882263813d0,        0.0000000000000000d0,        0.0000000000000000d0,        0.0000000000000000d0     /)
-! ! MomExt(:,4) = (/   1.3135994878171624d0,       0.42456630578305915d0,       0.21956629062037109d0,       0.81818736866241160d0     /)
-! ! MomExt(:,5) = (/   1.5685651004092189d0,      -0.42456630578305915d0,      -0.21956629062037109d0,      -0.81818736866241160d0     /)
-! MomExt(:,3) = (/  0.84468740474861237d0,       0.31717806095969059d0,      -0.23143689367021594d0,       0.74788492004791629d0     /)
-! MomExt(:,4) = (/  0.46891208306855003d0,       0.10738824482336856d0,       0.45100318429058706d0,        7.0302448614495305d-002  /)      
-!    endif
-   
-
-   call EvalUnpolAmpSq_gg_VH( (/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,4)/),LO_Res_Unpol)
-
-   LO_Res_Unpol = LO_Res_Unpol * SpinAvg * GluonColAvg**2
-   PDFFac = pdf(0,1)  *  pdf(0,2)
-   EvalWeighted_ggVH = LO_Res_Unpol * PDFFac * PreFac
-
-
-!!! now calculating the qqbar virtuals
-
-   call CalcFormFactor1(0,Ehat**2,FF1)
-   LO_Res_Unpol = (0d0,0d0)
-   VI_Res_Unpol = (0d0,0d0)
-   do h12 = -1,+1,2
-   do h45 = -1,+1,2
-       LO_Res_Pol(1:6) = TreeAmp_qqb_ZH((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,3),MomExt(1:4,4)/),(/h12,-h12,h45,-h45/))
-       LO_Res_Unpol = LO_Res_Unpol + cdabs(LO_Res_Pol(Up_))**2 * pdf(Up_,1) *  pdf(AUp_,2)
-       VI_Res_Unpol = VI_Res_Unpol + 2d0*dreal(FF1*LO_Res_Pol(Up_)*dconjg(LO_Res_Pol(Up_))) * pdf(Up_,1) *  pdf(AUp_,2)       
-   enddo
-   enddo
-   LO_Res_Unpol = LO_Res_Unpol * SpinAvg * QuarkColAvg**2 * 3d0 * PreFac
-   VI_Res_Unpol = VI_Res_Unpol * SpinAvg * QuarkColAvg**2 * 3d0 * PreFac * (alphas/(2d0*Pi)) * CF 
-   EvalWeighted_ggVH = EvalWeighted_ggVH + VI_Res_Unpol
-
-! ! !    end qqbar virtuals  
-
-
-
-! !       INTEGRATED DIPOLES
-!         z = yRnd(5)
-!         call setPDFs(eta1/z,eta2/z,MuFac,pdf_z)
-! 
-! 
-!         call IntDip_qqb_Zprime_ttb(z,EHat**2,IDip(1:3))
-!         IDip(1:3) = IDip(1:3) * (alpha_s/(2d0*Pi)*RunFactor) * PreFac
-! 
-!         do iPart=Up_,Bot_! =1...5
-!               IDipAmp = ( IDip(1)   * pdf(iPart,1)  * pdf(-iPart,2)    &
-!                         + IDip(2)/z * pdf_z(iPart,1)* pdf(-iPart,2)    &
-!                         + IDip(3)/z * pdf(iPart,1)  * pdf_z(-iPart,2)  &
-!                         + IDip(1)   * pdf(iPart,2)  * pdf(-iPart,1)    &
-!                         + IDip(2)/z * pdf_z(iPart,2)* pdf(-iPart,1)    &
-!                         + IDip(3)/z * pdf(iPart,2)  * pdf_z(-iPart,1) ) * Tree_Unpol(iPart)
-!               LO_Res_Unpol = LO_Res_Unpol + IDipAmp
-!         enddo
-! 
-! 
-!         call IntDip_gqb_Zprime_ttb(z,EHat**2,IDip(1:3))
-!         IDip(1:3) = IDip(1:3) * (alpha_s/(2d0*Pi)*RunFactor) * PreFac
-! 
-!         do iPart=Up_,Bot_! =1...5
-!               IDipAmp = ( IDip(1)   * pdf(0,1)  * pdf(-iPart,2)    &
-!                         + IDip(2)/z * pdf_z(0,1)* pdf(-iPart,2)    &
-!                         + IDip(3)/z * pdf(0,1)  * pdf_z(-iPart,2)  &
-!                         + IDip(1)   * pdf(0,2)  * pdf(-iPart,1)    &
-!                         + IDip(2)/z * pdf_z(0,2)* pdf(-iPart,1)    &
-!                         + IDip(3)/z * pdf(0,2)  * pdf_z(-iPart,1) ) * Tree_Unpol(iPart)
-!               ZprimeTTB_LO_VI = ZprimeTTB_LO_VI + IDipAmp
-!         enddo
-! 
-!         call IntDip_qg_Zprime_ttb(z,EHat**2,IDip(1:3))
-!         IDip(1:3) = IDip(1:3) * (alpha_s/(2d0*Pi)*RunFactor) * PreFac
-!         do iPart=Up_,Bot_! =1...5
-!               IDipAmp = ( IDip(1)   * pdf(iPart,1)  * pdf(0,2)    &
-!                         + IDip(2)/z * pdf_z(iPart,1)* pdf(0,2)    &
-!                         + IDip(3)/z * pdf(iPart,1)  * pdf_z(0,2)  &
-!                         + IDip(1)   * pdf(iPart,2)  * pdf(0,1)    &
-!                         + IDip(2)/z * pdf_z(iPart,2)* pdf(0,1)    &
-!                         + IDip(3)/z * pdf(iPart,2)  * pdf_z(0,1) ) * Tree_Unpol(iPart)
-!               ZprimeTTB_LO_VI = ZprimeTTB_LO_VI + IDipAmp
-!         enddo
-        
-! ! ! ! !    begin int. dipoles 
-
-
-   if( unweighted ) then
-     if( warmup ) then
-
-       CrossSec(iPart_sel,jPart_sel) = CrossSec(iPart_sel,jPart_sel) + EvalWeighted_ggVH
-       CrossSecMax(iPart_sel,jPart_sel) = max(CrossSecMax(iPart_sel,jPart_sel),EvalWeighted_ggVH)
-
-     else! not warmup
-
-       call random_number(xRnd)
-       if( EvalWeighted_ggVH.gt.CrossSecMax(iPart_sel,jPart_sel) ) then
-         write(io_LogFile,"(2X,A,1PE13.6,1PE13.6)") "CrossSecMax is too small.",EvalWeighted_ggVH, CrossSecMax(iPart_sel,jPart_sel)
-         write(io_stdout, "(2X,A,1PE13.6,1PE13.6,1PE13.6,I3,I3)") "CrossSecMax is too small.",EvalWeighted_ggVH, CrossSecMax(iPart_sel,jPart_sel),EvalWeighted_ggVH/CrossSecMax(iPart_sel,jPart_sel),iPart_sel,jPart_sel
-         AlertCounter = AlertCounter + 1
-
-         CrossSecMax(iPart_sel,jPart_sel)=CrossSecMax(iPart_sel,jPart_sel) * 1.1d0
-
-       elseif( EvalWeighted_ggVH .gt. xRnd*CrossSecMax(iPart_sel,jPart_sel) ) then
-
-         AccepCounter = AccepCounter + 1
-         AccepCounter_part(iPart_sel,jPart_sel) = AccepCounter_part(iPart_sel,jPart_sel) + 1
-         do NHisto=1,NumHistograms
-           call intoHisto(NHisto,NBin(NHisto),1d0)
-         enddo
-
-!          call WriteOutEvent_VHiggs(id,helicity,MomExt,inv_mass)
-
-       endif
-
-     endif! warmup
-
-   else! weighted
-
-
-      if( EvalWeighted_ggVH.ne.0d0 ) then
-        AccepCounter=AccepCounter+1
-        if( writeWeightedLHE .and. (.not. warmup) ) then
-!             call WriteOutEvent_VHiggs(id,helicity,MomExt,inv_mass,EventWeight=1d0)
-        endif
-        do NHisto=1,NumHistograms
-            call intoHisto(NHisto,NBin(NHisto),EvalWeighted_ggVH)
-        enddo
-      endif
-   endif! unweighted
-
-
-
-   EvalWeighted_ggVH = EvalWeighted_ggVH/VgsWgt
-   RETURN
-
-
-END FUNCTION
-
-
- 
-
-
- FUNCTION EvalWeighted_qqbVHglu(yRnd,VgsWgt)
- use ModKinematics
- use ModParameters
- use ModVHiggs
- use ModMisc
-#if compiler==1
- use ifport
-#endif
- implicit none
- real(8) :: EvalWeighted_qqbVHglu,LO_Res_Unpol,RE_Res_Unpol,yRnd(1:10),VgsWgt
- real(8) :: eta1,eta2,tau,x1,x2,sHatJacobi,PreFac,FluxFac,PDFFac
- complex(8) :: RE_Res_Pol(1:6),LO_Res_Pol(1:6)
- real(8) :: pdf(-6:6,1:2)
- integer :: NBin(1:NumHistograms),NHisto,i,MY_IDUP(1:9), ICOLUP(1:2,1:9),xBin(1:4),h12,h45,h6
- integer :: NumPartonicChannels,iPartChannel,ijSel(1:121,1:3),PartChannelAvg,flav1,flav2,nDipole
- real(8) :: EHat,PSWgt,PSWgt2,PSWgt3,ML1,ML2,ML3,ML4,MZ1,MZ2
- real(8) :: MomExt(1:4,1:7),xRnd,MG_MOM(1:4,1:6),MG_MOM2(1:4,1:5),MadGraph_tree
- logical :: applyPSCut
- real(8) :: MomExtTd(1:4,1:6),Dip_Unpol(1:2),Dipole
- complex(8) :: Dip_Pol(1:6)
- include 'vegas_common.f'
-
- 
-!  print *, "fixing yrnd for singularity checks "
-!  yrnd(1:10) = (/ 4.3378083693509741d-002,  0.69162807553480876d0,       0.84835019537076295d0,       0.31352259094470375d0,       0.58122444125141959d0,       0.99527017332949630d0,       0.15986871983151701d0,       0.55399023460067853d0,       0.66041823079350626d0,       0.75836505537508170d0  /)
-
- 
- 
-    LO_Res_Unpol = 0d0
-    RE_Res_Unpol = 0d0
-    EvalWeighted_qqbVHglu = 0d0
-
-    call PDFMapping(2,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi,EhatMin=M_Reso+M_Z)
-    EvalCounter = EvalCounter+1
-
-    NumPartonicChannels = 1
-    iPart_sel = 0
-    jPart_sel = 0
-    MY_IDUP(1:2)=(/Up_,AUp_/)
-    ICOLUP(1:2,1) = (/501,000/)
-    ICOLUP(1:2,2) = (/000,501/)
-    PartChannelAvg = NumPartonicChannels
-
-    if( EHat.lt.M_Reso+M_Z ) return
-    
-    call EvalPhasespace_VHglu(yRnd(3:10),EHat,MomExt(1:4,1:7),PSWgt)! q1 q2 H34 f5 f6 glu7
-!     call boost2Lab(eta1,eta2,7,MomExt(1:4,1:7))
-
-! call genps(4,EHat,yRnd(3:10),(/M_Reso,0d0,0d0,0d0/),MomExt(1:4,3:6),PSWgt)
-! PSWgt = PSWgt * (2d0*Pi)**(4-(4)*3) * (4d0*Pi)**((4)-1)
-! EvalWeighted_qqbVHglu = PSWgt * (MomExt(1:4,3).dot.MomExt(1:4,6))*(MomExt(1:4,6).dot.MomExt(1:4,4))
-! return
-
-
-! 1:in 2:in 3:V* 4:V 5:H 6,7: q(Z)q(Z) 8,9: q(h)q(H)
-   call Kinematics_VHiggs(  &
-      (/convertLHE(Up_),convertLHE(Up_),convertLHE(Z0_),convertLHE(Z0_),convertLHE(Hig_),convertLHE(ElM_),convertLHE(ElP_),convertLHE(Bot_),convertLHE(ABot_)/),&
-      (/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,1)+MomExt(1:4,2)+MomExt(1:4,7),MomExt(1:4,5)+MomExt(1:4,6),&
-        MomExt(1:4,3)+MomExt(1:4,4),MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,3),MomExt(1:4,4)/),&
-        (/1d0,1d0,1d0,1d0,1d0,1d0,1d0,1d0,1d0/),NBin,applyPSCut)  ! careful: invmass not set gives wrong angular distributions !! 
-applyPSCut=.false.; print *, "removing cuts"
-
-   Mu_Fact = EHat !M_Reso
-   Mu_Ren  = EHat !M_Reso
-   
-Mu_Fact = M_Reso  ; print *, "fixing scale for comparison"
-Mu_Ren  = M_Reso
-   
-!    print *, "setting couplings to one"
-!    aR_lep = 1d0
-!    aL_lep = 1d0
-!    aR_QUp = 1d0
-!    aL_QUp = 1d0
-!    aR_QDn = 0d0
-!    aL_QDn = 0d0
-   
-   
-   call EvalAlphaS()
-   call setPDFs(eta1,eta2,pdf)
-   FluxFac = 1d0/(2d0*EHat**2)
-   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt
-   
-!    alphas = 0.13
-!    alpha_QED = 1d0/137d0
-   
-   
-   do h12 = -1,+1,2
-   do h45 = -1,+1,2
-   do h6  = -1,+1,2
-
-       RE_Res_Pol(1:6) = TreeAmp_qqbg_ZH(MomExt(1:4,1:7),(/h12,-h12,h45,-h45,h6/))
-       RE_Res_Unpol = RE_Res_Unpol + cdabs(RE_Res_Pol(Up_))**2 !* pdf(Up_,1) *  pdf(AUp_,2)
-
-   enddo
-   enddo
-   enddo
-   RE_Res_Unpol = RE_Res_Unpol * SpinAvg * QuarkColAvg**2 * 3d0 * (3d0**2-1)/2d0/3d0 !* PreFac
-   if( applyPSCut ) RE_Res_Unpol = 0d0
-
-  
-!       MG_MOM(1:4,1) = MomExt(1:4,1)*100d0
-!       MG_MOM(1:4,2) = MomExt(1:4,2)*100d0
-!       MG_MOM(1:4,3) = MomExt(1:4,3)*100d0
-!       MG_MOM(1:4,4) = MomExt(1:4,5)*100d0
-!       MG_MOM(1:4,5) = MomExt(1:4,6)*100d0
-!       MG_MOM(1:4,6) = MomExt(1:4,7)*100d0
-!       call coupsm(0)
-!       call SUUB_HEMEPG(MG_MOM,MadGraph_tree)
-!       MadGraph_tree = MadGraph_tree / GeV**4  * PreFac
-      
-   
-   print *, ""
-!    write(*,*) MomExt(1:4,1)
-!    write(*,*) MomExt(1:4,2)
-!    write(*,*) MomExt(1:4,3)
-!    write(*,*) MomExt(1:4,5)
-!    write(*,*) MomExt(1:4,6)
-!    write(*,*) MomExt(1:4,7)
-!    if(EvalCounter.eq.1) print *,"event 1 ",17.092619212219237d0/RE_Res_Unpol       ! these are Yaofu's numbers from 29.08.2017
-!    if(EvalCounter.eq.2) print *,"event 2 ",8.6544731212312345d-004/RE_Res_Unpol
-   if(EvalCounter.eq.1) print *,"event 1 ", 	 218.58143370667170d0/RE_Res_Unpol       ! these are Yaofu's numbers from 30.08.2017
-   if(EvalCounter.eq.2) print *,"event 2 ",  1.1067391833442512d-002/RE_Res_Unpol
-!    print *, "MG N+1",MadGraph_tree
-!    print *, "MG ratio N+1",RE_Res_Unpol/MadGraph_tree
-!    pause
-   
-   
-!    print *, "s17/shat",(MomExt(1:4,1).dot.MomExt(1:4,7))/Ehat**2
-!    print *, "s27/shat",(MomExt(1:4,2).dot.MomExt(1:4,7))/Ehat**2
-!    print *, "Real ME",RE_Res_Unpol
-   
-   
-   if( RE_Res_Unpol.ne.0d0 ) then
-     AccepCounter=AccepCounter+1
-     do NHisto=1,NumHistograms
-         call intoHisto(NHisto,NBin(NHisto),RE_Res_Unpol)
-     enddo
-   endif
-
-   EvalWeighted_qqbVHglu = RE_Res_Unpol
-      
-
-
-!---------------------------
-!       TheDipoles         !
-!---------------------------
-   do nDipole=1,2
-    
-                  call Dipoles_qqb_VH(nDipole,MomExt(1:4,1:7),MomExtTd(1:4,1:6),Dipole)
-! Dipole=1d0; print *, "removing dipoles"         
-print *, "remove dipole 2"; if(nDipole.eq.2) cycle
-!                   print *, "Dipole ",nDipole
-!                   print *, MomExtTd(1:4,1).dot.MomExtTd(1:4,1)
-!                   print *, MomExtTd(1:4,2).dot.MomExtTd(1:4,2)
-!                   print *, MomExtTd(1:4,3).dot.MomExtTd(1:4,3)
-!                   print *, MomExtTd(1:4,4).dot.MomExtTd(1:4,4)
-!                   print *, MomExtTd(1:4,5).dot.MomExtTd(1:4,5)
-!                   print *, MomExtTd(1:4,6).dot.MomExtTd(1:4,6)
-!                   print *, MomExt(1:4,1)+MomExt(1:4,2)-MomExt(1:4,3)-MomExt(1:4,4)-MomExt(1:4,5)-MomExt(1:4,6)-MomExt(1:4,7)
-!                   print *, MomExtTd(1:4,1)+MomExtTd(1:4,2)-MomExtTd(1:4,3)-MomExtTd(1:4,4)-MomExtTd(1:4,5)-MomExtTd(1:4,6)
-!                   pause
-                  
-                  ! 1:in 2:in 3:V* 4:V 5:H 6,7: q(Z)q(Z) 8,9: q(h)q(H)
-                  call Kinematics_VHiggs(  &
-                     (/convertLHE(Up_),convertLHE(Up_),convertLHE(Z0_),convertLHE(Z0_),convertLHE(Hig_),convertLHE(ElM_),convertLHE(ElP_),convertLHE(Bot_),convertLHE(ABot_)/),&
-                     (/MomExtTd(1:4,1),MomExtTd(1:4,2),MomExtTd(1:4,1)+MomExtTd(1:4,2),MomExtTd(1:4,5)+MomExtTd(1:4,6),&
-                       MomExtTd(1:4,3)+MomExtTd(1:4,4),MomExtTd(1:4,5),MomExtTd(1:4,6),MomExtTd(1:4,3),MomExtTd(1:4,4)/),&
-                       (/1d0,1d0,1d0,1d0,1d0,1d0,1d0,1d0,1d0/),NBin,applyPSCut)  ! careful: invmass not set gives wrong angular distributions !! 
-applyPSCut=.false.; print *, "removing cuts"                       
-                  if( applyPSCut .or. Dipole.eq.(0d0,0d0) ) cycle
-
-                  Dip_Unpol(nDipole) = (0d0,0d0)
-                  do h12 = -1,+1,2
-                  do h45 = -1,+1,2
-
-                      Dip_Pol(1:6) = TreeAmp_qqb_ZH(MomExtTd(1:4,1:6),(/h12,-h12,h45,-h45/))
-                      Dip_Unpol(nDipole) = Dip_Unpol(nDipole) + cdabs(Dip_Pol(Up_))**2 !* pdf(Up_,1) *  pdf(AUp_,2)
-
-                  enddo
-                  enddo
-                  Dip_Unpol(nDipole) = Dip_Unpol(nDipole) * SpinAvg * QuarkColAvg**2 * 3d0  !* PreFac * 4d0*Pi*alphas*Dipole                 
-                  
-                  do NHisto=1,NumHistograms
-                      call intoHisto(NHisto,NBin(NHisto),Dip_Unpol(nDipole))
-                  enddo
-                  EvalWeighted_qqbVHglu = EvalWeighted_qqbVHglu + Dip_Unpol(nDipole) 
-      
-      
-
-!       MG_MOM2(1:4,1) = MomExtTd(1:4,1)*100d0
-!       MG_MOM2(1:4,2) = MomExtTd(1:4,2)*100d0
-!       MG_MOM2(1:4,3) = MomExtTd(1:4,3)*100d0
-!       MG_MOM2(1:4,4) = MomExtTd(1:4,5)*100d0
-!       MG_MOM2(1:4,5) = MomExtTd(1:4,6)*100d0
-! !       call coupsm(0)
-!       call SUUB_HEMEP(MG_MOM2,MadGraph_tree)
-!       MadGraph_tree = MadGraph_tree / GeV**2  * PreFac     
-   
-!       print *, ""
-!       write(*,*) MomExtTd(1:4,1)
-!       write(*,*) MomExtTd(1:4,2)
-!       write(*,*) MomExtTd(1:4,3)
-!       write(*,*) MomExtTd(1:4,5)
-!       write(*,*) MomExtTd(1:4,6)
-!       print *, "Dip_Unpol",Dip_Unpol(1)
-!       print *, "MG N",MadGraph_tree
-!       print *, "MG ratio N",Dip_Unpol(1)/MadGraph_tree
-!       pause      
-
-
-
-       if(EvalCounter.eq.1) print *,"event 1 ",0.10948059879555475d0 /Dip_Unpol(1) ! these are Yaofu's numbers from 30.08.2017
-       if(EvalCounter.eq.2) print *,"event 2 ", 1.5083828786219668d-004/Dip_Unpol(1)
-
-      
-     enddo
-     
-     
-         
-     
-!         print *, "Dipole",nDipole, Dip_Unpol(1)+Dip_Unpol(2)
-!         print *, "Real/(-Dipole)",RE_Res_Unpol/(-(Dip_Unpol(1)+Dip_Unpol(2)))
-!         print *, "Real/(-Dipole)-1d0",RE_Res_Unpol/(-(Dip_Unpol(1)+Dip_Unpol(2)))   - 1d0
-      
-     pause
-      
-     EvalWeighted_qqbVHglu = EvalWeighted_qqbVHglu/VgsWgt
-
-
-RETURN
-END FUNCTION
-#endif
-
 
 
 

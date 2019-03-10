@@ -2,7 +2,7 @@ MODULE ModKinematics
 implicit none
 save
 
-public :: GetBWPropagator,ReweightBWPropagator,SetRunningScales,setPDFs,EvalAlphaS
+public :: GetBWPropagator,ReweightBWPropagator,SetRunningScales,setPDFs!,EvalAlphaS
 
 CONTAINS
 
@@ -1139,11 +1139,12 @@ implicit none
 real(dp), intent(in) :: p(1:4,4:6) ! No need to run the second index from 3 to 7: pH, pJ1, pJ2
 integer, intent(in) :: id(4:7) ! id_JJH/id_JJVV, id_J1, id_J2, id_JJ (if applicable)
 real(8) :: polemass(3:7) ! mJJH, mH, mJ1, mJ2, mJJ (if applicable)
-real(8) :: pJJHstar(4),pHstar(4),pJ(4,2),pJJ(4),pJHstar(4)
+real(8) :: pJJHstar(4),pHstar(4),pJ(4,2),pJJ(4),pJHstar(4),pTjet(5:6),maxpTjet,minpTjet
 integer idx,ip
 
    pHstar(:) = 0d0
    pJJ(:) = 0d0
+   pTjet(:) = 0d0
    polemass(3) = getMass(id(4)) ! Pole mass of the JJH system
    polemass(4) = M_Reso
    do idx=4,6
@@ -1156,8 +1157,11 @@ integer idx,ip
          do ip=1,4
             pJJ(ip) = pJJ(ip) + p(ip,idx)
          enddo
+         pTjet(idx) = get_PT(p(1:4,idx))
       endif
    enddo
+   maxpTjet = maxval(pTjet)
+   minpTjet = minval(pTjet, mask=.not.all(p(1:4,5:6).eq.0d0, 1))
    polemass(7) = getMass(id(7)) ! Pole mass of the JJ system
 
    pJJHstar = pJJ + pHstar
@@ -1211,6 +1215,12 @@ integer idx,ip
       Mu_Fact = Get_MInv(pJ(1:4,1))
    elseif(FacScheme .eq. -kRenFacScheme_mj) then
       Mu_Fact = polemass(5)
+   elseif(FacScheme .eq. kRenFacScheme_maxpTj) then
+      Mu_Fact = maxpTjet
+   elseif(FacScheme .eq. kRenFacScheme_minpTj) then
+      Mu_Fact = minpTjet
+   else
+      call Error("This should never be able to happen.")
    endif
 
    ! Do the same for the renormalization scale
@@ -1253,6 +1263,12 @@ integer idx,ip
       Mu_Ren = Get_MInv(pJ(1:4,1))
    elseif(RenScheme .eq. -kRenFacScheme_mj) then
       Mu_Ren = polemass(5)
+   elseif(RenScheme .eq. kRenFacScheme_maxpTj) then
+      Mu_Ren = maxpTjet
+   elseif(RenScheme .eq. kRenFacScheme_minpTj) then
+      Mu_Ren = minpTjet
+   else
+      call Error("This should never be able to happen.")
    endif
 
    ! Never ever allow the scales to go negative
@@ -1493,52 +1509,52 @@ double precision Q,xsave,qsave,Ctq6Pdf,D,U
 RETURN
 END SUBROUTINE
 
-! QCD scale from MCFM
-! Implementation into JHUGen by Ulascan Sarica, Dec. 2015
-subroutine EvalAlphaS()
-   use ModParameters
-   IMPLICIT NONE
-#if useLHAPDF==1
-!--- This is simply a wrapper to the LHAPDF implementation of the running coupling alphas, in the style of the native MCFM routine
-   DOUBLE PRECISION alphasPDF
-   REAL(DP) :: Q
-      Q = Mu_Ren/GeV
-      alphas=alphasPDF(Q)
-#else
-!     Evaluation of strong coupling constant alphas
-!     Original Author: R.K. Ellis
-!     q -- Scale at which alpha_s is to be evaluated
-!     alphas_mz -- ModParameters value of alpha_s at the mass of the Z-boson
-!     nloops_pdf -- ModParameters value of the number of loops (1,2, or 3) at which the beta function is evaluated to determine running.
-!     If you somehow need a more complete implementation, check everything at or before commit 28472c5bfee128dde458fd4929b4d3ece9519ab8
-   INTEGER, PARAMETER :: NF6=6
-   INTEGER, PARAMETER :: NF5=5
-   INTEGER, PARAMETER :: NF4=4
-   INTEGER, PARAMETER :: NF3=3
-   INTEGER, PARAMETER :: NF2=2
-   INTEGER, PARAMETER :: NF1=1
-
-      IF (Mu_Ren .LE. 0d0) THEN
-         WRITE(6,*) 'ModKinematics::EvalAlphaS: Mu_Ren .le. 0, Mu_Ren (GeV) = ',(Mu_Ren*GeV)
-         stop
-      ENDIF
-      IF (nQflavors_pdf .NE. NF5) THEN
-         WRITE(6,*) 'ModKinematics::EvalAlphaS: nQflavors_pdf invalid, nQflavors_pdf = ',nQflavors_pdf
-         WRITE(6,*) 'ModKinematics::EvalAlphaS: Check 28472c5bfee128dde458fd4929b4d3ece9519ab8'
-         stop
-      ENDIF
-      IF (nloops_pdf .NE. 1) THEN
-         WRITE(6,*) 'ModKinematics::EvalAlphaS: nloops_pdf invalid, nloops_pdf = ',nloops_pdf
-         WRITE(6,*) 'ModKinematics::EvalAlphaS: Check 28472c5bfee128dde458fd4929b4d3ece9519ab8'
-         stop
-      ENDIF
-
-      alphas=alphas_mz/(1.0_dp+alphas_mz*B0_PDF(NF5)*2.0_dp*dlog((Mu_Ren/zmass_pdf)))
-#endif
-      ! Calculate the derived couplings
-      call ComputeQCDVariables()
-   RETURN
-end subroutine EvalAlphaS
+!! QCD scale from MCFM
+!! Implementation into JHUGen by Ulascan Sarica, Dec. 2015
+!subroutine EvalAlphaS()
+!   use ModParameters
+!   IMPLICIT NONE
+!#if useLHAPDF==1
+!!--- This is simply a wrapper to the LHAPDF implementation of the running coupling alphas, in the style of the native MCFM routine
+!   DOUBLE PRECISION alphasPDF
+!   REAL(DP) :: Q
+!      Q = Mu_Ren/GeV
+!      alphas=alphasPDF(Q)
+!#else
+!!     Evaluation of strong coupling constant alphas
+!!     Original Author: R.K. Ellis
+!!     q -- Scale at which alpha_s is to be evaluated
+!!     alphas_mz -- ModParameters value of alpha_s at the mass of the Z-boson
+!!     nloops_pdf -- ModParameters value of the number of loops (1,2, or 3) at which the beta function is evaluated to determine running.
+!!     If you somehow need a more complete implementation, check everything at or before commit 28472c5bfee128dde458fd4929b4d3ece9519ab8
+!   INTEGER, PARAMETER :: NF6=6
+!   INTEGER, PARAMETER :: NF5=5
+!   INTEGER, PARAMETER :: NF4=4
+!   INTEGER, PARAMETER :: NF3=3
+!   INTEGER, PARAMETER :: NF2=2
+!   INTEGER, PARAMETER :: NF1=1
+!
+!      IF (Mu_Ren .LE. 0d0) THEN
+!         WRITE(6,*) 'ModKinematics::EvalAlphaS: Mu_Ren .le. 0, Mu_Ren (GeV) = ',(Mu_Ren*GeV)
+!         stop
+!      ENDIF
+!      IF (nQflavors_pdf .NE. NF5) THEN
+!         WRITE(6,*) 'ModKinematics::EvalAlphaS: nQflavors_pdf invalid, nQflavors_pdf = ',nQflavors_pdf
+!         WRITE(6,*) 'ModKinematics::EvalAlphaS: Check 28472c5bfee128dde458fd4929b4d3ece9519ab8'
+!         stop
+!      ENDIF
+!      IF (nloops_pdf .NE. 1) THEN
+!         WRITE(6,*) 'ModKinematics::EvalAlphaS: nloops_pdf invalid, nloops_pdf = ',nloops_pdf
+!         WRITE(6,*) 'ModKinematics::EvalAlphaS: Check 28472c5bfee128dde458fd4929b4d3ece9519ab8'
+!         stop
+!      ENDIF
+!
+!      alphas=alphas_mz/(1.0_dp+alphas_mz*B0_PDF(NF5)*2.0_dp*dlog((Mu_Ren/zmass_pdf)))
+!#endif
+!      ! Calculate the derived couplings
+!      call ComputeQCDVariables()
+!   RETURN
+!end subroutine EvalAlphaS
 
 
 

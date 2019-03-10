@@ -12,7 +12,7 @@ cd $scriptdir
 pkgname="collier-1.2"
 pkgdir="COLLIER-1.2"
 tarname=$pkgname".tar.gz"
-tarweb="https://www.hepforge.org/archive/collier/"$tarname
+tarweb="https://collier.hepforge.org/downloads/"$tarname
 libname="libcollier.so"
 tmpdir="colliertmp"
 
@@ -35,14 +35,14 @@ if [[ $# > 0 ]] && [[ "$1" == *"clean"* ]];then
 else
 
   if ! [ -f "../data/$SCRAM_ARCH/$libname" ]; then
-    wget $tarweb
+    wget --no-check-certificate $tarweb
     mkdir $tmpdir
     tar -xvzf $tarname -C $tmpdir
     rm $tarname
     mv $tmpdir"/"$pkgdir"/src/"* ./
     rm -rf $tmpdir
 
-    make
+    make $@
     mv $libname "../data/$SCRAM_ARCH/$libname"
   fi
 

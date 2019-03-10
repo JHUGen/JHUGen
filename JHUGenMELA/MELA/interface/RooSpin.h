@@ -18,7 +18,7 @@
 
 
 namespace AnaMelaHelpers{
-  void multiplyComplexNumbers(std::vector<Double_t> reals, std::vector<Double_t> imags, Double_t& resRe, Double_t& resIm);
+  void multiplyComplexNumbers(std::vector<Double_t> const& reals, std::vector<Double_t> const& imags, Double_t& resRe, Double_t& resIm);
 }
 
 
@@ -80,8 +80,8 @@ public:
   RooSpin();
   RooSpin(
     const char* name, const char* title,
-    modelMeasurables _measurables,
-    modelParameters _parameters,
+    modelMeasurables const& _measurables,
+    modelParameters const& _parameters,
     RooSpin::VdecayType _Vdecay1=RooSpin::kVdecayType_Zll, RooSpin::VdecayType _Vdecay2=RooSpin::kVdecayType_Zll,
     TVar::VerbosityLevel verbosity_=TVar::ERROR
     );

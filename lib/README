@@ -4,3 +4,6 @@ Then set `link[whatever] = Yes` in the JHUGenerator makefile.
 
 You can also link an installation from somewhere else.
 In that case, just set `link[whatever] = Yes`, and set `[whatever]Dir` to the correct directory.
+
+COLLIER is also included with MELA, so if you compile JHUGenMELA and set linkMELA=Yes, you don't
+have to compile this one.

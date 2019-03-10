@@ -22,8 +22,14 @@ INTERFACE OPERATOR (.cross.)
 END INTERFACE OPERATOR (.cross.)
 
 interface BubleSort
-   module procedure BubleSort_realinteger, BubleSort_stringlogical, BubleSort_stringinteger, BubleSort_stringreal8, BubleSort_stringcomplex8, BubleSort_stringstring
+   module procedure BubleSort_integerinteger,BubleSort_realinteger, BubleSort_stringlogical, BubleSort_stringinteger, BubleSort_stringreal8, BubleSort_stringcomplex8, BubleSort_stringstring
 end interface BubleSort
+
+interface ReOrder
+   module procedure ReOrder_integerinteger,ReOrder_integerreal
+end interface ReOrder
+
+
 contains
 
 
@@ -287,6 +293,7 @@ logical :: keepgoing                     ;\
 RETURN                                   ;\
 END SUBROUTINE
 
+MakeBubleSort(integer(8), integer, BubleSort_integerinteger)
 MakeBubleSort(real(8), integer, BubleSort_realinteger)
 MakeBubleSort(character(len=100), logical, BubleSort_stringlogical)
 MakeBubleSort(character(len=100), integer, BubleSort_stringinteger)
@@ -307,6 +314,25 @@ MakeBubleSort(character(len=100), character(len=100), BubleSort_stringstring)
 !     print *, iy(:)
 !     stop
 
+
+#define MakeReOrder(typey, typex, name)      \
+SUBROUTINE name(N, iy,x)                    ;\
+integer :: n,i                              ;\
+typex :: x(1:n)                             ;\
+typey :: iy(1:n)                            ;\
+typex :: temp(1:n)                          ;\
+                                            ;\
+     do i=1,N                               ;\
+         temp(i) = x( iy(i) )               ;\
+     enddo                                  ;\
+     x(1:N) = temp(1:N)                     ;\
+                                            ;\
+RETURN                                      ;\
+END SUBROUTINE                              ;\
+
+MakeReOrder(integer,integer,  ReOrder_integerinteger)
+MakeReOrder(integer, real(8), ReOrder_integerreal)
+#undef MakeReOrder
 
 
 SUBROUTINE printMom(Mom)
@@ -1508,6 +1534,8 @@ function CalculatesXsec(Process)
   if (Process.le.2) then
     CalculatesXsec=.true.
   elseif (Process.eq.50) then
+    CalculatesXsec=.false.
+  elseif (Process.ge.51 .and. Process.le.52) then
     CalculatesXsec=.false.
   elseif (Process.eq.60) then
     CalculatesXsec=.true.

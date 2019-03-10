@@ -47,10 +47,10 @@ public:
   RooSpinZero_7DComplex_withAccep_HVV();
   RooSpinZero_7DComplex_withAccep_HVV(
     const char *name, const char *title,
-    modelMeasurables _measurables,
-    modelParameters _parameters,
-    modelCouplings _couplings,
-    accepParameters _accepParams,
+    modelMeasurables const& _measurables,
+    modelParameters const& _parameters,
+    modelCouplings const& _couplings,
+    accepParameters const& _accepParams,
     RooSpin::VdecayType _Vdecay1=RooSpin::kVdecayType_Zll, RooSpin::VdecayType _Vdecay2=RooSpin::kVdecayType_Zll,
     TVar::VerbosityLevel verbosity_=TVar::ERROR
   );

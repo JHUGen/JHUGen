@@ -29,6 +29,7 @@ extern "C" {
   void __modparameters_MOD_computeewvariables();
   void __modparameters_MOD_computeqcdvariables();
 
+  void __modparameters_MOD_evalalphas();
 }
 
 #endif

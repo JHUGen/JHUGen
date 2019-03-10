@@ -4,7 +4,7 @@ using namespace std;
 using namespace MELAStreamHelpers;
 
 
-void AnaMelaHelpers::multiplyComplexNumbers(std::vector<Double_t> reals, std::vector<Double_t> imags, Double_t& resRe, Double_t& resIm){
+void AnaMelaHelpers::multiplyComplexNumbers(std::vector<Double_t> const& reals, std::vector<Double_t> const& imags, Double_t& resRe, Double_t& resIm){
   resRe=0; resIm=0;
   const unsigned int nreals = reals.size();
   const unsigned int nimags = imags.size();
@@ -39,8 +39,8 @@ verbosity(TVar::ERROR)
 
 RooSpin::RooSpin(
   const char* name, const char* title,
-  modelMeasurables _measurables,
-  modelParameters _parameters,
+  modelMeasurables const& _measurables,
+  modelParameters const& _parameters,
   RooSpin::VdecayType _Vdecay1, RooSpin::VdecayType _Vdecay2,
   TVar::VerbosityLevel verbosity_
 ) : RooAbsPdf(name, title),

@@ -114,45 +114,45 @@ std::vector<intQuad_t> TMCFMUtils::Hash_QQVVQQ(){
   */
   std::vector<intQuad_t> base_cfg; base_cfg.reserve(17);
   // uc_uc
-  base_cfg.push_back(intQuad_t(2, 4, 2, 4));
+  base_cfg.emplace_back(2, 4, 2, 4);
   // ds_ds
-  base_cfg.push_back(intQuad_t(1, 3, 1, 3));
-  base_cfg.push_back(intQuad_t(1, 5, 1, 5));
-  base_cfg.push_back(intQuad_t(3, 5, 3, 5));
+  base_cfg.emplace_back(1, 3, 1, 3);
+  base_cfg.emplace_back(1, 5, 1, 5);
+  base_cfg.emplace_back(3, 5, 3, 5);
   // ub_ub
-  base_cfg.push_back(intQuad_t(2, 3, 2, 3));
-  base_cfg.push_back(intQuad_t(2, 5, 2, 5));
-  base_cfg.push_back(intQuad_t(4, 5, 4, 5));
+  base_cfg.emplace_back(2, 3, 2, 3);
+  base_cfg.emplace_back(2, 5, 2, 5);
+  base_cfg.emplace_back(4, 5, 4, 5);
   // dc_dc
-  base_cfg.push_back(intQuad_t(1, 4, 1, 4));
+  base_cfg.emplace_back(1, 4, 1, 4);
   // du_du
-  base_cfg.push_back(intQuad_t(1, 2, 1, 2));
-  base_cfg.push_back(intQuad_t(3, 4, 3, 4));
+  base_cfg.emplace_back(1, 2, 1, 2);
+  base_cfg.emplace_back(3, 4, 3, 4);
   // dc_us
-  base_cfg.push_back(intQuad_t(1, 4, 2, 3));
+  base_cfg.emplace_back(1, 4, 2, 3);
   // us_dc
-  base_cfg.push_back(intQuad_t(2, 3, 1, 4));
+  base_cfg.emplace_back(2, 3, 1, 4);
   // uu_uu
-  base_cfg.push_back(intQuad_t(2));
-  base_cfg.push_back(intQuad_t(4));
+  base_cfg.emplace_back(2);
+  base_cfg.emplace_back(4);
   // dd_dd
-  base_cfg.push_back(intQuad_t(1));
-  base_cfg.push_back(intQuad_t(3));
-  base_cfg.push_back(intQuad_t(5));
+  base_cfg.emplace_back(1);
+  base_cfg.emplace_back(3);
+  base_cfg.emplace_back(5);
 
   std::vector<intQuad_t> jcfg; jcfg.reserve(12);
-  jcfg.push_back(intQuad_t(0, 1, 2, 3));
-  jcfg.push_back(intQuad_t(1, 0, 2, 3));
-  jcfg.push_back(intQuad_t(3, 2, 1, 0));
-  jcfg.push_back(intQuad_t(3, 2, 0, 1));
-  jcfg.push_back(intQuad_t(2, 1, 0, 3));
-  jcfg.push_back(intQuad_t(1, 2, 3, 0));
-  jcfg.push_back(intQuad_t(2, 0, 1, 3));
-  jcfg.push_back(intQuad_t(0, 2, 3, 1));
-  jcfg.push_back(intQuad_t(0, 2, 1, 3));
-  jcfg.push_back(intQuad_t(2, 0, 3, 1));
-  jcfg.push_back(intQuad_t(1, 2, 0, 3));
-  jcfg.push_back(intQuad_t(2, 1, 3, 0));
+  jcfg.emplace_back(0, 1, 2, 3);
+  jcfg.emplace_back(1, 0, 2, 3);
+  jcfg.emplace_back(3, 2, 1, 0);
+  jcfg.emplace_back(3, 2, 0, 1);
+  jcfg.emplace_back(2, 1, 0, 3);
+  jcfg.emplace_back(1, 2, 3, 0);
+  jcfg.emplace_back(2, 0, 1, 3);
+  jcfg.emplace_back(0, 2, 3, 1);
+  jcfg.emplace_back(0, 2, 1, 3);
+  jcfg.emplace_back(2, 0, 3, 1);
+  jcfg.emplace_back(1, 2, 0, 3);
+  jcfg.emplace_back(2, 1, 3, 0);
 
   std::vector<intQuad_t> pcfg;
   for (unsigned int j=0; j<jcfg.size(); j++){
@@ -196,16 +196,16 @@ std::vector<intQuad_t> TMCFMUtils::Hash_QQVVQQStrong(){
   */
   std::vector<intQuad_t> base_cfg; base_cfg.reserve(5);
   // Start with qqb_gg
-  for (int iq=1; iq<=5; iq++) base_cfg.push_back(intQuad_t(iq, -iq, 21, 21));
+  for (int iq=1; iq<=5; iq++) base_cfg.emplace_back(iq, -iq, 21, 21);
 
   std::vector<intQuad_t> jcfg; jcfg.reserve(7);
-  jcfg.push_back(intQuad_t(0, 1, 2, 3)); // qqb->gg
-  jcfg.push_back(intQuad_t(1, 0, 2, 3)); // qbq->gg
-  jcfg.push_back(intQuad_t(2, 3, 0, 1)); // gg->qbq
-  jcfg.push_back(intQuad_t(2, 1, 0, 3)); // gqb->qbg
-  jcfg.push_back(intQuad_t(2, 0, 1, 3)); // qbg->qbg
-  jcfg.push_back(intQuad_t(1, 3, 2, 0)); // gq->gq
-  jcfg.push_back(intQuad_t(0, 3, 2, 1)); // qg->gq
+  jcfg.emplace_back(0, 1, 2, 3); // qqb->gg
+  jcfg.emplace_back(1, 0, 2, 3); // qbq->gg
+  jcfg.emplace_back(2, 3, 0, 1); // gg->qbq
+  jcfg.emplace_back(2, 1, 0, 3); // gqb->qbg
+  jcfg.emplace_back(2, 0, 1, 3); // qbg->qbg
+  jcfg.emplace_back(1, 3, 2, 0); // gq->gq
+  jcfg.emplace_back(0, 3, 2, 1); // qg->gq
 
   std::vector<intQuad_t> pcfg;
   for (unsigned int j=0; j<jcfg.size(); j++){

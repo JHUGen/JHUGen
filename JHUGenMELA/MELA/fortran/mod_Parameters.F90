@@ -3,7 +3,7 @@ implicit none
 save
 !
 !
-character(len=*),parameter :: JHUGen_Version="v7.1.5"
+character(len=*),parameter :: JHUGen_Version="v7.2.6"
 !
 !
 !=====================================================
@@ -35,7 +35,9 @@ integer, public, parameter :: kRenFacScheme_mj_mj=6
 integer, public, parameter :: kRenFacScheme_mjhstar=7
 integer, public, parameter :: kRenFacScheme_mj_mhstar=8
 integer, public, parameter :: kRenFacScheme_mj=9
-integer, public, parameter :: nRenFacSchemes=10
+integer, public, parameter :: kRenFacScheme_maxpTj=10
+integer, public, parameter :: kRenFacScheme_minpTj=11
+integer, public, parameter :: nRenFacSchemes=12
 integer, public, parameter :: maxpart = 30
 integer(8), public :: EvalCounter=0
 integer(8), public :: RejeCounter=0
@@ -109,8 +111,8 @@ integer, public :: VBFoffsh_run=-1
 ! then the seeds are used to generate the (compiler dependent) required number of seeds
 ! and THOSE are used for event generation
 !note that even if the same seed is provided, results are compiler dependent
-integer, public, parameter :: nmaxseeds = 20
-integer, public, parameter :: DefaultSeeds(1:nmaxseeds) = (/847362834,470115596,392845769,191039475,372910496,192049687,695820194,218930493,902943834,471748302,123958674,390534012,938576849,386472918,938576483,891928354,593857698,938576432,948576849,192847564/)
+integer, public, parameter :: nmaxseeds = 33
+integer, public, parameter :: DefaultSeeds(1:nmaxseeds) = (/847362834,470115596,392845769,191039475,372910496,192049687,695820194,218930493,902943834,471748302,123958674,390534012,938576849,386472918,938576483,891928354,593857698,938576432,948576849,192847564     ,218940493,902943854,471748304,123958670,390534013,938576846,386472917,938576484,891928359,593857698,938576434,948576848,192847565/)
 integer, public            :: TheSeeds(1:nmaxseeds) = DefaultSeeds
 !changing the default seeds is not advised, since then results from before the change
 ! will not be reproducible
@@ -128,9 +130,30 @@ logical, public :: RandomizeVVdecays = .true.    ! randomize DecayMode1 and Deca
 
 logical, public :: UseUnformattedRead = .false.  !Set this to true if the regular reading fails for whatever reason
 
+logical, public :: HbbDecays =.false.                 ! default to false so H in V* > VH (Process = 51) does not decay to bbbar
+
 logical, public :: H_DK =.false.                 ! default to false so H in V* > VH (Process = 50) does not decay to bbbar
 !=====================================================
 
+! new VH
+character(len=2), public :: VH_PC = "lo"                ! VH partonic channel and mode selection, in development.
+                                                        ! "ee" ( = e+ e- @LO)
+                                                        ! "gg" ( = triangles + boxes of gg)
+                                                        ! "qq" ( = q q~ @LO)
+                                                        ! "lo" ( = q q~ @LO)
+                                                        ! "tr" ( = triangles of gg)
+                                                        ! "bo" ( = boxes of gg)
+                                                        ! "in" ( = interference = 2*dble(box*dconjg(triangle)) of gg)
+                                                        ! "qg" ( = real - dipoles, for g q/q~ > VH + q/q~, for development only)
+                                                        ! "gq" ( = virtual + I + K + P, for g q/q~ > VH + q/q~, for development only)
+                                                        ! "sb" ( = real - dipoles, for q q~ @NLO, for development only)
+                                                        ! "sp" ( = virtual + I + K + P, for q q~ @NLO, for development only)
+                                                        ! "nl" ( = full oneloop = q ~ @LO + NLO + gg + gq)
+                                                        ! VH_PC overrides Pchannel.
+
+real(8), public :: alpha_dip = 1d0 !extra non physical degree of freedom for dipoles. Vary to check indepedence (of alpha_dip).
+! new VH
+!=====================================================
 
 !=====================================================
 !cuts - should be set on the command line
@@ -140,14 +163,16 @@ real(8), public :: detajetcut = -1d0                          ! min difference i
 real(8), public :: Rjet = -1d0                                ! jet deltaR, anti-kt algorithm, default is set in main (0 in VH, 0.3 otherwise)
 real(8), public :: mJJcut = 0d0*GeV                           ! minimum mJJ for VBF, HJJ, bbH, VH
 real(8), public :: m4l_minmax(1:2) = (/ -1d0,-1d0 /)*GeV      ! min and max for m_4l in off-shell VBF production;   default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
+real(8), public :: m2l_minmax(1:2) = (/ 0d0,14000d0 /)*GeV   ! min and max for m_V in VH production;
+real(8), public :: mVH_minmax(1:2) = (/ 0d0,14000d0 /)*GeV      ! min and max for m_VH in VH production;
 logical, public :: includeGammaStar = .false.                 ! include offshell photons?
 logical, public :: includeVprime = .false.
 real(8), public :: MPhotonCutoff = -1d0*GeV                          ! minimum |mass_ll| for offshell photons when includeGammaStar = .true. or in VBF bkg
 real(8), public :: pTlepcut = -1d0*GeV
-real(8), public :: etalepcut = -1d0
+real(8), public :: etalepcut = 999d0
+real(8), public :: pTHcut = 0d0*GeV
 logical, public :: JetsOppositeEta = .true.
 !=====================================================
-
 
 !=====================================================
 !constants
@@ -187,7 +212,7 @@ real(8), public            :: POL_A = 0d0                   ! e+ polarization. 0
 real(8), public            :: POL_B = 0d0                   ! e- polarization. 0: no polarization, 100: helicity = 1, -100: helicity = -1
 
 ! PDF and QCD scale variables, set in main::InitPDFNonConstVals if not a parameter
-integer, public, parameter :: nQflavors_pdf = 5    ! Number of flavors enforced to the PDF, used in ModKinematics::EvalAlphaS()
+integer, public, parameter :: nQflavors_pdf = 5    ! Number of flavors enforced to the PDF, used in ModParameters::EvalAlphaS()
 integer, public, parameter :: nloops_pdf = 1       ! alpha_s order
 real(8), public            :: zmass_pdf            ! Z mass used in pdf toward the QCD scale, reset later in main per PDF if needed
 real(8), public            :: Mu_Fact              ! pdf factorization scale (set to M_Reso in main.F90)
@@ -883,6 +908,7 @@ real(dp), public, parameter :: nf = 5.0_dp
 real(dp), public, parameter :: xn = 3.0_dp
 real(dp), public, parameter :: Ca = 3.0_dp
 real(dp), public, parameter :: Cf = 4.0_dp/3.0_dp
+real(dp), public, parameter :: Tr = 0.5_dp
 real(dp), public, parameter :: avegg = 1.0_dp/4.0_dp/64.0_dp
 real(dp), public, parameter :: aveqg = 1.0_dp/4.0_dp/24.0_dp
 real(dp), public, parameter :: aveqq = 1.0_dp/4.0_dp/9.0_dp
@@ -1006,6 +1032,7 @@ integer, public, parameter :: pdfATop_ = -6 ! Dummy
 
 real(dp), public, parameter :: pi =3.141592653589793238462643383279502884197_dp
 real(dp), public, parameter :: sqrt2 = 1.4142135623730950488016887242096980786_dp
+real(dp), public, parameter :: gamma_0 = 0.5772156649015328606065120900824024310421_dp  !Euler–Mascheroni constant
 real(dp), public, parameter :: pisq = pi**2
 real(8), public, parameter :: one = 1.0d0, mone = -1.0d0
 real(8), public, parameter :: half  = 0.5d0,two = 2.0d0
@@ -1242,6 +1269,7 @@ logical :: computeQsqCompundCoupl
       endif
    endif
 
+return
 end function
 
 
@@ -1435,6 +1463,7 @@ else
   ScaleFactor = 1d0
 endif
 
+return
 END FUNCTION
 
 FUNCTION CKMbare(id1in,id2in)
@@ -1474,6 +1503,115 @@ integer :: id1in, id2in
   CKM=CKMbare(id1in, id2in)*sqrt(ScaleFactor(id1in,id2in))
 END FUNCTION
 
+! for VH use
+FUNCTION ZFFbare(id1in,id2in,h1,h2)
+implicit none
+real(8) :: ZFFbare
+integer :: id1, id2, id1in, id2in
+real(8) :: h1,h2
+
+id1 = abs(id1in)
+id2 = abs(id2in)
+
+  if(id1.ne.id2)then
+    print*,"Not a valid Z to fermion pair vertex!",id1in,id2in
+    stop
+  !Zll
+  else if(id1.eq.convertLHE(ElM_).or.id1.eq.convertLHE(MuM_).or.id1.eq.convertLHE(TaM_))then
+    if((id1in*h1).gt.0d0)then
+      ZFFbare = aR_lep
+    else
+      ZFFbare = aL_lep
+    endif
+  !Zuu
+  else if(id1.eq.convertLHE(Up_).or.id1.eq.convertLHE(Chm_).or.id1.eq.convertLHE(Top_))then
+    if((id1in*h1).gt.0d0)then
+      ZFFbare = aR_QUp
+    else
+      ZFFbare = aL_QUp
+    endif
+  !Zdd
+  else if(id1.eq.convertLHE(Dn_).or.id1.eq.convertLHE(Str_).or.id1.eq.convertLHE(Bot_))then
+    if((id1in*h1).gt.0d0)then
+      ZFFbare = aR_QDn
+    else
+      ZFFbare = aL_QDn
+    endif
+  !Z nu nu
+  else if(id1.eq.convertLHE(NuE_).or.id1.eq.convertLHE(NuM_).or.id1.eq.convertLHE(NuT_))then
+    if((id1in*h1).lt.0d0)then
+      ZFFbare = aL_neu
+    else
+      print*,"No right-handed neutrino here!",id1in,h1
+      stop
+    endif
+  else
+    print*,"Not a valid Z to fermion pair vertex!",id1in,id2in
+    stop
+  endif
+
+return
+END FUNCTION
+
+FUNCTION ZFF(id1in,id2in,h1,h2)
+implicit none
+real(8) :: ZFF
+integer :: id1in, id2in
+real(8) :: h1,h2
+  ZFF = ZFFbare(id1in,id2in,h1,h2) * sqrt(ScaleFactor(id1in,id2in))
+return
+END FUNCTION
+
+FUNCTION AFF(id1in,id2in,h1,h2)
+implicit none
+real(8) :: AFF
+integer :: id1, id2, id1in, id2in
+real(8) :: h1,h2
+logical, save :: printedneutrinowarning = .false.
+
+id1 = abs(id1in)
+id2 = abs(id2in)
+
+  if(id1.ne.id2)then
+    print*,"Not a valid Z to fermion pair vertex!",id1in,id2in
+    stop
+  !photon ll
+  else if(id1.eq.convertLHE(ElM_).or.id1.eq.convertLHE(MuM_).or.id1.eq.convertLHE(TaM_))then
+    if((id1in*h1).gt.0d0)then
+      AFF = QlR
+    else
+      AFF = QlL
+    endif
+  !photon uu
+  else if(id1.eq.convertLHE(Up_).or.id1.eq.convertLHE(Chm_).or.id1.eq.convertLHE(Top_))then
+    if((id1in*h1).gt.0d0)then
+      AFF = QuR
+    else
+      AFF = QuL
+    endif
+  !photon dd
+  else if(id1.eq.convertLHE(Dn_).or.id1.eq.convertLHE(Str_).or.id1.eq.convertLHE(Bot_))then
+    if((id1in*h1).gt.0d0)then
+      AFF = QdR
+    else
+      AFF = QdL
+    endif
+  !photon nu nu
+  else if(id1.eq.convertLHE(NuE_).or.id1.eq.convertLHE(NuM_).or.id1.eq.convertLHE(NuT_))then
+    AFF = 0d0
+    if (.not. printedneutrinowarning) then
+      print*,"Warning, gamma > nu nu~ gives 0.",id1in,id2in
+      printedneutrinowarning = .true.
+    endif
+  else
+    print*,"Not a valid photon to fermion pair vertex!",id1in,id2in
+    stop
+  endif
+
+return
+END FUNCTION
+
+! for VH use
 
 
 FUNCTION convertLHEreverse(Part) ! PDG/PDF->JHU
@@ -2326,6 +2464,53 @@ integer :: Part
 END FUNCTION
 
 
+Function CouplToLHEWp(Part)
+  implicit none
+  logical :: CouplToLHEWp
+  integer, intent(in) :: Part(1:2)
+
+  CouplToLHEWp = &
+     ((Part(1).eq.2 .and.Part(2).eq.-1) &
+  .or.(Part(1).eq.2 .and.Part(2).eq.-3) &
+  .or.(Part(1).eq.2 .and.Part(2).eq.-5) &
+  .or.(Part(1).eq.4 .and.Part(2).eq.-1) &
+  .or.(Part(1).eq.4 .and.Part(2).eq.-3) &
+  .or.(Part(1).eq.4 .and.Part(2).eq.-5) &
+  .or.(Part(1).eq.-1.and.Part(2).eq. 2) &
+  .or.(Part(1).eq.-3.and.Part(2).eq. 2) &
+  .or.(Part(1).eq.-5.and.Part(2).eq. 2) &
+  .or.(Part(1).eq.-1.and.Part(2).eq. 4) &
+  .or.(Part(1).eq.-3.and.Part(2).eq. 4) &
+  .or.(Part(1).eq.-5.and.Part(2).eq. 4))
+
+  return
+end function CouplToLHEWp
+
+
+Function CouplToLHEWm(Part)
+  implicit none
+  logical :: CouplToLHEWm
+  integer, intent(in) :: Part(1:2)
+
+  CouplToLHEWm = &
+     ((Part(1).eq.-2.and.Part(2).eq. 1) &
+  .or.(Part(1).eq.-2.and.Part(2).eq. 3) &
+  .or.(Part(1).eq.-2.and.Part(2).eq. 5) &
+  .or.(Part(1).eq.-4.and.Part(2).eq. 1) &
+  .or.(Part(1).eq.-4.and.Part(2).eq. 3) &
+  .or.(Part(1).eq.-4.and.Part(2).eq. 5) &
+  .or.(Part(1).eq. 1.and.Part(2).eq.-2) &
+  .or.(Part(1).eq. 3.and.Part(2).eq.-2) &
+  .or.(Part(1).eq. 5.and.Part(2).eq.-2) &
+  .or.(Part(1).eq. 1.and.Part(2).eq.-4) &
+  .or.(Part(1).eq. 3.and.Part(2).eq.-4) &
+  .or.(Part(1).eq. 5.and.Part(2).eq.-4))
+
+  return
+end function CouplToLHEWm
+
+
+
 
 
 FUNCTION ChargeFlip(Part)
@@ -2460,6 +2645,7 @@ implicit none
    ! Normalizations used in VH and VBF
    couplWffsq = gwsq/2.0_dp
    couplZffsq = gwsq/4.0_dp/(1.0_dp-xw)
+   !couplZffsq = alpha_QED*4d0*pi/xw/4.0_dp/(1.0_dp-xw)
    couplAZff = -gwsq*sitW/2.0_dp/sqrt(1.0_dp-xw)
    couplAffsq = gwsq*xw
 
@@ -2470,6 +2656,148 @@ subroutine ComputeQCDVariables()
 implicit none
    gs = sqrt(alphas*4.0_dp*pi)
 end subroutine ComputeQCDVariables
+
+
+
+! QCD scale from MCFM
+! Implementation into JHUGen by Ulascan Sarica, Dec. 2015
+subroutine EvalAlphaS()
+!   use ModParameters
+   IMPLICIT NONE
+#if useLHAPDF==1
+!--- This is simply a wrapper to the LHAPDF implementation of the running coupling alphas, in the style of the native MCFM routine
+   DOUBLE PRECISION alphasPDF
+   REAL(DP) :: Q
+      Q = Mu_Ren/GeV
+      alphas=alphasPDF(Q)
+#else
+!     Evaluation of strong coupling constant alphas
+!     Original Author: R.K. Ellis
+!     q -- Scale at which alpha_s is to be evaluated
+!     alphas_mz -- ModParameters value of alpha_s at the mass of the Z-boson
+!     nloops_pdf -- ModParameters value of the number of loops (1,2, or 3) at which the beta function is evaluated to determine running.
+!     If you somehow need a more complete implementation, check everything at or before commit 28472c5bfee128dde458fd4929b4d3ece9519ab8
+   INTEGER, PARAMETER :: NF6=6
+   INTEGER, PARAMETER :: NF5=5
+   INTEGER, PARAMETER :: NF4=4
+   INTEGER, PARAMETER :: NF3=3
+   INTEGER, PARAMETER :: NF2=2
+   INTEGER, PARAMETER :: NF1=1
+
+      IF (Mu_Ren .LE. 0d0) THEN
+         WRITE(6,*) 'ModParameters::EvalAlphaS: Mu_Ren .le. 0, Mu_Ren (GeV) = ',(Mu_Ren*GeV)
+         stop
+      ENDIF
+      IF (nQflavors_pdf .NE. NF5) THEN
+         WRITE(6,*) 'ModParameters::EvalAlphaS: nQflavors_pdf invalid, nQflavors_pdf = ',nQflavors_pdf
+         WRITE(6,*) 'ModParameters::EvalAlphaS: Check 28472c5bfee128dde458fd4929b4d3ece9519ab8'
+         stop
+      ENDIF
+      IF (nloops_pdf .NE. 1) THEN
+         WRITE(6,*) 'ModParameters::EvalAlphaS: nloops_pdf invalid, nloops_pdf = ',nloops_pdf
+         WRITE(6,*) 'ModParameters::EvalAlphaS: Check 28472c5bfee128dde458fd4929b4d3ece9519ab8'
+         stop
+      ENDIF
+
+      alphas=alphas_mz/(1.0_dp+alphas_mz*B0_PDF(NF5)*2.0_dp*dlog((Mu_Ren/zmass_pdf)))
+#endif
+      ! Calculate the derived couplings
+      call ComputeQCDVariables()
+   RETURN
+end subroutine EvalAlphaS
+
+
+
+!-----------------------------------------------------------------------------
+!
+      real(8) function massfrun(mf,scale)
+!
+!-----------------------------------------------------------------------------
+!
+!       This function returns the 'nloop' value of a MSbar fermion mass
+!       at a given scale.
+!
+!       INPUT: mf    = MSbar mass of fermion at MSbar fermion mass scale 
+!              scale = scale at which the running mass is evaluated
+!              asmz  = AS(MZ) : this is passed to alphas(scale,asmz,2)
+!              nloop = # of loops in the evolutionC       
+!
+!       COMMON BLOCKS: COMMON/QMASS/CMASS,BMASS,TMASS
+!                      contains the MS-bar masses of the heavy quarks.
+!
+!       EXTERNAL:      double precision alphas(scale,asmz,2)
+!                      
+!-----------------------------------------------------------------------------
+!
+!      use ModParameters
+      implicit none
+!
+!     ARGUMENTS
+!
+      real(8), intent(in) :: mf, scale
+      real(8) scale_temp_ren
+      !integer , intent(in) :: nloop
+!
+!     LOCAL
+!
+      real(8)  beta0, beta1,gamma0,gamma1
+      real(8)  as,asmf,l2
+      integer  nfrun
+
+      scale_temp_ren=Mu_Ren
+!
+!     EXTERNAL
+!
+!      double precision  alphas
+!      external          alphas
+!
+!     COMMON
+!
+!      real *8      cmass,bmass,tmass
+!      COMMON/QMASS/CMASS,BMASS,TMASS
+!
+!     CONSTANTS
+!
+!      double precision  One, Two, Three, Pi
+      !parameter( One = 1d0, Two = 2d0, Three = 3d0 )
+      !parameter( Pi = 3.14159265358979323846d0) 
+
+      if ( mf.gt.m_top ) then
+         nfrun = 6
+      else
+         nfrun = 5
+      end if
+
+      beta0 = ( 11d0 - 2d0/3d0 *nfrun )/4d0
+      !beta1 = ( 102d0  - 38d0/3d0*nf )/16d0
+      gamma0= 1d0
+      !gamma1= ( 202d0/3d0  - 20d0/9d0*nf )/16d0
+      !A1    = -beta1*gamma0/beta0**2+gamma1/beta0
+      Mu_Ren=scale
+      call EvalAlphaS()
+      as=alphas
+
+      Mu_Ren=mf
+      call EvalAlphaS()
+      asmf=alphas
+      !l2    = (1d0+A1*as/Pi)/(one+A1*asmf/Pi)
+      
+      massfrun = mf * (as/asmf)**(gamma0/beta0)
+
+      !if(nloop.eq.2) massfrun=massfrun*l2
+
+      Mu_Ren=scale_temp_ren
+      call EvalAlphaS()
+
+      return
+      end function massfrun
+
+
+
+
+
+
+
 
 
 !========================================================================
@@ -2866,6 +3194,10 @@ subroutine spinoru(p,za,zb,s)
       enddo
 
     end subroutine spinoru
+
+
+
+
 !========================================================================
 
 !========================================================================

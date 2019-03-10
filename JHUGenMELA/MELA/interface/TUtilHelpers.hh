@@ -29,6 +29,9 @@ template void TUtilHelpers::copyVector<bool>(std::vector<bool> const& input, std
 template void TUtilHelpers::copyVector<short>(std::vector<short> const& input, std::vector<short>& target);
 template void TUtilHelpers::copyVector<unsigned int>(std::vector<unsigned int> const& input, std::vector<unsigned int>& target);
 template void TUtilHelpers::copyVector<int>(std::vector<int> const& input, std::vector<int>& target);
+template void TUtilHelpers::copyVector<unsigned long>(std::vector<unsigned long> const& input, std::vector<unsigned long>& target);
+template void TUtilHelpers::copyVector<long>(std::vector<long> const& input, std::vector<long>& target);
+template void TUtilHelpers::copyVector<long long>(std::vector<long long> const& input, std::vector<long long>& target);
 template void TUtilHelpers::copyVector<float>(std::vector<float> const& input, std::vector<float>& target);
 template void TUtilHelpers::copyVector<double>(std::vector<double> const& input, std::vector<double>& target);
 template void TUtilHelpers::copyVector<TNumericUtil::intQuad_t>(std::vector<TNumericUtil::intQuad_t> const& input, std::vector<TNumericUtil::intQuad_t>& target);
@@ -47,6 +50,9 @@ template bool TUtilHelpers::checkElementExists<bool>(bool const& element, std::v
 template bool TUtilHelpers::checkElementExists<short>(short const& element, std::vector<short> const& elementlist);
 template bool TUtilHelpers::checkElementExists<unsigned int>(unsigned int const& element, std::vector<unsigned int> const& elementlist);
 template bool TUtilHelpers::checkElementExists<int>(int const& element, std::vector<int> const& elementlist);
+template bool TUtilHelpers::checkElementExists<unsigned long>(unsigned long const& element, std::vector<unsigned long> const& elementlist);
+template bool TUtilHelpers::checkElementExists<long>(long const& element, std::vector<long> const& elementlist);
+template bool TUtilHelpers::checkElementExists<long long>(long long const& element, std::vector<long long> const& elementlist);
 template bool TUtilHelpers::checkElementExists<float>(float const& element, std::vector<float> const& elementlist);
 template bool TUtilHelpers::checkElementExists<double>(double const& element, std::vector<double> const& elementlist);
 template bool TUtilHelpers::checkElementExists<TNumericUtil::intQuad_t>(TNumericUtil::intQuad_t const& element, std::vector<TNumericUtil::intQuad_t> const& elementlist);

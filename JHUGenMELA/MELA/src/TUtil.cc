@@ -63,7 +63,7 @@ void TUtil::constrainedRemovePairMass(TLorentzVector& p1, TLorentzVector& p2, do
   p1=p1hat;
   p2=p2hat;
 }
-void TUtil::scaleMomentumToEnergy(const TLorentzVector&  massiveJet, TLorentzVector& masslessJet, double mass){
+void TUtil::scaleMomentumToEnergy(const TLorentzVector& massiveJet, TLorentzVector& masslessJet, double mass){
   double energy, p3, newp3, ratio;
   energy = massiveJet.T();
   p3 = massiveJet.P();
@@ -72,8 +72,8 @@ void TUtil::scaleMomentumToEnergy(const TLorentzVector&  massiveJet, TLorentzVec
   masslessJet.SetXYZT(massiveJet.X()*ratio, massiveJet.Y()*ratio, massiveJet.Z()*ratio, energy);
 }
 pair<TLorentzVector, TLorentzVector> TUtil::removeMassFromPair(
-  TLorentzVector jet1, int jet1Id,
-  TLorentzVector jet2, int jet2Id,
+  TLorentzVector const& jet1, int const& jet1Id,
+  TLorentzVector const& jet2, int const& jet2Id,
   double m1, double m2
   ){
   TLorentzVector nullFourVector(0, 0, 0, 0);
@@ -149,7 +149,7 @@ void TUtil::adjustTopDaughters(SimpleParticleCollection_t& daughters){ // Daught
   }
 }
 // Compute a fake jet
-void TUtil::computeFakeJet(TLorentzVector realJet, TLorentzVector others, TLorentzVector& fakeJet){
+void TUtil::computeFakeJet(TLorentzVector const& realJet, TLorentzVector const& others, TLorentzVector& fakeJet){
   TLorentzVector masslessRealJet(0, 0, 0, 0);
   if (TUtil::forbidMassiveJets) TUtil::scaleMomentumToEnergy(realJet, masslessRealJet);
   else masslessRealJet = realJet;
@@ -159,7 +159,7 @@ void TUtil::computeFakeJet(TLorentzVector realJet, TLorentzVector others, TLoren
 }
 
 /***** Complex Boost *****/
-std::pair<TLorentzVector, TLorentzVector> TUtil::ComplexBoost(TVector3 beta, TLorentzVector p4){
+std::pair<TLorentzVector, TLorentzVector> TUtil::ComplexBoost(TVector3 const& beta, TLorentzVector const& p4){
   double bx=beta.X();
   double by=beta.Y();
   double bz=beta.Z();
@@ -369,7 +369,7 @@ void TUtil::computeAngles(
   }
 }
 void TUtil::computeAnglesCS(
-  float pbeam,
+  float const& pbeam,
   float& costhetastar,
   float& costheta1,
   float& costheta2,
@@ -1291,6 +1291,16 @@ double TUtil::InterpretScaleScheme(const TVar::Production& production, const TVa
   else if (scheme == TVar::Dynamic_HT){
     for (int c=2; c<mxpart; c++) Q += p[c].Pt(); // Scalar sum of all pTs
   }
+  else if (scheme == TVar::Dynamic_Leading_pTJ){
+    // pT of the hardest jet, should be just p[6].Pt() if jets are already ordered in pT
+    for (int c=6; c<mxpart; c++) Q = std::max(Q, p[c].Pt());
+  }
+  else if (scheme == TVar::Dynamic_Softest_pTJ){
+    // pT of the softest jet, should be just p[7].Pt() if jets are already ordered in pT
+    Q = p[6].Pt();
+    for (int c=7; c<mxpart; c++){ if (p[c].Pt()>0.) Q = std::min(Q, p[c].Pt()); }
+    if (Q<0.) Q = 0;
+  }
   else if (scheme == TVar::DefaultScaleScheme){
     // Defaults are dynamic scales except in ttH and bbH.
     if (matrixElement==TVar::JHUGen){
@@ -1429,7 +1439,7 @@ void TUtil::SetAlphaS(double& Q_ren, double& Q_fac, double multiplier_ren, doubl
   double muren_jhu = scale_.scale*GeV;
   double mufac_jhu = facscale_.facscale*GeV;
   __modjhugenmela_MOD_setmurenfac(&muren_jhu, &mufac_jhu);
-  __modkinematics_MOD_evalalphas();
+  __modparameters_MOD_evalalphas();
   TUtil::GetAlphaS(&(qcdcouple_.as), &(couple_.amz));
 
   qcdcouple_.gsq = 4.0*TMath::Pi()*qcdcouple_.as;
@@ -7402,7 +7412,7 @@ double TUtil::SumMEPDF(const TLorentzVector& p0, const TLorentzVector& p1, doubl
 
 
 // Propagator reweighting
-double TUtil::ResonancePropagator(double sqrts, TVar::ResonancePropagatorScheme scheme){
+double TUtil::ResonancePropagator(double const& sqrts, TVar::ResonancePropagatorScheme scheme){
   __modjhugenmela_MOD_resetmubarhgabarh();
 
   const double GeV=1./100.; // JHUGen mom. scale factor
