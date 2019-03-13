@@ -196,13 +196,13 @@ void TEvtProb::SetProcess(TVar::Process proc, TVar::MatrixElement me, TVar::Prod
   matrixElement = me;
   production = prod;
   // In case s-channel processes are passed for JHUGen ME, flip them back to JHUGen-specific productions.
-  if (matrixElement==TVar::JHUGen){
-    if (production==TVar::Had_ZH_S) production=TVar::Had_ZH;
-    else if (production==TVar::Had_WH_S) production=TVar::Had_WH;
-    else if (production==TVar::Lep_ZH_S) production=TVar::Lep_ZH;
-    else if (production==TVar::Lep_WH_S) production=TVar::Lep_WH;
-    else if (production==TVar::JJVBF_S) production=TVar::JJVBF;
-    else if (production==TVar::JJQCD_S) production=TVar::JJQCD;
+  if (matrixElement == TVar::JHUGen){
+    if (production == TVar::Had_ZH_S) production = TVar::Had_ZH;
+    else if (production == TVar::Had_WH_S) production = TVar::Had_WH;
+    else if (production == TVar::Lep_ZH_S) production = TVar::Lep_ZH;
+    else if (production == TVar::Lep_WH_S) production = TVar::Lep_WH;
+    else if (production == TVar::JJVBF_S) production = TVar::JJVBF;
+    else if (production == TVar::JJQCD_S) production = TVar::JJQCD;
   }
   process = proc;
 }
@@ -285,7 +285,7 @@ void TEvtProb::SetInputEvent(
     isGen,
     &particleList, &candList // push_back is done automatically
     );
-  if (cand!=0) melaCand=cand;
+  if (cand) melaCand=cand;
 }
 void TEvtProb::AppendTopCandidate(SimpleParticleCollection_t* TopDaughters){
   if (!CheckInputPresent()){
@@ -296,7 +296,7 @@ void TEvtProb::AppendTopCandidate(SimpleParticleCollection_t* TopDaughters){
     TopDaughters,
     &particleList, &topCandList // push_back is done automatically
     );
-  if (cand!=0) melaCand->addAssociatedTops(cand);
+  if (cand) melaCand->addAssociatedTops(cand);
 }
 void TEvtProb::SetRcdCandPtr(){ RcdME.melaCand = melaCand; }
 void TEvtProb::SetCurrentCandidateFromIndex(unsigned int icand){
@@ -305,7 +305,7 @@ void TEvtProb::SetCurrentCandidateFromIndex(unsigned int icand){
 }
 void TEvtProb::SetCurrentCandidate(MELACandidate* cand){
   melaCand = cand;
-  if (verbosity>=TVar::INFO && melaCand==0) MELAout << "TEvtProb::SetCurrentCandidate: BE CAREFUL! melaCand==0!" << endl;
+  if (verbosity>=TVar::INFO && !melaCand) MELAout << "TEvtProb::SetCurrentCandidate: BE CAREFUL! !melaCand!" << endl;
   if (verbosity>=TVar::INFO && GetCurrentCandidateIndex()<0) MELAout << "TEvtProb::SetCurrentCandidate: The current candidate is not in the list of candidates. It is the users' responsibility to delete this candidate and all of its associated particles." << endl;
 }
 
@@ -373,7 +373,7 @@ double TEvtProb::GetHiggsWidthAtPoleMass(double mass){
 MelaIO* TEvtProb::GetIORecord(){ return RcdME.getRef(); }
 MELACandidate* TEvtProb::GetCurrentCandidate(){ return melaCand; }
 int TEvtProb::GetCurrentCandidateIndex(){
-  if (melaCand==0) return -1;
+  if (!melaCand) return -1;
   for (unsigned int icand=0; icand<candList.size(); icand++){
     if (candList.at(icand)==melaCand) return (int)icand;
   }
@@ -385,11 +385,11 @@ std::vector<MELATopCandidate*>* TEvtProb::GetTopCandidates(){ return &topCandLis
 
 // Check/test functions
 bool TEvtProb::CheckInputPresent(){
-  if (melaCand==0){
+  if (!melaCand){
     MELAerr
       << "TEvtProb::CheckInputPresent: melaCand==" << melaCand << " is nullPtr!"
       << endl;
-    if (candList.size()==0) return false;
+    if (candList.empty()) return false;
     else{
       SetCurrentCandidateFromIndex(candList.size()-1);
       MELAerr << "TEvtProb::CheckInputPresent: melaCand now points to the latest candidate (cand" << (candList.size()-1) << ")" << endl;
@@ -417,12 +417,12 @@ double TEvtProb::XsecCalc_XVV(){
     if (needBSMHiggs) SetLeptonInterf(TVar::InterfOn); // All anomalous coupling computations have to use lepton interference
 
     calculateME = (
-      production==TVar::ZZGG ||
-      production==TVar::ZZQQB ||
-      production==TVar::ZZQQB_STU ||
-      production==TVar::ZZQQB_S ||
-      production==TVar::ZZQQB_TU ||
-      production==TVar::ZZINDEPENDENT ||
+      production == TVar::ZZGG ||
+      production == TVar::ZZQQB ||
+      production == TVar::ZZQQB_STU ||
+      production == TVar::ZZQQB_S ||
+      production == TVar::ZZQQB_TU ||
+      production == TVar::ZZINDEPENDENT ||
       (production == TVar::JJQCD && process == TVar::bkgZJets) // Allow Z+jets to be computed here.
       );
     if (calculateME){
@@ -729,9 +729,9 @@ double TEvtProb::XsecCalc_VVXVV(){
     if (needBSMHiggs) SetLeptonInterf(TVar::InterfOn); // All anomalous coupling computations have to use lepton interference
 
     calculateME = (
-      production==TVar::Had_WH || production==TVar::Had_ZH || production==TVar::Lep_WH || production==TVar::Lep_ZH || production==TVar::JJVBF || production==TVar::JJEW || production==TVar::JJQCD || production==TVar::JJEWQCD
-      || production==TVar::Had_WH_S || production==TVar::Had_ZH_S || production==TVar::Lep_WH_S || production==TVar::Lep_ZH_S || production==TVar::JJVBF_S || production==TVar::JJEW_S/* || production==TVar::JJQCD_S*/ || production==TVar::JJEWQCD_S
-      || production==TVar::Had_WH_TU || production==TVar::Had_ZH_TU || production==TVar::Lep_WH_TU || production==TVar::Lep_ZH_TU || production==TVar::JJVBF_TU || production==TVar::JJEW_TU/* || production==TVar::JJQCD_TU*/ || production==TVar::JJEWQCD_TU
+      production == TVar::Had_WH || production == TVar::Had_ZH || production == TVar::Lep_WH || production == TVar::Lep_ZH || production == TVar::JJVBF || production == TVar::JJEW || production == TVar::JJQCD || production == TVar::JJEWQCD
+      || production == TVar::Had_WH_S || production == TVar::Had_ZH_S || production == TVar::Lep_WH_S || production == TVar::Lep_ZH_S || production == TVar::JJVBF_S || production == TVar::JJEW_S/* || production == TVar::JJQCD_S*/ || production == TVar::JJEWQCD_S
+      || production == TVar::Had_WH_TU || production == TVar::Had_ZH_TU || production == TVar::Lep_WH_TU || production == TVar::Lep_ZH_TU || production == TVar::JJVBF_TU || production == TVar::JJEW_TU/* || production == TVar::JJQCD_TU*/ || production == TVar::JJEWQCD_TU
       );
     if (calculateME){
       SetMCFMSpinZeroCouplings(needBSMHiggs, &selfDSpinZeroCoupl, false);
@@ -968,16 +968,16 @@ double TEvtProb::XsecCalc_TTX(
     else if (process == TVar::SelfDefine_spin0){
       for (int i=0; i<SIZE_HQQ; i++){
         for (int j=0; j<2; j++){
-          if ((selfDSpinZeroCoupl.Httcoupl)[i][j]!=0. && production==TVar::ttH) Hqqcoupl[i][j] = (selfDSpinZeroCoupl.Httcoupl)[i][j];
-          else if ((selfDSpinZeroCoupl.Hbbcoupl)[i][j]!=0. && production==TVar::bbH) Hqqcoupl[i][j] = (selfDSpinZeroCoupl.Hbbcoupl)[i][j];
+          if ((selfDSpinZeroCoupl.Httcoupl)[i][j]!=0. && production == TVar::ttH) Hqqcoupl[i][j] = (selfDSpinZeroCoupl.Httcoupl)[i][j];
+          else if ((selfDSpinZeroCoupl.Hbbcoupl)[i][j]!=0. && production == TVar::bbH) Hqqcoupl[i][j] = (selfDSpinZeroCoupl.Hbbcoupl)[i][j];
           else Hqqcoupl[i][j] = (selfDSpinZeroCoupl.Hqqcoupl)[i][j];
         }
       }
     }
     SetJHUGenSpinZeroQQCouplings(Hqqcoupl);
 
-    if (production==TVar::ttH) dXsec = TTHiggsMatEl(process, production, matrixElement, &event_scales, &RcdME, EBEAM, topDecay, topProcess, verbosity);
-    else if (production==TVar::bbH) dXsec = BBHiggsMatEl(process, production, matrixElement, &event_scales, &RcdME, EBEAM, topProcess, verbosity);
+    if (production == TVar::ttH) dXsec = TTHiggsMatEl(process, production, matrixElement, &event_scales, &RcdME, EBEAM, topDecay, topProcess, verbosity);
+    else if (production == TVar::bbH) dXsec = BBHiggsMatEl(process, production, matrixElement, &event_scales, &RcdME, EBEAM, topProcess, verbosity);
     else if (verbosity >= TVar::ERROR) MELAout << "TEvtProb::XsecCalc_TTX only supports ttH and bbH productions for the moment." << endl;
     if (verbosity >= TVar::DEBUG) MELAout << "TEvtProb::XsecCalc_TTX: Process " << TVar::ProcessName(process) << " dXsec=" << dXsec << endl;
   }
@@ -1118,5 +1118,3 @@ bool TEvtProb::CheckSelfDCouplings_HVV(){
   }
   return false;
 }
-
-
