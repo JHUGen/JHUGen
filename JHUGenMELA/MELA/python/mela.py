@@ -56,8 +56,8 @@ class Mela(object):
       mela.getPAux(result);
       return result;
     }
-    vector<float> computeDecayAngles(Mela& mela) {
-      vector<float> result(8);
+    array<float, 8> computeDecayAngles(Mela& mela) {
+      array<float, 8> result;
       mela.computeDecayAngles(
         result[0],
         result[1],
@@ -70,8 +70,8 @@ class Mela(object):
       );
       return result;
     }
-    vector<float> computeVBFAngles(Mela& mela) {
-      vector<float> result(7);
+    array<float, 7> computeVBFAngles(Mela& mela) {
+      array<float, 7> result;
       mela.computeVBFAngles(
         result[0],
         result[1],
@@ -83,8 +83,8 @@ class Mela(object):
       );
       return result;
     }
-    vector<float> computeVBFAngles_ComplexBoost(Mela& mela) {
-      vector<float> result(9);
+    array<float, 9> computeVBFAngles_ComplexBoost(Mela& mela) {
+      array<float, 9> result;
       mela.computeVBFAngles_ComplexBoost(
         result[0],
         result[1],
@@ -98,15 +98,17 @@ class Mela(object):
       );
       return result;
     }
-    vector<float> computeVHAngles(Mela& mela, TVar::Production prod) {
+    array<float, 7> computeVHAngles(Mela& mela, TVar::Production prod) {
       mela.setProcess(TVar::HSMHiggs, TVar::JHUGen, prod);
-      vector<float> result(5);
+      array<float, 7> result;
       mela.computeVHAngles(
         result[0],
         result[1],
         result[2],
         result[3],
-        result[4]
+        result[4],
+        result[5],
+        result[6]
       );
       return result;
     }
@@ -274,8 +276,9 @@ class Mela(object):
   def computeVBFAngles(self): return self.VBFAngles(*ROOT.computeVBFAngles(self.__mela))
   def computeVBFAngles_ComplexBoost(self):
     result = ROOT.computeVBFAngles_ComplexBoost(self.__mela)
+    result = tuple(result)
     return self.VBFAngles(result[0], result[1], result[2]+1j*result[3], result[4]+1j*result[5], *result[6:])
-  VHAngles = namedtuple("VHAngles", "costheta1 costheta2 Phi costhetastar Phi1")
+  VHAngles = namedtuple("VHAngles", "mVstar mV costheta1 costheta2 Phi costhetastar Phi1")
   def computeVHAngles(self, prod): return self.VHAngles(*ROOT.computeVHAngles(self.__mela, prod))
 
   def computeP(self, useConstant=True): return ROOT.computeP(self.__mela, useConstant)
