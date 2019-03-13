@@ -3008,6 +3008,7 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
     float Phi1=0;
     float Q2V1=0;
     float Q2V2=0;
+    float mVstar=0, mV=0;
 
     float pingMom[8][4]={
       { 0, 0, 865.37881546721542, 865.37881546721542 },
@@ -3102,6 +3103,8 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
         costheta2,
         Phi,
         Phi1,
+        mVstar,
+        mV,
 
         daughters.at(0).second, daughters.at(0).first,
         daughters.at(1).second, daughters.at(1).first,
@@ -3139,6 +3142,8 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
         costheta2,
         Phi,
         Phi1,
+        mVstar,
+        mV,
 
         daughters.at(0).second, daughters.at(0).first,
         daughters.at(1).second, daughters.at(1).first,
@@ -4901,6 +4906,7 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
     float Phi1=0;
     float Q2V1=0;
     float Q2V2=0;
+    float mVstar=0, mV=0;
 
     float pingMom[8][4]={
       { 0, 0, 865.37881546721542, 865.37881546721542 },
@@ -5045,6 +5051,8 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
         costheta2,
         Phi,
         Phi1,
+        mVstar,
+        mV,
 
         daughters.at(0).second, daughters.at(0).first,
         daughters.at(1).second, daughters.at(1).first,
@@ -5082,6 +5090,8 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
         costheta2,
         Phi,
         Phi1,
+        mVstar,
+        mV,
 
         daughters.at(0).second, daughters.at(0).first,
         daughters.at(1).second, daughters.at(1).first,
@@ -5722,6 +5732,7 @@ void testME_ProdDec_MCFM_JHUGen_Comparison(int flavor=2, bool useBkgSample=false
   float Phi1=0;
   float Q2V1=0;
   float Q2V2=0;
+  float mVstar=0, mV=0;
 
   TTree* tree = (TTree*)finput->Get(TREE_NAME);
   tree->SetBranchAddress("NJets30", &NJets30);
@@ -5888,6 +5899,8 @@ void testME_ProdDec_MCFM_JHUGen_Comparison(int flavor=2, bool useBkgSample=false
           costheta2,
           Phi,
           Phi1,
+          mVstar,
+          mV,
 
           daughters_ZZ.at(0).second, daughters_ZZ.at(0).first,
           daughters_ZZ.at(1).second, daughters_ZZ.at(1).first,
@@ -5925,6 +5938,8 @@ void testME_ProdDec_MCFM_JHUGen_Comparison(int flavor=2, bool useBkgSample=false
           costheta2,
           Phi,
           Phi1,
+          mVstar,
+          mV,
 
           daughters_ZZ.at(0).second, daughters_ZZ.at(0).first,
           daughters_ZZ.at(1).second, daughters_ZZ.at(1).first,
