@@ -11,7 +11,9 @@
 #include <iomanip>
 #include <string>
 #include <vector>
+#include <utility>
 #include "TString.h"
+#include "TLorentzVector.h"
 #include "MELACandidate.h"
 
 
@@ -25,6 +27,7 @@ public:
   ~MELAOutputStreamer();
 
   template<typename T> MELAOutputStreamer& operator<<(T const& val);
+  template<typename T, typename U> MELAOutputStreamer& operator<<(std::pair<T, U> const& val);
   template<typename T> MELAOutputStreamer& operator<<(std::vector<T> const& val);
   MELAOutputStreamer& operator<<(std::ostream& (*fcn)(std::ostream&));
   MELAOutputStreamer& operator<<(std::ios& (*fcn)(std::ios&));
@@ -55,6 +58,8 @@ template MELAOutputStreamer& MELAOutputStreamer::operator<< <unsigned int>(unsig
 template MELAOutputStreamer& MELAOutputStreamer::operator<< <int>(int const& val);
 template MELAOutputStreamer& MELAOutputStreamer::operator<< <unsigned long>(unsigned long const& val);
 template MELAOutputStreamer& MELAOutputStreamer::operator<< <long>(long const& val);
+template MELAOutputStreamer& MELAOutputStreamer::operator<< <unsigned long long>(unsigned long long const& val);
+template MELAOutputStreamer& MELAOutputStreamer::operator<< <long long>(long long const& val);
 template MELAOutputStreamer& MELAOutputStreamer::operator<< <float>(float const& val);
 template MELAOutputStreamer& MELAOutputStreamer::operator<< <double>(double const& val);
 template MELAOutputStreamer& MELAOutputStreamer::operator<< <long double>(long double const& val);
@@ -69,14 +74,22 @@ template MELAOutputStreamer& MELAOutputStreamer::operator<< <unsigned char*>(uns
 template MELAOutputStreamer& MELAOutputStreamer::operator<< <unsigned char const*>(unsigned char const* const& val);
 template MELAOutputStreamer& MELAOutputStreamer::operator<< <unsigned char>(unsigned char const& val);
 
+template<> MELAOutputStreamer& MELAOutputStreamer::operator<< <TLorentzVector>(TLorentzVector const& val);
+
 template MELAOutputStreamer& MELAOutputStreamer::operator<< <std::string>(std::string const& val);
 template MELAOutputStreamer& MELAOutputStreamer::operator<< <TString>(TString const& val);
 template MELAOutputStreamer& MELAOutputStreamer::operator<< <std::streambuf*>(std::streambuf* const& val);
 template MELAOutputStreamer& MELAOutputStreamer::operator<< <void*>(void* const& val);
 
 template<> MELAOutputStreamer& MELAOutputStreamer::operator<< <MELAParticle>(MELAParticle const& val);
-template<> MELAOutputStreamer& MELAOutputStreamer::operator<< <SimpleParticle_t>(SimpleParticle_t const& val);
 template<> MELAOutputStreamer& MELAOutputStreamer::operator<< <MELACandidate>(MELACandidate const& val);
+
+
+template<typename T, typename U> MELAOutputStreamer& MELAOutputStreamer::operator<<(std::pair<T, U> const& val){
+  *this << "(" << val.first << ", " << val.second << ")";
+  return *this;
+}
+template<> MELAOutputStreamer& MELAOutputStreamer::operator<< <int, TLorentzVector>(SimpleParticle_t const& val);
 
 
 template<typename T> MELAOutputStreamer& MELAOutputStreamer::operator<<(std::vector<T> const& val){
@@ -93,6 +106,8 @@ template MELAOutputStreamer& MELAOutputStreamer::operator<< <unsigned int>(std::
 template MELAOutputStreamer& MELAOutputStreamer::operator<< <int>(std::vector<int> const& val);
 template MELAOutputStreamer& MELAOutputStreamer::operator<< <unsigned long>(std::vector<unsigned long> const& val);
 template MELAOutputStreamer& MELAOutputStreamer::operator<< <long>(std::vector<long> const& val);
+template MELAOutputStreamer& MELAOutputStreamer::operator<< <unsigned long long>(std::vector<unsigned long long> const& val);
+template MELAOutputStreamer& MELAOutputStreamer::operator<< <long long>(std::vector<long long> const& val);
 template MELAOutputStreamer& MELAOutputStreamer::operator<< <float>(std::vector<float> const& val);
 template MELAOutputStreamer& MELAOutputStreamer::operator<< <double>(std::vector<double> const& val);
 template MELAOutputStreamer& MELAOutputStreamer::operator<< <long double>(std::vector<long double> const& val);
@@ -134,6 +149,9 @@ template void MELAOutputStreamer::writeCentered<short>(const short& val, char fi
 template void MELAOutputStreamer::writeCentered<unsigned int>(const unsigned int& val, char fillch, std::streamsize gapsize);
 template void MELAOutputStreamer::writeCentered<int>(const int& val, char fillch, std::streamsize gapsize);
 template void MELAOutputStreamer::writeCentered<unsigned long>(const unsigned long& val, char fillch, std::streamsize gapsize);
+template void MELAOutputStreamer::writeCentered<long>(const long& val, char fillch, std::streamsize gapsize);
+template void MELAOutputStreamer::writeCentered<unsigned long long>(const unsigned long long& val, char fillch, std::streamsize gapsize);
+template void MELAOutputStreamer::writeCentered<long long>(const long long& val, char fillch, std::streamsize gapsize);
 template void MELAOutputStreamer::writeCentered<float>(const float& val, char fillch, std::streamsize gapsize);
 template void MELAOutputStreamer::writeCentered<double>(const double& val, char fillch, std::streamsize gapsize);
 template void MELAOutputStreamer::writeCentered<long double>(const long double& val, char fillch, std::streamsize gapsize);
