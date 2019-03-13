@@ -184,7 +184,7 @@ void Mela::build(double mh_){
   if (myVerbosity_>=TVar::DEBUG) MELAout << "Set ZZMatrixElement masses" << endl;
   setMelaPrimaryHiggsMass(mh_);
   setMelaHiggsMass(mh_, 0); setMelaHiggsMass(-1., 1);
-  setMelaHiggsWidth(-1., 0); setMelaHiggsWidth(0., 1);
+  setMelaHiggsWidth(-1., 0); setMelaHiggsWidth(-1., 1);
   setMelaLeptonInterference(TVar::DefaultLeptonInterf);
   setCandidateDecayMode(TVar::CandidateDecay_ZZ); // Default decay mode is ZZ at the start
 
@@ -496,7 +496,7 @@ void Mela::computeDecayAngles(
   qH=0; m1=0; m2=0; costheta1=0; costheta2=0; Phi=0; costhetastar=0; Phi1=0;
 
   melaCand = getCurrentCandidate();
-  if (melaCand!=0){
+  if (melaCand){
     TLorentzVector nullVector(0, 0, 0, 0);
 
     int partIncCode=TVar::kNoAssociated; // Only use associated partons in the pT=0 frame boost
@@ -529,11 +529,11 @@ void Mela::computeDecayAngles(
     );
 
     // Protect against NaN
-    if (!(costhetastar==costhetastar)) costhetastar=0;
-    if (!(costheta1==costheta1)) costheta1=0;
-    if (!(costheta2==costheta2)) costheta2=0;
-    if (!(Phi==Phi)) Phi=0;
-    if (!(Phi1==Phi1)) Phi1=0;
+    if (!std::isfinite(costhetastar)) costhetastar=0;
+    if (!std::isfinite(costheta1)) costheta1=0;
+    if (!std::isfinite(costheta2)) costheta2=0;
+    if (!std::isfinite(Phi)) Phi=0;
+    if (!std::isfinite(Phi1)) Phi1=0;
   }
   else if (myVerbosity_>=TVar::DEBUG) MELAerr << "Mela::computeDecayAngles: No possible melaCand in TEvtProb to compute angles." << endl;
 
@@ -557,7 +557,7 @@ void Mela::computeVBFAngles(
   Q2V1=0; Q2V2=0; costheta1=0; costheta2=0; Phi=0; costhetastar=0; Phi1=0;
 
   melaCand = getCurrentCandidate();
-  if (melaCand!=0){
+  if (melaCand){
     TLorentzVector nullVector(0, 0, 0, 0);
 
     int nRequested_AssociatedJets=2;
@@ -605,11 +605,13 @@ void Mela::computeVBFAngles(
     );
 
     // Protect against NaN
-    if (!(costhetastar==costhetastar)) costhetastar=0;
-    if (!(costheta1==costheta1)) costheta1=0;
-    if (!(costheta2==costheta2)) costheta2=0;
-    if (!(Phi==Phi)) Phi=0;
-    if (!(Phi1==Phi1)) Phi1=0;
+    if (!std::isfinite(costhetastar)) costhetastar=0;
+    if (!std::isfinite(costheta1)) costheta1=0;
+    if (!std::isfinite(costheta2)) costheta2=0;
+    if (!std::isfinite(Phi)) Phi=0;
+    if (!std::isfinite(Phi1)) Phi1=0;
+    if (!std::isfinite(Q2V1)) Q2V1=0;
+    if (!std::isfinite(Q2V2)) Q2V2=0;
 
     if (myVerbosity_>=TVar::DEBUG) MELAout
       << "Mela::computeVBFAngles: (Q2_1, Q2_2, h1, h2, Phi, hs, Phi1) = "
@@ -637,7 +639,7 @@ void Mela::computeVBFAngles_ComplexBoost(
   Q2V1=0; Q2V2=0; costheta1_real=0; costheta2_real=0; costheta1_imag=0; costheta2_imag=0; Phi=0; costhetastar=0; Phi1=0;
 
   melaCand = getCurrentCandidate();
-  if (melaCand!=0){
+  if (melaCand){
     TLorentzVector nullVector(0, 0, 0, 0);
 
     int nRequested_AssociatedJets=2;
@@ -678,13 +680,15 @@ void Mela::computeVBFAngles_ComplexBoost(
     );
 
     // Protect against NaN
-    if (!(costhetastar==costhetastar)) costhetastar=0;
-    if (!(costheta1_real==costheta1_real)) costheta1_real=0;
-    if (!(costheta2_real==costheta2_real)) costheta2_real=0;
-    if (!(costheta1_imag==costheta1_imag)) costheta1_imag=0;
-    if (!(costheta2_imag==costheta2_imag)) costheta2_imag=0;
-    if (!(Phi==Phi)) Phi=0;
-    if (!(Phi1==Phi1)) Phi1=0;
+    if (!std::isfinite(costhetastar)) costhetastar=0;
+    if (!std::isfinite(costheta1_real)) costheta1_real=0;
+    if (!std::isfinite(costheta2_real)) costheta2_real=0;
+    if (!std::isfinite(costheta1_imag)) costheta1_imag=0;
+    if (!std::isfinite(costheta2_imag)) costheta2_imag=0;
+    if (!std::isfinite(Phi)) Phi=0;
+    if (!std::isfinite(Phi1)) Phi1=0;
+    if (!std::isfinite(Q2V1)) Q2V1=0;
+    if (!std::isfinite(Q2V2)) Q2V2=0;
 
     if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela::computeVBFAngles_ComplexBoost: result = " << Q2V1 << ", " << Q2V2
                                            << ", " << costheta1_real << " + " << costheta1_imag << "i, "
@@ -705,6 +709,8 @@ void Mela::computeVBFAngles_ComplexBoost(
 
 // VH angles computation script of Mela to convert MELACandidates to production angles.
 void Mela::computeVHAngles(
+  float& mVstar,
+  float& mV,
   float& costheta1,
   float& costheta2,
   float& Phi,
@@ -714,10 +720,10 @@ void Mela::computeVHAngles(
   using TVar::simple_event_record;
   if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela: Begin computeVHAngles" << endl;
 
-  costheta1=0; costheta2=0; Phi=0; costhetastar=0; Phi1=0;
+  mVstar = 0; mV = 0; costheta1=0; costheta2=0; Phi=0; costhetastar=0; Phi1=0;
 
   melaCand = getCurrentCandidate();
-  if (melaCand!=0){
+  if (melaCand){
     TLorentzVector nullVector(0, 0, 0, 0);
 
     if (!(myProduction_ == TVar::Lep_ZH || myProduction_ == TVar::Lep_WH || myProduction_ == TVar::Had_ZH || myProduction_ == TVar::Had_WH || myProduction_ == TVar::GammaH)){
@@ -780,7 +786,7 @@ void Mela::computeVHAngles(
     }
 
     TUtil::computeVHAngles(
-      costhetastar, costheta1, costheta2, Phi, Phi1,
+      costhetastar, costheta1, costheta2, Phi, Phi1, mVstar, mV,
       daughters.at(0).second, daughters.at(0).first,
       daughters.at(1).second, daughters.at(1).first,
       daughters.at(2).second, daughters.at(2).first,
@@ -792,15 +798,17 @@ void Mela::computeVHAngles(
     );
 
     // Protect against NaN
-    if (!(costhetastar==costhetastar)) costhetastar=0;
-    if (!(costheta1==costheta1)) costheta1=0;
-    if (!(costheta2==costheta2)) costheta2=0;
-    if (!(Phi==Phi)) Phi=0;
-    if (!(Phi1==Phi1)) Phi1=0;
+    if (!std::isfinite(costhetastar)) costhetastar=0;
+    if (!std::isfinite(costheta1)) costheta1=0;
+    if (!std::isfinite(costheta2)) costheta2=0;
+    if (!std::isfinite(Phi)) Phi=0;
+    if (!std::isfinite(Phi1)) Phi1=0;
+    if (!std::isfinite(mVstar)) mVstar=0;
+    if (!std::isfinite(mV)) mV=0;
 
     if (myVerbosity_>=TVar::DEBUG) MELAout
-      << "Mela::computeVHAngles: (h1, h2, Phi, hs, Phi1) = "
-      << costheta1 << ", " << costheta2 << ", " << Phi << ", "
+      << "Mela::computeVHAngles: (mVstar, mV, h1, h2, Phi, hs, Phi1) = "
+      << mVstar << ", " << mV << ", " << costheta1 << ", " << costheta2 << ", " << Phi << ", "
       << costhetastar << ", " << Phi1 << endl;
   }
   else if (myVerbosity_>=TVar::DEBUG) MELAerr << "Mela::computeVHAngles: No possible melaCand in TEvtProb to compute angles." << endl;
@@ -924,7 +932,7 @@ void Mela::computeP(
   reset_PAux();
 
   melaCand = getCurrentCandidate();
-  if (melaCand!=0){
+  if (melaCand){
     TLorentzVector nullVector(0, 0, 0, 0);
     float mZZ=0, mZ1=0, mZ2=0, costheta1=0, costheta2=0, Phi=0, costhetastar=0, Phi1=0;
 
@@ -1046,9 +1054,9 @@ void Mela::computeP(
               &partList_tmp,
               &candList_tmp
               );
-            if (myVerbosity_>=TVar::ERROR && cand_tmp==0) MELAerr << "Mela::computeP: Failed to construct temporary candidate!" << endl;
+            if (myVerbosity_>=TVar::ERROR && !cand_tmp) MELAerr << "Mela::computeP: Failed to construct temporary candidate!" << endl;
             setCurrentCandidate(cand_tmp);
-            if (myVerbosity_>=TVar::DEBUG && cand_tmp!=0){ MELAout << "Mela::computeP: ZZINDEPENDENT calculation produces candidate:" << endl; TUtil::PrintCandidateSummary(cand_tmp); }
+            if (myVerbosity_>=TVar::DEBUG && cand_tmp){ MELAout << "Mela::computeP: ZZINDEPENDENT calculation produces candidate:" << endl; TUtil::PrintCandidateSummary(cand_tmp); }
             // calculate the ME
             ZZME->computeXS(temp_prob);
             // Delete the temporary particles
@@ -1210,7 +1218,7 @@ void Mela::computeProdDecP(
     MELAout << "Mela::computeProdDecP production mode is not supported for production " << myProduction_ << endl;
     hasFailed = true;
   }
-  if (melaCand==0) hasFailed=true;
+  if (!melaCand) hasFailed=true;
   if (hasFailed) prob=0;
   else{
     setSpinZeroCouplings();
@@ -1256,7 +1264,7 @@ void Mela::computeProdP(
     reset_PAux();
 
     melaCand = getCurrentCandidate();
-    if (melaCand!=0){
+    if (melaCand){
       TLorentzVector nullFourVector(0, 0, 0, 0);
       bool isJet2Fake = false;
       MELACandidate* candOriginal = melaCand;
@@ -1486,7 +1494,7 @@ void Mela::computeProdP_VH(
   reset_PAux();
 
   melaCand = getCurrentCandidate();
-  if (melaCand!=0){
+  if (melaCand){
     if (myProduction_ == TVar::Lep_ZH || myProduction_ == TVar::Lep_WH || myProduction_ == TVar::Had_ZH || myProduction_ == TVar::Had_WH || myProduction_ == TVar::GammaH){
       if (myModel_ == TVar::SelfDefine_spin0) setSpinZeroCouplings();
       ZZME->computeProdXS_VH(prob, includeHiggsDecay); // VH
@@ -1511,7 +1519,7 @@ void Mela::computeProdP_ttH(
   reset_PAux();
 
   melaCand = getCurrentCandidate();
-  if (melaCand!=0){
+  if (melaCand){
     if (myModel_ == TVar::SelfDefine_spin0) setSpinZeroCouplings();
     ZZME->computeProdXS_ttH(prob,topProcess, topDecay);
     if (useConstant) computeConstant(prob);
@@ -1525,7 +1533,7 @@ void Mela::computeProdP_ttH(
 void Mela::getXPropagator(TVar::ResonancePropagatorScheme scheme, float& prop){
   prop=0.;
   melaCand = getCurrentCandidate();
-  if (melaCand!=0) ZZME->get_XPropagator(scheme, prop);
+  if (melaCand) ZZME->get_XPropagator(scheme, prop);
   reset_CandRef();
 }
 
@@ -1534,7 +1542,7 @@ void Mela::compute4FermionWeight(float& w){ // Lepton interference using JHUGen
   reset_PAux();
 
   melaCand = getCurrentCandidate();
-  if (melaCand!=0){
+  if (melaCand){
     bool hasFailed=false;
     int id_original[2][2];
     for (int iv=0; iv<2; iv++){
@@ -1592,7 +1600,7 @@ void Mela::computePM4l(TVar::SuperMelaSyst syst, float& prob){
   prob=-99;
 
   melaCand = getCurrentCandidate();
-  if (melaCand!=0){
+  if (melaCand){
     bool hasFailed=false;
     int id_original[2][2];
     for (int iv=0; iv<2; iv++){
@@ -1669,7 +1677,7 @@ void Mela::computeD_gg(
   }
 
   melaCand = getCurrentCandidate();
-  if (melaCand!=0){
+  if (melaCand){
     float bkg_VAMCFM, ggzz_VAMCFM_noscale, ggHZZ_prob_pure_noscale, ggHZZ_prob_int_noscale, bkgHZZ_prob_noscale;
     float ggScale=0;
     setProcess(TVar::bkgZZ, myME, TVar::ZZGG); computeP(ggzz_VAMCFM_noscale, false);
@@ -1900,7 +1908,7 @@ void Mela::computeConstant(float& prob){
 }
 void Mela::setConstant(){
   float constant = 1;
-  if (melaCand==0){ if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela::getConstant: melaCand==0" << endl; }
+  if (!melaCand){ if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela::getConstant: !melaCand" << endl; }
   else{
     if ( // Undecayed Higgs MEs from JHUGen
       myME_ == TVar::JHUGen
@@ -1976,7 +1984,7 @@ void Mela::setConstant(){
 }
 float Mela::getConstant_JHUGenUndecayed(){
   float constant = 1;
-  if (melaCand==0) return constant;
+  if (!melaCand) return constant;
 
   MelaPConstant* pchandle=0;
   unsigned int iarray=0;
@@ -2011,7 +2019,7 @@ float Mela::getConstant_JHUGenUndecayed(){
 }
 float Mela::getConstant_4l(){
   float constant = 1;
-  if (melaCand==0) return constant;
+  if (!melaCand) return constant;
   int decid = abs(
     melaCand->getSortedV(0)->getDaughter(0)->id*
     melaCand->getSortedV(0)->getDaughter(1)->id*
@@ -2022,7 +2030,7 @@ float Mela::getConstant_4l(){
 }
 float Mela::getConstant_2l2q(){
   float constant = 1;
-  if (melaCand==0) return constant;
+  if (!melaCand) return constant;
   int decid = 1;
   if (PDGHelpers::isALepton(melaCand->getSortedV(0)->getDaughter(0)->id)) decid *= melaCand->getSortedV(0)->getDaughter(0)->id*melaCand->getSortedV(0)->getDaughter(1)->id;
   if (PDGHelpers::isALepton(melaCand->getSortedV(1)->getDaughter(0)->id)) decid *= melaCand->getSortedV(1)->getDaughter(0)->id*melaCand->getSortedV(1)->getDaughter(1)->id;
@@ -2031,7 +2039,7 @@ float Mela::getConstant_2l2q(){
 }
 float Mela::getConstant_4q(){
   float constant = 1;
-  if (melaCand==0) return constant;
+  if (!melaCand) return constant;
   const int decid = 121;
   return getConstant_FourFermionDecay(decid);
 }

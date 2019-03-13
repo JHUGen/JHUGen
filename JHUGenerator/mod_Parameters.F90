@@ -3,7 +3,7 @@ implicit none
 save
 !
 !
-character(len=*),parameter :: JHUGen_Version="v7.2.6"
+character(len=*),parameter :: JHUGen_Version="v7.2.7"
 !
 !
 !=====================================================
@@ -66,7 +66,7 @@ integer, public :: Collier_maxNLoopProps = -1
 integer, public :: Collier_maxRank = -1
 ! End COLLIER initialization variables
 #endif
-logical, public :: includeInterference, writegit
+logical, public :: includeInterference, ReweightInterference, writegit
 real(8), public :: M_V,Ga_V, M_Vprime,Ga_Vprime, M_V_ps,Ga_V_ps, M_Z_ps,Ga_Z_ps, M_W_ps,Ga_W_ps
 real(8), public, parameter :: GeV=1d0/100d0 ! we are using units of 100GeV, i.e. Lambda=10 is 1TeV
 real(8), public, parameter :: percent=1d0/100d0
@@ -100,6 +100,8 @@ integer, public :: PMZZminindex=-1, PMZZmaxindex=-1  !store the largest and smal
 complex(8), public :: PrintPMZZ   !real part is the minimum, imaginary part is the maximum
 integer, public :: PrintPMZZIntervals
 integer, public :: VBFoffsh_run=-1
+logical, public :: FindCrossSectionWithWeights = .false.
+real(8), public :: CrossSectionWithWeights = 0d0, CrossSectionWithWeightsErrorSquared = 0d0
 !=====================================================
 
 

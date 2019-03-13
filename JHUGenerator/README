@@ -32,6 +32,8 @@ command line parameter quick reference:
                          9=Z->anything, 10=W->lnu+taunu, 11=W->anything
     Interf:            0=neglect interference for 4f final states,
                        1=include interference
+    ReweightInterf:    if true, include interference as LHE event weights for
+                       offshell VBF events
     RandomizeVVdecays: Randomizes the order of DecayMode1 and DecayMode2,
                        per event (default true)
                        For a WW decay, turning this off will mean

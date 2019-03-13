@@ -165,7 +165,7 @@ void ZZMatrixElement::set_TempCandidate(
     isGen,
     &tmpPartList, &tmpCandList // push_back is done automatically
     );
-  if (cand!=0){
+  if (cand){
     melaCand=cand;
     set_CurrentCandidate(melaCand);
   }
@@ -209,13 +209,13 @@ void ZZMatrixElement::resetPerEvent(){
   Xcal2.SetHiggsMass(mHiggs[0], -1, -1);
 
   // Return back to default lepton interference settings after each calculation
-  if (processLeptonInterference!=TVar::DefaultLeptonInterf) set_LeptonInterference(TVar::DefaultLeptonInterf);
+  if (processLeptonInterference != TVar::DefaultLeptonInterf) set_LeptonInterference(TVar::DefaultLeptonInterf);
 
   // Delete the temporary input objects owned
-  for (unsigned int ic=0; ic<tmpCandList.size(); ic++){ if (tmpCandList.at(ic)!=0) delete tmpCandList.at(ic); }
-  //for (unsigned int itc=0; itc<tmpTopCandList.size(); itc++){ if (tmpTopCandList.at(itc)!=0) delete tmpTopCandList.at(itc); }
-  for (unsigned int ip=0; ip<tmpPartList.size(); ip++){ if (tmpPartList.at(ip)!=0) delete tmpPartList.at(ip); }
-  melaCand=0;
+  for (unsigned int ic=0; ic<tmpCandList.size(); ic++){ if (tmpCandList.at(ic)) delete tmpCandList.at(ic); }
+  //for (unsigned int itc=0; itc<tmpTopCandList.size(); itc++){ if (tmpTopCandList.at(itc)) delete tmpTopCandList.at(itc); }
+  for (unsigned int ip=0; ip<tmpPartList.size(); ip++){ if (tmpPartList.at(ip)) delete tmpPartList.at(ip); }
+  melaCand=nullptr;
 }
 // Resets all candidates in Xcal2, to be called at the end of each event after all computations are done
 void ZZMatrixElement::reset_InputEvent(){ Xcal2.ResetInputEvent(); }
@@ -332,9 +332,9 @@ void ZZMatrixElement::computeXS(
   ){
   melaCand = get_CurrentCandidate();
 
-  if (melaCand!=0){
+  if (melaCand){
     double zzmass = melaCand->m();
-    if (processME==TVar::MCFM){
+    if (processME == TVar::MCFM){
       for (int jh=0; jh<(int)nSupportedHiggses; jh++) Xcal2.SetHiggsMass(mHiggs[jh], wHiggs[jh], jh+1);
     }
     else Xcal2.SetHiggsMass(zzmass, wHiggs[0], -1);
@@ -352,9 +352,9 @@ void ZZMatrixElement::computeProdXS_VVHVV(
   ){
   melaCand = get_CurrentCandidate();
 
-  if (melaCand!=0){
+  if (melaCand){
     double zzmass = melaCand->m();
-    if (processME==TVar::MCFM){
+    if (processME == TVar::MCFM){
       for (int jh=0; jh<(int)nSupportedHiggses; jh++) Xcal2.SetHiggsMass(mHiggs[jh], wHiggs[jh], jh+1);
     }
     else Xcal2.SetHiggsMass(zzmass, wHiggs[0], -1);
@@ -372,7 +372,7 @@ void ZZMatrixElement::computeProdXS_JJH(
   ){
   melaCand = get_CurrentCandidate();
 
-  if (melaCand!=0){
+  if (melaCand){
     mevalue  = Xcal2.XsecCalcXJJ();
   }
 
@@ -386,7 +386,7 @@ void ZZMatrixElement::computeProdXS_JH(
   ){
   melaCand = get_CurrentCandidate();
 
-  if (melaCand!=0){
+  if (melaCand){
     mevalue  = Xcal2.XsecCalcXJ();
   }
 
@@ -401,9 +401,9 @@ void ZZMatrixElement::computeProdXS_VH(
   ){
   melaCand = get_CurrentCandidate();
 
-  if (melaCand!=0){
+  if (melaCand){
     double zzmass = melaCand->m();
-    if (processME==TVar::MCFM){ for (int jh=0; jh<(int)nSupportedHiggses; jh++) Xcal2.SetHiggsMass(mHiggs[jh], wHiggs[jh], jh+1); }
+    if (processME == TVar::MCFM){ for (int jh=0; jh<(int)nSupportedHiggses; jh++) Xcal2.SetHiggsMass(mHiggs[jh], wHiggs[jh], jh+1); }
     else Xcal2.SetHiggsMass(zzmass, wHiggs[0], -1);
 
     mevalue  = Xcal2.XsecCalc_VX(
@@ -425,12 +425,12 @@ void ZZMatrixElement::computeProdXS_ttH(
   ){
   melaCand = get_CurrentCandidate();
 
-  if (melaCand!=0){
+  if (melaCand){
     double zzmass = melaCand->m();
-    if (processME==TVar::MCFM){ for (int jh=0; jh<(int)nSupportedHiggses; jh++) Xcal2.SetHiggsMass(mHiggs[jh], wHiggs[jh], jh+1); }
+    if (processME == TVar::MCFM){ for (int jh=0; jh<(int)nSupportedHiggses; jh++) Xcal2.SetHiggsMass(mHiggs[jh], wHiggs[jh], jh+1); }
     else Xcal2.SetHiggsMass(zzmass, wHiggs[0], -1);
 
-    if (processProduction==TVar::ttH || processProduction==TVar::bbH){
+    if (processProduction == TVar::ttH || processProduction == TVar::bbH){
       mevalue  = Xcal2.XsecCalc_TTX(
         topProcess, topDecay
         );
@@ -446,7 +446,7 @@ void ZZMatrixElement::get_XPropagator(TVar::ResonancePropagatorScheme scheme, fl
   prop=0.;
   melaCand = get_CurrentCandidate();
 
-  if (melaCand!=0){
+  if (melaCand){
     Xcal2.SetHiggsMass(mHiggs[0], wHiggs[0], -1);
     prop=Xcal2.GetXPropagator(scheme);
   }

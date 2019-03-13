@@ -28,11 +28,11 @@ real(8) :: yRnd(1:18),VgsWgt, EvalWeighted_HJJ_fulldecay
 real(8) :: pdf(-6:6,1:2),me2(-5:5,-5:5)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
 real(8) :: MomExt(1:4,1:10),PSWgt
-real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5),msq_VgsWgt(-5:5,-5:5),msq_MCFM_interf(-5:5,-5:5), Wgt_Ratio_Interf(1:2)
+real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5),msq_VgsWgt(-5:5,-5:5),Wgt_Ratio_Interf,originalprobability
 integer :: id_MCFM(mxpart),MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),NHisto,ipart,jpart
 integer, pointer :: ijSel(:,:)
 integer :: iPartChannel,PartChannelAvg,NumPartonicChannels,iflip,i,j,k
-real(8) :: PreFac,VegasWeighted_HJJ_fulldecay,xRnd
+real(8) :: PreFac,VegasWeighted_HJJ_fulldecay,xRnd,LeptonAndVegasWeighted_HJJ_fulldecay
 logical :: applyPSCut
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
 include 'vegas_common.f'
@@ -154,13 +154,13 @@ EvalWeighted_HJJ_fulldecay = 0d0
 
    call EvalAmp_qqVVqq(id_MCFM, p_MCFM, msq_MCFM) ! 1 for ZZ decay, 2 for WW decay, 3 for ZZ+WW mixture
 
-   Wgt_Ratio_Interf(:) = msq_MCFM(iPart_sel,jPart_sel)
-
 #else
    print *, "To use this process, please set linkMELA=Yes in the makefile and recompile."
    print *, "You will also need to have a compiled JHUGenMELA in the directory specified by JHUGenMELADir in the makefile."
    stop 1
 #endif
+
+   originalprobability = msq_MCFM(iPart_sel,jPart_sel)
 
    PreFac = fbGeV2 * FluxFac * PSWgt * sHatJacobi
    msq_MCFM = msq_MCFM * PreFac / (GeV**8)  ! adjust msq_MCFM for GeV units of MCFM mat.el.
@@ -186,10 +186,15 @@ EvalWeighted_HJJ_fulldecay = 0d0
        CrossSec2(iPartChannel) = CrossSec2(iPartChannel) + VegasWeighted_HJJ_fulldecay
        CrossSecMax2(iPartChannel) = max(CrossSecMax2(iPartChannel),VegasWeighted_HJJ_fulldecay)
 
-
        do NHisto=1,NumHistograms
          call intoHisto(NHisto,NBin(NHisto),VegasWeighted_HJJ_fulldecay)
        enddo
+
+       if (FindCrossSectionWithWeights) then
+         LeptonAndVegasWeighted_HJJ_fulldecay = VegasWeighted_HJJ_fulldecay * ReweightLeptonInterference(id_MCFM, p_MCFM, originalprobability)
+         CrossSectionWithWeights = CrossSectionWithWeights + LeptonAndVegasWeighted_HJJ_fulldecay
+         CrossSectionWithWeightsErrorSquared = CrossSectionWithWeightsErrorSquared + LeptonAndVegasWeighted_HJJ_fulldecay**2
+       endif
               
      else! not warmup
 
@@ -209,21 +214,11 @@ EvalWeighted_HJJ_fulldecay = 0d0
           AccepCounter = AccepCounter + 1
           AccepCounter_part2(iPartChannel) = AccepCounter_part2(iPartChannel) + 1
 
-          if( (MY_IDUP(7).eq.MY_IDUP(9)) .and. (.not. includeInterference) ) then
-             includeInterference=.true.
-#if linkMELA==1
-             call EvalAmp_qqVVqq(id_MCFM, p_MCFM, msq_MCFM_interf)
-#else
-             print *, "this shouldn't be able to happen"
-             stop 1
-#endif
-             includeInterference=.false.
-             Wgt_Ratio_Interf(1) = msq_MCFM_interf(iPart_sel,jPart_sel)
-          endif
+          Wgt_Ratio_Interf = ReweightLeptonInterference(id_MCFM, p_MCFM, originalprobability)
 
           MY_IDUP(1:2)= id_MCFM(1:2)
           MY_IDUP(3:4)= id_MCFM(7:8)
-          call WriteOutEvent_HJJ_fulldecay(MomExt,MY_IDUP,ICOLUP,EventWeight=Wgt_Ratio_Interf(1)/Wgt_Ratio_Interf(2))
+          call WriteOutEvent_HJJ_fulldecay(MomExt,MY_IDUP,ICOLUP,EventWeight=Wgt_Ratio_Interf)
 
           do NHisto=1,NumHistograms
             call intoHisto(NHisto,NBin(NHisto),1d0)
@@ -1162,18 +1157,96 @@ END FUNCTION EvalUnWeighted_HJJ
 
 
 
+function ReweightLeptonInterference(id_MCFM, p_MCFM, originalprobability)
+use ModMisc
+use ModParameters
+#if linkMELA==1
+use ModMCFMWrapper
+#endif
+implicit none
+integer,parameter :: mxpart=14 ! this has to match the MCFM parameter
+integer, intent(in) :: id_MCFM(mxpart)
+real(8), intent(in) :: p_MCFM(mxpart,1:4), originalprobability
+real(8) :: msq_MCFM_interf(-5:5,-5:5), msq_MCFM_swapped(-5:5,-5:5), p_MCFM_swapped(mxpart,1:4), numerator, denominator
+real(8) :: ReweightLeptonInterference
 
+   ReweightLeptonInterference = 1d0
 
+   if( (id_MCFM(3).eq.id_MCFM(5)) .and. (ReweightInterference) ) then
+      if (includeInterference) then
+        print *, "This shouldn't be able to happen"
+        stop 1
+      endif
 
+      !a bit of explanation here:
+      !Let's say this event is 4mu.
+      !Label the muons 1, 2, 3, 4.  1 and 3 are positive, 2 and 4 are negative.
+      !We generated this event without interference.
+      !However, we want to include weights so that the final weighted event
+      !distribution will have interference.
 
+      !The weight of each event will be a ratio of two probabilities.
+      !In the code, the numerator and denominator will be Wgt_Ratio_Interf(1:2), respectively.
+      !Note that these have both already been set to the 2e2mu-style ME above, for easier bookkeeping.
+      !In a real 2e2mu event, we never enter this if statement, so the ratio is just 1.
+      !The numerator is easy: it's just the probability of producing this event including interference.
+      !We calculate it now.
+
+      includeInterference=.true.
+#if linkMELA==1
+      call EvalAmp_qqVVqq(id_MCFM, p_MCFM, msq_MCFM_interf)
+#else
+      print *, "this shouldn't be able to happen"
+      stop 1
+#endif
+      includeInterference=.false.
+      numerator = msq_MCFM_interf(iPart_sel,jPart_sel)
+
+      !Now for the denominator, which is supposed to be the probability of producing this event
+      !with the 2e2mu code.
+      !The ME calculation above used Z->12 Z->34.
+      !However, there's also another configuration, Z->14 Z->32, which also leads to the
+      !exact same event when the final state flavors are the same.
+      !(This is in contrast to 2e2mu for example, where switching e- and mu- gives a different event.)
+      !Therefore, the denominator can be EITHER the probability for Z->12 Z->34,
+      !OR the average of P(Z->12 Z->34) and P(Z->14 Z->32)
+      !Either of these gives the right result.
+
+      !If we divide by P(Z->12 Z->34), then the final probability * weight for the event is
+      !0.5 * (
+      !   P(Z->12 Z->34) * (P(with interference) / P(Z->12 Z->34))
+      ! + P(Z->14 Z->32) * (P(with interference) / P(Z->14 Z->32))
+      !)      ^^^                             ^^^^^
+      !    probability                        weight
+      !
+      ! = P(with interference)
+      !where the factor of 0.5 comes because we want the probability for a single 4mu event,
+      !instead of the two 2e2mu events that could be produced by this procedure
+
+      !On the other hand, if we divide by the average of P(Z->12 Z->34) and P(Z->14 Z->32),
+      !the final probability*weight for the event is
+      !0.5 * (
+      !   P(Z->12 Z->34) * (P(with interference) / (0.5 * (P(Z->12 Z->34) + P(Z->14 Z->32))))
+      ! + P(Z->14 Z->32) * (P(with interference) / (0.5 * (P(Z->12 Z->34) + P(Z->14 Z->32))))
+      !)      ^^^                             ^^^^^
+      !    probability                        weight
+      !
+      ! = P(with interference)
+
+      !Here, we choose the second approach because the weights are closer to 1 at high mass.
+
+      p_MCFM_swapped(:,:) = p_MCFM(:,:)
+      call swap(p_MCFM_swapped(4,:), p_MCFM_swapped(6,:))
+      call EvalAmp_qqVVqq(id_MCFM, p_MCFM_swapped, msq_MCFM_swapped)
+
+      denominator = (originalprobability + msq_MCFM_swapped(iPart_sel,jPart_sel)) / 2
+
+      ReweightLeptonInterference = numerator / denominator
+
+   endif
+
+end function ReweightLeptonInterference
 
 
 
 END MODULE ModCrossSection_HJJ
-
-
-
-
-
-
-
