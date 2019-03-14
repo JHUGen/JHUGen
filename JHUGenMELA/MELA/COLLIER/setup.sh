@@ -43,7 +43,7 @@ else
     rm -rf $tmpdir
 
     make $@
-    cp $libname "../data/$SCRAM_ARCH/$libname"
+    mv $libname "../data/$SCRAM_ARCH/$libname"
   fi
 
 fi
