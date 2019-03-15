@@ -125,11 +125,7 @@ jobs:
           name: compile mela
           command: |
             cd JHUGenMELA/MELA/
-            ./setup.sh
-            #this is needed because cmsenv happens in $BASH_ENV,
-            #so $SCRAM_ARCH is overwritten for MELA/COLLIER/setup.sh
-            #after being set in MELA/setup.sh
-            mv data/$SCRAM_ARCH/libcollier.so data/slc6_amd64_gcc530/libcollier.so
+            ./setup.sh -j
       - run: cd JHUGenerator && make
       - run: cd JHUGenerator/pdfs && ./downloadNNPDF.sh
       - persist_to_workspace:

@@ -26,28 +26,38 @@ UseLHAPDF=No
 # this one in terms of the environment variable should work in most cases
 MyLHADir=${LHAPDF_DATA_PATH}/../../lib/
 
-#link MCFM libraries from MELA
-# remember to export
-#          LD_LIBRARY_PATH=/.../MELA/data/$SCRAM_ARCH/:${LD_LIBRARY_PATH}
-linkMELA = Yes
-
-ifeq ($(linkMELA),Yes)
-ifndef SCRAM_ARCH
-  $(error $$SCRAM_ARCH is not set. Please set the MELA environment properly)
-endif
-  MELADir = $(Here)/../JHUGenMELA/MELA
-  MELAFortranDir = $(MELADir)/fortran
-  MELADataDir = $(MELADir)/data
-  MELALibDir = $(MELADataDir)/$(SCRAM_ARCH)
-  #$(info $$MELALibDir is [${MELALibDir}])
-endif
-
 ifeq ($(UseLHAPDF),Yes)
    LHAPDFflags = -L$(MyLHADir) -lLHAPDF -I$(MyLHADir)/../include -DuseLHAPDF=1 -lstdc++
 else
    LHAPDFflags = -DuseLHAPDF=0
 endif
 
+#link MCFM libraries from MELA
+# remember to export
+#          LD_LIBRARY_PATH=/.../MELA/data/$SCRAM_ARCH/:${LD_LIBRARY_PATH}
+linkMELA = Yes
+
+MELAflags = -DlinkMELA=0
+
+ifeq ($(linkMELA),Yes)
+  ifndef SCRAM_ARCH
+    $(error $$SCRAM_ARCH is not set. Please set the MELA environment properly)
+  endif
+  MELADir = $(Here)/../JHUGenMELA/MELA
+  MELAFortranDir = $(MELADir)/fortran
+  MELADataDir = $(MELADir)/data
+  MELALibDir = $(MELADataDir)/$(SCRAM_ARCH)
+  #$(info $$MELALibDir is [${MELALibDir}])
+
+  ifeq ($(Comp),gfort)
+    MELAflags = -DlinkMELA=1 -L$(MELALibDir) -l$(MCFMLib)
+  else
+    $(error linkMELA = Yes only works with gfortran.  Please set your Compiler to gfort or set linkMELA to No in the makefile.)
+  endif
+  ifeq ("$(wildcard $(MELALibDir)/lib$(MCFMLib).so)", "")
+    $(error Your MELA release is not compiled.  Please either compile it by running setup.sh or set linkMELA to No in the JHUGen makefile)
+  endif
+endif
 
 #include Collier Loop Integral Library
 linkCollierLib = No
@@ -70,39 +80,23 @@ else
    endif
 endif
 
-
-MELAflags = -DlinkMELA=0
-
-ifeq ($(linkMELA),Yes)
- ifeq ($(Comp),gfort)
-    MELAflags = -DlinkMELA=1 -L$(MELALibDir) -l$(MCFMLib)
- else
-    $(error linkMELA = Yes only works with gfortran.  Please set your Compiler to gfort or set linkMELA to No in the makefile.)
- endif
- ifeq ("$(wildcard $(MELALibDir)/lib$(MCFMLib).so)", "")
-    $(error Your MELA release is not compiled.  Please either compile it by running setup.sh or set linkMELA to No in the JHUGen makefile)
- endif
-endif
-
 ifeq ($(Comp),gfort)
- CompFullName = gfortran
- ifeq ($(Opt),Yes)
+  ifeq ($(Opt),Yes)
     OptOpts  = -O3
- else
+  else
     OptOpts  = -O0 -fcheck=all
- endif
- fcomp = gfortran $(OptOpts) -ffree-line-length-none -I$(VegasDir) -I$(ModuleDir) -J$(ModuleDir) $(LHAPDFflags) $(MELAflags) $(CollierLibflags) -Dcompiler=2
+  endif
+  fcomp = gfortran $(OptOpts) -ffree-line-length-none -I$(VegasDir) -I$(ModuleDir) -J$(ModuleDir) $(LHAPDFflags) $(MELAflags) $(CollierLibflags) -Dcompiler=2
 endif
 
 
 ifeq ($(Comp),ifort)
- CompFullName = ifort
- ifeq ($(Opt),Yes)
+  ifeq ($(Opt),Yes)
     OptOpts  = -O2 -vec-report0 -diag-disable remark
- else
+  else
     OptOpts  = -O0 -implicitnone -check bounds -check pointer -warn interfaces -ftrapuv  -diag-disable remark -debug extended -g -traceback -fpe0 -check uninit
- endif
- fcomp = ifort -fpp $(OptOpts) -module $(ModuleDir) -I$(VegasDir) -Dcompiler=1 $(LHAPDFflags) $(MELAflags) $(CollierLibflags)
+  endif
+  fcomp = ifort -fpp $(OptOpts) -module $(ModuleDir) -I$(VegasDir) -Dcompiler=1 $(LHAPDFflags) $(MELAflags) $(CollierLibflags)
 endif
 
 
