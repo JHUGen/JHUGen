@@ -165,7 +165,7 @@ jobs:
           name: compile mela
           command: |
             cd JHUGenMELA/MELA/
-            ./setup.sh
+            ./setup.sh -j
       - run: cd JHUGenerator && make
       - run: cd JHUGenerator/pdfs && ./downloadNNPDF.sh
       - run:
