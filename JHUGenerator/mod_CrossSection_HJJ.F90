@@ -175,6 +175,9 @@ EvalWeighted_HJJ_fulldecay = 0d0
 !      if(id_MCFM(jpart+4) .ne. 0) id_MCFM(jpart+4)=convertLHE(id_MCFM(jpart+4))
    enddo
 
+   !write(6,*) "id_MCFM:",id_MCFM
+   !write(6,*) "p_MCFM:",p_MCFM
+
 
 #if linkMELA==1
 
@@ -185,6 +188,9 @@ EvalWeighted_HJJ_fulldecay = 0d0
    print *, "You will also need to have a compiled JHUGenMELA in the directory specified by JHUGenMELADir in the makefile."
    stop 1
 #endif
+
+   !write(6,*) "msq_MCFM:",msq_MCFM
+   !pause
 
    originalprobability = msq_MCFM(iPart_sel,jPart_sel)
 

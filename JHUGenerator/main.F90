@@ -1648,7 +1648,7 @@ type(SaveValues) :: tosave, oldsavevalues
             endif
         endif
     endif
-    if (Process.eq.60 .or. (Process.ge.66 .and. Process.le.69)) then
+    if (Process.eq.60 .or. (Process.ge.66 .and. Process.lt.69)) then
         if ((SetHZprime .and. .not.SetZprimeff) .or. (.not.SetHZprime .and. SetZprimeff)) then
             call Error("To use Z' contact terms, you have to set both HVZ' and Z'ff couplings")
         endif
@@ -2741,7 +2741,7 @@ real(8) :: CrossSec2_in(1:VBFoffsh_run_maxsize,1:NMAXCHANNELS),CrossSecMax2_in(1
     ingridfile=trim(outgridfile)
 
 
-    if( Process.ge.69 .and. Process.le.79 ) call Error("Missing ChannelHash for Process 69") !can change 79 if we add more processes in between
+    if( Process.gt.69 .and. Process.le.79 ) call Error("Missing ChannelHash for the process") !can change 79 if we add more processes in between
 
 if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !----------------------- weighted events
 
@@ -3032,6 +3032,8 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
        VBFoffsh_run_size = VBFoffsh_run_qqVVqqStrong_size
     endif
 
+    !write(6,*) "VBFoffsh_Hash_Size, VBFoffsh_run_size", VBFoffsh_Hash_Size, VBFoffsh_run_size
+
     if( .not.(VBFoffsh_run.ge.1 .and. VBFoffsh_run.le.VBFoffsh_run_size) ) call Error("Please specify VBFoffsh_run")
     print *, "VBFoffsh_run = ",VBFoffsh_run
 
@@ -3122,6 +3124,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
            if( ios.eq.0 ) print *, "read ",trim(DataFile(1:i-1))//'8_gridinfo.txt'
         endif
 
+        !write(6,*) "calls1_in:",calls1_in
         do j=2,VBFoffsh_run_size
            if( calls1_in(1).ne.calls1_in(j) ) call Error("Mismatch in calls1")
         enddo
@@ -3135,13 +3138,18 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
             if( CrossSec2(i).lt.0d0 ) then
                 print *, "WARNING: CrossSec2(i) has not been filled",i,CrossSec2_in(1:VBFoffsh_run_size,i)
                 CrossSec2(i) = 0d0
+            !else
+            !    print *, "Filled CrossSec2(i) with",i,CrossSec2_in(1:VBFoffsh_run_size,i)
             endif
         enddo
+        if (VBFoffsh_Hash_Size .lt. NMAXCHANNELS) CrossSec2(VBFoffsh_Hash_Size+1:NMAXCHANNELS)=0d0
+
 
         CrossSecMax2(:) = -1d0
         do i=1,VBFoffsh_Hash_Size
             CrossSecMax2(i) = CrossSecMax2_in( max(1,VBFoffsh_run),i)
         enddo
+        if (VBFoffsh_Hash_Size .lt. NMAXCHANNELS) CrossSecMax2(VBFoffsh_Hash_Size+1:NMAXCHANNELS)=0d0
 
         VG_Result = 0d0; VG_Error = 0d0
         CrossSectionWithWeights = 0d0; CrossSectionWithWeightsErrorSquared = 0d0
@@ -3152,6 +3160,12 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
            CrossSectionWithWeightsErrorSquared = CrossSectionWithWeightsErrorSquared_in(j) + CrossSectionWithWeightsErrorSquared
         enddo
         VG_Error = dsqrt(VG_Error)
+
+        !write(6,*) "CrossSec2:",CrossSec2
+        !write(6,*) "CrossSecMax2:",CrossSecMax2
+        !write(6,*) "CrossSectionWithWeights,CrossSectionWithWeightsErrorSquared:",CrossSectionWithWeights,CrossSectionWithWeightsErrorSquared
+        !write(6,*) "VG_Result,VG_Error:",VG_Result,VG_Error
+        !pause
 
 
     else
@@ -3259,55 +3273,26 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
        if( VBFoffsh_run.eq.1 ) then ! removing the requested events for the wrong VBFoffsh_run
             RequEvents2(3:Hash_MCFM_qqVVqq_Size) = 0
             NumPartonicChannels = 2
-!          call BubleSort(NumPartonicChannels,RequEvents2(1:),SortedHash)
-!          call ReOrder(NumPartonicChannels,SortedHash,CrossSec2(1:))
-!          call ReOrder(NumPartonicChannels,SortedHash,CrossSecMax2(1:))
-!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(1:,1))
-!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(1:,2))
-
        elseif( VBFoffsh_run.eq.2 ) then
             RequEvents2(1:2) = 0
             RequEvents2(10:Hash_MCFM_qqVVqq_Size) = 0
             NumPartonicChannels = 7
-!          call BubleSort(NumPartonicChannels,RequEvents2(3:),SortedHash)
-!          call ReOrder(NumPartonicChannels,SortedHash,CrossSec2(3:))
-!          call ReOrder(NumPartonicChannels,SortedHash,CrossSecMax2(3:))
-!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(3:,1))
-!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(3:,2))
-
        elseif( VBFoffsh_run.eq.3 ) then
             RequEvents2(1:9) = 0
             RequEvents2(41:Hash_MCFM_qqVVqq_Size) = 0
             NumPartonicChannels = 31
-!          call BubleSort(NumPartonicChannels,RequEvents2(10:),SortedHash)
-!          call ReOrder(NumPartonicChannels,SortedHash,CrossSec2(10:))
-!          call ReOrder(NumPartonicChannels,SortedHash,CrossSecMax2(10:))
-!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(10:,1))
-!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(10:,2))
-
-
        elseif( VBFoffsh_run.eq.4 ) then
             RequEvents2(1:40) = 0
             RequEvents2(104:Hash_MCFM_qqVVqq_Size) = 0
             NumPartonicChannels = 63
-!          call BubleSort(NumPartonicChannels,RequEvents2(41:),SortedHash)
-!          call ReOrder(NumPartonicChannels,SortedHash,CrossSec2(41:))
-!          call ReOrder(NumPartonicChannels,SortedHash,CrossSecMax2(41:))
-!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(41:,1))
-!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(41:,2))
-
        elseif( VBFoffsh_run.eq.5 ) then
             RequEvents2(1:103) = 0
             NumPartonicChannels = 61
-!          call BubleSort(NumPartonicChannels,RequEvents2(104:),SortedHash)
-!          call ReOrder(NumPartonicChannels,SortedHash,CrossSec2(104:))
-!          call ReOrder(NumPartonicChannels,SortedHash,CrossSecMax2(104:))
-!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(104:,1))
-!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(104:,2))
-
        endif
     endif
     ingridfile = trim(CSmaxFile)//'_step2.grid'
+
+    !write(6,*) "NumPartonicChannels | RequEvents2",NumPartonicChannels," | ",RequEvents2
 
 
 !     print *, "New sorted hash for VBFoffsh_run=",VBFoffsh_run
@@ -3389,6 +3374,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 
 
 
+    !pause
 
 
 ENDIF
