@@ -5,7 +5,7 @@ env: &env
         PATH: "/home/cmsbld/dos2unix-7.4.0/:/home/cmsbld/githack/:/home/cmsbld/CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
         LIBRARY_PATH: "/home/cmsbld/boost_1_61_0/stage/lib"
         CPATH: "/home/cmsbld/boost_1_61_0"
-        LD_LIBRARY_PATH: "/home/cmsbld/JHUGen/JHUGenMELA/MELA/data/slc6_amd64_gcc530"
+        LD_LIBRARY_PATH: "/home/cmsbld/JHUGen/JHUGenMELA/MELA/data/slc6_amd64_gcc630"
         PYTHONPATH: "/home/cmsbld/JHUGen/JHUGenMELA/MELA/python"
 
         REFERENCE_LHES_USERNAME: "hroskes"
@@ -166,10 +166,6 @@ jobs:
           command: |
             cd JHUGenMELA/MELA/
             ./setup.sh
-            #this is needed because cmsenv happens in $BASH_ENV,
-            #so $SCRAM_ARCH is overwritten for MELA/COLLIER/setup.sh
-            #after being set in MELA/setup.sh
-            mv data/$SCRAM_ARCH/libcollier.so data/slc6_amd64_gcc530/libcollier.so
       - run: cd JHUGenerator && make
       - run: cd JHUGenerator/pdfs && ./downloadNNPDF.sh
       - run:
