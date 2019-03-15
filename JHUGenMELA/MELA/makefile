@@ -18,7 +18,7 @@ MELADIR = .
 MELASRCDIR = $(MELADIR)/src
 MELADATADIR = $(MELADIR)/data
 # Modify MELALIBDIR for the gcc version as needed
-MELALIBDIR = $(MELADATADIR)/slc6_amd64_gcc530
+MELALIBDIR = $(MELADATADIR)/${SCRAM_ARCH}
 
 ROOTCFLAGS = $(shell root-config --cflags)
 ROOTGLIBS = $(shell root-config --evelibs) -Lrootlib

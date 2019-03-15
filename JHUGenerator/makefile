@@ -2,11 +2,10 @@ Here = $(PWD)
 Makefile=makefile
 ModuleDir = $(Here)/modules
 ObjectDir = $(Here)/objects
-MELADir = $(Here)/../JHUGenMELA/MELA
-#MELADir = $(Here)/../../Ulascan/JHUGen/JHUGenMELA/MELA
-MELAFortranDir = $(MELADir)/fortran
-MELADataDir = $(MELADir)/data
-MELALibDir = $(MELADataDir)/slc6_amd64_gcc530
+MELADir = ""
+MELAFortranDir = ""
+MELADataDir = ""
+MELALibDir = ""
 #libmcfm_705.so
 MCFMLib = mcfm_705
 PDFDir = $(Here)/pdfs
@@ -31,6 +30,17 @@ MyLHADir=${LHAPDF_DATA_PATH}/../../lib/
 # remember to export
 #          LD_LIBRARY_PATH=/.../MELA/data/$SCRAM_ARCH/:${LD_LIBRARY_PATH}
 linkMELA = Yes
+
+ifeq ($(linkMELA),Yes)
+ifndef SCRAM_ARCH
+  $(error $$SCRAM_ARCH is not set. Please set the MELA environment properly)
+endif
+  MELADir = $(Here)/../JHUGenMELA/MELA
+  MELAFortranDir = $(MELADir)/fortran
+  MELADataDir = $(MELADir)/data
+  MELALibDir = $(MELADataDir)/$(SCRAM_ARCH)
+  #$(info $$MELALibDir is [${MELALibDir}])
+endif
 
 ifeq ($(UseLHAPDF),Yes)
    LHAPDFflags = -L$(MyLHADir) -lLHAPDF -I$(MyLHADir)/../include -DuseLHAPDF=1 -lstdc++
