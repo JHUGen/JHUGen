@@ -24,7 +24,7 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
 #endif
  implicit none
  real(8) :: EvalWeighted,LO_Res_Unpol,yRnd(1:22),VgsWgt
- real(8) :: eta1,eta2,tau,x1,x2,sHatJacobi,PreFac,FluxFac,PDFFac,m1ffwgt,m2ffwgt
+ real(8) :: eta1,eta2,tau,x1,x2,sHatJacobi,PreFac,FluxFac,PDFFac,m1ffwgt,m2ffwgt,FinalStateWeight
  real(8) :: pdf(-6:6,1:2)
  integer :: NBin(1:NumHistograms),NHisto,i,MY_IDUP(1:9),ICOLUP(1:2,1:9),xBin(1:4)
  integer, pointer :: ijSel(:,:)
@@ -79,7 +79,7 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
 !    IDUP(8)  -->  MomExt(:,8) == MomDK(:,4)  -->     v-spinor
 !    IDUP(9)  -->  MomExt(:,7) == MomDK(:,3)  -->  ubar-spinor
     ICOLUP(1:2,1:9) = 0
-    call VVBranchings(MY_IDUP(4:9),ICOLUP(1:2,6:9))
+    call VVBranchings(MY_IDUP(4:9),ICOLUP(1:2,6:9),FinalStateWeight)
     MY_IDUP(1:3) = 0
     if( RandomizeVVdecays .and. OffShellV1.eqv.OffShellV2) then
        call random_number(yrnd(17:18))
@@ -171,7 +171,7 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
 
    FluxFac = 1d0/(2d0*EHat**2)
    PDFFac = pdf(LHA2M_pdf(iPart_sel),1)  *  pdf(LHA2M_pdf(jPart_sel),2)
-   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * VgsWgt * PartChannelAvg
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * VgsWgt * PartChannelAvg * FinalStateWeight
 
    !print *,"Mom1: ",MomExt(1:4,1)
    !print *,"Mom2: ",MomExt(1:4,2)
@@ -332,7 +332,7 @@ use ifport
 implicit none
 real(8) :: Res!  .ne.0: accepted event,  .eq.0: reject event,   .eq.-1: reject event and exit the loop over 'tries'
 real(8) :: EvalUnWeighted_DecayToVV,LO_Res_Unpol,yRnd(1:22),VgsWgt,LO_Res_Unpol1,LO_Res_Unpol2
-real(8) :: tau,x1,x2,sHatJacobi,PreFac
+real(8) :: tau,x1,x2,sHatJacobi,PreFac,FinalStateWeight
 integer :: NBin(1:NumHistograms),NHisto,i
 real(8) :: EHat,PSWgt,PSWgt2,PSWgt3
 real(8) :: MomExt(1:4,1:4),MomDK(1:4,1:4),MomExt_f(1:4,1:4),MomDK_f(1:4,1:4),MomDK_massless(1:4,1:4)
@@ -361,7 +361,7 @@ include 'csmaxvalue.f'
 !    IDUP(7)  -->  MomDK(:,1)  -->  ubar-spinor
 !    IDUP(8)  -->  MomDK(:,4)  -->     v-spinor
 !    IDUP(9)  -->  MomDK(:,3)  -->  ubar-spinor
-   call VVBranchings(MY_IDUP(4:9),ICOLUP(1:2,6:9))
+   call VVBranchings(MY_IDUP(4:9),ICOLUP(1:2,6:9),FinalStateWeight)
 !    print *, MY_IDUP(4:9);pause
 
    if( (RandomizeVVdecays.eqv..true.) ) then
@@ -566,7 +566,7 @@ IF( GENEVT ) THEN
       endif
 
 
-      PreFac = 2d0 * fbGeV2 * sHatJacobi * PSWgt * SymmFac
+      PreFac = 2d0 * fbGeV2 * sHatJacobi * PSWgt * SymmFac * FinalStateWeight
       EvalUnWeighted_DecayToVV = LO_Res_Unpol * PreFac
 
       CS_max = csmax(0,0)
@@ -691,7 +691,7 @@ ELSE! NOT GENEVT
          endif
       endif
 
-     PreFac = 2d0 * fbGeV2 * sHatJacobi * PSWgt * SymmFac
+     PreFac = 2d0 * fbGeV2 * sHatJacobi * PSWgt * SymmFac * FinalStateWeight
      EvalUnWeighted_DecayToVV = LO_Res_Unpol * PreFac
      Res = EvalUnWeighted_DecayToVV
 
@@ -723,7 +723,7 @@ END FUNCTION
 !  real(8) :: eta1,eta2,tau,x1,x2,sHatJacobi,PreFac,FluxFac,PDFFac,PDFFac1,PDFFac2
 !  real(8) :: pdf(-6:6,1:2)
 !  integer :: NBin(1:NumHistograms),NHisto,i,MY_IDUP(1:9), ICOLUP(1:2,1:9),xBin(1:4)
-!  real(8) :: EHat,PSWgt,PSWgt2,PSWgt3
+!  real(8) :: EHat,PSWgt,PSWgt2,PSWgt3,FinalStateWeight
 !  real(8) :: MomExt(1:4,1:4),MomDK(1:4,1:4),MomDK_massless(1:4,1:4)
 !  real(8) :: EZ,  EZ1, EZ2, pz, xmax, xx1, xx2
 !  real(8) :: pz12, MomExt_f(1:4,1:4), MomDK_f(1:4,1:4)
@@ -749,7 +749,7 @@ END FUNCTION
 ! !    IDUP(8)  -->  MomDK(:,4)  -->     v-spinor
 ! !    IDUP(9)  -->  MomDK(:,3)  -->  ubar-spinor
 !     ICOLUP(1:2,1:9) = 0
-!     call VVBranchings(MY_IDUP(4:9),ICOLUP(1:2,6:9))
+!     call VVBranchings(MY_IDUP(4:9),ICOLUP(1:2,6:9),FinalStateWeight)
 !     MY_IDUP(1:3) = 0
 !     yz1 = yRnd(10)
 !     yz2 = yRnd(11)
@@ -934,7 +934,7 @@ END FUNCTION
 !       endif
 !
 !       LO_Res_Unpol = LO_Res_Unpol * SpinAvg * GluonColAvg**2
-!       PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * SymmFac
+!       PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * SymmFac * FinalStateWeight
 !       EvalWeighted = LO_Res_Unpol * PreFac
 !
 ! ! EvalWeighted = PreFac  ! for PS output   (only run 1 iteration without vegas adaptation)
@@ -982,7 +982,7 @@ END FUNCTION
 !       LO_Res_Unpol1 = LO_Res_Unpol1 * SpinAvg * QuarkColAvg**2 * PDFFac1
 !       LO_Res_Unpol2 = LO_Res_Unpol2 * SpinAvg * QuarkColAvg**2 * PDFFac2
 !       LO_Res_Unpol = LO_Res_Unpol1 + LO_Res_Unpol2
-!       PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * SymmFac
+!       PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * SymmFac * FinalStateWeight
 !
 !       EvalWeighted = LO_Res_Unpol * PreFac
 !    endif
@@ -1032,7 +1032,7 @@ real(8) :: EvalUnWeighted,LO_Res_Unpol,yRnd(1:22),VgsWgt,LO_Res_Unpol1,LO_Res_Un
 real(8) :: eta1,eta2,tau,x1,x2,sHatJacobi,PreFac,FluxFac,PDFFac
 real(8) :: pdf(-6:6,1:2)
 integer :: NBin(1:NumHistograms),NHisto,i
-real(8) :: EHat,PSWgt,PSWgt2,PSWgt3
+real(8) :: EHat,PSWgt,PSWgt2,PSWgt3,FinalStateWeight
 real(8) :: MomExt(1:4,1:8),MomDK(1:4,1:4),MomDK_massless(1:4,1:4),MomExt_f(1:4,1:4),MomDK_f(1:4,1:4)
 logical :: applyPSCut,genEvt
 real(8) :: CS_max, channel_ratio
@@ -1066,7 +1066,7 @@ include 'csmaxvalue.f'
 !    IDUP(7)  -->  MomDK(:,1)  -->  ubar-spinor
 !    IDUP(8)  -->  MomDK(:,4)  -->     v-spinor
 !    IDUP(9)  -->  MomDK(:,3)  -->  ubar-spinor
-   call VVBranchings(MY_IDUP(4:9),ICOLUP(1:2,6:9))
+   call VVBranchings(MY_IDUP(4:9),ICOLUP(1:2,6:9),FinalStateWeight)
 ! if(  my_idup(6).eq.my_idup(8)) return! for 2e2mu   ! noi+ 0.92591989,     i+ 0.92775679,   i- 0.14072385,     ix+ 3.2770660  ix-  0.88181581E-02
 ! if(  my_idup(6).ne.my_idup(8)) return! for 4mu/4e  ! noi+ 0.92608512,     i+ 1.01761060,   i- 0.12915384,     ix+  3.5925481 ix-  0.80721147E-02
 !                                                            50/50%              48/52%         52/48%               48%                52%
@@ -1454,7 +1454,7 @@ IF( GENEVT ) THEN
        CS_max = csmax(i2,-i2)
    endif
 
-   PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * SymmFac
+   PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * SymmFac * FinalStateWeight
    EvalUnWeighted = LO_Res_Unpol * PreFac
    if( WidthScheme.ne.2 ) EvalUnWeighted = EvalUnWeighted * ReweightBWPropagator( Get_MInv2( MomExt(1:4,3)+MomExt(1:4,4) ) )
 
@@ -1545,7 +1545,7 @@ ELSE! NOT GENEVT
       LO_Res_Unpol = LO_Res_Unpol * SpinAvg * GluonColAvg**2
 
 
-      PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * SymmFac
+      PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * SymmFac * FinalStateWeight
       EvalUnWeighted = LO_Res_Unpol * PreFac
       if( WidthScheme.ne.2 ) EvalUnWeighted = EvalUnWeighted * ReweightBWPropagator( Get_MInv2( MomExt(1:4,3)+MomExt(1:4,4) ) )
       RES(0,0) = EvalUnWeighted
@@ -3124,7 +3124,7 @@ use ifport
 #endif
 implicit none
 real(8) :: EvalUnWeighted_DecayToTauTau,Ehat,Res,AcceptedEvent(:,:),DKRnd
-real(8) :: yRnd(:),Mom(1:4,1:13),pHiggs(1:4),PSWgt,PreFac,LO_Res_Unpol,CS_max,m1ffwgt,m2ffwgt
+real(8) :: yRnd(:),Mom(1:4,1:13),pHiggs(1:4),PSWgt,PreFac,LO_Res_Unpol,CS_max,m1ffwgt,m2ffwgt,FinalStateWeight
 integer :: MY_IDUP(:),ICOLUP(:,:),NBin(1:NumHistograms),NHisto=1,DK_IDUP(1:6),DK_ICOLUP(1:2,3:6)
 logical :: applyPSCut,genEvt
 integer, parameter :: inLeft=1, inRight=2, Hig=3, tauP=4, tauM=5, Wp=6, Wm=7,   nu=8, nubar_tau=9, lepP=10,   lepM=11, nu_tau=12, nubar=13
@@ -3143,7 +3143,7 @@ m2ffwgt=1d0
 !      call random_number(DKRnd)
 !      if( DKRnd.lt.0.5d0 ) call swapi(DecayMode1,DecayMode2)
 !   endif
-  call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6),800)
+  call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6),FinalStateWeight,800)
   MY_IDUP(nu_tau)   = NuT_;        ICOLUP(1:2,nu_tau)   = (/000,000/)
   MY_IDUP(Wp)       = DK_IDUP(1);  ICOLUP(1:2,Wp)       = (/000,000/)
   MY_IDUP(lepP)     = DK_IDUP(3);  ICOLUP(1:2,lepP)     = DK_ICOLUP(1:2,3)
@@ -3165,7 +3165,7 @@ m2ffwgt=1d0
       EvalUnWeighted_DecayToTauTau = 0d0
       return
   endif
-  PreFac = fbGeV2 * PSWgt
+  PreFac = fbGeV2 * PSWgt * FinalStateWeight
 
   call SetRunningScales( (/ pHiggs(1:4),Mom_Not_a_particle(1:4),Mom_Not_a_particle(1:4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) ) ! Call anyway
 
@@ -3238,7 +3238,7 @@ END FUNCTION
  real(8) :: eta1,eta2,tau,x1,x2,sHatJacobi,PreFac,FluxFac,PDFFac,PDFFac1,PDFFac2
  real(8) :: pdf(-6:6,1:2)
  integer :: NBin(1:NumHistograms),NHisto,i,MY_IDUP(1:9), ICOLUP(1:2,1:9),xBin(1:4)
- real(8) :: EHat,PSWgt,PSWgt2,PSWgt3
+ real(8) :: EHat,PSWgt,PSWgt2,PSWgt3,FinalStateWeight
  real(8) :: MomExt(1:4,1:4),MomDK(1:4,1:4),MomDK_massless(1:4,1:4)
  real(8) :: EZ,  EZ1, EZ2, pz, xmax, xx1, xx2
  real(8) :: pz12, MomExt_f(1:4,1:4), MomDK_f(1:4,1:4)
@@ -3263,7 +3263,7 @@ END FUNCTION
 !    IDUP(7)  -->  MomDK(:,1)  -->  ubar-spinor
 !    IDUP(8)  -->  MomDK(:,4)  -->     v-spinor
 !    IDUP(9)  -->  MomDK(:,3)  -->  ubar-spinor
-    call VVBranchings(MY_IDUP(4:9),ICOLUP(1:2,6:9))
+    call VVBranchings(MY_IDUP(4:9),ICOLUP(1:2,6:9),FinalStateWeight)
     MY_IDUP(1:3) = 0
     yz1 = yRnd(10)
     yz2 = yRnd(11)
@@ -3392,7 +3392,7 @@ END FUNCTION
     endif
 
 
-    EvalOnlyPS = PSWgt
+    EvalOnlyPS = PSWgt * FinalStateWeight
 
     if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode2))   ) then
           call WriteOutEvent((/MomExt(1:4,1),MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9),EventWeight=1d0)

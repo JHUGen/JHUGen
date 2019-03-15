@@ -27,7 +27,7 @@ integer,parameter :: mxpart=14 ! this has to match the MCFM parameter
 real(8) :: yRnd(1:18),VgsWgt, EvalWeighted_HJJ_fulldecay
 real(8) :: pdf(-6:6,1:2),me2(-5:5,-5:5)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
-real(8) :: MomExt(1:4,1:10),PSWgt
+real(8) :: MomExt(1:4,1:10),PSWgt,FinalStateWeight
 real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5),msq_VgsWgt(-5:5,-5:5),Wgt_Ratio_Interf,originalprobability
 integer :: id_MCFM(mxpart),MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),NHisto,ipart,jpart
 integer, pointer :: ijSel(:,:)
@@ -116,7 +116,7 @@ EvalWeighted_HJJ_fulldecay = 0d0
 
    !DecayMode1=0
    !DecayMode2=0
-   call VVBranchings(MY_IDUP(5:10),ICOLUP(1:2,7:10),700)
+   call VVBranchings(MY_IDUP(5:10),ICOLUP(1:2,7:10),FinalStateWeight,700)
    call swap(MY_IDUP(7),MY_IDUP(8))!   switch ordering ElP_,ElM_,MuP_,MuM_ --> ElM_,ElP_,MuM_,MuP_
    call swap(MY_IDUP(9),MY_IDUP(10))
    id_MCFM(3:6) = MY_IDUP(7:10)
@@ -138,7 +138,7 @@ EvalWeighted_HJJ_fulldecay = 0d0
 !       return
 
    call boost2Lab(eta1,eta2,10,MomExt(1:4,1:10))
-   PSWgt = PSWgt * PartChannelAvg
+   PSWgt = PSWgt * PartChannelAvg * FinalStateWeight
 
 
    call Kinematics_HVBF_fulldecay(MomExt,applyPSCut,NBin)

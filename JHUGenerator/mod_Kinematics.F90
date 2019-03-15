@@ -2663,7 +2663,7 @@ logical :: hasAonshell
          MomZ(1:4) = MomExt(1:4,3)
          MomBoost(1)   = +MomExt(1,4)
          MomBoost(2:4) = -MomExt(2:4,4)
-         
+
          if(id(6).gt.0) then
             MomFerm1(1:4)  = MomExt(1:4,6)
             MomFerm2(1:4)  = MomExt(1:4,7)
@@ -2677,7 +2677,7 @@ logical :: hasAonshell
          costheta2 = Get_CosAlpha( MomFerm1(1:4),MomZ(1:4) )
 
 
-       
+
 !phistar1, which is really phi1 in arXiv:1309.4819 [hep-ph] FIG.1 middle
       MomReso(1:4)  = -MomExt(1:4,5)
       MomBoost(1)   = +MomReso(1)
@@ -2867,7 +2867,7 @@ real(8) :: MomBoostT(1:4),m_Vstar_L,m_Vstar_T
 !     else
 !        if(includeGammaStar .and. m_Vstar.lt.MPhotonCutoff)applyPSCut=.true.
 !     endif
-      
+
       m_Vstar_T=dsqrt(mom(1,3)**2-mom(2,3)**2-mom(3,3)**2)
 
       if(Get_PT2(momext(:,3)).gt.1d-8)then
@@ -2886,7 +2886,7 @@ real(8) :: MomBoostT(1:4),m_Vstar_L,m_Vstar_T
 !print*,m_Vstar_L
 
       momext(:,1)=0.5d0*m_Vstar_L * (/+1d0,0d0,0d0,+1d0/)
-      momext(:,2)=0.5d0*m_Vstar_L * (/+1d0,0d0,0d0,-1d0/)  
+      momext(:,2)=0.5d0*m_Vstar_L * (/+1d0,0d0,0d0,-1d0/)
       call boost2lab(x1,x2,2,momext(1:4,1:2))
 
 !print*,momext(1:4,1),"1"
@@ -2896,7 +2896,7 @@ real(8) :: MomBoostT(1:4),m_Vstar_L,m_Vstar_T
       if(Get_PT2(mom(:,3)).gt.1d-8)then
 
         MomBoostT(1:4)=(/mom(1,3),-mom(2,3),-mom(3,3),0d0/)!momentum/vector used to boost away the transverse moment of VH
-  
+
         if((.not.HbbDecays).and.hasAonshell)then   ! if H, V
           call boost(momext(1:4,4),MomBoostT(1:4),m_Vstar_T)
           call boost(momext(1:4,5),MomBoostT(1:4),m_Vstar_T)
@@ -3631,25 +3631,25 @@ real(8),parameter :: yy=Ncol*xx
 
   if( xRnd .le. yy ) then
       ZAnyBranching_flat = Up_
-  elseif(xRnd .le. 2*yy ) then
+  elseif(xRnd .le. 2d0*yy ) then
       ZAnyBranching_flat = Chm_
-  elseif(xRnd .le. 2*yy+yy ) then
+  elseif(xRnd .le. 3d0*yy ) then
       ZAnyBranching_flat = Dn_
-  elseif(xRnd .le. 2*yy+2*yy ) then
+  elseif(xRnd .le. 4d0*yy ) then
       ZAnyBranching_flat = Str_
-  elseif(xRnd .le. 2*yy+3*yy ) then
+  elseif(xRnd .le. 5d0*yy ) then
       ZAnyBranching_flat = Bot_
-  elseif(xRnd .le. yy*(2+3) + xx ) then
+  elseif(xRnd .le. 5d0*yy + xx ) then
       ZAnyBranching_flat = ElM_
-  elseif(xRnd .le. yy*(2+3) + xx*2 ) then
+  elseif(xRnd .le. 5d0*yy + 2d0*xx ) then
       ZAnyBranching_flat = MuM_
-  elseif(xRnd .le. yy*(2+3) + xx*3 ) then
+  elseif(xRnd .le. 5d0*yy + 3d0*xx ) then
       ZAnyBranching_flat = TaM_
-  elseif(xRnd .le. yy*(2+3)+xx*3 + xx ) then
+  elseif(xRnd .le. 5d0*yy + 4d0*xx ) then
       ZAnyBranching_flat = NuE_
-  elseif(xRnd .le. yy*(2+3)+xx*3 + xx*2 ) then
+  elseif(xRnd .le. 5d0*yy + 5d0*xx ) then
       ZAnyBranching_flat = NuM_
-  elseif(xRnd .le. yy*(2+3)+xx*3 + xx*3 ) then
+  elseif(xRnd .le. 5d0*yy + 6d0*xx ) then
       ZAnyBranching_flat = NuT_
   else
       print *, "error ",xRnd
@@ -3899,15 +3899,15 @@ real(8),parameter :: xx=1d0/9d0
 real(8),parameter :: yy=Ncol*xx
 
 
-  if( xRnd .le. yy ) then
+  if( xRnd .le.        yy ) then
       WAnyBranching_flat = Up_
-  elseif(xRnd .le. 2*yy ) then
+  elseif(xRnd .le. 2d0*yy ) then
       WAnyBranching_flat = Chm_
-  elseif(xRnd .le. 2*yy+xx ) then
+  elseif(xRnd .le. 2d0*yy +     xx ) then
       WAnyBranching_flat = ElM_
-  elseif(xRnd .le. 2*yy+2*xx ) then
+  elseif(xRnd .le. 2d0*yy + 2d0*xx ) then
       WAnyBranching_flat = MuM_
-  elseif(xRnd .le. 2*yy+3*xx ) then
+  elseif(xRnd .le. 2d0*yy + 3d0*xx ) then
       WAnyBranching_flat = TaM_
   else
       print *, "error ",xRnd
@@ -3970,11 +3970,16 @@ END FUNCTION
 
 
 
-SUBROUTINE VVBranchings(MY_IDUP,ICOLUP,ColorBase)
+! VVBranchings also takes into account color multiplicity, so it should be used only when color is not taken into account inside the ME!
+! This is why some final states count 3 times instead of just once.
+! Rule of thumb for counting final states in this function is e,mu,ta,nus=1, d,u,s,c,b=3
+! When a CKM partner is called, since sum(VCKM**@)=1 along a row, counting should not be unaffected.
+SUBROUTINE VVBranchings(MY_IDUP,ICOLUP,CombWeight,ColorBase)
 use ModParameters
 implicit none
 integer :: MY_IDUP(4:9),ICOLUP(1:2,6:9),DKFlavor,ICOLUP_Base
 integer, optional ::ColorBase
+real(8), intent(out) :: CombWeight
 real(8) :: DKRnd
 
 !    particle associations:
@@ -3991,12 +3996,14 @@ real(8) :: DKRnd
    endif
 
    ICOLUP(:,:) = 0
+   CombWeight = 1d0
    if( DecayMode1.eq.0 ) then! Z1->2l
         call random_number(DKRnd)
         MY_IDUP(4) = Z0_
         DKFlavor = ZLepBranching_flat( DKRnd )!= ElM or MuM
         MY_IDUP(6) =-DKFlavor
         MY_IDUP(7) =+DKFlavor
+        CombWeight = CombWeight*2d0
    elseif( DecayMode1.eq.1 ) then! Z1->2q
         call random_number(DKRnd)
         MY_IDUP(4) = Z0_
@@ -4005,6 +4012,7 @@ real(8) :: DKRnd
         MY_IDUP(7) =+DKFlavor
         ICOLUP(1:2,6) = (/            0,ICOLUP_BASE+3/)
         ICOLUP(1:2,7) = (/ICOLUP_BASE+3,            0/)
+        CombWeight = CombWeight*5d0*3d0
    elseif( DecayMode1.eq.2 ) then! Z1->2tau
         MY_IDUP(4) = Z0_
         MY_IDUP(6) = TaP_
@@ -4015,12 +4023,14 @@ real(8) :: DKRnd
         DKFlavor = ZNuBranching_flat( DKRnd )!= NuE,NuM,NuT
         MY_IDUP(6) =-DKFlavor
         MY_IDUP(7) =+DKFlavor
+        CombWeight = CombWeight*3d0
    elseif( DecayMode1.eq.4 ) then! W1(+)->lnu
         call random_number(DKRnd)
         MY_IDUP(4) = Wp_
         DKFlavor = WLepBranching_flat( DKRnd )!= ElM or MuM
         MY_IDUP(6) = +abs(DKFlavor)     ! lepton(+)
         MY_IDUP(7) = +abs(DKFlavor)+7   ! neutrino
+        CombWeight = CombWeight*2d0
    elseif( DecayMode1.eq.5 ) then! W1(+)->2q
         call random_number(DKRnd)
         MY_IDUP(4) = Wp_
@@ -4031,6 +4041,7 @@ real(8) :: DKRnd
         MY_IDUP(6) = GetCKMPartner(MY_IDUP(7))! anti-dn flavor
         ICOLUP(1:2,6) = (/            0,ICOLUP_BASE+3/)
         ICOLUP(1:2,7) = (/ICOLUP_BASE+3,            0/)
+        CombWeight = CombWeight*2d0*3d0
    elseif( DecayMode1.eq.6 ) then! W1(+)->taunu
         MY_IDUP(4) = Wp_
         MY_IDUP(6) = TaP_
@@ -4045,6 +4056,7 @@ real(8) :: DKRnd
         DKFlavor = ZLepPlusTauBranching_flat( DKRnd )!= ElM or MuM or TaM
         MY_IDUP(6) =-DKFlavor
         MY_IDUP(7) =+DKFlavor
+        CombWeight = CombWeight*3d0
    elseif( DecayMode1.eq.9 ) then! Z1-> anything
         call random_number(DKRnd)
         MY_IDUP(4) = Z0_
@@ -4055,12 +4067,14 @@ real(8) :: DKRnd
            ICOLUP(1:2,6) = (/            0,ICOLUP_BASE+3/)
            ICOLUP(1:2,7) = (/ICOLUP_BASE+3,            0/)
         endif
+        CombWeight = CombWeight*21d0!*(6d0 + 5d0*3d0)
    elseif( DecayMode1.eq.10 ) then! W1(+)->l+tau  +nu
         call random_number(DKRnd)
         MY_IDUP(4) = Wp_
         DKFlavor = WLepPlusTauBranching_flat( DKRnd )!= ElM or MuM or TaM
         MY_IDUP(6) = +abs(DKFlavor)     ! lepton(+)
         MY_IDUP(7) = +abs(DKFlavor)+7   ! neutrino
+        CombWeight = CombWeight*3d0
    elseif( DecayMode1.eq.11 ) then! W1(+)-> anything
         call random_number(DKRnd)
         MY_IDUP(4) = Wp_
@@ -4076,6 +4090,7 @@ real(8) :: DKRnd
            MY_IDUP(6) = +abs(DKFlavor)     ! lepton(+)
            MY_IDUP(7) = +abs(DKFlavor)+7   ! neutrino
         endif
+        CombWeight = CombWeight*9d0!*(3d0 + 2d0*3d0)
    endif
 
 
@@ -4085,6 +4100,7 @@ real(8) :: DKRnd
         DKFlavor = ZLepBranching_flat( DKRnd )!= ElM or MuM
         MY_IDUP(8) =-DKFlavor
         MY_IDUP(9) =+DKFlavor
+        CombWeight = CombWeight*2d0
    elseif( DecayMode2.eq.1 ) then! Z2->2q
         call random_number(DKRnd)
         MY_IDUP(5) = Z0_
@@ -4093,6 +4109,7 @@ real(8) :: DKRnd
         MY_IDUP(9) =+DKFlavor
         ICOLUP(1:2,8) = (/            0,ICOLUP_BASE+4/)
         ICOLUP(1:2,9) = (/ICOLUP_BASE+4,            0/)
+        CombWeight = CombWeight*5d0*3d0
    elseif( DecayMode2.eq.2 ) then! Z2->2tau
         MY_IDUP(5) = Z0_
         MY_IDUP(8) = TaP_
@@ -4103,12 +4120,14 @@ real(8) :: DKRnd
         DKFlavor = ZNuBranching_flat( DKRnd )!= NuE,NuM,NuT
         MY_IDUP(8) =-DKFlavor
         MY_IDUP(9) =+DKFlavor
+        CombWeight = CombWeight*3d0
    elseif( DecayMode2.eq.4 ) then! W2(-)->lnu
         call random_number(DKRnd)
         MY_IDUP(5) = Wm_
         DKFlavor = WLepBranching_flat( DKRnd )!= ElM or MuM
         MY_IDUP(8) = -abs(DKFlavor)-7   ! anti-neutrino
         MY_IDUP(9) = -abs(DKFlavor)     ! lepton(-)
+        CombWeight = CombWeight*2d0
    elseif( DecayMode2.eq.5 ) then! W2(-)->2q (sample over u,d,s,c)
         call random_number(DKRnd)
         MY_IDUP(5) = Wm_
@@ -4119,6 +4138,7 @@ real(8) :: DKRnd
         MY_IDUP(9) = GetCKMPartner(MY_IDUP(8))! dn flavor
         ICOLUP(1:2,8) = (/            0,ICOLUP_BASE+4/)
         ICOLUP(1:2,9) = (/ICOLUP_BASE+4,            0/)
+        CombWeight = CombWeight*2d0*3d0
    elseif( DecayMode2.eq.6 ) then! W2(-)->taunu
         MY_IDUP(5) = Wm_
         MY_IDUP(8) = ANuT_
@@ -4133,6 +4153,7 @@ real(8) :: DKRnd
         DKFlavor = ZLepPlusTauBranching_flat( DKRnd )!= ElM or MuM or TaM
         MY_IDUP(8) =-DKFlavor
         MY_IDUP(9) =+DKFlavor
+        CombWeight = CombWeight*3d0
    elseif( DecayMode2.eq.9 ) then! Z2-> anything
         call random_number(DKRnd)
         MY_IDUP(5) = Z0_
@@ -4143,12 +4164,14 @@ real(8) :: DKRnd
            ICOLUP(1:2,8) = (/            0,ICOLUP_BASE+4/)
            ICOLUP(1:2,9) = (/ICOLUP_BASE+4,            0/)
         endif
+        CombWeight = CombWeight*21d0!*(6d0 + 5d0*3d0)
    elseif( DecayMode2.eq.10 ) then! W2(-)->l+tau + nu
         call random_number(DKRnd)
         MY_IDUP(5) = Wm_
         DKFlavor = WLepPlusTauBranching_flat( DKRnd )!= ElM or MuM or TaM
         MY_IDUP(8) = -abs(DKFlavor)-7   ! anti-neutrino
         MY_IDUP(9) = -abs(DKFlavor)     ! lepton(-)
+        CombWeight = CombWeight*3d0
    elseif( DecayMode2.eq.11 ) then! W2(-)-> anything
         call random_number(DKRnd)
         MY_IDUP(5) = Wm_
@@ -4164,6 +4187,7 @@ real(8) :: DKRnd
            MY_IDUP(8) = -abs(DKFlavor)-7   ! anti-neutrino
            MY_IDUP(9) = -abs(DKFlavor)     ! lepton(-)
         endif
+        CombWeight = CombWeight*9d0!*(3d0 + 2d0*3d0)
    endif
 
 
