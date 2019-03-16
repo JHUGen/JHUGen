@@ -3223,7 +3223,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
     else
        call getRef_MCFM_qqVVqq_Hash(ijSel)
     endif
-    RequEvents(:,:) = 0d0
+    !RequEvents(:,:) = 0d0 ! This variable is not used here
     do i=1,VBFoffsh_Hash_Size
          i1 = convertToPartIndex(ijSel(i,1))
          j1 = convertToPartIndex(ijSel(i,2))

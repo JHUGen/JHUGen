@@ -43,30 +43,43 @@ m1ffwgt=1d0;m2ffwgt=1d0
 
    if (Process.eq.69) then
       call getRef_MCFM_qqVVqqStrong_Hash(ijSel) ! ijSel is in JHU convention
+       ! Hashes go as 1-25, 26-50, 51-100, 101-140, 141-150, 151-160, 161-170, 171-175
       if( VBFoffsh_run.eq.1 ) then
-         NumPartonicChannels= 2
+         NumPartonicChannels= 25
          iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-         iPartChannel= iPartChannel  ! runs from 1..2
+         iPartChannel= iPartChannel
       elseif( VBFoffsh_run.eq.2 ) then
-         NumPartonicChannels= 7
+         NumPartonicChannels= 25
          iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-         iPartChannel= iPartChannel+2  ! runs from 3..9
+         iPartChannel= iPartChannel+25
       elseif( VBFoffsh_run.eq.3 ) then
-         NumPartonicChannels= 31
+         NumPartonicChannels= 50
          iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-         iPartChannel= iPartChannel+9  ! runs from 10..40
+         iPartChannel= iPartChannel+50
       elseif( VBFoffsh_run.eq.4 ) then
-         NumPartonicChannels= 63
+         NumPartonicChannels= 40
          iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-         iPartChannel= iPartChannel+40  ! runs from 41..103
+         iPartChannel= iPartChannel+100
       elseif( VBFoffsh_run.eq.5 ) then
-         NumPartonicChannels= 61
+         NumPartonicChannels= 10
          iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-         iPartChannel= iPartChannel+103  ! runs from 104..164
+         iPartChannel= iPartChannel+140
+      elseif( VBFoffsh_run.eq.6 ) then
+         NumPartonicChannels= 10
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel+150
+      elseif( VBFoffsh_run.eq.7 ) then
+         NumPartonicChannels= 10
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel+160
+      elseif( VBFoffsh_run.eq.8 ) then
+         NumPartonicChannels= 5
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel+170
       else
          NumPartonicChannels= Hash_MCFM_qqVVqqStrong_Size
          iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-         iPartChannel= iPartChannel  ! runs from 1..164
+         iPartChannel= iPartChannel
       endif
    else
       call getRef_MCFM_qqVVqq_Hash(ijSel) ! ijSel is in JHU convention
@@ -110,6 +123,9 @@ m1ffwgt=1d0;m2ffwgt=1d0
 !          return
 !        endif
    endif
+
+   !write(6,*) "Chose channel",iPartChannel,";Accepted,requested=",AccepCounter_part2(iPartChannel),RequEvents2(iPartChannel)
+   !write(6,*) "Chose channel",iPartChannel,";Accepted,requested=",AccepCounter_part2(iPartChannel),RequEvents2(iPartChannel)
 
 
    if( (unweighted) .and. (.not. warmup) .and. (AccepCounter_part2(iPartChannel) .ge. RequEvents2(iPartChannel))  ) return
@@ -219,7 +235,8 @@ m1ffwgt=1d0;m2ffwgt=1d0
    !if (EvalWeighted_HJJ_fulldecay.eq.0d0) then
    !   write(6,*) "EvalWeighted_HJJ_fulldecay==0. Ids:",id_MCFM
    !endif
-
+   !write(6,*) "originalprobability,EvalWeighted_HJJ_fulldecay,VgsWgt=",originalprobability,EvalWeighted_HJJ_fulldecay,VgsWgt
+   !pause
 
 
    if( unweighted ) then

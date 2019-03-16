@@ -464,7 +464,7 @@ AmpObj =  $(ObjectDir)/mod_TopDecay.o \
           $(ObjectDir)/mod_VH_dipole.o \
           $(ObjectDir)/mod_VH_virtual.o \
           $(ObjectDir)/mod_VH_gg.o \
-		  $(ObjectDir)/mod_HH.o \
+          $(ObjectDir)/mod_HH.o \
           $(ObjectDir)/mod_TTBHiggs.o \
           $(ObjectDir)/mod_THiggs.o
 else

@@ -6013,18 +6013,15 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
    Mom(1:4,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
 
 
-   if( InQuarks(1)+InQuarks(2).eq.0  ) then
+   if( Process.ne.69 .and. CoupledVertex(Inquarks(1:2),-1).eq.Z0_  ) then
       NumChannels = 2
       ZHchannel=.true.! ZH
-    elseif(  (Inquarks(1).eq.Up_.and.Inquarks(2).eq.ADn_) .or. (Inquarks(1).eq.ADn_.and.Inquarks(2).eq.Up_) .or. &
-             (Inquarks(1).eq.AUp_.and.Inquarks(2).eq.Dn_) .or. (Inquarks(1).eq.Dn_.and.Inquarks(2).eq.AUp_) .or. &
-             (Inquarks(1).eq.Chm_.and.Inquarks(2).eq.AStr_) .or. (Inquarks(1).eq.AStr_.and.Inquarks(2).eq.Chm_) .or. &
-             (Inquarks(1).eq.AChm_.and.Inquarks(2).eq.Str_) .or. (Inquarks(1).eq.Str_.and.Inquarks(2).eq.AChm_)  ) then
+   elseif( Process.ne.69 .and. abs(CoupledVertex(Inquarks(1:2),-1)).eq.abs(Wp_) ) then
       NumChannels = 2
       ZHchannel=.false.! WH
-    else
+   else
       NumChannels = 1
-    endif
+   endif
 
 
    iChannel = int(xchannel * NumChannels -1d-10)+1
