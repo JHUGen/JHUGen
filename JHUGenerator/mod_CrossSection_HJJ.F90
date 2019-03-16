@@ -27,7 +27,7 @@ integer,parameter :: mxpart=14 ! this has to match the MCFM parameter
 real(8) :: yRnd(1:18),VgsWgt, EvalWeighted_HJJ_fulldecay
 real(8) :: pdf(-6:6,1:2),me2(-5:5,-5:5)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
-real(8) :: MomExt(1:4,1:10),PSWgt,FinalStateWeight
+real(8) :: MomExt(1:4,1:10),MomShifted(1:4,1:10),PSWgt,FinalStateWeight,m1ffwgt,m2ffwgt
 real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5),msq_VgsWgt(-5:5,-5:5),Wgt_Ratio_Interf,originalprobability
 integer :: id_MCFM(mxpart),MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),NHisto,ipart,jpart
 integer, pointer :: ijSel(:,:)
@@ -38,6 +38,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
 include 'vegas_common.f'
 include 'maxwt.f'
 EvalWeighted_HJJ_fulldecay = 0d0
+m1ffwgt=1d0;m2ffwgt=1d0
 
 
    if (Process.eq.69) then
@@ -165,6 +166,14 @@ EvalWeighted_HJJ_fulldecay = 0d0
    call convert_to_MCFM(+MomExt(1:4,outBot),p_MCFM(8,1:4))
    msq_MCFM(:,:) = 0d0
 
+   MomShifted = MomExt
+   if(.not.IsAPhoton(DecayMode1)) then
+      call ShiftMass(MomExt(1:4,Lep1P),MomExt(1:4,Lep1M), GetMass(MY_IDUP(Lep1P)),GetMass(MY_IDUP(Lep1M)),MomShifted(1:4,Lep1P),MomShifted(1:4,Lep1M),MassWeight=m1ffwgt)
+   endif
+   if(.not.IsAPhoton(DecayMode2)) then
+      call ShiftMass(MomExt(1:4,Lep2P),MomExt(1:4,Lep2M), GetMass(MY_IDUP(Lep2P)),GetMass(MY_IDUP(Lep2M)),MomShifted(1:4,Lep2P),MomShifted(1:4,Lep2M),MassWeight=m2ffwgt)
+   endif
+
 
    do jpart=1,2
       id_MCFM(jpart) = ijSel(iPartChannel,jpart) ! JHU convention
@@ -174,6 +183,8 @@ EvalWeighted_HJJ_fulldecay = 0d0
       id_MCFM(jpart+4) = ijSel(iPartChannel,jpart)
 !      if(id_MCFM(jpart+4) .ne. 0) id_MCFM(jpart+4)=convertLHE(id_MCFM(jpart+4))
    enddo
+   MY_IDUP(1:2)= id_MCFM(1:2)
+   MY_IDUP(3:4)= id_MCFM(7:8)
 
    !write(6,*) "id_MCFM:",id_MCFM
    !write(6,*) "p_MCFM:",p_MCFM
@@ -194,7 +205,7 @@ EvalWeighted_HJJ_fulldecay = 0d0
 
    originalprobability = msq_MCFM(iPart_sel,jPart_sel)
 
-   PreFac = fbGeV2 * FluxFac * PSWgt * sHatJacobi
+   PreFac = fbGeV2 * FluxFac * PSWgt * sHatJacobi * m1ffwgt * m2ffwgt
    msq_MCFM = msq_MCFM * PreFac / (GeV**8)  ! adjust msq_MCFM for GeV units of MCFM mat.el.
 !    do ipart=-5,5; do jpart=-5,5
 !       msq_MCFM(ipart,jpart)=msq_MCFM(ipart,jpart) * pdf(LHA2M_pdf(ipart),1)*pdf(LHA2M_pdf(jpart),2)
@@ -248,9 +259,7 @@ EvalWeighted_HJJ_fulldecay = 0d0
 
           Wgt_Ratio_Interf = ReweightLeptonInterference(id_MCFM, p_MCFM, originalprobability)
 
-          MY_IDUP(1:2)= id_MCFM(1:2)
-          MY_IDUP(3:4)= id_MCFM(7:8)
-          call WriteOutEvent_HJJ_fulldecay(MomExt,MY_IDUP,ICOLUP,EventWeight=Wgt_Ratio_Interf)
+          call WriteOutEvent_HJJ_fulldecay(MomShifted,MY_IDUP,ICOLUP,EventWeight=Wgt_Ratio_Interf)
 
           do NHisto=1,NumHistograms
             call intoHisto(NHisto,NBin(NHisto),1d0)
@@ -266,7 +275,7 @@ EvalWeighted_HJJ_fulldecay = 0d0
       if( VegasWeighted_HJJ_fulldecay.ne.0d0 ) then
         AccepCounter=AccepCounter+1
         if( writeWeightedLHE .and. (.not. warmup) ) then
-            call WriteOutEvent_HJJ_fulldecay(MomExt,MY_IDUP,ICOLUP,EventWeight=VegasWeighted_HJJ_fulldecay)
+            call WriteOutEvent_HJJ_fulldecay(MomShifted,MY_IDUP,ICOLUP,EventWeight=VegasWeighted_HJJ_fulldecay)
         endif
         do NHisto=1,NumHistograms
           call intoHisto(NHisto,NBin(NHisto),VegasWeighted_HJJ_fulldecay)
