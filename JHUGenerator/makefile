@@ -163,11 +163,11 @@ AuxDep = mod_Parameters.F90 \
          mod_HashCollection.F90
 
 ifeq ($(linkCollierLib),Yes)
-KimDep = mod_Kinematics.F90 \
+KinDep = mod_Kinematics.F90 \
          mod_Kinematics_VH.F90\
          mod_Kinematics_HH.F90
 else
-KimDep = mod_Kinematics.F90 \
+KinDep = mod_Kinematics.F90 \
          mod_Kinematics_VH.F90
 endif
 
@@ -186,11 +186,11 @@ ggVHAmpDep = \
          gg_VH_Boxes/mod_ffbH_Box11_12_mmp.F90 \
          gg_VH_Boxes/mod_ffbH_Box11_12_ppp.F90 \
          gg_VH_Boxes/mod_ffbH_Box7_8_mpm.F90 \
-		 gg_VH_Boxes/mod_ffbH_Box7_8_mpp.F90 \
-		 gg_VH_Boxes/mod_ffbH_Box9_10_mpm.F90 \
-		 gg_VH_Boxes/mod_ffbH_Box9_10_mpp.F90 \
-		 gg_VH_Boxes/mod_ffbH_Box11_12_mpm.F90 \
-		 gg_VH_Boxes/mod_ffbH_Box11_12_mpp.F90 \
+         gg_VH_Boxes/mod_ffbH_Box7_8_mpp.F90 \
+         gg_VH_Boxes/mod_ffbH_Box9_10_mpm.F90 \
+         gg_VH_Boxes/mod_ffbH_Box9_10_mpp.F90 \
+         gg_VH_Boxes/mod_ffbH_Box11_12_mpm.F90 \
+         gg_VH_Boxes/mod_ffbH_Box11_12_mpp.F90 \
          gg_VH_Boxes/mod_ffbH_Box7_8_pmm.F90 \
          gg_VH_Boxes/mod_ffbH_Box7_8_pmp.F90 \
          gg_VH_Boxes/mod_ffbH_Box9_10_pmm.F90 \
@@ -212,11 +212,11 @@ ggVH5AmpDep = \
          gg_VH5_Boxes/mod_ffbH5_Box11_12_mmp.F90 \
          gg_VH5_Boxes/mod_ffbH5_Box11_12_ppp.F90 \
          gg_VH5_Boxes/mod_ffbH5_Box7_8_mpm.F90 \
-		 gg_VH5_Boxes/mod_ffbH5_Box7_8_mpp.F90 \
-		 gg_VH5_Boxes/mod_ffbH5_Box9_10_mpm.F90 \
-		 gg_VH5_Boxes/mod_ffbH5_Box9_10_mpp.F90 \
-		 gg_VH5_Boxes/mod_ffbH5_Box11_12_mpm.F90 \
-		 gg_VH5_Boxes/mod_ffbH5_Box11_12_mpp.F90 \
+         gg_VH5_Boxes/mod_ffbH5_Box7_8_mpp.F90 \
+         gg_VH5_Boxes/mod_ffbH5_Box9_10_mpm.F90 \
+         gg_VH5_Boxes/mod_ffbH5_Box9_10_mpp.F90 \
+         gg_VH5_Boxes/mod_ffbH5_Box11_12_mpm.F90 \
+         gg_VH5_Boxes/mod_ffbH5_Box11_12_mpp.F90 \
          gg_VH5_Boxes/mod_ffbH5_Box7_8_pmm.F90 \
          gg_VH5_Boxes/mod_ffbH5_Box7_8_pmp.F90 \
          gg_VH5_Boxes/mod_ffbH5_Box9_10_pmm.F90 \
@@ -225,7 +225,7 @@ ggVH5AmpDep = \
          gg_VH5_Boxes/mod_ffbH5_Box11_12_pmp.F90
 
 ggHHAmpDep = \
-		 gg_HH_Boxes/mod_gg_box_HH_1_mm.F90 \
+         gg_HH_Boxes/mod_gg_box_HH_1_mm.F90 \
          gg_HH_Boxes/mod_gg_box_HH_1_mp.F90 \
          gg_HH_Boxes/mod_gg_box_HH_1_pm.F90 \
          gg_HH_Boxes/mod_gg_box_HH_1_pp.F90 \
@@ -405,9 +405,9 @@ AmpDep = mod_TopDecay.F90 \
          mod_VH_dipole.F90 \
          mod_VH_virtual.F90 \
          mod_VH_IKP.F90 \
-		 mod_VH_gg.F90 \
-		 mod_HH.F90 \
-		 mod_TTBHiggs.F90 \
+         mod_VH_gg.F90 \
+         mod_HH.F90 \
+         mod_TTBHiggs.F90 \
          mod_THiggs.F90
 else
 AmpDep = mod_TopDecay.F90 \
@@ -434,17 +434,19 @@ AuxObj =  $(ObjectDir)/mod_HashCollection.o \
           $(ObjectDir)/mod_Phasespace.o
 
 ifeq ($(linkCollierLib),Yes)
-KimObj = $(ObjectDir)/mod_Kinematics.o \
+KinObj = $(ObjectDir)/mod_Kinematics.o \
           $(ObjectDir)/mod_Kinematics_VH.o\
           $(ObjectDir)/mod_Kinematics_HH.o
 else
-KimObj = $(ObjectDir)/mod_Kinematics.o \
+KinObj = $(ObjectDir)/mod_Kinematics.o \
           $(ObjectDir)/mod_Kinematics_VH.o
 endif
 
+MCFMInterfaceDep=
+MCFMInterfaceObj=
 ifeq ($(linkMELA),Yes)
-    AuxDep += mod_MCFMWrapper.F90
-    AuxObj += $(ObjectDir)/mod_MCFMWrapper.o
+    MCFMInterfaceDep = mod_MCFMWrapper.F90
+    MCFMInterfaceObj = $(ObjectDir)/mod_MCFMWrapper.o
 endif
 
 ifeq ($(linkCollierLib),Yes)
@@ -536,7 +538,7 @@ MadGraphObj = $(ObjectDir)/gg_ttbh.o \
 
 
 
-JHUGenerator: $(CPSObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(AuxObj) $(ggVHAmpObj) $(LHAPDFInterfaceObj) $(ggVH5AmpObj) $(ggHHAmpObj) $(ggHH5AmpObj) $(AmpObj) $(KimObj) $(MainObj)
+JHUGenerator: $(CPSObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(AuxObj) $(MCFMInterfaceObj) $(ggVHAmpObj) $(LHAPDFInterfaceObj) $(ggVH5AmpObj) $(ggHHAmpObj) $(ggHH5AmpObj) $(AmpObj) $(KinObj) $(MainObj)
 	@echo " linkMELA = "$(linkMELA)
 	@echo " linkCollierLib = "$(linkCollierLib)
 	@echo " linking"
@@ -547,7 +549,7 @@ else
 endif
 	@echo " executable file "$(Exec)" is compiled with "$(Comp)
 	@echo " "
-	$(fcomp) -o $(Exec) $(MainObj) $(PSGenObj) $(AuxObj) $(AmpObj) $(KimObj) $(ggVHAmpObj) $(LHAPDFInterfaceObj) $(ggVH5AmpObj) $(ggHHAmpObj) $(ggHH5AmpObj) $(VegasObj) $(PDFObj) $(CPSObj) $(MCFM_Obj) $(LHAPDFflags)
+	$(fcomp) -o $(Exec) $(MainObj) $(PSGenObj) $(AuxObj) $(MCFMInterfaceObj) $(AmpObj) $(KinObj) $(ggVHAmpObj) $(LHAPDFInterfaceObj) $(ggVH5AmpObj) $(ggHHAmpObj) $(ggHH5AmpObj) $(VegasObj) $(PDFObj) $(CPSObj) $(MCFM_Obj) $(LHAPDFflags)
 
 $(AuxObj): $(AuxDep) $(Makefile)
 	@echo " compiling misc. and aux. tools"
@@ -588,9 +590,9 @@ $(ggHH5AmpObj): $(ggHH5AmpDep) $(AuxObj) $(Makefile)
 	$(fcomp) -c $(ggHH5AmpDep)
 	mv *.o $(ObjectDir)
 
-$(KimObj): $(KimDep) $(Makefile)
+$(KinObj): $(KinDep) $(Makefile)
 	@echo " compiling Kinematics dependencies"
-	$(fcomp) -c $(KimDep)
+	$(fcomp) -c $(KinDep)
 	mv *.o $(ObjectDir)
 
 $(AmpObj): $(AmpDep) mod_Misc.F90 mod_Parameters.F90 $(Makefile)
@@ -627,6 +629,13 @@ ifeq ($(UseLHAPDF),Yes)
 $(LHAPDFInterfaceObj) : $(LHAPDFInterfaceDep) $(Makefile)
 	@echo " compiling LHAPDF interface"
 	$(ccomp) $(LHAPDFflags) -c $(LHAPDFInterfaceC)
+	mv *.o $(ObjectDir)
+endif
+
+ifeq ($(linkMELA),Yes)
+$(MCFMInterfaceObj) : $(MCFMInterfaceDep) $(Makefile)
+	@echo " compiling MCFM interface"
+	$(fcomp) -c $(MCFMInterfaceDep)
 	mv *.o $(ObjectDir)
 endif
 
