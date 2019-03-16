@@ -98,6 +98,7 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
             Process.eq.66 .or.  &
             Process.eq.67 .or.  &
             Process.eq.68 .or.  &
+            Process.eq.69 .or.  &
             Process.eq.76 .or.  &
             Process.eq.77 .or.  &
             Process.eq.78 .or.  &
