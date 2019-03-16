@@ -5994,8 +5994,8 @@ IF( iChannel.EQ.1 ) THEN
    endif
 
    Jac2 = k_l(xRnd(2),mJJcut**2,(Energy-dsqrt(s56))**2,s34)    ! s34 = mjj^2, hence the minumum is set to mJJcut
-   Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)
-   Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)
+   Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(3),s78)
+   Jac4 = s_channel_propagator(M_V**2,Ga_V,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)
 
 !  splittings
    Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:))
@@ -6044,8 +6044,8 @@ ELSEIF( iChannel.EQ.2 ) THEN
    else
        Jac2 = s_channel_propagator(M_W**2,Ga_W*5,mJJcut**2,(Energy-dsqrt(s56))**2,xRnd(2),s34)
    endif
-   Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)
-   Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)
+   Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(3),s78)
+   Jac4 = s_channel_propagator(M_V**2,Ga_V,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)
 
 !  splittings
    Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:))
@@ -6085,8 +6085,8 @@ ELSEIF( iChannel.EQ.2 ) THEN
 !    endif
 !
 !    Jac2 = s_channel_propagator(M_W**2,Ga_W,mJJcut**2,(Energy-dsqrt(s56))**2,xRnd(2),s34)
-!    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)
-!    Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)
+!    Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(3),s78)
+!    Jac4 = s_channel_propagator(M_V**2,Ga_V,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)
 !
 ! !  splittings
 !    Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:))
@@ -6124,8 +6124,8 @@ ENDIF
 !       Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)                                            !  int d(s56)    = linear mapping
 !    endif
 !    Jac2 = k_l(xRnd(2),s56,Energy**2,s3H)                                                                                          !  int d(s3H)
-!    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
-!    Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                           !  int d(s910) = Z2
+!    Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
+!    Jac4 = s_channel_propagator(M_V**2,Ga_V,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                           !  int d(s910) = Z2
 !
 ! !  splittings
 !    Jac5 = t_channel_prop_decay(Mom(:,1),Mom(:,2),M_W**2,s3H,0d0,xRnd(5:6),Mom_Dummy(1:4),Mom(:,4))                                !  1+2 --> (3H)+4
@@ -6145,8 +6145,8 @@ ENDIF
 !       Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)                                            !  int d(s56)    = linear mapping
 !    endif
 !    Jac2 = k_l(xRnd(2),s56,Energy**2,s4H)                                                                                          !  int d(s4H)
-!    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
-!    Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                           !  int d(s910) = Z2
+!    Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
+!    Jac4 = s_channel_propagator(M_V**2,Ga_V,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                           !  int d(s910) = Z2
 !
 ! !  splittings
 !    Jac5 = t_channel_prop_decay(Mom(:,1),Mom(:,2),M_W**2,s4H,0d0,xRnd(5:6),Mom_Dummy(1:4),Mom(:,3))                                !  1+2 --> (4H)+3
@@ -6166,8 +6166,8 @@ ENDIF
 !       Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)                                            !  int d(s56)    = linear mapping
 !    endif
 !    Jac2 = k_l(xRnd(2),s56,Energy**2,s3H)                                                                                          !  int d(s3H)
-!    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
-!    Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                           !  int d(s910) = Z2
+!    Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
+!    Jac4 = s_channel_propagator(M_V**2,Ga_V,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                           !  int d(s910) = Z2
 !
 ! !  splittings
 !    Jac5 = t_channel_prop_decay(Mom(:,1),Mom(:,2),M_Z**2,s3H,0d0,xRnd(5:6),Mom_Dummy(1:4),Mom(:,4))                                !  1+2 --> (3H)+4
@@ -6186,8 +6186,8 @@ ENDIF
 !       Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)                                            !  int d(s56)    = linear mapping
 !    endif
 !    Jac2 = k_l(xRnd(2),s56,Energy**2,s4H)                                                                                          !  int d(s4H)
-!    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
-!    Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                           !  int d(s910) = Z2
+!    Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
+!    Jac4 = s_channel_propagator(M_V**2,Ga_V,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                           !  int d(s910) = Z2
 !
 ! !  splittings
 !    Jac5 = t_channel_prop_decay(Mom(:,1),Mom(:,2),M_Z**2,s4H,0d0,xRnd(5:6),Mom_Dummy(1:4),Mom(:,3))                                !  1+2 --> (4H)+3
@@ -6264,8 +6264,8 @@ ENDIF
 !
 ! !    Jac2 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(Energy-dsqrt(s56))**2,xRnd(2),s34)
 !    Jac2 = k_l(xRnd(2),mJJcut**2,(Energy-dsqrt(s56))**2,s34)    ! s34 = mjj^2, hence the minumum is set to mJJcut
-!    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)
-!    Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)
+!    Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(3),s78)
+!    Jac4 = s_channel_propagator(M_V**2,Ga_V,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)
 !
 ! !  splittings
 !    Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:)) !   Z* --> Z+H
@@ -6302,8 +6302,8 @@ ENDIF
 !    endif
 !    Jac2 = s_channel_propagator(M_Z**2,Ga_Z,mJJcut**2,(Energy-dsqrt(s56))**2,xRnd(2),s34) ! s34 = mjj^2, hence the minumum is set to mJJcut
 ! !    Jac2 = k_l(xRnd(2),0d0,(Energy-dsqrt(s56))**2,s34)
-!    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)
-!    Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)
+!    Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(3),s78)
+!    Jac4 = s_channel_propagator(M_V**2,Ga_V,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)
 !
 !
 ! !  splittings
@@ -6331,8 +6331,8 @@ ENDIF
 !    endif
 !    Jac2 = s_channel_propagator(M_W**2,Ga_W,mJJcut**2,(Energy-dsqrt(s56))**2,xRnd(2),s34) ! s34 = mjj^2, hence the minumum is set to mJJcut
 ! !    Jac2 = k_l(xRnd(2),0d0,(Energy-dsqrt(s56))**2,s34)
-!    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)
-!    Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)
+!    Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(3),s78)
+!    Jac4 = s_channel_propagator(M_V**2,Ga_V,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)
 !
 !
 ! !  splittings
