@@ -5,12 +5,12 @@ env: &env
         PATH: "/home/cmsbld/dos2unix-7.4.0/:/home/cmsbld/githack/:/home/cmsbld/CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
         LIBRARY_PATH: "/home/cmsbld/boost_1_61_0/stage/lib"
         CPATH: "/home/cmsbld/boost_1_61_0"
-        LD_LIBRARY_PATH: "/home/cmsbld/JHUGen/JHUGenMELA/MELA/data/slc6_amd64_gcc530"
+        LD_LIBRARY_PATH: "/home/cmsbld/JHUGen/JHUGenMELA/MELA/data/slc6_amd64_gcc630"
         PYTHONPATH: "/home/cmsbld/JHUGen/JHUGenMELA/MELA/python"
 
-        REFERENCE_LHES_USERNAME: "hroskes"
-        REFERENCE_LHES_BUILD_NUMBER: "2478"  #note this has to be the build number of generator_reference
-        REFERENCE_JHUGEN_VERSION: "v7.2.7"
+        REFERENCE_LHES_USERNAME: "usarica"
+        REFERENCE_LHES_BUILD_NUMBER: "348"  #note this has to be the build number of generator_reference
+        REFERENCE_JHUGEN_VERSION: "v7.2.8"
 
         REFERENCE_COUPLINGS_SPIN0: "ghg2=0.383432074687728,0.918260989345657 ghg3=6294.49296087723,2253.12941717723 ghg4=0.335495485382528,0.17285803562226 ghz1=0.154934976270359,0.453918144016304 ghz2=0.469297059144414,0.745302300947002 ghz3=3947.40921062637,3597.4885961919 ghz4=0.177791270766536,0.920170534486048 ghzgs2=0.0240331049939919,0.232175381101053 ghzgs3=0.331962910170583,0.0450183240308457 ghzgs4=0.808286540247172,0.133184346613754 ghgsgs2=0.530394804029869,0.211218112389125 ghgsgs3=0.914978695198138,0.055650585081425 ghgsgs4=0.694524307167701,0.511424456076726 ghz1_prime=0.143354267833606,0.0910761280837012 ghz1_prime2=7416.7007267243,4861.35525489789 ghz1_prime3=4431.44656075298,4436.48625894176 ghz1_prime4=2441.69123517064,6946.16318931911 ghz1_prime5=78314042.889773,69465359.939181 ghz1_prime6=51233058.8130761,29537873.5850789 ghz1_prime7=47832192.9001564,59559649.9633293 ghz2_prime=0.574657934630028,0.419921909647711 ghz2_prime2=4385.45874563721,6176.12459852571 ghz2_prime3=4592.16963616924,7549.93910627412 ghz2_prime4=8471.59059254828,7199.72377618203 ghz2_prime5=19558280.2853878,94843889.2606103 ghz2_prime6=23209661.2997162,67617823.213967 ghz2_prime7=7005990.36881107,53660190.8462267 ghz3_prime=4045.70652084481,1969.31611860658 ghz3_prime2=33402456.1975735,3761591.91683341 ghz3_prime3=44855079.5072533,12184926.2142809 ghz3_prime4=27878602.2354225,78237523.9345265 ghz3_prime5=932464343314.011,631580849953.887 ghz3_prime6=358115623918.415,410777463003.642 ghz3_prime7=622981476674.746,618278567362.628 ghz4_prime=0.416533954328515,0.331155934531404 ghz4_prime2=7588.37556838387,3923.43274304607 ghz4_prime3=8956.07552332742,9302.03148380015 ghz4_prime4=3203.44114317821,2863.76747251504 ghz4_prime5=49012574.439022,74595800.8833662 ghz4_prime6=73323809.5808115,53968832.1189929 ghz4_prime7=68563876.4508939,43025213.6236445 ghzgs1_prime2=5668.9642840505,7017.67588606661 kappa=0.689310602032707,0.649791728597345 kappa_tilde=0.202059494758542,0.398401745337368 cz_q1sq=1 cz_q2sq=1 cz_q12sq=-1 Lambda_z11=138.878490490027 Lambda_z21=154.519403407032 Lambda_z31=119.983302253928 Lambda_z41=181.363668458552 Lambda_z12=136.665079759304 Lambda_z22=166.590821204599 Lambda_z32=138.840555064043 Lambda_z42=49.0635744690497 Lambda_z10=9.69729610745373 Lambda_z20=193.257456475821 Lambda_z30=89.2044521747102 Lambda_z40=161.673304321983"
         REFERENCE_COUPLINGS_SPIN1: "zprime_qq_left=0.159847991225521,0.324512374690709 zprime_qq_right=0.514696145793129,0.150317974674483 zprime_zz_1=0.4084476008646,0.289302928999951 zprime_zz_2=0.328820833481286,0.910335641048151"
@@ -125,11 +125,7 @@ jobs:
           name: compile mela
           command: |
             cd JHUGenMELA/MELA/
-            ./setup.sh
-            #this is needed because cmsenv happens in $BASH_ENV,
-            #so $SCRAM_ARCH is overwritten for MELA/COLLIER/setup.sh
-            #after being set in MELA/setup.sh
-            mv data/$SCRAM_ARCH/libcollier.so data/slc6_amd64_gcc530/libcollier.so
+            ./setup.sh -j
       - run: cd JHUGenerator && make
       - run: cd JHUGenerator/pdfs && ./downloadNNPDF.sh
       - persist_to_workspace:
@@ -169,11 +165,7 @@ jobs:
           name: compile mela
           command: |
             cd JHUGenMELA/MELA/
-            ./setup.sh
-            #this is needed because cmsenv happens in $BASH_ENV,
-            #so $SCRAM_ARCH is overwritten for MELA/COLLIER/setup.sh
-            #after being set in MELA/setup.sh
-            mv data/$SCRAM_ARCH/libcollier.so data/slc6_amd64_gcc530/libcollier.so
+            ./setup.sh -j
       - run: cd JHUGenerator && make
       - run: cd JHUGenerator/pdfs && ./downloadNNPDF.sh
       - run:

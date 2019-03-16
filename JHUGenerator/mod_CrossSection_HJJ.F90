@@ -27,7 +27,7 @@ integer,parameter :: mxpart=14 ! this has to match the MCFM parameter
 real(8) :: yRnd(1:18),VgsWgt, EvalWeighted_HJJ_fulldecay
 real(8) :: pdf(-6:6,1:2),me2(-5:5,-5:5)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
-real(8) :: MomExt(1:4,1:10),PSWgt
+real(8) :: MomExt(1:4,1:10),MomShifted(1:4,1:10),PSWgt,FinalStateWeight,m1ffwgt,m2ffwgt
 real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5),msq_VgsWgt(-5:5,-5:5),Wgt_Ratio_Interf,originalprobability
 integer :: id_MCFM(mxpart),MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),NHisto,ipart,jpart
 integer, pointer :: ijSel(:,:)
@@ -38,43 +38,83 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
 include 'vegas_common.f'
 include 'maxwt.f'
 EvalWeighted_HJJ_fulldecay = 0d0
+m1ffwgt=1d0;m2ffwgt=1d0
 
- 
 
-   call getRef_MCFM_qqVVqq_Hash(ijSel) ! ijSel is in JHU convention
-   
-   
-   if( VBFoffsh_run.eq.1 ) then
-      NumPartonicChannels= 2
-      iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-      iPartChannel= iPartChannel  ! runs from 1..2   
-   elseif( VBFoffsh_run.eq.2 ) then
-      NumPartonicChannels= 7
-      iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-      iPartChannel= iPartChannel+2  ! runs from 3..9   
-   elseif( VBFoffsh_run.eq.3 ) then
-      NumPartonicChannels= 31
-      iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-      iPartChannel= iPartChannel+9  ! runs from 10..40   
-   elseif( VBFoffsh_run.eq.4 ) then
-      NumPartonicChannels= 63
-      iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-      iPartChannel= iPartChannel+40  ! runs from 41..103
-   elseif( VBFoffsh_run.eq.5 ) then
-      NumPartonicChannels= 61
-      iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-      iPartChannel= iPartChannel+103  ! runs from 104..164   
+   if (Process.eq.69) then
+      call getRef_MCFM_qqVVqqStrong_Hash(ijSel) ! ijSel is in JHU convention
+       ! Hashes go as 1-25, 26-50, 51-100, 101-140, 141-150, 151-160, 161-170, 171-175
+      if( VBFoffsh_run.eq.1 ) then
+         NumPartonicChannels= 25
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel
+      elseif( VBFoffsh_run.eq.2 ) then
+         NumPartonicChannels= 25
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel+25
+      elseif( VBFoffsh_run.eq.3 ) then
+         NumPartonicChannels= 50
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel+50
+      elseif( VBFoffsh_run.eq.4 ) then
+         NumPartonicChannels= 40
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel+100
+      elseif( VBFoffsh_run.eq.5 ) then
+         NumPartonicChannels= 10
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel+140
+      elseif( VBFoffsh_run.eq.6 ) then
+         NumPartonicChannels= 10
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel+150
+      elseif( VBFoffsh_run.eq.7 ) then
+         NumPartonicChannels= 10
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel+160
+      elseif( VBFoffsh_run.eq.8 ) then
+         NumPartonicChannels= 5
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel+170
+      else
+         NumPartonicChannels= Hash_MCFM_qqVVqqStrong_Size
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel
+      endif
    else
-      NumPartonicChannels= 164
-      iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-      iPartChannel= iPartChannel  ! runs from 1..164   
+      call getRef_MCFM_qqVVqq_Hash(ijSel) ! ijSel is in JHU convention
+      if( VBFoffsh_run.eq.1 ) then
+         NumPartonicChannels= 2
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel  ! runs from 1..2
+      elseif( VBFoffsh_run.eq.2 ) then
+         NumPartonicChannels= 7
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel+2  ! runs from 3..9
+      elseif( VBFoffsh_run.eq.3 ) then
+         NumPartonicChannels= 31
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel+9  ! runs from 10..40
+      elseif( VBFoffsh_run.eq.4 ) then
+         NumPartonicChannels= 63
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel+40  ! runs from 41..103
+      elseif( VBFoffsh_run.eq.5 ) then
+         NumPartonicChannels= 61
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel+103  ! runs from 104..164
+      else
+         NumPartonicChannels= Hash_MCFM_qqVVqq_Size
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         iPartChannel= iPartChannel  ! runs from 1..164
+      endif
    endif
-    
-  
+
+
    PartChannelAvg = NumPartonicChannels
    iPart_sel = convertToPartIndex(ijSel(iPartChannel,1))! convert to LHA convention
    jPart_sel = convertToPartIndex(ijSel(iPartChannel,2))
-      
+
    if(.not. warmup) then
        call random_number(xRnd)!   throwing random number for accept-reject
 !        if( (ThisDmax.gt.0d0) .and. (ThisDmax .lt. xRnd*CrossSecMax(iPart_sel,jPart_sel)) ) then  !   switching off for now
@@ -84,20 +124,23 @@ EvalWeighted_HJJ_fulldecay = 0d0
 !        endif
    endif
 
+   !write(6,*) "Chose channel",iPartChannel,";Accepted,requested=",AccepCounter_part2(iPartChannel),RequEvents2(iPartChannel)
+   !write(6,*) "Chose channel",iPartChannel,";Accepted,requested=",AccepCounter_part2(iPartChannel),RequEvents2(iPartChannel)
+
 
    if( (unweighted) .and. (.not. warmup) .and. (AccepCounter_part2(iPartChannel) .ge. RequEvents2(iPartChannel))  ) return
 
 
-   DecayMode1=0
-   DecayMode2=0
-   call VVBranchings(MY_IDUP(5:10),ICOLUP(1:2,7:10),700)
+   !DecayMode1=0
+   !DecayMode2=0
+   call VVBranchings(MY_IDUP(5:10),ICOLUP(1:2,7:10),FinalStateWeight,700)
    call swap(MY_IDUP(7),MY_IDUP(8))!   switch ordering ElP_,ElM_,MuP_,MuM_ --> ElM_,ElP_,MuM_,MuP_
    call swap(MY_IDUP(9),MY_IDUP(10))
    id_MCFM(3:6) = MY_IDUP(7:10)
 
    call PDFMapping(2,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi,EhatMin=dmax1(m4l_minmax(1),0d0)+mJJcut)
    call EvalPhasespace_VBF_H4f(yRnd(3),yRnd(4:17),EHat,MomExt(1:4,1:10),PSWgt,ijSel(iPartChannel,1:2),MY_IDUP(7)-MY_IDUP(9))
- 
+
 !       call genps(6,EHat,yRnd(3:16),(/0d0,0d0,0d0,0d0,0d0,0d0/),MomExt(1:4,3:8),PSWgt)
 !       MomExt(1:4,1)=(/Ehat,0d0,0d0,+Ehat/)/2d0
 !       MomExt(1:4,2)=(/Ehat,0d0,0d0,-Ehat/)/2d0
@@ -112,17 +155,17 @@ EvalWeighted_HJJ_fulldecay = 0d0
 !       return
 
    call boost2Lab(eta1,eta2,10,MomExt(1:4,1:10))
-   PSWgt = PSWgt * PartChannelAvg
+   PSWgt = PSWgt * PartChannelAvg * FinalStateWeight
 
 
    call Kinematics_HVBF_fulldecay(MomExt,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.lt.1d-33 ) then
       return
    endif
-   
+
 !       EvalWeighted_HJJ_fulldecay=PSWgt *sHatJacobi  * ( MomExt(1:4,3).dot.MomExt(1:4,7) ) * ( MomExt(1:4,4).dot.MomExt(1:4,10) ) * ( MomExt(1:4,8).dot.MomExt(1:4,9) ) * ( MomExt(1:4,7).dot.MomExt(1:4,10) ) / EHat**8
 !       return
-   
+
    call SetRunningScales( (/MomExt(1:4,5)+MomExt(1:4,6),MomExt(1:4,3),MomExt(1:4,4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) )
    call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
@@ -139,6 +182,14 @@ EvalWeighted_HJJ_fulldecay = 0d0
    call convert_to_MCFM(+MomExt(1:4,outBot),p_MCFM(8,1:4))
    msq_MCFM(:,:) = 0d0
 
+   MomShifted = MomExt
+   if(.not.IsAPhoton(DecayMode1)) then
+      call ShiftMass(MomExt(1:4,Lep1P),MomExt(1:4,Lep1M), GetMass(MY_IDUP(Lep1P)),GetMass(MY_IDUP(Lep1M)),MomShifted(1:4,Lep1P),MomShifted(1:4,Lep1M),MassWeight=m1ffwgt)
+   endif
+   if(.not.IsAPhoton(DecayMode2)) then
+      call ShiftMass(MomExt(1:4,Lep2P),MomExt(1:4,Lep2M), GetMass(MY_IDUP(Lep2P)),GetMass(MY_IDUP(Lep2M)),MomShifted(1:4,Lep2P),MomShifted(1:4,Lep2M),MassWeight=m2ffwgt)
+   endif
+
 
    do jpart=1,2
       id_MCFM(jpart) = ijSel(iPartChannel,jpart) ! JHU convention
@@ -148,6 +199,11 @@ EvalWeighted_HJJ_fulldecay = 0d0
       id_MCFM(jpart+4) = ijSel(iPartChannel,jpart)
 !      if(id_MCFM(jpart+4) .ne. 0) id_MCFM(jpart+4)=convertLHE(id_MCFM(jpart+4))
    enddo
+   MY_IDUP(1:2)= id_MCFM(1:2)
+   MY_IDUP(3:4)= id_MCFM(7:8)
+
+   !write(6,*) "id_MCFM:",id_MCFM
+   !write(6,*) "p_MCFM:",p_MCFM
 
 
 #if linkMELA==1
@@ -160,9 +216,12 @@ EvalWeighted_HJJ_fulldecay = 0d0
    stop 1
 #endif
 
+   !write(6,*) "msq_MCFM:",msq_MCFM
+   !pause
+
    originalprobability = msq_MCFM(iPart_sel,jPart_sel)
 
-   PreFac = fbGeV2 * FluxFac * PSWgt * sHatJacobi
+   PreFac = fbGeV2 * FluxFac * PSWgt * sHatJacobi * m1ffwgt * m2ffwgt
    msq_MCFM = msq_MCFM * PreFac / (GeV**8)  ! adjust msq_MCFM for GeV units of MCFM mat.el.
 !    do ipart=-5,5; do jpart=-5,5
 !       msq_MCFM(ipart,jpart)=msq_MCFM(ipart,jpart) * pdf(LHA2M_pdf(ipart),1)*pdf(LHA2M_pdf(jpart),2)
@@ -173,6 +232,11 @@ EvalWeighted_HJJ_fulldecay = 0d0
    EvalWeighted_HJJ_fulldecay = msq_MCFM(iPart_sel,jPart_sel) * pdf(LHA2M_pdf(iPart_sel),1)*pdf(LHA2M_pdf(jPart_sel),2)
    VegasWeighted_HJJ_fulldecay = EvalWeighted_HJJ_fulldecay * VgsWgt
 
+   !if (EvalWeighted_HJJ_fulldecay.eq.0d0) then
+   !   write(6,*) "EvalWeighted_HJJ_fulldecay==0. Ids:",id_MCFM
+   !endif
+   !write(6,*) "originalprobability,EvalWeighted_HJJ_fulldecay,VgsWgt=",originalprobability,EvalWeighted_HJJ_fulldecay,VgsWgt
+   !pause
 
 
    if( unweighted ) then
@@ -195,7 +259,7 @@ EvalWeighted_HJJ_fulldecay = 0d0
          CrossSectionWithWeights = CrossSectionWithWeights + LeptonAndVegasWeighted_HJJ_fulldecay
          CrossSectionWithWeightsErrorSquared = CrossSectionWithWeightsErrorSquared + LeptonAndVegasWeighted_HJJ_fulldecay**2
        endif
-              
+
      else! not warmup
 
        EvalCounter = EvalCounter+1
@@ -216,9 +280,7 @@ EvalWeighted_HJJ_fulldecay = 0d0
 
           Wgt_Ratio_Interf = ReweightLeptonInterference(id_MCFM, p_MCFM, originalprobability)
 
-          MY_IDUP(1:2)= id_MCFM(1:2)
-          MY_IDUP(3:4)= id_MCFM(7:8)
-          call WriteOutEvent_HJJ_fulldecay(MomExt,MY_IDUP,ICOLUP,EventWeight=Wgt_Ratio_Interf)
+          call WriteOutEvent_HJJ_fulldecay(MomShifted,MY_IDUP,ICOLUP,EventWeight=Wgt_Ratio_Interf)
 
           do NHisto=1,NumHistograms
             call intoHisto(NHisto,NBin(NHisto),1d0)
@@ -234,7 +296,7 @@ EvalWeighted_HJJ_fulldecay = 0d0
       if( VegasWeighted_HJJ_fulldecay.ne.0d0 ) then
         AccepCounter=AccepCounter+1
         if( writeWeightedLHE .and. (.not. warmup) ) then
-            call WriteOutEvent_HJJ_fulldecay(MomExt,MY_IDUP,ICOLUP,EventWeight=VegasWeighted_HJJ_fulldecay)
+            call WriteOutEvent_HJJ_fulldecay(MomShifted,MY_IDUP,ICOLUP,EventWeight=VegasWeighted_HJJ_fulldecay)
         endif
         do NHisto=1,NumHistograms
           call intoHisto(NHisto,NBin(NHisto),VegasWeighted_HJJ_fulldecay)
@@ -1241,7 +1303,7 @@ real(8) :: ReweightLeptonInterference
 
       denominator = (originalprobability + msq_MCFM_swapped(iPart_sel,jPart_sel)) / 2
 
-      ReweightLeptonInterference = numerator / denominator
+      if (denominator .gt. 0d0) ReweightLeptonInterference = numerator / denominator
 
    endif
 

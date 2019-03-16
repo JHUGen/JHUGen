@@ -1848,6 +1848,7 @@ common/runstring/runstring
 end subroutine
 
 ! Subroutines to check and pass the ordering for the associated particles
+! Needs to be an exact translation of MELA/TMCFMUtils::AssociatedParticleOrdering_QQVVQQAny
 subroutine Check_APartHash_MCFM_qqVVqq(idAPart,order) ! idAPart is in JHU convention
 use ModParameters
 use ModHashCollection
@@ -1880,7 +1881,7 @@ logical  :: outFound
       ) cycle
 
       ! Final particles are q
-      if ((IsALightQuark(idAPart(3)) .or. idAPart(3).eq.0) .and. (IsALightQuark(idAPart(4)) .or. idAPart(4).eq.0)) then
+      if ((IsAJet(idAPart(3)) .or. idAPart(3).eq.0) .and. (IsAJet(idAPart(4)) .or. idAPart(4).eq.0)) then
          if ( &
          (idAPart(3).eq.0 .or. idAPart(3).eq.hash(ih,3)) &
          .and. &
@@ -1961,6 +1962,10 @@ integer :: i,j,ip
    pin_MCFMconv(:,:)=pin(:,:)/GeV
 
    doCompute = Setup_MCFM_qqVVqq(idin,pin_MCFMconv,id_MCFM,p_MCFM,ZWcode)
+   !if (.not.doCompute) then
+   !   write(6,*) "mod_MCFMWrapper::EvalAmp_qqVVqq: Setup failed for idin:",idin,"(id_MCFM:",id_MCFM,")"
+   !   pause
+   !endif
    if (doCompute) then
       idDummy=idin
       id_MCFM_78swap=id_MCFM
