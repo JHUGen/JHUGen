@@ -216,6 +216,10 @@ m1ffwgt=1d0;m2ffwgt=1d0
    EvalWeighted_HJJ_fulldecay = msq_MCFM(iPart_sel,jPart_sel) * pdf(LHA2M_pdf(iPart_sel),1)*pdf(LHA2M_pdf(jPart_sel),2)
    VegasWeighted_HJJ_fulldecay = EvalWeighted_HJJ_fulldecay * VgsWgt
 
+   !if (EvalWeighted_HJJ_fulldecay.eq.0d0) then
+   !   write(6,*) "EvalWeighted_HJJ_fulldecay==0. Ids:",id_MCFM
+   !endif
+
 
 
    if( unweighted ) then
@@ -1282,7 +1286,7 @@ real(8) :: ReweightLeptonInterference
 
       denominator = (originalprobability + msq_MCFM_swapped(iPart_sel,jPart_sel)) / 2
 
-      ReweightLeptonInterference = numerator / denominator
+      if (denominator .gt. 0d0) ReweightLeptonInterference = numerator / denominator
 
    endif
 

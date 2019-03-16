@@ -841,7 +841,7 @@ integer,parameter :: NUP=10
 real(8) :: Mom(1:4,1:NUP),xRnd,s34,s36,s45,s56
 real(8),optional :: EventWeight
 integer :: MY_IDUP(1:NUP),ICOLUP(1:2,1:NUP),LHE_IDUP(1:NUP),ISTUP(1:NUP),MOTHUP(1:2,1:NUP)
-integer :: IDPRUP,i,smallestInv
+integer :: IDPRUP,i,smallestInv,j
 real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,Lifetime,Spin,MomDummy(1:4,1:NUP),TheMass,mjj
 character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
@@ -859,99 +859,204 @@ logical :: canbeVBF, canbeVH, isVHlike
       ISTUP(1:2) = -1
       MOTHUP(1:2,1:2) = 0
 
-      canbeVH = .false.
-      canbeVBF = .false.
+      if (Process .eq. 69) then
+         if( IsAGluon(MY_IDUP(1)) .and. IsAGluon(MY_IDUP(2)) ) then! gg->gg/qqb
+            ICOLUP(1:2,1) = (/501,502/)
+            ICOLUP(1:2,2) = (/503,501/)
+            if (IsAGluon(MY_IDUP(3))) then ! gg->gg
+               ICOLUP(1:2,3) = (/504,502/)
+               ICOLUP(1:2,4) = (/503,504/)
+            elseif (MY_IDUP(3).gt.0) then  ! gg->qqb
+               ICOLUP(1:2,3) = (/503,000/)
+               ICOLUP(1:2,4) = (/000,502/)
+            else                           ! gg->qbq
+               ICOLUP(1:2,4) = (/503,000/)
+               ICOLUP(1:2,3) = (/000,502/)
+            endif
+         elseif (IsAGluon(MY_IDUP(3)) .and. IsAGluon(MY_IDUP(4))) then ! qqb->gg
+            ICOLUP(1:2,3) = (/501,502/)
+            ICOLUP(1:2,4) = (/503,501/)
+            if (MY_IDUP(1).gt.0) then  ! qqb->gg
+               ICOLUP(1:2,1) = (/503,000/)
+               ICOLUP(1:2,2) = (/000,502/)
+            else                           ! qbq->gg
+               ICOLUP(1:2,2) = (/503,000/)
+               ICOLUP(1:2,1) = (/000,502/)
+            endif
+         elseif( (IsAQuark(MY_IDUP(1)) .and. IsAGluon(MY_IDUP(2))) .or. (IsAQuark(MY_IDUP(2)) .and. IsAGluon(MY_IDUP(1))) ) then! qg->qg
+            ICOLUP(1:2,1) = (/501,000/)
+            ICOLUP(1:2,2) = (/502,501/)
+            ICOLUP(1:2,3) = (/503,000/)
+            ICOLUP(1:2,4) = (/502,503/)
 
-      !try VBF first because there are more options there, but overwrite with VH if that's better
+            if ( IsAGluon(MY_IDUP(1)) ) then
+              do j=1,2; call swap(ICOLUP(j,1),ICOLUP(j,2)); enddo
+              if (MY_IDUP(2).lt.0) then
+                 call swap(ICOLUP(1,1),ICOLUP(2,1))
+                 call swap(ICOLUP(1,2),ICOLUP(2,2))
+              endif
+            else
+               if (MY_IDUP(1).lt.0) then
+                 call swap(ICOLUP(1,1),ICOLUP(2,1))
+                 call swap(ICOLUP(1,2),ICOLUP(2,2))
+               endif
+            endif
 
-      if( MY_IDUP(1).gt.0 ) then ! quark
-        ICOLUP(1:2,1) = (/501,000/)
-      else! anti-quark
-        ICOLUP(1:2,1) = (/000,501/)
-      endif
-      if( MY_IDUP(2).gt.0 ) then! quark
-        ICOLUP(1:2,2) = (/502,000/)
-      else! anti-quark
-        ICOLUP(1:2,2) = (/000,502/)
-      endif
+            if ( IsAGluon(MY_IDUP(3)) ) then
+              do j=1,2; call swap(ICOLUP(j,3),ICOLUP(j,4)); enddo
+              if (MY_IDUP(4).lt.0) then
+                 call swap(ICOLUP(1,3),ICOLUP(2,3))
+                 call swap(ICOLUP(1,4),ICOLUP(2,4))
+              endif
+            else
+              if (MY_IDUP(3).lt.0) then
+                 call swap(ICOLUP(1,3),ICOLUP(2,3))
+                 call swap(ICOLUP(1,4),ICOLUP(2,4))
+              endif
+            endif
+         ! qq->qq
+         elseif (MY_IDUP(1).eq.MY_IDUP(2)) then
+            ICOLUP(1:2,1) = (/501,000/)
+            ICOLUP(1:2,2) = (/501,000/)
+            ICOLUP(1:2,3) = (/000,502/)
+            ICOLUP(1:2,4) = (/000,502/)
+            if (MY_IDUP(1).lt.0) then
+               do j=1,2
+                  call swap(ICOLUP(j,1),ICOLUP(j,3))
+                  call swap(ICOLUP(j,2),ICOLUP(j,4))
+               enddo
+            endif
+         elseif (MY_IDUP(1).eq.MY_IDUP(3)) then
+            ICOLUP(1:2,1) = (/501,000/)
+            ICOLUP(1:2,2) = (/000,502/)
+            ICOLUP(1:2,3) = (/501,000/)
+            ICOLUP(1:2,4) = (/000,502/)
+            if (MY_IDUP(1).lt.0) then
+               do j=1,2
+                  call swap(ICOLUP(j,1),ICOLUP(j,2))
+                  call swap(ICOLUP(j,3),ICOLUP(j,4))
+               enddo
+            endif
+         elseif (MY_IDUP(1).eq.MY_IDUP(4)) then
+            ICOLUP(1:2,1) = (/501,000/)
+            ICOLUP(1:2,2) = (/000,502/)
+            ICOLUP(1:2,3) = (/000,502/)
+            ICOLUP(1:2,4) = (/501,000/)
+            if (MY_IDUP(1).lt.0) then
+               do j=1,2
+                  call swap(ICOLUP(j,1),ICOLUP(j,2))
+                  call swap(ICOLUP(j,3),ICOLUP(j,4))
+               enddo
+            endif
+         else
+           print *, "Color for this Process 69 configuration cannot be resolved"
+           print *, MY_IDUP(1:4)
+           stop 1
+         endif
 
-      !WW is typically larger xsec, so choose that if possible, then ZZ
-      if(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(3)/), -1)) .eq. abs(Wp_) &
-          .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(4)/), -1)) .eq. abs(Wp_)) then
-        ICOLUP(1:2,3) = ICOLUP(1:2,1)
-        ICOLUP(1:2,4) = ICOLUP(1:2,2)
-        canbeVBF = .true.
-      elseif(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(4)/), -1)) .eq. abs(Wp_) &
-              .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(3)/), -1)) .eq. abs(Wp_)) then
-        ICOLUP(1:2,3) = ICOLUP(1:2,2)
-        ICOLUP(1:2,4) = ICOLUP(1:2,1)
-        canbeVBF = .true.
-      elseif(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(3)/), -1)) .eq. abs(Z0_) &
-              .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(4)/), -1)) .eq. abs(Z0_)) then
-        ICOLUP(1:2,3) = ICOLUP(1:2,1)
-        ICOLUP(1:2,4) = ICOLUP(1:2,2)
-        canbeVBF = .true.
-      elseif(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(4)/), -1)) .eq. abs(Z0_) &
-              .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(3)/), -1)) .eq. abs(Z0_)) then
-        ICOLUP(1:2,3) = ICOLUP(1:2,2)
-        ICOLUP(1:2,4) = ICOLUP(1:2,1)
-        canbeVBF = .true.
-      endif
+      else
+         canbeVH = .false.
+         canbeVBF = .false.
 
-      if( CoupledVertex(MY_IDUP(1:2), -1) .ne. Not_a_particle_ .and. CoupledVertex(MY_IDUP(3:4), -1) .ne. Not_a_particle_) then
-        canbeVH = .true.
-      endif
+         !try VBF first because there are more options there, but overwrite with VH if that's better
 
-      if( .not. canbeVH .and. .not. canbeVBF) then
-        print *, "Event doesn't make sense"
-        print *, MY_IDUP(1:4)
-        stop 1
-      endif
+         if( MY_IDUP(1).gt.0 ) then ! quark
+           ICOLUP(1:2,1) = (/501,000/)
+         else! anti-quark
+           ICOLUP(1:2,1) = (/000,501/)
+         endif
+         if( MY_IDUP(2).gt.0 ) then! quark
+           ICOLUP(1:2,2) = (/502,000/)
+         else! anti-quark
+           ICOLUP(1:2,2) = (/000,502/)
+         endif
 
-      if( canbeVH .and. canbeVBF ) then
-        mjj = Get_MInv( Mom(1:4,3)+Mom(1:4,4) )
-        if( abs(CoupledVertex(MY_IDUP(1:2), -1)).eq.Wp_ ) then
-          isVHlike = ( mjj .gt. M_W-2d0*Ga_W .and. mjj .lt. M_W+2d0*Ga_W )
-        else
-          isVHlike = ( mjj .gt. M_Z-2d0*Ga_Z .and. mjj .lt. M_Z+2d0*Ga_Z )
-        endif
-      elseif( canbeVH ) then
-        isVHlike = .true.
-      endif
+         !WW is typically larger xsec, so choose that if possible, then ZZ
+         if (.not.IsAQuark(MY_IDUP(3))) then
+           ICOLUP(1:2,3) = 0
+           ICOLUP(1:2,4) = 0
+           canbeVH = .true.
+         elseif(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(3)/), -1)) .eq. abs(Wp_) &
+             .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(4)/), -1)) .eq. abs(Wp_)) then
+           ICOLUP(1:2,3) = ICOLUP(1:2,1)
+           ICOLUP(1:2,4) = ICOLUP(1:2,2)
+           canbeVBF = .true.
+         elseif(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(4)/), -1)) .eq. abs(Wp_) &
+                 .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(3)/), -1)) .eq. abs(Wp_)) then
+           ICOLUP(1:2,3) = ICOLUP(1:2,2)
+           ICOLUP(1:2,4) = ICOLUP(1:2,1)
+           canbeVBF = .true.
+         elseif(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(3)/), -1)) .eq. abs(Z0_) &
+                 .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(4)/), -1)) .eq. abs(Z0_)) then
+           ICOLUP(1:2,3) = ICOLUP(1:2,1)
+           ICOLUP(1:2,4) = ICOLUP(1:2,2)
+           canbeVBF = .true.
+         elseif(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(4)/), -1)) .eq. abs(Z0_) &
+                 .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(3)/), -1)) .eq. abs(Z0_)) then
+           ICOLUP(1:2,3) = ICOLUP(1:2,2)
+           ICOLUP(1:2,4) = ICOLUP(1:2,1)
+           canbeVBF = .true.
+         endif
 
-      if( isVHlike ) then
-        if( MY_IDUP(1).gt.0 ) then ! quark
-          ICOLUP(1:2,1) = (/501,000/)
-          ICOLUP(1:2,2) = (/000,501/)
-        else! anti-quark
-          ICOLUP(1:2,1) = (/000,501/)
-          ICOLUP(1:2,2) = (/501,000/)
-        endif
-        if( MY_IDUP(3).gt.0 ) then ! quark
-          ICOLUP(1:2,3) = (/502,000/)
-          ICOLUP(1:2,4) = (/000,502/)
-        else! anti-quark
-          ICOLUP(1:2,3) = (/000,502/)
-          ICOLUP(1:2,4) = (/502,000/)
-        endif
+         if( CoupledVertex(MY_IDUP(1:2), -1) .eq. CoupledVertex(MY_IDUP(3:4), -1) .and. CoupledVertex(MY_IDUP(3:4), -1) .ne. Not_a_particle_) then
+           canbeVH = .true.
+         endif
+
+         if( .not. canbeVH .and. .not. canbeVBF) then
+           print *, "Event doesn't make sense"
+           print *, MY_IDUP(1:4)
+           stop 1
+         endif
+
+         if( canbeVH .and. canbeVBF ) then
+           mjj = Get_MInv( Mom(1:4,3)+Mom(1:4,4) )
+           if( abs(CoupledVertex(MY_IDUP(1:2), -1)).eq.abs(Wp_) ) then
+             isVHlike = ( mjj .gt. M_W-2d0*Ga_W .and. mjj .lt. M_W+2d0*Ga_W )
+           else
+             isVHlike = ( mjj .gt. M_Z-2d0*Ga_Z .and. mjj .lt. M_Z+2d0*Ga_Z )
+           endif
+         elseif( canbeVH ) then
+           isVHlike = .true.
+         endif
+
+         if( isVHlike ) then
+           if( MY_IDUP(1).gt.0 ) then ! quark
+             ICOLUP(1:2,1) = (/501,000/)
+             ICOLUP(1:2,2) = (/000,501/)
+           else! anti-quark
+             ICOLUP(1:2,1) = (/000,501/)
+             ICOLUP(1:2,2) = (/501,000/)
+           endif
+           if (IsAQuark(MY_IDUP(3))) then
+              if( MY_IDUP(3).gt.0 ) then ! quark
+                ICOLUP(1:2,3) = (/502,000/)
+                ICOLUP(1:2,4) = (/000,502/)
+              else! anti-quark
+                ICOLUP(1:2,3) = (/000,502/)
+                ICOLUP(1:2,4) = (/502,000/)
+              endif
+           endif
+         endif
+
+         if( MY_IDUP(3).eq.Glu_) then ! 10 = LHA2M_ID(0) for the case where MY_IDUP(3:4) are not set (i.e. deterministicME=.false.). 10 doesn't mean gluon here
+            call Error("This shouldn't be able to happen anymore, assert false")
+            call random_number(xRnd)
+            if( xRnd.lt.0.5d0 ) then! ZZ fusion
+                   MY_IDUP(3:4)= (/MY_IDUP(1),MY_IDUP(2)/)
+            else! WW fusion
+                   MY_IDUP(3) = -GetCKMPartner( MY_IDUP(1) )
+                   MY_IDUP(4) = -GetCKMPartner( MY_IDUP(2) )
+                   if( abs(MY_IDUP(3)).eq.Top_ ) MY_IDUP(3) = MY_IDUP(1)
+                   if( abs(MY_IDUP(4)).eq.Top_ ) MY_IDUP(4) = MY_IDUP(2)
+            endif
+         endif
+
       endif
 
       ISTUP(3:10) = +1
       MOTHUP(1:2,3)= (/1,2/)
       MOTHUP(1:2,4)= (/1,2/)
 
-      if( MY_IDUP(3).eq.10 ) then ! 10 = LHA2M_ID(0) for the case where MY_IDUP(3:4) are not set (i.e. deterministicME=.false.). 10 doesn't mean gluon here
-         call random_number(xRnd)
-         if( xRnd.lt.0.5d0 ) then! ZZ fusion
-                MY_IDUP(3:4)= (/MY_IDUP(1),MY_IDUP(2)/)
-         else! WW fusion
-                MY_IDUP(3) = -GetCKMPartner( MY_IDUP(1) )
-                MY_IDUP(4) = -GetCKMPartner( MY_IDUP(2) )
-                if( abs(MY_IDUP(3)).eq.Top_ ) MY_IDUP(3) = MY_IDUP(1)
-                if( abs(MY_IDUP(4)).eq.Top_ ) MY_IDUP(4) = MY_IDUP(2)
-         endif
-         call Error("This shouldn't be able to happen anymore, assert false")
-      endif
 
       ISTUP(5:6) = 2
       ICOLUP(1:2,5:6) = 0
@@ -962,9 +1067,6 @@ logical :: canbeVBF, canbeVH, isVHlike
       MOTHUP(1:2,8 )= (/5,5/)
       MOTHUP(1:2,9 )= (/6,6/)
       MOTHUP(1:2,10)= (/6,6/)
-
-
-
 
 
       if( present(EventWeight) ) then
@@ -978,14 +1080,14 @@ logical :: canbeVBF, canbeVH, isVHlike
 
       do i=1,NUP
           LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
-          MomDummy(1,i) = 100.0d0*Mom(1,i)
-          MomDummy(2,i) = 100.0d0*Mom(2,i)
-          MomDummy(3,i) = 100.0d0*Mom(3,i)
-          MomDummy(4,i) = 100.0d0*Mom(4,i)
+          MomDummy(1,i) = Mom(1,i)/GeV
+          MomDummy(2,i) = Mom(2,i)/GeV
+          MomDummy(3,i) = Mom(3,i)/GeV
+          MomDummy(4,i) = Mom(4,i)/GeV
       enddo
 
 
-!  associte lepton pairs to MOTHUP
+!  associate lepton pairs to MOTHUP
       if( MY_IDUP(7).eq.MY_IDUP(9) ) then
           s34 = Get_MInv( Mom(1:4,7)+Mom(1:4,8) )
           s56 = Get_MInv( Mom(1:4,9)+Mom(1:4,10) )

@@ -3164,6 +3164,8 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 
         !write(6,*) "CrossSec2:",CrossSec2
         !write(6,*) "CrossSecMax2:",CrossSecMax2
+        !write(6,*) "CrossSectionWithWeights_in:",CrossSectionWithWeights_in
+        !write(6,*) "CrossSectionWithWeightsErrorSquared_in:",CrossSectionWithWeightsErrorSquared_in
         !write(6,*) "CrossSectionWithWeights,CrossSectionWithWeightsErrorSquared:",CrossSectionWithWeights,CrossSectionWithWeightsErrorSquared
         !write(6,*) "VG_Result,VG_Error:",VG_Result,VG_Error
         !pause
