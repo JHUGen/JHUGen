@@ -31,6 +31,7 @@ integer, parameter :: NumPartonicChannels=6
 integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,nubar=9,  b=10,Wp=11,lepP=12,nu=13
 EvalWeighted_TTBH = 0d0
 WdecayKfactor = 1d0
+FinalStateWeight = 1d0
 
    iPartChannel = int(yRnd(1) * NumPartonicChannels)
    if( PChannel.eq.0 ) then
@@ -251,6 +252,7 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,
 include 'csmaxvalue.f'
 EvalUnWeighted_TTBH = 0d0
 WdecayKfactor = 1d0
+FinalStateWeight = 1d0
 
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
 

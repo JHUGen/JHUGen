@@ -32,6 +32,7 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
 include 'vegas_common.f'
 EvalWeighted2_TH = 0d0
 WdecayKfactor = 1d0
+FinalStateWeight = 1d0
 
 
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
@@ -401,6 +402,7 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
 include 'csmaxvalue.f'
 EvalUnWeighted_TH = 0d0
 WdecayKfactor = 1d0
+FinalStateWeight = 1d0
 
 
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
