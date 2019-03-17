@@ -1484,7 +1484,7 @@ bool TUtil::MCFM_chooser(
   //bool isZJJ = false;
   //if (ndau>=4) isZJJ = (PDGHelpers::isAZBoson(mela_event.intermediateVid.at(0)) && PDGHelpers::isAJet(pId[2]) && PDGHelpers::isAJet(pId[3])); // Notice both isZZ and isZJJ could be true
   //bool isZG = (ndau>=3 && PDGHelpers::isAZBoson(mela_event.intermediateVid.at(0)) && PDGHelpers::isAPhoton(mela_event.intermediateVid.at(1)));
-  //bool isGG = (ndau>=2 && PDGHelpers::isAPhoton(mela_event.intermediateVid.at(0)) && PDGHelpers::isAPhoton(mela_event.intermediateVid.at(1)));
+  bool isGG = (ndau>=2 && PDGHelpers::isAPhoton(mela_event.intermediateVid.at(0)) && PDGHelpers::isAPhoton(mela_event.intermediateVid.at(1)));
   if (verbosity>=TVar::DEBUG) MELAout << "TUtil::MCFM_chooser: isWW=" << (int)isWW << ", isZZ=" << (int)isZZ << ", hasZZ4fInterf=" << (int)hasZZ4fInterf << endl;
 
   npart_.npart=4; // Default number of particles is just 4, indicating no associated particles
@@ -1586,7 +1586,28 @@ bool TUtil::MCFM_chooser(
     breit_.n3=1;
     breit_.mass3=masses_mcfm_.zmass;
     breit_.width3=masses_mcfm_.zwidth;
+    //lastphot_.lastphot=5; // Done during particle label assignment
     nwz_.nwz=0; ckmfill_(&(nwz_.nwz));
+
+    if (verbosity>=TVar::DEBUG) MELAout << "TUtil::MCFM_chooser: Setup is (production, process)=(" << TVar::ProductionName(production) << ", " << TVar::ProcessName(process) << ")" << endl;
+
+  }
+  else if (
+    isGG
+    &&
+    (production == TVar::ZZQQB || production == TVar::ZZINDEPENDENT || production == TVar::ZZGG)
+    &&
+    process == TVar::bkgGammaGamma
+    ){
+    // -- 285 '  f(p1)+f(p2) --> gamma(p3)+gamma(p4)'
+
+    nqcdjets_.nqcdjets=0;
+    bveg1_mcfm_.ndim=4;
+    breit_.n3=0;
+    lastphot_.lastphot=4;
+    nwz_.nwz=0; ckmfill_(&(nwz_.nwz));
+    if (production == TVar::ZZQQB || production == TVar::ZZINDEPENDENT) noglue_.omitgg=true;
+    else noglue_.omitgg=false;
 
     if (verbosity>=TVar::DEBUG) MELAout << "TUtil::MCFM_chooser: Setup is (production, process)=(" << TVar::ProductionName(production) << ", " << TVar::ProcessName(process) << ")" << endl;
 
@@ -1862,6 +1883,7 @@ bool TUtil::MCFM_chooser(
     MELAerr << "TUtil::MCFM_chooser: ndau: " << ndau << '\t';
     MELAerr << "TUtil::MCFM_chooser: isZZ: " << isZZ << '\t';
     MELAerr << "TUtil::MCFM_chooser: isWW: " << isWW << '\t';
+    MELAerr << "TUtil::MCFM_chooser: isGG: " << isGG << '\t';
     MELAerr << endl;
     result = false;
   }
@@ -2091,6 +2113,12 @@ bool TUtil::MCFM_SetupParticleCouplings(
       lastphot_.lastphot=5;
       strplabel[4]="ga";
       strplabel[5]="pp";
+    }
+    else if (isGG && (production == TVar::ZZGG || production == TVar::ZZQQB || production == TVar::ZZINDEPENDENT) && process == TVar::bkgGammaGamma){
+      //lastphot_.lastphot=4; // Done in chooser
+      strplabel[2]="ga";
+      strplabel[3]="ga";
+      strplabel[4]="pp";
     }
     else if (isWW && (production == TVar::ZZINDEPENDENT || production == TVar::ZZQQB) && process == TVar::bkgWW){
       strplabel[6]="pp";
@@ -2715,8 +2743,12 @@ bool TUtil::MCFM_SetupParticleCouplings(
 
   int* ordering=nullptr;
   if (ndau<=2){
-    if (production == TVar::ZZINDEPENDENT || production == TVar::ZZQQB){
-      if (process == TVar::bkgZGamma){ ordering = pZOrder; if (!hasZ1 || !isZG) result = false; }
+    if (production == TVar::ZZGG){
+      if (process == TVar::bkgGammaGamma){ ordering = pOrder; if (!isGG) result = false; }
+    }
+    else if (production == TVar::ZZINDEPENDENT || production == TVar::ZZQQB){
+      if (process == TVar::bkgGammaGamma){ ordering = pZOrder; if (!isGG) result = false; }
+      else if (process == TVar::bkgZGamma){ ordering = pZOrder; if (!hasZ1 || !isZG) result = false; }
     }
     else if (production == TVar::JJQCD){
       if (process == TVar::bkgZJets){ ordering = pZOrder; if (!hasZ1 || !isZJJ) result = false; }
@@ -3724,6 +3756,7 @@ double TUtil::SumMatrixElementPDF(
     //bool isZG = (PDGHelpers::isAZBoson(mela_event.intermediateVid.at(0)) && PDGHelpers::isAPhoton(mela_event.intermediateVid.at(1)));
     bool isWW = (PDGHelpers::isAWBoson(mela_event.intermediateVid.at(0)) && PDGHelpers::isAWBoson(mela_event.intermediateVid.at(1)));
     bool isZZ = (PDGHelpers::isAZBoson(mela_event.intermediateVid.at(0)) && PDGHelpers::isAZBoson(mela_event.intermediateVid.at(1)));
+    bool isGG = (PDGHelpers::isAPhoton(mela_event.intermediateVid.at(0)) && PDGHelpers::isAPhoton(mela_event.intermediateVid.at(1)));
     //initialize decayed particles
     for (int ix=0; ix<(int)partOrder.size(); ix++){
       int ipar = min((int)mxpart, min(NPart, 2))+ix;
@@ -3781,7 +3814,8 @@ double TUtil::SumMatrixElementPDF(
       ((production == TVar::ZZQQB_STU || production == TVar::ZZQQB_S || production == TVar::ZZQQB_TU) && process == TVar::bkgZZ)
       ){
       if (production == TVar::ZZINDEPENDENT || production == TVar::ZZQQB){
-        if (process == TVar::bkgZGamma) qqb_zgam_(p4[0], msq[0]);
+        if (process == TVar::bkgGammaGamma){ qqb_gamgam_(p4[0], msq[0]); msq[5][5]=0; } // This function actually computes qqb/gg -> GG, so need to set msq[g][g]=0
+        else if (process == TVar::bkgZGamma) qqb_zgam_(p4[0], msq[0]);
         else if (process == TVar::bkgZZ) qqb_zz_(p4[0], msq[0]);
         else if (process == TVar::bkgWW) qqb_ww_(p4[0], msq[0]);
       }
@@ -3841,6 +3875,17 @@ double TUtil::SumMatrixElementPDF(
         if (verbosity>=TVar::DEBUG){
           MELAout << "\tTUtil::SumMatrixElementPDF: ZZGG && ZZ/WW/ZZ+WW MEs using WW (runstring: " << runstring_.runstring << ")" << endl;
           for (int i=0; i<NPart; i++) MELAout << "\tp["<<i<<"] (Px, Py, Pz, E):\t" << p4[0][i] << '\t' << p4[1][i] << '\t' << p4[2][i] << '\t' << p4[3][i] << endl;
+        }
+      }
+      else if (isGG){
+        if (process == TVar::bkgGammaGamma){
+          qqb_gamgam_(p4[0], msq[0]);
+          for (int iquark=-5; iquark<=5; iquark++){
+            for (int jquark=-5; jquark<=5; jquark++){
+              if (iquark==0 && jquark==0) continue;
+              msq[jquark+5][iquark+5] = 0;
+            }
+          }
         }
       }
 
