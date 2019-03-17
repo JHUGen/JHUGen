@@ -244,6 +244,11 @@ extern "C" {
     bool srdiags;
   } srdiags_;
 
+  //mcfm/src/Inc/noglue.f
+  extern struct{
+    bool noglue, ggonly, gqonly, omitgg;
+  } noglue_;
+
   //mcfm/src/Inc/zcouple.F
   extern struct{
     double l[nf], r[nf], q1, l1, r1, q2, l2, r2, le, ln, re, rn, sin2w;
@@ -384,6 +389,10 @@ extern "C" {
 
 #define qqb_wgam_ qqb_wgam_
   void qqb_wgam_(double* p, double* msq);
+
+  // qqb/gg->GG
+#define qqb_gamgam_ qqb_gamgam_
+  void qqb_gamgam_(double* p, double* msq);
 
 
 #define qqb_w_g_ qqb_w_g_

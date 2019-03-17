@@ -6602,6 +6602,11 @@ void testME_Dec_JHUGenMCFM_Ping(int flavor=2, shared_ptr<Mela> melaptr=nullptr){
     mela.computeP(pVAJHUGen_ggZG_0m_sig, true);
     cout << "pVAJHUGen_ggZG_0m_sig: " << pVAJHUGen_ggZG_0m_sig << '\n' << endl;
 
+    float pVAMCFM_qqZG_bkg;
+    mela.setProcess(TVar::bkgZGamma, TVar::MCFM, TVar::ZZQQB);
+    mela.computeP(pVAMCFM_qqZG_bkg, true);
+    cout << "pVAMCFM_qqZG_bkg: " << pVAMCFM_qqZG_bkg << '\n' << endl;
+
     /***** GG *****/
     cindex=3;
     mela.setCurrentCandidateFromIndex(cindex);
@@ -6628,6 +6633,16 @@ void testME_Dec_JHUGenMCFM_Ping(int flavor=2, shared_ptr<Mela> melaptr=nullptr){
     mela.selfDHzzcoupl[0][gHIGGS_AA_4][0]=1.;
     mela.computeP(pVAJHUGen_ggGG_0m_sig, true);
     cout << "pVAJHUGen_ggGG_0m_sig: " << pVAJHUGen_ggGG_0m_sig << '\n' << endl;
+
+    float pVAMCFM_ggGG_bkg;
+    mela.setProcess(TVar::bkgGammaGamma, TVar::MCFM, TVar::ZZGG);
+    mela.computeP(pVAMCFM_ggGG_bkg, true);
+    cout << "pVAMCFM_ggGG_bkg: " << pVAMCFM_ggGG_bkg << '\n' << endl;
+
+    float pVAMCFM_qqGG_bkg;
+    mela.setProcess(TVar::bkgGammaGamma, TVar::MCFM, TVar::ZZQQB);
+    mela.computeP(pVAMCFM_qqGG_bkg, true);
+    cout << "pVAMCFM_qqGG_bkg: " << pVAMCFM_qqGG_bkg << '\n' << endl;
 
 
     if (verbosity>=TVar::DEBUG){

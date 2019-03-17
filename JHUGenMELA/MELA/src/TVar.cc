@@ -39,6 +39,7 @@ TString TVar::ProcessName(TVar::Process temp){
   else if (temp==TVar::H2_g9) return TString("H2_g9");
   else if (temp==TVar::H2_g10) return TString("H2_g10");
 
+  else if (temp==TVar::bkgGammaGamma) return TString("bkgGammaGamma");
   else if (temp==TVar::bkgZGamma) return TString("bkgZGamma");
   else if (temp==TVar::bkgZJets) return TString("bkgZJets");
   else if (temp==TVar::bkgZZ) return TString("bkgZZ");
