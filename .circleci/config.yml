@@ -25,7 +25,7 @@ env: &env
 
         SEED: "765543533"
 
-        REFERENCE_FILENAMES: "ggH_ZZ.lhe ggH_WW.lhe ggH_Zgamma.lhe ggH_gammagamma.lhe ggH_ZZ_contact.lhe ggH_ZZ_Zprime.lhe spin1_ZZ.lhe spin1_WW.lhe gg_spin2_ZZ.lhe qq_spin2_WW.lhe gg_spin2_Zgamma.lhe qq_spin2_gammagamma.lhe ZH_bb.lhe WH_Zgamma.lhe ee_gammaH_bb.lhe VBF_ZZ.lhe HJJ_WW.lhe HJ_gammagamma.lhe ttH_tautau.lhe gg_bbH_tautau.lhe qq_bbH.lhe tqH_110.lhe tqH_111.lhe tqH_112.lhe tqH_113.lhe tqH_114.lhe gg_ZH_llbb.lhe ee_ZH_llbb.lhe qq_ZH_llbb.lhe VBFoffshell_68_1.lhe VBFoffshell_68_2.lhe VBFoffshell_68_3.lhe VBFoffshell_68_4.lhe VBFoffshell_68_5.lhe"
+        REFERENCE_FILENAMES: "ggH_ZZ.lhe ggH_WW.lhe ggH_Zgamma.lhe ggH_gammagamma.lhe ggH_ZZ_contact.lhe ggH_ZZ_Zprime.lhe spin1_ZZ.lhe spin1_WW.lhe gg_spin2_ZZ.lhe qq_spin2_WW.lhe gg_spin2_Zgamma.lhe qq_spin2_gammagamma.lhe ZH_bb.lhe WH_Zgamma.lhe ee_gammaH_bb.lhe VBF_ZZ.lhe HJJ_WW.lhe HJ_gammagamma.lhe ttH_tautau.lhe gg_bbH_tautau.lhe qq_bbH.lhe tqH_110.lhe tqH_111.lhe tqH_112.lhe tqH_113.lhe tqH_114.lhe gg_ZH_llbb.lhe ee_ZH_llbb.lhe qq_ZH_llbb.lhe VBFoffshell_68_001.lhe VBFoffshell_68_002.lhe VBFoffshell_68_003.lhe VBFoffshell_68_004.lhe VBFoffshell_68_005.lhe"
         REFERENCE_FILENAME_GGH: "ggH_ZZ.lhe"
         REFERENCE_FILENAME_VBF: "VBF_ZZ.lhe"
         REFERENCE_FILENAME_HJJ: "HJJ_WW.lhe"
@@ -269,14 +269,14 @@ jobs:
           command: |
             if ! $DOREFERENCE ; then exit 0; fi
             mkdir -p VBFoffshell_68/
-            for i in {1..5}; do
+            for i in {001..005}; do
               ./JHUGen Seed=$SEED Process=68 VBFoffsh_run=$i DecayMode1=0 DecayMode2=0 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 detajetcut=0 JetsOppositeEta=1 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=compare_to_reference/VBFoffshell_68.lhe CSmaxFile=VBFoffshell_68/output
             done
       - run:
           name: VBF offshell
           command: |
             if ! $DOREFERENCE ; then exit 0; fi
-            for i in {1..5}; do
+            for i in {001..005}; do
               ./JHUGen Seed=$SEED Process=68 VBFoffsh_run=$i DecayMode1=0 DecayMode2=0 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 detajetcut=0 JetsOppositeEta=1 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=compare_to_reference/VBFoffshell_68.lhe CSmaxFile=VBFoffshell_68/output ReadCSmax VegasNc2=10
             done
 
@@ -454,26 +454,26 @@ jobs:
       - run: "! $DOSYNTAX || grep -q 'Interference: F' $LHEDIR/tbarH_t_ZZ.lhe"
 
       - restore_cache:
-          key: v2-VBF-offshell-grids-68-syntax
+          key: v3-VBF-offshell-grids-68-syntax
       - run:
           name: VBF offshell grids
           command: |
             if ! $DOSYNTAX ; then exit 0; fi
             mkdir -p VBFoffshell_68/
-            for i in {1..5}; do
+            for i in {001..005}; do
               if ! [ -e VBFoffshell_68/output_${i}_step2.grid ]; then
                 ./JHUGen Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=68 VBFoffsh_run=$i DecayMode1=8 DecayMode2=8 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 detajetcut=0 JetsOppositeEta=1 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=$LHEDIR/VBFoffshell_68.lhe CSmaxFile=VBFoffshell_68/output
               fi
             done
       - save_cache:
-          key: v2-VBF-offshell-grids-68-syntax
+          key: v3-VBF-offshell-grids-68-syntax
           paths:
             - ~/JHUGen/JHUGenerator/VBFoffshell_68/
       - run:
           name: VBF offshell
           command: |
             if ! $DOSYNTAX ; then exit 0; fi
-            for i in {1..5}; do
+            for i in {001..005}; do
               ./JHUGen Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=68 VBFoffsh_run=$i DecayMode1=8 DecayMode2=8 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 detajetcut=0 JetsOppositeEta=1 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=$LHEDIR/VBFoffshell_68.lhe CSmaxFile=VBFoffshell_68/output ReadCSmax VegasNc2=10
             done
 

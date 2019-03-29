@@ -75,7 +75,7 @@ command line parameter quick reference:
     alpha_dip          extra non-physical degree of freedom for Process=51 & VH_PC=nl, defaulted at 1.
                        Vary to check indepedence (of alpha_dip).
     VBFoffsh_run:      For VBF offshell production, set this to a number from 1-5
-                       for each of the 5 jobs.  See manual for more details.
+                       for each of the jobs.  See manual for more details.
   Resonance parameters:
     MReso:             resonance mass in GeV (default=125.00)
     GaReso:            resonance width in GeV (default=0.00407)

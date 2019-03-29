@@ -1116,28 +1116,14 @@ type(SaveValues) :: tosave, oldsavevalues
     endif
     call system('mkdir -p ./data')! -p is suppressing error messages if directory already exists
 
-    if( VBFoffsh_run.eq.1 ) DataFile = trim(DataFile)//"_1"
-    if( VBFoffsh_run.eq.2 ) DataFile = trim(DataFile)//"_2"
-    if( VBFoffsh_run.eq.3 ) DataFile = trim(DataFile)//"_3"
-    if( VBFoffsh_run.eq.4 ) DataFile = trim(DataFile)//"_4"
-    if( VBFoffsh_run.eq.5 ) DataFile = trim(DataFile)//"_5"
-    if( VBFoffsh_run.eq.6 ) DataFile = trim(DataFile)//"_6"
-    if( VBFoffsh_run.eq.7 ) DataFile = trim(DataFile)//"_7"
-    if( VBFoffsh_run.eq.8 ) DataFile = trim(DataFile)//"_8"
+    write(DataFile, "(A,A,I0.3)") trim(DataFile), "_", VBFoffsh_run
 
     if( SetCSmaxFile ) then
       i = len(trim(CSmaxFile))
       if( CSmaxFile(i-3:i).eq.".lhe" ) then
           CSmaxFile = CSmaxFile(1:i-4)
       endif
-      if( VBFoffsh_run.eq.1 ) CSmaxFile = trim(CSmaxFile)//"_1"
-      if( VBFoffsh_run.eq.2 ) CSmaxFile = trim(CSmaxFile)//"_2"
-      if( VBFoffsh_run.eq.3 ) CSmaxFile = trim(CSmaxFile)//"_3"
-      if( VBFoffsh_run.eq.4 ) CSmaxFile = trim(CSmaxFile)//"_4"
-      if( VBFoffsh_run.eq.5 ) CSmaxFile = trim(CSmaxFile)//"_5"
-      if( VBFoffsh_run.eq.6 ) CSmaxFile = trim(CSmaxFile)//"_6"
-      if( VBFoffsh_run.eq.7 ) CSmaxFile = trim(CSmaxFile)//"_7"
-      if( VBFoffsh_run.eq.8 ) CSmaxFile = trim(CSmaxFile)//"_8"
+      write(CSmaxFile, "(A,A,I0.3)") trim(CSmaxFile), "_", VBFoffsh_run
     else
       CSmaxFile = DataFile
     endif
@@ -2702,6 +2688,7 @@ character :: ProcessStr*(3)
 logical :: UseBetaVersion=.false.
 real(8) :: VG_Result_in(1:NMAXPSPARTITIONS),VG_Error_in(1:NMAXPSPARTITIONS),calls1_in(1:NMAXPSPARTITIONS),calls2_in(1:NMAXPSPARTITIONS)
 real(8) :: CrossSec2_in(1:VBFoffsh_run_maxsize,1:NMAXCHANNELS),CrossSecMax2_in(1:VBFoffsh_run_maxsize,NMAXCHANNELS),CrossSectionWithWeights_in(1:VBFoffsh_run_maxsize),CrossSectionWithWeightsErrorSquared_in(1:VBFoffsh_run_maxsize)
+character(len=len(CSmaxFile)+20) :: FileToRead
 
     VBFoffsh_Hash_Size = 0
     VBFoffsh_run_size = 0
@@ -3043,87 +3030,18 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 
     if( ReadCSmax ) then
         i=len(trim(CSmaxFile))
-        open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'1_gridinfo.txt',form='formatted',status='old',iostat=ios)
-        read(io_TmpFile,fmt=*) calls1_in(1)
-        read(io_TmpFile,fmt=*) CrossSec2_in(1,1:VBFoffsh_Hash_Size)
-        read(io_TmpFile,fmt=*) CrossSecMax2_in(1,1:VBFoffsh_Hash_Size)
-        read(io_TmpFile,fmt=*) VG_Result_in(1)
-        read(io_TmpFile,fmt=*) VG_Error_in(1)
-        read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(1), CrossSectionWithWeightsErrorSquared_in(1)
-        close(unit=io_TmpFile)
-        if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'1_gridinfo.txt'
-
-        open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'2_gridinfo.txt',form='formatted',status='old',iostat=ios)
-        read(io_TmpFile,fmt=*) calls1_in(2)
-        read(io_TmpFile,fmt=*) CrossSec2_in(2,1:VBFoffsh_Hash_Size)
-        read(io_TmpFile,fmt=*) CrossSecMax2_in(2,1:VBFoffsh_Hash_Size)
-        read(io_TmpFile,fmt=*) VG_Result_in(2)
-        read(io_TmpFile,fmt=*) VG_Error_in(2)
-        read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(2), CrossSectionWithWeightsErrorSquared_in(2)
-        close(unit=io_TmpFile)
-        if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'2_gridinfo.txt'
-
-        open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'3_gridinfo.txt',form='formatted',status='old',iostat=ios)
-        read(io_TmpFile,fmt=*) calls1_in(3)
-        read(io_TmpFile,fmt=*) CrossSec2_in(3,1:VBFoffsh_Hash_Size)
-        read(io_TmpFile,fmt=*) CrossSecMax2_in(3,1:VBFoffsh_Hash_Size)
-        read(io_TmpFile,fmt=*) VG_Result_in(3)
-        read(io_TmpFile,fmt=*) VG_Error_in(3)
-        read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(3), CrossSectionWithWeightsErrorSquared_in(3)
-        close(unit=io_TmpFile)
-        if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'3_gridinfo.txt'
-
-        open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'4_gridinfo.txt',form='formatted',status='old',iostat=ios)
-        read(io_TmpFile,fmt=*) calls1_in(4)
-        read(io_TmpFile,fmt=*) CrossSec2_in(4,1:VBFoffsh_Hash_Size)
-        read(io_TmpFile,fmt=*) CrossSecMax2_in(4,1:VBFoffsh_Hash_Size)
-        read(io_TmpFile,fmt=*) VG_Result_in(4)
-        read(io_TmpFile,fmt=*) VG_Error_in(4)
-        read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(4), CrossSectionWithWeightsErrorSquared_in(4)
-        close(unit=io_TmpFile)
-        if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'4_gridinfo.txt'
-
-        open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'5_gridinfo.txt',form='formatted',status='old',iostat=ios)
-        read(io_TmpFile,fmt=*) calls1_in(5)
-        read(io_TmpFile,fmt=*) CrossSec2_in(5,1:VBFoffsh_Hash_Size)
-        read(io_TmpFile,fmt=*) CrossSecMax2_in(5,1:VBFoffsh_Hash_Size)
-        read(io_TmpFile,fmt=*) VG_Result_in(5)
-        read(io_TmpFile,fmt=*) VG_Error_in(5)
-        read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(5), CrossSectionWithWeightsErrorSquared_in(5)
-        close(unit=io_TmpFile)
-        if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'5_gridinfo.txt'
-
-        if (Process .eq. 69) then
-           open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'6_gridinfo.txt',form='formatted',status='old',iostat=ios)
-           read(io_TmpFile,fmt=*) calls1_in(6)
-           read(io_TmpFile,fmt=*) CrossSec2_in(6,1:VBFoffsh_Hash_Size)
-           read(io_TmpFile,fmt=*) CrossSecMax2_in(6,1:VBFoffsh_Hash_Size)
-           read(io_TmpFile,fmt=*) VG_Result_in(6)
-           read(io_TmpFile,fmt=*) VG_Error_in(6)
-           read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(6), CrossSectionWithWeightsErrorSquared_in(6)
-           close(unit=io_TmpFile)
-           if( ios.eq.0 ) print *, "read ",trim(DataFile(1:i-1))//'6_gridinfo.txt'
-
-           open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'7_gridinfo.txt',form='formatted',status='old',iostat=ios)
-           read(io_TmpFile,fmt=*) calls1_in(7)
-           read(io_TmpFile,fmt=*) CrossSec2_in(7,1:VBFoffsh_Hash_Size)
-           read(io_TmpFile,fmt=*) CrossSecMax2_in(7,1:VBFoffsh_Hash_Size)
-           read(io_TmpFile,fmt=*) VG_Result_in(7)
-           read(io_TmpFile,fmt=*) VG_Error_in(7)
-           read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(7), CrossSectionWithWeightsErrorSquared_in(7)
-           close(unit=io_TmpFile)
-           if( ios.eq.0 ) print *, "read ",trim(DataFile(1:i-1))//'7_gridinfo.txt'
-
-           open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'8_gridinfo.txt',form='formatted',status='old',iostat=ios)
-           read(io_TmpFile,fmt=*) calls1_in(8)
-           read(io_TmpFile,fmt=*) CrossSec2_in(8,1:VBFoffsh_Hash_Size)
-           read(io_TmpFile,fmt=*) CrossSecMax2_in(8,1:VBFoffsh_Hash_Size)
-           read(io_TmpFile,fmt=*) VG_Result_in(8)
-           read(io_TmpFile,fmt=*) VG_Error_in(8)
-           read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(8), CrossSectionWithWeightsErrorSquared_in(8)
-           close(unit=io_TmpFile)
-           if( ios.eq.0 ) print *, "read ",trim(DataFile(1:i-1))//'8_gridinfo.txt'
-        endif
+        do j=1,VBFoffsh_run_size
+            write(FileToRead, "(A,I0.3,A)") trim(CSmaxFile(1:i-3)), j, "_gridinfo.txt"
+            open(unit=io_TmpFile,file=FileToRead,form='formatted',status='old',iostat=ios)
+            read(io_TmpFile,fmt=*) calls1_in(j)
+            read(io_TmpFile,fmt=*) CrossSec2_in(j,1:VBFoffsh_Hash_Size)
+            read(io_TmpFile,fmt=*) CrossSecMax2_in(j,1:VBFoffsh_Hash_Size)
+            read(io_TmpFile,fmt=*) VG_Result_in(j)
+            read(io_TmpFile,fmt=*) VG_Error_in(j)
+            read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(j), CrossSectionWithWeightsErrorSquared_in(1)
+            close(unit=io_TmpFile)
+            if( ios.eq.0 ) print *, "read ",FileToRead
+        enddo
 
         !write(6,*) "calls1_in:",calls1_in
         do j=2,VBFoffsh_run_size
@@ -3235,7 +3153,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 
 
     if( .not. ReadCSmax ) then! For ReadCSmax=.false. the program ends here
-       if( VBFoffsh_run.ge.1 .and. VBFoffsh_run.le.VBFoffsh_run_size ) print *, "WARNING: These are not the final number of events because the total cross section needs to be assembled from VBFoffsh_run=1,2,3,4,5 (,6,7,8 for process=69)"
+       if( VBFoffsh_run.ge.1 .and. VBFoffsh_run.le.VBFoffsh_run_size ) print *, "WARNING: These are not the final number of events because the total cross section needs to be assembled from all the VBFoffsh_runs"
        RETURN
     endif
 
@@ -3293,6 +3211,12 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
             NumPartonicChannels = 61
        endif
     endif
+
+    !removing the requested events for the wrong VBFoffsh_run
+    !(will uncomment these lines when I change it to one channel per job)
+    !RequEvents2(1:VBFoffsh_run-1) = 0
+    !RequEvents2(VBFoffsh_run+1:VBFoffsh_Hash_Size) = 0
+
     ingridfile = trim(CSmaxFile)//'_step2.grid'
 
     !write(6,*) "NumPartonicChannels | RequEvents2",NumPartonicChannels," | ",RequEvents2
@@ -6589,7 +6513,7 @@ implicit none
         print *, "   alpha_dip          extra non-physical degree of freedom for Process=51 & VH_PC=nl, defaulted at 1."
         print *, "                      Vary to check indepedence (of alpha_dip)."
         print *, "   VBFoffsh_run:      For VBF offshell production, set this to a number from 1-5"
-        print *, "                      for each of the 5 jobs.  See manual for more details."
+        print *, "                      for each of the jobs.  See manual for more details."
         print *, " Resonance parameters:"
         print *, "   MReso:             resonance mass in GeV (default=125.00)"
         print *, "   GaReso:            resonance width in GeV (default=0.00407)"
