@@ -1116,14 +1116,14 @@ type(SaveValues) :: tosave, oldsavevalues
     endif
     call system('mkdir -p ./data')! -p is suppressing error messages if directory already exists
 
-    write(DataFile, "(A,A,I0.3)") trim(DataFile), "_", VBFoffsh_run
+    if (SetVBFoffsh_run) write(DataFile, "(A,A,I0.3)") trim(DataFile), "_", VBFoffsh_run
 
     if( SetCSmaxFile ) then
       i = len(trim(CSmaxFile))
       if( CSmaxFile(i-3:i).eq.".lhe" ) then
           CSmaxFile = CSmaxFile(1:i-4)
       endif
-      write(CSmaxFile, "(A,A,I0.3)") trim(CSmaxFile), "_", VBFoffsh_run
+      if (SetVBFoffsh_run) write(CSmaxFile, "(A,A,I0.3)") trim(CSmaxFile), "_", VBFoffsh_run
     else
       CSmaxFile = DataFile
     endif
