@@ -2683,10 +2683,10 @@ include 'csmaxvalue.f'
 integer :: flav1,flav2,StatusPercent,MissingEvents,MaxEvts,imax
 integer :: VegasSeed,PreviousSum,ios,NumPartonicChannels
 integer :: VBFoffsh_Hash_Size,VBFoffsh_run_size
-integer, parameter :: VBFoffsh_run_maxsize=NMAXPSPARTITIONS
+integer, parameter :: VBFoffsh_run_maxsize=max(Hash_MCFM_qqVVqq_Size, Hash_MCFM_qqVVqqStrong_Size)
 character :: ProcessStr*(3)
 logical :: UseBetaVersion=.false.
-real(8) :: VG_Result_in(1:NMAXPSPARTITIONS),VG_Error_in(1:NMAXPSPARTITIONS),calls1_in(1:NMAXPSPARTITIONS),calls2_in(1:NMAXPSPARTITIONS)
+real(8) :: VG_Result_in(1:VBFoffsh_run_maxsize),VG_Error_in(1:VBFoffsh_run_maxsize),calls1_in(1:VBFoffsh_run_maxsize),calls2_in(1:VBFoffsh_run_maxsize)
 real(8) :: CrossSec2_in(1:VBFoffsh_run_maxsize,1:NMAXCHANNELS),CrossSecMax2_in(1:VBFoffsh_run_maxsize,NMAXCHANNELS),CrossSectionWithWeights_in(1:VBFoffsh_run_maxsize),CrossSectionWithWeightsErrorSquared_in(1:VBFoffsh_run_maxsize)
 character(len=len(CSmaxFile)+20) :: FileToRead
 
@@ -3014,11 +3014,13 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 
     if (Process.ge.66 .and. Process.lt.69) then
        VBFoffsh_Hash_Size = Hash_MCFM_qqVVqq_Size
-       VBFoffsh_run_size = VBFoffsh_run_qqVVqq_size
+       VBFoffsh_run_size = Hash_MCFM_qqVVqq_Size
     else
        VBFoffsh_Hash_Size = Hash_MCFM_qqVVqqStrong_Size
-       VBFoffsh_run_size = VBFoffsh_run_qqVVqqStrong_size
+       VBFoffsh_run_size = Hash_MCFM_qqVVqqStrong_Size
     endif
+
+    if (VBFoffsh_run_size .gt. VBFoffsh_run_maxsize) call Error("This should never be able to happen")
 
     !write(6,*) "VBFoffsh_Hash_Size, VBFoffsh_run_size", VBFoffsh_Hash_Size, VBFoffsh_run_size
 
@@ -3157,65 +3159,10 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
        RETURN
     endif
 
-    if (Process .eq. 69) then
-       ! Hashes go as 1-25, 26-50, 51-100, 101-140, 141-150, 151-160, 161-170, 171-175
-       if( VBFoffsh_run.eq.1 ) then ! removing the requested events for the wrong VBFoffsh_run
-            RequEvents2(26:Hash_MCFM_qqVVqqStrong_Size) = 0
-            NumPartonicChannels = 25
-       elseif( VBFoffsh_run.eq.2 ) then
-            RequEvents2(1:25) = 0
-            RequEvents2(51:Hash_MCFM_qqVVqqStrong_Size) = 0
-            NumPartonicChannels = 25
-       elseif( VBFoffsh_run.eq.3 ) then
-            RequEvents2(1:50) = 0
-            RequEvents2(101:Hash_MCFM_qqVVqqStrong_Size) = 0
-            NumPartonicChannels = 50
-       elseif( VBFoffsh_run.eq.4 ) then
-            RequEvents2(1:100) = 0
-            RequEvents2(141:Hash_MCFM_qqVVqqStrong_Size) = 0
-            NumPartonicChannels = 40
-       elseif( VBFoffsh_run.eq.5 ) then
-            RequEvents2(1:140) = 0
-            RequEvents2(151:Hash_MCFM_qqVVqqStrong_Size) = 0
-            NumPartonicChannels = 10
-       elseif( VBFoffsh_run.eq.6 ) then
-            RequEvents2(1:150) = 0
-            RequEvents2(161:Hash_MCFM_qqVVqqStrong_Size) = 0
-            NumPartonicChannels = 10
-       elseif( VBFoffsh_run.eq.7 ) then
-            RequEvents2(1:160) = 0
-            RequEvents2(171:Hash_MCFM_qqVVqqStrong_Size) = 0
-            NumPartonicChannels = 10
-       elseif( VBFoffsh_run.eq.8 ) then
-            RequEvents2(1:170) = 0
-            NumPartonicChannels = 5
-       endif
-    else
-       if( VBFoffsh_run.eq.1 ) then ! removing the requested events for the wrong VBFoffsh_run
-            RequEvents2(3:Hash_MCFM_qqVVqq_Size) = 0
-            NumPartonicChannels = 2
-       elseif( VBFoffsh_run.eq.2 ) then
-            RequEvents2(1:2) = 0
-            RequEvents2(10:Hash_MCFM_qqVVqq_Size) = 0
-            NumPartonicChannels = 7
-       elseif( VBFoffsh_run.eq.3 ) then
-            RequEvents2(1:9) = 0
-            RequEvents2(41:Hash_MCFM_qqVVqq_Size) = 0
-            NumPartonicChannels = 31
-       elseif( VBFoffsh_run.eq.4 ) then
-            RequEvents2(1:40) = 0
-            RequEvents2(104:Hash_MCFM_qqVVqq_Size) = 0
-            NumPartonicChannels = 63
-       elseif( VBFoffsh_run.eq.5 ) then
-            RequEvents2(1:103) = 0
-            NumPartonicChannels = 61
-       endif
-    endif
-
     !removing the requested events for the wrong VBFoffsh_run
-    !(will uncomment these lines when I change it to one channel per job)
-    !RequEvents2(1:VBFoffsh_run-1) = 0
-    !RequEvents2(VBFoffsh_run+1:VBFoffsh_Hash_Size) = 0
+    RequEvents2(1:VBFoffsh_run-1) = 0
+    RequEvents2(VBFoffsh_run+1:VBFoffsh_Hash_Size) = 0
+    NumPartonicChannels = 1
 
     ingridfile = trim(CSmaxFile)//'_step2.grid'
 
@@ -6512,7 +6459,7 @@ implicit none
         print *, "                      VH_PC overrides Pchannel."
         print *, "   alpha_dip          extra non-physical degree of freedom for Process=51 & VH_PC=nl, defaulted at 1."
         print *, "                      Vary to check indepedence (of alpha_dip)."
-        print *, "   VBFoffsh_run:      For VBF offshell production, set this to a number from 1-5"
+        print *, "   VBFoffsh_run:      For VBF offshell production, set this to an index"
         print *, "                      for each of the jobs.  See manual for more details."
         print *, " Resonance parameters:"
         print *, "   MReso:             resonance mass in GeV (default=125.00)"
