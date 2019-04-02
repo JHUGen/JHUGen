@@ -3038,7 +3038,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
             read(io_TmpFile,fmt=*) CrossSecMax2_in(j,1:VBFoffsh_Hash_Size)
             read(io_TmpFile,fmt=*) VG_Result_in(j)
             read(io_TmpFile,fmt=*) VG_Error_in(j)
-            read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(j), CrossSectionWithWeightsErrorSquared_in(1)
+            read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(j), CrossSectionWithWeightsErrorSquared_in(j)
             close(unit=io_TmpFile)
             if( ios.eq.0 ) print *, "read ",FileToRead
         enddo
