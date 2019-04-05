@@ -1,8 +1,13 @@
 #!/usr/bin/env python
 
 """
-Simple python wrapper for JHUGen.
-In the simplest case, calling this with arguments will just call JHUGen with those same arguments.
+Simple python wrapper for JHUGen. In the simplest
+case, calling this with arguments will just call
+JHUGen with those same arguments. Run with
+--submit-to batch_type to submit the job
+to a queue (slurm and condor are currently
+supported; contact us if you'd like us to add
+another batch system).
 """
 
 import abc
@@ -47,6 +52,9 @@ class JobSubmitter(object):
     self.jobname = jobname
     self.jobtime = jobtime
 
+    self.dodryrun()
+
+  def dodryrun(self):
     try:
       JHUGen(*self.args.JHUGenarg + ["DryRun"], hideoutput=True)
     except subprocess.CalledProcessError as e:
@@ -55,9 +63,15 @@ class JobSubmitter(object):
       raise
 
   @abc.abstractmethod
-  def submittoqueue(self): pass
-  @property
-  def commandline(self):
+  def submittoqueue(self, arrayjobs=None): pass
+  @abc.abstractproperty
+  def jobindex(self):
+    """
+    string that indicates the job index when submitting job arrays
+    os.path.expandvars will be called on this in the job
+    """
+
+  def commandline(self, isarray=False):
     result = [__file__, "--on-queue", os.path.dirname(os.path.abspath(__file__))]
 
     for varname in ("LD_LIBRARY_PATH",):
@@ -66,25 +80,35 @@ class JobSubmitter(object):
       except KeyError:
         pass
 
+    if isarray:
+      result += ["--array-index", self.jobindex]
+
     return result + self.argv
+
   @property
   def args(self):
     return parse_args(self.argv)
+
+  @property
+  def VBFoffsh_run(self):
+    VBFoffsh_run = None
+    for arg in self.args.JHUGenarg:
+      if arg.startswith("VBFoffsh_run="):
+        VBFoffsh_run = int(arg.split("=", 1)[1])
+    return VBFoffsh_run
+
   @property
   def DataFile(self):
-    VBFoffsh_run = None
     datafile = "data/output.lhe"
     for arg in self.args.JHUGenarg:
       if arg.startswith("DataFile="):
         datafile = arg.split("=", 1)[1]
-      if arg.startswith("VBFoffsh_run="):
-        VBFoffsh_run = int(arg.split("=", 1)[1])
 
     if datafile.endswith(".lhe"):
       datafile = datafile.replace(".lhe", "")
 
-    if VBFoffsh_run is not None:
-      datafile = "{}_{:03d}".format(datafile, VBFoffsh_run)
+    if self.VBFoffsh_run is not None:
+      datafile = "{}_{:03d}".format(datafile, self.VBFoffsh_run)
 
     return datafile
 
@@ -133,16 +157,44 @@ class JobSubmitter(object):
   @abc.abstractproperty
   def jobrunning(self): pass
 
+class JobRunner(JobSubmitter):
+  def dodryrun(self):
+    "no need to do anything"
+
+  def submittoqueue(self, arrayjobs=None):
+    if self.args.on_queue:
+      cdto = self.args.on_queue
+    else:
+      cdto = os.path.dirname(__file__)
+
+    for name, value in self.args.set_env_var:
+      os.environ[name] = os.path.expandvars(value)
+
+    with cd(cdto):
+      return JHUGen(*self.args.JHUGenarg)
+
+  @property
+  def jobrunning(self): return False
+
+  @property
+  def jobindex(self):
+    return self.args.job_index
+
 class JobSubmitterSlurm(JobSubmitter):
-  def submittoqueue(self):
+  def submittoqueue(self, arrayjobs=None):
+    sbatchcommandline = [
+      "sbatch",
+      "--job-name", self.jobname,
+      "--time", self.formattedjobtime,
+      "--output", self.outputfile,
+      "--error", self.errorfile,
+    ]
+    if arrayjobs is not None:
+      sbatchcommandline += ["--array="+",".join(arrayjobs)]
+    sbatchcommandline += self.commandline(isarray=arrayjobs is not None)
     try:
-      sbatchout = subprocess.check_output([
-        "sbatch",
-          "--job-name", self.jobname,
-          "--time", self.formattedjobtime,
-          "--output", self.outputfile,
-          "--error", self.errorfile,
-        ] + self.commandline,
+      sbatchout = subprocess.check_output(
+        sbatchcommandline,
         stderr=subprocess.STDOUT,
       )
     except subprocess.CalledProcessError as e:
@@ -167,6 +219,10 @@ class JobSubmitterSlurm(JobSubmitter):
       return jobid
     return False
 
+  @property
+  def jobindex(self):
+    return "$SLURM_ARRAY_TASK_ID"
+
 class JobSubmitterCondor(JobSubmitter):
   @staticmethod
   def quote(commandlineoption):
@@ -174,34 +230,31 @@ class JobSubmitterCondor(JobSubmitter):
   @property
   def formattedjobtime(self):
     return "{:d}".format(int(self.jobtime.total_seconds()))
-  @property
-  def environmentvariables(self):
-    return [
-      "{}={}".format(name, os.environ[name])
-        for name in ("LD_LIBRARY_PATH",)
-    ]
-  def submittoqueue(self):
+  def submittoqueue(self, arrayjobs=None):
+    commandline = self.commandline(isarray=arrayjobs is not None)
     with tempfile.NamedTemporaryFile(bufsize=0) as f:
       f.write(
         textwrap.dedent(
           """
             executable = {}
             arguments = {}
-            #environment = {}
 
             output = {self.outputfile}
             error = {self.errorfile}
             log = {self.logfile}
 
             +MaxRuntime = {self.formattedjobtime}
-            periodic_remove         = JobStatus == 5
+            periodic_remove = JobStatus == 5
 
-            queue 1
+            queue {queue}
           """.format(
-            self.commandline[0],
-            '"' + " ".join(self.quote(_) for _ in self.commandline[1:]) + '"',
-            '"' + " ".join(self.quote(_) for _ in self.environmentvariables) + '"',
+            commandline[0],
+            '"' + " ".join(self.quote(_) for _ in commandline[1:]) + '"',
             self=self,
+            queue=(
+              "1" if arrayjobs is None
+              else ("JobIndexInArray in " + " ".join(arrayjobs))
+            )
           )
         )
       )
@@ -221,9 +274,14 @@ class JobSubmitterCondor(JobSubmitter):
         return ", ".join(sorted(jobids))
     except IOError:
       return False
+  @property
+  def jobindex(self):
+    return "$(JobIndexInArray)"
+
 
 def jobsubmitter(submitto, *args, **kwargs):
   return {
+    "local": JobRunner,
     "slurm": JobSubmitterSlurm,
     "condor": JobSubmitterCondor,
   }[submitto](*args, **kwargs)
@@ -238,19 +296,7 @@ def submitjob(submitto, *args, **kwargs):
 
 def main(argv):
   args = parse_args(argv)
-  if args.submit_to and not args.on_queue:
-    return submitjob(args.submit_to, argv=sys.argv[1:], jobname=args.job_name, jobtime=args.job_time)
-
-  if args.on_queue:
-    cdto = args.on_queue
-  else:
-    cdto = os.path.dirname(__file__)
-
-  for name, value in args.set_env_var:
-    os.environ[name] = os.path.expandvars(value)
-
-  with cd(cdto):
-    return JHUGen(*args.JHUGenarg)
+  return submitjob(args.submit_to, argv=sys.argv[1:], jobname=args.job_name, jobtime=args.job_time)
 
 def parse_time(time):
   #http://stackoverflow.com/a/4628148/5228524
@@ -262,12 +308,20 @@ def parse_time(time):
 def parse_args(*args, **kwargs):
   p = argparse.ArgumentParser()
   p.add_argument("JHUGenarg", nargs="*")
-  p.add_argument("--submit-to", choices=("condor", "slurm"))
+  p.add_argument("--submit-to", choices=("condor", "slurm"), default="local")
   p.add_argument("--job-name", default="JHUGen")
   p.add_argument("--job-time", type=parse_time)
   p.add_argument("--grid", action="store_true", help="set this to true if the purpose of this job is to generate a grid to be used by later jobs")
-  p.add_argument("--on-queue", help=argparse.SUPPRESS)  #used internally
-  p.add_argument("--set-env-var", help=argparse.SUPPRESS, nargs=2, action="append")  #used internally
-  return p.parse_args(*args, **kwargs)
+
+  #The following arguments are used internally when this script
+  #submits itself to a queue.  They shouldn't be set manually.
+  p.add_argument("--on-queue", help=argparse.SUPPRESS)
+  p.add_argument("--set-env-var", help=argparse.SUPPRESS, nargs=2, action="append", default=[])
+  p.add_argument("--array-index", help=argparse.SUPPRESS, type=os.path.expandvars)
+
+  args = p.parse_args(*args, **kwargs)
+
+  if args.on_queue: args.submit_to = "local"
+  return args
 
 main(sys.argv[1:])
