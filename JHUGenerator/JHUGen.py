@@ -13,6 +13,8 @@ import os
 import re
 import sys
 import subprocess
+import tempfile
+import textwrap
 
 @contextlib.contextmanager
 def cd(newdir):
@@ -56,7 +58,15 @@ class JobSubmitter(object):
   def submittoqueue(self): pass
   @property
   def commandline(self):
-    return [__file__, "--on-queue", os.path.dirname(__file__)] + self.argv
+    result = [__file__, "--on-queue", os.path.dirname(os.path.abspath(__file__))]
+
+    for varname in ("LD_LIBRARY_PATH",):
+      try:
+        result += ["--set-env-var", varname, os.environ[varname]]
+      except KeyError:
+        pass
+
+    return result + self.argv
   @property
   def args(self):
     return parse_args(self.argv)
@@ -163,7 +173,13 @@ class JobSubmitterCondor(JobSubmitter):
     return "'" + commandlineoption.replace("'", "''").replace('"', '""') + "'"
   @property
   def formattedjobtime(self):
-    return "{}s".format(self.jobtime.total_seconds())
+    return "{:d}".format(int(self.jobtime.total_seconds()))
+  @property
+  def environmentvariables(self):
+    return [
+      "{}={}".format(name, os.environ[name])
+        for name in ("LD_LIBRARY_PATH",)
+    ]
   def submittoqueue(self):
     with tempfile.NamedTemporaryFile(bufsize=0) as f:
       f.write(
@@ -171,6 +187,7 @@ class JobSubmitterCondor(JobSubmitter):
           """
             executable = {}
             arguments = {}
+            #environment = {}
 
             output = {self.outputfile}
             error = {self.errorfile}
@@ -180,18 +197,28 @@ class JobSubmitterCondor(JobSubmitter):
             periodic_remove         = JobStatus == 5
 
             queue 1
-          """.format(self.commandline[0], '"' + " ".join(self.quote(_) for _ in self.commandline[1:]) + '"', self=self)
+          """.format(
+            self.commandline[0],
+            '"' + " ".join(self.quote(_) for _ in self.commandline[1:]) + '"',
+            '"' + " ".join(self.quote(_) for _ in self.environmentvariables) + '"',
+            self=self,
+          )
         )
       )
       subprocess.check_call(["condor_submit", "--batch-name", self.jobname, f.name])
   @property
   def jobrunning(self):
+    jobids = set()
     try:
       with open(self.logfile) as f:
         for line in f:
-          if line.startswith("004") or line.startswith("005") or line.startswith("009"):
-            return re.search(r"^00. \((0-9)+[.](0-9)+)", line).group(1)
-        return False
+          match = re.search(r"^00. \(([0-9]+[.][0-9]+)", line)
+          if match:
+            if line.startswith("004") or line.startswith("005") or line.startswith("009"):
+              jobids.discard(match.group(1))
+            elif line.startswith("000"):
+              jobids.add(match.group(1))
+        return ", ".join(sorted(jobids))
     except IOError:
       return False
 
@@ -219,6 +246,9 @@ def main(argv):
   else:
     cdto = os.path.dirname(__file__)
 
+  for name, value in args.set_env_var:
+    os.environ[name] = os.path.expandvars(value)
+
   with cd(cdto):
     return JHUGen(*args.JHUGenarg)
 
@@ -237,6 +267,7 @@ def parse_args(*args, **kwargs):
   p.add_argument("--job-time", type=parse_time)
   p.add_argument("--grid", action="store_true", help="set this to true if the purpose of this job is to generate a grid to be used by later jobs")
   p.add_argument("--on-queue", help=argparse.SUPPRESS)  #used internally
+  p.add_argument("--set-env-var", help=argparse.SUPPRESS, nargs=2, action="append")  #used internally
   return p.parse_args(*args, **kwargs)
 
 main(sys.argv[1:])
