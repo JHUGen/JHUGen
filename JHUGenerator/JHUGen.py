@@ -196,6 +196,7 @@ class JobSubmitter(object):
       result += ".grid"
 
     result += ".job.out"
+    return result
 
   @property
   def errorfile(self):
@@ -208,6 +209,7 @@ class JobSubmitter(object):
       result += ".grid"
 
     result += ".job.err"
+    return result
 
   @property
   def logfile(self):
@@ -390,6 +392,7 @@ def parse_args(*args, **kwargs):
 
   args = p.parse_args(*args, **kwargs)
 
+  if args.on_queue: args.submit_to = None
   if args.submit_to is not None and args.job_time is None:
     p.error("Have to supply a job time when submitting to a queue")
 
