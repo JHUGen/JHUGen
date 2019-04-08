@@ -269,16 +269,12 @@ jobs:
           command: |
             if ! $DOREFERENCE ; then exit 0; fi
             mkdir -p VBFoffshell_68/
-            for i in {001..005}; do
-              ./JHUGen Seed=$SEED Process=68 VBFoffsh_run=$i DecayMode1=0 DecayMode2=0 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 detajetcut=0 JetsOppositeEta=1 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=compare_to_reference/VBFoffshell_68.lhe CSmaxFile=VBFoffshell_68/output
-            done
+            ./JHUGen.py Seed=$SEED Process=68 DecayMode1=0 DecayMode2=0 VegasNc0=10000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 detajetcut=0 JetsOppositeEta=1 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=compare_to_reference/VBFoffshell_68.lhe CSmaxFile=VBFoffshell_68/output
       - run:
           name: VBF offshell
           command: |
             if ! $DOREFERENCE ; then exit 0; fi
-            for i in {001..005}; do
-              ./JHUGen Seed=$SEED Process=68 VBFoffsh_run=$i DecayMode1=0 DecayMode2=0 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 detajetcut=0 JetsOppositeEta=1 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=compare_to_reference/VBFoffshell_68.lhe CSmaxFile=VBFoffshell_68/output ReadCSmax VegasNc2=10
-            done
+            ./JHUGen.py Seed=$SEED Process=68 DecayMode1=0 DecayMode2=0                PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 detajetcut=0 JetsOppositeEta=1 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=compare_to_reference/VBFoffshell_68.lhe CSmaxFile=VBFoffshell_68/output ReadCSmax VegasNc2=10
 
       #now compare to reference
       - run:
@@ -454,28 +450,27 @@ jobs:
       - run: "! $DOSYNTAX || grep -q 'Interference: F' $LHEDIR/tbarH_t_ZZ.lhe"
 
       - restore_cache:
-          key: v3-VBF-offshell-grids-68-syntax
+          key: v4-VBF-offshell-grids-68-syntax
       - run:
           name: VBF offshell grids
           command: |
             if ! $DOSYNTAX ; then exit 0; fi
             mkdir -p VBFoffshell_68/
-            for i in {001..005}; do
+            for i in {001..164}; do
               if ! [ -e VBFoffshell_68/output_${i}_step2.grid ]; then
-                ./JHUGen Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=68 VBFoffsh_run=$i DecayMode1=8 DecayMode2=8 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 detajetcut=0 JetsOppositeEta=1 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=$LHEDIR/VBFoffshell_68.lhe CSmaxFile=VBFoffshell_68/output
+                ./JHUGen.py Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=68 DecayMode1=8 DecayMode2=8 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 detajetcut=0 JetsOppositeEta=1 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=$LHEDIR/VBFoffshell_68.lhe CSmaxFile=VBFoffshell_68/output
+                break
               fi
             done
       - save_cache:
-          key: v3-VBF-offshell-grids-68-syntax
+          key: v4-VBF-offshell-grids-68-syntax
           paths:
             - ~/JHUGen/JHUGenerator/VBFoffshell_68/
       - run:
           name: VBF offshell
           command: |
             if ! $DOSYNTAX ; then exit 0; fi
-            for i in {001..005}; do
-              ./JHUGen Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=68 VBFoffsh_run=$i DecayMode1=8 DecayMode2=8 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 detajetcut=0 JetsOppositeEta=1 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=$LHEDIR/VBFoffshell_68.lhe CSmaxFile=VBFoffshell_68/output ReadCSmax VegasNc2=10
-            done
+            ./JHUGen.py Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=68 DecayMode1=8 DecayMode2=8 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 detajetcut=0 JetsOppositeEta=1 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=$LHEDIR/VBFoffshell_68.lhe CSmaxFile=VBFoffshell_68/output ReadCSmax VegasNc2=10
 
       - run:
           name: checklhe

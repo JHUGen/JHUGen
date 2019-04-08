@@ -52,15 +52,52 @@ class JobSubmitter(object):
     self.jobname = jobname
     self.jobtime = jobtime
 
-    self.dodryrun()
+  def JHUGenargs(self, array_index=None):
+    result = self.args.JHUGenarg
 
-  def dodryrun(self):
+    if array_index is not None:
+      assert self.args.array_index in (None, array_index)
+    else:
+      array_index = self.args.array_index
+
+    if array_index is not None:
+      if 66 <= self.Process <= 69:
+        if self.VBFoffsh_run is not None: raise RuntimeError("With VBFoffsh_run set to {:d}, shouldn't have an array index".format(self.VBFoffsh_run))
+        result.append("VBFoffsh_run={:d}".format(array_index))
+      else:
+        raise RuntimeError("Process {:d} shouldn't have an array index".format(self.Process))
+
+    return result
+
+  def dodryrun(self, *args, **kwargs):
+    JHUGenargs = self.JHUGenargs(*args, **kwargs)
     try:
-      JHUGen(*self.args.JHUGenarg + ["DryRun"], hideoutput=True)
+      JHUGen(*JHUGenargs + ["DryRun"], hideoutput=True)
     except subprocess.CalledProcessError as e:
-      print "Invalid command line: " + " ".join(self.args.JHUGenarg)
+      print "Invalid command line: " + " ".join(JHUGenargs)
       print e.output
       raise
+
+  def submit(self):
+    if 66 <= self.Process <= 69 and self.VBFoffsh_run is None and self.args.array_index is None:
+      njobs = {
+        66: 164,
+        67: 164,
+        68: 164,
+        69: 175,
+      }[self.Process]
+      arrayjobs=range(1, njobs+1)
+      for _ in arrayjobs:
+        self.dodryrun(array_index=_)
+    else:
+      arrayjobs = None
+      self.dodryrun()
+
+    jobrunning = self.jobrunning
+    if jobrunning:
+      print "job {} is already running".format(jobrunning)
+      return
+    return self.submittoqueue(arrayjobs=arrayjobs)
 
   @abc.abstractmethod
   def submittoqueue(self, arrayjobs=None): pass
@@ -68,6 +105,13 @@ class JobSubmitter(object):
   def jobindex(self):
     """
     string that indicates the job index when submitting job arrays
+    os.path.expandvars will be called on this in the job
+    """
+  @abc.abstractproperty
+  def jobindexforoutputfile(self):
+    """
+    string that indicates the job index when submitting job arrays
+    in the output and error file names
     os.path.expandvars will be called on this in the job
     """
 
@@ -143,12 +187,28 @@ class JobSubmitter(object):
 
   @property
   def outputfile(self):
-    if self.isforgrid: return self.DataFile+".grid.job.out"
-    return self.DataFile+".job.out"
+    result = self.DataFile
+
+    if 66 <= self.Process <= 69 and self.VBFoffsh_run is None and self.args.array_index is None:
+      result += "_"+self.jobindexforoutputfile
+
+    if self.isforgrid:
+      result += ".grid"
+
+    result += ".job.out"
+
   @property
   def errorfile(self):
-    if self.isforgrid: return self.DataFile+".grid.job.err"
-    return self.DataFile+".job.err"
+    result = self.DataFile
+
+    if 66 <= self.Process <= 69 and self.VBFoffsh_run is None and self.args.array_index is None:
+      result += "_"+self.jobindexforoutputfile
+
+    if self.isforgrid:
+      result += ".grid"
+
+    result += ".job.err"
+
   @property
   def logfile(self):
     if self.isforgrid: return self.DataFile+".grid.job.log"
@@ -158,7 +218,7 @@ class JobSubmitter(object):
   def jobrunning(self): pass
 
 class JobRunner(JobSubmitter):
-  def dodryrun(self):
+  def dodryrun(self, *args, **kwargs):
     "no need to do anything"
 
   def submittoqueue(self, arrayjobs=None):
@@ -170,15 +230,22 @@ class JobRunner(JobSubmitter):
     for name, value in self.args.set_env_var:
       os.environ[name] = os.path.expandvars(value)
 
+    if arrayjobs is None: arrayjobs = [self.args.array_index]
+
     with cd(cdto):
-      return JHUGen(*self.args.JHUGenarg)
+      for array_index in arrayjobs:
+        JHUGen(*self.JHUGenargs(array_index=array_index))
 
   @property
   def jobrunning(self): return False
 
   @property
   def jobindex(self):
-    return self.args.job_index
+    assert False
+
+  @property
+  def jobindexforoutputfile(self):
+    assert False
 
 class JobSubmitterSlurm(JobSubmitter):
   def submittoqueue(self, arrayjobs=None):
@@ -222,6 +289,9 @@ class JobSubmitterSlurm(JobSubmitter):
   @property
   def jobindex(self):
     return "$SLURM_ARRAY_TASK_ID"
+  @property
+  def jobindexforoutputfile(self):
+    return "%a"
 
 class JobSubmitterCondor(JobSubmitter):
   @staticmethod
@@ -253,7 +323,7 @@ class JobSubmitterCondor(JobSubmitter):
             self=self,
             queue=(
               "1" if arrayjobs is None
-              else ("JobIndexInArray in " + " ".join(arrayjobs))
+              else ("JobIndexInArray in " + " ".join("{:d}".format(_) for _ in arrayjobs))
             )
           )
         )
@@ -277,22 +347,21 @@ class JobSubmitterCondor(JobSubmitter):
   @property
   def jobindex(self):
     return "$(JobIndexInArray)"
+  @property
+  def jobindexforoutputfile(self):
+    return self.jobindex
 
 
 def jobsubmitter(submitto, *args, **kwargs):
   return {
-    "local": JobRunner,
+    None: JobRunner,
     "slurm": JobSubmitterSlurm,
     "condor": JobSubmitterCondor,
   }[submitto](*args, **kwargs)
 
 def submitjob(submitto, *args, **kwargs):
   submitter = jobsubmitter(submitto, *args, **kwargs)
-  jobrunning = submitter.jobrunning
-  if jobrunning:
-    print "job {} is already running".format(jobrunning)
-    return
-  submitter.submittoqueue()
+  submitter.submit()
 
 def main(argv):
   args = parse_args(argv)
@@ -308,7 +377,7 @@ def parse_time(time):
 def parse_args(*args, **kwargs):
   p = argparse.ArgumentParser()
   p.add_argument("JHUGenarg", nargs="*")
-  p.add_argument("--submit-to", choices=("condor", "slurm"), default="local")
+  p.add_argument("--submit-to", choices=("condor", "slurm"))
   p.add_argument("--job-name", default="JHUGen")
   p.add_argument("--job-time", type=parse_time)
   p.add_argument("--grid", action="store_true", help="set this to true if the purpose of this job is to generate a grid to be used by later jobs")
@@ -321,7 +390,9 @@ def parse_args(*args, **kwargs):
 
   args = p.parse_args(*args, **kwargs)
 
-  if args.on_queue: args.submit_to = "local"
+  if args.submit_to is not None and args.job_time is None:
+    p.error("Have to supply a job time when submitting to a queue")
+
   return args
 
 main(sys.argv[1:])

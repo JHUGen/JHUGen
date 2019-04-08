@@ -1140,6 +1140,11 @@ type(SaveValues) :: tosave, oldsavevalues
       call Error("VBFoffsh_run is only for VBF offshell")
     endif
 
+    if( Process.ge.66 .and. Process.le.69) then
+      if( m4l_minmax(1).lt.0d0 ) call Error("Have to set m4l_min for VBF offshell")
+      if( m4l_minmax(1).gt.m4l_minmax(2) ) call Error("Have to set m4l_max to something bigger than m4l_min")
+    endif
+
     !PChannel
     if (Process.eq.0) PChannel = 0   !only gluons
 !Yaofu Zhou ggZH
