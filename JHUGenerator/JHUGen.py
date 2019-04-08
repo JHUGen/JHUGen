@@ -14,8 +14,11 @@ import abc
 import argparse
 import contextlib
 import datetime
+import functools
+import multiprocessing
 import os
 import re
+import signal
 import sys
 import subprocess
 import tempfile
@@ -44,6 +47,17 @@ def JHUGen(*jhugenargs, **kwargs):
     functionkwargs = {}
 
   function(["./JHUGen"] + [str(_) for _ in jhugenargs], **functionkwargs)
+
+def _callJHUGenFromRunner(array_index, runner):
+  """
+  wrapper function so that it's pickleable
+  to be used by multiprocessing
+  """
+  try:
+    return JHUGen(*runner.JHUGenargs(array_index=array_index))
+  except KeyboardInterrupt as e:
+    class KeyboardInterruptException(KeyboardInterrupt, Exception): pass
+    raise KeyboardInterruptException(e)
 
 class JobSubmitter(object):
   __metaclass__ = abc.ABCMeta
@@ -220,9 +234,6 @@ class JobSubmitter(object):
   def jobrunning(self): pass
 
 class JobRunner(JobSubmitter):
-  def dodryrun(self, *args, **kwargs):
-    "no need to do anything"
-
   def submittoqueue(self, arrayjobs=None):
     if self.args.on_queue:
       cdto = self.args.on_queue
@@ -235,8 +246,10 @@ class JobRunner(JobSubmitter):
     if arrayjobs is None: arrayjobs = [self.args.array_index]
 
     with cd(cdto):
-      for array_index in arrayjobs:
-        JHUGen(*self.JHUGenargs(array_index=array_index))
+      #https://stackoverflow.com/a/6191991
+      p = multiprocessing.Pool()
+      runjob = functools.partial(_callJHUGenFromRunner, runner=self)
+      p.map_async(runjob, arrayjobs).get()
 
   @property
   def jobrunning(self): return False
