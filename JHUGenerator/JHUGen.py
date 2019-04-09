@@ -77,7 +77,7 @@ class JobSubmitter(object):
     if array_index is not None:
       if 66 <= self.Process <= 69:
         if self.VBFoffsh_run is not None: raise RuntimeError("With VBFoffsh_run set to {:d}, shouldn't have an array index".format(self.VBFoffsh_run))
-        result.append("VBFoffsh_run={:d}".format(array_index))
+        result.append("VBFoffsh_run={:d}".format(int(array_index)))
       else:
         raise RuntimeError("Process {:d} shouldn't have an array index".format(self.Process))
 
@@ -92,6 +92,23 @@ class JobSubmitter(object):
       print e.output
       raise
 
+  @contextlib.contextmanager
+  def setenvandcd(self):
+    bkp = {}
+    try:
+      for name, value in self.args.set_env_var:
+        if name in os.environ:
+          bkp[name] = os.environ[name]
+        os.environ[name] = os.path.expandvars(value)
+      if self.args.on_queue:
+        cdto = self.args.on_queue
+      else:
+        cdto = os.path.dirname(__file__)
+      with cd(cdto):
+        yield
+    finally:
+      os.environ.update(bkp)
+
   def submit(self):
     if 66 <= self.Process <= 69 and self.VBFoffsh_run is None and self.args.array_index is None:
       njobs = {
@@ -101,11 +118,13 @@ class JobSubmitter(object):
         69: 175,
       }[self.Process]
       arrayjobs=range(1, njobs+1)
-      for _ in arrayjobs:
-        self.dodryrun(array_index=_)
+      with self.setenvandcd():
+        for _ in arrayjobs:
+          self.dodryrun(array_index=_)
     else:
       arrayjobs = None
-      self.dodryrun()
+      with self.setenvandcd():
+        self.dodryrun()
 
     jobrunning = self.jobrunning
     if jobrunning:
@@ -235,17 +254,9 @@ class JobSubmitter(object):
 
 class JobRunner(JobSubmitter):
   def submittoqueue(self, arrayjobs=None):
-    if self.args.on_queue:
-      cdto = self.args.on_queue
-    else:
-      cdto = os.path.dirname(__file__)
-
-    for name, value in self.args.set_env_var:
-      os.environ[name] = os.path.expandvars(value)
-
     if arrayjobs is None: arrayjobs = [self.args.array_index]
 
-    with cd(cdto):
+    with self.setenvandcd():
       #https://stackoverflow.com/a/6191991
       p = multiprocessing.Pool()
       runjob = functools.partial(_callJHUGenFromRunner, runner=self)
@@ -338,7 +349,7 @@ class JobSubmitterCondor(JobSubmitter):
             self=self,
             queue=(
               "1" if arrayjobs is None
-              else ("JobIndexInArray in " + " ".join("{:d}".format(_) for _ in arrayjobs))
+              else ("JobIndexInArray in " + " ".join("{:03d}".format(_) for _ in arrayjobs))
             )
           )
         )
