@@ -117,7 +117,7 @@ class JobSubmitter(object):
         68: 164,
         69: 175,
       }[self.Process]
-      arrayjobs=range(1, njobs+1)
+      arrayjobs=["{:03d}".format(_) for _ in xrange(1, njobs+1)]
       with self.setenvandcd():
         for _ in arrayjobs:
           self.dodryrun(array_index=_)
@@ -126,10 +126,13 @@ class JobSubmitter(object):
       with self.setenvandcd():
         self.dodryrun()
 
-    jobrunning = self.jobrunning
-    if jobrunning:
-      print "job {} is already running".format(jobrunning)
-      return
+    jobindicesrunning, jobids = self.jobindicesrunning(arrayjobs)
+    if jobids:
+      plural = len(jobids) > 1
+      print "job{} {} {} already running".format("s" if plural else "", ", ".join(sorted(jobids)), "are" if plural else "is")
+      for index in jobindicesrunning:
+        arrayjobs.remove(index)
+    if not arrayjobs: return
     return self.submittoqueue(arrayjobs=arrayjobs)
 
   @abc.abstractmethod
@@ -145,7 +148,12 @@ class JobSubmitter(object):
     """
     string that indicates the job index when submitting job arrays
     in the output and error file names
-    os.path.expandvars will be called on this in the job
+    """
+  @abc.abstractproperty
+  def jobindexforlogfile(self):
+    """
+    string that indicates the job index when submitting job arrays
+    in the output and error file names
     """
 
   def commandline(self, isarray=False):
@@ -244,13 +252,25 @@ class JobSubmitter(object):
     result += ".job.err"
     return result
 
-  @property
-  def logfile(self):
-    if self.isforgrid: return self.DataFile+".grid.job.log"
-    return self.DataFile+".job.log"
+  def logfile(self, array_index=None):
+    if array_index is None: array_index = self.args.array_index
+    if array_index is None and not self.args.on_queue:
+      if 66 <= self.Process <= 69 and self.VBFoffsh_run is None:
+        array_index = self.jobindexforlogfile
 
-  @abc.abstractproperty
-  def jobrunning(self): pass
+    result = self.DataFile
+
+    if array_index is not None:
+      result += "_"+str(array_index)
+
+    if self.isforgrid:
+      result += ".grid"
+
+    result += ".job.log"
+    return result
+
+  @abc.abstractmethod
+  def jobindicesrunning(self, arrayjobs=None): pass
 
 class JobRunner(JobSubmitter):
   def submittoqueue(self, arrayjobs=None):
@@ -262,8 +282,7 @@ class JobRunner(JobSubmitter):
       runjob = functools.partial(_callJHUGenFromRunner, runner=self)
       p.map_async(runjob, arrayjobs).get()
 
-  @property
-  def jobrunning(self): return False
+  def jobindicesrunning(self, arrayjobs=None): return [], []
 
   @property
   def jobindex(self):
@@ -271,6 +290,10 @@ class JobRunner(JobSubmitter):
 
   @property
   def jobindexforoutputfile(self):
+    assert False
+
+  @property
+  def jobindexforlogfile(self):
     assert False
 
 class JobSubmitterSlurm(JobSubmitter):
@@ -294,23 +317,27 @@ class JobSubmitterSlurm(JobSubmitter):
       print e.output,
       raise
     print sbatchout,
-    with open(self.logfile, "w") as f:
-      f.write(sbatchout)
+    for arrayjob in arrayjobs:
+      with open(self.logfile(arrayjob), "w") as f:
+        f.write(sbatchout)
 
   @property
   def formattedjobtime(self):
     return re.sub(" days?, ", "-", str(self.jobtime))
 
-  @property
-  def jobrunning(self):
-    try:
-      with open(self.logfile) as f:
-        jobid = f.read().split()[-1]
-    except IOError:
-      return False
-    if jobid in subprocess.check_output(["squeue", "--job", str(jobid)]):
-      return jobid
-    return False
+  def jobindicesrunning(self, arrayjobs=None):
+    jobindices = set()
+    jobids = set()
+    for index in arrayjobs:
+      try:
+        with open(self.logfile(index)) as f:
+          jobid = f.read().split()[-1]
+      except IOError:
+        continue
+      if jobid in subprocess.check_output(["squeue", "--job", str(jobid)]):
+        jobids.add(jobid)
+        jobindices.add(index)
+    return jobids, jobindices
 
   @property
   def jobindex(self):
@@ -318,6 +345,9 @@ class JobSubmitterSlurm(JobSubmitter):
   @property
   def jobindexforoutputfile(self):
     return "%a"
+  @property
+  def jobindexforlogfile(self):
+    assert False
 
 class JobSubmitterCondor(JobSubmitter):
   @staticmethod
@@ -337,7 +367,7 @@ class JobSubmitterCondor(JobSubmitter):
 
             output = {self.outputfile}
             error = {self.errorfile}
-            log = {self.logfile}
+            log = {logfile}
 
             +MaxRuntime = {self.formattedjobtime}
             periodic_remove = JobStatus == 5
@@ -349,32 +379,42 @@ class JobSubmitterCondor(JobSubmitter):
             self=self,
             queue=(
               "1" if arrayjobs is None
-              else ("JobIndexInArray in " + " ".join("{:03d}".format(_) for _ in arrayjobs))
-            )
+              else ("JobIndexInArray in " + " ".join(arrayjobs))
+            ),
+            logfile=self.logfile(),
           )
         )
       )
       subprocess.check_call(["condor_submit", "--batch-name", self.jobname, f.name])
-  @property
-  def jobrunning(self):
-    jobids = set()
-    try:
-      with open(self.logfile) as f:
-        for line in f:
-          match = re.search(r"^00. \(([0-9]+[.][0-9]+)", line)
-          if match:
-            if line.startswith("004") or line.startswith("005") or line.startswith("009"):
-              jobids.discard(match.group(1))
-            elif line.startswith("000"):
-              jobids.add(match.group(1))
-        return ", ".join(sorted(jobids))
-    except IOError:
-      return False
+  def jobindicesrunning(self, arrayjobs):
+    indices = set()
+    alljobids = set()
+    for index in arrayjobs:
+      jobids = set()
+      try:
+        print self.logfile(index)
+        with open(self.logfile(index)) as f:
+          for line in f:
+            match = re.search(r"^00. \(([0-9]+[.][0-9]+)", line)
+            if match:
+              if line.startswith("004") or line.startswith("005") or line.startswith("009"):
+                jobids.discard(match.group(1))
+              elif line.startswith("000"):
+                jobids.add(match.group(1))
+      except IOError:
+        continue
+      if jobids:
+        indices.add(index)
+        alljobids |= jobids
+    return indices, alljobids
   @property
   def jobindex(self):
     return "$(JobIndexInArray)"
   @property
   def jobindexforoutputfile(self):
+    return self.jobindex
+  @property
+  def jobindexforlogfile(self):
     return self.jobindex
 
 
@@ -406,7 +446,8 @@ def parse_args(*args, **kwargs):
   p.add_argument("--submit-to", choices=("condor", "slurm"))
   p.add_argument("--job-name", default="JHUGen")
   p.add_argument("--job-time", type=parse_time)
-  p.add_argument("--grid", action="store_true", help="set this to true if the purpose of this job is to generate a grid to be used by later jobs")
+  p.add_argument("--grid", action="store_true", help="indicate that the purpose of this job is to generate a grid to be used by later jobs")
+  p.add_argument("--overwrite", action="store_true", help="overwrite existing grid or lhe file")
 
   #The following arguments are used internally when this script
   #submits itself to a queue.  They shouldn't be set manually.
