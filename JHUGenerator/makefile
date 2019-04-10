@@ -2,11 +2,10 @@ Here = $(PWD)
 Makefile=makefile
 ModuleDir = $(Here)/modules
 ObjectDir = $(Here)/objects
-MELADir = $(Here)/../JHUGenMELA/MELA
-#MELADir = $(Here)/../../Ulascan/JHUGen/JHUGenMELA/MELA
-MELAFortranDir = $(MELADir)/fortran
-MELADataDir = $(MELADir)/data
-MELALibDir = $(MELADataDir)/slc6_amd64_gcc530
+MELADir = ""
+MELAFortranDir = ""
+MELADataDir = ""
+MELALibDir = ""
 #libmcfm_705.so
 MCFMLib = mcfm_705
 PDFDir = $(Here)/pdfs
@@ -27,17 +26,38 @@ UseLHAPDF=No
 # this one in terms of the environment variable should work in most cases
 MyLHADir=${LHAPDF_DATA_PATH}/../../lib/
 
-#link MCFM libraries from MELA
-# remember to export
-#          LD_LIBRARY_PATH=/.../MELA/data/$SCRAM_ARCH/:${LD_LIBRARY_PATH}
-linkMELA = Yes
-
 ifeq ($(UseLHAPDF),Yes)
    LHAPDFflags = -L$(MyLHADir) -lLHAPDF -I$(MyLHADir)/../include -DuseLHAPDF=1 -lstdc++
 else
    LHAPDFflags = -DuseLHAPDF=0
 endif
 
+#link MCFM libraries from MELA
+# remember to export
+#          LD_LIBRARY_PATH=/.../MELA/data/$SCRAM_ARCH/:${LD_LIBRARY_PATH}
+linkMELA = Yes
+
+MELAflags = -DlinkMELA=0
+
+ifeq ($(linkMELA),Yes)
+  ifndef SCRAM_ARCH
+    $(error $$SCRAM_ARCH is not set. Please set the MELA environment properly)
+  endif
+  MELADir = $(Here)/../JHUGenMELA/MELA
+  MELAFortranDir = $(MELADir)/fortran
+  MELADataDir = $(MELADir)/data
+  MELALibDir = $(MELADataDir)/$(SCRAM_ARCH)
+  #$(info $$MELALibDir is [${MELALibDir}])
+
+  ifeq ($(Comp),gfort)
+    MELAflags = -DlinkMELA=1 -L$(MELALibDir) -l$(MCFMLib)
+  else
+    $(error linkMELA = Yes only works with gfortran.  Please set your Compiler to gfort or set linkMELA to No in the makefile.)
+  endif
+  ifeq ("$(wildcard $(MELALibDir)/lib$(MCFMLib).so)", "")
+    $(error Your MELA release is not compiled.  Please either compile it by running setup.sh or set linkMELA to No in the JHUGen makefile)
+  endif
+endif
 
 #include Collier Loop Integral Library
 linkCollierLib = No
@@ -60,39 +80,23 @@ else
    endif
 endif
 
-
-MELAflags = -DlinkMELA=0
-
-ifeq ($(linkMELA),Yes)
- ifeq ($(Comp),gfort)
-    MELAflags = -DlinkMELA=1 -L$(MELALibDir) -l$(MCFMLib)
- else
-    $(error linkMELA = Yes only works with gfortran.  Please set your Compiler to gfort or set linkMELA to No in the makefile.)
- endif
- ifeq ("$(wildcard $(MELALibDir)/lib$(MCFMLib).so)", "")
-    $(error Your MELA release is not compiled.  Please either compile it by running setup.sh or set linkMELA to No in the JHUGen makefile)
- endif
-endif
-
 ifeq ($(Comp),gfort)
- CompFullName = gfortran
- ifeq ($(Opt),Yes)
+  ifeq ($(Opt),Yes)
     OptOpts  = -O3
- else
+  else
     OptOpts  = -O0 -fcheck=all
- endif
- fcomp = gfortran $(OptOpts) -ffree-line-length-none -I$(VegasDir) -I$(ModuleDir) -J$(ModuleDir) $(LHAPDFflags) $(MELAflags) $(CollierLibflags) -Dcompiler=2
+  endif
+  fcomp = gfortran $(OptOpts) -ffree-line-length-none -I$(VegasDir) -I$(ModuleDir) -J$(ModuleDir) $(LHAPDFflags) $(MELAflags) $(CollierLibflags) -Dcompiler=2
 endif
 
 
 ifeq ($(Comp),ifort)
- CompFullName = ifort
- ifeq ($(Opt),Yes)
+  ifeq ($(Opt),Yes)
     OptOpts  = -O2 -vec-report0 -diag-disable remark
- else
+  else
     OptOpts  = -O0 -implicitnone -check bounds -check pointer -warn interfaces -ftrapuv  -diag-disable remark -debug extended -g -traceback -fpe0 -check uninit
- endif
- fcomp = ifort -fpp $(OptOpts) -module $(ModuleDir) -I$(VegasDir) -Dcompiler=1 $(LHAPDFflags) $(MELAflags) $(CollierLibflags)
+  endif
+  fcomp = ifort -fpp $(OptOpts) -module $(ModuleDir) -I$(VegasDir) -Dcompiler=1 $(LHAPDFflags) $(MELAflags) $(CollierLibflags)
 endif
 
 
@@ -159,11 +163,11 @@ AuxDep = mod_Parameters.F90 \
          mod_HashCollection.F90
 
 ifeq ($(linkCollierLib),Yes)
-KimDep = mod_Kinematics.F90 \
+KinDep = mod_Kinematics.F90 \
          mod_Kinematics_VH.F90\
          mod_Kinematics_HH.F90
 else
-KimDep = mod_Kinematics.F90 \
+KinDep = mod_Kinematics.F90 \
          mod_Kinematics_VH.F90
 endif
 
@@ -182,11 +186,11 @@ ggVHAmpDep = \
          gg_VH_Boxes/mod_ffbH_Box11_12_mmp.F90 \
          gg_VH_Boxes/mod_ffbH_Box11_12_ppp.F90 \
          gg_VH_Boxes/mod_ffbH_Box7_8_mpm.F90 \
-		 gg_VH_Boxes/mod_ffbH_Box7_8_mpp.F90 \
-		 gg_VH_Boxes/mod_ffbH_Box9_10_mpm.F90 \
-		 gg_VH_Boxes/mod_ffbH_Box9_10_mpp.F90 \
-		 gg_VH_Boxes/mod_ffbH_Box11_12_mpm.F90 \
-		 gg_VH_Boxes/mod_ffbH_Box11_12_mpp.F90 \
+         gg_VH_Boxes/mod_ffbH_Box7_8_mpp.F90 \
+         gg_VH_Boxes/mod_ffbH_Box9_10_mpm.F90 \
+         gg_VH_Boxes/mod_ffbH_Box9_10_mpp.F90 \
+         gg_VH_Boxes/mod_ffbH_Box11_12_mpm.F90 \
+         gg_VH_Boxes/mod_ffbH_Box11_12_mpp.F90 \
          gg_VH_Boxes/mod_ffbH_Box7_8_pmm.F90 \
          gg_VH_Boxes/mod_ffbH_Box7_8_pmp.F90 \
          gg_VH_Boxes/mod_ffbH_Box9_10_pmm.F90 \
@@ -208,11 +212,11 @@ ggVH5AmpDep = \
          gg_VH5_Boxes/mod_ffbH5_Box11_12_mmp.F90 \
          gg_VH5_Boxes/mod_ffbH5_Box11_12_ppp.F90 \
          gg_VH5_Boxes/mod_ffbH5_Box7_8_mpm.F90 \
-		 gg_VH5_Boxes/mod_ffbH5_Box7_8_mpp.F90 \
-		 gg_VH5_Boxes/mod_ffbH5_Box9_10_mpm.F90 \
-		 gg_VH5_Boxes/mod_ffbH5_Box9_10_mpp.F90 \
-		 gg_VH5_Boxes/mod_ffbH5_Box11_12_mpm.F90 \
-		 gg_VH5_Boxes/mod_ffbH5_Box11_12_mpp.F90 \
+         gg_VH5_Boxes/mod_ffbH5_Box7_8_mpp.F90 \
+         gg_VH5_Boxes/mod_ffbH5_Box9_10_mpm.F90 \
+         gg_VH5_Boxes/mod_ffbH5_Box9_10_mpp.F90 \
+         gg_VH5_Boxes/mod_ffbH5_Box11_12_mpm.F90 \
+         gg_VH5_Boxes/mod_ffbH5_Box11_12_mpp.F90 \
          gg_VH5_Boxes/mod_ffbH5_Box7_8_pmm.F90 \
          gg_VH5_Boxes/mod_ffbH5_Box7_8_pmp.F90 \
          gg_VH5_Boxes/mod_ffbH5_Box9_10_pmm.F90 \
@@ -221,7 +225,7 @@ ggVH5AmpDep = \
          gg_VH5_Boxes/mod_ffbH5_Box11_12_pmp.F90
 
 ggHHAmpDep = \
-		 gg_HH_Boxes/mod_gg_box_HH_1_mm.F90 \
+         gg_HH_Boxes/mod_gg_box_HH_1_mm.F90 \
          gg_HH_Boxes/mod_gg_box_HH_1_mp.F90 \
          gg_HH_Boxes/mod_gg_box_HH_1_pm.F90 \
          gg_HH_Boxes/mod_gg_box_HH_1_pp.F90 \
@@ -401,9 +405,9 @@ AmpDep = mod_TopDecay.F90 \
          mod_VH_dipole.F90 \
          mod_VH_virtual.F90 \
          mod_VH_IKP.F90 \
-		 mod_VH_gg.F90 \
-		 mod_HH.F90 \
-		 mod_TTBHiggs.F90 \
+         mod_VH_gg.F90 \
+         mod_HH.F90 \
+         mod_TTBHiggs.F90 \
          mod_THiggs.F90
 else
 AmpDep = mod_TopDecay.F90 \
@@ -430,17 +434,19 @@ AuxObj =  $(ObjectDir)/mod_HashCollection.o \
           $(ObjectDir)/mod_Phasespace.o
 
 ifeq ($(linkCollierLib),Yes)
-KimObj = $(ObjectDir)/mod_Kinematics.o \
+KinObj = $(ObjectDir)/mod_Kinematics.o \
           $(ObjectDir)/mod_Kinematics_VH.o\
           $(ObjectDir)/mod_Kinematics_HH.o
 else
-KimObj = $(ObjectDir)/mod_Kinematics.o \
+KinObj = $(ObjectDir)/mod_Kinematics.o \
           $(ObjectDir)/mod_Kinematics_VH.o
 endif
 
+MCFMInterfaceDep=
+MCFMInterfaceObj=
 ifeq ($(linkMELA),Yes)
-    AuxDep += mod_MCFMWrapper.F90
-    AuxObj += $(ObjectDir)/mod_MCFMWrapper.o
+    MCFMInterfaceDep = mod_MCFMWrapper.F90
+    MCFMInterfaceObj = $(ObjectDir)/mod_MCFMWrapper.o
 endif
 
 ifeq ($(linkCollierLib),Yes)
@@ -458,7 +464,7 @@ AmpObj =  $(ObjectDir)/mod_TopDecay.o \
           $(ObjectDir)/mod_VH_dipole.o \
           $(ObjectDir)/mod_VH_virtual.o \
           $(ObjectDir)/mod_VH_gg.o \
-		  $(ObjectDir)/mod_HH.o \
+          $(ObjectDir)/mod_HH.o \
           $(ObjectDir)/mod_TTBHiggs.o \
           $(ObjectDir)/mod_THiggs.o
 else
@@ -532,7 +538,7 @@ MadGraphObj = $(ObjectDir)/gg_ttbh.o \
 
 
 
-JHUGenerator: $(CPSObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(AuxObj) $(ggVHAmpObj) $(LHAPDFInterfaceObj) $(ggVH5AmpObj) $(ggHHAmpObj) $(ggHH5AmpObj) $(AmpObj) $(KimObj) $(MainObj)
+JHUGenerator: $(CPSObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(AuxObj) $(MCFMInterfaceObj) $(ggVHAmpObj) $(LHAPDFInterfaceObj) $(ggVH5AmpObj) $(ggHHAmpObj) $(ggHH5AmpObj) $(AmpObj) $(KinObj) $(MainObj)
 	@echo " linkMELA = "$(linkMELA)
 	@echo " linkCollierLib = "$(linkCollierLib)
 	@echo " linking"
@@ -543,7 +549,7 @@ else
 endif
 	@echo " executable file "$(Exec)" is compiled with "$(Comp)
 	@echo " "
-	$(fcomp) -o $(Exec) $(MainObj) $(PSGenObj) $(AuxObj) $(AmpObj) $(KimObj) $(ggVHAmpObj) $(LHAPDFInterfaceObj) $(ggVH5AmpObj) $(ggHHAmpObj) $(ggHH5AmpObj) $(VegasObj) $(PDFObj) $(CPSObj) $(MCFM_Obj) $(LHAPDFflags)
+	$(fcomp) -o $(Exec) $(MainObj) $(PSGenObj) $(AuxObj) $(MCFMInterfaceObj) $(AmpObj) $(KinObj) $(ggVHAmpObj) $(LHAPDFInterfaceObj) $(ggVH5AmpObj) $(ggHHAmpObj) $(ggHH5AmpObj) $(VegasObj) $(PDFObj) $(CPSObj) $(MCFM_Obj) $(LHAPDFflags)
 
 $(AuxObj): $(AuxDep) $(Makefile)
 	@echo " compiling misc. and aux. tools"
@@ -584,9 +590,9 @@ $(ggHH5AmpObj): $(ggHH5AmpDep) $(AuxObj) $(Makefile)
 	$(fcomp) -c $(ggHH5AmpDep)
 	mv *.o $(ObjectDir)
 
-$(KimObj): $(KimDep) $(Makefile)
+$(KinObj): $(KinDep) $(Makefile)
 	@echo " compiling Kinematics dependencies"
-	$(fcomp) -c $(KimDep)
+	$(fcomp) -c $(KinDep)
 	mv *.o $(ObjectDir)
 
 $(AmpObj): $(AmpDep) mod_Misc.F90 mod_Parameters.F90 $(Makefile)
@@ -623,6 +629,13 @@ ifeq ($(UseLHAPDF),Yes)
 $(LHAPDFInterfaceObj) : $(LHAPDFInterfaceDep) $(Makefile)
 	@echo " compiling LHAPDF interface"
 	$(ccomp) $(LHAPDFflags) -c $(LHAPDFInterfaceC)
+	mv *.o $(ObjectDir)
+endif
+
+ifeq ($(linkMELA),Yes)
+$(MCFMInterfaceObj) : $(MCFMInterfaceDep) $(Makefile)
+	@echo " compiling MCFM interface"
+	$(fcomp) -c $(MCFMInterfaceDep)
 	mv *.o $(ObjectDir)
 endif
 

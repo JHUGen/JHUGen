@@ -841,7 +841,7 @@ integer,parameter :: NUP=10
 real(8) :: Mom(1:4,1:NUP),xRnd,s34,s36,s45,s56
 real(8),optional :: EventWeight
 integer :: MY_IDUP(1:NUP),ICOLUP(1:2,1:NUP),LHE_IDUP(1:NUP),ISTUP(1:NUP),MOTHUP(1:2,1:NUP)
-integer :: IDPRUP,i,smallestInv
+integer :: IDPRUP,i,smallestInv,j
 real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,Lifetime,Spin,MomDummy(1:4,1:NUP),TheMass,mjj
 character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
@@ -859,99 +859,204 @@ logical :: canbeVBF, canbeVH, isVHlike
       ISTUP(1:2) = -1
       MOTHUP(1:2,1:2) = 0
 
-      canbeVH = .false.
-      canbeVBF = .false.
+      if (Process .eq. 69) then
+         if( IsAGluon(MY_IDUP(1)) .and. IsAGluon(MY_IDUP(2)) ) then! gg->gg/qqb
+            ICOLUP(1:2,1) = (/501,502/)
+            ICOLUP(1:2,2) = (/503,501/)
+            if (IsAGluon(MY_IDUP(3))) then ! gg->gg
+               ICOLUP(1:2,3) = (/504,502/)
+               ICOLUP(1:2,4) = (/503,504/)
+            elseif (MY_IDUP(3).gt.0) then  ! gg->qqb
+               ICOLUP(1:2,3) = (/503,000/)
+               ICOLUP(1:2,4) = (/000,502/)
+            else                           ! gg->qbq
+               ICOLUP(1:2,4) = (/503,000/)
+               ICOLUP(1:2,3) = (/000,502/)
+            endif
+         elseif (IsAGluon(MY_IDUP(3)) .and. IsAGluon(MY_IDUP(4))) then ! qqb->gg
+            ICOLUP(1:2,3) = (/501,502/)
+            ICOLUP(1:2,4) = (/503,501/)
+            if (MY_IDUP(1).gt.0) then  ! qqb->gg
+               ICOLUP(1:2,1) = (/503,000/)
+               ICOLUP(1:2,2) = (/000,502/)
+            else                           ! qbq->gg
+               ICOLUP(1:2,2) = (/503,000/)
+               ICOLUP(1:2,1) = (/000,502/)
+            endif
+         elseif( (IsAQuark(MY_IDUP(1)) .and. IsAGluon(MY_IDUP(2))) .or. (IsAQuark(MY_IDUP(2)) .and. IsAGluon(MY_IDUP(1))) ) then! qg->qg
+            ICOLUP(1:2,1) = (/501,000/)
+            ICOLUP(1:2,2) = (/502,501/)
+            ICOLUP(1:2,3) = (/503,000/)
+            ICOLUP(1:2,4) = (/502,503/)
 
-      !try VBF first because there are more options there, but overwrite with VH if that's better
+            if ( IsAGluon(MY_IDUP(1)) ) then
+              do j=1,2; call swap(ICOLUP(j,1),ICOLUP(j,2)); enddo
+              if (MY_IDUP(2).lt.0) then
+                 call swap(ICOLUP(1,1),ICOLUP(2,1))
+                 call swap(ICOLUP(1,2),ICOLUP(2,2))
+              endif
+            else
+               if (MY_IDUP(1).lt.0) then
+                 call swap(ICOLUP(1,1),ICOLUP(2,1))
+                 call swap(ICOLUP(1,2),ICOLUP(2,2))
+               endif
+            endif
 
-      if( MY_IDUP(1).gt.0 ) then ! quark
-        ICOLUP(1:2,1) = (/501,000/)
-      else! anti-quark
-        ICOLUP(1:2,1) = (/000,501/)
-      endif
-      if( MY_IDUP(2).gt.0 ) then! quark
-        ICOLUP(1:2,2) = (/502,000/)
-      else! anti-quark
-        ICOLUP(1:2,2) = (/000,502/)
-      endif
+            if ( IsAGluon(MY_IDUP(3)) ) then
+              do j=1,2; call swap(ICOLUP(j,3),ICOLUP(j,4)); enddo
+              if (MY_IDUP(4).lt.0) then
+                 call swap(ICOLUP(1,3),ICOLUP(2,3))
+                 call swap(ICOLUP(1,4),ICOLUP(2,4))
+              endif
+            else
+              if (MY_IDUP(3).lt.0) then
+                 call swap(ICOLUP(1,3),ICOLUP(2,3))
+                 call swap(ICOLUP(1,4),ICOLUP(2,4))
+              endif
+            endif
+         ! qq->qq
+         elseif (MY_IDUP(1).eq.MY_IDUP(2)) then
+            ICOLUP(1:2,1) = (/501,000/)
+            ICOLUP(1:2,2) = (/501,000/)
+            ICOLUP(1:2,3) = (/000,502/)
+            ICOLUP(1:2,4) = (/000,502/)
+            if (MY_IDUP(1).lt.0) then
+               do j=1,2
+                  call swap(ICOLUP(j,1),ICOLUP(j,3))
+                  call swap(ICOLUP(j,2),ICOLUP(j,4))
+               enddo
+            endif
+         elseif (MY_IDUP(1).eq.MY_IDUP(3)) then
+            ICOLUP(1:2,1) = (/501,000/)
+            ICOLUP(1:2,2) = (/000,502/)
+            ICOLUP(1:2,3) = (/501,000/)
+            ICOLUP(1:2,4) = (/000,502/)
+            if (MY_IDUP(1).lt.0) then
+               do j=1,2
+                  call swap(ICOLUP(j,1),ICOLUP(j,2))
+                  call swap(ICOLUP(j,3),ICOLUP(j,4))
+               enddo
+            endif
+         elseif (MY_IDUP(1).eq.MY_IDUP(4)) then
+            ICOLUP(1:2,1) = (/501,000/)
+            ICOLUP(1:2,2) = (/000,502/)
+            ICOLUP(1:2,3) = (/000,502/)
+            ICOLUP(1:2,4) = (/501,000/)
+            if (MY_IDUP(1).lt.0) then
+               do j=1,2
+                  call swap(ICOLUP(j,1),ICOLUP(j,2))
+                  call swap(ICOLUP(j,3),ICOLUP(j,4))
+               enddo
+            endif
+         else
+           print *, "Color for this Process 69 configuration cannot be resolved"
+           print *, MY_IDUP(1:4)
+           stop 1
+         endif
 
-      !WW is typically larger xsec, so choose that if possible, then ZZ
-      if(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(3)/), -1)) .eq. abs(Wp_) &
-          .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(4)/), -1)) .eq. abs(Wp_)) then
-        ICOLUP(1:2,3) = ICOLUP(1:2,1)
-        ICOLUP(1:2,4) = ICOLUP(1:2,2)
-        canbeVBF = .true.
-      elseif(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(4)/), -1)) .eq. abs(Wp_) &
-              .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(3)/), -1)) .eq. abs(Wp_)) then
-        ICOLUP(1:2,3) = ICOLUP(1:2,2)
-        ICOLUP(1:2,4) = ICOLUP(1:2,1)
-        canbeVBF = .true.
-      elseif(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(3)/), -1)) .eq. abs(Z0_) &
-              .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(4)/), -1)) .eq. abs(Z0_)) then
-        ICOLUP(1:2,3) = ICOLUP(1:2,1)
-        ICOLUP(1:2,4) = ICOLUP(1:2,2)
-        canbeVBF = .true.
-      elseif(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(4)/), -1)) .eq. abs(Z0_) &
-              .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(3)/), -1)) .eq. abs(Z0_)) then
-        ICOLUP(1:2,3) = ICOLUP(1:2,2)
-        ICOLUP(1:2,4) = ICOLUP(1:2,1)
-        canbeVBF = .true.
-      endif
+      else
+         canbeVH = .false.
+         canbeVBF = .false.
 
-      if( CoupledVertex(MY_IDUP(1:2), -1) .ne. Not_a_particle_ .and. CoupledVertex(MY_IDUP(3:4), -1) .ne. Not_a_particle_) then
-        canbeVH = .true.
-      endif
+         !try VBF first because there are more options there, but overwrite with VH if that's better
 
-      if( .not. canbeVH .and. .not. canbeVBF) then
-        print *, "Event doesn't make sense"
-        print *, MY_IDUP(1:4)
-        stop 1
-      endif
+         if( MY_IDUP(1).gt.0 ) then ! quark
+           ICOLUP(1:2,1) = (/501,000/)
+         else! anti-quark
+           ICOLUP(1:2,1) = (/000,501/)
+         endif
+         if( MY_IDUP(2).gt.0 ) then! quark
+           ICOLUP(1:2,2) = (/502,000/)
+         else! anti-quark
+           ICOLUP(1:2,2) = (/000,502/)
+         endif
 
-      if( canbeVH .and. canbeVBF ) then
-        mjj = Get_MInv( Mom(1:4,3)+Mom(1:4,4) )
-        if( abs(CoupledVertex(MY_IDUP(1:2), -1)).eq.Wp_ ) then
-          isVHlike = ( mjj .gt. M_W-2d0*Ga_W .and. mjj .lt. M_W+2d0*Ga_W )
-        else
-          isVHlike = ( mjj .gt. M_Z-2d0*Ga_Z .and. mjj .lt. M_Z+2d0*Ga_Z )
-        endif
-      elseif( canbeVH ) then
-        isVHlike = .true.
-      endif
+         !WW is typically larger xsec, so choose that if possible, then ZZ
+         if (.not.IsAQuark(MY_IDUP(3))) then
+           ICOLUP(1:2,3) = 0
+           ICOLUP(1:2,4) = 0
+           canbeVH = .true.
+         elseif(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(3)/), -1)) .eq. abs(Wp_) &
+             .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(4)/), -1)) .eq. abs(Wp_)) then
+           ICOLUP(1:2,3) = ICOLUP(1:2,1)
+           ICOLUP(1:2,4) = ICOLUP(1:2,2)
+           canbeVBF = .true.
+         elseif(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(4)/), -1)) .eq. abs(Wp_) &
+                 .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(3)/), -1)) .eq. abs(Wp_)) then
+           ICOLUP(1:2,3) = ICOLUP(1:2,2)
+           ICOLUP(1:2,4) = ICOLUP(1:2,1)
+           canbeVBF = .true.
+         elseif(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(3)/), -1)) .eq. abs(Z0_) &
+                 .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(4)/), -1)) .eq. abs(Z0_)) then
+           ICOLUP(1:2,3) = ICOLUP(1:2,1)
+           ICOLUP(1:2,4) = ICOLUP(1:2,2)
+           canbeVBF = .true.
+         elseif(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(4)/), -1)) .eq. abs(Z0_) &
+                 .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(3)/), -1)) .eq. abs(Z0_)) then
+           ICOLUP(1:2,3) = ICOLUP(1:2,2)
+           ICOLUP(1:2,4) = ICOLUP(1:2,1)
+           canbeVBF = .true.
+         endif
 
-      if( isVHlike ) then
-        if( MY_IDUP(1).gt.0 ) then ! quark
-          ICOLUP(1:2,1) = (/501,000/)
-          ICOLUP(1:2,2) = (/000,501/)
-        else! anti-quark
-          ICOLUP(1:2,1) = (/000,501/)
-          ICOLUP(1:2,2) = (/501,000/)
-        endif
-        if( MY_IDUP(3).gt.0 ) then ! quark
-          ICOLUP(1:2,3) = (/502,000/)
-          ICOLUP(1:2,4) = (/000,502/)
-        else! anti-quark
-          ICOLUP(1:2,3) = (/000,502/)
-          ICOLUP(1:2,4) = (/502,000/)
-        endif
+         if( CoupledVertex(MY_IDUP(1:2), -1) .eq. CoupledVertex(MY_IDUP(3:4), -1) .and. CoupledVertex(MY_IDUP(3:4), -1) .ne. Not_a_particle_) then
+           canbeVH = .true.
+         endif
+
+         if( .not. canbeVH .and. .not. canbeVBF) then
+           print *, "Event doesn't make sense"
+           print *, MY_IDUP(1:4)
+           stop 1
+         endif
+
+         if( canbeVH .and. canbeVBF ) then
+           mjj = Get_MInv( Mom(1:4,3)+Mom(1:4,4) )
+           if( abs(CoupledVertex(MY_IDUP(1:2), -1)).eq.abs(Wp_) ) then
+             isVHlike = ( mjj .gt. M_W-2d0*Ga_W .and. mjj .lt. M_W+2d0*Ga_W )
+           else
+             isVHlike = ( mjj .gt. M_Z-2d0*Ga_Z .and. mjj .lt. M_Z+2d0*Ga_Z )
+           endif
+         elseif( canbeVH ) then
+           isVHlike = .true.
+         endif
+
+         if( isVHlike ) then
+           if( MY_IDUP(1).gt.0 ) then ! quark
+             ICOLUP(1:2,1) = (/501,000/)
+             ICOLUP(1:2,2) = (/000,501/)
+           else! anti-quark
+             ICOLUP(1:2,1) = (/000,501/)
+             ICOLUP(1:2,2) = (/501,000/)
+           endif
+           if (IsAQuark(MY_IDUP(3))) then
+              if( MY_IDUP(3).gt.0 ) then ! quark
+                ICOLUP(1:2,3) = (/502,000/)
+                ICOLUP(1:2,4) = (/000,502/)
+              else! anti-quark
+                ICOLUP(1:2,3) = (/000,502/)
+                ICOLUP(1:2,4) = (/502,000/)
+              endif
+           endif
+         endif
+
+         if( MY_IDUP(3).eq.Glu_) then ! 10 = LHA2M_ID(0) for the case where MY_IDUP(3:4) are not set (i.e. deterministicME=.false.). 10 doesn't mean gluon here
+            call Error("This shouldn't be able to happen anymore, assert false")
+            call random_number(xRnd)
+            if( xRnd.lt.0.5d0 ) then! ZZ fusion
+                   MY_IDUP(3:4)= (/MY_IDUP(1),MY_IDUP(2)/)
+            else! WW fusion
+                   MY_IDUP(3) = -GetCKMPartner( MY_IDUP(1) )
+                   MY_IDUP(4) = -GetCKMPartner( MY_IDUP(2) )
+                   if( abs(MY_IDUP(3)).eq.Top_ ) MY_IDUP(3) = MY_IDUP(1)
+                   if( abs(MY_IDUP(4)).eq.Top_ ) MY_IDUP(4) = MY_IDUP(2)
+            endif
+         endif
+
       endif
 
       ISTUP(3:10) = +1
       MOTHUP(1:2,3)= (/1,2/)
       MOTHUP(1:2,4)= (/1,2/)
 
-      if( MY_IDUP(3).eq.10 ) then ! 10 = LHA2M_ID(0) for the case where MY_IDUP(3:4) are not set (i.e. deterministicME=.false.). 10 doesn't mean gluon here
-         call random_number(xRnd)
-         if( xRnd.lt.0.5d0 ) then! ZZ fusion
-                MY_IDUP(3:4)= (/MY_IDUP(1),MY_IDUP(2)/)
-         else! WW fusion
-                MY_IDUP(3) = -GetCKMPartner( MY_IDUP(1) )
-                MY_IDUP(4) = -GetCKMPartner( MY_IDUP(2) )
-                if( abs(MY_IDUP(3)).eq.Top_ ) MY_IDUP(3) = MY_IDUP(1)
-                if( abs(MY_IDUP(4)).eq.Top_ ) MY_IDUP(4) = MY_IDUP(2)
-         endif
-         call Error("This shouldn't be able to happen anymore, assert false")
-      endif
 
       ISTUP(5:6) = 2
       ICOLUP(1:2,5:6) = 0
@@ -962,9 +1067,6 @@ logical :: canbeVBF, canbeVH, isVHlike
       MOTHUP(1:2,8 )= (/5,5/)
       MOTHUP(1:2,9 )= (/6,6/)
       MOTHUP(1:2,10)= (/6,6/)
-
-
-
 
 
       if( present(EventWeight) ) then
@@ -978,14 +1080,14 @@ logical :: canbeVBF, canbeVH, isVHlike
 
       do i=1,NUP
           LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
-          MomDummy(1,i) = 100.0d0*Mom(1,i)
-          MomDummy(2,i) = 100.0d0*Mom(2,i)
-          MomDummy(3,i) = 100.0d0*Mom(3,i)
-          MomDummy(4,i) = 100.0d0*Mom(4,i)
+          MomDummy(1,i) = Mom(1,i)/GeV
+          MomDummy(2,i) = Mom(2,i)/GeV
+          MomDummy(3,i) = Mom(3,i)/GeV
+          MomDummy(4,i) = Mom(4,i)/GeV
       enddo
 
 
-!  associte lepton pairs to MOTHUP
+!  associate lepton pairs to MOTHUP
       if( MY_IDUP(7).eq.MY_IDUP(9) ) then
           s34 = Get_MInv( Mom(1:4,7)+Mom(1:4,8) )
           s56 = Get_MInv( Mom(1:4,9)+Mom(1:4,10) )
@@ -2663,7 +2765,7 @@ logical :: hasAonshell
          MomZ(1:4) = MomExt(1:4,3)
          MomBoost(1)   = +MomExt(1,4)
          MomBoost(2:4) = -MomExt(2:4,4)
-         
+
          if(id(6).gt.0) then
             MomFerm1(1:4)  = MomExt(1:4,6)
             MomFerm2(1:4)  = MomExt(1:4,7)
@@ -2677,7 +2779,7 @@ logical :: hasAonshell
          costheta2 = Get_CosAlpha( MomFerm1(1:4),MomZ(1:4) )
 
 
-       
+
 !phistar1, which is really phi1 in arXiv:1309.4819 [hep-ph] FIG.1 middle
       MomReso(1:4)  = -MomExt(1:4,5)
       MomBoost(1)   = +MomReso(1)
@@ -2867,7 +2969,7 @@ real(8) :: MomBoostT(1:4),m_Vstar_L,m_Vstar_T
 !     else
 !        if(includeGammaStar .and. m_Vstar.lt.MPhotonCutoff)applyPSCut=.true.
 !     endif
-      
+
       m_Vstar_T=dsqrt(mom(1,3)**2-mom(2,3)**2-mom(3,3)**2)
 
       if(Get_PT2(momext(:,3)).gt.1d-8)then
@@ -2886,7 +2988,7 @@ real(8) :: MomBoostT(1:4),m_Vstar_L,m_Vstar_T
 !print*,m_Vstar_L
 
       momext(:,1)=0.5d0*m_Vstar_L * (/+1d0,0d0,0d0,+1d0/)
-      momext(:,2)=0.5d0*m_Vstar_L * (/+1d0,0d0,0d0,-1d0/)  
+      momext(:,2)=0.5d0*m_Vstar_L * (/+1d0,0d0,0d0,-1d0/)
       call boost2lab(x1,x2,2,momext(1:4,1:2))
 
 !print*,momext(1:4,1),"1"
@@ -2896,7 +2998,7 @@ real(8) :: MomBoostT(1:4),m_Vstar_L,m_Vstar_T
       if(Get_PT2(mom(:,3)).gt.1d-8)then
 
         MomBoostT(1:4)=(/mom(1,3),-mom(2,3),-mom(3,3),0d0/)!momentum/vector used to boost away the transverse moment of VH
-  
+
         if((.not.HbbDecays).and.hasAonshell)then   ! if H, V
           call boost(momext(1:4,4),MomBoostT(1:4),m_Vstar_T)
           call boost(momext(1:4,5),MomBoostT(1:4),m_Vstar_T)
@@ -3631,25 +3733,25 @@ real(8),parameter :: yy=Ncol*xx
 
   if( xRnd .le. yy ) then
       ZAnyBranching_flat = Up_
-  elseif(xRnd .le. 2*yy ) then
+  elseif(xRnd .le. 2d0*yy ) then
       ZAnyBranching_flat = Chm_
-  elseif(xRnd .le. 2*yy+yy ) then
+  elseif(xRnd .le. 3d0*yy ) then
       ZAnyBranching_flat = Dn_
-  elseif(xRnd .le. 2*yy+2*yy ) then
+  elseif(xRnd .le. 4d0*yy ) then
       ZAnyBranching_flat = Str_
-  elseif(xRnd .le. 2*yy+3*yy ) then
+  elseif(xRnd .le. 5d0*yy ) then
       ZAnyBranching_flat = Bot_
-  elseif(xRnd .le. yy*(2+3) + xx ) then
+  elseif(xRnd .le. 5d0*yy + xx ) then
       ZAnyBranching_flat = ElM_
-  elseif(xRnd .le. yy*(2+3) + xx*2 ) then
+  elseif(xRnd .le. 5d0*yy + 2d0*xx ) then
       ZAnyBranching_flat = MuM_
-  elseif(xRnd .le. yy*(2+3) + xx*3 ) then
+  elseif(xRnd .le. 5d0*yy + 3d0*xx ) then
       ZAnyBranching_flat = TaM_
-  elseif(xRnd .le. yy*(2+3)+xx*3 + xx ) then
+  elseif(xRnd .le. 5d0*yy + 4d0*xx ) then
       ZAnyBranching_flat = NuE_
-  elseif(xRnd .le. yy*(2+3)+xx*3 + xx*2 ) then
+  elseif(xRnd .le. 5d0*yy + 5d0*xx ) then
       ZAnyBranching_flat = NuM_
-  elseif(xRnd .le. yy*(2+3)+xx*3 + xx*3 ) then
+  elseif(xRnd .le. 5d0*yy + 6d0*xx ) then
       ZAnyBranching_flat = NuT_
   else
       print *, "error ",xRnd
@@ -3899,15 +4001,15 @@ real(8),parameter :: xx=1d0/9d0
 real(8),parameter :: yy=Ncol*xx
 
 
-  if( xRnd .le. yy ) then
+  if( xRnd .le.        yy ) then
       WAnyBranching_flat = Up_
-  elseif(xRnd .le. 2*yy ) then
+  elseif(xRnd .le. 2d0*yy ) then
       WAnyBranching_flat = Chm_
-  elseif(xRnd .le. 2*yy+xx ) then
+  elseif(xRnd .le. 2d0*yy +     xx ) then
       WAnyBranching_flat = ElM_
-  elseif(xRnd .le. 2*yy+2*xx ) then
+  elseif(xRnd .le. 2d0*yy + 2d0*xx ) then
       WAnyBranching_flat = MuM_
-  elseif(xRnd .le. 2*yy+3*xx ) then
+  elseif(xRnd .le. 2d0*yy + 3d0*xx ) then
       WAnyBranching_flat = TaM_
   else
       print *, "error ",xRnd
@@ -3970,11 +4072,16 @@ END FUNCTION
 
 
 
-SUBROUTINE VVBranchings(MY_IDUP,ICOLUP,ColorBase)
+! VVBranchings also takes into account color multiplicity, so it should be used only when color is not taken into account inside the ME!
+! This is why some final states count 3 times instead of just once.
+! Rule of thumb for counting final states in this function is e,mu,ta,nus=1, d,u,s,c,b=3
+! When a CKM partner is called, since sum(VCKM**@)=1 along a row, counting should not be unaffected.
+SUBROUTINE VVBranchings(MY_IDUP,ICOLUP,CombWeight,ColorBase)
 use ModParameters
 implicit none
 integer :: MY_IDUP(4:9),ICOLUP(1:2,6:9),DKFlavor,ICOLUP_Base
 integer, optional ::ColorBase
+real(8), intent(out) :: CombWeight
 real(8) :: DKRnd
 
 !    particle associations:
@@ -3991,12 +4098,14 @@ real(8) :: DKRnd
    endif
 
    ICOLUP(:,:) = 0
+   CombWeight = 1d0
    if( DecayMode1.eq.0 ) then! Z1->2l
         call random_number(DKRnd)
         MY_IDUP(4) = Z0_
         DKFlavor = ZLepBranching_flat( DKRnd )!= ElM or MuM
         MY_IDUP(6) =-DKFlavor
         MY_IDUP(7) =+DKFlavor
+        CombWeight = CombWeight*2d0
    elseif( DecayMode1.eq.1 ) then! Z1->2q
         call random_number(DKRnd)
         MY_IDUP(4) = Z0_
@@ -4005,6 +4114,7 @@ real(8) :: DKRnd
         MY_IDUP(7) =+DKFlavor
         ICOLUP(1:2,6) = (/            0,ICOLUP_BASE+3/)
         ICOLUP(1:2,7) = (/ICOLUP_BASE+3,            0/)
+        CombWeight = CombWeight*5d0*3d0
    elseif( DecayMode1.eq.2 ) then! Z1->2tau
         MY_IDUP(4) = Z0_
         MY_IDUP(6) = TaP_
@@ -4015,12 +4125,14 @@ real(8) :: DKRnd
         DKFlavor = ZNuBranching_flat( DKRnd )!= NuE,NuM,NuT
         MY_IDUP(6) =-DKFlavor
         MY_IDUP(7) =+DKFlavor
+        CombWeight = CombWeight*3d0
    elseif( DecayMode1.eq.4 ) then! W1(+)->lnu
         call random_number(DKRnd)
         MY_IDUP(4) = Wp_
         DKFlavor = WLepBranching_flat( DKRnd )!= ElM or MuM
         MY_IDUP(6) = +abs(DKFlavor)     ! lepton(+)
         MY_IDUP(7) = +abs(DKFlavor)+7   ! neutrino
+        CombWeight = CombWeight*2d0
    elseif( DecayMode1.eq.5 ) then! W1(+)->2q
         call random_number(DKRnd)
         MY_IDUP(4) = Wp_
@@ -4031,6 +4143,7 @@ real(8) :: DKRnd
         MY_IDUP(6) = GetCKMPartner(MY_IDUP(7))! anti-dn flavor
         ICOLUP(1:2,6) = (/            0,ICOLUP_BASE+3/)
         ICOLUP(1:2,7) = (/ICOLUP_BASE+3,            0/)
+        CombWeight = CombWeight*2d0*3d0
    elseif( DecayMode1.eq.6 ) then! W1(+)->taunu
         MY_IDUP(4) = Wp_
         MY_IDUP(6) = TaP_
@@ -4045,6 +4158,7 @@ real(8) :: DKRnd
         DKFlavor = ZLepPlusTauBranching_flat( DKRnd )!= ElM or MuM or TaM
         MY_IDUP(6) =-DKFlavor
         MY_IDUP(7) =+DKFlavor
+        CombWeight = CombWeight*3d0
    elseif( DecayMode1.eq.9 ) then! Z1-> anything
         call random_number(DKRnd)
         MY_IDUP(4) = Z0_
@@ -4055,12 +4169,14 @@ real(8) :: DKRnd
            ICOLUP(1:2,6) = (/            0,ICOLUP_BASE+3/)
            ICOLUP(1:2,7) = (/ICOLUP_BASE+3,            0/)
         endif
+        CombWeight = CombWeight*21d0!*(6d0 + 5d0*3d0)
    elseif( DecayMode1.eq.10 ) then! W1(+)->l+tau  +nu
         call random_number(DKRnd)
         MY_IDUP(4) = Wp_
         DKFlavor = WLepPlusTauBranching_flat( DKRnd )!= ElM or MuM or TaM
         MY_IDUP(6) = +abs(DKFlavor)     ! lepton(+)
         MY_IDUP(7) = +abs(DKFlavor)+7   ! neutrino
+        CombWeight = CombWeight*3d0
    elseif( DecayMode1.eq.11 ) then! W1(+)-> anything
         call random_number(DKRnd)
         MY_IDUP(4) = Wp_
@@ -4076,6 +4192,7 @@ real(8) :: DKRnd
            MY_IDUP(6) = +abs(DKFlavor)     ! lepton(+)
            MY_IDUP(7) = +abs(DKFlavor)+7   ! neutrino
         endif
+        CombWeight = CombWeight*9d0!*(3d0 + 2d0*3d0)
    endif
 
 
@@ -4085,6 +4202,7 @@ real(8) :: DKRnd
         DKFlavor = ZLepBranching_flat( DKRnd )!= ElM or MuM
         MY_IDUP(8) =-DKFlavor
         MY_IDUP(9) =+DKFlavor
+        CombWeight = CombWeight*2d0
    elseif( DecayMode2.eq.1 ) then! Z2->2q
         call random_number(DKRnd)
         MY_IDUP(5) = Z0_
@@ -4093,6 +4211,7 @@ real(8) :: DKRnd
         MY_IDUP(9) =+DKFlavor
         ICOLUP(1:2,8) = (/            0,ICOLUP_BASE+4/)
         ICOLUP(1:2,9) = (/ICOLUP_BASE+4,            0/)
+        CombWeight = CombWeight*5d0*3d0
    elseif( DecayMode2.eq.2 ) then! Z2->2tau
         MY_IDUP(5) = Z0_
         MY_IDUP(8) = TaP_
@@ -4103,12 +4222,14 @@ real(8) :: DKRnd
         DKFlavor = ZNuBranching_flat( DKRnd )!= NuE,NuM,NuT
         MY_IDUP(8) =-DKFlavor
         MY_IDUP(9) =+DKFlavor
+        CombWeight = CombWeight*3d0
    elseif( DecayMode2.eq.4 ) then! W2(-)->lnu
         call random_number(DKRnd)
         MY_IDUP(5) = Wm_
         DKFlavor = WLepBranching_flat( DKRnd )!= ElM or MuM
         MY_IDUP(8) = -abs(DKFlavor)-7   ! anti-neutrino
         MY_IDUP(9) = -abs(DKFlavor)     ! lepton(-)
+        CombWeight = CombWeight*2d0
    elseif( DecayMode2.eq.5 ) then! W2(-)->2q (sample over u,d,s,c)
         call random_number(DKRnd)
         MY_IDUP(5) = Wm_
@@ -4119,6 +4240,7 @@ real(8) :: DKRnd
         MY_IDUP(9) = GetCKMPartner(MY_IDUP(8))! dn flavor
         ICOLUP(1:2,8) = (/            0,ICOLUP_BASE+4/)
         ICOLUP(1:2,9) = (/ICOLUP_BASE+4,            0/)
+        CombWeight = CombWeight*2d0*3d0
    elseif( DecayMode2.eq.6 ) then! W2(-)->taunu
         MY_IDUP(5) = Wm_
         MY_IDUP(8) = ANuT_
@@ -4133,6 +4255,7 @@ real(8) :: DKRnd
         DKFlavor = ZLepPlusTauBranching_flat( DKRnd )!= ElM or MuM or TaM
         MY_IDUP(8) =-DKFlavor
         MY_IDUP(9) =+DKFlavor
+        CombWeight = CombWeight*3d0
    elseif( DecayMode2.eq.9 ) then! Z2-> anything
         call random_number(DKRnd)
         MY_IDUP(5) = Z0_
@@ -4143,12 +4266,14 @@ real(8) :: DKRnd
            ICOLUP(1:2,8) = (/            0,ICOLUP_BASE+4/)
            ICOLUP(1:2,9) = (/ICOLUP_BASE+4,            0/)
         endif
+        CombWeight = CombWeight*21d0!*(6d0 + 5d0*3d0)
    elseif( DecayMode2.eq.10 ) then! W2(-)->l+tau + nu
         call random_number(DKRnd)
         MY_IDUP(5) = Wm_
         DKFlavor = WLepPlusTauBranching_flat( DKRnd )!= ElM or MuM or TaM
         MY_IDUP(8) = -abs(DKFlavor)-7   ! anti-neutrino
         MY_IDUP(9) = -abs(DKFlavor)     ! lepton(-)
+        CombWeight = CombWeight*3d0
    elseif( DecayMode2.eq.11 ) then! W2(-)-> anything
         call random_number(DKRnd)
         MY_IDUP(5) = Wm_
@@ -4164,6 +4289,7 @@ real(8) :: DKRnd
            MY_IDUP(8) = -abs(DKFlavor)-7   ! anti-neutrino
            MY_IDUP(9) = -abs(DKFlavor)     ! lepton(-)
         endif
+        CombWeight = CombWeight*9d0!*(3d0 + 2d0*3d0)
    endif
 
 
@@ -5887,18 +6013,18 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
    Mom(1:4,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
 
 
-   if( InQuarks(1)+InQuarks(2).eq.0  ) then
+   if( Process.ne.69 .and. CoupledVertex(Inquarks(1:2),-1).eq.Z0_  ) then
       NumChannels = 2
       ZHchannel=.true.! ZH
-    elseif(  (Inquarks(1).eq.Up_.and.Inquarks(2).eq.ADn_) .or. (Inquarks(1).eq.ADn_.and.Inquarks(2).eq.Up_) .or. &
-             (Inquarks(1).eq.AUp_.and.Inquarks(2).eq.Dn_) .or. (Inquarks(1).eq.Dn_.and.Inquarks(2).eq.AUp_) .or. &
-             (Inquarks(1).eq.Chm_.and.Inquarks(2).eq.AStr_) .or. (Inquarks(1).eq.AStr_.and.Inquarks(2).eq.Chm_) .or. &
-             (Inquarks(1).eq.AChm_.and.Inquarks(2).eq.Str_) .or. (Inquarks(1).eq.Str_.and.Inquarks(2).eq.AChm_)  ) then
+   elseif( Process.ne.69 .and. ((Inquarks(1).eq.Up_.and.Inquarks(2).eq.ADn_) .or. (Inquarks(1).eq.ADn_.and.Inquarks(2).eq.Up_) .or. &
+            (Inquarks(1).eq.AUp_.and.Inquarks(2).eq.Dn_) .or. (Inquarks(1).eq.Dn_.and.Inquarks(2).eq.AUp_) .or. &
+            (Inquarks(1).eq.Chm_.and.Inquarks(2).eq.AStr_) .or. (Inquarks(1).eq.AStr_.and.Inquarks(2).eq.Chm_) .or. &
+            (Inquarks(1).eq.AChm_.and.Inquarks(2).eq.Str_) .or. (Inquarks(1).eq.Str_.and.Inquarks(2).eq.AChm_))  ) then
       NumChannels = 2
       ZHchannel=.false.! WH
-    else
+   else
       NumChannels = 1
-    endif
+   endif
 
 
    iChannel = int(xchannel * NumChannels -1d-10)+1
@@ -5970,8 +6096,8 @@ IF( iChannel.EQ.1 ) THEN
    endif
 
    Jac2 = k_l(xRnd(2),mJJcut**2,(Energy-dsqrt(s56))**2,s34)    ! s34 = mjj^2, hence the minumum is set to mJJcut
-   Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)
-   Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)
+   Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(3),s78)
+   Jac4 = s_channel_propagator(M_V**2,Ga_V,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)
 
 !  splittings
    Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:))
@@ -6020,8 +6146,8 @@ ELSEIF( iChannel.EQ.2 ) THEN
    else
        Jac2 = s_channel_propagator(M_W**2,Ga_W*5,mJJcut**2,(Energy-dsqrt(s56))**2,xRnd(2),s34)
    endif
-   Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)
-   Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)
+   Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(3),s78)
+   Jac4 = s_channel_propagator(M_V**2,Ga_V,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)
 
 !  splittings
    Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:))
@@ -6061,8 +6187,8 @@ ELSEIF( iChannel.EQ.2 ) THEN
 !    endif
 !
 !    Jac2 = s_channel_propagator(M_W**2,Ga_W,mJJcut**2,(Energy-dsqrt(s56))**2,xRnd(2),s34)
-!    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)
-!    Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)
+!    Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(3),s78)
+!    Jac4 = s_channel_propagator(M_V**2,Ga_V,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)
 !
 ! !  splittings
 !    Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:))
@@ -6100,8 +6226,8 @@ ENDIF
 !       Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)                                            !  int d(s56)    = linear mapping
 !    endif
 !    Jac2 = k_l(xRnd(2),s56,Energy**2,s3H)                                                                                          !  int d(s3H)
-!    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
-!    Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                           !  int d(s910) = Z2
+!    Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
+!    Jac4 = s_channel_propagator(M_V**2,Ga_V,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                           !  int d(s910) = Z2
 !
 ! !  splittings
 !    Jac5 = t_channel_prop_decay(Mom(:,1),Mom(:,2),M_W**2,s3H,0d0,xRnd(5:6),Mom_Dummy(1:4),Mom(:,4))                                !  1+2 --> (3H)+4
@@ -6121,8 +6247,8 @@ ENDIF
 !       Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)                                            !  int d(s56)    = linear mapping
 !    endif
 !    Jac2 = k_l(xRnd(2),s56,Energy**2,s4H)                                                                                          !  int d(s4H)
-!    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
-!    Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                           !  int d(s910) = Z2
+!    Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
+!    Jac4 = s_channel_propagator(M_V**2,Ga_V,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                           !  int d(s910) = Z2
 !
 ! !  splittings
 !    Jac5 = t_channel_prop_decay(Mom(:,1),Mom(:,2),M_W**2,s4H,0d0,xRnd(5:6),Mom_Dummy(1:4),Mom(:,3))                                !  1+2 --> (4H)+3
@@ -6142,8 +6268,8 @@ ENDIF
 !       Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)                                            !  int d(s56)    = linear mapping
 !    endif
 !    Jac2 = k_l(xRnd(2),s56,Energy**2,s3H)                                                                                          !  int d(s3H)
-!    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
-!    Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                           !  int d(s910) = Z2
+!    Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
+!    Jac4 = s_channel_propagator(M_V**2,Ga_V,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                           !  int d(s910) = Z2
 !
 ! !  splittings
 !    Jac5 = t_channel_prop_decay(Mom(:,1),Mom(:,2),M_Z**2,s3H,0d0,xRnd(5:6),Mom_Dummy(1:4),Mom(:,4))                                !  1+2 --> (3H)+4
@@ -6162,8 +6288,8 @@ ENDIF
 !       Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)                                            !  int d(s56)    = linear mapping
 !    endif
 !    Jac2 = k_l(xRnd(2),s56,Energy**2,s4H)                                                                                          !  int d(s4H)
-!    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
-!    Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                           !  int d(s910) = Z2
+!    Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
+!    Jac4 = s_channel_propagator(M_V**2,Ga_V,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                           !  int d(s910) = Z2
 !
 ! !  splittings
 !    Jac5 = t_channel_prop_decay(Mom(:,1),Mom(:,2),M_Z**2,s4H,0d0,xRnd(5:6),Mom_Dummy(1:4),Mom(:,3))                                !  1+2 --> (4H)+3
@@ -6240,8 +6366,8 @@ ENDIF
 !
 ! !    Jac2 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(Energy-dsqrt(s56))**2,xRnd(2),s34)
 !    Jac2 = k_l(xRnd(2),mJJcut**2,(Energy-dsqrt(s56))**2,s34)    ! s34 = mjj^2, hence the minumum is set to mJJcut
-!    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)
-!    Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)
+!    Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(3),s78)
+!    Jac4 = s_channel_propagator(M_V**2,Ga_V,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)
 !
 ! !  splittings
 !    Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:)) !   Z* --> Z+H
@@ -6278,8 +6404,8 @@ ENDIF
 !    endif
 !    Jac2 = s_channel_propagator(M_Z**2,Ga_Z,mJJcut**2,(Energy-dsqrt(s56))**2,xRnd(2),s34) ! s34 = mjj^2, hence the minumum is set to mJJcut
 ! !    Jac2 = k_l(xRnd(2),0d0,(Energy-dsqrt(s56))**2,s34)
-!    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)
-!    Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)
+!    Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(3),s78)
+!    Jac4 = s_channel_propagator(M_V**2,Ga_V,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)
 !
 !
 ! !  splittings
@@ -6307,8 +6433,8 @@ ENDIF
 !    endif
 !    Jac2 = s_channel_propagator(M_W**2,Ga_W,mJJcut**2,(Energy-dsqrt(s56))**2,xRnd(2),s34) ! s34 = mjj^2, hence the minumum is set to mJJcut
 ! !    Jac2 = k_l(xRnd(2),0d0,(Energy-dsqrt(s56))**2,s34)
-!    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)
-!    Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)
+!    Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(3),s78)
+!    Jac4 = s_channel_propagator(M_V**2,Ga_V,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)
 !
 !
 ! !  splittings

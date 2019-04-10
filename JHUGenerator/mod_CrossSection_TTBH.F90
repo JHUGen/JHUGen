@@ -21,7 +21,7 @@ implicit none
 real(8) :: yRnd(1:16),VgsWgt, EvalWeighted_TTBH
 real(8) :: pdf(-6:6,1:2)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi, PDFFac1,PDFFac2,xRnd
-real(8) :: MomExt(1:4,1:13),MomOffShell(1:4,1:13),PSWgt,PSWgt2,PSWgt3,PSWgt4
+real(8) :: MomExt(1:4,1:13),MomOffShell(1:4,1:13),PSWgt,PSWgt2,PSWgt3,PSWgt4,FinalStateWeight
 real(8) :: LO_Res_Unpol,LO_Res_GG_Unpol,LO_Res_QQB_Unpol,PreFac  !, MG_MOM(0:3,1:5),MadGraph_tree
 real(8) :: WdecayKfactor
 integer :: NBin(1:NumHistograms),NHisto,iPartChannel,PartChannelAvg
@@ -31,6 +31,7 @@ integer, parameter :: NumPartonicChannels=6
 integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,nubar=9,  b=10,Wp=11,lepP=12,nu=13
 EvalWeighted_TTBH = 0d0
 WdecayKfactor = 1d0
+FinalStateWeight = 1d0
 
    iPartChannel = int(yRnd(1) * NumPartonicChannels)
    if( PChannel.eq.0 ) then
@@ -75,7 +76,7 @@ WdecayKfactor = 1d0
    call EvalPhasespace_2to3M(EHat,(/M_Reso,M_Top,M_Top/),yRnd(4:8),MomExt(1:4,1:5),PSWgt)! a(1)b(2)-->H(3)+tbar(4)+t(5)
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
 
-   call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6),700) ! Do not assign MY_IDUP yet
+   call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6),FinalStateWeight,700) ! Do not assign MY_IDUP yet
    if( TOPDECAYS.NE.0 ) then
       call EvalPhasespace_TopDecay(MomExt(1:4,tbar),yRnd(09:12),MomExt(1:4,06:08),PSWgt2)    ! ATop
       MomExt(1:4,bbar) = MomExt(1:4,06)
@@ -103,7 +104,7 @@ WdecayKfactor = 1d0
    call Kinematics_TTBH(MomOffShell,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return
    FluxFac = 1d0/(2d0*EHat**2)
-   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * PartChannelAvg * WdecayKfactor
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * PartChannelAvg * WdecayKfactor * FinalStateWeight
    call SetRunningScales( (/ MomExt(1:4,Hbos),MomExt(1:4,tbar),MomExt(1:4,t) /) , (/ Not_a_particle_,ATop_,Top_,Not_a_particle_ /) )
    call EvalAlphaS()
    call setPDFs(eta1,eta2,pdf)
@@ -241,7 +242,7 @@ implicit none
 real(8) :: yRnd(1:16),VgsWgt, EvalUnWeighted_TTBH
 real(8) :: pdf(-6:6,1:2),RES(-5:5,-5:5)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi,CS_Max,DKRnd
-real(8) :: MomExt(1:4,1:13),MomOffShell(1:4,1:13),PSWgt,PSWgt2,PSWgt3,PSWgt4
+real(8) :: MomExt(1:4,1:13),MomOffShell(1:4,1:13),PSWgt,PSWgt2,PSWgt3,PSWgt4,FinalStateWeight
 real(8) :: LO_Res_GG_Unpol,LO_Res_QQB_Unpol,PreFac,PDFFac1,PDFFac2
 real(8) :: WdecayKfactor
 integer :: NBin(1:NumHistograms),NHisto,iPartons(1:2),DKFlavor
@@ -251,6 +252,7 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,
 include 'csmaxvalue.f'
 EvalUnWeighted_TTBH = 0d0
 WdecayKfactor = 1d0
+FinalStateWeight = 1d0
 
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
 
@@ -283,7 +285,7 @@ WdecayKfactor = 1d0
          call random_number(DKRnd)
          if( DKRnd.lt.0.5d0 ) call swapi(DecayMode1,DecayMode2)
       endif
-      call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6),700)
+      call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6),FinalStateWeight,700)
       MY_IDUP(b)    = Bot_;        ICOLUP(1:2,b) = (/501,00/)
       MY_IDUP(Wp)   = DK_IDUP(1);  ICOLUP(1:2,Wp)   = (/000,000/)
       MY_IDUP(lepP) = DK_IDUP(3);  ICOLUP(1:2,lepP) = DK_ICOLUP(1:2,3)
@@ -300,7 +302,7 @@ WdecayKfactor = 1d0
 !    call EvalPhasespace_HDecay(MomExt(1:4,3),yRnd(16:17),MomExt(1:4,12:13),PSWgt4)
 !    PSWgt = PSWgt * PSWgt4
    FluxFac = 1d0/(2d0*EHat**2)
-   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * WdecayKfactor
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * WdecayKfactor * FinalStateWeight
 
    call Kinematics_TTBH(MomOffShell,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return

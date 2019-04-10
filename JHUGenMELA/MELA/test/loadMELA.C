@@ -1,7 +1,7 @@
 {
   TString loadMELA = __FILE__;
   TString testdir = loadMELA(0, loadMELA.Last('/'));
-  TString LIBMCFMPATH = testdir+"/../data/slc6_amd64_gcc530/";
+  TString LIBMCFMPATH = testdir+"/../data/$SCRAM_ARCH/";
   TString LIBMCFM="libmcfm_705.so";
   TString LIBJHUGENMELA="libjhugenmela.so";
   TString LIBMELA="libMELA.so";

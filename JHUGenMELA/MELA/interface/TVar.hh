@@ -164,6 +164,7 @@ namespace TVar{
     H2_g9, // 2h9-
     H2_g10, // 2h10-
 
+    bkgGammaGamma, // gamma+gamma cont.
     bkgZGamma, // Z+gamma cont.
     bkgZJets, // Z + 0/1/2 jets (ZZGG, JQCD, JJQCD)
     bkgZZ, // qq/gg->ZZ cont.

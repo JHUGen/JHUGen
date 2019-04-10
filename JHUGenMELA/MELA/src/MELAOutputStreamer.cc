@@ -27,20 +27,28 @@ MELAOutputStreamer& MELAOutputStreamer::operator<<(std::ios_base& (*fcn)(std::io
   if (stdout_ptr) fcn(*stdout_ptr);
   return *this;
 }
+template<> MELAOutputStreamer& MELAOutputStreamer::operator<< <TLorentzVector>(TLorentzVector const& val){
+  theFile << "{" << val.X() << ", " << val.Y() << ", " << val.Z() << ", " << val.T() << ", " << val.M() << "}";
+  if (stdout_ptr) *stdout_ptr << "{" << val.X() << ", " << val.Y() << ", " << val.Z() << ", " << val.T() << ", " << val.M() << "}";
+  return *this;
+}
 template<> MELAOutputStreamer& MELAOutputStreamer::operator<< <MELAParticle>(MELAParticle const& val){
-  *this << "(" << val.id << ") (X,Y,Z,T)=( "
+  *this << "(" << val.id << ") (X,Y,Z,T,M)=( "
     << val.x() << " , "
     << val.y() << " , "
     << val.z() << " , "
-    << val.t() << " )";
+    << val.t() << " , "
+    << val.m()
+    << " )";
   return *this;
 }
-template<> MELAOutputStreamer& MELAOutputStreamer::operator<< <SimpleParticle_t>(SimpleParticle_t const& val){
-  *this << "(" << val.first << ") (X,Y,Z,T)=( "
+template<> MELAOutputStreamer& MELAOutputStreamer::operator<< <int, TLorentzVector>(SimpleParticle_t const& val){
+  *this << "(" << val.first << ") (X,Y,Z,T,M)=( "
     << val.second.X() << " , "
     << val.second.Y() << " , "
     << val.second.Z() << " , "
-    << val.second.T() << " )";
+    << val.second.T() << " , "
+    << val.second.M() << " )";
   return *this;
 }
 template<> MELAOutputStreamer& MELAOutputStreamer::operator<< <MELACandidate>(MELACandidate const& val){

@@ -98,6 +98,7 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
             Process.eq.66 .or.  &
             Process.eq.67 .or.  &
             Process.eq.68 .or.  &
+            Process.eq.69 .or.  &
             Process.eq.76 .or.  &
             Process.eq.77 .or.  &
             Process.eq.78 .or.  &
@@ -1120,7 +1121,9 @@ type(SaveValues) :: tosave, oldsavevalues
     if( VBFoffsh_run.eq.3 ) DataFile = trim(DataFile)//"_3"
     if( VBFoffsh_run.eq.4 ) DataFile = trim(DataFile)//"_4"
     if( VBFoffsh_run.eq.5 ) DataFile = trim(DataFile)//"_5"
-    if( VBFoffsh_run.eq.0 ) DataFile = trim(DataFile)//"_0"
+    if( VBFoffsh_run.eq.6 ) DataFile = trim(DataFile)//"_6"
+    if( VBFoffsh_run.eq.7 ) DataFile = trim(DataFile)//"_7"
+    if( VBFoffsh_run.eq.8 ) DataFile = trim(DataFile)//"_8"
 
     if( SetCSmaxFile ) then
       i = len(trim(CSmaxFile))
@@ -1132,7 +1135,9 @@ type(SaveValues) :: tosave, oldsavevalues
       if( VBFoffsh_run.eq.3 ) CSmaxFile = trim(CSmaxFile)//"_3"
       if( VBFoffsh_run.eq.4 ) CSmaxFile = trim(CSmaxFile)//"_4"
       if( VBFoffsh_run.eq.5 ) CSmaxFile = trim(CSmaxFile)//"_5"
-      if( VBFoffsh_run.eq.0 ) CSmaxFile = trim(CSmaxFile)//"_0"
+      if( VBFoffsh_run.eq.6 ) CSmaxFile = trim(CSmaxFile)//"_6"
+      if( VBFoffsh_run.eq.7 ) CSmaxFile = trim(CSmaxFile)//"_7"
+      if( VBFoffsh_run.eq.8 ) CSmaxFile = trim(CSmaxFile)//"_8"
     else
       CSmaxFile = DataFile
     endif
@@ -1644,7 +1649,7 @@ type(SaveValues) :: tosave, oldsavevalues
             endif
         endif
     endif
-    if (Process.eq.60 .or. (Process.ge.66 .and. Process.le.69)) then
+    if (Process.eq.60 .or. (Process.ge.66 .and. Process.lt.69)) then
         if ((SetHZprime .and. .not.SetZprimeff) .or. (.not.SetHZprime .and. SetZprimeff)) then
             call Error("To use Z' contact terms, you have to set both HVZ' and Z'ff couplings")
         endif
@@ -2686,17 +2691,20 @@ include 'maxwt.f'
 real(8) :: VG_Result,VG_Error,VG_Chi2
 real(8) :: yRnd(1:22),calls1,calls2,calls_rescale
 real(8) :: dum, RES(-5:5,-5:5),ResFrac(-5:5,-5:5),TotalXSec
-integer :: i, i1, j1,PChannel_aux, PChannel_aux1,NHisto
+integer :: i, j, i1, j1,PChannel_aux, PChannel_aux1,NHisto
 integer, pointer :: ijSel(:,:)
 include 'csmaxvalue.f'
 integer :: flav1,flav2,StatusPercent,MissingEvents,MaxEvts,imax
 integer :: VegasSeed,PreviousSum,ios,NumPartonicChannels
+integer :: VBFoffsh_Hash_Size,VBFoffsh_run_size
+integer, parameter :: VBFoffsh_run_maxsize=NMAXPSPARTITIONS
 character :: ProcessStr*(3)
 logical :: UseBetaVersion=.false.
-real(8) :: VG_Result_in(1:5),VG_Error_in(1:5),calls1_in(1:5),calls2_in(1:5)
-real(8) :: CrossSec2_in(1:5,1:164),CrossSecMax2_in(1:5,164),CrossSectionWithWeights_in(1:5),CrossSectionWithWeightsErrorSquared_in(1:5)
+real(8) :: VG_Result_in(1:NMAXPSPARTITIONS),VG_Error_in(1:NMAXPSPARTITIONS),calls1_in(1:NMAXPSPARTITIONS),calls2_in(1:NMAXPSPARTITIONS)
+real(8) :: CrossSec2_in(1:VBFoffsh_run_maxsize,1:NMAXCHANNELS),CrossSecMax2_in(1:VBFoffsh_run_maxsize,NMAXCHANNELS),CrossSectionWithWeights_in(1:VBFoffsh_run_maxsize),CrossSectionWithWeightsErrorSquared_in(1:VBFoffsh_run_maxsize)
 
-
+    VBFoffsh_Hash_Size = 0
+    VBFoffsh_run_size = 0
     VG_Result = -13d0
     VG_Error  = -13d0
 
@@ -2734,7 +2742,7 @@ real(8) :: CrossSec2_in(1:5,1:164),CrossSecMax2_in(1:5,164),CrossSectionWithWeig
     ingridfile=trim(outgridfile)
 
 
-    if( Process.ge.69 .and. Process.le.79 ) call Error("Missing ChannelHash for Process 69") !can change 79 if we add more processes in between
+    if( Process.gt.69 .and. Process.le.79 ) call Error("Missing ChannelHash for the process") !can change 79 if we add more processes in between
 
 if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !----------------------- weighted events
 
@@ -3017,8 +3025,17 @@ IF( .NOT. (Process.ge.66 .and. Process.le.69) ) THEN! special treatment for offs
 
 ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell VBF
 
+    if (Process.ge.66 .and. Process.lt.69) then
+       VBFoffsh_Hash_Size = Hash_MCFM_qqVVqq_Size
+       VBFoffsh_run_size = VBFoffsh_run_qqVVqq_size
+    else
+       VBFoffsh_Hash_Size = Hash_MCFM_qqVVqqStrong_Size
+       VBFoffsh_run_size = VBFoffsh_run_qqVVqqStrong_size
+    endif
 
-    if( VBFoffsh_run.ne.0 .and. VBFoffsh_run.ne.1 .and. VBFoffsh_run.ne.2 .and. VBFoffsh_run.ne.3 .and. VBFoffsh_run.ne.4 .and. VBFoffsh_run.ne.5 ) call Error("Please specify VBFoffsh_run")
+    !write(6,*) "VBFoffsh_Hash_Size, VBFoffsh_run_size", VBFoffsh_Hash_Size, VBFoffsh_run_size
+
+    if( .not.(VBFoffsh_run.ge.1 .and. VBFoffsh_run.le.VBFoffsh_run_size) ) call Error("Please specify VBFoffsh_run")
     print *, "VBFoffsh_run = ",VBFoffsh_run
 
     write(io_stdout,"(2X,A)")  "Scanning the integrand"
@@ -3028,8 +3045,8 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         i=len(trim(CSmaxFile))
         open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'1_gridinfo.txt',form='formatted',status='old',iostat=ios)
         read(io_TmpFile,fmt=*) calls1_in(1)
-        read(io_TmpFile,fmt=*) CrossSec2_in(1,:)
-        read(io_TmpFile,fmt=*) CrossSecMax2_in(1,:)
+        read(io_TmpFile,fmt=*) CrossSec2_in(1,1:VBFoffsh_Hash_Size)
+        read(io_TmpFile,fmt=*) CrossSecMax2_in(1,1:VBFoffsh_Hash_Size)
         read(io_TmpFile,fmt=*) VG_Result_in(1)
         read(io_TmpFile,fmt=*) VG_Error_in(1)
         read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(1), CrossSectionWithWeightsErrorSquared_in(1)
@@ -3038,8 +3055,8 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 
         open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'2_gridinfo.txt',form='formatted',status='old',iostat=ios)
         read(io_TmpFile,fmt=*) calls1_in(2)
-        read(io_TmpFile,fmt=*) CrossSec2_in(2,:)
-        read(io_TmpFile,fmt=*) CrossSecMax2_in(2,:)
+        read(io_TmpFile,fmt=*) CrossSec2_in(2,1:VBFoffsh_Hash_Size)
+        read(io_TmpFile,fmt=*) CrossSecMax2_in(2,1:VBFoffsh_Hash_Size)
         read(io_TmpFile,fmt=*) VG_Result_in(2)
         read(io_TmpFile,fmt=*) VG_Error_in(2)
         read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(2), CrossSectionWithWeightsErrorSquared_in(2)
@@ -3048,8 +3065,8 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 
         open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'3_gridinfo.txt',form='formatted',status='old',iostat=ios)
         read(io_TmpFile,fmt=*) calls1_in(3)
-        read(io_TmpFile,fmt=*) CrossSec2_in(3,:)
-        read(io_TmpFile,fmt=*) CrossSecMax2_in(3,:)
+        read(io_TmpFile,fmt=*) CrossSec2_in(3,1:VBFoffsh_Hash_Size)
+        read(io_TmpFile,fmt=*) CrossSecMax2_in(3,1:VBFoffsh_Hash_Size)
         read(io_TmpFile,fmt=*) VG_Result_in(3)
         read(io_TmpFile,fmt=*) VG_Error_in(3)
         read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(3), CrossSectionWithWeightsErrorSquared_in(3)
@@ -3058,8 +3075,8 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 
         open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'4_gridinfo.txt',form='formatted',status='old',iostat=ios)
         read(io_TmpFile,fmt=*) calls1_in(4)
-        read(io_TmpFile,fmt=*) CrossSec2_in(4,:)
-        read(io_TmpFile,fmt=*) CrossSecMax2_in(4,:)
+        read(io_TmpFile,fmt=*) CrossSec2_in(4,1:VBFoffsh_Hash_Size)
+        read(io_TmpFile,fmt=*) CrossSecMax2_in(4,1:VBFoffsh_Hash_Size)
         read(io_TmpFile,fmt=*) VG_Result_in(4)
         read(io_TmpFile,fmt=*) VG_Error_in(4)
         read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(4), CrossSectionWithWeightsErrorSquared_in(4)
@@ -3068,40 +3085,91 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 
         open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'5_gridinfo.txt',form='formatted',status='old',iostat=ios)
         read(io_TmpFile,fmt=*) calls1_in(5)
-        read(io_TmpFile,fmt=*) CrossSec2_in(5,:)
-        read(io_TmpFile,fmt=*) CrossSecMax2_in(5,:)
+        read(io_TmpFile,fmt=*) CrossSec2_in(5,1:VBFoffsh_Hash_Size)
+        read(io_TmpFile,fmt=*) CrossSecMax2_in(5,1:VBFoffsh_Hash_Size)
         read(io_TmpFile,fmt=*) VG_Result_in(5)
         read(io_TmpFile,fmt=*) VG_Error_in(5)
         read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(5), CrossSectionWithWeightsErrorSquared_in(5)
         close(unit=io_TmpFile)
         if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'5_gridinfo.txt'
 
-        if( calls1_in(1).ne.calls1_in(2) .or. calls1_in(1).ne.calls1_in(3) .or. calls1_in(2).ne.calls1_in(3) .or. calls1_in(1).ne.calls1_in(4) .or. calls1_in(1).ne.calls1_in(5) ) call Error("Mismatch in calls1")
+        if (Process .eq. 69) then
+           open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'6_gridinfo.txt',form='formatted',status='old',iostat=ios)
+           read(io_TmpFile,fmt=*) calls1_in(6)
+           read(io_TmpFile,fmt=*) CrossSec2_in(6,1:VBFoffsh_Hash_Size)
+           read(io_TmpFile,fmt=*) CrossSecMax2_in(6,1:VBFoffsh_Hash_Size)
+           read(io_TmpFile,fmt=*) VG_Result_in(6)
+           read(io_TmpFile,fmt=*) VG_Error_in(6)
+           read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(6), CrossSectionWithWeightsErrorSquared_in(6)
+           close(unit=io_TmpFile)
+           if( ios.eq.0 ) print *, "read ",trim(DataFile(1:i-1))//'6_gridinfo.txt'
+
+           open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'7_gridinfo.txt',form='formatted',status='old',iostat=ios)
+           read(io_TmpFile,fmt=*) calls1_in(7)
+           read(io_TmpFile,fmt=*) CrossSec2_in(7,1:VBFoffsh_Hash_Size)
+           read(io_TmpFile,fmt=*) CrossSecMax2_in(7,1:VBFoffsh_Hash_Size)
+           read(io_TmpFile,fmt=*) VG_Result_in(7)
+           read(io_TmpFile,fmt=*) VG_Error_in(7)
+           read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(7), CrossSectionWithWeightsErrorSquared_in(7)
+           close(unit=io_TmpFile)
+           if( ios.eq.0 ) print *, "read ",trim(DataFile(1:i-1))//'7_gridinfo.txt'
+
+           open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'8_gridinfo.txt',form='formatted',status='old',iostat=ios)
+           read(io_TmpFile,fmt=*) calls1_in(8)
+           read(io_TmpFile,fmt=*) CrossSec2_in(8,1:VBFoffsh_Hash_Size)
+           read(io_TmpFile,fmt=*) CrossSecMax2_in(8,1:VBFoffsh_Hash_Size)
+           read(io_TmpFile,fmt=*) VG_Result_in(8)
+           read(io_TmpFile,fmt=*) VG_Error_in(8)
+           read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(8), CrossSectionWithWeightsErrorSquared_in(8)
+           close(unit=io_TmpFile)
+           if( ios.eq.0 ) print *, "read ",trim(DataFile(1:i-1))//'8_gridinfo.txt'
+        endif
+
+        !write(6,*) "calls1_in:",calls1_in
+        do j=2,VBFoffsh_run_size
+           if( calls1_in(1).ne.calls1_in(j) ) call Error("Mismatch in calls1")
+        enddo
         calls1 = calls1_in(1)
 
         CrossSec2(:) = -1d0
-        do i=1,Hash_MCFM_qqVVqq_Size
-            if( CrossSec2_in(1,i).ne.0d0 .and. CrossSec2(i).eq.-1d0 ) CrossSec2(i) = CrossSec2_in(1,i)
-            if( CrossSec2_in(2,i).ne.0d0 .and. CrossSec2(i).eq.-1d0 ) CrossSec2(i) = CrossSec2_in(2,i)
-            if( CrossSec2_in(3,i).ne.0d0 .and. CrossSec2(i).eq.-1d0 ) CrossSec2(i) = CrossSec2_in(3,i)
-            if( CrossSec2_in(4,i).ne.0d0 .and. CrossSec2(i).eq.-1d0 ) CrossSec2(i) = CrossSec2_in(4,i)
-            if( CrossSec2_in(5,i).ne.0d0 .and. CrossSec2(i).eq.-1d0 ) CrossSec2(i) = CrossSec2_in(5,i)
+        do i=1,VBFoffsh_Hash_Size
+            do j=1,VBFoffsh_run_size
+               if( CrossSec2_in(j,i).ne.0d0 .and. CrossSec2(i).eq.-1d0 ) CrossSec2(i) = CrossSec2_in(j,i)
+            enddo
             if( CrossSec2(i).lt.0d0 ) then
-                print *, "WARNING: CrossSec2(i) has not been filled",i,CrossSec2_in(1:5,i)
+                print *, "WARNING: CrossSec2(i) has not been filled",i,CrossSec2_in(1:VBFoffsh_run_size,i)
                 CrossSec2(i) = 0d0
+            !else
+            !    print *, "Filled CrossSec2(i) with",i,CrossSec2_in(1:VBFoffsh_run_size,i)
             endif
         enddo
+        if (VBFoffsh_Hash_Size .lt. NMAXCHANNELS) CrossSec2(VBFoffsh_Hash_Size+1:NMAXCHANNELS)=0d0
+
 
         CrossSecMax2(:) = -1d0
-        do i=1,Hash_MCFM_qqVVqq_Size
+        do i=1,VBFoffsh_Hash_Size
             CrossSecMax2(i) = CrossSecMax2_in( max(1,VBFoffsh_run),i)
         enddo
+        if (VBFoffsh_Hash_Size .lt. NMAXCHANNELS) CrossSecMax2(VBFoffsh_Hash_Size+1:NMAXCHANNELS)=0d0
 
-        VG_Result = VG_Result_in(1)+VG_Result_in(2)+VG_Result_in(3)+VG_Result_in(4)+VG_Result_in(5)
-        VG_Error  = dsqrt(VG_Error_in(1)**2+VG_Error_in(2)**2+VG_Error_in(3)**2+VG_Error_in(4)**2+VG_Error_in(5)**2)
+        VG_Result = 0d0; VG_Error = 0d0
+        CrossSectionWithWeights = 0d0; CrossSectionWithWeightsErrorSquared = 0d0
+        do j=1,VBFoffsh_run_size
+           VG_Result = VG_Result_in(j) + VG_Result
+           VG_Error  = VG_Error_in(j)**2 + VG_Error
+           CrossSectionWithWeights = CrossSectionWithWeights_in(j) + CrossSectionWithWeights
+           CrossSectionWithWeightsErrorSquared = CrossSectionWithWeightsErrorSquared_in(j) + CrossSectionWithWeightsErrorSquared
+        enddo
+        VG_Error = dsqrt(VG_Error)
 
-        CrossSectionWithWeights = CrossSectionWithWeights_in(1) + CrossSectionWithWeights_in(2) + CrossSectionWithWeights_in(3) + CrossSectionWithWeights_in(4) + CrossSectionWithWeights_in(5)
-        CrossSectionWithWeightsErrorSquared = CrossSectionWithWeightsErrorSquared_in(1) + CrossSectionWithWeightsErrorSquared_in(2) + CrossSectionWithWeightsErrorSquared_in(3) + CrossSectionWithWeightsErrorSquared_in(4) + CrossSectionWithWeightsErrorSquared_in(5)
+        !write(6,*) "CrossSec2:",CrossSec2
+        !write(6,*) "CrossSecMax2:",CrossSecMax2
+        !write(6,*) "CrossSectionWithWeights_in:",CrossSectionWithWeights_in
+        !write(6,*) "CrossSectionWithWeightsErrorSquared_in:",CrossSectionWithWeightsErrorSquared_in
+        !write(6,*) "CrossSectionWithWeights,CrossSectionWithWeightsErrorSquared:",CrossSectionWithWeights,CrossSectionWithWeightsErrorSquared
+        !write(6,*) "VG_Result,VG_Error:",VG_Result,VG_Error
+        !pause
+
 
     else
         itmx = 10
@@ -3134,8 +3202,8 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 
         open(unit=io_TmpFile,file=trim(CSmaxFile)//'_gridinfo.txt',form='formatted',status='replace')
         write(io_TmpFile,fmt=*) calls1
-        write(io_TmpFile,fmt=*) CrossSec2
-        write(io_TmpFile,fmt=*) CrossSecMax2
+        write(io_TmpFile,fmt=*) CrossSec2(1:VBFoffsh_Hash_Size)
+        write(io_TmpFile,fmt=*) CrossSecMax2(1:VBFoffsh_Hash_Size)
         write(io_TmpFile,fmt=*) VG_Result
         write(io_TmpFile,fmt=*) VG_Error
         write(io_TmpFile,fmt=*) CrossSectionWithWeights, CrossSectionWithWeightsErrorSquared
@@ -3150,9 +3218,13 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
     RequEvents2(:) = 0
     call HouseOfRepresentatives2(CrossSec2, RequEvents2, VegasNc2)
 
-    call getRef_MCFM_qqVVqq_Hash(ijSel)
-    RequEvents(:,:) = 0d0
-    do i=1,Hash_MCFM_qqVVqq_Size
+    if (Process.eq.69) then
+       call getRef_MCFM_qqVVqqStrong_Hash(ijSel)
+    else
+       call getRef_MCFM_qqVVqq_Hash(ijSel)
+    endif
+    !RequEvents(:,:) = 0d0 ! This variable is not used here
+    do i=1,VBFoffsh_Hash_Size
          i1 = convertToPartIndex(ijSel(i,1))
          j1 = convertToPartIndex(ijSel(i,2))
          if( RequEvents2(i).ne.0 ) write(*,"(I4,I4,I4,F18.8,I10,I10)") i, i1,j1,CrossSec2(i),RequEvents2(i)
@@ -3163,71 +3235,71 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 
 
     if( .not. ReadCSmax ) then! For ReadCSmax=.false. the program ends here
-       if( VBFoffsh_run.eq.1 .or. VBFoffsh_run.eq.2 .or. VBFoffsh_run.eq.3 .or. VBFoffsh_run.eq.4 .or. VBFoffsh_run.eq.5 ) print *, "WARNING: These are not the final number of events because the total cross section needs to be assembled from VBFoffsh_run=1,2,3,4,5"
+       if( VBFoffsh_run.ge.1 .and. VBFoffsh_run.le.VBFoffsh_run_size ) print *, "WARNING: These are not the final number of events because the total cross section needs to be assembled from VBFoffsh_run=1,2,3,4,5 (,6,7,8 for process=69)"
        RETURN
     endif
 
-
-    if( VBFoffsh_run.eq.1 ) then ! removing the requested events for the wrong VBFoffsh_run
-         RequEvents2(3:164) = 0
-
-         NumPartonicChannels = 2
-!          call BubleSort(NumPartonicChannels,RequEvents2(1:),SortedHash)
-!          call ReOrder(NumPartonicChannels,SortedHash,CrossSec2(1:))
-!          call ReOrder(NumPartonicChannels,SortedHash,CrossSecMax2(1:))
-!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(1:,1))
-!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(1:,2))
-
-    elseif( VBFoffsh_run.eq.2 ) then
-         RequEvents2(1:2) = 0
-         RequEvents2(10:164) = 0
-
-         NumPartonicChannels = 7
-!          call BubleSort(NumPartonicChannels,RequEvents2(3:),SortedHash)
-!          call ReOrder(NumPartonicChannels,SortedHash,CrossSec2(3:))
-!          call ReOrder(NumPartonicChannels,SortedHash,CrossSecMax2(3:))
-!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(3:,1))
-!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(3:,2))
-
-    elseif( VBFoffsh_run.eq.3 ) then
-         RequEvents2(1:9) = 0
-         RequEvents2(41:164) = 0
-
-         NumPartonicChannels = 31
-!          call BubleSort(NumPartonicChannels,RequEvents2(10:),SortedHash)
-!          call ReOrder(NumPartonicChannels,SortedHash,CrossSec2(10:))
-!          call ReOrder(NumPartonicChannels,SortedHash,CrossSecMax2(10:))
-!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(10:,1))
-!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(10:,2))
-
-
-    elseif( VBFoffsh_run.eq.4 ) then
-         RequEvents2(1:40) = 0
-         RequEvents2(104:164) = 0
-
-         NumPartonicChannels = 63
-!          call BubleSort(NumPartonicChannels,RequEvents2(41:),SortedHash)
-!          call ReOrder(NumPartonicChannels,SortedHash,CrossSec2(41:))
-!          call ReOrder(NumPartonicChannels,SortedHash,CrossSecMax2(41:))
-!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(41:,1))
-!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(41:,2))
-
-    elseif( VBFoffsh_run.eq.5 ) then
-         RequEvents2(1:103) = 0
-
-         NumPartonicChannels = 61
-!          call BubleSort(NumPartonicChannels,RequEvents2(104:),SortedHash)
-!          call ReOrder(NumPartonicChannels,SortedHash,CrossSec2(104:))
-!          call ReOrder(NumPartonicChannels,SortedHash,CrossSecMax2(104:))
-!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(104:,1))
-!          call ReOrder(NumPartonicChannels,SortedHash,ijSel(104:,2))
-
+    if (Process .eq. 69) then
+       ! Hashes go as 1-25, 26-50, 51-100, 101-140, 141-150, 151-160, 161-170, 171-175
+       if( VBFoffsh_run.eq.1 ) then ! removing the requested events for the wrong VBFoffsh_run
+            RequEvents2(26:Hash_MCFM_qqVVqqStrong_Size) = 0
+            NumPartonicChannels = 25
+       elseif( VBFoffsh_run.eq.2 ) then
+            RequEvents2(1:25) = 0
+            RequEvents2(51:Hash_MCFM_qqVVqqStrong_Size) = 0
+            NumPartonicChannels = 25
+       elseif( VBFoffsh_run.eq.3 ) then
+            RequEvents2(1:50) = 0
+            RequEvents2(101:Hash_MCFM_qqVVqqStrong_Size) = 0
+            NumPartonicChannels = 50
+       elseif( VBFoffsh_run.eq.4 ) then
+            RequEvents2(1:100) = 0
+            RequEvents2(141:Hash_MCFM_qqVVqqStrong_Size) = 0
+            NumPartonicChannels = 40
+       elseif( VBFoffsh_run.eq.5 ) then
+            RequEvents2(1:140) = 0
+            RequEvents2(151:Hash_MCFM_qqVVqqStrong_Size) = 0
+            NumPartonicChannels = 10
+       elseif( VBFoffsh_run.eq.6 ) then
+            RequEvents2(1:150) = 0
+            RequEvents2(161:Hash_MCFM_qqVVqqStrong_Size) = 0
+            NumPartonicChannels = 10
+       elseif( VBFoffsh_run.eq.7 ) then
+            RequEvents2(1:160) = 0
+            RequEvents2(171:Hash_MCFM_qqVVqqStrong_Size) = 0
+            NumPartonicChannels = 10
+       elseif( VBFoffsh_run.eq.8 ) then
+            RequEvents2(1:170) = 0
+            NumPartonicChannels = 5
+       endif
+    else
+       if( VBFoffsh_run.eq.1 ) then ! removing the requested events for the wrong VBFoffsh_run
+            RequEvents2(3:Hash_MCFM_qqVVqq_Size) = 0
+            NumPartonicChannels = 2
+       elseif( VBFoffsh_run.eq.2 ) then
+            RequEvents2(1:2) = 0
+            RequEvents2(10:Hash_MCFM_qqVVqq_Size) = 0
+            NumPartonicChannels = 7
+       elseif( VBFoffsh_run.eq.3 ) then
+            RequEvents2(1:9) = 0
+            RequEvents2(41:Hash_MCFM_qqVVqq_Size) = 0
+            NumPartonicChannels = 31
+       elseif( VBFoffsh_run.eq.4 ) then
+            RequEvents2(1:40) = 0
+            RequEvents2(104:Hash_MCFM_qqVVqq_Size) = 0
+            NumPartonicChannels = 63
+       elseif( VBFoffsh_run.eq.5 ) then
+            RequEvents2(1:103) = 0
+            NumPartonicChannels = 61
+       endif
     endif
     ingridfile = trim(CSmaxFile)//'_step2.grid'
 
+    !write(6,*) "NumPartonicChannels | RequEvents2",NumPartonicChannels," | ",RequEvents2
+
 
 !     print *, "New sorted hash for VBFoffsh_run=",VBFoffsh_run
-!     do i=1,Hash_MCFM_qqVVqq_Size
+!     do i=1,VBFoffsh_Hash_Size
 !          i1 = convertToPartIndex(ijSel(i,1))
 !          j1 = convertToPartIndex(ijSel(i,2))
 !          if( RequEvents2(i).ne.0 ) write(*,"(I4,I4,I4,I4,F18.8,I10,I10)") i,SortedHash(i), i1,j1,CrossSec2(i)/VG_Result,RequEvents2(i)
@@ -3274,7 +3346,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         if( Process.ge.66 .and. Process.le.69 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
         write(io_stdout,*) ""
 
-        do i1=1,Hash_MCFM_qqVVqq_Size
+        do i1=1,VBFoffsh_Hash_Size
             if( RequEvents2(i1).gt.0 .and. AccepCounter_part2(i1).lt.RequEvents2(i1)  ) then
                write(*,"(I3,I7,I7,E16.3)") i1, &
                AccepCounter_part2(i1), RequEvents2(i1), &
@@ -3305,6 +3377,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 
 
 
+    !pause
 
 
 ENDIF

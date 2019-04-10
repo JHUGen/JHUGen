@@ -21,7 +21,7 @@ implicit none
 real(8) :: yRnd(1:12),VgsWgt, EvalWeighted2_TH,VegasWeighted_TH
 real(8) :: pdf(-6:6,1:2)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi,MH_Inv
-real(8) :: MomExt(1:4,1:9),MomOffShell(1:4,1:9),PSWgt,PSWgt2,PSWgt3
+real(8) :: MomExt(1:4,1:9),MomOffShell(1:4,1:9),PSWgt,PSWgt2,PSWgt3,FinalStateWeight
 real(8) :: LO_Res_Unpol(-6:6,-6:6),PreFac,PDFFac1,DKRnd
 real(8) :: WdecayKfactor,xRnd
 integer :: NBin(1:NumHistograms),NHisto,DKFlavor,iPartChannel,NumPartonicChannels,PartChannelAvg
@@ -32,6 +32,7 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
 include 'vegas_common.f'
 EvalWeighted2_TH = 0d0
 WdecayKfactor = 1d0
+FinalStateWeight = 1d0
 
 
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
@@ -134,7 +135,7 @@ WdecayKfactor = 1d0
       MomOffShell(1:4,1:3) = MomExt(1:4,1:3)
 !       PSWgt = PSWgt * PSWgt3        ! not using the Jacobian because the mat.el. don't have BW-propagators
 
-      call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6),700)
+      call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6),FinalStateWeight,700)
       if( iPROCESS.EQ.110 ) then
           MY_IDUP(b)   = Bot_;       ICOLUP(1:2,b)   = (/501,000/)
           MY_IDUP(W)   = DK_IDUP(1); ICOLUP(1:2,W)   = (/000,000/)
@@ -172,7 +173,7 @@ WdecayKfactor = 1d0
    ENDIF
 
    FluxFac = 1d0/(2d0*EHat**2)
-   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * WdecayKfactor * PartChannelAvg
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * WdecayKfactor * PartChannelAvg * FinalStateWeight
 
    call Kinematics_TH(MomOffShell,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return
@@ -391,7 +392,7 @@ implicit none
 real(8) :: yRnd(1:16),VgsWgt, EvalUnWeighted_TH
 real(8) :: pdf(-6:6,1:2),RES(-5:5,-5:5)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi,MH_Inv
-real(8) :: MomExt(1:4,1:9),MomOffShell(1:4,1:9),PSWgt,PSWgt2,PSWgt3
+real(8) :: MomExt(1:4,1:9),MomOffShell(1:4,1:9),PSWgt,PSWgt2,PSWgt3,FinalStateWeight
 real(8) :: LO_Res_Unpol(-6:6,-6:6),PreFac,PDFFac1,CS_Max,DKRnd
 real(8) :: WdecayKfactor
 integer :: NBin(1:NumHistograms),NHisto,iPartons(1:2),DKFlavor
@@ -401,6 +402,7 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
 include 'csmaxvalue.f'
 EvalUnWeighted_TH = 0d0
 WdecayKfactor = 1d0
+FinalStateWeight = 1d0
 
 
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
@@ -488,7 +490,7 @@ WdecayKfactor = 1d0
       MomOffShell(1:4,1:3) = MomExt(1:4,1:3)
 !       PSWgt = PSWgt * PSWgt3        ! not using the Jacobian because the mat.el. don't have BW-propagators
 
-      call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6),700)
+      call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6),FinalStateWeight,700)
       if( PROCESS.EQ.110 ) then
           MY_IDUP(b)   = Bot_;       ICOLUP(1:2,b)   = (/501,000/)
           MY_IDUP(W)   = DK_IDUP(1); ICOLUP(1:2,W)   = (/000,000/)
@@ -526,7 +528,7 @@ WdecayKfactor = 1d0
    ENDIF
 
    FluxFac = 1d0/(2d0*EHat**2)
-   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * WdecayKfactor
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * WdecayKfactor * FinalStateWeight
 
    call Kinematics_TH(MomOffShell,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return
