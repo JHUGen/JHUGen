@@ -336,7 +336,7 @@ c     HVV anomalous couplings
       data gh2w4_prime6 / (0d0,0d0) /
       data gh2w4_prime7 / (0d0,0d0) /
 
-c     anomalous couplings for triple and quartic gauge boson coupling (SM: set all to 1.0)
+c     anomalous couplings for triple and quartic gauge boson coupling with d_1-3 (SM: set all to 1)
       data dV_A / (1d0,0d0) /
       data dP_A / (1d0,0d0) /
       data dM_A / (1d0,0d0) /
@@ -345,8 +345,12 @@ c     anomalous couplings for triple and quartic gauge boson coupling (SM: set a
       data dM_Z / (1d0,0d0) /
       data dZZWpWm / (1d0,0d0) /
       data dZAWpWm / (1d0,0d0) /
-      
-      
+      data dAAWpWm / (1d0,0d0) /
+c     anomalous couplings for triple and quartic gauge boson coupling with d_4 (SM: set all to 0)
+      data dFour_A / (0d0,0d0) /
+      data dFour_Z / (0d0,0d0) /
+
+
 c     End anomalous couplings
 
 

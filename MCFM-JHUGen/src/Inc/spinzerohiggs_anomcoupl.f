@@ -107,10 +107,10 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
 
 !     anomalous couplings for triple and quartic gauge boson couplings: VVV, VVVV
 !     notation wrt paper: dV_N=d^{NWW}*d_1^N, dP_N=d^{NWW}*d_2^N, dM_N=d^{NWW}*d_3^N, dFour_N=d^{NWW}*d_4^N, for N=Z,\gamma
-!                         dZZWpWm = d^{ZZWW}*sw^2/cw^2, dZAWpWm = d^{Z\gammaWW}*sw/cw
+!                         dZZWpWm = d^{ZZWW}*sw^2/cw^2, dZAWpWm = d^{Z\gammaWW}*sw/cw, dAAWpWm = d^{\gamma\gammaWW}
       double complex dV_A,dP_A,dM_A,dFour_A
       double complex dV_Z,dP_Z,dM_Z,dFour_Z
-      double complex dZZWpWm,dZAWpWm
+      double complex dZZWpWm,dZAWpWm,dAAWpWm
 
 
       common/spinzerohiggs_anomcoupl/
@@ -206,8 +206,8 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
      & gh2w1_prime5,gh2w2_prime5,gh2w3_prime5,gh2w4_prime5,
      & gh2w1_prime6,gh2w2_prime6,gh2w3_prime6,gh2w4_prime6,
      & gh2w1_prime7,gh2w2_prime7,gh2w3_prime7,gh2w4_prime7,
-     
+
      & dV_A,dP_A,dM_A,dFour_A,
      & dV_Z,dP_Z,dM_Z,dFour_Z,
-     & dZZWpWm,dZAWpWm
+     & dZZWpWm,dZAWpWm,dAAWpWm
 
