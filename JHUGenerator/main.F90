@@ -69,6 +69,8 @@ END PROGRAM
 ! !       Scheme=+-kRenFacScheme_mj_mj_mhstar: Scale ~ m_J + m_J + m_Hstar (or m_J+m_J+m_VV in bkg.); + for running, - for fixed
 ! !       Scheme=+-kRenFacScheme_mjj: Scale ~ m_JJ; + for running, - for fixed
 ! !       Scheme=+-kRenFacScheme_mj_mj: Scale ~ m_J + m_J; + for running, - for fixed
+! !       Scheme=+ kRenScheme_maxpTj: Scale ~ pT of the hardest associated jet
+! !       Scheme=+ kRenScheme_minpTj: Scale ~ pT of the softest associated jet
 ! !       Below, J stands for either the top in JJ associated production (e.g. tqH), or the single jet (Hj)
 ! !       Scheme=+-kRenFacScheme_mjhstar: Scale ~ m_JHstar (or m_JVV in bkg.); + for running, - for fixed
 ! !       Scheme=+-kRenFacScheme_mj_mhstar: Scale ~ m_J + m_Hstar (or m_J+m_VV in bkg.); + for running, - for fixed
@@ -233,6 +235,18 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
             (abs(RenScheme).eq.kRenFacScheme_mj_mj_mhstar) .or. (abs(RenScheme).eq.kRenFacScheme_mj_mj)      &
          )                     &
       ) call Error("HJJ, JJQCD, VBF and VH processes outgoing partons are mostly massless, and alpha_S at a scale ~0 GeV is very unstable. Choose a different renormalization or factorization scheme (e.g. kRenFacScheme_mhstar).")
+
+      if( &
+         (                     &
+            Process.eq.50 .or. &
+            Process.eq.51      &
+         ) .and. (             &
+            (abs(FacScheme).eq.kRenFacScheme_maxpTj) .or. (abs(RenScheme).eq.kRenFacScheme_maxpTj) .or.      &
+            (abs(FacScheme).eq.kRenFacScheme_minpTj) .or. (abs(RenScheme).eq.kRenFacScheme_minpTj)           &
+         ) .and. (             &
+            DecayMode1.ne.1 .and. DecayMode2.ne.5 &
+         )                     &
+      ) call Error("For VH with V decay to something other than qq, can't base the scale on the pT of the a jet.  Choose a different renormalization or factorization scheme.")
 
       ! H+1j Me
       if( &
@@ -504,6 +518,7 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "FilterNJets", success, RequestNJets)
     call ReadCommandLineArgument(arg, "Unweighted", success, Unweighted)
     call ReadCommandLineArgument(arg, "Interf", success, includeInterference, success2=interfSet, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ReweightInterf", success, reweightInterference, success2=interfSet, tosave=tosave)
     call ReadCommandLineArgument(arg, "ReadLHE", success, LHEProdFile, success2=ReadLHEFile)
     call ReadCommandLineArgument(arg, "ConvertLHE", success, LHEProdFile, success2=ConvertLHEFile)
     call ReadCommandLineArgument(arg, "ReadCSmax", success, ReadCSmax)
@@ -1093,8 +1108,10 @@ type(SaveValues) :: tosave, oldsavevalues
     !output file
 
     i = len(trim(DataFile))
-    if( DataFile(i-3:i).eq.".lhe" ) then
-        DataFile = DataFile(1:i-4)
+    if( i.gt.3 ) then
+       if( DataFile(i-3:i).eq.".lhe" ) then
+          DataFile = DataFile(1:i-4)
+       endif
     endif
     call system('mkdir -p ./data')! -p is suppressing error messages if directory already exists
 
@@ -1163,7 +1180,12 @@ type(SaveValues) :: tosave, oldsavevalues
 
     !Renormalization/factorization schemes
 
-    if((abs(FacScheme) .ge. nRenFacSchemes) .or. (abs(RenScheme) .ge. nRenFacSchemes) .or. (MuFacMultiplier.le.0d0) .or. (MuRenMultiplier.le.0d0)) call Error("The renormalization or factorization scheme is invalid, or the scale multiplier to either is not positive.")
+    if( &
+      (abs(FacScheme) .ge. nRenFacSchemes) .or. (abs(RenScheme) .ge. nRenFacSchemes)     .or. &
+      (FacScheme .eq. -kRenFacScheme_maxpTj) .or. (RenScheme .eq. -kRenFacScheme_maxpTj) .or. &
+      (FacScheme .eq. -kRenFacScheme_minpTj) .or. (RenScheme .eq. -kRenFacScheme_minpTj) .or. &
+      (MuFacMultiplier.le.0d0) .or. (MuRenMultiplier.le.0d0)                                  &
+    ) call Error("The renormalization or factorization scheme is invalid, or the scale multiplier to either is not positive.")
     if( SetFacScheme.neqv.SetMuFacMultiplier ) call Error("If you want to set the factorization scale, please set both the scheme (FacScheme) and the multiplier (MuFacMultiplier)")
     if( SetRenScheme.neqv.SetMuRenMultiplier ) call Error("If you want to set the renormalization scale, please set both the scheme (RenScheme) and the multiplier (MuRenMultiplier)")
 
@@ -1283,14 +1305,36 @@ type(SaveValues) :: tosave, oldsavevalues
         (DecayMode1.eq.0  .and. DecayMode2.eq.8)               .or.  &
         (DecayMode1.eq.2  .and. DecayMode2.eq.8)               ) then !  allow interference
             if( .not.interfSet ) then!  set default interference switch
-                if( M_Reso.gt.2d0*M_Z ) then
+                if (Process.ge.66 .and. Process.le.69) then
+                    if (Unweighted) then
+                        includeInterference = .false.
+                        reweightInterference = .true.
+                    else if (m4l_minmax(1) .gt. 2d0*M_Z) then
+                        includeInterference = .false.
+                        reweightInterference = .false.
+                    else
+                        includeInterference = .true.
+                        reweightInterference = .false.
+                    endif
+                elseif( M_Reso.gt.2d0*M_Z ) then
                     includeInterference = .false.
+                    reweightInterference = .false.
                 else
                     includeInterference = .true.
+                    reweightInterference = .false.
                 endif
             endif
     else
         includeInterference = .false.   ! no interference if decay mode does not allow 4 same flavor leptons
+        reweightInterference = .false.
+    endif
+
+    if (reweightInterference .and. includeInterference) call Error("Can't set both Interf and ReweightInterf")
+    if (reweightInterference .and. .not.unweighted) call Error("Can't reweight interference for weighted events, try setting Interf=1 instead")
+    if (reweightInterference .and. ReadLHEFile) call Error("Interference reweighting is not implemented for ReadLHE mode")
+    if (reweightInterference .and. .not. (Process.ge.66 .and. Process.le.69)) then
+      print *, "Interference reweighting is not implemented for process ", Process
+      stop 1
     endif
 
     !decay mode checks
@@ -2650,7 +2694,7 @@ integer :: VegasSeed,PreviousSum,ios,NumPartonicChannels
 character :: ProcessStr*(3)
 logical :: UseBetaVersion=.false.
 real(8) :: VG_Result_in(1:5),VG_Error_in(1:5),calls1_in(1:5),calls2_in(1:5)
-real(8) :: CrossSec2_in(1:5,1:164),CrossSecMax2_in(1:5,164)
+real(8) :: CrossSec2_in(1:5,1:164),CrossSecMax2_in(1:5,164),CrossSectionWithWeights_in(1:5),CrossSectionWithWeightsErrorSquared_in(1:5)
 
 
     VG_Result = -13d0
@@ -2988,6 +3032,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         read(io_TmpFile,fmt=*) CrossSecMax2_in(1,:)
         read(io_TmpFile,fmt=*) VG_Result_in(1)
         read(io_TmpFile,fmt=*) VG_Error_in(1)
+        read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(1), CrossSectionWithWeightsErrorSquared_in(1)
         close(unit=io_TmpFile)
         if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'1_gridinfo.txt'
 
@@ -2997,6 +3042,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         read(io_TmpFile,fmt=*) CrossSecMax2_in(2,:)
         read(io_TmpFile,fmt=*) VG_Result_in(2)
         read(io_TmpFile,fmt=*) VG_Error_in(2)
+        read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(2), CrossSectionWithWeightsErrorSquared_in(2)
         close(unit=io_TmpFile)
         if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'2_gridinfo.txt'
 
@@ -3006,6 +3052,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         read(io_TmpFile,fmt=*) CrossSecMax2_in(3,:)
         read(io_TmpFile,fmt=*) VG_Result_in(3)
         read(io_TmpFile,fmt=*) VG_Error_in(3)
+        read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(3), CrossSectionWithWeightsErrorSquared_in(3)
         close(unit=io_TmpFile)
         if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'3_gridinfo.txt'
 
@@ -3015,6 +3062,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         read(io_TmpFile,fmt=*) CrossSecMax2_in(4,:)
         read(io_TmpFile,fmt=*) VG_Result_in(4)
         read(io_TmpFile,fmt=*) VG_Error_in(4)
+        read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(4), CrossSectionWithWeightsErrorSquared_in(4)
         close(unit=io_TmpFile)
         if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'4_gridinfo.txt'
 
@@ -3024,8 +3072,9 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         read(io_TmpFile,fmt=*) CrossSecMax2_in(5,:)
         read(io_TmpFile,fmt=*) VG_Result_in(5)
         read(io_TmpFile,fmt=*) VG_Error_in(5)
+        read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(5), CrossSectionWithWeightsErrorSquared_in(5)
         close(unit=io_TmpFile)
-        if( ios.eq.0 ) print *, "read ",trim(DataFile(1:i-1))//'5_gridinfo.txt'
+        if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'5_gridinfo.txt'
 
         if( calls1_in(1).ne.calls1_in(2) .or. calls1_in(1).ne.calls1_in(3) .or. calls1_in(2).ne.calls1_in(3) .or. calls1_in(1).ne.calls1_in(4) .or. calls1_in(1).ne.calls1_in(5) ) call Error("Mismatch in calls1")
         calls1 = calls1_in(1)
@@ -3051,6 +3100,9 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         VG_Result = VG_Result_in(1)+VG_Result_in(2)+VG_Result_in(3)+VG_Result_in(4)+VG_Result_in(5)
         VG_Error  = dsqrt(VG_Error_in(1)**2+VG_Error_in(2)**2+VG_Error_in(3)**2+VG_Error_in(4)**2+VG_Error_in(5)**2)
 
+        CrossSectionWithWeights = CrossSectionWithWeights_in(1) + CrossSectionWithWeights_in(2) + CrossSectionWithWeights_in(3) + CrossSectionWithWeights_in(4) + CrossSectionWithWeights_in(5)
+        CrossSectionWithWeightsErrorSquared = CrossSectionWithWeightsErrorSquared_in(1) + CrossSectionWithWeightsErrorSquared_in(2) + CrossSectionWithWeightsErrorSquared_in(3) + CrossSectionWithWeightsErrorSquared_in(4) + CrossSectionWithWeightsErrorSquared_in(5)
+
     else
         itmx = 10
         ncall= VegasNc0
@@ -3069,7 +3121,11 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         print *, "resetting CrossSecMax2(:)"
         itmx = 1
         call ClearHisto()
+        FindCrossSectionWithWeights = .true.
+        CrossSectionWithWeights = 0d0
+        CrossSectionWithWeightsErrorSquared = 0d0
         if( Process.ge.66 .and. Process.le.69 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+        FindCrossSectionWithWeights = .false.
         writeout=.false.
         ingridfile=trim(outgridfile)
 
@@ -3082,12 +3138,14 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         write(io_TmpFile,fmt=*) CrossSecMax2
         write(io_TmpFile,fmt=*) VG_Result
         write(io_TmpFile,fmt=*) VG_Error
+        write(io_TmpFile,fmt=*) CrossSectionWithWeights, CrossSectionWithWeightsErrorSquared
         close(unit=io_TmpFile)
     endif
 
     write(io_stdout,"(A)")  ""
-    write(io_stdout,*) "Total xsec: ",VG_Result, " +/-",VG_Error, " fb    vs.",sum(CrossSec2(:))
-    call InitOutput(VG_Result, VG_Error)
+    write(io_stdout,*) "Total unweighted xsec (used by Vegas): ", VG_Result, " +/-", VG_Error, " fb    vs.",sum(CrossSec2(:))
+    write(io_stdout,*) "Total xsec with weights (use for physics): ", CrossSectionWithWeights, " +/-", sqrt(CrossSectionWithWeightsErrorSquared)
+    call InitOutput(CrossSectionWithWeights, sqrt(CrossSectionWithWeightsErrorSquared))
 
     RequEvents2(:) = 0
     call HouseOfRepresentatives2(CrossSec2, RequEvents2, VegasNc2)
@@ -5508,7 +5566,7 @@ integer :: stat
         endif
 #endif
     endif
-    if( .not.unweighted ) then
+    if( ReweightInterference .or. .not.unweighted ) then
         weightscheme = 4
     else
         weightscheme = 3
@@ -5755,7 +5813,12 @@ character :: arg*(500)
     if( ReweightDecay ) then
         write(TheUnit,"(4X,A,I1)") "Reweighting events using the decay matrix element, using input WidthScheme ", WidthSchemeIn
     endif
-    if( Process.le.2 .or. ReadLHEFile ) write(TheUnit,"(4X,A,L)") "Interference: ",includeInterference
+    if(Process.ge.66 .and. Process.le.69 .and. ReweightInterference) then
+      write(TheUnit, "(4X,A)") "Interference: included through event weights"
+    elseif( Process.le.2 .or. (Process.ge.66 .and. Process.le.69) .or. ReadLHEFile ) then
+      write(TheUnit,"(4X,A,L)") "Interference: ",includeInterference
+    endif
+
     if( &
         ( (Process.le.2 .or. ReadLHEFile) .and. (IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2)) ) .or. &
         Process.eq.60 .or. (Process.ge.66 .and. Process.le.68)                                            &
@@ -6410,6 +6473,8 @@ implicit none
         print *, "                        9=Z->anything, 10=W->lnu+taunu, 11=W->anything"
         print *, "   Interf:            0=neglect interference for 4f final states,"
         print *, "                      1=include interference"
+        print *, "   ReweightInterf:    if true, include interference as LHE event weights for"
+        print *, "                      offshell VBF events"
         print *, "   RandomizeVVdecays: Randomizes the order of DecayMode1 and DecayMode2,"
         print *, "                      per event (default true)"
         print *, "                      For a WW decay, turning this off will mean"

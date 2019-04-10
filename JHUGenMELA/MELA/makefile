@@ -47,13 +47,14 @@ LIB = libMELA.so
 
 .PHONY: all help compile clean
 
-all: SRCFILES LinkDefOut LinkDef $(LIB) python/__init__.py
+all: $(LIB) python/__init__.py
 
-LinkDefOut: $(MELASRCDIR)/LinkDef.h
+$(MELASRCDIR)/LinkDef_out.o: $(MELASRCDIR)/LinkDef.h
 	$(QUIET) echo "Making CINT dictionaries"; \
         rootcint -f $(MELASRCDIR)/LinkDef_out.cc -c -p $(CPPINC) $(MELASRCDIR)/LinkDef.h; \
         cat $(MELASRCDIR)/LinkDef.h $(MELASRCDIR)/LinkDef_out.cc > $(MELASRCDIR)/LinkDef_out.cxx; \
-	rm $(MELASRCDIR)/LinkDef_out.cc; mv $(MELASRCDIR)/LinkDef_out_rdict.pcm $(MELALIBDIR)/LinkDef_out_rdict.pcm
+        rm $(MELASRCDIR)/LinkDef_out.cc; mv $(MELASRCDIR)/LinkDef_out_rdict.pcm $(MELALIBDIR)/LinkDef_out_rdict.pcm; \
+        $(CC) $(CPPOPTS) $(CPPINC) -c $(MELASRCDIR)/LinkDef_out.cxx -o $(MELASRCDIR)/LinkDef_out.o
 
 # General rule for making object files
 %.d:	$(MELASRCDIR)/%.cc $(MELASRCDIR)/%.cxx
@@ -65,13 +66,7 @@ LinkDefOut: $(MELASRCDIR)/LinkDef.h
 	$(QUIET) echo "Compiling $<"; \
 	$(CC) $(CPPFLAGS) $< -c -o $@
 
-SRCFILES: $(OBJECTS)
-	
-LinkDef: $(MELASRCDIR)/LinkDef_out.cxx
-	$(QUIET) echo "Compiling $<"; \
-	$(CC) $(CPPOPTS) $(CPPINC) $< -c -o $(MELASRCDIR)/LinkDef_out.o
-
-$(LIB):	$(OBJECTS)
+$(LIB):	$(OBJECTS) $(MELASRCDIR)/LinkDef_out.o
 	$(QUIET) echo "Linking $(LIB)"; \
 	$(LINKER) $(LINKERFLAGS) -shared $(OBJECTS) $(MELASRCDIR)/LinkDef_out.o -o $@; \
 	mv $(LIB) $(MELALIBDIR)/$(LIB)

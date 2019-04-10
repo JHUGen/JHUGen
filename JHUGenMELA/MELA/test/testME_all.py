@@ -1,8 +1,19 @@
 #!/usr/bin/env python
 
-from collections import defaultdict
+import argparse
 import os
+import random
 import re
+import sys
+
+from collections import defaultdict
+
+p = argparse.ArgumentParser()
+#https://stackoverflow.com/a/5012617/5228524
+p.add_argument("seed_for_sort", type=int, default=random.randrange(sys.maxsize), nargs="?")
+args = p.parse_args()
+random.seed(args.seed_for_sort)
+print "Seed:", args.seed_for_sort
 
 import ROOT
 
@@ -25,7 +36,10 @@ badselfD = set()
 messedup = set()
 
 referencefiles = os.listdir("reference")
-referencefiles.sort(key=lambda _: "testME_Prop" not in _)
+#first sort alphabetically to make it deterministic given the seed
+referencefiles.sort()
+#then shuffle them
+random.shuffle(referencefiles)
 
 def unifycontent(content):
   """
@@ -34,7 +48,6 @@ def unifycontent(content):
   For example 0x1234567 --> 0xPOINTER
   """
   content = re.sub("0x[0-9a-f]+", "0xPOINTER", content)
-#  if "Start Mela constructor" in content: content = content.split("End Mela constructor")[1].lstrip()
   return content
 
 melaptr = ROOT.makemelaptr(13, 125, ROOT.TVar.ERROR)

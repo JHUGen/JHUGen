@@ -474,6 +474,84 @@ void testME_Dec_ANALYTICAL_FullSim(int erg_tev=13, bool useConstants=false, shar
   cout.precision(bkpprecision);
 }
 
+void testME_RenFacScales_Ping(shared_ptr<Mela> melaptr=nullptr){
+  ofstream tout(TString("testME_RenFacScales_Ping.out"));
+  streambuf* coutbuf = cout.rdbuf();
+  cout.rdbuf(tout.rdbuf());
+
+  int erg_tev=13;
+  float mPOLE=125.;
+  float wPOLE=4.07e-3;
+
+  TVar::VerbosityLevel verbosity = TVar::ERROR;
+  if (!melaptr) melaptr.reset(new Mela(erg_tev, mPOLE, verbosity));
+  Mela& mela = *melaptr;
+  TVar::VerbosityLevel bkpverbosity = mela.getVerbosity();
+  mela.setVerbosity(verbosity);
+  if (verbosity>=TVar::DEBUG) cout << "Mela is initialized" << endl;
+
+  float pingMom[8][4]={
+    { 0, 0, 865.37881546721542, 865.37881546721542 },
+    { 0, 0, -624.03396598421773, 624.03396598421773 },
+    { 7.6145299215002638, -17.259247740062808, 9.4660586470659975, 21.106135714241464 },
+    { 90.901719112641416, -69.683681833050798, 32.066319224729980, 118.94194752090492 },
+    { 78.476352131782917, -35.264818847819797, -8.8615639484695272, 86.490881645951262 },
+    { 191.68369742375290, -197.85205601463366, 100.99437243828194, 293.40746273989180 },
+    { -131.59521398083137, 330.56000090294270, 437.01695094737875, 563.53440884737279 },
+    { -237.08108460884614, -10.500196467375645, -329.33728782598945, 405.93194498307093 }
+  };
+  int idOrdered[8] ={ 1, 2, 11, -11, 13, -13, 1, 2 };
+  SimpleParticleCollection_t mothers; mothers.reserve(2);
+  for (unsigned int ip=0; ip<2; ip++){
+    mothers.emplace_back(
+      idOrdered[ip],
+      TLorentzVector(pingMom[ip][0], pingMom[ip][1], pingMom[ip][2], pingMom[ip][3])
+    );
+  }
+  SimpleParticleCollection_t daughters; daughters.reserve(4);
+  for (unsigned int ip=2; ip<6; ip++){
+    daughters.emplace_back(
+      idOrdered[ip],
+      TLorentzVector(pingMom[ip][0], pingMom[ip][1], pingMom[ip][2], pingMom[ip][3])
+    );
+  }
+  SimpleParticleCollection_t associated; associated.reserve(2);
+  for (unsigned int ip=6; ip<8; ip++){
+    associated.emplace_back(
+      idOrdered[ip],
+      TLorentzVector(pingMom[ip][0], pingMom[ip][1], pingMom[ip][2], pingMom[ip][3])
+    );
+  }
+  mela.setCandidateDecayMode(TVar::CandidateDecay_ZZ);
+  mela.setInputEvent(&daughters, &associated, &mothers, true);
+
+  std::vector<TVar::EventScaleScheme> eventscaleschemes;
+  for (int is=0; is<(int) TVar::nEventScaleSchemes; is++) eventscaleschemes.push_back((TVar::EventScaleScheme) is);
+
+  float meval_init;
+  mela.setProcess(TVar::HSMHiggs, TVar::JHUGen, TVar::JJVBF);
+  mela.computeProdP(meval_init);
+  cout << "MELA default scheme setting gives ME val: " << meval_init << endl;
+  for (auto const& scheme : eventscaleschemes){
+    cout << "Using scale scheme: " << scheme << endl;
+    mela.setRenFacScaleMode(scheme, scheme, 1, 1); // Default is 0.5, 0.5, so even default scheme won't be the same.
+    float meval;
+    mela.computeProdP(meval);
+    cout << "\t- ME val: " << meval << endl;
+    if (meval==meval_init) cout << "\t- ERROR: meval==meval_init!" << endl;
+  }
+  float meval_final;
+  mela.computeProdP(meval_final);
+  cout << "Is MELA default scheme setting restored? " << (meval_final==meval_init) << endl;
+  if (meval_final!=meval_init) cout << "\t- ERROR: meval_final!=meval_init!" << endl;
+
+  mela.resetInputEvent();
+
+  cout.rdbuf(coutbuf);
+  tout.close();
+  mela.setVerbosity(bkpverbosity);
+}
+
 
 void testME_Dec_MCFM_Ping(int flavor=2, int useMothers=0, bool useConstants=false, shared_ptr<Mela> melaptr=nullptr){
   ofstream tout(TString("testME_Dec_MCFM_Ping_")+long(flavor)+"_"+long(useMothers)+"_"+long(useConstants)+".out");
@@ -1775,15 +1853,17 @@ void testME_VH_JHUGen_Ping(int erg_tev=13, bool useConstants=false, shared_ptr<M
 
         cout << "*******************************************************" << endl;
 
-        float costhetastar = 0, costheta1 = 0, costheta2 = 0, Phi = 0, Phi1 = 0;
+        float mVstar = 0, mV = 0, costhetastar = 0, costheta1 = 0, costheta2 = 0, Phi = 0, Phi1 = 0;
         if (prod != TVar::GammaH) mela.computeVHAngles(
+          mVstar,
+          mV,
           costheta1,
           costheta2,
           Phi,
           costhetastar,
           Phi1
         );
-        cout << "VH (" << TVar::ProductionName(prod) << ") angles: " << costheta1 << " " << costheta2 << " " << Phi << " " << costhetastar << " " << Phi1 << endl;
+        cout << "VH (" << TVar::ProductionName(prod) << ") angles: " << mVstar << " " << mV << " " << costheta1 << " " << costheta2 << " " << Phi << " " << costhetastar << " " << Phi1 << endl;
 
       }
     }
@@ -2335,6 +2415,73 @@ void testME_VBF_JHUGen_Ping(int erg_tev=13, bool useConstants=false, shared_ptr<
 }
 
 
+void testME_JVBF_JHUGen_Ping(shared_ptr<Mela> melaptr=nullptr){
+  ofstream tout(TString("testME_JVBF_JHUGen_Ping.out"));
+  streambuf* coutbuf = cout.rdbuf();
+  cout.rdbuf(tout.rdbuf());
+
+  int erg_tev=13;
+  float mPOLE=125.;
+  float wPOLE=4.07e-3;
+
+  TVar::VerbosityLevel verbosity = TVar::DEBUG;
+  if (!melaptr) melaptr.reset(new Mela(erg_tev, mPOLE, verbosity));
+  Mela& mela = *melaptr;
+  TVar::VerbosityLevel bkpverbosity = mela.getVerbosity();
+  mela.setVerbosity(verbosity);
+  if (verbosity>=TVar::DEBUG) cout << "Mela is initialized" << endl;
+
+  float pingMom[8][4]={
+    { 0, 0, 865.37881546721542, 865.37881546721542 },
+    { 0, 0, -624.03396598421773, 624.03396598421773 },
+    { 7.6145299215002638, -17.259247740062808, 9.4660586470659975, 21.106135714241464 },
+    { 90.901719112641416, -69.683681833050798, 32.066319224729980, 118.94194752090492 },
+    { 78.476352131782917, -35.264818847819797, -8.8615639484695272, 86.490881645951262 },
+    { 191.68369742375290, -197.85205601463366, 100.99437243828194, 293.40746273989180 },
+    { -131.59521398083137, 330.56000090294270, 437.01695094737875, 563.53440884737279 },
+    { -237.08108460884614, -10.500196467375645, -329.33728782598945, 405.93194498307093 }
+  };
+  int idOrdered[8] ={ 1, 2, 11, -11, 13, -13, 1, 2 };
+  SimpleParticleCollection_t mothers; mothers.reserve(2);
+  for (unsigned int ip=0; ip<2; ip++){
+    mothers.emplace_back(
+      idOrdered[ip],
+      TLorentzVector(pingMom[ip][0], pingMom[ip][1], pingMom[ip][2], pingMom[ip][3])
+    );
+  }
+  SimpleParticleCollection_t daughters; daughters.reserve(4);
+  for (unsigned int ip=2; ip<6; ip++){
+    daughters.emplace_back(
+      idOrdered[ip],
+      TLorentzVector(pingMom[ip][0], pingMom[ip][1], pingMom[ip][2], pingMom[ip][3])
+    );
+  }
+  SimpleParticleCollection_t associated; associated.reserve(1);
+  associated.emplace_back(
+    idOrdered[6],
+    TLorentzVector(pingMom[6][0], pingMom[6][1], pingMom[6][2], pingMom[6][3])
+  );
+  mela.setCandidateDecayMode(TVar::CandidateDecay_ZZ);
+  mela.setInputEvent(&daughters, &associated, &mothers, true);
+
+  std::vector<TVar::EventScaleScheme> eventscaleschemes;
+  for (int is=0; is<(int) TVar::nEventScaleSchemes; is++) eventscaleschemes.push_back((TVar::EventScaleScheme) is);
+
+  float meval_init;
+  mela.setProcess(TVar::HSMHiggs, TVar::JHUGen, TVar::JJVBF);
+  mela.computeProdP(meval_init);
+  cout << "Probability = " << meval_init << endl;
+  mela.getPAux(meval_init);
+  cout << "Auxiliary probability = " << meval_init << endl;
+
+  mela.resetInputEvent();
+
+  cout.rdbuf(coutbuf);
+  tout.close();
+  mela.setVerbosity(bkpverbosity);
+}
+
+
 void testME_Prop_Ping(int useMothers=0, shared_ptr<Mela> melaptr=nullptr){
   ofstream tout(TString("testME_Prop_Ping_")+(long)useMothers+".out");
   streambuf* coutbuf = cout.rdbuf();
@@ -2819,8 +2966,12 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
     mela.setVerbosity(verbosity);
 
     jhume p_prod_0mplus_dec_0mplus_VAJHU;
+    jhume p_prod_0hplus_dec_0hplus_VAJHU;
+    jhume p_prod_fa2_dec_fa2_VAJHU;
+    jhume p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAJHU;
     jhume p_prod_0minus_dec_0minus_VAJHU;
     jhume p_prod_fa3_dec_fa3_VAJHU;
+    jhume p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAJHU;
     jhume p_prod_0mplusL2_dec_0mplusL2_VAJHU;
     jhume p_prod_fL2_dec_fL2_VAJHU;
     jhume p_prod_0minusZA_dec_0minusZA_VAJHU;
@@ -2830,10 +2981,14 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
 
     mcfmme p_bkg_VAMCFM, p_bkg_VAMCFM_rssum;
     mcfmme p_prod_0mplus_dec_0mplus_VAMCFM;
+    mcfmme p_prod_0hplus_dec_0hplus_VAMCFM;
     mcfmme p_prod_0minus_dec_0minus_VAMCFM;
     mcfmme p_prod_0mplusL2_dec_0mplusL2_VAMCFM;
     mcfmme p_prod_fL2_dec_fL2_VAMCFM;
+    mcfmme p_prod_fa2_dec_fa2_VAMCFM;
+    mcfmme p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAMCFM;
     mcfmme p_prod_fa3_dec_fa3_VAMCFM;
+    mcfmme p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAMCFM;
     mcfmme p_prod_0minusZA_dec_0minusZA_VAMCFM;
     mcfmme p_prod_fa3ZA_dec_fa3ZA_VAMCFM;
     mcfmme p_prod_0minusAA_dec_0minusAA_VAMCFM;
@@ -2851,6 +3006,7 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
     float Phi1=0;
     float Q2V1=0;
     float Q2V2=0;
+    float mVstar=0, mV=0;
 
     float pingMom[8][4]={
       { 0, 0, 865.37881546721542, 865.37881546721542 },
@@ -2894,7 +3050,7 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
         TLorentzVector(pingMom[ip][0], pingMom[ip][1], pingMom[ip][2], pingMom[ip][3])
         )
         );
-    };
+    }
     SimpleParticleCollection_t daughters;
     for (unsigned int ip=2; ip<6; ip++){
       daughters.push_back(
@@ -2903,7 +3059,7 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
         TLorentzVector(pingMom[ip][0], pingMom[ip][1], pingMom[ip][2], pingMom[ip][3])
         )
         );
-    };
+    }
     SimpleParticleCollection_t associated;
     for (unsigned int ip=6; ip<8; ip++){
       associated.push_back(
@@ -2912,7 +3068,7 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
         TLorentzVector(pingMom[ip][0], pingMom[ip][1], pingMom[ip][2], pingMom[ip][3])
         )
         );
-    };
+    }
     mjj = (associated.at(0).second+associated.at(1).second).M();
     mzz = (daughters.at(0).second+daughters.at(1).second+daughters.at(2).second+daughters.at(3).second).M();
 
@@ -2945,6 +3101,8 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
         costheta2,
         Phi,
         Phi1,
+        mVstar,
+        mV,
 
         daughters.at(0).second, daughters.at(0).first,
         daughters.at(1).second, daughters.at(1).first,
@@ -2982,6 +3140,8 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
         costheta2,
         Phi,
         Phi1,
+        mVstar,
+        mV,
 
         daughters.at(0).second, daughters.at(0).first,
         daughters.at(1).second, daughters.at(1).first,
@@ -3013,12 +3173,27 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
     mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
     mela.computeP(p_prod_0mplus_dec_0mplus_VAJHU.decme, false);
 
+    mela.selfDHzzcoupl[0][gHIGGS_VV_2][0]=1;
+    mela.computeP(p_prod_0hplus_dec_0hplus_VAJHU.decme, false);
+
+    mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_2][0]=1;
+    mela.computeP(p_prod_fa2_dec_fa2_VAJHU.decme, false);
+
+    mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_2][1]=1;
+    mela.computeP(p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAJHU.decme, false);
+
     mela.selfDHzzcoupl[0][gHIGGS_VV_4][0]=1;
     mela.computeP(p_prod_0minus_dec_0minus_VAJHU.decme, false);
 
     mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
     mela.selfDHzzcoupl[0][gHIGGS_VV_4][0]=1;
     mela.computeP(p_prod_fa3_dec_fa3_VAJHU.decme, false);
+
+    mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_4][1]=1;
+    mela.computeP(p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAJHU.decme, false);
 
     if (decZZWW==1){
       mela.selfDHzzcoupl[0][gHIGGS_ZA_4][0]=1;
@@ -3052,7 +3227,7 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
       p_prod_fa3AA_dec_fa3AA_VAJHU.decme=p_prod_0mplus_dec_0mplus_VAJHU.decme;
     }
 
-    bool computeL2WWprod=(isZZWW==2 || (decZZWW==2 && vbfvhchannel==0));
+    bool computeL2WWprod=(isZZWW==2 || (decZZWW==2 && vbfvhchannel==0)); // This flag turns on Lambda2 couplings to check W+/W- - asymmetric couplings
     bool computeJHUZA=true;
     if (vbfvhchannel>=1){
       if (isZZWW==2 && decZZWW==1){ // WH->ZZ
@@ -3081,6 +3256,21 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
       mela.computeProdP(p_prod_0mplus_dec_0mplus_VAJHU.prodme, false);
       mela.getIORecord()->getUnweightedMEArray(p_prod_0mplus_dec_0mplus_VAJHU.mearray);
 
+      if (isZZWW!=2){ mela.selfDHzzcoupl[0][gHIGGS_VV_2][0]=1; if (isZZWW==1) mela.differentiate_HWW_HZZ=true; }
+      else{ mela.selfDHwwcoupl[0][gHIGGS_VV_2][0]=1; mela.differentiate_HWW_HZZ=true; }
+      mela.computeProdP(p_prod_0hplus_dec_0hplus_VAJHU.prodme, false);
+      mela.getIORecord()->getUnweightedMEArray(p_prod_0hplus_dec_0hplus_VAJHU.mearray);
+
+      if (isZZWW!=2){ mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1; mela.selfDHzzcoupl[0][gHIGGS_VV_2][0]=1; if (isZZWW==1) mela.differentiate_HWW_HZZ=true; }
+      else{ mela.selfDHwwcoupl[0][gHIGGS_VV_1][0]=1; mela.selfDHwwcoupl[0][gHIGGS_VV_1][0]=1; mela.selfDHwwcoupl[0][gHIGGS_VV_2][0]=1; mela.differentiate_HWW_HZZ=true; }
+      mela.computeProdP(p_prod_fa2_dec_fa2_VAJHU.prodme, false);
+      mela.getIORecord()->getUnweightedMEArray(p_prod_fa2_dec_fa2_VAJHU.mearray);
+
+      if (isZZWW!=2){ mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1; mela.selfDHzzcoupl[0][gHIGGS_VV_2][1]=1; if (isZZWW==1) mela.differentiate_HWW_HZZ=true; }
+      else{ mela.selfDHwwcoupl[0][gHIGGS_VV_1][0]=1; mela.selfDHwwcoupl[0][gHIGGS_VV_1][0]=1; mela.selfDHwwcoupl[0][gHIGGS_VV_2][1]=1; mela.differentiate_HWW_HZZ=true; }
+      mela.computeProdP(p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAJHU.prodme, false);
+      mela.getIORecord()->getUnweightedMEArray(p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAJHU.mearray);
+
       if (isZZWW!=2){ mela.selfDHzzcoupl[0][gHIGGS_VV_4][0]=1; if (isZZWW==1) mela.differentiate_HWW_HZZ=true; }
       else{ mela.selfDHwwcoupl[0][gHIGGS_VV_4][0]=1; mela.differentiate_HWW_HZZ=true; }
       mela.computeProdP(p_prod_0minus_dec_0minus_VAJHU.prodme, false);
@@ -3090,6 +3280,11 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
       else{ mela.selfDHwwcoupl[0][gHIGGS_VV_1][0]=1; mela.selfDHwwcoupl[0][gHIGGS_VV_1][0]=1; mela.selfDHwwcoupl[0][gHIGGS_VV_4][0]=1; mela.differentiate_HWW_HZZ=true; }
       mela.computeProdP(p_prod_fa3_dec_fa3_VAJHU.prodme, false);
       mela.getIORecord()->getUnweightedMEArray(p_prod_fa3_dec_fa3_VAJHU.mearray);
+
+      if (isZZWW!=2){ mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1; mela.selfDHzzcoupl[0][gHIGGS_VV_4][1]=1; if (isZZWW==1) mela.differentiate_HWW_HZZ=true; }
+      else{ mela.selfDHwwcoupl[0][gHIGGS_VV_1][0]=1; mela.selfDHwwcoupl[0][gHIGGS_VV_1][0]=1; mela.selfDHwwcoupl[0][gHIGGS_VV_4][1]=1; mela.differentiate_HWW_HZZ=true; }
+      mela.computeProdP(p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAJHU.prodme, false);
+      mela.getIORecord()->getUnweightedMEArray(p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAJHU.mearray);
 
       if (computeL2WWprod){
         if (decZZWW==2 && isZZWW==1) mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
@@ -3113,7 +3308,7 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
         mela.computeProdP(p_prod_fL2_dec_fL2_VAJHU.prodme, false);
         mela.getIORecord()->getUnweightedMEArray(p_prod_fL2_dec_fL2_VAJHU.mearray);
       }
-      if (computeJHUZA){
+      if (computeJHUZA){ // Compute contributions with Z/A
         if (isZZWW==2 && decZZWW==1){ // WW->ZZ
           mela.selfDHwwcoupl[0][gHIGGS_VV_1][0]=1;
           mela.selfDHzzcoupl[0][gHIGGS_ZA_4][0]=1;
@@ -3196,7 +3391,7 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
         mela.computeProdP(p_prod_fa3AA_dec_fa3AA_VAJHU.prodme, false);
         mela.getIORecord()->getUnweightedMEArray(p_prod_fa3AA_dec_fa3AA_VAJHU.mearray);
       }
-      else{
+      else{ // No Z/A contributions, compute SM MEs
         if (isZZWW!=2){ mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1; if (isZZWW==1) mela.differentiate_HWW_HZZ=true; }
         else{ mela.selfDHwwcoupl[0][gHIGGS_VV_1][0]=1; mela.differentiate_HWW_HZZ=true; }
         mela.computeProdP(p_prod_0minusZA_dec_0minusZA_VAJHU.prodme, false);
@@ -3234,6 +3429,21 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
         mela.computeProdP(p_prod_0mplus_dec_0mplus_VAJHU.prodme, false);
         mela.getIORecord()->getUnweightedMEArray(p_prod_0mplus_dec_0mplus_VAJHU.mearray);
 
+        if (isZZWW!=2) mela.selfDHzzcoupl[0][gHIGGS_VV_2][0]=1;
+        else mela.selfDHzzcoupl[0][gHIGGS_VV_2][0]=0;
+        mela.computeProdP(p_prod_0hplus_dec_0hplus_VAJHU.prodme, false);
+        mela.getIORecord()->getUnweightedMEArray(p_prod_0hplus_dec_0hplus_VAJHU.mearray);
+
+        if (isZZWW!=2){ mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1; mela.selfDHzzcoupl[0][gHIGGS_VV_2][0]=1; }
+        else{ mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=0; mela.selfDHzzcoupl[0][gHIGGS_VV_2][0]=0; }
+        mela.computeProdP(p_prod_fa2_dec_fa2_VAJHU.prodme, false);
+        mela.getIORecord()->getUnweightedMEArray(p_prod_fa2_dec_fa2_VAJHU.mearray);
+
+        if (isZZWW!=2){ mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1; mela.selfDHzzcoupl[0][gHIGGS_VV_2][1]=1; }
+        else{ mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=0; mela.selfDHzzcoupl[0][gHIGGS_VV_2][1]=0; }
+        mela.computeProdP(p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAJHU.prodme, false);
+        mela.getIORecord()->getUnweightedMEArray(p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAJHU.mearray);
+
         if (isZZWW!=2) mela.selfDHzzcoupl[0][gHIGGS_VV_4][0]=1;
         else mela.selfDHzzcoupl[0][gHIGGS_VV_4][0]=0;
         mela.computeProdP(p_prod_0minus_dec_0minus_VAJHU.prodme, false);
@@ -3243,6 +3453,11 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
         else{ mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=0; mela.selfDHzzcoupl[0][gHIGGS_VV_4][0]=0; }
         mela.computeProdP(p_prod_fa3_dec_fa3_VAJHU.prodme, false);
         mela.getIORecord()->getUnweightedMEArray(p_prod_fa3_dec_fa3_VAJHU.mearray);
+
+        if (isZZWW!=2){ mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1; mela.selfDHzzcoupl[0][gHIGGS_VV_4][1]=1; }
+        else{ mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=0; mela.selfDHzzcoupl[0][gHIGGS_VV_4][1]=0; }
+        mela.computeProdP(p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAJHU.prodme, false);
+        mela.getIORecord()->getUnweightedMEArray(p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAJHU.mearray);
 
         {
           mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
@@ -3302,6 +3517,20 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
         mela.computeProdP(p_prod_0mplus_dec_0mplus_VAJHU.prodme, false);
         mela.getIORecord()->getUnweightedMEArray(p_prod_0mplus_dec_0mplus_VAJHU.mearray);
 
+        if (isZZWW!=1) mela.selfDHzzcoupl[0][gHIGGS_VV_2][0]=1;
+        mela.computeProdP(p_prod_0hplus_dec_0hplus_VAJHU.prodme, false);
+        mela.getIORecord()->getUnweightedMEArray(p_prod_0hplus_dec_0hplus_VAJHU.mearray);
+
+        if (isZZWW!=1){ mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1; mela.selfDHzzcoupl[0][gHIGGS_VV_2][0]=1; }
+        else{ mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=0; mela.selfDHzzcoupl[0][gHIGGS_VV_2][0]=0; }
+        mela.computeProdP(p_prod_fa2_dec_fa2_VAJHU.prodme, false);
+        mela.getIORecord()->getUnweightedMEArray(p_prod_fa2_dec_fa2_VAJHU.mearray);
+
+        if (isZZWW!=1){ mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1; mela.selfDHzzcoupl[0][gHIGGS_VV_2][1]=1; }
+        else{ mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=0; mela.selfDHzzcoupl[0][gHIGGS_VV_2][1]=0; }
+        mela.computeProdP(p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAJHU.prodme, false);
+        mela.getIORecord()->getUnweightedMEArray(p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAJHU.mearray);
+
         if (isZZWW!=1) mela.selfDHzzcoupl[0][gHIGGS_VV_4][0]=1;
         mela.computeProdP(p_prod_0minus_dec_0minus_VAJHU.prodme, false);
         mela.getIORecord()->getUnweightedMEArray(p_prod_0minus_dec_0minus_VAJHU.mearray);
@@ -3310,6 +3539,11 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
         else{ mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=0; mela.selfDHzzcoupl[0][gHIGGS_VV_4][0]=0; }
         mela.computeProdP(p_prod_fa3_dec_fa3_VAJHU.prodme, false);
         mela.getIORecord()->getUnweightedMEArray(p_prod_fa3_dec_fa3_VAJHU.mearray);
+
+        if (isZZWW!=1){ mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1; mela.selfDHzzcoupl[0][gHIGGS_VV_4][1]=1; }
+        else{ mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=0; mela.selfDHzzcoupl[0][gHIGGS_VV_4][1]=0; }
+        mela.computeProdP(p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAJHU.prodme, false);
+        mela.getIORecord()->getUnweightedMEArray(p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAJHU.mearray);
 
         mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
         mela.computeProdP(p_prod_0minusZA_dec_0minusZA_VAJHU.prodme, false);
@@ -3348,22 +3582,34 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
     }
     p_prod_0mplus_dec_0mplus_VAJHU.prodme *= propagator; p_prod_0mplus_dec_0mplus_VAJHU.multiplyarray(propagator);
     p_prod_0minus_dec_0minus_VAJHU.prodme *= propagator; p_prod_0minus_dec_0minus_VAJHU.multiplyarray(propagator);
+    p_prod_0hplus_dec_0hplus_VAJHU.prodme *= propagator; p_prod_0hplus_dec_0hplus_VAJHU.multiplyarray(propagator);
     p_prod_0mplusL2_dec_0mplusL2_VAJHU.prodme *= propagator; p_prod_0mplusL2_dec_0mplusL2_VAJHU.multiplyarray(propagator);
     p_prod_0minusZA_dec_0minusZA_VAJHU.prodme *= propagator; p_prod_0minusZA_dec_0minusZA_VAJHU.multiplyarray(propagator);
     p_prod_0minusAA_dec_0minusAA_VAJHU.prodme *= propagator; p_prod_0minusAA_dec_0minusAA_VAJHU.multiplyarray(propagator);
+    p_prod_fa2_dec_fa2_VAJHU.prodme *= propagator; p_prod_fa2_dec_fa2_VAJHU.multiplyarray(propagator);
+    p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAJHU.prodme *= propagator; p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAJHU.multiplyarray(propagator);
     p_prod_fa3_dec_fa3_VAJHU.prodme *= propagator; p_prod_fa3_dec_fa3_VAJHU.multiplyarray(propagator);
+    p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAJHU.prodme *= propagator; p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAJHU.multiplyarray(propagator);
     p_prod_fL2_dec_fL2_VAJHU.prodme *= propagator; p_prod_fL2_dec_fL2_VAJHU.multiplyarray(propagator);
     p_prod_fa3ZA_dec_fa3ZA_VAJHU.prodme *= propagator; p_prod_fa3ZA_dec_fa3ZA_VAJHU.multiplyarray(propagator);
     p_prod_fa3AA_dec_fa3AA_VAJHU.prodme *= propagator; p_prod_fa3AA_dec_fa3AA_VAJHU.multiplyarray(propagator);
 
     p_prod_0mplus_dec_0mplus_VAJHU.proddecme = p_prod_0mplus_dec_0mplus_VAJHU.prodme*p_prod_0mplus_dec_0mplus_VAJHU.decme; p_prod_0mplus_dec_0mplus_VAJHU.multiplyarray(p_prod_0mplus_dec_0mplus_VAJHU.decme);
     if (isZZWW==ZZWWdec_onevertexflag){ // MCFM setting below turns off ZZ anomalous couplings if WH with WW couplings tested, so we should do the same here.
+      p_prod_0hplus_dec_0hplus_VAJHU.proddecme = p_prod_0hplus_dec_0hplus_VAJHU.prodme*p_prod_0mplus_dec_0mplus_VAJHU.decme; p_prod_0hplus_dec_0hplus_VAJHU.multiplyarray(p_prod_0mplus_dec_0mplus_VAJHU.decme);
+      p_prod_fa2_dec_fa2_VAJHU.proddecme = p_prod_fa2_dec_fa2_VAJHU.prodme*p_prod_0mplus_dec_0mplus_VAJHU.decme; p_prod_fa2_dec_fa2_VAJHU.multiplyarray(p_prod_0mplus_dec_0mplus_VAJHU.decme);
+      p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAJHU.proddecme = p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAJHU.prodme*p_prod_0mplus_dec_0mplus_VAJHU.decme; p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAJHU.multiplyarray(p_prod_0mplus_dec_0mplus_VAJHU.decme);
       p_prod_0minus_dec_0minus_VAJHU.proddecme = p_prod_0minus_dec_0minus_VAJHU.prodme*p_prod_0mplus_dec_0mplus_VAJHU.decme; p_prod_0minus_dec_0minus_VAJHU.multiplyarray(p_prod_0mplus_dec_0mplus_VAJHU.decme);
       p_prod_fa3_dec_fa3_VAJHU.proddecme = p_prod_fa3_dec_fa3_VAJHU.prodme*p_prod_0mplus_dec_0mplus_VAJHU.decme; p_prod_fa3_dec_fa3_VAJHU.multiplyarray(p_prod_0mplus_dec_0mplus_VAJHU.decme);
+      p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAJHU.proddecme = p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAJHU.prodme*p_prod_0mplus_dec_0mplus_VAJHU.decme; p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAJHU.multiplyarray(p_prod_0mplus_dec_0mplus_VAJHU.decme);
     }
     else{
+      p_prod_0hplus_dec_0hplus_VAJHU.proddecme = p_prod_0hplus_dec_0hplus_VAJHU.prodme*p_prod_0hplus_dec_0hplus_VAJHU.decme; p_prod_0hplus_dec_0hplus_VAJHU.multiplyarray(p_prod_0hplus_dec_0hplus_VAJHU.decme);
+      p_prod_fa2_dec_fa2_VAJHU.proddecme = p_prod_fa2_dec_fa2_VAJHU.prodme*p_prod_fa2_dec_fa2_VAJHU.decme; p_prod_fa2_dec_fa2_VAJHU.multiplyarray(p_prod_fa2_dec_fa2_VAJHU.decme);
+      p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAJHU.proddecme = p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAJHU.prodme*p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAJHU.decme; p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAJHU.multiplyarray(p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAJHU.decme);
       p_prod_0minus_dec_0minus_VAJHU.proddecme = p_prod_0minus_dec_0minus_VAJHU.prodme*p_prod_0minus_dec_0minus_VAJHU.decme; p_prod_0minus_dec_0minus_VAJHU.multiplyarray(p_prod_0minus_dec_0minus_VAJHU.decme);
       p_prod_fa3_dec_fa3_VAJHU.proddecme = p_prod_fa3_dec_fa3_VAJHU.prodme*p_prod_fa3_dec_fa3_VAJHU.decme; p_prod_fa3_dec_fa3_VAJHU.multiplyarray(p_prod_fa3_dec_fa3_VAJHU.decme);
+      p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAJHU.proddecme = p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAJHU.prodme*p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAJHU.decme; p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAJHU.multiplyarray(p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAJHU.decme);
     }
     // These MEs only test WW anomalous couplings, so everything is fine here.
     p_prod_0mplusL2_dec_0mplusL2_VAJHU.proddecme = p_prod_0mplusL2_dec_0mplusL2_VAJHU.prodme*p_prod_0mplusL2_dec_0mplusL2_VAJHU.decme; p_prod_0mplusL2_dec_0mplusL2_VAJHU.multiplyarray(p_prod_0mplusL2_dec_0mplusL2_VAJHU.decme);
@@ -3391,6 +3637,21 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
     mela.computeProdDecP(p_prod_0mplus_dec_0mplus_VAMCFM.proddecme, false);
     mela.getIORecord()->getUnweightedMEArray(p_prod_0mplus_dec_0mplus_VAMCFM.mearray);
 
+    if (isZZWW!=2){ mela.selfDHzzcoupl[0][gHIGGS_VV_2][0]=1; if (isZZWW==1) mela.differentiate_HWW_HZZ=true; }
+    else{ mela.selfDHwwcoupl[0][gHIGGS_VV_2][0]=1; mela.differentiate_HWW_HZZ=true; }
+    mela.computeProdDecP(p_prod_0hplus_dec_0hplus_VAMCFM.proddecme, false);
+    mela.getIORecord()->getUnweightedMEArray(p_prod_0hplus_dec_0hplus_VAMCFM.mearray);
+
+    if (isZZWW!=2){ mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1; mela.selfDHzzcoupl[0][gHIGGS_VV_2][0]=1; if (isZZWW==1) mela.differentiate_HWW_HZZ=true; }
+    else{ mela.selfDHwwcoupl[0][gHIGGS_VV_1][0]=1; mela.selfDHwwcoupl[0][gHIGGS_VV_2][0]=1; mela.differentiate_HWW_HZZ=true; }
+    mela.computeProdDecP(p_prod_fa2_dec_fa2_VAMCFM.proddecme, false);
+    mela.getIORecord()->getUnweightedMEArray(p_prod_fa2_dec_fa2_VAMCFM.mearray);
+
+    if (isZZWW!=2){ mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1; mela.selfDHzzcoupl[0][gHIGGS_VV_2][1]=1; if (isZZWW==1) mela.differentiate_HWW_HZZ=true; }
+    else{ mela.selfDHwwcoupl[0][gHIGGS_VV_1][0]=1; mela.selfDHwwcoupl[0][gHIGGS_VV_2][1]=1; mela.differentiate_HWW_HZZ=true; }
+    mela.computeProdDecP(p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAMCFM.proddecme, false);
+    mela.getIORecord()->getUnweightedMEArray(p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAMCFM.mearray);
+
     if (isZZWW!=2){ mela.selfDHzzcoupl[0][gHIGGS_VV_4][0]=1; if (isZZWW==1) mela.differentiate_HWW_HZZ=true; }
     else{ mela.selfDHwwcoupl[0][gHIGGS_VV_4][0]=1; mela.differentiate_HWW_HZZ=true; }
     mela.computeProdDecP(p_prod_0minus_dec_0minus_VAMCFM.proddecme, false);
@@ -3400,6 +3661,11 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
     else{ mela.selfDHwwcoupl[0][gHIGGS_VV_1][0]=1; mela.selfDHwwcoupl[0][gHIGGS_VV_4][0]=1; mela.differentiate_HWW_HZZ=true; }
     mela.computeProdDecP(p_prod_fa3_dec_fa3_VAMCFM.proddecme, false);
     mela.getIORecord()->getUnweightedMEArray(p_prod_fa3_dec_fa3_VAMCFM.mearray);
+
+    if (isZZWW!=2){ mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1; mela.selfDHzzcoupl[0][gHIGGS_VV_4][1]=1; if (isZZWW==1) mela.differentiate_HWW_HZZ=true; }
+    else{ mela.selfDHwwcoupl[0][gHIGGS_VV_1][0]=1; mela.selfDHwwcoupl[0][gHIGGS_VV_4][1]=1; mela.differentiate_HWW_HZZ=true; }
+    mela.computeProdDecP(p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAMCFM.proddecme, false);
+    mela.getIORecord()->getUnweightedMEArray(p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAMCFM.mearray);
 
     // Test L2 asymmetric coupling in WW as well
     bool computeL2WWproddec=(isZZWW==2 || decZZWW==2);
@@ -3727,6 +3993,21 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
     cout << "\tJHUGen prod.-alone: " << p_prod_0mplus_dec_0mplus_VAJHU.prodme << endl;
     cout << "\tJHUGen ME: " << p_prod_0mplus_dec_0mplus_VAJHU.proddecme << endl;
     cout << "\tMCFM ME: " << p_prod_0mplus_dec_0mplus_VAMCFM.proddecme << endl;
+    cout << "0hplus" << endl;
+    cout << "\tJHUGen decay-alone: " << p_prod_0hplus_dec_0hplus_VAJHU.decme << endl;
+    cout << "\tJHUGen prod.-alone: " << p_prod_0hplus_dec_0hplus_VAJHU.prodme << endl;
+    cout << "\tJHUGen ME: " << p_prod_0hplus_dec_0hplus_VAJHU.proddecme << endl;
+    cout << "\tMCFM ME: " << p_prod_0hplus_dec_0hplus_VAMCFM.proddecme << endl;
+    cout << "fa2" << endl;
+    cout << "\tJHUGen decay-alone: " << p_prod_fa2_dec_fa2_VAJHU.decme << endl;
+    cout << "\tJHUGen prod.-alone: " << p_prod_fa2_dec_fa2_VAJHU.prodme << endl;
+    cout << "\tJHUGen ME: " << p_prod_fa2_dec_fa2_VAJHU.proddecme << endl;
+    cout << "\tMCFM ME: " << p_prod_fa2_dec_fa2_VAMCFM.proddecme << endl;
+    cout << "fa2, phia2=90" << endl;
+    cout << "\tJHUGen decay-alone: " << p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAJHU.decme << endl;
+    cout << "\tJHUGen prod.-alone: " << p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAJHU.prodme << endl;
+    cout << "\tJHUGen ME: " << p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAJHU.proddecme << endl;
+    cout << "\tMCFM ME: " << p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAMCFM.proddecme << endl;
     cout << "0minus" << endl;
     cout << "\tJHUGen decay-alone: " << p_prod_0minus_dec_0minus_VAJHU.decme << endl;
     cout << "\tJHUGen prod.-alone: " << p_prod_0minus_dec_0minus_VAJHU.prodme << endl;
@@ -3737,6 +4018,11 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
     cout << "\tJHUGen prod.-alone: " << p_prod_fa3_dec_fa3_VAJHU.prodme << endl;
     cout << "\tJHUGen ME: " << p_prod_fa3_dec_fa3_VAJHU.proddecme << endl;
     cout << "\tMCFM ME: " << p_prod_fa3_dec_fa3_VAMCFM.proddecme << endl;
+    cout << "fa3, phia3=90" << endl;
+    cout << "\tJHUGen decay-alone: " << p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAJHU.decme << endl;
+    cout << "\tJHUGen prod.-alone: " << p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAJHU.prodme << endl;
+    cout << "\tJHUGen ME: " << p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAJHU.proddecme << endl;
+    cout << "\tMCFM ME: " << p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAMCFM.proddecme << endl;
     cout << "0mplusL2" << endl;
     cout << "\tJHUGen decay-alone: " << p_prod_0mplusL2_dec_0mplusL2_VAJHU.decme << endl;
     cout << "\tJHUGen prod.-alone: " << p_prod_0mplusL2_dec_0mplusL2_VAJHU.prodme << endl;
@@ -3783,6 +4069,48 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
       }
       cout << endl;
     }
+    cout << "0hplus" << endl;
+    cout << "\tJHUGen" << endl;
+    p_prod_0hplus_dec_0hplus_VAJHU.printarray();
+    cout << "\tMCFM" << endl;
+    p_prod_0hplus_dec_0hplus_VAMCFM.printarray();
+    cout << "\tJHUGen/MCFM Ratio" << endl;
+    for (int ii=0; ii<nmsq; ii++){
+      for (int jj=0; jj<nmsq; jj++){
+        cout << '\t';
+        if (p_prod_0hplus_dec_0hplus_VAMCFM.mearray[ii][jj]!=0.) cout << p_prod_0hplus_dec_0hplus_VAJHU.mearray[ii][jj]/p_prod_0hplus_dec_0hplus_VAMCFM.mearray[ii][jj];
+        else cout << 0;
+      }
+      cout << endl;
+    }
+    cout << "fa2" << endl;
+    cout << "\tJHUGen" << endl;
+    p_prod_fa2_dec_fa2_VAJHU.printarray();
+    cout << "\tMCFM" << endl;
+    p_prod_fa2_dec_fa2_VAMCFM.printarray();
+    cout << "\tJHUGen/MCFM Ratio" << endl;
+    for (int ii=0; ii<nmsq; ii++){
+      for (int jj=0; jj<nmsq; jj++){
+        cout << '\t';
+        if (p_prod_fa2_dec_fa2_VAMCFM.mearray[ii][jj]!=0.) cout << p_prod_fa2_dec_fa2_VAJHU.mearray[ii][jj]/p_prod_fa2_dec_fa2_VAMCFM.mearray[ii][jj];
+        else cout << 0;
+      }
+      cout << endl;
+    }
+    cout << "fa2, phia2=90" << endl;
+    cout << "\tJHUGen" << endl;
+    p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAJHU.printarray();
+    cout << "\tMCFM" << endl;
+    p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAMCFM.printarray();
+    cout << "\tJHUGen/MCFM Ratio" << endl;
+    for (int ii=0; ii<nmsq; ii++){
+      for (int jj=0; jj<nmsq; jj++){
+        cout << '\t';
+        if (p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAMCFM.mearray[ii][jj]!=0.) cout << p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAJHU.mearray[ii][jj]/p_prod_fa2_phia2_90_dec_fa2_phia2_90_VAMCFM.mearray[ii][jj];
+        else cout << 0;
+      }
+      cout << endl;
+    }
     cout << "0minus" << endl;
     cout << "\tJHUGen" << endl;
     p_prod_0minus_dec_0minus_VAJHU.printarray();
@@ -3807,6 +4135,20 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
       for (int jj=0; jj<nmsq; jj++){
         cout << '\t';
         if (p_prod_fa3_dec_fa3_VAMCFM.mearray[ii][jj]!=0.) cout << p_prod_fa3_dec_fa3_VAJHU.mearray[ii][jj]/p_prod_fa3_dec_fa3_VAMCFM.mearray[ii][jj];
+        else cout << 0;
+      }
+      cout << endl;
+    }
+    cout << "fa3, phia3=90" << endl;
+    cout << "\tJHUGen" << endl;
+    p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAJHU.printarray();
+    cout << "\tMCFM" << endl;
+    p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAMCFM.printarray();
+    cout << "\tJHUGen/MCFM Ratio" << endl;
+    for (int ii=0; ii<nmsq; ii++){
+      for (int jj=0; jj<nmsq; jj++){
+        cout << '\t';
+        if (p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAMCFM.mearray[ii][jj]!=0.) cout << p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAJHU.mearray[ii][jj]/p_prod_fa3_phia3_90_dec_fa3_phia3_90_VAMCFM.mearray[ii][jj];
         else cout << 0;
       }
       cout << endl;
@@ -4516,6 +4858,7 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
     float Phi1=0;
     float Q2V1=0;
     float Q2V2=0;
+    float mVstar=0, mV=0;
 
     float pingMom[8][4]={
       { 0, 0, 865.37881546721542, 865.37881546721542 },
@@ -4660,6 +5003,8 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
         costheta2,
         Phi,
         Phi1,
+        mVstar,
+        mV,
 
         daughters.at(0).second, daughters.at(0).first,
         daughters.at(1).second, daughters.at(1).first,
@@ -4697,6 +5042,8 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
         costheta2,
         Phi,
         Phi1,
+        mVstar,
+        mV,
 
         daughters.at(0).second, daughters.at(0).first,
         daughters.at(1).second, daughters.at(1).first,
@@ -5337,6 +5684,7 @@ void testME_ProdDec_MCFM_JHUGen_Comparison(int flavor=2, bool useBkgSample=false
   float Phi1=0;
   float Q2V1=0;
   float Q2V2=0;
+  float mVstar=0, mV=0;
 
   TTree* tree = (TTree*)finput->Get(TREE_NAME);
   tree->SetBranchAddress("NJets30", &NJets30);
@@ -5503,6 +5851,8 @@ void testME_ProdDec_MCFM_JHUGen_Comparison(int flavor=2, bool useBkgSample=false
           costheta2,
           Phi,
           Phi1,
+          mVstar,
+          mV,
 
           daughters_ZZ.at(0).second, daughters_ZZ.at(0).first,
           daughters_ZZ.at(1).second, daughters_ZZ.at(1).first,
@@ -5540,6 +5890,8 @@ void testME_ProdDec_MCFM_JHUGen_Comparison(int flavor=2, bool useBkgSample=false
           costheta2,
           Phi,
           Phi1,
+          mVstar,
+          mV,
 
           daughters_ZZ.at(0).second, daughters_ZZ.at(0).first,
           daughters_ZZ.at(1).second, daughters_ZZ.at(1).first,

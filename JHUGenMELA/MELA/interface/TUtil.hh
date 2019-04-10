@@ -143,6 +143,8 @@ namespace TUtil{
     float& costheta2,
     float& Phi,
     float& Phi1,
+    float& m1,
+    float& m2,
     TLorentzVector p4M11, int Z1_lept1Id,
     TLorentzVector p4M12, int Z1_lept2Id,
     TLorentzVector p4M21, int Z2_lept1Id,

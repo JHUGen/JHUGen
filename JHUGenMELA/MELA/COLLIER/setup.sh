@@ -42,7 +42,7 @@ else
     mv $tmpdir"/"$pkgdir"/src/"* ./
     rm -rf $tmpdir
 
-    make
+    make $@
     cp $libname "../data/$SCRAM_ARCH/$libname"
   fi
 

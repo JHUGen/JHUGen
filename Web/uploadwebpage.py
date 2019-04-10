@@ -172,9 +172,9 @@ class Version(object):
             check_call(["tar", "-cvzf", self.tarballname] + store)
             check_call(["mv", self.tarballname, WebGeneratordir])
 
-def create_Download(mostrecentversion, *olderversions):
-    if not mostrecentversion.visible:
-        raise ValueError("The most recent version has to be visible")
+def create_Download(*versions):
+    mostrecentversion = [_ for _ in versions if _.visible][0]
+    olderversions = [_ for _ in versions if _ is not mostrecentversion]
     mostrecentversion.createtarball(force=True)
     check_call(["cp", os.path.join(gitdir, mostrecentversion.manualname), os.path.join(Webdir, "Manual.pdf")])
     for version in [mostrecentversion] + list(olderversions) + list(reallyold):
@@ -254,6 +254,8 @@ Download_template = """
 #   - melacommit, name of the commit to checkout for the JHUGenMELA folder.  Default is the same
 #       as the generator
 versions = (
+            Version("v7.2.7", visible=False, gitcommit="05c4ea749698a25ccc789519f1dff84914b34411"),
+            Version("v7.2.6", visible=False),
             Version("v7.2.4"),
             Version("v7.2.3", visible=False),
             Version("v7.2.2", visible=False),
@@ -275,7 +277,7 @@ versions = (
             Version("v5.2.5", manualcommit="b9c0fa8"),
             Version("v5.2.3"),
             Version("v4.5.2"),
-            Version("v4.3.2", manualcommit="4b13646"),
+            Version("v4.3.2", manualcommit="v4.3.2-manual"),
             Version("v4.2.1", manualcommit="41fc189"),
             Version("v4.0.1", manualcommit="757d864"),
             Version("v3.1.8"),
