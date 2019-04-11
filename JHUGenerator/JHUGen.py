@@ -74,11 +74,12 @@ class JobSubmitter(object):
     else:
       array_index = self.args.array_index
 
-    if array_index is not None:
-      if 66 <= self.Process <= 69:
+    if 66 <= self.Process <= 69:
+      if array_index is not None:
         if self.VBFoffsh_run is not None: raise RuntimeError("With VBFoffsh_run set to {:d}, shouldn't have an array index".format(self.VBFoffsh_run))
         result.append("VBFoffsh_run={:d}".format(int(array_index)))
-      else:
+    else:
+      if array_index is not None and int(array_index) != 0:
         raise RuntimeError("Process {:d} shouldn't have an array index".format(self.Process))
 
     return result
@@ -122,7 +123,10 @@ class JobSubmitter(object):
         for _ in arrayjobs:
           self.dodryrun(array_index=_)
     else:
-      arrayjobs = None
+      if self.args.array_index is not None:
+        arrayjobs = [self.args.array_index]
+      else:
+        arrayjobs = [None]
       with self.setenvandcd():
         self.dodryrun()
 
@@ -136,7 +140,7 @@ class JobSubmitter(object):
     return self.submittoqueue(arrayjobs=arrayjobs)
 
   @abc.abstractmethod
-  def submittoqueue(self, arrayjobs=None): pass
+  def submittoqueue(self, arrayjobs): pass
   @abc.abstractproperty
   def jobindex(self):
     """
@@ -156,7 +160,8 @@ class JobSubmitter(object):
     in the output and error file names
     """
 
-  def commandline(self, isarray=False):
+  @property
+  def commandline(self):
     result = [__file__, "--on-queue", os.path.dirname(os.path.abspath(__file__))]
 
     for varname in ("LD_LIBRARY_PATH",):
@@ -165,8 +170,7 @@ class JobSubmitter(object):
       except KeyError:
         pass
 
-    if isarray:
-      result += ["--array-index", self.jobindex]
+    result += ["--array-index", self.jobindex]
 
     return result + self.argv
 
@@ -273,9 +277,7 @@ class JobSubmitter(object):
   def jobindicesrunning(self, arrayjobs=None): pass
 
 class JobRunner(JobSubmitter):
-  def submittoqueue(self, arrayjobs=None):
-    if arrayjobs is None: arrayjobs = [self.args.array_index]
-
+  def submittoqueue(self, arrayjobs):
     with self.setenvandcd():
       #https://stackoverflow.com/a/6191991
       p = multiprocessing.Pool()
@@ -297,17 +299,16 @@ class JobRunner(JobSubmitter):
     assert False
 
 class JobSubmitterSlurm(JobSubmitter):
-  def submittoqueue(self, arrayjobs=None):
+  def submittoqueue(self, arrayjobs):
     sbatchcommandline = [
       "sbatch",
       "--job-name", self.jobname,
       "--time", self.formattedjobtime,
       "--output", self.outputfile,
       "--error", self.errorfile,
+      "--array", ",".join(arrayjobs)
     ]
-    if arrayjobs is not None:
-      sbatchcommandline += ["--array="+",".join(arrayjobs)]
-    sbatchcommandline += self.commandline(isarray=arrayjobs is not None)
+    sbatchcommandline += self.commandline
     try:
       sbatchout = subprocess.check_output(
         sbatchcommandline,
@@ -325,7 +326,7 @@ class JobSubmitterSlurm(JobSubmitter):
   def formattedjobtime(self):
     return re.sub(" days?, ", "-", str(self.jobtime))
 
-  def jobindicesrunning(self, arrayjobs=None):
+  def jobindicesrunning(self, arrayjobs):
     jobindices = set()
     jobids = set()
     for index in arrayjobs:
@@ -356,8 +357,8 @@ class JobSubmitterCondor(JobSubmitter):
   @property
   def formattedjobtime(self):
     return "{:d}".format(int(self.jobtime.total_seconds()))
-  def submittoqueue(self, arrayjobs=None):
-    commandline = self.commandline(isarray=arrayjobs is not None)
+  def submittoqueue(self, arrayjobs):
+    commandline = self.commandline
     with tempfile.NamedTemporaryFile(bufsize=0) as f:
       f.write(
         textwrap.dedent(
@@ -377,10 +378,7 @@ class JobSubmitterCondor(JobSubmitter):
             commandline[0],
             '"' + " ".join(self.quote(_) for _ in commandline[1:]) + '"',
             self=self,
-            queue=(
-              "1" if arrayjobs is None
-              else ("JobIndexInArray in " + " ".join(arrayjobs))
-            ),
+            queue="JobIndexInArray in " + " ".join(str(_) for _ in arrayjobs),
             logfile=self.logfile(),
           )
         )
@@ -440,6 +438,11 @@ def parse_time(time):
   kwargs = {key: int(value) for key, value in match.groupdict().iteritems() if value is not None}
   return datetime.timedelta(**kwargs)
 
+def parse_array_index(array_index):
+  result = os.path.expandvars(array_index)
+  if result == "None": return None
+  return int(result)
+
 def parse_args(*args, **kwargs):
   p = argparse.ArgumentParser()
   p.add_argument("JHUGenarg", nargs="*")
@@ -453,7 +456,7 @@ def parse_args(*args, **kwargs):
   #submits itself to a queue.  They shouldn't be set manually.
   p.add_argument("--on-queue", help=argparse.SUPPRESS)
   p.add_argument("--set-env-var", help=argparse.SUPPRESS, nargs=2, action="append", default=[])
-  p.add_argument("--array-index", help=argparse.SUPPRESS, type=os.path.expandvars)
+  p.add_argument("--array-index", help=argparse.SUPPRESS, type=parse_array_index)
 
   args = p.parse_args(*args, **kwargs)
 
