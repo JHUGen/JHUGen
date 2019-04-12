@@ -33,7 +33,9 @@ EBEAM(other.EBEAM),
 Xcal2(other.Xcal2),
 melaCand(0) // 0 is correct in the copy constructor
 {
+  if (processVerbosity>=TVar::DEBUG) MELAout << "Begin ZZMatrixElement copy constructor" << endl;
   build();
+  if (processVerbosity>=TVar::DEBUG) MELAout << "End ZZMatrixElement copy constructor" << endl;
 }
 
 void ZZMatrixElement::build(){
@@ -48,6 +50,7 @@ void ZZMatrixElement::build(){
   selfD_SpinOneCouplings = Xcal2.GetSelfDSpinOneCouplings();
   selfD_SpinTwoCouplings = Xcal2.GetSelfDSpinTwoCouplings();
   selfD_VprimeCouplings = Xcal2.GetSelfDVprimeCouplings();
+  selfD_aTQGCCouplings = Xcal2.GetSelfDaTQGCCouplings();
 
   if (processVerbosity>=TVar::DEBUG) MELAout << "End ZZMatrixElement::build" << endl;
 }
@@ -322,6 +325,11 @@ void ZZMatrixElement::set_VprimeContactCouplings(
   }
   selfD_VprimeCouplings->SetZPrimeMassWidth(M_Zprime, Ga_Zprime);
   selfD_VprimeCouplings->SetWPrimeMassWidth(M_Wprime, Ga_Wprime);
+}
+void ZZMatrixElement::set_aTQGCCouplings(
+  double selfDaTQGCcoupl[SIZE_ATQGC][2]
+){
+  for (int ic=0; ic<SIZE_ATQGC; ic++) selfD_aTQGCCouplings->SetATQGCCouplings(ic, selfDaTQGCcoupl[ic][0], selfDaTQGCcoupl[ic][1]);
 }
 
 

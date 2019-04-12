@@ -207,6 +207,7 @@ class Mela(object):
                ("selfDGvvcoupl", (ROOT.py_SIZE_GVV, 2)),
                ("selfDGvvpcoupl", (ROOT.py_SIZE_GVV, 2)),
                ("selfDGvpvpcoupl", (ROOT.py_SIZE_GVV, 2)),
+               ("selfDaTQGCcoupl", (ROOT.py_SIZE_ATQGC, 2)),
               )
 
     f = None
@@ -610,6 +611,21 @@ class Mela(object):
   bzpzp8 = SelfDCoupling("selfDGvpvpcoupl", ROOT.py_gGRAVITON_VV_8)
   bzpzp9 = SelfDCoupling("selfDGvpvpcoupl", ROOT.py_gGRAVITON_VV_9)
   bzpzp10 = SelfDCoupling("selfDGvpvpcoupl", ROOT.py_gGRAVITON_VV_10)
+
+  dV_A = SelfDCoupling("selfDaTQGCcoupl", ROOT.py_gATQGC_dVA);
+  dP_A = SelfDCoupling("selfDaTQGCcoupl", ROOT.py_gATQGC_dPA);
+  dM_A = SelfDCoupling("selfDaTQGCcoupl", ROOT.py_gATQGC_dMA);
+  dFour_A = SelfDCoupling("selfDaTQGCcoupl", ROOT.py_gATQGC_dFourA);
+
+  dV_Z = SelfDCoupling("selfDaTQGCcoupl", ROOT.py_gATQGC_dVZ);
+  dP_Z = SelfDCoupling("selfDaTQGCcoupl", ROOT.py_gATQGC_dPZ);
+  dM_Z = SelfDCoupling("selfDaTQGCcoupl", ROOT.py_gATQGC_dMZ);
+  dFour_Z = SelfDCoupling("selfDaTQGCcoupl", ROOT.py_gATQGC_dFourZ);
+
+  dAAWpWm = SelfDCoupling("selfDaTQGCcoupl", ROOT.py_gATQGC_dAAWpWm);
+  dZAWpWm = SelfDCoupling("selfDaTQGCcoupl", ROOT.py_gATQGC_dZAWpWm);
+  dZZWpWm = SelfDCoupling("selfDaTQGCcoupl", ROOT.py_gATQGC_dZZWpWm);
+
 
 
 

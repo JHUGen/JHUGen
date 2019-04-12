@@ -163,6 +163,23 @@ namespace{
 
     SIZE_GVV
   };
+  enum{
+    gATQGC_dVA,
+    gATQGC_dPA,
+    gATQGC_dMA,
+    gATQGC_dFourA,
+
+    gATQGC_dVZ,
+    gATQGC_dPZ,
+    gATQGC_dMZ,
+    gATQGC_dFourZ,
+
+    gATQGC_dAAWpWm,
+    gATQGC_dZAWpWm,
+    gATQGC_dZZWpWm,
+
+    SIZE_ATQGC
+  };
 }
 
 

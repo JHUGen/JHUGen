@@ -356,6 +356,12 @@ void Mela::setSpinTwoCouplings(){
     selfDGa_Wprime
   );
 }
+void Mela::setATQGCCouplings(){
+  ZZME->set_aTQGCCouplings(
+    selfDaTQGCcoupl
+  );
+}
+
 
 // Notice that this only sets the members of MELA, not TEvtProb. TEvtProb resets itself.
 void Mela::reset_SelfDCouplings(){
@@ -427,6 +433,11 @@ void Mela::reset_SelfDCouplings(){
   selfDGa_Zprime = 0;
   selfDM_Wprime = -1;
   selfDGa_Wprime = 0;
+
+  // aTQGC couplings
+  for (int im=0; im<2; im++){
+    for (int ic=0; ic<SIZE_ATQGC; ic++) selfDaTQGCcoupl[ic][im] = 0;
+  }
 
   // Did I tell you that we have a lot of them?
 }
@@ -1173,6 +1184,7 @@ void Mela::computeD_CP(
 void Mela::computeProdDecP(
   double selfDHvvcoupl_input[nSupportedHiggses][SIZE_HVV][2],
   double selfDHwwcoupl_input[nSupportedHiggses][SIZE_HVV][2],
+  double selfDaTQGCcoupl_input[SIZE_ATQGC][2],
   float& prob,
   bool useConstant
   ){
@@ -1183,6 +1195,9 @@ void Mela::computeProdDecP(
         selfDHwwcoupl[jh][ic][im] = selfDHwwcoupl_input[jh][ic][im]; // Just for extra protection since differentiate_HWW_HZZ is set to false.
       }
     }
+  }
+  for (int im=0; im<2; im++){
+    for (int ic=0; ic<SIZE_ATQGC; ic++) selfDaTQGCcoupl[ic][im] = selfDaTQGCcoupl_input[ic][im];
   }
   computeProdDecP(
     prob,
@@ -1222,6 +1237,7 @@ void Mela::computeProdDecP(
   if (hasFailed) prob=0;
   else{
     setSpinZeroCouplings();
+    setATQGCCouplings();
     ZZME->computeProdXS_VVHVV(prob);
     if (useConstant) computeConstant(prob);
   }

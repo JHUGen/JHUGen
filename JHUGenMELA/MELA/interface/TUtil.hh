@@ -192,7 +192,8 @@ namespace TUtil{
   void ResetAmplitudeIncludes();
 
   // Spin-0 couplings
-  void SetMCFMSpinZeroCouplings(bool useBSM, SpinZeroCouplings* Hcouplings, bool forceZZ);
+  void SetMCFMSpinZeroCouplings(bool useBSM, SpinZeroCouplings const* Hcouplings, bool forceZZ);
+  void SetMCFMaTQGCCouplings(bool useBSM, aTQGCCouplings const* couplings);
   void SetJHUGenSpinZeroVVCouplings(double Hvvcoupl[SIZE_HVV][2], double Hvvpcoupl[SIZE_HVV][2], double Hvpvpcoupl[SIZE_HVV][2], int Hvvcoupl_cqsq[SIZE_HVV_CQSQ], double HvvLambda_qsq[SIZE_HVV_LAMBDAQSQ][SIZE_HVV_CQSQ], bool useWWcoupl);
   void SetJHUGenSpinZeroGGCouplings(double Hggcoupl[SIZE_HGG][2]);
   void SetJHUGenSpinZeroQQCouplings(double Hqqcoupl[SIZE_HQQ][2]);

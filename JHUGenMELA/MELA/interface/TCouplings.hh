@@ -7,11 +7,12 @@
 class SpinZeroCouplings{
 public:
   SpinZeroCouplings();
+  SpinZeroCouplings(SpinZeroCouplings const& other);
   virtual ~SpinZeroCouplings();
 
   void allow_WWZZSeparation(bool doAllow = true);
   void reset();
-  void copy(SpinZeroCouplings& other);
+  void copy(SpinZeroCouplings const& other);
   SpinZeroCouplings* getRef();
 
   void SetHVVCouplings(unsigned int index, double c_real, double c_imag, bool setWW = false, int whichResonance=1);
@@ -64,10 +65,11 @@ public:
 class SpinOneCouplings{
 public:
   SpinOneCouplings();
+  SpinOneCouplings(SpinOneCouplings const& other);
   virtual ~SpinOneCouplings();
 
   void reset();
-  void copy(SpinOneCouplings& other);
+  void copy(SpinOneCouplings const& other);
   SpinOneCouplings* getRef();
 
   void SetZVVCouplings(unsigned int index, double c_real, double c_imag);
@@ -80,10 +82,11 @@ public:
 class SpinTwoCouplings{
 public:
   SpinTwoCouplings();
+  SpinTwoCouplings(SpinTwoCouplings const& other);
   virtual ~SpinTwoCouplings();
 
   void reset();
-  void copy(SpinTwoCouplings& other);
+  void copy(SpinTwoCouplings const& other);
   SpinTwoCouplings* getRef();
 
   void SetGVVCouplings(unsigned int index, double c_real, double c_imag);
@@ -102,10 +105,11 @@ public:
 class VprimeCouplings{
 public:
   VprimeCouplings();
+  VprimeCouplings(VprimeCouplings const& other);
   virtual ~VprimeCouplings();
 
   void reset();
-  void copy(VprimeCouplings& other);
+  void copy(VprimeCouplings const& other);
   VprimeCouplings* getRef();
 
   void SetVpffCouplings(unsigned int index, double c_real, double c_imag, bool setWpff = false, int whichResonance=1);
@@ -121,5 +125,19 @@ public:
   double Ga_Wprime;
 };
 
+class aTQGCCouplings{
+public:
+  aTQGCCouplings();
+  aTQGCCouplings(aTQGCCouplings const& other);
+  virtual ~aTQGCCouplings();
+
+  void reset();
+  void copy(aTQGCCouplings const& other);
+  aTQGCCouplings* getRef();
+
+  void SetATQGCCouplings(unsigned int index, double c_real, double c_imag);
+
+  double aTQGCcoupl[SIZE_ATQGC][2];
+};
 
 #endif

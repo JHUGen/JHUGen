@@ -120,6 +120,7 @@ public:
   SpinOneCouplings* GetSelfDSpinOneCouplings();
   SpinTwoCouplings* GetSelfDSpinTwoCouplings();
   VprimeCouplings* GetSelfDVprimeCouplings();
+  aTQGCCouplings* GetSelfDaTQGCCouplings();
   double GetPrimaryHiggsMass();
   double GetPrimaryMass(int ipart);
   double GetPrimaryWidth(int ipart);
@@ -154,6 +155,7 @@ protected:
   SpinOneCouplings selfDSpinOneCoupl;
   SpinTwoCouplings selfDSpinTwoCoupl;
   VprimeCouplings selfDVprimeCoupl;
+  aTQGCCouplings selfDaTQGCCoupl;
   MelaIO RcdME;
 
   MELACandidate* melaCand; // Only a pointer to the top-level (input) candList object
@@ -176,6 +178,7 @@ protected:
   bool CheckSelfDCouplings_Htt();
   bool CheckSelfDCouplings_Hbb();
   bool CheckSelfDCouplings_HVV();
+  bool CheckSelfDCouplings_aTQGC();
 
   // Constructor wrapper
   void Build();

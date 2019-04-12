@@ -238,6 +238,10 @@ extern "C" {
     double gh2w1_prime6[2]; double gh2w2_prime6[2]; double gh2w3_prime6[2]; double gh2w4_prime6[2]; // q1**4 - q2**4
     double gh2w1_prime7[2]; double gh2w2_prime7[2]; double gh2w3_prime7[2]; double gh2w4_prime7[2]; // |q1**2| * |q2**2|
 
+    double dV_A[2]; double dP_A[2]; double dM_A[2]; double dFour_A[2];
+    double dV_Z[2]; double dP_Z[2]; double dM_Z[2]; double dFour_Z[2];
+    double dZZWpWm[2]; double dZAWpWm[2]; double dAAWpWm[2];
+
   } spinzerohiggs_anomcoupl_;
 
   extern struct {

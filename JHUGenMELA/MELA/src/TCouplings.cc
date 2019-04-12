@@ -10,6 +10,7 @@ using namespace std;
 
 /********** Spin-0 couplings **********/
 SpinZeroCouplings::SpinZeroCouplings(){ reset(); }
+SpinZeroCouplings::SpinZeroCouplings(SpinZeroCouplings const& other){ this->copy(other); }
 SpinZeroCouplings::~SpinZeroCouplings(){}
 
 void SpinZeroCouplings::allow_WWZZSeparation(bool doAllow){ separateWWZZcouplings = doAllow; }
@@ -59,7 +60,7 @@ void SpinZeroCouplings::reset(){
     }
   }
 }
-void SpinZeroCouplings::copy(SpinZeroCouplings& other){
+void SpinZeroCouplings::copy(SpinZeroCouplings const& other){
   allow_WWZZSeparation(other.separateWWZZcouplings);
 
   for (int im=0; im<2; im++){
@@ -270,6 +271,7 @@ void SpinZeroCouplings::SetHVpVpCouplings(unsigned int index, double c_real, dou
 
 /********** Spin-1 couplings **********/
 SpinOneCouplings::SpinOneCouplings(){ reset(); }
+SpinOneCouplings::SpinOneCouplings(SpinOneCouplings const& other){ this->copy(other); }
 SpinOneCouplings::~SpinOneCouplings(){}
 
 void SpinOneCouplings::reset(){
@@ -283,7 +285,7 @@ void SpinOneCouplings::reset(){
   Zqqcoupl[1][0]=1.0;
   */
 }
-void SpinOneCouplings::copy(SpinOneCouplings& other){
+void SpinOneCouplings::copy(SpinOneCouplings const& other){
   for (int im=0; im<2; im++){
     for (int ic=0; ic<SIZE_ZVV; ic++) Zvvcoupl[ic][im] = (other.Zvvcoupl)[ic][im];
     for (int ic=0; ic<SIZE_ZQQ; ic++) Zqqcoupl[ic][im] = (other.Zqqcoupl)[ic][im];
@@ -309,6 +311,7 @@ void SpinOneCouplings::SetZQQCouplings(unsigned int index, double c_real, double
 
 /********** Spin-2 couplings **********/
 SpinTwoCouplings::SpinTwoCouplings(){ reset(); }
+SpinTwoCouplings::SpinTwoCouplings(SpinTwoCouplings const& other){ this->copy(other); }
 SpinTwoCouplings::~SpinTwoCouplings(){}
 
 void SpinTwoCouplings::reset(){
@@ -328,7 +331,7 @@ void SpinTwoCouplings::reset(){
   Gvvcoupl[0][0]=1.0;
   */
 }
-void SpinTwoCouplings::copy(SpinTwoCouplings& other){
+void SpinTwoCouplings::copy(SpinTwoCouplings const& other){
   for (int im=0; im<2; im++){
     for (int ic=0; ic<SIZE_GVV; ic++) Gvvcoupl[ic][im] = (other.Gvvcoupl)[ic][im];
     for (int ic=0; ic<SIZE_GGG; ic++) Gggcoupl[ic][im] = (other.Gggcoupl)[ic][im];
@@ -376,6 +379,7 @@ void SpinTwoCouplings::SetGGGCouplings(unsigned int index, double c_real, double
 
 /********** Vprime couplings **********/
 VprimeCouplings::VprimeCouplings(){ reset(); }
+VprimeCouplings::VprimeCouplings(VprimeCouplings const& other){ this->copy(other); }
 VprimeCouplings::~VprimeCouplings(){}
 
 void VprimeCouplings::reset(){
@@ -389,7 +393,7 @@ void VprimeCouplings::reset(){
   SetZPrimeMassWidth(-1, 0);
   SetWPrimeMassWidth(-1, 0);
 }
-void VprimeCouplings::copy(VprimeCouplings& other){
+void VprimeCouplings::copy(VprimeCouplings const& other){
   for (int im=0; im<2; im++){
     for (int ic=0; ic<SIZE_Vpff; ic++){
       Zpffcoupl[ic][im] = (other.Zpffcoupl)[ic][im];
@@ -429,3 +433,29 @@ void VprimeCouplings::SetVpffCouplings(unsigned int index, double c_real, double
 }
 void VprimeCouplings::SetZPrimeMassWidth(double inmass, double inwidth){ M_Zprime = inmass; Ga_Zprime = inwidth; }
 void VprimeCouplings::SetWPrimeMassWidth(double inmass, double inwidth){ M_Wprime = inmass; Ga_Wprime = inwidth; }
+
+
+/********** aTQGC couplings **********/
+aTQGCCouplings::aTQGCCouplings(){ reset(); }
+aTQGCCouplings::aTQGCCouplings(aTQGCCouplings const& other){ this->copy(other); }
+aTQGCCouplings::~aTQGCCouplings(){}
+
+void aTQGCCouplings::reset(){
+  for (int im=0; im<2; im++){
+    for (int ic = 0; ic < SIZE_ATQGC; ic++) aTQGCcoupl[ic][im]=0;
+  }
+}
+void aTQGCCouplings::copy(aTQGCCouplings const& other){
+  for (int im=0; im<2; im++){
+    for (int ic=0; ic<SIZE_ATQGC; ic++) aTQGCcoupl[ic][im] = (other.aTQGCcoupl)[ic][im];
+  }
+}
+aTQGCCouplings* aTQGCCouplings::getRef(){ return this; }
+
+void aTQGCCouplings::SetATQGCCouplings(unsigned int index, double c_real, double c_imag){
+  if (index>=SIZE_ATQGC){ MELAerr << "aTQGCCouplings::SetATQGCCouplings: Cannot set index " << index << ", out of range for the type requested." << endl; }
+  else{
+    aTQGCcoupl[index][0] = c_real;
+    aTQGCcoupl[index][1] = c_imag;
+  }
+}

@@ -332,6 +332,8 @@ void TEvtProb::ResetCouplings(){
   selfDSpinZeroCoupl.reset();
   selfDSpinOneCoupl.reset();
   selfDSpinTwoCoupl.reset();
+  selfDVprimeCoupl.reset();
+  selfDaTQGCCoupl.reset();
   AllowSeparateWWCouplings(false);
   ResetAmplitudeIncludes();
 }
@@ -357,6 +359,7 @@ SpinZeroCouplings* TEvtProb::GetSelfDSpinZeroCouplings(){ return selfDSpinZeroCo
 SpinOneCouplings* TEvtProb::GetSelfDSpinOneCouplings(){ return selfDSpinOneCoupl.getRef(); }
 SpinTwoCouplings* TEvtProb::GetSelfDSpinTwoCouplings(){ return selfDSpinTwoCoupl.getRef(); }
 VprimeCouplings* TEvtProb::GetSelfDVprimeCouplings(){ return selfDVprimeCoupl.getRef(); }
+aTQGCCouplings* TEvtProb::GetSelfDaTQGCCouplings(){ return selfDaTQGCCoupl.getRef(); }
 double TEvtProb::GetPrimaryHiggsMass(){ return PrimaryHMass; }
 double TEvtProb::GetPrimaryMass(int ipart){
   if (PDGHelpers::isAHiggs(ipart)) return GetPrimaryHiggsMass();
@@ -722,11 +725,13 @@ double TEvtProb::XsecCalc_VVXVV(){
 
   bool useMCFM = matrixElement == TVar::MCFM;
   bool needBSMHiggs=false;
+  bool needATQGC=false;
   bool calculateME=false;
   if (useMCFM){
     if (verbosity>=TVar::DEBUG) MELAout << "TEvtProb::XsecCalc_VVXVV: Try MCFM" << endl;
     needBSMHiggs = CheckSelfDCouplings_HVV();
-    if (needBSMHiggs) SetLeptonInterf(TVar::InterfOn); // All anomalous coupling computations have to use lepton interference
+    needATQGC = CheckSelfDCouplings_aTQGC();
+    if (needBSMHiggs || needATQGC) SetLeptonInterf(TVar::InterfOn); // All anomalous coupling computations have to use lepton interference
 
     calculateME = (
       production == TVar::Had_WH || production == TVar::Had_ZH || production == TVar::Lep_WH || production == TVar::Lep_ZH || production == TVar::JJVBF || production == TVar::JJEW || production == TVar::JJQCD || production == TVar::JJEWQCD
@@ -735,6 +740,7 @@ double TEvtProb::XsecCalc_VVXVV(){
       );
     if (calculateME){
       SetMCFMSpinZeroCouplings(needBSMHiggs, &selfDSpinZeroCoupl, false);
+      SetMCFMaTQGCCouplings(needATQGC, &selfDaTQGCCoupl);
       dXsec = SumMatrixElementPDF(process, production, matrixElement, leptonInterf, &event_scales, &RcdME, EBEAM, verbosity);
     }
     else if (verbosity>=TVar::INFO) MELAout << "TEvtProb::XsecCalc_VVXVV: MCFM_chooser failed to determine the process configuration." << endl;
@@ -748,8 +754,12 @@ double TEvtProb::XsecCalc_VVXVV(){
 
   ResetCouplings(); // Should come first
   if (useMCFM){ // Set defaults. Should come next...
-    if (needBSMHiggs) SetLeptonInterf(TVar::DefaultLeptonInterf);
-    if (calculateME) SetMCFMSpinZeroCouplings(false, &selfDSpinZeroCoupl, true); // ... because of this!
+    if (needBSMHiggs || needATQGC) SetLeptonInterf(TVar::DefaultLeptonInterf);
+    if (calculateME){
+      // ... because of these!
+      SetMCFMSpinZeroCouplings(false, &selfDSpinZeroCoupl, true);
+      SetMCFMaTQGCCouplings(false, &selfDaTQGCCoupl);
+    }
   }
   ResetRenFacScaleMode();
   if (verbosity>=TVar::DEBUG) MELAout << "End XsecCalc_VVXVV" << endl;
@@ -1115,6 +1125,16 @@ bool TEvtProb::CheckSelfDCouplings_HVV(){
         return true;
       }
     } // No need to check c_q**2. If these are 0, z_q**2 do not have any effect.
+  }
+  return false;
+}
+bool TEvtProb::CheckSelfDCouplings_aTQGC(){
+  for (int vv = 0; vv < SIZE_ATQGC; vv++){
+    if (
+      (selfDaTQGCCoupl.aTQGCcoupl)[vv][1] != 0 || (selfDaTQGCCoupl.aTQGCcoupl)[vv][0] != 0
+      ){
+      return true;
+    }
   }
   return false;
 }

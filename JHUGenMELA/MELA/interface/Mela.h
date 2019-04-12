@@ -182,6 +182,7 @@ public:
   void computeProdDecP(
     double selfDHvvcoupl_input[nSupportedHiggses][SIZE_HVV][2],
     double selfDHwwcoupl_input[nSupportedHiggses][SIZE_HVV][2],
+    double selfDaTQGCcoupl_input[SIZE_ATQGC][2],
     float& prob,
     bool useConstant=true
     );
@@ -309,6 +310,8 @@ public:
   double selfDGvvcoupl[SIZE_GVV][2];
   double selfDGvvpcoupl[SIZE_GVV][2];
   double selfDGvpvpcoupl[SIZE_GVV][2];
+  //****aTQGC****//
+  double selfDaTQGCcoupl[SIZE_ATQGC][2];
   // That is a lot of them!
 
 protected:
@@ -399,6 +402,7 @@ protected:
   void setSpinZeroCouplings();
   void setSpinOneCouplings();
   void setSpinTwoCouplings();
+  void setATQGCCouplings();
 
   bool configureAnalyticalPDFs();
   void reset_SelfDCouplings();
