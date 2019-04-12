@@ -2691,7 +2691,7 @@ integer :: VBFoffsh_Hash_Size,VBFoffsh_run_size
 integer, parameter :: VBFoffsh_run_maxsize=max(Hash_MCFM_qqVVqq_Size, Hash_MCFM_qqVVqqStrong_Size)
 character :: ProcessStr*(3)
 logical :: UseBetaVersion=.false.
-real(8) :: VG_Result_in(1:VBFoffsh_run_maxsize),VG_Error_in(1:VBFoffsh_run_maxsize),calls1_in(1:VBFoffsh_run_maxsize),calls2_in(1:VBFoffsh_run_maxsize)
+real(8) :: VG_Result_in(1:VBFoffsh_run_maxsize),VG_Error_in(1:VBFoffsh_run_maxsize),calls1_array(1:VBFoffsh_run_maxsize)
 real(8) :: CrossSec2_in(1:VBFoffsh_run_maxsize,1:NMAXCHANNELS),CrossSecMax2_in(1:VBFoffsh_run_maxsize,NMAXCHANNELS),CrossSectionWithWeights_in(1:VBFoffsh_run_maxsize),CrossSectionWithWeightsErrorSquared_in(1:VBFoffsh_run_maxsize)
 character(len=len(CSmaxFile)+20) :: FileToRead
 
@@ -3016,7 +3016,6 @@ IF( .NOT. (Process.ge.66 .and. Process.le.69) ) THEN! special treatment for offs
 
 
 ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell VBF
-
     if (Process.ge.66 .and. Process.lt.69) then
        VBFoffsh_Hash_Size = Hash_MCFM_qqVVqq_Size
        VBFoffsh_run_size = Hash_MCFM_qqVVqq_Size
@@ -3040,7 +3039,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         do j=1,VBFoffsh_run_size
             write(FileToRead, "(A,I0.3,A)") trim(CSmaxFile(1:i-3)), j, "_gridinfo.txt"
             open(unit=io_TmpFile,file=FileToRead,form='formatted',status='old',iostat=ios)
-            read(io_TmpFile,fmt=*) calls1_in(j)
+            read(io_TmpFile,fmt=*) calls1_array(j)
             read(io_TmpFile,fmt=*) CrossSec2_in(j,1:VBFoffsh_Hash_Size)
             read(io_TmpFile,fmt=*) CrossSecMax2_in(j,1:VBFoffsh_Hash_Size)
             read(io_TmpFile,fmt=*) VG_Result_in(j)
@@ -3050,11 +3049,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
             if( ios.eq.0 ) print *, "read ",FileToRead
         enddo
 
-        !write(6,*) "calls1_in:",calls1_in
-        do j=2,VBFoffsh_run_size
-           if( calls1_in(1).ne.calls1_in(j) ) call Error("Mismatch in calls1")
-        enddo
-        calls1 = calls1_in(1)
+        !write(6,*) "calls1_array:",calls1_array
 
         CrossSec2(:) = -1d0
         do i=1,VBFoffsh_Hash_Size
@@ -3073,7 +3068,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 
         CrossSecMax2(:) = -1d0
         do i=1,VBFoffsh_Hash_Size
-            CrossSecMax2(i) = CrossSecMax2_in( max(1,VBFoffsh_run),i)
+            CrossSecMax2(i) = CrossSecMax2_in( max(1,VBFoffsh_run),i) * calls1_array(VBFoffsh_run)
         enddo
         if (VBFoffsh_Hash_Size .lt. NMAXCHANNELS) CrossSecMax2(VBFoffsh_Hash_Size+1:NMAXCHANNELS)=0d0
 
@@ -3122,11 +3117,11 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         writeout=.false.
         ingridfile=trim(outgridfile)
 
-        call vegas_get_calls(calls1)
+        call vegas_get_calls(calls1_array(VBFoffsh_run))
         CrossSec2(:) = CrossSec2(:)/dble(itmx)
 
         open(unit=io_TmpFile,file=trim(CSmaxFile)//'_gridinfo.txt',form='formatted',status='replace')
-        write(io_TmpFile,fmt=*) calls1
+        write(io_TmpFile,fmt=*) calls1_array(VBFoffsh_run)
         write(io_TmpFile,fmt=*) CrossSec2(1:VBFoffsh_Hash_Size)
         write(io_TmpFile,fmt=*) CrossSecMax2(1:VBFoffsh_Hash_Size)
         write(io_TmpFile,fmt=*) VG_Result
@@ -3209,9 +3204,8 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
     writeout=.false.
 
     call vegas_get_calls(calls2)
-    calls_rescale = calls1/calls2
+    calls_rescale = 1d0/calls2
     CrossSecMax2(:) = CrossSecMax2(:) * calls_rescale
-    print *, "Rescale CrossSecMax2 by ",calls_rescale
 
     PreviousSum = 0
     if( sum(RequEvents2(:)).eq.0 ) StatusPercent = 100d0
