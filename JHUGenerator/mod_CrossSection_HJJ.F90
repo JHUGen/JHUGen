@@ -33,7 +33,7 @@ integer :: id_MCFM(mxpart),MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),
 integer, pointer :: ijSel(:,:)
 integer :: iPartChannel,PartChannelAvg,NumPartonicChannels,iflip,i,j,k
 real(8) :: PreFac,VegasWeighted_HJJ_fulldecay,xRnd,LeptonAndVegasWeighted_HJJ_fulldecay
-logical :: applyPSCut
+logical :: applyPSCut,swap34_56
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
 include 'vegas_common.f'
 include 'maxwt.f'
@@ -113,7 +113,7 @@ m1ffwgt=1d0;m2ffwgt=1d0
    endif
 
    call PDFMapping(2,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi,EhatMin=dmax1(m4l_minmax(1),0d0)+mJJcut)
-   call EvalPhasespace_VBF_H4f(yRnd(3),yRnd(4:17),EHat,MomExt(1:4,1:10),PSWgt,id_MCFM(1:8))
+   call EvalPhasespace_VBF_H4f(yRnd(3),yRnd(4:17),EHat,MomExt(1:4,1:10),PSWgt,id_MCFM(1:8),swap34_56)
    !write(6,*) "After EvalPS, MomExt:",MomExt,", Pwwgt:",PSWgt
 
 !       call genps(6,EHat,yRnd(3:16),(/0d0,0d0,0d0,0d0,0d0,0d0/),MomExt(1:4,3:8),PSWgt)
@@ -133,7 +133,7 @@ m1ffwgt=1d0;m2ffwgt=1d0
    PSWgt = PSWgt * PartChannelAvg * FinalStateWeight
 
 
-   call Kinematics_HVBF_fulldecay(MomExt,applyPSCut,NBin)
+   call Kinematics_HVBF_fulldecay(MomExt,id_MCFM,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.lt.1d-33 ) then
       return
    endif
@@ -158,11 +158,20 @@ m1ffwgt=1d0;m2ffwgt=1d0
    msq_MCFM(:,:) = 0d0
 
    MomShifted = MomExt
-   if(.not.IsAPhoton(DecayMode1)) then
-      call ShiftMass(MomExt(1:4,Lep1P),MomExt(1:4,Lep1M), GetMass(MY_IDUP(Lep1P)),GetMass(MY_IDUP(Lep1M)),MomShifted(1:4,Lep1P),MomShifted(1:4,Lep1M),MassWeight=m1ffwgt)
-   endif
-   if(.not.IsAPhoton(DecayMode2)) then
-      call ShiftMass(MomExt(1:4,Lep2P),MomExt(1:4,Lep2M), GetMass(MY_IDUP(Lep2P)),GetMass(MY_IDUP(Lep2M)),MomShifted(1:4,Lep2P),MomShifted(1:4,Lep2M),MassWeight=m2ffwgt)
+   if (swap34_56) then
+      if(.not.IsAPhoton(DecayMode1)) then
+         call ShiftMass(MomExt(1:4,Lep1P),MomExt(1:4,Lep2M), GetMass(MY_IDUP(Lep1P)),GetMass(MY_IDUP(Lep2M)),MomShifted(1:4,Lep1P),MomShifted(1:4,Lep2M),MassWeight=m1ffwgt)
+      endif
+      if(.not.IsAPhoton(DecayMode2)) then
+         call ShiftMass(MomExt(1:4,Lep2P),MomExt(1:4,Lep1M), GetMass(MY_IDUP(Lep2P)),GetMass(MY_IDUP(Lep1M)),MomShifted(1:4,Lep2P),MomShifted(1:4,Lep1M),MassWeight=m2ffwgt)
+      endif
+   else
+      if(.not.IsAPhoton(DecayMode1)) then
+         call ShiftMass(MomExt(1:4,Lep1P),MomExt(1:4,Lep1M), GetMass(MY_IDUP(Lep1P)),GetMass(MY_IDUP(Lep1M)),MomShifted(1:4,Lep1P),MomShifted(1:4,Lep1M),MassWeight=m1ffwgt)
+      endif
+      if(.not.IsAPhoton(DecayMode2)) then
+         call ShiftMass(MomExt(1:4,Lep2P),MomExt(1:4,Lep2M), GetMass(MY_IDUP(Lep2P)),GetMass(MY_IDUP(Lep2M)),MomShifted(1:4,Lep2P),MomShifted(1:4,Lep2M),MassWeight=m2ffwgt)
+      endif
    endif
 
 

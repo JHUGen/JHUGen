@@ -2132,7 +2132,7 @@ END SUBROUTINE
 
 
 
-SUBROUTINE Kinematics_HVBF_fulldecay(MomExt,applyPSCut,NBin)
+SUBROUTINE Kinematics_HVBF_fulldecay(MomExt,ids,applyPSCut,NBin)
 use ModMisc
 use ModParameters
 implicit none
@@ -2140,7 +2140,7 @@ real(8) :: MomExt(:,:), mZ1, mZ2, MReso
 real(8) :: MomLepP(1:4),MomLepM(1:4),MomBoost(1:4),BeamAxis(1:4),ScatteringAxis(1:4),dummy(1:4)
 real(8) :: MomLept(1:4,1:4),MomLeptX(1:4,1:4),MomLeptPlane1(2:4),MomLeptPlane2(2:4),MomBeamScatterPlane(2:4)
 logical :: applyPSCut
-integer :: NBin(:)
+integer :: NBin(:),ids(1:8)
 real(8) :: m_jj,y_j1,y_j2,dphi_jj,dy_j1j2,pT_jl,pT_j1,pT_j2,pT_H,m_4l,dR_j1j2
 real(8) :: pT_l1,pT_l2,pT_l3,pT_l4,y_l1,y_l2,y_l3,y_l4
 real(8) :: Phi1,signPhi1,MomReso(1:4)
@@ -2170,6 +2170,8 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
 
        mZ1 = get_MInv(MomExt(1:4,Lep1P)+MomExt(1:4,Lep1M))
        mZ2 = get_MInv(MomExt(1:4,Lep2P)+MomExt(1:4,Lep2M))
+       mZ1alt = get_MInv(MomExt(1:4,Lep1P)+MomExt(1:4,Lep2M))
+       mZ2alt = get_MInv(MomExt(1:4,Lep2P)+MomExt(1:4,Lep1M))
 
        dphi_jj = abs( Get_PHI(MomExt(1:4,3)) - Get_PHI(MomExt(1:4,4)) )
        if( dphi_jj.gt.Pi ) dphi_jj=2d0*Pi-dphi_jj
@@ -2184,6 +2186,19 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
 !          write(6,*) "Failed mphoton cutoff. mZ2=",mZ2,"<",MPhotonCutoff
           applyPSCut=.true.
           return
+       endif
+
+       if(ids(3).eq.ids(5) .and. ids(4).eq.ids(6)) then
+          if( mZ1alt.lt.MPhotonCutoff ) then
+!             write(6,*) "Failed mphoton cutoff. mZ1alt=",mZ1alt,"<",MPhotonCutoff
+             applyPSCut=.true.
+             return
+          endif
+          if( mZ2alt.lt.MPhotonCutoff ) then
+!             write(6,*) "Failed mphoton cutoff. mZ2alt=",mZ2alt,"<",MPhotonCutoff
+             applyPSCut=.true.
+             return
+          endif
        endif
 !       if( m_4l.lt.70d0*GeV ) then
 !          applyPSCut=.true.
@@ -5994,7 +6009,7 @@ real(8) :: Jac,Jac1,Jac2,Jac3,Mom_ij_Dummy(1:4),s35,s45
 RETURN
 END SUBROUTINE
 
-SUBROUTINE EvalPhasespace_VBF_H4f(xchannel,xRnd,Energy,Mom,Jac,ids)
+SUBROUTINE EvalPhasespace_VBF_H4f(xchannel,xRnd,Energy,Mom,Jac,ids,swap34_56)
 use ModParameters
 use ModPhasespace
 use ModMisc
@@ -6008,12 +6023,13 @@ real(8), parameter :: RescaleWidth=1d0
 real(8) :: s1min, s2min
 integer :: NumChannels, it_chan, ch_ctr
 integer :: id12, id78, id17, id28, id18, id27
-logical :: isZH, isWH, isVBF
+logical :: swap34_56, isZH, isWH, isVBF
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
 
    isZH = .false.
    isWH = .false.
    isVBF = .false.
+   swap34_56 = .false.
 
 
    Mom(1:4,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
@@ -6142,6 +6158,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
       if( xRndLeptInterf.gt.0.5d0 ) then ! Swapped config.
          Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,9),Mom(:,8))       !   Z --> ffbar
          Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,7),Mom(:,10))      !   Z --> ffbar
+         swap34_56 = .true.
       else ! Normal config
          Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))       !   Z --> ffbar
          Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))      !   Z --> ffbar
