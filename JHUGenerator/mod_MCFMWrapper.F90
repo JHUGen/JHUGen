@@ -1994,7 +1994,7 @@ integer :: i,j,ip
                enddo
                enddo
             endif
-         else if (Process.eq.69) then ! Or some other number?
+         else if (Process.eq.69) then
             call SetupParticleLabels(id_MCFM,1,8,.false.,.true.) ! Assign plabels
             call qq_zzqqstrong(p_MCFM,msq)
             if (id_MCFM(7).eq.0 .and. id_MCFM(8).eq.0) then ! Calculate for swapped momentum combination

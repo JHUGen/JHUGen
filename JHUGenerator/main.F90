@@ -1139,6 +1139,9 @@ type(SaveValues) :: tosave, oldsavevalues
     if( .not. (Process.ge.66 .and. Process.le.69) .and. SetVBFoffsh_run ) then
       call Error("VBFoffsh_run is only for VBF offshell")
     endif
+    if( (Process.ge.66 .and. Process.le.69) .and. VBFoffsh_run.le.0 ) then
+      call Error("VBFoffsh_run must be greater than 0.")
+    endif
 
     if( Process.ge.66 .and. Process.le.69) then
       if( m4l_minmax(1).lt.0d0 ) call Error("Have to set m4l_min for VBF offshell")
@@ -2058,7 +2061,7 @@ include "vegas_common.f"
          NDim = NDim + 8
          NDim = NDim + 1
          NDim = NDim + 1
-         NDim = NDim + 1
+         if (VBFoffsh_run.le.0) NDim = NDim + 1
 
          VegasIt1_default = 15
          VegasNc0_default = 10000000
