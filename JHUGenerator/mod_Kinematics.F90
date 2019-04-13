@@ -2136,7 +2136,7 @@ SUBROUTINE Kinematics_HVBF_fulldecay(MomExt,ids,applyPSCut,NBin)
 use ModMisc
 use ModParameters
 implicit none
-real(8) :: MomExt(:,:), mZ1, mZ2, MReso
+real(8) :: MomExt(:,:), mZ1, mZ2, MReso, mZ1alt, mZ2alt
 real(8) :: MomLepP(1:4),MomLepM(1:4),MomBoost(1:4),BeamAxis(1:4),ScatteringAxis(1:4),dummy(1:4)
 real(8) :: MomLept(1:4,1:4),MomLeptX(1:4,1:4),MomLeptPlane1(2:4),MomLeptPlane2(2:4),MomBeamScatterPlane(2:4)
 logical :: applyPSCut

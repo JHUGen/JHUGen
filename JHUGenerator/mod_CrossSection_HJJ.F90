@@ -260,7 +260,7 @@ m1ffwgt=1d0;m2ffwgt=1d0
           write(io_stdout, "(2X,A,1PE13.6,1PE13.6,1PE13.6,I4,I4,I4)") "CrossSecMax is too small.",VegasWeighted_HJJ_fulldecay, CrossSecMax2(iPartChannel),VegasWeighted_HJJ_fulldecay/CrossSecMax2(iPartChannel),iPartChannel,iPart_sel,jPart_sel
           AlertCounter = AlertCounter + 1
 
- !          This dynamically increases the maximum in case it is exceeded
+!          This dynamically increases the maximum in case it is exceeded
           CrossSecMax2(iPartChannel) = VegasWeighted_HJJ_fulldecay
           write(io_LogFile,"(2X,A,1PE13.6)") "Increasing CrossSecMax to ",VegasWeighted_HJJ_fulldecay
           write(io_stdout, "(2X,A,1PE13.6)") "Increasing CrossSecMax to ",VegasWeighted_HJJ_fulldecay
