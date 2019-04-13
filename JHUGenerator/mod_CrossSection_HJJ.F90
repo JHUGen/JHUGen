@@ -91,10 +91,20 @@ m1ffwgt=1d0;m2ffwgt=1d0
    call VVBranchings(MY_IDUP(5:10),ICOLUP(1:2,7:10),FinalStateWeight,700)
    call swap(MY_IDUP(7),MY_IDUP(8))!   switch ordering ElP_,ElM_,MuP_,MuM_ --> ElM_,ElP_,MuM_,MuP_
    call swap(MY_IDUP(9),MY_IDUP(10))
+   do jpart=1,2
+      id_MCFM(jpart) = ijSel(iPartChannel,jpart) ! JHU convention
+   enddo
    id_MCFM(3:6) = MY_IDUP(7:10)
+   do jpart=3,4
+      id_MCFM(jpart+4) = ijSel(iPartChannel,jpart)
+   enddo
+   MY_IDUP(1:2)= id_MCFM(1:2)
+   MY_IDUP(3:4)= id_MCFM(7:8)
+   !write(6,*) "id_MCFM:",id_MCFM
+   !write(6,*) "p_MCFM:",p_MCFM
 
    call PDFMapping(2,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi,EhatMin=dmax1(m4l_minmax(1),0d0)+mJJcut)
-   call EvalPhasespace_VBF_H4f(yRnd(3),yRnd(4:17),EHat,MomExt(1:4,1:10),PSWgt,ijSel(iPartChannel,1:2),MY_IDUP(7)-MY_IDUP(9))
+   call EvalPhasespace_VBF_H4f(yRnd(3),yRnd(4:17),EHat,MomExt(1:4,1:10),PSWgt,id_MCFM(1:8))
 
 !       call genps(6,EHat,yRnd(3:16),(/0d0,0d0,0d0,0d0,0d0,0d0/),MomExt(1:4,3:8),PSWgt)
 !       MomExt(1:4,1)=(/Ehat,0d0,0d0,+Ehat/)/2d0
@@ -144,21 +154,6 @@ m1ffwgt=1d0;m2ffwgt=1d0
    if(.not.IsAPhoton(DecayMode2)) then
       call ShiftMass(MomExt(1:4,Lep2P),MomExt(1:4,Lep2M), GetMass(MY_IDUP(Lep2P)),GetMass(MY_IDUP(Lep2M)),MomShifted(1:4,Lep2P),MomShifted(1:4,Lep2M),MassWeight=m2ffwgt)
    endif
-
-
-   do jpart=1,2
-      id_MCFM(jpart) = ijSel(iPartChannel,jpart) ! JHU convention
-!      if(id_MCFM(jpart) .ne. 0) id_MCFM(jpart)=convertLHE(id_MCFM(jpart))
-   enddo
-   do jpart=3,4
-      id_MCFM(jpart+4) = ijSel(iPartChannel,jpart)
-!      if(id_MCFM(jpart+4) .ne. 0) id_MCFM(jpart+4)=convertLHE(id_MCFM(jpart+4))
-   enddo
-   MY_IDUP(1:2)= id_MCFM(1:2)
-   MY_IDUP(3:4)= id_MCFM(7:8)
-
-   !write(6,*) "id_MCFM:",id_MCFM
-   !write(6,*) "p_MCFM:",p_MCFM
 
 
 #if linkMELA==1

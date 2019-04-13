@@ -2414,6 +2414,48 @@ function CoupledVertex(id,hel,useAHcoupl)
    return
 end function CoupledVertex
 
+function CoupledVertexIsDiagonal(id,hel)
+   implicit none
+   integer, intent(in) :: id(1:2),hel
+   logical :: CoupledVertexIsDiagonal
+
+   if( (&
+   (id(1).eq.ElP_ .and. id(2).eq.NuE_) .or. (id(2).eq.ElP_ .and. id(1).eq.NuE_) .or. & ! W+ -> l+ nu
+   (id(1).eq.MuP_ .and. id(2).eq.NuM_) .or. (id(2).eq.MuP_ .and. id(1).eq.NuM_) .or. &
+   (id(1).eq.TaP_ .and. id(2).eq.NuT_) .or. (id(2).eq.TaP_ .and. id(1).eq.NuT_) .or. &
+   (id(1).eq.Up_  .and. id(2).eq.ADn_) .or. (id(2).eq.Up_  .and. id(1).eq.ADn_) .or. & ! W+ -> qu qbd
+   (id(1).eq.Chm_ .and. id(2).eq.AStr_) .or. (id(2).eq.Chm_ .and. id(1).eq.AStr_) .or. &
+   (id(1).eq.Top_ .and. id(2).eq.ABot_) .or. (id(2).eq.Top_ .and. id(1).eq.ABot_) .or. &
+   (id(1).eq.ElM_ .and. id(2).eq.ANuE_) .or. (id(2).eq.ElM_ .and. id(1).eq.ANuE_) .or. & ! W- -> l- nub
+   (id(1).eq.MuM_ .and. id(2).eq.ANuM_) .or. (id(2).eq.MuM_ .and. id(1).eq.ANuM_) .or. &
+   (id(1).eq.TaM_ .and. id(2).eq.ANuT_) .or. (id(2).eq.TaM_ .and. id(1).eq.ANuT_) .or. &
+   (id(1).eq.AUp_  .and. id(2).eq.Dn_ ) .or. (id(2).eq.AUp_  .and. id(1).eq.Dn_) .or. & ! W- -> qd qbu
+   (id(1).eq.AChm_ .and. id(2).eq.Str_) .or. (id(2).eq.AChm_ .and. id(1).eq.Str_) .or. &
+   (id(1).eq.ATop_ .and. id(2).eq.Bot_) .or. (id(2).eq.ATop_ .and. id(1).eq.Bot_) .or. &
+   (id(1).eq.NuE_ .and. id(2).eq.ANuE_) .or. (id(2).eq.NuE_ .and. id(1).eq.ANuE_) .or. & ! Z -> nu nu
+   (id(1).eq.NuM_ .and. id(2).eq.ANuM_) .or. (id(2).eq.NuM_ .and. id(1).eq.ANuM_) .or. &
+   (id(1).eq.NuT_ .and. id(2).eq.ANuT_) .or. (id(2).eq.NuT_ .and. id(1).eq.ANuT_)      &
+   ) .and. hel.lt.0) then
+      CoupledVertexIsDiagonal=.true.
+   elseif( (&
+   (id(1).eq.ElM_ .and. id(2).eq.ElP_) .or. (id(2).eq.ElM_ .and. id(1).eq.ElP_) .or. & ! Z -> ll
+   (id(1).eq.MuM_ .and. id(2).eq.MuP_) .or. (id(2).eq.MuM_ .and. id(1).eq.MuP_) .or. &
+   (id(1).eq.TaM_ .and. id(2).eq.TaP_) .or. (id(2).eq.TaM_ .and. id(1).eq.TaP_) .or. &
+   (id(1).eq.Up_  .and. id(2).eq.AUp_) .or. (id(2).eq.Up_  .and. id(1).eq.AUp_) .or. & ! Z -> qq
+   (id(1).eq.Dn_  .and. id(2).eq.ADn_) .or. (id(2).eq.Dn_  .and. id(1).eq.ADn_) .or. &
+   (id(1).eq.Chm_ .and. id(2).eq.AChm_) .or. (id(2).eq.Chm_ .and. id(1).eq.AChm_) .or. &
+   (id(1).eq.Str_ .and. id(2).eq.AStr_) .or. (id(2).eq.Str_ .and. id(1).eq.Astr_) .or. &
+   (id(1).eq.Top_ .and. id(2).eq.ATop_) .or. (id(2).eq.Top_ .and. id(1).eq.ATop_) .or. &
+   (id(1).eq.Bot_ .and. id(2).eq.ABot_) .or. (id(2).eq.Bot_ .and. id(1).eq.ABot_)      &
+   ) .and. hel.ne.0) then
+      CoupledVertexIsDiagonal=.true.
+   else
+      CoupledVertexIsDiagonal=.false.
+   endif
+
+   return
+end function CoupledVertexIsDiagonal
+
 
 
 FUNCTION CountLeptons( MY_IDUP )
