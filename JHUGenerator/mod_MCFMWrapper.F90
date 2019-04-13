@@ -102,6 +102,19 @@ integer, parameter :: &
    gGRAVITON_VV_9=9, &
    gGRAVITON_VV_10=10, &
    SIZE_GVV=10
+integer, parameter :: &
+   gATQGC_dVA=1, &
+   gATQGC_dPA=2, &
+   gATQGC_dMA=3, &
+   gATQGC_dFourA=4, &
+   gATQGC_dVZ=5, &
+   gATQGC_dPZ=6, &
+   gATQGC_dMZ=7, &
+   gATQGC_dFourZ=8, &
+   gATQGC_dAAWpWm=9, &
+   gATQGC_dZAWpWm=10, &
+   gATQGC_dZZWpWm=11, &
+   SIZE_ATQGC=11
 
 
 contains
@@ -177,6 +190,9 @@ subroutine MCFM_firsttime()
    integer H2wwCLambda_qsq(1:SIZE_HVV_CQSQ)
 
 
+   double complex aTQGCcoupl(1:SIZE_ATQGC)
+
+
    inputfile='input.DAT'
    workdir='./'
 
@@ -234,8 +250,11 @@ subroutine MCFM_firsttime()
    call GetSpinZeroVVCouplings(2, .false., H2zzcoupl, H2zzCLambda_qsq, H2zzLambda_qsq, H2zzLambda, H2Lambda_zgs1, H2Lambda_Q)
    call GetSpinZeroVVCouplings(2, .true.,  H2wwcoupl, H2wwCLambda_qsq, H2wwLambda_qsq, H2wwLambda, H2Lambda_zgs1, H2Lambda_Q)
 
-   call qlinit()
+! aTQGC
+   call GetATQGCCouplings(aTQGCcoupl)
 
+
+   call qlinit()
 
    call Init_MCFMCommon_spinzerohiggs_anomcoupl(Hggcoupl,Httcoupl,Hbbcoupl,Hg4g4coupl,Ht4t4coupl,Hb4b4coupl,    &
                                                 Hzzcoupl,Hwwcoupl,     &
@@ -245,7 +264,8 @@ subroutine MCFM_firsttime()
                                                 h2mass_in, h2width_in, &
                                                 H2zzcoupl,H2wwcoupl,   &
                                                 H2zzCLambda_qsq,H2wwCLambda_qsq,H2zzLambda_qsq,H2wwLambda_qsq,H2zzLambda,  &
-                                                H2wwLambda,H2Lambda_zgs1,H2Lambda_Q,H2LambdaBSM &
+                                                H2wwLambda,H2Lambda_zgs1,H2Lambda_Q,H2LambdaBSM, &
+                                                aTQGCcoupl &
                                                )
 
 
@@ -374,7 +394,9 @@ subroutine Init_MCFMCommon_spinzerohiggs_anomcoupl( &
 
    h2mass_in, h2width_in, &
    H2zzcoupl,H2wwcoupl,   &
-   H2zzCLambda_qsq,H2wwCLambda_qsq,H2zzLambda_qsq,H2wwLambda_qsq,H2zzLambda,H2wwLambda,H2Lambda_zgs1,H2Lambda_Q,H2LambdaBSM &
+   H2zzCLambda_qsq,H2wwCLambda_qsq,H2zzLambda_qsq,H2wwLambda_qsq,H2zzLambda,H2wwLambda,H2Lambda_zgs1,H2Lambda_Q,H2LambdaBSM, &
+
+   aTQGCcoupl &
    )
    implicit none
    double complex Hggcoupl(1:SIZE_HGG)
@@ -421,10 +443,11 @@ subroutine Init_MCFMCommon_spinzerohiggs_anomcoupl( &
    integer H2zzCLambda_qsq(1:SIZE_HVV_CQSQ)
    integer H2wwCLambda_qsq(1:SIZE_HVV_CQSQ)
 
+   double complex aTQGCcoupl(1:SIZE_ATQGC)
 
 
 
-   ! MCFM declarations
+   ! MCFM declarations: Needs to be a verbatim copy of spinzerohiggs_anomcoupl.f
    integer AllowAnomalousCouplings
    integer distinguish_HWWcouplings
    integer AnomalCouplPR
@@ -520,104 +543,112 @@ subroutine Init_MCFMCommon_spinzerohiggs_anomcoupl( &
    double complex gh2w1_prime6,gh2w2_prime6,gh2w3_prime6,gh2w4_prime6
    double complex gh2w1_prime7,gh2w2_prime7,gh2w3_prime7,gh2w4_prime7
 
-
-
-      common/spinzerohiggs_anomcoupl/     &
-        AllowAnomalousCouplings,     &
-        distinguish_HWWcouplings,     &
-        AnomalCouplPR,AnomalCouplDK,     &
-        channeltoggle_stu,vvhvvtoggle_vbfvh,     &
-        cz_q1sq,cz_q2sq,cz_q12sq,     &
-        cw_q1sq,cw_q2sq,cw_q12sq,     &
-        c2z_q1sq,c2z_q2sq,c2z_q12sq,     &
-        c2w_q1sq,c2w_q2sq,c2w_q12sq,     &
-
-        mb_4gen,mt_4gen,     &
-
-        LambdaBSM,Lambda_Q,     &
-        Lambda_zgs1,     &
-        Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4,     &
-        Lambda_z11,Lambda_z21,Lambda_z31,Lambda_z41,     &
-        Lambda_z12,Lambda_z22,Lambda_z32,Lambda_z42,     &
-        Lambda_z10,Lambda_z20,Lambda_z30,Lambda_z40,     &
-        Lambda_w1,Lambda_w2,Lambda_w3,Lambda_w4,     &
-        Lambda_w11,Lambda_w21,Lambda_w31,Lambda_w41,     &
-        Lambda_w12,Lambda_w22,Lambda_w32,Lambda_w42,     &
-        Lambda_w10,Lambda_w20,Lambda_w30,Lambda_w40,     &
-
-        h2mass,h2width,     &
-
-        Lambda2BSM,Lambda2_Q,     &
-        Lambda2_zgs1,     &
-        Lambda2_z1,Lambda2_z2,Lambda2_z3,Lambda2_z4,     &
-        Lambda2_z11,Lambda2_z21,Lambda2_z31,Lambda2_z41,     &
-        Lambda2_z12,Lambda2_z22,Lambda2_z32,Lambda2_z42,     &
-        Lambda2_z10,Lambda2_z20,Lambda2_z30,Lambda2_z40,     &
-        Lambda2_w1,Lambda2_w2,Lambda2_w3,Lambda2_w4,     &
-        Lambda2_w11,Lambda2_w21,Lambda2_w31,Lambda2_w41,     &
-        Lambda2_w12,Lambda2_w22,Lambda2_w32,Lambda2_w42,     &
-        Lambda2_w10,Lambda2_w20,Lambda2_w30,Lambda2_w40,     &
-
-
-        kappa_top,kappa_tilde_top,     &
-        kappa_bot,kappa_tilde_bot,     &
-        ghg2,ghg3,ghg4,     &
-        kappa_4gen_top,kappa_tilde_4gen_top,     &
-        kappa_4gen_bot,kappa_tilde_4gen_bot,     &
-        ghg2_4gen,ghg3_4gen,ghg4_4gen,     &
-
-        ghz1,ghz2,ghz3,ghz4,     &
-        ghz1_prime,ghz2_prime,ghz3_prime,ghz4_prime,     &
-        ghz1_prime2,ghz2_prime2,ghz3_prime2,ghz4_prime2,     &
-        ghz1_prime3,ghz2_prime3,ghz3_prime3,ghz4_prime3,     &
-        ghz1_prime4,ghz2_prime4,ghz3_prime4,ghz4_prime4,     &
-        ghz1_prime5,ghz2_prime5,ghz3_prime5,ghz4_prime5,     &
-        ghz1_prime6,ghz2_prime6,ghz3_prime6,ghz4_prime6,     &
-        ghz1_prime7,ghz2_prime7,ghz3_prime7,ghz4_prime7,     &
-
-        ghzgs1_prime2,ghzgs2,ghzgs3,ghzgs4,     &
-        ghgsgs2,ghgsgs3,ghgsgs4,     &
-
-        ghw1,ghw2,ghw3,ghw4,     &
-        ghw1_prime,ghw2_prime,ghw3_prime,ghw4_prime,     &
-        ghw1_prime2,ghw2_prime2,ghw3_prime2,ghw4_prime2,     &
-        ghw1_prime3,ghw2_prime3,ghw3_prime3,ghw4_prime3,     &
-        ghw1_prime4,ghw2_prime4,ghw3_prime4,ghw4_prime4,     &
-        ghw1_prime5,ghw2_prime5,ghw3_prime5,ghw4_prime5,     &
-        ghw1_prime6,ghw2_prime6,ghw3_prime6,ghw4_prime6,     &
-        ghw1_prime7,ghw2_prime7,ghw3_prime7,ghw4_prime7,     &
-
-
-        kappa2_top,kappa2_tilde_top,     &
-        kappa2_bot,kappa2_tilde_bot,     &
-        gh2g2,gh2g3,gh2g4,     &
-        kappa2_4gen_top,kappa2_tilde_4gen_top,     &
-        kappa2_4gen_bot,kappa2_tilde_4gen_bot,     &
-        gh2g2_4gen,gh2g3_4gen,gh2g4_4gen,     &
-
-        gh2z1,gh2z2,gh2z3,gh2z4,     &
-        gh2z1_prime,gh2z2_prime,gh2z3_prime,gh2z4_prime,     &
-        gh2z1_prime2,gh2z2_prime2,gh2z3_prime2,gh2z4_prime2,     &
-        gh2z1_prime3,gh2z2_prime3,gh2z3_prime3,gh2z4_prime3,     &
-        gh2z1_prime4,gh2z2_prime4,gh2z3_prime4,gh2z4_prime4,     &
-        gh2z1_prime5,gh2z2_prime5,gh2z3_prime5,gh2z4_prime5,     &
-        gh2z1_prime6,gh2z2_prime6,gh2z3_prime6,gh2z4_prime6,     &
-        gh2z1_prime7,gh2z2_prime7,gh2z3_prime7,gh2z4_prime7,     &
-
-        gh2zgs1_prime2,gh2zgs2,gh2zgs3,gh2zgs4,     &
-        gh2gsgs2,gh2gsgs3,gh2gsgs4,     &
-
-        gh2w1,gh2w2,gh2w3,gh2w4,     &
-        gh2w1_prime,gh2w2_prime,gh2w3_prime,gh2w4_prime,     &
-        gh2w1_prime2,gh2w2_prime2,gh2w3_prime2,gh2w4_prime2,     &
-        gh2w1_prime3,gh2w2_prime3,gh2w3_prime3,gh2w4_prime3,     &
-        gh2w1_prime4,gh2w2_prime4,gh2w3_prime4,gh2w4_prime4,     &
-        gh2w1_prime5,gh2w2_prime5,gh2w3_prime5,gh2w4_prime5,     &
-        gh2w1_prime6,gh2w2_prime6,gh2w3_prime6,gh2w4_prime6,     &
-        gh2w1_prime7,gh2w2_prime7,gh2w3_prime7,gh2w4_prime7
+!     anomalous couplings for triple and quartic gauge boson couplings: VVV, VVVV
+!     notation wrt paper: dV_N=d^{NWW}*d_1^N, dP_N=d^{NWW}*d_2^N, dM_N=d^{NWW}*d_3^N, dFour_N=d^{NWW}*d_4^N, for N=Z,\gamma
+!                         dZZWpWm = d^{ZZWW}*sw^2/cw^2, dZAWpWm = d^{Z\gammaWW}*sw/cw, dAAWpWm = d^{\gamma\gammaWW}
+   double complex dV_A,dP_A,dM_A,dFour_A
+   double complex dV_Z,dP_Z,dM_Z,dFour_Z
+   double complex dZZWpWm,dZAWpWm,dAAWpWm
 
 
 
+   common/spinzerohiggs_anomcoupl/     &
+     AllowAnomalousCouplings,     &
+     distinguish_HWWcouplings,     &
+     AnomalCouplPR,AnomalCouplDK,     &
+     channeltoggle_stu,vvhvvtoggle_vbfvh,     &
+     cz_q1sq,cz_q2sq,cz_q12sq,     &
+     cw_q1sq,cw_q2sq,cw_q12sq,     &
+     c2z_q1sq,c2z_q2sq,c2z_q12sq,     &
+     c2w_q1sq,c2w_q2sq,c2w_q12sq,     &
+
+     mb_4gen,mt_4gen,     &
+
+     LambdaBSM,Lambda_Q,     &
+     Lambda_zgs1,     &
+     Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4,     &
+     Lambda_z11,Lambda_z21,Lambda_z31,Lambda_z41,     &
+     Lambda_z12,Lambda_z22,Lambda_z32,Lambda_z42,     &
+     Lambda_z10,Lambda_z20,Lambda_z30,Lambda_z40,     &
+     Lambda_w1,Lambda_w2,Lambda_w3,Lambda_w4,     &
+     Lambda_w11,Lambda_w21,Lambda_w31,Lambda_w41,     &
+     Lambda_w12,Lambda_w22,Lambda_w32,Lambda_w42,     &
+     Lambda_w10,Lambda_w20,Lambda_w30,Lambda_w40,     &
+
+     h2mass,h2width,     &
+
+     Lambda2BSM,Lambda2_Q,     &
+     Lambda2_zgs1,     &
+     Lambda2_z1,Lambda2_z2,Lambda2_z3,Lambda2_z4,     &
+     Lambda2_z11,Lambda2_z21,Lambda2_z31,Lambda2_z41,     &
+     Lambda2_z12,Lambda2_z22,Lambda2_z32,Lambda2_z42,     &
+     Lambda2_z10,Lambda2_z20,Lambda2_z30,Lambda2_z40,     &
+     Lambda2_w1,Lambda2_w2,Lambda2_w3,Lambda2_w4,     &
+     Lambda2_w11,Lambda2_w21,Lambda2_w31,Lambda2_w41,     &
+     Lambda2_w12,Lambda2_w22,Lambda2_w32,Lambda2_w42,     &
+     Lambda2_w10,Lambda2_w20,Lambda2_w30,Lambda2_w40,     &
+
+
+     kappa_top,kappa_tilde_top,     &
+     kappa_bot,kappa_tilde_bot,     &
+     ghg2,ghg3,ghg4,     &
+     kappa_4gen_top,kappa_tilde_4gen_top,     &
+     kappa_4gen_bot,kappa_tilde_4gen_bot,     &
+     ghg2_4gen,ghg3_4gen,ghg4_4gen,     &
+
+     ghz1,ghz2,ghz3,ghz4,     &
+     ghz1_prime,ghz2_prime,ghz3_prime,ghz4_prime,     &
+     ghz1_prime2,ghz2_prime2,ghz3_prime2,ghz4_prime2,     &
+     ghz1_prime3,ghz2_prime3,ghz3_prime3,ghz4_prime3,     &
+     ghz1_prime4,ghz2_prime4,ghz3_prime4,ghz4_prime4,     &
+     ghz1_prime5,ghz2_prime5,ghz3_prime5,ghz4_prime5,     &
+     ghz1_prime6,ghz2_prime6,ghz3_prime6,ghz4_prime6,     &
+     ghz1_prime7,ghz2_prime7,ghz3_prime7,ghz4_prime7,     &
+
+     ghzgs1_prime2,ghzgs2,ghzgs3,ghzgs4,     &
+     ghgsgs2,ghgsgs3,ghgsgs4,     &
+
+     ghw1,ghw2,ghw3,ghw4,     &
+     ghw1_prime,ghw2_prime,ghw3_prime,ghw4_prime,     &
+     ghw1_prime2,ghw2_prime2,ghw3_prime2,ghw4_prime2,     &
+     ghw1_prime3,ghw2_prime3,ghw3_prime3,ghw4_prime3,     &
+     ghw1_prime4,ghw2_prime4,ghw3_prime4,ghw4_prime4,     &
+     ghw1_prime5,ghw2_prime5,ghw3_prime5,ghw4_prime5,     &
+     ghw1_prime6,ghw2_prime6,ghw3_prime6,ghw4_prime6,     &
+     ghw1_prime7,ghw2_prime7,ghw3_prime7,ghw4_prime7,     &
+
+
+     kappa2_top,kappa2_tilde_top,     &
+     kappa2_bot,kappa2_tilde_bot,     &
+     gh2g2,gh2g3,gh2g4,     &
+     kappa2_4gen_top,kappa2_tilde_4gen_top,     &
+     kappa2_4gen_bot,kappa2_tilde_4gen_bot,     &
+     gh2g2_4gen,gh2g3_4gen,gh2g4_4gen,     &
+
+     gh2z1,gh2z2,gh2z3,gh2z4,     &
+     gh2z1_prime,gh2z2_prime,gh2z3_prime,gh2z4_prime,     &
+     gh2z1_prime2,gh2z2_prime2,gh2z3_prime2,gh2z4_prime2,     &
+     gh2z1_prime3,gh2z2_prime3,gh2z3_prime3,gh2z4_prime3,     &
+     gh2z1_prime4,gh2z2_prime4,gh2z3_prime4,gh2z4_prime4,     &
+     gh2z1_prime5,gh2z2_prime5,gh2z3_prime5,gh2z4_prime5,     &
+     gh2z1_prime6,gh2z2_prime6,gh2z3_prime6,gh2z4_prime6,     &
+     gh2z1_prime7,gh2z2_prime7,gh2z3_prime7,gh2z4_prime7,     &
+
+     gh2zgs1_prime2,gh2zgs2,gh2zgs3,gh2zgs4,     &
+     gh2gsgs2,gh2gsgs3,gh2gsgs4,     &
+
+     gh2w1,gh2w2,gh2w3,gh2w4,     &
+     gh2w1_prime,gh2w2_prime,gh2w3_prime,gh2w4_prime,     &
+     gh2w1_prime2,gh2w2_prime2,gh2w3_prime2,gh2w4_prime2,     &
+     gh2w1_prime3,gh2w2_prime3,gh2w3_prime3,gh2w4_prime3,     &
+     gh2w1_prime4,gh2w2_prime4,gh2w3_prime4,gh2w4_prime4,     &
+     gh2w1_prime5,gh2w2_prime5,gh2w3_prime5,gh2w4_prime5,     &
+     gh2w1_prime6,gh2w2_prime6,gh2w3_prime6,gh2w4_prime6,     &
+     gh2w1_prime7,gh2w2_prime7,gh2w3_prime7,gh2w4_prime7,     &
+
+     dV_A,dP_A,dM_A,dFour_A,                                  &
+     dV_Z,dP_Z,dM_Z,dFour_Z,                                  &
+     dZZWpWm,dZAWpWm,dAAWpWm
 
 
    ! Begin assignments
@@ -711,9 +742,6 @@ subroutine Init_MCFMCommon_spinzerohiggs_anomcoupl( &
    ghgsgs2 = Hzzcoupl(gHIGGS_AA_2)
    ghgsgs3 = Hzzcoupl(gHIGGS_AA_3)
    ghgsgs4 = Hzzcoupl(gHIGGS_AA_4)
-
-
-
 
    if (distinguish_HWWcouplings .eq. 1) then
       Lambda_w1 = HwwLambda(LambdaHIGGS_QSQ_VV_1)
@@ -830,7 +858,6 @@ subroutine Init_MCFMCommon_spinzerohiggs_anomcoupl( &
 
 
 !   /***** SECOND RESONANCE *****/
-
    h2mass= h2mass_in
    h2width = h2width_in
 
@@ -916,9 +943,6 @@ subroutine Init_MCFMCommon_spinzerohiggs_anomcoupl( &
    gh2gsgs2 = H2zzcoupl(gHIGGS_AA_2)
    gh2gsgs3 = H2zzcoupl(gHIGGS_AA_3)
    gh2gsgs4 = H2zzcoupl(gHIGGS_AA_4)
-
-
-
 
    if (distinguish_Hwwcouplings .eq. 1) then
       Lambda2_w1 = H2wwLambda(LambdaHIGGS_QSQ_VV_1)
@@ -1032,6 +1056,21 @@ subroutine Init_MCFMCommon_spinzerohiggs_anomcoupl( &
    endif
 !   /***** END SECOND RESONANCE *****/
 
+!   /***** aTQGC *****/
+   dV_A = aTQGCcoupl(gATQGC_dVA)
+   dP_A = aTQGCcoupl(gATQGC_dPA)
+   dM_A = aTQGCcoupl(gATQGC_dMA)
+   dFour_A = aTQGCcoupl(gATQGC_dFourA)
+
+   dV_Z = aTQGCcoupl(gATQGC_dVZ)
+   dP_Z = aTQGCcoupl(gATQGC_dPZ)
+   dM_Z = aTQGCcoupl(gATQGC_dMZ)
+   dFour_Z = aTQGCcoupl(gATQGC_dFourZ)
+
+   dZZWpWm = aTQGCcoupl(gATQGC_dZZWpWm)
+   dZAWpWm = aTQGCcoupl(gATQGC_dZAWpWm)
+   dAAWpWm = aTQGCcoupl(gATQGC_dAAWpWm)
+!   /***** END aTQGC *****/
 
    return
 end subroutine
@@ -1269,21 +1308,19 @@ subroutine GetLambdaBSM(Lambda_BSM,Lambda2_BSM)
    use ModParameters
    implicit none
    double precision, intent(out) :: Lambda_BSM,Lambda2_BSM
+
    Lambda_BSM = Lambda/GeV
    Lambda2_BSM = Lambda2/GeV
 end subroutine
-
-
-
 
 subroutine GetSpinZeroVVCouplings(NReso, useWWcoupl, vvcoupl, cqsq, Lambda_qsq, Lambdag, Lambdag_zgs1, Lambdag_Q)
    use ModParameters
    implicit none
    integer, intent(in) :: NReso
-   complex(8), intent(out) :: vvcoupl(39)
-   integer, intent(out) :: cqsq(3)
-   double precision, intent(out) :: Lambda_qsq(1:3,1:4)
-   double precision, intent(out) :: Lambdag(1:4),Lambdag_zgs1,Lambdag_Q
+   complex(8), intent(out) :: vvcoupl(SIZE_HVV)
+   integer, intent(out) :: cqsq(SIZE_HVV_CQSQ)
+   double precision, intent(out) :: Lambda_qsq(1:SIZE_HVV_LAMBDAQSQ,1:SIZE_HVV_CQSQ)
+   double precision, intent(out) :: Lambdag(1:SIZE_HVV_LAMBDAQSQ),Lambdag_zgs1,Lambdag_Q
    logical, intent(in) :: useWWcoupl
 
    vvcoupl(:)=0d0
@@ -1296,296 +1333,295 @@ subroutine GetSpinZeroVVCouplings(NReso, useWWcoupl, vvcoupl, cqsq, Lambda_qsq, 
       Lambdag_zgs1 = Lambda_zgs1
       Lambdag_Q = Lambda_Q
       if(.not.useWWcoupl) then
-         Lambdag(1) = Lambda_z1
-         Lambdag(2) = Lambda_z2
-         Lambdag(3) = Lambda_z3
-         Lambdag(4) = Lambda_z4
+         Lambdag(LambdaHIGGS_QSQ_VV_1) = Lambda_z1
+         Lambdag(LambdaHIGGS_QSQ_VV_2) = Lambda_z2
+         Lambdag(LambdaHIGGS_QSQ_VV_3) = Lambda_z3
+         Lambdag(LambdaHIGGS_QSQ_VV_4) = Lambda_z4
 
-         cqsq(1) = cz_q1sq
-         Lambda_qsq(1,1) = Lambda_z11
-         Lambda_qsq(1,2) = Lambda_z21
-         Lambda_qsq(1,3) = Lambda_z31
-         Lambda_qsq(1,4) = Lambda_z41
-         cqsq(2) = cz_q2sq
-         Lambda_qsq(2,1) = Lambda_z12
-         Lambda_qsq(2,2) = Lambda_z22
-         Lambda_qsq(2,3) = Lambda_z32
-         Lambda_qsq(2,4) = Lambda_z42
-         cqsq(3) = cz_q12sq
-         Lambda_qsq(3,1) = Lambda_z10
-         Lambda_qsq(3,2) = Lambda_z20
-         Lambda_qsq(3,3) = Lambda_z30
-         Lambda_qsq(3,4) = Lambda_z40
+         cqsq(cLambdaHIGGS_VV_QSQ1) = cz_q1sq
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_1,cLambdaHIGGS_VV_QSQ1) = Lambda_z11
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_2,cLambdaHIGGS_VV_QSQ1) = Lambda_z21
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_3,cLambdaHIGGS_VV_QSQ1) = Lambda_z31
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_4,cLambdaHIGGS_VV_QSQ1) = Lambda_z41
+         cqsq(cLambdaHIGGS_VV_QSQ2) = cz_q2sq
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_1,cLambdaHIGGS_VV_QSQ2) = Lambda_z12
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_2,cLambdaHIGGS_VV_QSQ2) = Lambda_z22
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_3,cLambdaHIGGS_VV_QSQ2) = Lambda_z32
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_4,cLambdaHIGGS_VV_QSQ2) = Lambda_z42
+         cqsq(cLambdaHIGGS_VV_QSQ12) = cz_q12sq
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_1,cLambdaHIGGS_VV_QSQ12) = Lambda_z10
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_2,cLambdaHIGGS_VV_QSQ12) = Lambda_z20
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_3,cLambdaHIGGS_VV_QSQ12) = Lambda_z30
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_4,cLambdaHIGGS_VV_QSQ12) = Lambda_z40
 
-         vvcoupl(1) = ghz1
-         vvcoupl(2) = ghz2
-         vvcoupl(3) = ghz3
-         vvcoupl(4) = ghz4
+         vvcoupl(gHIGGS_VV_1) = ghz1
+         vvcoupl(gHIGGS_VV_2) = ghz2
+         vvcoupl(gHIGGS_VV_3) = ghz3
+         vvcoupl(gHIGGS_VV_4) = ghz4
 
-         vvcoupl(5) = ghzgs2
-         vvcoupl(6) = ghzgs3
-         vvcoupl(7) = ghzgs4
-         vvcoupl(8) = ghgsgs2
-         vvcoupl(9) = ghgsgs3
-         vvcoupl(10) = ghgsgs4
+         vvcoupl(gHIGGS_VV_1_PRIME) = ghz1_prime
+         vvcoupl(gHIGGS_VV_1_PRIME2) = ghz1_prime2
+         vvcoupl(gHIGGS_VV_1_PRIME3) = ghz1_prime3
+         vvcoupl(gHIGGS_VV_1_PRIME4) = ghz1_prime4
+         vvcoupl(gHIGGS_VV_1_PRIME5) = ghz1_prime5
+         vvcoupl(gHIGGS_VV_1_PRIME6) = ghz1_prime6
+         vvcoupl(gHIGGS_VV_1_PRIME7) = ghz1_prime7
 
-         vvcoupl(11) = ghz1_prime
-         vvcoupl(12) = ghz1_prime2
-         vvcoupl(13) = ghz1_prime3
-         vvcoupl(14) = ghz1_prime4
-         vvcoupl(15) = ghz1_prime5
+         vvcoupl(gHIGGS_VV_2_PRIME) = ghz2_prime
+         vvcoupl(gHIGGS_VV_2_PRIME2) = ghz2_prime2
+         vvcoupl(gHIGGS_VV_2_PRIME3) = ghz2_prime3
+         vvcoupl(gHIGGS_VV_2_PRIME4) = ghz2_prime4
+         vvcoupl(gHIGGS_VV_2_PRIME5) = ghz2_prime5
+         vvcoupl(gHIGGS_VV_2_PRIME6) = ghz2_prime6
+         vvcoupl(gHIGGS_VV_2_PRIME7) = ghz2_prime7
 
-         vvcoupl(16) = ghz2_prime
-         vvcoupl(17) = ghz2_prime2
-         vvcoupl(18) = ghz2_prime3
-         vvcoupl(19) = ghz2_prime4
-         vvcoupl(20) = ghz2_prime5
+         vvcoupl(gHIGGS_VV_3_PRIME) = ghz3_prime
+         vvcoupl(gHIGGS_VV_3_PRIME2) = ghz3_prime2
+         vvcoupl(gHIGGS_VV_3_PRIME3) = ghz3_prime3
+         vvcoupl(gHIGGS_VV_3_PRIME4) = ghz3_prime4
+         vvcoupl(gHIGGS_VV_3_PRIME5) = ghz3_prime5
+         vvcoupl(gHIGGS_VV_3_PRIME6) = ghz3_prime6
+         vvcoupl(gHIGGS_VV_3_PRIME7) = ghz3_prime7
 
-         vvcoupl(21) = ghz3_prime
-         vvcoupl(22) = ghz3_prime2
-         vvcoupl(23) = ghz3_prime3
-         vvcoupl(24) = ghz3_prime4
-         vvcoupl(25) = ghz3_prime5
+         vvcoupl(gHIGGS_VV_4_PRIME) = ghz4_prime
+         vvcoupl(gHIGGS_VV_4_PRIME2) = ghz4_prime2
+         vvcoupl(gHIGGS_VV_4_PRIME3) = ghz4_prime3
+         vvcoupl(gHIGGS_VV_4_PRIME4) = ghz4_prime4
+         vvcoupl(gHIGGS_VV_4_PRIME5) = ghz4_prime5
+         vvcoupl(gHIGGS_VV_4_PRIME6) = ghz4_prime6
+         vvcoupl(gHIGGS_VV_4_PRIME7) = ghz4_prime7
 
-         vvcoupl(26) = ghz4_prime
-         vvcoupl(27) = ghz4_prime2
-         vvcoupl(28) = ghz4_prime3
-         vvcoupl(29) = ghz4_prime4
-         vvcoupl(30) = ghz4_prime5
+         vvcoupl(gHIGGS_ZA_2) = ghzgs2
+         vvcoupl(gHIGGS_ZA_3) = ghzgs3
+         vvcoupl(gHIGGS_ZA_4) = ghzgs4
+         vvcoupl(gHIGGS_ZA_1_PRIME2) = ghzgs1_prime2
 
-         vvcoupl(31) = ghzgs1_prime2
-
-         vvcoupl(32) = ghz1_prime6
-         vvcoupl(33) = ghz1_prime7
-         vvcoupl(34) = ghz2_prime6
-         vvcoupl(35) = ghz2_prime7
-         vvcoupl(36) = ghz3_prime6
-         vvcoupl(37) = ghz3_prime7
-         vvcoupl(38) = ghz4_prime6
-         vvcoupl(39) = ghz4_prime7
+         vvcoupl(gHIGGS_AA_2) = ghgsgs2
+         vvcoupl(gHIGGS_AA_3) = ghgsgs3
+         vvcoupl(gHIGGS_AA_4) = ghgsgs4
 
       else
-         Lambdag(1) = Lambda_w1
-         Lambdag(2) = Lambda_w2
-         Lambdag(3) = Lambda_w3
-         Lambdag(4) = Lambda_w4
+         Lambdag(LambdaHIGGS_QSQ_VV_1) = Lambda_w1
+         Lambdag(LambdaHIGGS_QSQ_VV_2) = Lambda_w2
+         Lambdag(LambdaHIGGS_QSQ_VV_3) = Lambda_w3
+         Lambdag(LambdaHIGGS_QSQ_VV_4) = Lambda_w4
 
-         cqsq(1) = cw_q1sq
-         Lambda_qsq(1,1) = Lambda_w11
-         Lambda_qsq(1,2) = Lambda_w21
-         Lambda_qsq(1,3) = Lambda_w31
-         Lambda_qsq(1,4) = Lambda_w41
-         cqsq(2) = cw_q2sq
-         Lambda_qsq(2,1) = Lambda_w12
-         Lambda_qsq(2,2) = Lambda_w22
-         Lambda_qsq(2,3) = Lambda_w32
-         Lambda_qsq(2,4) = Lambda_w42
-         cqsq(3) = cw_q12sq
-         Lambda_qsq(3,1) = Lambda_w10
-         Lambda_qsq(3,2) = Lambda_w20
-         Lambda_qsq(3,3) = Lambda_w30
-         Lambda_qsq(3,4) = Lambda_w40
+         cqsq(cLambdaHIGGS_VV_QSQ1) = cw_q1sq
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_1,cLambdaHIGGS_VV_QSQ1) = Lambda_w11
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_2,cLambdaHIGGS_VV_QSQ1) = Lambda_w21
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_3,cLambdaHIGGS_VV_QSQ1) = Lambda_w31
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_4,cLambdaHIGGS_VV_QSQ1) = Lambda_w41
+         cqsq(cLambdaHIGGS_VV_QSQ2) = cw_q2sq
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_1,cLambdaHIGGS_VV_QSQ2) = Lambda_w12
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_2,cLambdaHIGGS_VV_QSQ2) = Lambda_w22
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_3,cLambdaHIGGS_VV_QSQ2) = Lambda_w32
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_4,cLambdaHIGGS_VV_QSQ2) = Lambda_w42
+         cqsq(cLambdaHIGGS_VV_QSQ12) = cw_q12sq
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_1,cLambdaHIGGS_VV_QSQ12) = Lambda_w10
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_2,cLambdaHIGGS_VV_QSQ12) = Lambda_w20
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_3,cLambdaHIGGS_VV_QSQ12) = Lambda_w30
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_4,cLambdaHIGGS_VV_QSQ12) = Lambda_w40
 
-         vvcoupl(1) = ghw1
-         vvcoupl(2) = ghw2
-         vvcoupl(3) = ghw3
-         vvcoupl(4) = ghw4
+         vvcoupl(gHIGGS_VV_1) = ghw1
+         vvcoupl(gHIGGS_VV_2) = ghw2
+         vvcoupl(gHIGGS_VV_3) = ghw3
+         vvcoupl(gHIGGS_VV_4) = ghw4
 
-         vvcoupl(5:10) = czero
+         vvcoupl(gHIGGS_VV_1_PRIME) = ghw1_prime
+         vvcoupl(gHIGGS_VV_1_PRIME2) = ghw1_prime2
+         vvcoupl(gHIGGS_VV_1_PRIME3) = ghw1_prime3
+         vvcoupl(gHIGGS_VV_1_PRIME4) = ghw1_prime4
+         vvcoupl(gHIGGS_VV_1_PRIME5) = ghw1_prime5
+         vvcoupl(gHIGGS_VV_1_PRIME6) = ghw1_prime6
+         vvcoupl(gHIGGS_VV_1_PRIME7) = ghw1_prime7
 
-         vvcoupl(11) = ghw1_prime
-         vvcoupl(12) = ghw1_prime2
-         vvcoupl(13) = ghw1_prime3
-         vvcoupl(14) = ghw1_prime4
-         vvcoupl(15) = ghw1_prime5
+         vvcoupl(gHIGGS_VV_2_PRIME) = ghw2_prime
+         vvcoupl(gHIGGS_VV_2_PRIME2) = ghw2_prime2
+         vvcoupl(gHIGGS_VV_2_PRIME3) = ghw2_prime3
+         vvcoupl(gHIGGS_VV_2_PRIME4) = ghw2_prime4
+         vvcoupl(gHIGGS_VV_2_PRIME5) = ghw2_prime5
+         vvcoupl(gHIGGS_VV_2_PRIME6) = ghw2_prime6
+         vvcoupl(gHIGGS_VV_2_PRIME7) = ghw2_prime7
 
-         vvcoupl(16) = ghw2_prime
-         vvcoupl(17) = ghw2_prime2
-         vvcoupl(18) = ghw2_prime3
-         vvcoupl(19) = ghw2_prime4
-         vvcoupl(20) = ghw2_prime5
+         vvcoupl(gHIGGS_VV_3_PRIME) = ghw3_prime
+         vvcoupl(gHIGGS_VV_3_PRIME2) = ghw3_prime2
+         vvcoupl(gHIGGS_VV_3_PRIME3) = ghw3_prime3
+         vvcoupl(gHIGGS_VV_3_PRIME4) = ghw3_prime4
+         vvcoupl(gHIGGS_VV_3_PRIME5) = ghw3_prime5
+         vvcoupl(gHIGGS_VV_3_PRIME6) = ghw3_prime6
+         vvcoupl(gHIGGS_VV_3_PRIME7) = ghw3_prime7
 
-         vvcoupl(21) = ghw3_prime
-         vvcoupl(22) = ghw3_prime2
-         vvcoupl(23) = ghw3_prime3
-         vvcoupl(24) = ghw3_prime4
-         vvcoupl(25) = ghw3_prime5
+         vvcoupl(gHIGGS_VV_4_PRIME) = ghw4_prime
+         vvcoupl(gHIGGS_VV_4_PRIME2) = ghw4_prime2
+         vvcoupl(gHIGGS_VV_4_PRIME3) = ghw4_prime3
+         vvcoupl(gHIGGS_VV_4_PRIME4) = ghw4_prime4
+         vvcoupl(gHIGGS_VV_4_PRIME5) = ghw4_prime5
+         vvcoupl(gHIGGS_VV_4_PRIME6) = ghw4_prime6
+         vvcoupl(gHIGGS_VV_4_PRIME7) = ghw4_prime7
 
-         vvcoupl(26) = ghw4_prime
-         vvcoupl(27) = ghw4_prime2
-         vvcoupl(28) = ghw4_prime3
-         vvcoupl(29) = ghw4_prime4
-         vvcoupl(30) = ghw4_prime5
+         vvcoupl(gHIGGS_ZA_2) = czero
+         vvcoupl(gHIGGS_ZA_3) = czero
+         vvcoupl(gHIGGS_ZA_4) = czero
+         vvcoupl(gHIGGS_ZA_1_PRIME2) = czero
 
-         vvcoupl(31) = czero
-
-         vvcoupl(32) = ghw1_prime6
-         vvcoupl(33) = ghw1_prime7
-         vvcoupl(34) = ghw2_prime6
-         vvcoupl(35) = ghw2_prime7
-         vvcoupl(36) = ghw3_prime6
-         vvcoupl(37) = ghw3_prime7
-         vvcoupl(38) = ghw4_prime6
-         vvcoupl(39) = ghw4_prime7
+         vvcoupl(gHIGGS_AA_2) = czero
+         vvcoupl(gHIGGS_AA_3) = czero
+         vvcoupl(gHIGGS_AA_4) = czero
       endif
-
-      Lambda_qsq(:,:)=Lambda_qsq(:,:)/GeV
-      Lambdag(:)=Lambdag(:)/GeV
-      Lambdag_zgs1 = Lambdag_zgs1/GeV
-      Lambdag_Q = Lambdag_Q/GeV
 
    else! second resonance
       Lambdag_zgs1 = Lambda2_zgs1
       Lambdag_Q = Lambda2_Q
       if(.not.useWWcoupl) then
-         Lambdag(1) = Lambda2_z1
-         Lambdag(2) = Lambda2_z2
-         Lambdag(3) = Lambda2_z3
-         Lambdag(4) = Lambda2_z4
+         Lambdag(LambdaHIGGS_QSQ_VV_1) = Lambda2_z1
+         Lambdag(LambdaHIGGS_QSQ_VV_2) = Lambda2_z2
+         Lambdag(LambdaHIGGS_QSQ_VV_3) = Lambda2_z3
+         Lambdag(LambdaHIGGS_QSQ_VV_4) = Lambda2_z4
 
-         cqsq(1) = c2z_q1sq
-         Lambda_qsq(1,1) = Lambda2_z11
-         Lambda_qsq(1,2) = Lambda2_z21
-         Lambda_qsq(1,3) = Lambda2_z31
-         Lambda_qsq(1,4) = Lambda2_z41
-         cqsq(2) = c2z_q2sq
-         Lambda_qsq(2,1) = Lambda2_z12
-         Lambda_qsq(2,2) = Lambda2_z22
-         Lambda_qsq(2,3) = Lambda2_z32
-         Lambda_qsq(2,4) = Lambda2_z42
-         cqsq(3) = c2z_q12sq
-         Lambda_qsq(3,1) = Lambda2_z10
-         Lambda_qsq(3,2) = Lambda2_z20
-         Lambda_qsq(3,3) = Lambda2_z30
-         Lambda_qsq(3,4) = Lambda2_z40
+         cqsq(cLambdaHIGGS_VV_QSQ1) = c2z_q1sq
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_1,cLambdaHIGGS_VV_QSQ1) = Lambda2_z11
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_2,cLambdaHIGGS_VV_QSQ1) = Lambda2_z21
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_3,cLambdaHIGGS_VV_QSQ1) = Lambda2_z31
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_4,cLambdaHIGGS_VV_QSQ1) = Lambda2_z41
+         cqsq(cLambdaHIGGS_VV_QSQ2) = c2z_q2sq
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_1,cLambdaHIGGS_VV_QSQ2) = Lambda2_z12
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_2,cLambdaHIGGS_VV_QSQ2) = Lambda2_z22
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_3,cLambdaHIGGS_VV_QSQ2) = Lambda2_z32
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_4,cLambdaHIGGS_VV_QSQ2) = Lambda2_z42
+         cqsq(cLambdaHIGGS_VV_QSQ12) = c2z_q12sq
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_1,cLambdaHIGGS_VV_QSQ12) = Lambda2_z10
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_2,cLambdaHIGGS_VV_QSQ12) = Lambda2_z20
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_3,cLambdaHIGGS_VV_QSQ12) = Lambda2_z30
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_4,cLambdaHIGGS_VV_QSQ12) = Lambda2_z40
 
-         vvcoupl(1) = gh2z1
-         vvcoupl(2) = gh2z2
-         vvcoupl(3) = gh2z3
-         vvcoupl(4) = gh2z4
+         vvcoupl(gHIGGS_VV_1) = gh2z1
+         vvcoupl(gHIGGS_VV_2) = gh2z2
+         vvcoupl(gHIGGS_VV_3) = gh2z3
+         vvcoupl(gHIGGS_VV_4) = gh2z4
 
-         vvcoupl(5) = gh2zgs2
-         vvcoupl(6) = gh2zgs3
-         vvcoupl(7) = gh2zgs4
-         vvcoupl(8) = gh2gsgs2
-         vvcoupl(9) = gh2gsgs3
-         vvcoupl(10) = gh2gsgs4
+         vvcoupl(gHIGGS_VV_1_PRIME) = gh2z1_prime
+         vvcoupl(gHIGGS_VV_1_PRIME2) = gh2z1_prime2
+         vvcoupl(gHIGGS_VV_1_PRIME3) = gh2z1_prime3
+         vvcoupl(gHIGGS_VV_1_PRIME4) = gh2z1_prime4
+         vvcoupl(gHIGGS_VV_1_PRIME5) = gh2z1_prime5
+         vvcoupl(gHIGGS_VV_1_PRIME6) = gh2z1_prime6
+         vvcoupl(gHIGGS_VV_1_PRIME7) = gh2z1_prime7
 
-         vvcoupl(11) = gh2z1_prime
-         vvcoupl(12) = gh2z1_prime2
-         vvcoupl(13) = gh2z1_prime3
-         vvcoupl(14) = gh2z1_prime4
-         vvcoupl(15) = gh2z1_prime5
+         vvcoupl(gHIGGS_VV_2_PRIME) = gh2z2_prime
+         vvcoupl(gHIGGS_VV_2_PRIME2) = gh2z2_prime2
+         vvcoupl(gHIGGS_VV_2_PRIME3) = gh2z2_prime3
+         vvcoupl(gHIGGS_VV_2_PRIME4) = gh2z2_prime4
+         vvcoupl(gHIGGS_VV_2_PRIME5) = gh2z2_prime5
+         vvcoupl(gHIGGS_VV_2_PRIME6) = gh2z2_prime6
+         vvcoupl(gHIGGS_VV_2_PRIME7) = gh2z2_prime7
 
-         vvcoupl(16) = gh2z2_prime
-         vvcoupl(17) = gh2z2_prime2
-         vvcoupl(18) = gh2z2_prime3
-         vvcoupl(19) = gh2z2_prime4
-         vvcoupl(20) = gh2z2_prime5
+         vvcoupl(gHIGGS_VV_3_PRIME) = gh2z3_prime
+         vvcoupl(gHIGGS_VV_3_PRIME2) = gh2z3_prime2
+         vvcoupl(gHIGGS_VV_3_PRIME3) = gh2z3_prime3
+         vvcoupl(gHIGGS_VV_3_PRIME4) = gh2z3_prime4
+         vvcoupl(gHIGGS_VV_3_PRIME5) = gh2z3_prime5
+         vvcoupl(gHIGGS_VV_3_PRIME6) = gh2z3_prime6
+         vvcoupl(gHIGGS_VV_3_PRIME7) = gh2z3_prime7
 
-         vvcoupl(21) = gh2z3_prime
-         vvcoupl(22) = gh2z3_prime2
-         vvcoupl(23) = gh2z3_prime3
-         vvcoupl(24) = gh2z3_prime4
-         vvcoupl(25) = gh2z3_prime5
+         vvcoupl(gHIGGS_VV_4_PRIME) = gh2z4_prime
+         vvcoupl(gHIGGS_VV_4_PRIME2) = gh2z4_prime2
+         vvcoupl(gHIGGS_VV_4_PRIME3) = gh2z4_prime3
+         vvcoupl(gHIGGS_VV_4_PRIME4) = gh2z4_prime4
+         vvcoupl(gHIGGS_VV_4_PRIME5) = gh2z4_prime5
+         vvcoupl(gHIGGS_VV_4_PRIME6) = gh2z4_prime6
+         vvcoupl(gHIGGS_VV_4_PRIME7) = gh2z4_prime7
 
-         vvcoupl(26) = gh2z4_prime
-         vvcoupl(27) = gh2z4_prime2
-         vvcoupl(28) = gh2z4_prime3
-         vvcoupl(29) = gh2z4_prime4
-         vvcoupl(30) = gh2z4_prime5
+         vvcoupl(gHIGGS_ZA_2) = gh2zgs2
+         vvcoupl(gHIGGS_ZA_3) = gh2zgs3
+         vvcoupl(gHIGGS_ZA_4) = gh2zgs4
+         vvcoupl(gHIGGS_ZA_1_PRIME2) = gh2zgs1_prime2
 
-         vvcoupl(31) = gh2zgs1_prime2
-
-         vvcoupl(32) = gh2z1_prime6
-         vvcoupl(33) = gh2z1_prime7
-         vvcoupl(34) = gh2z2_prime6
-         vvcoupl(35) = gh2z2_prime7
-         vvcoupl(36) = gh2z3_prime6
-         vvcoupl(37) = gh2z3_prime7
-         vvcoupl(38) = gh2z4_prime6
-         vvcoupl(39) = gh2z4_prime7
+         vvcoupl(gHIGGS_AA_2) = ghgsgs2
+         vvcoupl(gHIGGS_AA_3) = ghgsgs3
+         vvcoupl(gHIGGS_AA_4) = ghgsgs4
 
       else
-         Lambdag(1) = Lambda2_w1
-         Lambdag(2) = Lambda2_w2
-         Lambdag(3) = Lambda2_w3
-         Lambdag(4) = Lambda2_w4
+         Lambdag(LambdaHIGGS_QSQ_VV_1) = Lambda2_w1
+         Lambdag(LambdaHIGGS_QSQ_VV_2) = Lambda2_w2
+         Lambdag(LambdaHIGGS_QSQ_VV_3) = Lambda2_w3
+         Lambdag(LambdaHIGGS_QSQ_VV_4) = Lambda2_w4
 
-         cqsq(1) = c2w_q1sq
-         Lambda_qsq(1,1) = Lambda2_w11
-         Lambda_qsq(1,2) = Lambda2_w21
-         Lambda_qsq(1,3) = Lambda2_w31
-         Lambda_qsq(1,4) = Lambda2_w41
-         cqsq(2) = c2w_q2sq
-         Lambda_qsq(2,1) = Lambda2_w12
-         Lambda_qsq(2,2) = Lambda2_w22
-         Lambda_qsq(2,3) = Lambda2_w32
-         Lambda_qsq(2,4) = Lambda2_w42
-         cqsq(3) = c2w_q12sq
-         Lambda_qsq(3,1) = Lambda2_w10
-         Lambda_qsq(3,2) = Lambda2_w20
-         Lambda_qsq(3,3) = Lambda2_w30
-         Lambda_qsq(3,4) = Lambda2_w40
+         cqsq(cLambdaHIGGS_VV_QSQ1) = c2w_q1sq
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_1,cLambdaHIGGS_VV_QSQ1) = Lambda2_w11
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_2,cLambdaHIGGS_VV_QSQ1) = Lambda2_w21
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_3,cLambdaHIGGS_VV_QSQ1) = Lambda2_w31
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_4,cLambdaHIGGS_VV_QSQ1) = Lambda2_w41
+         cqsq(cLambdaHIGGS_VV_QSQ2) = c2w_q2sq
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_1,cLambdaHIGGS_VV_QSQ2) = Lambda2_w12
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_2,cLambdaHIGGS_VV_QSQ2) = Lambda2_w22
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_3,cLambdaHIGGS_VV_QSQ2) = Lambda2_w32
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_4,cLambdaHIGGS_VV_QSQ2) = Lambda2_w42
+         cqsq(cLambdaHIGGS_VV_QSQ12) = c2w_q12sq
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_1,cLambdaHIGGS_VV_QSQ12) = Lambda2_w10
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_2,cLambdaHIGGS_VV_QSQ12) = Lambda2_w20
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_3,cLambdaHIGGS_VV_QSQ12) = Lambda2_w30
+         Lambda_qsq(LambdaHIGGS_QSQ_VV_4,cLambdaHIGGS_VV_QSQ12) = Lambda2_w40
 
-         vvcoupl(1) = gh2w1
-         vvcoupl(2) = gh2w2
-         vvcoupl(3) = gh2w3
-         vvcoupl(4) = gh2w4
+         vvcoupl(gHIGGS_VV_1) = gh2w1
+         vvcoupl(gHIGGS_VV_2) = gh2w2
+         vvcoupl(gHIGGS_VV_3) = gh2w3
+         vvcoupl(gHIGGS_VV_4) = gh2w4
 
-         vvcoupl(5:10) = czero
+         vvcoupl(gHIGGS_VV_1_PRIME) = gh2w1_prime
+         vvcoupl(gHIGGS_VV_1_PRIME2) = gh2w1_prime2
+         vvcoupl(gHIGGS_VV_1_PRIME3) = gh2w1_prime3
+         vvcoupl(gHIGGS_VV_1_PRIME4) = gh2w1_prime4
+         vvcoupl(gHIGGS_VV_1_PRIME5) = gh2w1_prime5
+         vvcoupl(gHIGGS_VV_1_PRIME6) = gh2w1_prime6
+         vvcoupl(gHIGGS_VV_1_PRIME7) = gh2w1_prime7
 
-         vvcoupl(11) = gh2w1_prime
-         vvcoupl(12) = gh2w1_prime2
-         vvcoupl(13) = gh2w1_prime3
-         vvcoupl(14) = gh2w1_prime4
-         vvcoupl(15) = gh2w1_prime5
+         vvcoupl(gHIGGS_VV_2_PRIME) = gh2w2_prime
+         vvcoupl(gHIGGS_VV_2_PRIME2) = gh2w2_prime2
+         vvcoupl(gHIGGS_VV_2_PRIME3) = gh2w2_prime3
+         vvcoupl(gHIGGS_VV_2_PRIME4) = gh2w2_prime4
+         vvcoupl(gHIGGS_VV_2_PRIME5) = gh2w2_prime5
+         vvcoupl(gHIGGS_VV_2_PRIME6) = gh2w2_prime6
+         vvcoupl(gHIGGS_VV_2_PRIME7) = gh2w2_prime7
 
-         vvcoupl(16) = gh2w2_prime
-         vvcoupl(17) = gh2w2_prime2
-         vvcoupl(18) = gh2w2_prime3
-         vvcoupl(19) = gh2w2_prime4
-         vvcoupl(20) = gh2w2_prime5
+         vvcoupl(gHIGGS_VV_3_PRIME) = gh2w3_prime
+         vvcoupl(gHIGGS_VV_3_PRIME2) = gh2w3_prime2
+         vvcoupl(gHIGGS_VV_3_PRIME3) = gh2w3_prime3
+         vvcoupl(gHIGGS_VV_3_PRIME4) = gh2w3_prime4
+         vvcoupl(gHIGGS_VV_3_PRIME5) = gh2w3_prime5
+         vvcoupl(gHIGGS_VV_3_PRIME6) = gh2w3_prime6
+         vvcoupl(gHIGGS_VV_3_PRIME7) = gh2w3_prime7
 
-         vvcoupl(21) = gh2w3_prime
-         vvcoupl(22) = gh2w3_prime2
-         vvcoupl(23) = gh2w3_prime3
-         vvcoupl(24) = gh2w3_prime4
-         vvcoupl(25) = gh2w3_prime5
+         vvcoupl(gHIGGS_VV_4_PRIME) = gh2w4_prime
+         vvcoupl(gHIGGS_VV_4_PRIME2) = gh2w4_prime2
+         vvcoupl(gHIGGS_VV_4_PRIME3) = gh2w4_prime3
+         vvcoupl(gHIGGS_VV_4_PRIME4) = gh2w4_prime4
+         vvcoupl(gHIGGS_VV_4_PRIME5) = gh2w4_prime5
+         vvcoupl(gHIGGS_VV_4_PRIME6) = gh2w4_prime6
+         vvcoupl(gHIGGS_VV_4_PRIME7) = gh2w4_prime7
 
-         vvcoupl(26) = gh2w4_prime
-         vvcoupl(27) = gh2w4_prime2
-         vvcoupl(28) = gh2w4_prime3
-         vvcoupl(29) = gh2w4_prime4
-         vvcoupl(30) = gh2w4_prime5
+         vvcoupl(gHIGGS_ZA_2) = czero
+         vvcoupl(gHIGGS_ZA_3) = czero
+         vvcoupl(gHIGGS_ZA_4) = czero
+         vvcoupl(gHIGGS_ZA_1_PRIME2) = czero
 
-         vvcoupl(31) = czero
-
-         vvcoupl(32) = gh2w1_prime6
-         vvcoupl(33) = gh2w1_prime7
-         vvcoupl(34) = gh2w2_prime6
-         vvcoupl(35) = gh2w2_prime7
-         vvcoupl(36) = gh2w3_prime6
-         vvcoupl(37) = gh2w3_prime7
-         vvcoupl(38) = gh2w4_prime6
-         vvcoupl(39) = gh2w4_prime7
+         vvcoupl(gHIGGS_AA_2) = czero
+         vvcoupl(gHIGGS_AA_3) = czero
+         vvcoupl(gHIGGS_AA_4) = czero
       endif
-
-      Lambda_qsq(:,:)=Lambda_qsq(:,:)/GeV
-      Lambdag(:)=Lambdag(:)/GeV
-      Lambdag_zgs1 = Lambdag_zgs1/GeV
-      Lambdag_Q = Lambdag_Q/GeV
-
    endif! end second resonance
 
+   ! Scale lambdas by 1/GeV for MCFM units rather than JHUGen
+   Lambda_qsq(:,:)=Lambda_qsq(:,:)/GeV
+   Lambdag(:)=Lambdag(:)/GeV
+   Lambdag_zgs1 = Lambdag_zgs1/GeV
+   Lambdag_Q = Lambdag_Q/GeV
+
 end subroutine
-
-
-
 subroutine GetDistinguishWWCouplingsFlag(doAllow)
    use ModParameters
    implicit none
    integer, intent(out) :: doAllow
+
    if(distinguish_HWWcouplings) then
       doAllow=1
    else
@@ -1598,17 +1634,41 @@ subroutine GetSpinZeroGGCouplings(ggcoupl)
    use ModParameters
    implicit none
    double complex, intent(out) :: ggcoupl(1:3)
-   ggcoupl(1) = dcmplx(ghg2)
-   ggcoupl(2) = dcmplx(ghg3)
-   ggcoupl(3) = dcmplx(ghg4)
+
+   ggcoupl(gHIGGS_GG_2) = dcmplx(ghg2)
+   ggcoupl(gHIGGS_GG_3) = dcmplx(ghg3)
+   ggcoupl(gHIGGS_GG_4) = dcmplx(ghg4)
 end subroutine
 subroutine GetSpinZeroQQCouplings(qqcoupl)
    use ModParameters
    implicit none
    double complex, intent(out) :: qqcoupl(1:2)
-   qqcoupl(1) = dcmplx(kappa)
-   qqcoupl(2) = dcmplx(kappa_tilde)
+
+   qqcoupl(gHIGGS_KAPPA) = dcmplx(kappa)
+   qqcoupl(gHIGGS_KAPPA_TILDE) = dcmplx(kappa_tilde)
 end subroutine
+
+subroutine GetATQGCCouplings(coupl)
+   use ModParameters
+   implicit none
+   double complex, intent(out) :: coupl(1:SIZE_ATQGC)
+
+   coupl(gATQGC_dVA) = dV_A
+   coupl(gATQGC_dPA) = dP_A
+   coupl(gATQGC_dMA) = dM_A
+
+   coupl(gATQGC_dVZ) = dV_Z
+   coupl(gATQGC_dPZ) = dP_Z
+   coupl(gATQGC_dMZ) = dM_Z
+
+   coupl(gATQGC_dAAWpWm) = dAAWpWm
+   coupl(gATQGC_dZAWpWm) = dZAWpWm
+   coupl(gATQGC_dZZWpWm) = dZZWpWm
+
+   coupl(gATQGC_dFourA) = dFour_A
+   coupl(gATQGC_dFourZ) = dFour_Z
+end subroutine
+
 subroutine GetEWInputs(Gf_inp_in,aemmz_inp_in,xw_inp_in,wmass_inp_in,zmass_inp_in)
    use ModParameters
    implicit none
