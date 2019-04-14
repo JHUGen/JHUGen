@@ -2144,7 +2144,7 @@ integer :: NBin(:),ids(1:8)
 real(8) :: m_jj,y_j1,y_j2,dphi_jj,dy_j1j2,pT_jl,pT_j1,pT_j2,pT_H,m_4l,dR_j1j2
 real(8) :: pT_l1,pT_l2,pT_l3,pT_l4,y_l1,y_l2,y_l3,y_l4
 real(8) :: Phi1,signPhi1,MomReso(1:4)
-integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
+integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=8, Lep1M=7, Lep2P=10, Lep2M=9
 
 
        applyPSCut = .false.
@@ -2156,99 +2156,115 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
        pT_H = get_PT(MomExt(1:4,V1)+MomExt(1:4,V2))
        pT_j1= get_PT(MomExt(1:4,outTop))
        pT_j2= get_PT(MomExt(1:4,outBot))
-       pT_l1= get_PT(MomExt(1:4,Lep1P))
-       pT_l2= get_PT(MomExt(1:4,Lep1M))
-       pT_l3= get_PT(MomExt(1:4,Lep2P))
-       pT_l4= get_PT(MomExt(1:4,Lep2M))
-       y_l1= get_eta(MomExt(1:4,Lep1P))
-       y_l2= get_eta(MomExt(1:4,Lep1M))
-       y_l3= get_eta(MomExt(1:4,Lep2P))
-       y_l4= get_eta(MomExt(1:4,Lep2M))
+       pT_l1= get_PT(MomExt(1:4,Lep1M))
+       pT_l2= get_PT(MomExt(1:4,Lep1P))
+       pT_l3= get_PT(MomExt(1:4,Lep2M))
+       pT_l4= get_PT(MomExt(1:4,Lep2P))
+       y_l1= get_eta(MomExt(1:4,Lep1M))
+       y_l2= get_eta(MomExt(1:4,Lep1P))
+       y_l3= get_eta(MomExt(1:4,Lep2M))
+       y_l4= get_eta(MomExt(1:4,Lep2P))
        pT_jl = max(pT_j1,pT_j2)
        dy_j1j2 = y_j1 - y_j2
        dR_j1j2 = get_R(MomExt(1:4,outTop), MomExt(1:4,outBot))
 
-       mZ1 = get_MInv(MomExt(1:4,Lep1P)+MomExt(1:4,Lep1M))
-       mZ2 = get_MInv(MomExt(1:4,Lep2P)+MomExt(1:4,Lep2M))
-       mZ1alt = get_MInv(MomExt(1:4,Lep1P)+MomExt(1:4,Lep2M))
-       mZ2alt = get_MInv(MomExt(1:4,Lep2P)+MomExt(1:4,Lep1M))
+       mZ1 = get_MInv(MomExt(1:4,Lep1M)+MomExt(1:4,Lep1P))
+       mZ2 = get_MInv(MomExt(1:4,Lep2M)+MomExt(1:4,Lep2P))
+       mZ1alt = get_MInv(MomExt(1:4,Lep1M)+MomExt(1:4,Lep2P))
+       mZ2alt = get_MInv(MomExt(1:4,Lep2M)+MomExt(1:4,Lep1P))
 
        dphi_jj = abs( Get_PHI(MomExt(1:4,3)) - Get_PHI(MomExt(1:4,4)) )
        if( dphi_jj.gt.Pi ) dphi_jj=2d0*Pi-dphi_jj
 
 
-       if( mZ1.lt.MPhotonCutoff ) then
-!          write(6,*) "Failed mphoton cutoff. mZ1=",mZ1,"<",MPhotonCutoff
+       ! Off-shell photon cut-offs
+       if ( m_jj.lt.MPhotonCutoff .and. .not.IsANeutrino(ids(7)) .and. CoupledVertex(ids(7),ids(8)).eq.Z0_) then
+          !write(6,*) "Failed mphoton cutoff. mll=",m_jj,"<",MPhotonCutoff
           applyPSCut=.true.
           return
        endif
-       if( mZ2.lt.MPhotonCutoff ) then
-!          write(6,*) "Failed mphoton cutoff. mZ2=",mZ2,"<",MPhotonCutoff
+       if( mZ1.lt.MPhotonCutoff .and. .not.IsANeutrino(ids(3)) .and. CoupledVertex(ids(3),ids(4)).eq.Z0_ ) then
+          !write(6,*) "Failed mphoton cutoff. mZ1=",mZ1,"<",MPhotonCutoff
+          applyPSCut=.true.
+          return
+       endif
+       if( mZ2.lt.MPhotonCutoff .and. .not.IsANeutrino(ids(5)) .and. CoupledVertex(ids(5),ids(6)).eq.Z0_ ) then
+          !write(6,*) "Failed mphoton cutoff. mZ2=",mZ2,"<",MPhotonCutoff
           applyPSCut=.true.
           return
        endif
 
        if(ids(3).eq.ids(5) .and. ids(4).eq.ids(6)) then
-          if( mZ1alt.lt.MPhotonCutoff ) then
-!             write(6,*) "Failed mphoton cutoff. mZ1alt=",mZ1alt,"<",MPhotonCutoff
+          if( mZ1alt.lt.MPhotonCutoff .and. .not.IsANeutrino(ids(3)) .and. CoupledVertex(ids(3),ids(6)).eq.Z0_ ) then
+             !write(6,*) "Failed mphoton cutoff. mZ1alt=",mZ1alt,"<",MPhotonCutoff
              applyPSCut=.true.
              return
           endif
-          if( mZ2alt.lt.MPhotonCutoff ) then
-!             write(6,*) "Failed mphoton cutoff. mZ2alt=",mZ2alt,"<",MPhotonCutoff
+          if( mZ2alt.lt.MPhotonCutoff .and. .not.IsANeutrino(ids(5)) .and. CoupledVertex(ids(5),ids(4)).eq.Z0_ ) then
+             !write(6,*) "Failed mphoton cutoff. mZ2alt=",mZ2alt,"<",MPhotonCutoff
              applyPSCut=.true.
              return
           endif
        endif
-!       if( m_4l.lt.70d0*GeV ) then
-!          applyPSCut=.true.
-!          return
-!       endif
 
-       if( pT_l1.lt.pTlepcut .or. pT_l2.lt.pTlepcut .or. pT_l3.lt.pTlepcut .or. pT_l4.lt.pTlepcut ) then
-!          write(6,*) "Failed pTlep cutoff. pTls=",pT_l1,pT_l2,pT_l3,pT_l4,"<",pTlepcut
+       if( &
+         (pT_l1.lt.pTlepcut .and. IsALepton(ids(3))) .or. &
+         (pT_l2.lt.pTlepcut .and. IsALepton(ids(4))) .or. &
+         (pT_l3.lt.pTlepcut .and. IsALepton(ids(5))) .or. &
+         (pT_l4.lt.pTlepcut .and. IsALepton(ids(6))) .or. &
+         (pT_j1.lt.pTlepcut .and. IsALepton(ids(7))) .or. &
+         (pT_j2.lt.pTlepcut .and. IsALepton(ids(8)))      &
+         ) then
+          !write(6,*) "Failed pTlep cutoff. pTls=",pT_l1,pT_l2,pT_l3,pT_l4,pT_j1,pT_j2,"<",pTlepcut
+          applyPSCut=.true.
+          return
+       endif
+       if( &
+         (pT_l1.lt.pTjetcut .and. IsAJet(ids(3))) .or. &
+         (pT_l2.lt.pTjetcut .and. IsAJet(ids(4))) .or. &
+         (pT_l3.lt.pTjetcut .and. IsAJet(ids(5))) .or. &
+         (pT_l4.lt.pTjetcut .and. IsAJet(ids(6))) .or. &
+         (pT_j1.lt.pTjetcut .and. IsAJet(ids(7))) .or. &
+         (pT_j2.lt.pTjetcut .and. IsAJet(ids(8)))      &
+         ) then
+          !write(6,*) "Failed pTjet cutoff. pTls=",pT_l1,pT_l2,pT_l3,pT_l4,pT_j1,pT_j2,"<",pTjetcut
           applyPSCut=.true.
           return
        endif
 
-       if( dabs(y_l1).gt.etalepcut .or. dabs(y_l2).gt.etalepcut .or. dabs(y_l3).gt.etalepcut .or. dabs(y_l4).gt.etalepcut ) then
-!          write(6,*) "Failed etalep cutoff. etas=",y_l1,y_l2,y_l3,y_l4,">",etalepcut
+       if( &
+         (abs(y_l1).lt.etalepcut .and. IsALepton(ids(3))) .or. &
+         (abs(y_l2).lt.etalepcut .and. IsALepton(ids(4))) .or. &
+         (abs(y_l3).lt.etalepcut .and. IsALepton(ids(5))) .or. &
+         (abs(y_l4).lt.etalepcut .and. IsALepton(ids(6))) .or. &
+         (abs(y_j1).lt.etalepcut .and. IsALepton(ids(7))) .or. &
+         (abs(y_j2).lt.etalepcut .and. IsALepton(ids(8)))      &
+         ) then
+          !write(6,*) "Failed ylep cutoff. pTls=",y_l1,y_l2,y_l3,y_l4,y_j1,y_j2,"<",etalepcut
+          applyPSCut=.true.
+          return
+       endif
+       if( &
+         (abs(y_l1).lt.etajetcut .and. IsAJet(ids(3))) .or. &
+         (abs(y_l2).lt.etajetcut .and. IsAJet(ids(4))) .or. &
+         (abs(y_l3).lt.etajetcut .and. IsAJet(ids(5))) .or. &
+         (abs(y_l4).lt.etajetcut .and. IsAJet(ids(6))) .or. &
+         (abs(y_j1).lt.etajetcut .and. IsAJet(ids(7))) .or. &
+         (abs(y_j2).lt.etajetcut .and. IsAJet(ids(8)))      &
+         ) then
+          !write(6,*) "Failed yjet cutoff. pTls=",y_l1,y_l2,y_l3,y_l4,y_j1,y_j2,"<",etajetcut
           applyPSCut=.true.
           return
        endif
 
-
-
-!      VERY loose VBF cuts
-!        if( m_jj.lt.400d0*GeV ) then
-!           applyPSCut=.true.
-!           return
-!        endif
-!        if( m4l_minmax(1).eq.-1d0*GeV .and. dabs(m_4l-m_reso).gt.5d0*GeV ) then
-!           applyPSCut=.true.
-!           return
-!        endif
-
-!        if( dabs(m_4l).lt.70d0*GeV ) then
-!           applyPSCut=.true.
-!           return
-!        endif
-
-
-        if( abs(y_j1).gt.etajetcut .or. abs(y_j2).gt.etajetcut ) then
-!           write(6,*) "Failed etajet cutoff. etals=",y_j1,y_j2,">",etajetcut
+        if( IsAJet(ids(7)) .and. (abs(y_j1-y_j2).lt.detajetcut .or. (JetsOppositeEta .and. y_j1*y_j2.gt.0d0)) ) then
+           write(6,*) "Failed detajet cutoff. deta=",y_j1,"-",y_j2,"<",etajetcut
            applyPSCut=.true.
            return
         endif
 
-        if( abs(y_j1-y_j2).lt.detajetcut .or. (JetsOppositeEta .and. y_j1*y_j2.gt.0d0) ) then
-!           write(6,*) "Failed detajet cutoff. deta=",y_j1,"-",y_j2,"<",etajetcut
-           applyPSCut=.true.
-           return
-        endif
-
-        if(  pT_j1.lt.pTjetcut .or. pT_j2.lt.pTjetcut .or. m_jj.lt.mJJcut .or. dR_j1j2.lt.Rjet)  then
-!           write(6,*) "Failed pTj cutoff. pTjs=",pT_j1,pT_j2,"<",pTjetcut,"or mjj=",m_jj,"<",mJJcut,"or dRjj=",dR_j1j2,"<",Rjet
+        if( IsAJet(ids(7)) .and. (m_jj.lt.mJJcut .or. dR_j1j2.lt.Rjet) )  then
+           write(6,*) "Failed pTj cutoff. pTjs=",pT_j1,pT_j2,"<",pTjetcut,"or mjj=",m_jj,"<",mJJcut,"or dRjj=",dR_j1j2,"<",Rjet
            applyPSCut=.true.
            return
         endif

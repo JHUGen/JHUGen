@@ -3,7 +3,7 @@ implicit none
 private
 
 public :: MCFM_firsttime
-public :: Setup_MCFM_qqVVqq_firsttime,Setup_MCFM_qqVVqq,EvalAmp_qqVVqq
+public :: Setup_MCFM_qqVVqq_firsttime,Setup_MCFM_qqVVqq,EvalAmp_qqVVqq,Check_APartHash_MCFM_qqVVqq
 
 integer, parameter :: mxpart=14
 integer, parameter :: mxdim=26
@@ -1727,6 +1727,7 @@ common/zcouple/l,r,q1,l1,r1,q2,l2,r2,le,ln,re,rn,sin2w
    ! Assign ordered daughter momenta
    call Check_DaughterOrdering_MCFM_qqVVqq(pid_MCFM_in(3:6),decayOrdering,idV,idVswap,ZWcode)
    if (any(decayOrdering .lt. 0)) then
+      write(6,*) "Decay ordering could not be determined:",decayOrdering
       return
    endif
    do ip=0,3
@@ -1739,6 +1740,7 @@ common/zcouple/l,r,q1,l1,r1,q2,l2,r2,le,ln,re,rn,sin2w
       (/ pid_MCFM_in(1),pid_MCFM_in(2),pid_MCFM_in(7),pid_MCFM_in(8) /), &
       apartOrdering)
    if (apartOrdering(1).eq.-1 .or. apartOrdering(2).eq.-1) then
+      write(6,*) "Associated particle ordering could not be determined:",apartOrdering
       return
    else
       do ip=0,1
@@ -1901,16 +1903,28 @@ logical  :: outFound
          endif
       ! Final particles l/nu
       else if ((IsALepton(idAPart(3)) .or. IsANeutrino(idAPart(3))) .and. (IsALepton(idAPart(4)) .or. IsANeutrino(idAPart(4)))) then
-         if (abs(hash(ih,1)).eq.abs(hash(ih,2)) .and. abs(hash(ih,1)).eq.abs(hash(ih,3)) .and. abs(hash(ih,1)).eq.abs(hash(ih,4))) cycle ! Do not consider the ordering in uquq_uquq or dqdq_dqdq
+         if ( &
+            abs(hash(ih,1)).eq.abs(hash(ih,2)) .and. &
+            abs(hash(ih,1)).eq.abs(hash(ih,3)) .and. &
+            abs(hash(ih,1)).eq.abs(hash(ih,4))       &
+            ) cycle ! Do not consider the ordering in uquq_uquq or dqdq_dqdq
+
+         !write(6,*) "Comparing has element",hash(ih,:),"to associated particles",idAPart(3),idAPart(4)
+         !write(6,*) "sign(1, convertLHE(idAPart(3)))=",sign(1, convertLHE(idAPart(3))),"?=",sign(1, convertLHE(hash(ih,3)))
+         !write(6,*) "sign(1, convertLHE(idAPart(4)))=",sign(1, convertLHE(idAPart(4))),"?=",sign(1, convertLHE(hash(ih,4)))
+         !write(6,*) "IsALepton(idAPart(3))=",IsALepton(idAPart(3)),"?=IsDownTypeQuark(hash(ih,3)))=",IsDownTypeQuark(hash(ih,3))
+         !write(6,*) "IsANeutrino(idAPart(3))=",IsANeutrino(idAPart(3)),"?=IsUpTypeQuark(hash(ih,3)))=",IsUpTypeQuark(hash(ih,3))
+         !write(6,*) "IsALepton(idAPart(4))=",IsALepton(idAPart(4)),"?=IsDownTypeQuark(hash(ih,4)))=",IsDownTypeQuark(hash(ih,4))
+         !write(6,*) "IsANeutrino(idAPart(4))=",IsANeutrino(idAPart(4)),"?=IsUpTypeQuark(hash(ih,4)))=",IsUpTypeQuark(hash(ih,4))
 
          if ( &
          ( &
-         sign(1, idAPart(3)).eq.sign(1, hash(ih,3)) .and. &
+         sign(1, convertLHE(idAPart(3))).eq.sign(1, convertLHE(hash(ih,3))) .and. &
          ((IsALepton(idAPart(3)) .and. IsDownTypeQuark(hash(ih,3))) .or. (IsANeutrino(idAPart(3)) .and. IsUpTypeQuark(hash(ih,3)))) &
          ) &
          .and. &
          ( &
-         sign(1, idAPart(4)).eq.sign(1, hash(ih,4)) .and. &
+         sign(1, convertLHE(idAPart(4))).eq.sign(1, convertLHE(hash(ih,4))) .and. &
          ((IsALepton(idAPart(4)) .and. IsDownTypeQuark(hash(ih,4))) .or. (IsANeutrino(idAPart(4)) .and. IsUpTypeQuark(hash(ih,4)))) &
          ) &
          ) then
@@ -1919,12 +1933,12 @@ logical  :: outFound
             outFound=.true.
          else if ( &
          ( &
-         sign(1, idAPart(3)).eq.sign(1, hash(ih,4)) .and. &
+         sign(1, convertLHE(idAPart(3))).eq.sign(1, convertLHE(hash(ih,4))) .and. &
          ((IsALepton(idAPart(3)) .and. IsDownTypeQuark(hash(ih,4))) .or. (IsANeutrino(idAPart(3)) .and. IsUpTypeQuark(hash(ih,4)))) &
          ) &
          .and. &
          ( &
-         sign(1, idAPart(4)).eq.sign(1, hash(ih,3)) .and. &
+         sign(1, convertLHE(idAPart(4))).eq.sign(1, convertLHE(hash(ih,3))) .and. &
          ((IsALepton(idAPart(4)) .and. IsDownTypeQuark(hash(ih,3))) .or. (IsANeutrino(idAPart(4)) .and. IsUpTypeQuark(hash(ih,3)))) &
          ) &
          ) then
@@ -1932,12 +1946,14 @@ logical  :: outFound
             order(2)=0
             outFound=.true.
          endif
-         outFound = ( CoupledVertex(idAPart(3:4), -1).eq.CoupledVertex(hash(ih,3:4),-1) )
+         if ( CoupledVertex(idAPart(3:4), -1).ne.CoupledVertex(hash(ih,3:4),-1) ) outFound=.false.
       endif
       if (outFound) then
          exit
       endif
    enddo
+
+   !pause
 
 end subroutine
 
@@ -1962,17 +1978,17 @@ integer :: i,j,ip
    pin_MCFMconv(:,:)=pin(:,:)/GeV
 
    doCompute = Setup_MCFM_qqVVqq(idin,pin_MCFMconv,id_MCFM,p_MCFM,ZWcode)
-   !if (.not.doCompute) then
-   !   write(6,*) "mod_MCFMWrapper::EvalAmp_qqVVqq: Setup failed for idin:",idin,"(id_MCFM:",id_MCFM,")"
-   !   pause
-   !endif
+   if (.not.doCompute) then
+      write(6,*) "mod_MCFMWrapper::EvalAmp_qqVVqq: Setup failed for idin:",idin,"(id_MCFM:",id_MCFM,")"
+      pause
+   endif
    if (doCompute) then
       idDummy=idin
       id_MCFM_78swap=id_MCFM
       call swap(id_MCFM_78swap(7),id_MCFM_78swap(8))
 
       if(ZWcode.eq.doZZ) then
-         if (Process.ge.66 .and. Process.le.68) then
+         if ((Process.ge.66 .and. Process.le.68) .or. (Process.ge.70 .and. Process.le.72)) then
             call SetupParticleLabels(id_MCFM,1,8,.true.,.true.) ! Assign plabels
             call qq_zzqq(p_MCFM,msq)
             if (id_MCFM(7).eq.0 .and. id_MCFM(8).eq.0) then ! Calculate for swapped momentum combination
@@ -2025,7 +2041,7 @@ integer :: i,j,ip
             endif
          endif
       else if(ZWcode.eq.doWW) then
-         if (Process.ge.66 .and. Process.le.68) then
+         if ((Process.ge.66 .and. Process.le.68) .or. (Process.ge.70 .and. Process.le.72)) then
             call SetupParticleLabels(id_MCFM,1,8,.true.,.true.) ! Assign plabels
             call qq_wwqq(p_MCFM,msq)
             if (id_MCFM(7).eq.0 .and. id_MCFM(8).eq.0) then ! Calculate for swapped momentum combination
@@ -2078,7 +2094,7 @@ integer :: i,j,ip
             endif
          endif
       else if(ZWcode.eq.doZZorWW) then
-         if (Process.ge.66 .and. Process.le.68) then
+         if ((Process.ge.66 .and. Process.le.68) .or. (Process.ge.70 .and. Process.le.72)) then
             call SetupParticleLabels(id_MCFM,1,8,.true.,.true.) ! Assign plabels
             call qq_vvqq(p_MCFM,msq)
             if (id_MCFM(7).eq.0 .and. id_MCFM(8).eq.0) then ! Calculate for swapped momentum combination

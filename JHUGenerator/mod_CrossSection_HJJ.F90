@@ -47,19 +47,31 @@ m1ffwgt=1d0;m2ffwgt=1d0
          NumPartonicChannels=1
          iPartChannel = VBFoffsh_run
       else
-         NumPartonicChannels= Hash_MCFM_qqVVqqStrong_Size
+         NumPartonicChannels=Hash_MCFM_qqVVqqStrong_Size
          !iPartChannel = int(yRnd(18) * NumPartonicChannels) +1 ! Must use last yRnd
          call Error("You may not use VBFoffsh_run<=0 anymore.")
          iPartChannel= iPartChannel
       endif
-   else
+   elseif (Process.ge.66 .and. Process.le.68) then
       call getRef_MCFM_qqVVqq_Hash(ijSel) ! ijSel is in JHU convention
       if( VBFoffsh_run.gt.0 ) then
          if (VBFoffsh_run .gt. Hash_MCFM_qqVVqq_Size) call Error("VBFoffsh_run is too big")
          NumPartonicChannels=1
          iPartChannel = VBFoffsh_run
       else
-         NumPartonicChannels= Hash_MCFM_qqVVqq_Size
+         NumPartonicChannels=Hash_MCFM_qqVVqq_Size
+         !iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         call Error("You may not use VBFoffsh_run<=0 anymore.")
+         iPartChannel= iPartChannel  ! runs from 1..164
+      endif
+   elseif (Process.ge.70 .and. Process.le.72) then
+      call getRef_MCFM_qqVVll_Hash(ijSel) ! ijSel is in JHU convention
+      if( VBFoffsh_run.gt.0 ) then
+         if (VBFoffsh_run .gt. Hash_MCFM_qqVVll_Size) call Error("VBFoffsh_run is too big")
+         NumPartonicChannels=1
+         iPartChannel = VBFoffsh_run
+      else
+         NumPartonicChannels=Hash_MCFM_qqVVll_Size
          !iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
          call Error("You may not use VBFoffsh_run<=0 anymore.")
          iPartChannel= iPartChannel  ! runs from 1..164
@@ -208,11 +220,11 @@ m1ffwgt=1d0;m2ffwgt=1d0
    !pause
 
    if ( &
-!      msq_MCFM(iPart_sel,jPart_sel) .le. 0d0 .or. &
-!      pdf(LHA2M_pdf(iPart_sel),1) .le. 0d0 .or. &
-!      pdf(LHA2M_pdf(jPart_sel),2) .le. 0d0 .or. &
-!      EvalWeighted_HJJ_fulldecay .le. 0d0 .or. &
-!      VegasWeighted_HJJ_fulldecay .le. 0d0 .or. &
+      !msq_MCFM(iPart_sel,jPart_sel) .le. 0d0 .or. &
+      !pdf(LHA2M_pdf(iPart_sel),1) .le. 0d0 .or. &
+      !pdf(LHA2M_pdf(jPart_sel),2) .le. 0d0 .or. &
+      !EvalWeighted_HJJ_fulldecay .le. 0d0 .or. &
+      !VegasWeighted_HJJ_fulldecay .le. 0d0 .or. &
       IsNaN(msq_MCFM(iPart_sel,jPart_sel)) .or. &
       IsNaN(pdf(LHA2M_pdf(iPart_sel),1)) .or. &
       IsNaN(pdf(LHA2M_pdf(jPart_sel),2)) .or. &
@@ -225,8 +237,9 @@ m1ffwgt=1d0;m2ffwgt=1d0
       write(6,*) "EvalWeighted_HJJ_fulldecay =",EvalWeighted_HJJ_fulldecay
       write(6,*) "VegasWeighted_HJJ_fulldecay =",VegasWeighted_HJJ_fulldecay
       do jpart=1,8
-         write(6,*) "P_MCFM(",jpart,")=",p_MCFM(jpart,:)
+         write(6,*) "P_MCFM(",convertLHE(id_MCFM(jpart)),")=",p_MCFM(jpart,:)
       enddo
+      pause
     endif
 
 
