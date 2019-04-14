@@ -199,8 +199,10 @@ This is the list of command line configurables (also defined in the \verb|README
                        250 GeV for e+e-
     Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance,
                        50=qq/ee->VH, 51=gg->ZH,
-                       60=weakVBF, 61=pp->Hjj, 62=pp->Hj,
-                       66=VVHVV offshell, 67=VVVVbkg, 68=VVHVV+VVVV,
+                       60=VBF, 61=pp->Hjj, 62=pp->Hj,
+                       66=EW VVJJ sig., 67=EW VVJJ bkg., 68=EW VVJJ tot.,
+                       69=QCD VVJJ bkg.,
+                       70=EW VVLL sig., 71=EW VVLL bkg., 72=EW VVLL tot.,
                        80=ttH, 90=bbH,
                        110=t+H t channel, 111=tbar+H t channel,
                        112=t+H s channel, 113=tbar+H s channel
@@ -255,8 +257,8 @@ This is the list of command line configurables (also defined in the \verb|README
                        VH_PC overrides Pchannel.
     alpha_dip          extra non-physical degree of freedom for Process=51 & VH_PC=nl, defaulted at 1.
                        Vary to check indepedence (of alpha_dip).
-    VBFoffsh_run:      For VBF offshell production, set this to a number from 1-5
-                       for each of the 5 jobs.  See below for more details.
+    VBFoffsh_run:      For VBF offshell production, set this to an index
+                       for each of the jobs.  See below for more details.
   Resonance parameters:
     MReso:             resonance mass in GeV (default=125.00)
     GaReso:            resonance width in GeV (default=0.00407)

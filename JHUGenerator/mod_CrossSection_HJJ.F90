@@ -24,7 +24,7 @@ use ifport
 #endif
 implicit none
 integer,parameter :: mxpart=14 ! this has to match the MCFM parameter
-real(8) :: yRnd(1:18),VgsWgt, EvalWeighted_HJJ_fulldecay
+real(8) :: yRnd(1:17),VgsWgt, EvalWeighted_HJJ_fulldecay
 real(8) :: pdf(-6:6,1:2),me2(-5:5,-5:5)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
 real(8) :: MomExt(1:4,1:10),MomShifted(1:4,1:10),PSWgt,FinalStateWeight,m1ffwgt,m2ffwgt
@@ -33,79 +33,47 @@ integer :: id_MCFM(mxpart),MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),
 integer, pointer :: ijSel(:,:)
 integer :: iPartChannel,PartChannelAvg,NumPartonicChannels,iflip,i,j,k
 real(8) :: PreFac,VegasWeighted_HJJ_fulldecay,xRnd,LeptonAndVegasWeighted_HJJ_fulldecay
-logical :: applyPSCut
+logical :: applyPSCut,swap34_56
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
 include 'vegas_common.f'
 include 'maxwt.f'
 EvalWeighted_HJJ_fulldecay = 0d0
 m1ffwgt=1d0;m2ffwgt=1d0
 
-
    if (Process.eq.69) then
       call getRef_MCFM_qqVVqqStrong_Hash(ijSel) ! ijSel is in JHU convention
-       ! Hashes go as 1-25, 26-50, 51-100, 101-140, 141-150, 151-160, 161-170, 171-175
-      if( VBFoffsh_run.eq.1 ) then
-         NumPartonicChannels= 25
-         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-         iPartChannel= iPartChannel
-      elseif( VBFoffsh_run.eq.2 ) then
-         NumPartonicChannels= 25
-         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-         iPartChannel= iPartChannel+25
-      elseif( VBFoffsh_run.eq.3 ) then
-         NumPartonicChannels= 50
-         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-         iPartChannel= iPartChannel+50
-      elseif( VBFoffsh_run.eq.4 ) then
-         NumPartonicChannels= 40
-         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-         iPartChannel= iPartChannel+100
-      elseif( VBFoffsh_run.eq.5 ) then
-         NumPartonicChannels= 10
-         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-         iPartChannel= iPartChannel+140
-      elseif( VBFoffsh_run.eq.6 ) then
-         NumPartonicChannels= 10
-         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-         iPartChannel= iPartChannel+150
-      elseif( VBFoffsh_run.eq.7 ) then
-         NumPartonicChannels= 10
-         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-         iPartChannel= iPartChannel+160
-      elseif( VBFoffsh_run.eq.8 ) then
-         NumPartonicChannels= 5
-         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-         iPartChannel= iPartChannel+170
+      if( VBFoffsh_run.gt.0 ) then
+         if (VBFoffsh_run .gt. Hash_MCFM_qqVVqqStrong_Size) call Error("VBFoffsh_run is too big")
+         NumPartonicChannels=1
+         iPartChannel = VBFoffsh_run
       else
-         NumPartonicChannels= Hash_MCFM_qqVVqqStrong_Size
-         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         NumPartonicChannels=Hash_MCFM_qqVVqqStrong_Size
+         !iPartChannel = int(yRnd(18) * NumPartonicChannels) +1 ! Must use last yRnd
+         call Error("You may not use VBFoffsh_run<=0 anymore.")
          iPartChannel= iPartChannel
       endif
-   else
+   elseif (Process.ge.66 .and. Process.le.68) then
       call getRef_MCFM_qqVVqq_Hash(ijSel) ! ijSel is in JHU convention
-      if( VBFoffsh_run.eq.1 ) then
-         NumPartonicChannels= 2
-         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-         iPartChannel= iPartChannel  ! runs from 1..2
-      elseif( VBFoffsh_run.eq.2 ) then
-         NumPartonicChannels= 7
-         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-         iPartChannel= iPartChannel+2  ! runs from 3..9
-      elseif( VBFoffsh_run.eq.3 ) then
-         NumPartonicChannels= 31
-         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-         iPartChannel= iPartChannel+9  ! runs from 10..40
-      elseif( VBFoffsh_run.eq.4 ) then
-         NumPartonicChannels= 63
-         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-         iPartChannel= iPartChannel+40  ! runs from 41..103
-      elseif( VBFoffsh_run.eq.5 ) then
-         NumPartonicChannels= 61
-         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-         iPartChannel= iPartChannel+103  ! runs from 104..164
+      if( VBFoffsh_run.gt.0 ) then
+         if (VBFoffsh_run .gt. Hash_MCFM_qqVVqq_Size) call Error("VBFoffsh_run is too big")
+         NumPartonicChannels=1
+         iPartChannel = VBFoffsh_run
       else
-         NumPartonicChannels= Hash_MCFM_qqVVqq_Size
-         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         NumPartonicChannels=Hash_MCFM_qqVVqq_Size
+         !iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         call Error("You may not use VBFoffsh_run<=0 anymore.")
+         iPartChannel= iPartChannel  ! runs from 1..164
+      endif
+   elseif (Process.ge.70 .and. Process.le.72) then
+      call getRef_MCFM_qqVVll_Hash(ijSel) ! ijSel is in JHU convention
+      if( VBFoffsh_run.gt.0 ) then
+         if (VBFoffsh_run .gt. Hash_MCFM_qqVVll_Size) call Error("VBFoffsh_run is too big")
+         NumPartonicChannels=1
+         iPartChannel = VBFoffsh_run
+      else
+         NumPartonicChannels=Hash_MCFM_qqVVll_Size
+         !iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+         call Error("You may not use VBFoffsh_run<=0 anymore.")
          iPartChannel= iPartChannel  ! runs from 1..164
       endif
    endif
@@ -136,10 +104,29 @@ m1ffwgt=1d0;m2ffwgt=1d0
    call VVBranchings(MY_IDUP(5:10),ICOLUP(1:2,7:10),FinalStateWeight,700)
    call swap(MY_IDUP(7),MY_IDUP(8))!   switch ordering ElP_,ElM_,MuP_,MuM_ --> ElM_,ElP_,MuM_,MuP_
    call swap(MY_IDUP(9),MY_IDUP(10))
+   do jpart=1,2
+      id_MCFM(jpart) = ijSel(iPartChannel,jpart) ! JHU convention
+   enddo
    id_MCFM(3:6) = MY_IDUP(7:10)
+   do jpart=3,4
+      id_MCFM(jpart+4) = ijSel(iPartChannel,jpart)
+   enddo
+   MY_IDUP(1:2)= id_MCFM(1:2)
+   MY_IDUP(3:4)= id_MCFM(7:8)
+   !write(6,*) "id_MCFM:",id_MCFM
+   !write(6,*) "p_MCFM:",p_MCFM
+
+   if (IsNaN(VgsWgt)) then
+      write(6,*) "PDFMapping args:",2,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi,dmax1(m4l_minmax(1),0d0)+mJJcut
+      write(6,*) "EvalPhasespace_VBF_H4f args:",yRnd(3),yRnd(4:17),EHat,MomExt(1:4,1:10),PSWgt,id_MCFM(1:8)
+      write(6,*) "CrossSec2 = ",CrossSec2(iPartChannel)
+      write(6,*) "CrossSecMax2 = ",CrossSecMax2(iPartChannel)
+      write(6,*) "CrossSectionWithWeights",CrossSectionWithWeights
+   endif
 
    call PDFMapping(2,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi,EhatMin=dmax1(m4l_minmax(1),0d0)+mJJcut)
-   call EvalPhasespace_VBF_H4f(yRnd(3),yRnd(4:17),EHat,MomExt(1:4,1:10),PSWgt,ijSel(iPartChannel,1:2),MY_IDUP(7)-MY_IDUP(9))
+   call EvalPhasespace_VBF_H4f(yRnd(3),yRnd(4:17),EHat,MomExt(1:4,1:10),PSWgt,id_MCFM(1:8),swap34_56)
+   !write(6,*) "After EvalPS, MomExt:",MomExt,", Pwwgt:",PSWgt
 
 !       call genps(6,EHat,yRnd(3:16),(/0d0,0d0,0d0,0d0,0d0,0d0/),MomExt(1:4,3:8),PSWgt)
 !       MomExt(1:4,1)=(/Ehat,0d0,0d0,+Ehat/)/2d0
@@ -158,7 +145,7 @@ m1ffwgt=1d0;m2ffwgt=1d0
    PSWgt = PSWgt * PartChannelAvg * FinalStateWeight
 
 
-   call Kinematics_HVBF_fulldecay(MomExt,applyPSCut,NBin)
+   call Kinematics_HVBF_fulldecay(MomExt,id_MCFM,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.lt.1d-33 ) then
       return
    endif
@@ -183,32 +170,26 @@ m1ffwgt=1d0;m2ffwgt=1d0
    msq_MCFM(:,:) = 0d0
 
    MomShifted = MomExt
-   if(.not.IsAPhoton(DecayMode1)) then
-      call ShiftMass(MomExt(1:4,Lep1P),MomExt(1:4,Lep1M), GetMass(MY_IDUP(Lep1P)),GetMass(MY_IDUP(Lep1M)),MomShifted(1:4,Lep1P),MomShifted(1:4,Lep1M),MassWeight=m1ffwgt)
+   if (swap34_56) then
+      if(.not.IsAPhoton(DecayMode1)) then
+         call ShiftMass(MomExt(1:4,Lep1P),MomExt(1:4,Lep2M), GetMass(MY_IDUP(Lep1P)),GetMass(MY_IDUP(Lep2M)),MomShifted(1:4,Lep1P),MomShifted(1:4,Lep2M),MassWeight=m1ffwgt)
+      endif
+      if(.not.IsAPhoton(DecayMode2)) then
+         call ShiftMass(MomExt(1:4,Lep2P),MomExt(1:4,Lep1M), GetMass(MY_IDUP(Lep2P)),GetMass(MY_IDUP(Lep1M)),MomShifted(1:4,Lep2P),MomShifted(1:4,Lep1M),MassWeight=m2ffwgt)
+      endif
+   else
+      if(.not.IsAPhoton(DecayMode1)) then
+         call ShiftMass(MomExt(1:4,Lep1P),MomExt(1:4,Lep1M), GetMass(MY_IDUP(Lep1P)),GetMass(MY_IDUP(Lep1M)),MomShifted(1:4,Lep1P),MomShifted(1:4,Lep1M),MassWeight=m1ffwgt)
+      endif
+      if(.not.IsAPhoton(DecayMode2)) then
+         call ShiftMass(MomExt(1:4,Lep2P),MomExt(1:4,Lep2M), GetMass(MY_IDUP(Lep2P)),GetMass(MY_IDUP(Lep2M)),MomShifted(1:4,Lep2P),MomShifted(1:4,Lep2M),MassWeight=m2ffwgt)
+      endif
    endif
-   if(.not.IsAPhoton(DecayMode2)) then
-      call ShiftMass(MomExt(1:4,Lep2P),MomExt(1:4,Lep2M), GetMass(MY_IDUP(Lep2P)),GetMass(MY_IDUP(Lep2M)),MomShifted(1:4,Lep2P),MomShifted(1:4,Lep2M),MassWeight=m2ffwgt)
-   endif
-
-
-   do jpart=1,2
-      id_MCFM(jpart) = ijSel(iPartChannel,jpart) ! JHU convention
-!      if(id_MCFM(jpart) .ne. 0) id_MCFM(jpart)=convertLHE(id_MCFM(jpart))
-   enddo
-   do jpart=3,4
-      id_MCFM(jpart+4) = ijSel(iPartChannel,jpart)
-!      if(id_MCFM(jpart+4) .ne. 0) id_MCFM(jpart+4)=convertLHE(id_MCFM(jpart+4))
-   enddo
-   MY_IDUP(1:2)= id_MCFM(1:2)
-   MY_IDUP(3:4)= id_MCFM(7:8)
-
-   !write(6,*) "id_MCFM:",id_MCFM
-   !write(6,*) "p_MCFM:",p_MCFM
 
 
 #if linkMELA==1
 
-   call EvalAmp_qqVVqq(id_MCFM, p_MCFM, msq_MCFM) ! 1 for ZZ decay, 2 for WW decay, 3 for ZZ+WW mixture
+   call EvalAmp_qqVVqq(id_MCFM, p_MCFM, msq_MCFM)
 
 #else
    print *, "To use this process, please set linkMELA=Yes in the makefile and recompile."
@@ -237,6 +218,29 @@ m1ffwgt=1d0;m2ffwgt=1d0
    !endif
    !write(6,*) "originalprobability,EvalWeighted_HJJ_fulldecay,VgsWgt=",originalprobability,EvalWeighted_HJJ_fulldecay,VgsWgt
    !pause
+
+   if ( &
+      !msq_MCFM(iPart_sel,jPart_sel) .le. 0d0 .or. &
+      !pdf(LHA2M_pdf(iPart_sel),1) .le. 0d0 .or. &
+      !pdf(LHA2M_pdf(jPart_sel),2) .le. 0d0 .or. &
+      !EvalWeighted_HJJ_fulldecay .le. 0d0 .or. &
+      !VegasWeighted_HJJ_fulldecay .le. 0d0 .or. &
+      IsNaN(msq_MCFM(iPart_sel,jPart_sel)) .or. &
+      IsNaN(pdf(LHA2M_pdf(iPart_sel),1)) .or. &
+      IsNaN(pdf(LHA2M_pdf(jPart_sel),2)) .or. &
+      IsNaN(EvalWeighted_HJJ_fulldecay) .or. &
+      IsNaN(VegasWeighted_HJJ_fulldecay) &
+      ) then
+      write(6,*) "msq_MCFM(",iPart_sel,",",jPart_sel,") =",msq_MCFM(iPart_sel,jPart_sel)
+      write(6,*) "pdf1 =",pdf(LHA2M_pdf(iPart_sel),1)
+      write(6,*) "pdf2 =",pdf(LHA2M_pdf(jPart_sel),2)
+      write(6,*) "EvalWeighted_HJJ_fulldecay =",EvalWeighted_HJJ_fulldecay
+      write(6,*) "VegasWeighted_HJJ_fulldecay =",VegasWeighted_HJJ_fulldecay
+      do jpart=1,8
+         write(6,*) "P_MCFM(",convertLHE(id_MCFM(jpart)),")=",p_MCFM(jpart,:)
+      enddo
+      pause
+    endif
 
 
    if( unweighted ) then
@@ -269,7 +273,7 @@ m1ffwgt=1d0;m2ffwgt=1d0
           write(io_stdout, "(2X,A,1PE13.6,1PE13.6,1PE13.6,I4,I4,I4)") "CrossSecMax is too small.",VegasWeighted_HJJ_fulldecay, CrossSecMax2(iPartChannel),VegasWeighted_HJJ_fulldecay/CrossSecMax2(iPartChannel),iPartChannel,iPart_sel,jPart_sel
           AlertCounter = AlertCounter + 1
 
- !          This dynamically increases the maximum in case it is exceeded
+!          This dynamically increases the maximum in case it is exceeded
           CrossSecMax2(iPartChannel) = VegasWeighted_HJJ_fulldecay
           write(io_LogFile,"(2X,A,1PE13.6)") "Increasing CrossSecMax to ",VegasWeighted_HJJ_fulldecay
           write(io_stdout, "(2X,A,1PE13.6)") "Increasing CrossSecMax to ",VegasWeighted_HJJ_fulldecay

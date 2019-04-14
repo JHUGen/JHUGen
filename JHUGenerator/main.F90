@@ -45,7 +45,7 @@ real(8) :: VG_Result,VG_Error
         call PrintMZZdistribution()
    else
         if( Process.eq.0 .or. Process.eq.1  .or. Process.eq.2 .or. Process.eq.80 &
-                         .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 .or. Process.eq.67 .or. Process.eq.68 .or. Process.eq.69 &
+                         .or. Process.eq.60 .or. Process.eq.61 .or. (Process.ge.66 .and. Process.le.72) &
                          .or. Process.eq.90 .or. Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113 .or. Process.eq.114 ) then
            call StartVegas_NEW(VG_Result,VG_Error)
         else
@@ -99,6 +99,9 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
             Process.eq.67 .or.  &
             Process.eq.68 .or.  &
             Process.eq.69 .or.  &
+            Process.eq.70 .or.  &
+            Process.eq.71 .or.  &
+            Process.eq.72 .or.  &
             Process.eq.76 .or.  &
             Process.eq.77 .or.  &
             Process.eq.78 .or.  &
@@ -131,10 +134,8 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
             FacScheme = -kRenFacScheme_mhstar
             MuFacMultiplier = 1d0
          elseif( &
-         Process.eq.66 .or. & !- VVHVV with decays
-         Process.eq.67 .or. & !- VVVV with decays
-         Process.eq.68 .or. & !- VVVV+VVHVV with decays
-         Process.eq.69      & !- QCD JJ bkg with decays
+         Process.ge.66 .and. & !- EW/QCD VV+JJ/LL with decays
+         Process.le.72      &
          ) then
             FacScheme = +kRenFacScheme_mhstar
             MuFacMultiplier = 1d0
@@ -175,10 +176,8 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
             RenScheme = -kRenFacScheme_mhstar
             MuRenMultiplier = 1d0
          elseif( &
-         Process.eq.66 .or. & !- VVHVV with decays
-         Process.eq.67 .or. & !- VVVV with decays
-         Process.eq.68 .or. & !- VVVV+VVHVV with decays
-         Process.eq.69      & !- QCD JJ bkg with decays
+         Process.ge.66 .and. & !- EW/QCD VV+JJ/LL with decays
+         Process.le.72      &
          ) then
             RenScheme = +kRenFacScheme_mhstar
             MuRenMultiplier = 1d0
@@ -212,6 +211,9 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
             Process.eq.67 .or. &
             Process.eq.68 .or. &
             Process.eq.69 .or. &
+            Process.eq.70 .or. &
+            Process.eq.71 .or. &
+            Process.eq.72 .or. &
             Process.eq.80 .or. &
             Process.eq.90      &
          ) .and. (             &
@@ -230,6 +232,9 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
             Process.eq.66 .or. &
             Process.eq.67 .or. &
             Process.eq.68 .or. &
+            Process.eq.70 .or. &
+            Process.eq.71 .or. &
+            Process.eq.72 .or. &
             Process.eq.69      &
          ) .and. (             &
             (abs(FacScheme).eq.kRenFacScheme_mj_mj_mhstar) .or. (abs(FacScheme).eq.kRenFacScheme_mj_mj) .or. &
@@ -1116,28 +1121,14 @@ type(SaveValues) :: tosave, oldsavevalues
     endif
     call system('mkdir -p ./data')! -p is suppressing error messages if directory already exists
 
-    if( VBFoffsh_run.eq.1 ) DataFile = trim(DataFile)//"_1"
-    if( VBFoffsh_run.eq.2 ) DataFile = trim(DataFile)//"_2"
-    if( VBFoffsh_run.eq.3 ) DataFile = trim(DataFile)//"_3"
-    if( VBFoffsh_run.eq.4 ) DataFile = trim(DataFile)//"_4"
-    if( VBFoffsh_run.eq.5 ) DataFile = trim(DataFile)//"_5"
-    if( VBFoffsh_run.eq.6 ) DataFile = trim(DataFile)//"_6"
-    if( VBFoffsh_run.eq.7 ) DataFile = trim(DataFile)//"_7"
-    if( VBFoffsh_run.eq.8 ) DataFile = trim(DataFile)//"_8"
+    if (SetVBFoffsh_run) write(DataFile, "(A,A,I0.3)") trim(DataFile), "_", VBFoffsh_run
 
     if( SetCSmaxFile ) then
       i = len(trim(CSmaxFile))
       if( CSmaxFile(i-3:i).eq.".lhe" ) then
           CSmaxFile = CSmaxFile(1:i-4)
       endif
-      if( VBFoffsh_run.eq.1 ) CSmaxFile = trim(CSmaxFile)//"_1"
-      if( VBFoffsh_run.eq.2 ) CSmaxFile = trim(CSmaxFile)//"_2"
-      if( VBFoffsh_run.eq.3 ) CSmaxFile = trim(CSmaxFile)//"_3"
-      if( VBFoffsh_run.eq.4 ) CSmaxFile = trim(CSmaxFile)//"_4"
-      if( VBFoffsh_run.eq.5 ) CSmaxFile = trim(CSmaxFile)//"_5"
-      if( VBFoffsh_run.eq.6 ) CSmaxFile = trim(CSmaxFile)//"_6"
-      if( VBFoffsh_run.eq.7 ) CSmaxFile = trim(CSmaxFile)//"_7"
-      if( VBFoffsh_run.eq.8 ) CSmaxFile = trim(CSmaxFile)//"_8"
+      if (SetVBFoffsh_run) write(CSmaxFile, "(A,A,I0.3)") trim(CSmaxFile), "_", VBFoffsh_run
     else
       CSmaxFile = DataFile
     endif
@@ -1150,15 +1141,23 @@ type(SaveValues) :: tosave, oldsavevalues
     endif
 
     !VBF offshell
-    if( .not. (Process.ge.66 .and. Process.le.69) .and. SetVBFoffsh_run ) then
-      call Error("VBFoffsh_run is only for VBF offshell")
+    if( .not. (Process.ge.66 .and. Process.le.72) .and. SetVBFoffsh_run ) then
+      call Error("VBFoffsh_run is only for VBF/QCD off-shell")
+    endif
+    if( (Process.ge.66 .and. Process.le.72) .and. VBFoffsh_run.le.0 ) then
+      call Error("VBFoffsh_run must be greater than 0.")
+    endif
+
+    if( Process.ge.66 .and. Process.le.72) then
+      if( m4l_minmax(1).lt.0d0 ) call Error("Have to set m4l_min for VBF offshell")
+      if( m4l_minmax(1).gt.m4l_minmax(2) ) call Error("Have to set m4l_max to something bigger than m4l_min")
     endif
 
     !PChannel
     if (Process.eq.0) PChannel = 0   !only gluons
 !Yaofu Zhou ggZH
     !if (Process.eq.1 .or. Process.eq.51 .or. Process.eq.60 .or. Process.eq.66 .or. Process.eq.67 .or. Process.eq.68) PChannel = 1   !only quarks
-    if (Process.eq.1 .or. Process.eq.60 .or. Process.eq.66 .or. Process.eq.67 .or. Process.eq.68) PChannel = 1   !only quarks
+    if (Process.eq.1 .or. Process.eq.60 .or. (Process.ge.66 .and. Process.le.68) .or. (Process.ge.70 .and. Process.le.72)) PChannel = 1   !only quarks
 
     !LHAPDF
 
@@ -1310,7 +1309,7 @@ type(SaveValues) :: tosave, oldsavevalues
         (DecayMode1.eq.0  .and. DecayMode2.eq.8)               .or.  &
         (DecayMode1.eq.2  .and. DecayMode2.eq.8)               ) then !  allow interference
             if( .not.interfSet ) then!  set default interference switch
-                if (Process.ge.66 .and. Process.le.69) then
+                if (Process.ge.66 .and. Process.le.72) then
                     if (Unweighted) then
                         includeInterference = .false.
                         reweightInterference = .true.
@@ -1337,7 +1336,7 @@ type(SaveValues) :: tosave, oldsavevalues
     if (reweightInterference .and. includeInterference) call Error("Can't set both Interf and ReweightInterf")
     if (reweightInterference .and. .not.unweighted) call Error("Can't reweight interference for weighted events, try setting Interf=1 instead")
     if (reweightInterference .and. ReadLHEFile) call Error("Interference reweighting is not implemented for ReadLHE mode")
-    if (reweightInterference .and. .not. (Process.ge.66 .and. Process.le.69)) then
+    if (reweightInterference .and. .not. (Process.ge.66 .and. Process.le.72)) then
       print *, "Interference reweighting is not implemented for process ", Process
       stop 1
     endif
@@ -1347,7 +1346,7 @@ type(SaveValues) :: tosave, oldsavevalues
         includeGammaStar = (SetZgammacoupling .or. Setgammagammacoupling .or. SetZprimegammacoupling)
     elseif( (IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. (Process.eq.0 .or. Process.eq.2) .and. TauDecays.lt.0) .or. (Process.ge.50 .and. Process.le.51 .and. IsAPhoton(DecayMode1)) ) then
         includeGammaStar = Setgammagammacoupling
-    else if (Process.eq.67 .or. Process.eq.68 .or. Process.eq.69) then
+    else if (Process.eq.67 .or. Process.eq.68 .or. Process.eq.71 .or. Process.eq.72 .or. Process.eq.69) then
         includeGammaStar = .true. ! Not really gamma*, but rather gamma* or gluon, set to true to manipulate phasespace generation
     endif
 
@@ -1397,14 +1396,14 @@ type(SaveValues) :: tosave, oldsavevalues
         endif
     endif
     if(.not.Setetajetcut) then
-        if(Process.ge.66 .and. Process.le.69) then
+        if(Process.ge.66 .and. Process.le.72) then
             etajetcut = 4d0
         else
             etajetcut = infinity()
         endif
     endif
     if(.not.Setdetajetcut) then
-        if(Process.ge.66 .and. Process.le.69) then
+        if(Process.ge.66 .and. Process.le.72) then
             detajetcut = 2d0
         else
             detajetcut = 0d0
@@ -1418,14 +1417,14 @@ type(SaveValues) :: tosave, oldsavevalues
         endif
     endif
     if(.not.SetpTlepcut) then
-        if(Process.ge.66 .and. Process.le.69) then
+        if(Process.ge.66 .and. Process.le.72) then
             pTlepcut = 3d0*GeV
         else
             pTlepcut = 0d0*GeV
         endif
     endif
     if(.not.Setetalepcut) then
-        if(Process.ge.66 .and. Process.le.69) then
+        if(Process.ge.66 .and. Process.le.72) then
             etalepcut = 2.7d0
         else
             etalepcut = infinity()
@@ -1434,7 +1433,7 @@ type(SaveValues) :: tosave, oldsavevalues
     if(.not.SetMPhotonCutoff) then
         if(includeGammaStar) then
             MPhotonCutoff = 4d0*GeV
-        elseif(Process.ge.66.and.Process.le.69) then
+        elseif(Process.ge.66.and.Process.le.72) then
             MPhotonCutoff = 2.5d0*GeV
         else
             MPhotonCutoff = 0d0
@@ -1475,8 +1474,8 @@ type(SaveValues) :: tosave, oldsavevalues
          pTHcut = 0d0 * GeV
       endif
     endif
-    if((Process.eq.60 .or. Process.eq.66 .or. Process.eq.67 .or. Process.eq.68 .or. Process.eq.69) .and. includeGammaStar .and. pTjetcut.le.0d0) then
-       print *, " Process=",Process," with offshell photons requires a non-zero pT cut. Current setting cut ",pTjetcut/GeV," GeV is not allowed."
+    if((Process.eq.60 .or. (Process.ge.66 .and. Process.le.72)) .and. includeGammaStar .and. pTjetcut.le.0d0) then
+       print *, " Process=",Process," with off-shell photons requires a non-zero pT cut. Current setting cut ",pTjetcut/GeV," GeV is not allowed."
        stop 1
     endif
     if((Process.eq.61 .or. Process.eq.62) .and. pTjetcut.le.0d0) then
@@ -1649,7 +1648,7 @@ type(SaveValues) :: tosave, oldsavevalues
             endif
         endif
     endif
-    if (Process.eq.60 .or. (Process.ge.66 .and. Process.lt.69)) then
+    if (Process.eq.60 .or. (Process.ge.66 .and. Process.lt.69) .or. (Process.ge.70 .and. Process.le.72)) then
         if ((SetHZprime .and. .not.SetZprimeff) .or. (.not.SetHZprime .and. SetZprimeff)) then
             call Error("To use Z' contact terms, you have to set both HVZ' and Z'ff couplings")
         endif
@@ -1730,12 +1729,12 @@ type(SaveValues) :: tosave, oldsavevalues
     endif
 
     ! VBF
-    if( distinguish_HWWcouplings .and. Process.ne.60 .and. Process.ne.66 .and. Process.ne.68 ) then
+    if( distinguish_HWWcouplings .and. Process.ne.60 .and. Process.ne.66 .and. Process.ne.68 .and. Process.ne.70 .and. Process.ne.72 ) then
         call Error("The separate HWW couplings are only used for VBF.  For H->WW decay or WH production, please set ghz* instead.")
     endif
 
     !Special for offshell VBF - default ghz1 is 1 to match the MCFM convention
-    if( .not.Setghz1 .and. Process.ge.66 .and. Process.le.68 ) then
+    if( .not.Setghz1 .and. ((Process.ge.66 .and. Process.le.68) .or. (Process.ge.70 .and. Process.le.72)) ) then
         !note this implies .not. SetAnomalousSpin0VV because of earlier errors
         ghz1=(1d0,0d0)
     endif
@@ -2061,13 +2060,13 @@ include "vegas_common.f"
       endif
 
       !- ppJJ with decays
-      if(Process.ge.66 .and. Process.le.69) then
+      if(Process.ge.66 .and. Process.le.72) then
          NDim = 5
          NDim = NDim + 2 ! sHat integration
          NDim = NDim + 8
          NDim = NDim + 1
          NDim = NDim + 1
-         NDim = NDim + 1
+         if (VBFoffsh_run.le.0) NDim = NDim + 1
 
          VegasIt1_default = 15
          VegasNc0_default = 10000000
@@ -2276,11 +2275,11 @@ implicit none
 integer, intent(in) :: Process
 
    if( &
-      (Process.ge.66 .and. Process.le.69) &
+      (Process.ge.66 .and. Process.le.72) &
       ) then
       call MCFM_firsttime()
       if( &
-         (Process.ge.66 .and. Process.le.69) &
+         (Process.ge.66 .and. Process.le.72) &
          ) then
          call Setup_MCFM_qqVVqq_firsttime(Process)
       !else if ... add more processes here
@@ -2697,11 +2696,12 @@ include 'csmaxvalue.f'
 integer :: flav1,flav2,StatusPercent,MissingEvents,MaxEvts,imax
 integer :: VegasSeed,PreviousSum,ios,NumPartonicChannels
 integer :: VBFoffsh_Hash_Size,VBFoffsh_run_size
-integer, parameter :: VBFoffsh_run_maxsize=NMAXPSPARTITIONS
+integer, parameter :: VBFoffsh_run_maxsize=max(Hash_MCFM_qqVVll_Size, max(Hash_MCFM_qqVVqq_Size, Hash_MCFM_qqVVqqStrong_Size))
 character :: ProcessStr*(3)
 logical :: UseBetaVersion=.false.
-real(8) :: VG_Result_in(1:NMAXPSPARTITIONS),VG_Error_in(1:NMAXPSPARTITIONS),calls1_in(1:NMAXPSPARTITIONS),calls2_in(1:NMAXPSPARTITIONS)
+real(8) :: VG_Result_in(1:VBFoffsh_run_maxsize),VG_Error_in(1:VBFoffsh_run_maxsize),calls1_array(1:VBFoffsh_run_maxsize)
 real(8) :: CrossSec2_in(1:VBFoffsh_run_maxsize,1:NMAXCHANNELS),CrossSecMax2_in(1:VBFoffsh_run_maxsize,NMAXCHANNELS),CrossSectionWithWeights_in(1:VBFoffsh_run_maxsize),CrossSectionWithWeightsErrorSquared_in(1:VBFoffsh_run_maxsize)
+character(len=len(CSmaxFile)+20) :: FileToRead
 
     VBFoffsh_Hash_Size = 0
     VBFoffsh_run_size = 0
@@ -2742,7 +2742,7 @@ real(8) :: CrossSec2_in(1:VBFoffsh_run_maxsize,1:NMAXCHANNELS),CrossSecMax2_in(1
     ingridfile=trim(outgridfile)
 
 
-    if( Process.gt.69 .and. Process.le.79 ) call Error("Missing ChannelHash for the process") !can change 79 if we add more processes in between
+    if( Process.gt.72 .and. Process.le.79 ) call Error("Missing ChannelHash for the process") !can change 79 if we add more processes in between
 
 if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !----------------------- weighted events
 
@@ -2769,7 +2769,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
       if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
 
       if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-      if( Process.ge.66 .and. Process.le.69 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+      if( Process.ge.66 .and. Process.le.72 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
       if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
 
       if( Process.eq.110) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
@@ -2802,7 +2802,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     if( Process.eq.90 ) call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
 
     if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-    if( Process.ge.66 .and. Process.le.69 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+    if( Process.ge.66 .and. Process.le.72 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
 
     if( Process.eq.110) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
@@ -2822,7 +2822,7 @@ UseBetaVersion = CalculatesXsec(Process)
 if( UseBetaVersion ) then
 ! !-------------------new stuff -------------------
 
-IF( .NOT. (Process.ge.66 .and. Process.le.69) ) THEN! special treatment for offshell VBF
+IF( .NOT. (Process.ge.66 .and. Process.le.72) ) THEN! special treatment for offshell VBF
 
     write(io_stdout,"(2X,A)")  "Scanning the integrand"
     warmup = .true.
@@ -3023,15 +3023,19 @@ IF( .NOT. (Process.ge.66 .and. Process.le.69) ) THEN! special treatment for offs
 
 
 
-ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell VBF
-
-    if (Process.ge.66 .and. Process.lt.69) then
+ELSEIF( Process.ge.66 .and. Process.le.72 ) THEN! special treatment for offshell VBF
+    if (Process.ge.66 .and. Process.le.68) then
        VBFoffsh_Hash_Size = Hash_MCFM_qqVVqq_Size
-       VBFoffsh_run_size = VBFoffsh_run_qqVVqq_size
+       VBFoffsh_run_size = Hash_MCFM_qqVVqq_Size
+    elseif (Process.ge.70 .and. Process.le.72) then
+       VBFoffsh_Hash_Size = Hash_MCFM_qqVVll_Size
+       VBFoffsh_run_size = Hash_MCFM_qqVVll_Size
     else
        VBFoffsh_Hash_Size = Hash_MCFM_qqVVqqStrong_Size
-       VBFoffsh_run_size = VBFoffsh_run_qqVVqqStrong_size
+       VBFoffsh_run_size = Hash_MCFM_qqVVqqStrong_Size
     endif
+
+    if (VBFoffsh_run_size .gt. VBFoffsh_run_maxsize) call Error("This should never be able to happen")
 
     !write(6,*) "VBFoffsh_Hash_Size, VBFoffsh_run_size", VBFoffsh_Hash_Size, VBFoffsh_run_size
 
@@ -3043,93 +3047,20 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 
     if( ReadCSmax ) then
         i=len(trim(CSmaxFile))
-        open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'1_gridinfo.txt',form='formatted',status='old',iostat=ios)
-        read(io_TmpFile,fmt=*) calls1_in(1)
-        read(io_TmpFile,fmt=*) CrossSec2_in(1,1:VBFoffsh_Hash_Size)
-        read(io_TmpFile,fmt=*) CrossSecMax2_in(1,1:VBFoffsh_Hash_Size)
-        read(io_TmpFile,fmt=*) VG_Result_in(1)
-        read(io_TmpFile,fmt=*) VG_Error_in(1)
-        read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(1), CrossSectionWithWeightsErrorSquared_in(1)
-        close(unit=io_TmpFile)
-        if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'1_gridinfo.txt'
-
-        open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'2_gridinfo.txt',form='formatted',status='old',iostat=ios)
-        read(io_TmpFile,fmt=*) calls1_in(2)
-        read(io_TmpFile,fmt=*) CrossSec2_in(2,1:VBFoffsh_Hash_Size)
-        read(io_TmpFile,fmt=*) CrossSecMax2_in(2,1:VBFoffsh_Hash_Size)
-        read(io_TmpFile,fmt=*) VG_Result_in(2)
-        read(io_TmpFile,fmt=*) VG_Error_in(2)
-        read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(2), CrossSectionWithWeightsErrorSquared_in(2)
-        close(unit=io_TmpFile)
-        if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'2_gridinfo.txt'
-
-        open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'3_gridinfo.txt',form='formatted',status='old',iostat=ios)
-        read(io_TmpFile,fmt=*) calls1_in(3)
-        read(io_TmpFile,fmt=*) CrossSec2_in(3,1:VBFoffsh_Hash_Size)
-        read(io_TmpFile,fmt=*) CrossSecMax2_in(3,1:VBFoffsh_Hash_Size)
-        read(io_TmpFile,fmt=*) VG_Result_in(3)
-        read(io_TmpFile,fmt=*) VG_Error_in(3)
-        read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(3), CrossSectionWithWeightsErrorSquared_in(3)
-        close(unit=io_TmpFile)
-        if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'3_gridinfo.txt'
-
-        open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'4_gridinfo.txt',form='formatted',status='old',iostat=ios)
-        read(io_TmpFile,fmt=*) calls1_in(4)
-        read(io_TmpFile,fmt=*) CrossSec2_in(4,1:VBFoffsh_Hash_Size)
-        read(io_TmpFile,fmt=*) CrossSecMax2_in(4,1:VBFoffsh_Hash_Size)
-        read(io_TmpFile,fmt=*) VG_Result_in(4)
-        read(io_TmpFile,fmt=*) VG_Error_in(4)
-        read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(4), CrossSectionWithWeightsErrorSquared_in(4)
-        close(unit=io_TmpFile)
-        if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'4_gridinfo.txt'
-
-        open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'5_gridinfo.txt',form='formatted',status='old',iostat=ios)
-        read(io_TmpFile,fmt=*) calls1_in(5)
-        read(io_TmpFile,fmt=*) CrossSec2_in(5,1:VBFoffsh_Hash_Size)
-        read(io_TmpFile,fmt=*) CrossSecMax2_in(5,1:VBFoffsh_Hash_Size)
-        read(io_TmpFile,fmt=*) VG_Result_in(5)
-        read(io_TmpFile,fmt=*) VG_Error_in(5)
-        read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(5), CrossSectionWithWeightsErrorSquared_in(5)
-        close(unit=io_TmpFile)
-        if( ios.eq.0 ) print *, "read ",trim(CSmaxFile(1:i-1))//'5_gridinfo.txt'
-
-        if (Process .eq. 69) then
-           open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'6_gridinfo.txt',form='formatted',status='old',iostat=ios)
-           read(io_TmpFile,fmt=*) calls1_in(6)
-           read(io_TmpFile,fmt=*) CrossSec2_in(6,1:VBFoffsh_Hash_Size)
-           read(io_TmpFile,fmt=*) CrossSecMax2_in(6,1:VBFoffsh_Hash_Size)
-           read(io_TmpFile,fmt=*) VG_Result_in(6)
-           read(io_TmpFile,fmt=*) VG_Error_in(6)
-           read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(6), CrossSectionWithWeightsErrorSquared_in(6)
-           close(unit=io_TmpFile)
-           if( ios.eq.0 ) print *, "read ",trim(DataFile(1:i-1))//'6_gridinfo.txt'
-
-           open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'7_gridinfo.txt',form='formatted',status='old',iostat=ios)
-           read(io_TmpFile,fmt=*) calls1_in(7)
-           read(io_TmpFile,fmt=*) CrossSec2_in(7,1:VBFoffsh_Hash_Size)
-           read(io_TmpFile,fmt=*) CrossSecMax2_in(7,1:VBFoffsh_Hash_Size)
-           read(io_TmpFile,fmt=*) VG_Result_in(7)
-           read(io_TmpFile,fmt=*) VG_Error_in(7)
-           read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(7), CrossSectionWithWeightsErrorSquared_in(7)
-           close(unit=io_TmpFile)
-           if( ios.eq.0 ) print *, "read ",trim(DataFile(1:i-1))//'7_gridinfo.txt'
-
-           open(unit=io_TmpFile,file=trim(CSmaxFile(1:i-1))//'8_gridinfo.txt',form='formatted',status='old',iostat=ios)
-           read(io_TmpFile,fmt=*) calls1_in(8)
-           read(io_TmpFile,fmt=*) CrossSec2_in(8,1:VBFoffsh_Hash_Size)
-           read(io_TmpFile,fmt=*) CrossSecMax2_in(8,1:VBFoffsh_Hash_Size)
-           read(io_TmpFile,fmt=*) VG_Result_in(8)
-           read(io_TmpFile,fmt=*) VG_Error_in(8)
-           read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(8), CrossSectionWithWeightsErrorSquared_in(8)
-           close(unit=io_TmpFile)
-           if( ios.eq.0 ) print *, "read ",trim(DataFile(1:i-1))//'8_gridinfo.txt'
-        endif
-
-        !write(6,*) "calls1_in:",calls1_in
-        do j=2,VBFoffsh_run_size
-           if( calls1_in(1).ne.calls1_in(j) ) call Error("Mismatch in calls1")
+        do j=1,VBFoffsh_run_size
+            write(FileToRead, "(A,I0.3,A)") trim(CSmaxFile(1:i-3)), j, "_gridinfo.txt"
+            open(unit=io_TmpFile,file=FileToRead,form='formatted',status='old',iostat=ios)
+            read(io_TmpFile,fmt=*) calls1_array(j)
+            read(io_TmpFile,fmt=*) CrossSec2_in(j,1:VBFoffsh_Hash_Size)
+            read(io_TmpFile,fmt=*) CrossSecMax2_in(j,1:VBFoffsh_Hash_Size)
+            read(io_TmpFile,fmt=*) VG_Result_in(j)
+            read(io_TmpFile,fmt=*) VG_Error_in(j)
+            read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(j), CrossSectionWithWeightsErrorSquared_in(j)
+            close(unit=io_TmpFile)
+            if( ios.eq.0 ) print *, "read ",FileToRead
         enddo
-        calls1 = calls1_in(1)
+
+        !write(6,*) "calls1_array:",calls1_array
 
         CrossSec2(:) = -1d0
         do i=1,VBFoffsh_Hash_Size
@@ -3148,7 +3079,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 
         CrossSecMax2(:) = -1d0
         do i=1,VBFoffsh_Hash_Size
-            CrossSecMax2(i) = CrossSecMax2_in( max(1,VBFoffsh_run),i)
+            CrossSecMax2(i) = CrossSecMax2_in( max(1,VBFoffsh_run),i) * calls1_array(VBFoffsh_run)
         enddo
         if (VBFoffsh_Hash_Size .lt. NMAXCHANNELS) CrossSecMax2(VBFoffsh_Hash_Size+1:NMAXCHANNELS)=0d0
 
@@ -3176,12 +3107,12 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         ncall= VegasNc0
         readin=.false.
         writeout=.true.
-        if( Process.ge.66 .and. Process.le.69 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+        if( Process.ge.66 .and. Process.le.72 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
 
         itmx = 2
         writeout=.true.
         outgridfile = trim(CSmaxFile)//'_step2.grid'
-        if( Process.ge.66 .and. Process.le.69 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+        if( Process.ge.66 .and. Process.le.72 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
 
 
         CrossSecMax2(:) = 0d0
@@ -3192,16 +3123,16 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         FindCrossSectionWithWeights = .true.
         CrossSectionWithWeights = 0d0
         CrossSectionWithWeightsErrorSquared = 0d0
-        if( Process.ge.66 .and. Process.le.69 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+        if( Process.ge.66 .and. Process.le.72 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
         FindCrossSectionWithWeights = .false.
         writeout=.false.
         ingridfile=trim(outgridfile)
 
-        call vegas_get_calls(calls1)
+        call vegas_get_calls(calls1_array(VBFoffsh_run))
         CrossSec2(:) = CrossSec2(:)/dble(itmx)
 
         open(unit=io_TmpFile,file=trim(CSmaxFile)//'_gridinfo.txt',form='formatted',status='replace')
-        write(io_TmpFile,fmt=*) calls1
+        write(io_TmpFile,fmt=*) calls1_array(VBFoffsh_run)
         write(io_TmpFile,fmt=*) CrossSec2(1:VBFoffsh_Hash_Size)
         write(io_TmpFile,fmt=*) CrossSecMax2(1:VBFoffsh_Hash_Size)
         write(io_TmpFile,fmt=*) VG_Result
@@ -3220,8 +3151,12 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 
     if (Process.eq.69) then
        call getRef_MCFM_qqVVqqStrong_Hash(ijSel)
-    else
+    elseif (Process.ge.66 .and. Process.le.68) then
        call getRef_MCFM_qqVVqq_Hash(ijSel)
+    elseif (Process.ge.70 .and. Process.le.72) then
+       call getRef_MCFM_qqVVll_Hash(ijSel)
+    else
+       call Error("Process hash unidentified!")
     endif
     !RequEvents(:,:) = 0d0 ! This variable is not used here
     do i=1,VBFoffsh_Hash_Size
@@ -3235,64 +3170,15 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
 
 
     if( .not. ReadCSmax ) then! For ReadCSmax=.false. the program ends here
-       if( VBFoffsh_run.ge.1 .and. VBFoffsh_run.le.VBFoffsh_run_size ) print *, "WARNING: These are not the final number of events because the total cross section needs to be assembled from VBFoffsh_run=1,2,3,4,5 (,6,7,8 for process=69)"
+       if( VBFoffsh_run.ge.1 .and. VBFoffsh_run.le.VBFoffsh_run_size ) print *, "WARNING: These are not the final number of events because the total cross section needs to be assembled from all the VBFoffsh_runs"
        RETURN
     endif
 
-    if (Process .eq. 69) then
-       ! Hashes go as 1-25, 26-50, 51-100, 101-140, 141-150, 151-160, 161-170, 171-175
-       if( VBFoffsh_run.eq.1 ) then ! removing the requested events for the wrong VBFoffsh_run
-            RequEvents2(26:Hash_MCFM_qqVVqqStrong_Size) = 0
-            NumPartonicChannels = 25
-       elseif( VBFoffsh_run.eq.2 ) then
-            RequEvents2(1:25) = 0
-            RequEvents2(51:Hash_MCFM_qqVVqqStrong_Size) = 0
-            NumPartonicChannels = 25
-       elseif( VBFoffsh_run.eq.3 ) then
-            RequEvents2(1:50) = 0
-            RequEvents2(101:Hash_MCFM_qqVVqqStrong_Size) = 0
-            NumPartonicChannels = 50
-       elseif( VBFoffsh_run.eq.4 ) then
-            RequEvents2(1:100) = 0
-            RequEvents2(141:Hash_MCFM_qqVVqqStrong_Size) = 0
-            NumPartonicChannels = 40
-       elseif( VBFoffsh_run.eq.5 ) then
-            RequEvents2(1:140) = 0
-            RequEvents2(151:Hash_MCFM_qqVVqqStrong_Size) = 0
-            NumPartonicChannels = 10
-       elseif( VBFoffsh_run.eq.6 ) then
-            RequEvents2(1:150) = 0
-            RequEvents2(161:Hash_MCFM_qqVVqqStrong_Size) = 0
-            NumPartonicChannels = 10
-       elseif( VBFoffsh_run.eq.7 ) then
-            RequEvents2(1:160) = 0
-            RequEvents2(171:Hash_MCFM_qqVVqqStrong_Size) = 0
-            NumPartonicChannels = 10
-       elseif( VBFoffsh_run.eq.8 ) then
-            RequEvents2(1:170) = 0
-            NumPartonicChannels = 5
-       endif
-    else
-       if( VBFoffsh_run.eq.1 ) then ! removing the requested events for the wrong VBFoffsh_run
-            RequEvents2(3:Hash_MCFM_qqVVqq_Size) = 0
-            NumPartonicChannels = 2
-       elseif( VBFoffsh_run.eq.2 ) then
-            RequEvents2(1:2) = 0
-            RequEvents2(10:Hash_MCFM_qqVVqq_Size) = 0
-            NumPartonicChannels = 7
-       elseif( VBFoffsh_run.eq.3 ) then
-            RequEvents2(1:9) = 0
-            RequEvents2(41:Hash_MCFM_qqVVqq_Size) = 0
-            NumPartonicChannels = 31
-       elseif( VBFoffsh_run.eq.4 ) then
-            RequEvents2(1:40) = 0
-            RequEvents2(104:Hash_MCFM_qqVVqq_Size) = 0
-            NumPartonicChannels = 63
-       elseif( VBFoffsh_run.eq.5 ) then
-            RequEvents2(1:103) = 0
-            NumPartonicChannels = 61
-       endif
-    endif
+    !removing the requested events for the wrong VBFoffsh_run
+    RequEvents2(1:VBFoffsh_run-1) = 0
+    RequEvents2(VBFoffsh_run+1:VBFoffsh_Hash_Size) = 0
+    NumPartonicChannels = 1
+
     ingridfile = trim(CSmaxFile)//'_step2.grid'
 
     !write(6,*) "NumPartonicChannels | RequEvents2",NumPartonicChannels," | ",RequEvents2
@@ -3333,9 +3219,8 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
     writeout=.false.
 
     call vegas_get_calls(calls2)
-    calls_rescale = calls1/calls2
+    calls_rescale = 1d0/calls2
     CrossSecMax2(:) = CrossSecMax2(:) * calls_rescale
-    print *, "Rescale CrossSecMax2 by ",calls_rescale
 
     PreviousSum = 0
     if( sum(RequEvents2(:)).eq.0 ) StatusPercent = 100d0
@@ -3343,7 +3228,7 @@ ELSEIF( Process.ge.66 .and. Process.le.69 ) THEN! special treatment for offshell
         call cpu_time(time_start)
         readin=.true.  ! this prevents adapting the grid during this while-loop
 
-        if( Process.ge.66 .and. Process.le.69 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+        if( Process.ge.66 .and. Process.le.72 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
         write(io_stdout,*) ""
 
         do i1=1,VBFoffsh_Hash_Size
@@ -3403,7 +3288,7 @@ else! not beta version
                     dum = EvalUnWeighted_BBBH(yRnd,.false.,(/-99,-99/),RES)
                 elseif( Process.eq.60 ) then
                     dum = EvalUnWeighted_HJJ(yRnd,.false.,(/-99,-99/),RES)
-                elseif( Process.ge.66 .and. Process.le.69 ) then
+                elseif( Process.ge.66 .and. Process.le.72 ) then
                     dum = EvalUnWeighted_HJJ_fulldecay(yRnd,.false.,(/-99,-99/),RES)
                 elseif( Process.eq.61 ) then
                     dum = EvalUnWeighted_HJJ(yRnd,.false.,(/-99,-99/),RES)
@@ -3481,7 +3366,7 @@ else! not beta version
                   dum = EvalUnWeighted_BBBH(yRnd,.true.,(/i1,j1/),RES)
               elseif( Process.eq.60 ) then
                   dum = EvalUnWeighted_HJJ(yRnd,.true.,(/i1,j1/),RES)
-              elseif( Process.ge.66 .and. Process.le.69 ) then
+              elseif( Process.ge.66 .and. Process.le.72 ) then
                   dum = EvalUnWeighted_HJJ_fulldecay(yRnd,.true.,(/i1,j1/),RES)
               elseif( Process.eq.61 ) then
                   dum = EvalUnWeighted_HJJ(yRnd,.true.,(/i1,j1/),RES)
@@ -4597,7 +4482,7 @@ SUBROUTINE InitHisto()
 use modParameters
 implicit none
 
-  if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.69) ) then
+  if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.72) ) then
      call InitHisto_HVBF()
   elseif( Process.eq.61) then
      call InitHisto_HJJ()
@@ -5749,8 +5634,8 @@ character :: arg*(500)
     if( Process.eq.60) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.61) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.62) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( (Process.eq.66 .or. Process.eq.68) .and. M_Reso.ge.0d0  ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "1st Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( (Process.eq.66 .or. Process.eq.68) .and. M_Reso2.ge.0d0 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "2nd Resonance: spin=0, mass=",M_Reso2*100d0," width=",Ga_Reso2*100d0
+    if( (Process.eq.66 .or. Process.eq.68 .or. Process.eq.70 .or. Process.eq.72) .and. M_Reso.ge.0d0  ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "1st Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( (Process.eq.66 .or. Process.eq.68 .or. Process.eq.70 .or. Process.eq.72) .and. M_Reso2.ge.0d0 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "2nd Resonance: spin=0, mass=",M_Reso2*100d0," width=",Ga_Reso2*100d0
     if( Process.eq.50) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.51) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.80) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
@@ -5764,7 +5649,7 @@ character :: arg*(500)
     if( ConvertLHEFile ) write(TheUnit,"(4X,A)") "           (This is ConvertLHEFile mode. Resonance mass/width are read from LHE input parameters.)"
     if( HiggsDecayLengthMM.ne.0d0 ) write(TheUnit,"(4X,A,F10.5,A)") "           ctau=", HiggsDecayLengthMM, " mm"
     if( &
-         (.not.ReadLHEFile .and. (Process.le.2 .or. Process.eq.50 .or. Process.eq.60 .or. (Process.ge.66 .and. Process.le.69) .or. ((TopDecays.eq.1).and.Process.eq.80) .or. (Process.ge.110 .and. Process.le.113))) &
+         (.not.ReadLHEFile .and. (Process.le.2 .or. Process.eq.50 .or. Process.eq.60 .or. (Process.ge.66 .and. Process.le.72) .or. ((TopDecays.eq.1).and.Process.eq.80) .or. (Process.ge.110 .and. Process.le.113))) &
     .or. (ReadLHEFile .and. TauDecays.ne.0) &
     .or. ConvertLHEFile ) &
     then
@@ -5773,34 +5658,34 @@ character :: arg*(500)
         else if( ReadLHEFile .or. Process.le.2 .or. Process .eq. 80 ) then
             write(TheUnit,"(4X,A,I2,2X,A,I2)") "DecayMode1:",DecayMode1, "DecayMode2:",DecayMode2
         endif
-        if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.69) .or. IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z boson: mass=",M_Z*100d0,", width=",Ga_Z*100d0
-        if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.69) .or. IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W boson: mass=",M_W*100d0,", width=",Ga_W*100d0
+        if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.72) .or. IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z boson: mass=",M_Z*100d0,", width=",Ga_Z*100d0
+        if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.72) .or. IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W boson: mass=",M_W*100d0,", width=",Ga_W*100d0
     endif
     if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or.Process.eq.112 .or. Process.eq.113 .or. Process.eq.114) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Top quark mass=",m_top*100d0,", width=",Ga_top*100d0
     if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113 .or. Process.eq.114) write(TheUnit,"(4X,A,I2)") "Top quark decay=",TOPDECAYS
     if( Process.eq.90 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Bottom quark mass=",m_top*100d0
-    if( Process.eq.50 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.62 .or. (Process.ge.66 .and. Process.le.69) .or. Process.eq.90 .or. &
+    if( Process.eq.50 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.62 .or. (Process.ge.66 .and. Process.le.72) .or. Process.eq.90 .or. &
        ((Process.eq.80 .or. (Process.ge.110 .and. Process.le.114)) .and. m_Top.lt.10d0*GeV) ) then
         write(TheUnit,"(4X,A)") "Jet cuts:"
         write(TheUnit,"(12X,A,F8.2,A)") "pT >= ", pTjetcut/GeV, " GeV"
-        if( Process.ge.66 .and. Process.le.69 ) then
+        if( Process.ge.66 .and. Process.le.72 ) then
             write(TheUnit,"(9X,A,F8.2)") "|eta| <= ", etajetcut
             write(TheUnit,"(4X,A,F8.2)") "|Deltaeta| >= ", detajetcut
             if (JetsOppositeEta) write(TheUnit,"(5X,A,F8.2)") "eta1*eta2 <= ", 0d0
         endif
-        if( Process.eq.50 .or. Process.eq.60 .or. Process.eq.61 .or. (Process.ge.66 .and. Process.le.69) .or. Process.eq.80 .or. Process.eq.90) then
+        if( Process.eq.50 .or. Process.eq.60 .or. Process.eq.61 .or. (Process.ge.66 .and. Process.le.72) .or. Process.eq.80 .or. Process.eq.90) then
             write(TheUnit,"(8X,A,F8.2)") "DeltaR >= ", Rjet
             write(TheUnit,"(11X,A,F8.2,A)") "mJJ >= ", mJJcut/GeV, " GeV"
         endif
     endif
-    if( Process.ge.66 .and. Process.le.69 ) then
+    if( Process.ge.66 .and. Process.le.72 ) then
         write(TheUnit,"(4X,A)") "4l cuts:"
-        if( Process.ge.66 .and. Process.le.69 ) then
+        if( Process.ge.66 .and. Process.le.72 ) then
             write(TheUnit,"(12X,A,F8.2,A)") "pT >= ", pTlepcut/GeV, " GeV"
             write(TheUnit,"(9X,A,F8.2)") "|eta| <= ", etalepcut
         endif
         write(TheUnit,"(11X,A,F8.2,A)") "mll >= ", MPhotonCutoff/GeV, " GeV"
-        if( Process.ge.66 .and. Process.le.69 ) then
+        if( Process.ge.66 .and. Process.le.72 ) then
             write(TheUnit,"(F10.2,A,F10.2,A)") m4l_minmax(1)/GeV, " GeV <= m4l <= ", m4l_minmax(2)/GeV, " GeV"
         endif
     endif
@@ -5886,20 +5771,20 @@ character :: arg*(500)
     if( ReweightDecay ) then
         write(TheUnit,"(4X,A,I1)") "Reweighting events using the decay matrix element, using input WidthScheme ", WidthSchemeIn
     endif
-    if(Process.ge.66 .and. Process.le.69 .and. ReweightInterference) then
+    if(Process.ge.66 .and. Process.le.72 .and. ReweightInterference) then
       write(TheUnit, "(4X,A)") "Interference: included through event weights"
-    elseif( Process.le.2 .or. (Process.ge.66 .and. Process.le.69) .or. ReadLHEFile ) then
+    elseif( Process.le.2 .or. (Process.ge.66 .and. Process.le.72) .or. ReadLHEFile ) then
       write(TheUnit,"(4X,A,L)") "Interference: ",includeInterference
     endif
 
     if( &
         ( (Process.le.2 .or. ReadLHEFile) .and. (IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2)) ) .or. &
-        Process.eq.60 .or. (Process.ge.66 .and. Process.le.68)                                            &
+        Process.eq.60 .or. (Process.ge.66 .and. Process.le.68) .or. (Process.ge.70 .and. Process.le.72)   &
       ) write(TheUnit,"(4X,A,L)") "Intermediate off-shell photons: ",includeGammaStar
     if( Process.eq.69 ) write(TheUnit,"(4X,A,L)") "Intermediate off-shell gluons: ",includeGammaStar
 
     write(TheUnit,"(4X,A)") ""
-    if( (Process.eq.0 .and. TauDecays.lt.0) .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.62 .or. Process.eq.66 .or. Process.eq.68 .or. Process.eq.50 .or. (Process.eq.51 .and. VH_PC.ne."bo") ) then
+    if( (Process.eq.0 .and. TauDecays.lt.0) .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.62 .or. Process.eq.66 .or. Process.eq.68 .or. Process.eq.70 .or. Process.eq.72 .or. Process.eq.50 .or. (Process.eq.51 .and. VH_PC.ne."bo") ) then
         write(TheUnit,"(4X,A)") "spin-0-VV couplings: "
         write(TheUnit,"(6X,A,L)") "generate_as=",generate_as
         if( generate_as ) then
@@ -6157,7 +6042,7 @@ character :: arg*(500)
             endif
         endif
         if(includeVprime) then
-            if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.69) .or. IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) then
+            if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.72) .or. IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) then
                 if(M_Zprime.gt.0d0) then
                   write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z' boson: mass=",M_Zprime*100d0,", width=",Ga_Zprime*100d0
                 else
@@ -6184,7 +6069,7 @@ character :: arg*(500)
                 if( cdabs(ezp_Top_left ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Top_left= ",ezp_Top_left ,"i"
                 if( cdabs(ezp_Top_right).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Top_right=",ezp_Top_right,"i"
             endif
-            if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.69) .or. IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) then
+            if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.72) .or. IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) then
                 if(M_Wprime.gt.0d0) then
                   write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W' boson: mass=",M_Wprime*100d0,", width=",Ga_Wprime*100d0
                 else
@@ -6532,8 +6417,10 @@ implicit none
         print *, "                      250 GeV for e+e-"
         print *, "   Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance,"
         print *, "                      50=qq/ee->VH, 51=gg->ZH,"
-        print *, "                      60=weakVBF, 61=pp->Hjj, 62=pp->Hj,"
-        print *, "                      66=VVHVV offshell, 67=VVVVbkg, 68=VVHVV+VVVV,"
+        print *, "                      60=VBF, 61=pp->Hjj, 62=pp->Hj,"
+        print *, "                      66=EW VVJJ sig., 67=EW VVJJ bkg., 68=EW VVJJ tot.,"
+        print *, "                      69=QCD VVJJ bkg.,"
+        print *, "                      70=EW VVLL sig., 71=EW VVLL bkg., 72=EW VVLL tot.,"
         print *, "                      80=ttH, 90=bbH,"
         print *, "                      110=t+H t channel, 111=tbar+H t channel,"
         print *, "                      112=t+H s channel, 113=tbar+H s channel"
@@ -6588,8 +6475,8 @@ implicit none
         print *, "                      VH_PC overrides Pchannel."
         print *, "   alpha_dip          extra non-physical degree of freedom for Process=51 & VH_PC=nl, defaulted at 1."
         print *, "                      Vary to check indepedence (of alpha_dip)."
-        print *, "   VBFoffsh_run:      For VBF offshell production, set this to a number from 1-5"
-        print *, "                      for each of the 5 jobs.  See manual for more details."
+        print *, "   VBFoffsh_run:      For VBF offshell production, set this to an index"
+        print *, "                      for each of the jobs.  See manual for more details."
         print *, " Resonance parameters:"
         print *, "   MReso:             resonance mass in GeV (default=125.00)"
         print *, "   GaReso:            resonance width in GeV (default=0.00407)"

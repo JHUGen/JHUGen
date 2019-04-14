@@ -9,6 +9,10 @@ public
 integer, parameter :: Hash_MCFM_qqVVqq_Size = 164
 integer, target :: Hash_MCFM_qqVVqq(1:Hash_MCFM_qqVVqq_Size,1:4)
 
+! MCFM qq_VVll hash - JHU conventions
+integer, parameter :: Hash_MCFM_qqVVll_Size = 84
+integer, target :: Hash_MCFM_qqVVll(1:Hash_MCFM_qqVVll_Size,1:4)
+
 ! MCFM qq_VVqqStrong hash - JHU conventions
 integer, parameter :: Hash_MCFM_qqVVqqStrong_Size = 175
 integer, target :: Hash_MCFM_qqVVqqStrong(1:Hash_MCFM_qqVVqqStrong_Size,1:4)
@@ -421,6 +425,62 @@ integer :: ih
 
    if (ih .ne. Hash_MCFM_qqVVqqStrong_Size+1) then
       print *,"Init_Hash_MCFM_qqVVqqStrong: Hash size does not match compiled parameter!"
+      stop
+   endif
+
+end subroutine
+
+subroutine Init_Hash_MCFM_qqVVll()
+implicit none
+integer :: i,j,ih
+integer :: Zdecarray(6,2),Wplusdecarray(3,2),Wminusdecarray(3,2)
+integer :: Zprodarray(5,2),Wplusprodarray(2,2),Wminusprodarray(2,2)
+
+   Zprodarray(1,:) = (/ Up_, AUp_ /)
+   Zprodarray(2,:) = (/ Dn_, ADn_ /)
+   Zprodarray(3,:) = (/ Chm_, AChm_ /)
+   Zprodarray(4,:) = (/ Str_, AStr_ /)
+   Zprodarray(5,:) = (/ Bot_, ABot_ /)
+   Wplusprodarray(1,:) = (/ Up_, ADn_ /)
+   Wplusprodarray(2,:) = (/ Chm_, AStr_ /)
+   Wminusprodarray(1,:) = (/ Dn_, AUp_ /)
+   Wminusprodarray(2,:) = (/ Str_, AChm_ /)
+
+   Zdecarray(1,:) = (/ ElP_, ElM_ /)
+   Zdecarray(2,:) = (/ MuP_, MuM_ /)
+   Zdecarray(3,:) = (/ TaP_, TaM_ /)
+   Zdecarray(4,:) = (/ ANuE_, NuE_ /)
+   Zdecarray(5,:) = (/ ANuM_, NuM_ /)
+   Zdecarray(6,:) = (/ ANuT_, NuT_ /)
+   Wplusdecarray(1,:) = (/ ElP_, NuE_ /)
+   Wplusdecarray(2,:) = (/ MuP_, NuM_ /)
+   Wplusdecarray(3,:) = (/ TaP_, NuT_ /)
+   Wminusdecarray(1,:) = (/ ANuE_, ElM_ /)
+   Wminusdecarray(2,:) = (/ ANuM_, MuM_ /)
+   Wminusdecarray(3,:) = (/ ANuT_, TaM_ /)
+
+   ih=1
+   do i=1,5
+   do j=1,6
+      Hash_MCFM_qqVVll(ih,:) = (/ Zprodarray(i,1), Zprodarray(i,2), Zdecarray(j,1), Zdecarray(j,2) /); ih=ih+1
+      Hash_MCFM_qqVVll(ih,:) = (/ Zprodarray(i,2), Zprodarray(i,1), Zdecarray(j,1), Zdecarray(j,2) /); ih=ih+1
+   enddo
+   enddo
+   do i=1,2
+   do j=1,3
+      Hash_MCFM_qqVVll(ih,:) = (/ Wplusprodarray(i,1), Wplusprodarray(i,2), Wplusdecarray(j,1), Wplusdecarray(j,2) /); ih=ih+1
+      Hash_MCFM_qqVVll(ih,:) = (/ Wplusprodarray(i,2), Wplusprodarray(i,1), Wplusdecarray(j,1), Wplusdecarray(j,2) /); ih=ih+1
+   enddo
+   enddo
+   do i=1,2
+   do j=1,3
+      Hash_MCFM_qqVVll(ih,:) = (/ Wminusprodarray(i,1), Wminusprodarray(i,2), Wminusdecarray(j,1), Wminusdecarray(j,2) /); ih=ih+1
+      Hash_MCFM_qqVVll(ih,:) = (/ Wminusprodarray(i,2), Wminusprodarray(i,1), Wminusdecarray(j,1), Wminusdecarray(j,2) /); ih=ih+1
+   enddo
+   enddo
+
+   if (ih .ne. Hash_MCFM_qqVVll_Size+1) then
+      print *,"Init_Hash_MCFM_qqVVll: Hash size does not match compiled parameter!"
       stop
    endif
 
@@ -968,6 +1028,7 @@ subroutine SetupHashes()
 implicit none
    if (.not. hashcoll_hashes_initialized) then
       call Init_Hash_MCFM_qqVVqq()
+      call Init_Hash_MCFM_qqVVll()
       call Init_Hash_MCFM_qqVVqqStrong()
       call Init_Hash_MCFM_qqVVqq_Generation()
       call Init_Hash_OnshellVBF()
@@ -990,6 +1051,16 @@ integer, pointer, intent(out) :: ijSel(:,:)
       call SetupHashes()
    endif
    ijSel=Hash_MCFM_qqVVqq
+return
+end subroutine
+
+subroutine get_MCFM_qqVVll_Hash(ijSel)
+implicit none
+integer, pointer, intent(out) :: ijSel(:,:)
+   if (.not. hashcoll_hashes_initialized) then
+      call SetupHashes()
+   endif
+   ijSel=Hash_MCFM_qqVVll
 return
 end subroutine
 
@@ -1096,6 +1167,16 @@ integer, pointer, intent(out) :: ijSel(:,:)
       call SetupHashes()
    endif
    ijSel => Hash_MCFM_qqVVqq
+return
+end subroutine
+
+subroutine getRef_MCFM_qqVVll_Hash(ijSel)
+implicit none
+integer, pointer, intent(out) :: ijSel(:,:)
+   if (.not. hashcoll_hashes_initialized) then
+      call SetupHashes()
+   endif
+   ijSel => Hash_MCFM_qqVVll
 return
 end subroutine
 

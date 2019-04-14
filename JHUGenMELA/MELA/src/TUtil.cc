@@ -1379,7 +1379,7 @@ double TUtil::InterpretScaleScheme(const TVar::Production& production, const TVa
   }
 
   if (Q<=0.){
-    MELAerr << "Scaling fails for production " << production << ", defaulting to dynamic scheme m3456 " << endl;
+    MELAerr << "Scaling " << scheme << " fails for production " << production << ", defaulting to dynamic scheme m3456 " << endl;
     TLorentzVector pTotal = p[2]+p[3]+p[4]+p[5];
     Q = fabs(pTotal.M());
   }
