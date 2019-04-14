@@ -802,7 +802,20 @@ real(8), public, parameter :: Lambda2 = 1000d0    *GeV      ! for second resonan
    real(8),    public :: Lambda2_w40 = 100d0*GeV
 
 
-
+!-- Anomalous coupling parameters in triple and quartic gauge couplings
+!     notation wrt paper: dV_N=d^{NWW}*d_1^N, dP_N=d^{NWW}*d_2^N, dM_N=d^{NWW}*d_3^N, dFour_N=d^{NWW}*d_4^N, for N=Z,\gamma
+!                         dZZWpWm = d^{ZZWW}*sw^2/cw^2, dZAWpWm = d^{Z\gammaWW}*sw/cw, dAAWpWm = d^{\gamma\gammaWW}
+   real(8),    public :: dV_A= (1.0d0,0d0)
+   real(8),    public :: dP_A= (1.0d0,0d0)
+   real(8),    public :: dM_A= (1.0d0,0d0)
+   real(8),    public :: dV_Z= (1.0d0,0d0)
+   real(8),    public :: dP_Z= (1.0d0,0d0)
+   real(8),    public :: dM_Z= (1.0d0,0d0)
+   real(8),    public :: dAAWpWm= (1.0d0,0d0)
+   real(8),    public :: dZAWpWm= (1.0d0,0d0)
+   real(8),    public :: dZZWpWm= (1.0d0,0d0)
+   real(8),    public :: dFour_A= (0.0d0,0d0)
+   real(8),    public :: dFour_Z= (0.0d0,0d0)
 
 
 

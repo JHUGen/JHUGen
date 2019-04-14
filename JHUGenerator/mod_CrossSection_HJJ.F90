@@ -220,6 +220,10 @@ m1ffwgt=1d0;m2ffwgt=1d0
       IsNaN(pdf(LHA2M_pdf(iPart_sel),1)) .or. &
       IsNaN(pdf(LHA2M_pdf(jPart_sel),2)) &
       ) then
+      write(6,*) "Mu_Fact =",Mu_Fact
+      write(6,*) "Mu_Ren =",Mu_Ren
+      write(6,*) "alphas =",alphas
+      write(6,*) "alphas_mz =",alphas_mz
       write(6,*) "msq_MCFM(",iPart_sel,",",jPart_sel,") =",msq_MCFM(iPart_sel,jPart_sel)
       write(6,*) "pdf1 =",pdf(LHA2M_pdf(iPart_sel),1)
       write(6,*) "pdf2 =",pdf(LHA2M_pdf(jPart_sel),2)

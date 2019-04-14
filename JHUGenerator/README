@@ -18,8 +18,10 @@ command line parameter quick reference:
                        250 GeV for e+e-
     Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance,
                        50=qq/ee->VH, 51=gg->ZH,
-                       60=weakVBF, 61=pp->Hjj, 62=pp->Hj,
-                       66=VVHVV offshell, 67=VVVVbkg, 68=VVHVV+VVVV,
+                       60=VBF, 61=pp->Hjj, 62=pp->Hj,
+                       66=EW VVJJ sig., 67=EW VVJJ bkg., 68=EW VVJJ tot.,
+                       69=QCD VVJJ bkg.,
+                       70=EW VVLL sig., 71=EW VVLL bkg., 72=EW VVLL tot.,
                        80=ttH, 90=bbH,
                        110=t+H t channel, 111=tbar+H t channel,
                        112=t+H s channel, 113=tbar+H s channel
@@ -106,8 +108,8 @@ command line parameter quick reference:
     pTlepcut:          Minimum pT for leptons in offshell VBF, in GeV (default: 3)
     etalepcut:         Maximum |eta| for leptons in offshell VBF (default: 2.7)
     m4l_min, m4l_max:  Minimum and maximum four-lepton mass in offshell VBF
-    m2l_min:    Minimum invariant mass of V (onshell) in new VH (\texttt{Process=51}) (default: 0)
-    m2l_max:   Maximum invariant mass of V (onshell) in newVH (\texttt{Process=51}) (default: infinity)
+    m2l_min:   Minimum invariant mass of V (onshell) in new VH (\texttt{Process=51}) (default: 0)
+    m2l_max:   Maximum invariant mass of V (onshell) in new VH (\texttt{Process=51}) (default: infinity)
     mVH_min:   Minimum invariant mass of VH in new VH (\texttt{Process=51}) (default: 0)
     mVH_max:   Maximum invariant mass of VH in new VH (\texttt{Process=51}) (default: infinity)
   Renormalization and factorization scales:
