@@ -1160,7 +1160,7 @@ subroutine SetRunningScales(p,id) ! p in JHU-GeV, id in JHUGen conventions
 use ModParameters
 use ModMisc
 implicit none
-real(dp), intent(in) :: p(1:4,4:6) ! No need to run the second index from 3 to 7: pH, pJ1, pJ2
+real(dp), intent(in) :: p(1:4,4:6) ! No need to run the second index from 4 to 7: pH, pJ1, pJ2
 integer, intent(in) :: id(4:7) ! id_JJH/id_JJVV, id_J1, id_J2, id_JJ (if applicable)
 real(8) :: polemass(3:7) ! mJJH, mH, mJ1, mJ2, mJJ (if applicable)
 real(8) :: pJJHstar(4),pHstar(4),pJ(4,2),pJJ(4),pJHstar(4),pTjet(5:6),maxpTjet,minpTjet
@@ -1310,7 +1310,7 @@ real(8) :: upv(1:2),dnv(1:2),usea(1:2),dsea(1:2),str(1:2),chm(1:2),bot(1:2),glu(
 integer,parameter :: swPDF_u=1, swPDF_d=1, swPDF_c=1, swPDF_s=1, swPDF_b=1, swPDF_g=1
 real(8) :: pdf(-6:6,1:2),NNpdf(1:2,-6:7)
 
-        PDFScale=Mu_Fact*100d0
+        PDFScale=Mu_Fact/GeV
         pdf(:,:) = 0d0
 
 #if useLHAPDF==1

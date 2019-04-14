@@ -2144,6 +2144,7 @@ integer :: NBin(:),ids(1:8)
 real(8) :: m_jj,y_j1,y_j2,dphi_jj,dy_j1j2,pT_jl,pT_j1,pT_j2,pT_H,m_4l,dR_j1j2
 real(8) :: pT_l1,pT_l2,pT_l3,pT_l4,y_l1,y_l2,y_l3,y_l4
 real(8) :: Phi1,signPhi1,MomReso(1:4)
+logical, parameter :: doPrintFailReason=.false.
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=8, Lep1M=7, Lep2P=10, Lep2M=9
 
 
@@ -2179,29 +2180,29 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=8, 
 
        ! Off-shell photon cut-offs
        if ( m_jj.lt.MPhotonCutoff .and. .not.IsANeutrino(ids(7)) .and. CoupledVertex(ids(7),ids(8)).eq.Z0_) then
-          !write(6,*) "Failed mphoton cutoff. mll=",m_jj,"<",MPhotonCutoff
+          if (doPrintFailReason) write(6,*) "Failed mphoton cutoff. mll=",m_jj,"<",MPhotonCutoff
           applyPSCut=.true.
           return
        endif
        if( mZ1.lt.MPhotonCutoff .and. .not.IsANeutrino(ids(3)) .and. CoupledVertex(ids(3),ids(4)).eq.Z0_ ) then
-          !write(6,*) "Failed mphoton cutoff. mZ1=",mZ1,"<",MPhotonCutoff
+          if (doPrintFailReason) write(6,*) "Failed mphoton cutoff. mZ1=",mZ1,"<",MPhotonCutoff
           applyPSCut=.true.
           return
        endif
        if( mZ2.lt.MPhotonCutoff .and. .not.IsANeutrino(ids(5)) .and. CoupledVertex(ids(5),ids(6)).eq.Z0_ ) then
-          !write(6,*) "Failed mphoton cutoff. mZ2=",mZ2,"<",MPhotonCutoff
+          if (doPrintFailReason) write(6,*) "Failed mphoton cutoff. mZ2=",mZ2,"<",MPhotonCutoff
           applyPSCut=.true.
           return
        endif
 
        if(ids(3).eq.ids(5) .and. ids(4).eq.ids(6)) then
           if( mZ1alt.lt.MPhotonCutoff .and. .not.IsANeutrino(ids(3)) .and. CoupledVertex(ids(3),ids(6)).eq.Z0_ ) then
-             !write(6,*) "Failed mphoton cutoff. mZ1alt=",mZ1alt,"<",MPhotonCutoff
+             if (doPrintFailReason) write(6,*) "Failed mphoton cutoff. mZ1alt=",mZ1alt,"<",MPhotonCutoff
              applyPSCut=.true.
              return
           endif
           if( mZ2alt.lt.MPhotonCutoff .and. .not.IsANeutrino(ids(5)) .and. CoupledVertex(ids(5),ids(4)).eq.Z0_ ) then
-             !write(6,*) "Failed mphoton cutoff. mZ2alt=",mZ2alt,"<",MPhotonCutoff
+             if (doPrintFailReason) write(6,*) "Failed mphoton cutoff. mZ2alt=",mZ2alt,"<",MPhotonCutoff
              applyPSCut=.true.
              return
           endif
@@ -2215,7 +2216,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=8, 
          (pT_j1.lt.pTlepcut .and. IsALepton(ids(7))) .or. &
          (pT_j2.lt.pTlepcut .and. IsALepton(ids(8)))      &
          ) then
-          !write(6,*) "Failed pTlep cutoff. pTls=",pT_l1,pT_l2,pT_l3,pT_l4,pT_j1,pT_j2,"<",pTlepcut
+          if (doPrintFailReason) write(6,*) "Failed pTlep cutoff. pTls=",pT_l1,pT_l2,pT_l3,pT_l4,pT_j1,pT_j2,"<",pTlepcut
           applyPSCut=.true.
           return
        endif
@@ -2227,44 +2228,44 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=8, 
          (pT_j1.lt.pTjetcut .and. IsAJet(ids(7))) .or. &
          (pT_j2.lt.pTjetcut .and. IsAJet(ids(8)))      &
          ) then
-          !write(6,*) "Failed pTjet cutoff. pTls=",pT_l1,pT_l2,pT_l3,pT_l4,pT_j1,pT_j2,"<",pTjetcut
+          if (doPrintFailReason) write(6,*) "Failed pTjet cutoff. pTls=",pT_l1,pT_l2,pT_l3,pT_l4,pT_j1,pT_j2,"<",pTjetcut
           applyPSCut=.true.
           return
        endif
 
        if( &
-         (abs(y_l1).lt.etalepcut .and. IsALepton(ids(3))) .or. &
-         (abs(y_l2).lt.etalepcut .and. IsALepton(ids(4))) .or. &
-         (abs(y_l3).lt.etalepcut .and. IsALepton(ids(5))) .or. &
-         (abs(y_l4).lt.etalepcut .and. IsALepton(ids(6))) .or. &
-         (abs(y_j1).lt.etalepcut .and. IsALepton(ids(7))) .or. &
-         (abs(y_j2).lt.etalepcut .and. IsALepton(ids(8)))      &
+         (abs(y_l1).gt.etalepcut .and. IsALepton(ids(3))) .or. &
+         (abs(y_l2).gt.etalepcut .and. IsALepton(ids(4))) .or. &
+         (abs(y_l3).gt.etalepcut .and. IsALepton(ids(5))) .or. &
+         (abs(y_l4).gt.etalepcut .and. IsALepton(ids(6))) .or. &
+         (abs(y_j1).gt.etalepcut .and. IsALepton(ids(7))) .or. &
+         (abs(y_j2).gt.etalepcut .and. IsALepton(ids(8)))      &
          ) then
-          !write(6,*) "Failed ylep cutoff. pTls=",y_l1,y_l2,y_l3,y_l4,y_j1,y_j2,"<",etalepcut
+          if (doPrintFailReason) write(6,*) "Failed ylep cutoff. ys=",y_l1,y_l2,y_l3,y_l4,y_j1,y_j2,">",etalepcut
           applyPSCut=.true.
           return
        endif
        if( &
-         (abs(y_l1).lt.etajetcut .and. IsAJet(ids(3))) .or. &
-         (abs(y_l2).lt.etajetcut .and. IsAJet(ids(4))) .or. &
-         (abs(y_l3).lt.etajetcut .and. IsAJet(ids(5))) .or. &
-         (abs(y_l4).lt.etajetcut .and. IsAJet(ids(6))) .or. &
-         (abs(y_j1).lt.etajetcut .and. IsAJet(ids(7))) .or. &
-         (abs(y_j2).lt.etajetcut .and. IsAJet(ids(8)))      &
+         (abs(y_l1).gt.etajetcut .and. IsAJet(ids(3))) .or. &
+         (abs(y_l2).gt.etajetcut .and. IsAJet(ids(4))) .or. &
+         (abs(y_l3).gt.etajetcut .and. IsAJet(ids(5))) .or. &
+         (abs(y_l4).gt.etajetcut .and. IsAJet(ids(6))) .or. &
+         (abs(y_j1).gt.etajetcut .and. IsAJet(ids(7))) .or. &
+         (abs(y_j2).gt.etajetcut .and. IsAJet(ids(8)))      &
          ) then
-          !write(6,*) "Failed yjet cutoff. pTls=",y_l1,y_l2,y_l3,y_l4,y_j1,y_j2,"<",etajetcut
+          if (doPrintFailReason) write(6,*) "Failed yjet cutoff. ys=",y_l1,y_l2,y_l3,y_l4,y_j1,y_j2,">",etajetcut
           applyPSCut=.true.
           return
        endif
 
         if( IsAJet(ids(7)) .and. (abs(y_j1-y_j2).lt.detajetcut .or. (JetsOppositeEta .and. y_j1*y_j2.gt.0d0)) ) then
-           write(6,*) "Failed detajet cutoff. deta=",y_j1,"-",y_j2,"<",etajetcut
+           if (doPrintFailReason) write(6,*) "Failed detajet cutoff. deta=",y_j1,"-",y_j2,"<",etajetcut
            applyPSCut=.true.
            return
         endif
 
         if( IsAJet(ids(7)) .and. (m_jj.lt.mJJcut .or. dR_j1j2.lt.Rjet) )  then
-           write(6,*) "Failed pTj cutoff. pTjs=",pT_j1,pT_j2,"<",pTjetcut,"or mjj=",m_jj,"<",mJJcut,"or dRjj=",dR_j1j2,"<",Rjet
+           if (doPrintFailReason) write(6,*) "Failed mjj cutoff. mjj=",m_jj,"<",mJJcut,"or dRjj=",dR_j1j2,"<",Rjet
            applyPSCut=.true.
            return
         endif
@@ -6025,7 +6026,7 @@ real(8) :: Jac,Jac1,Jac2,Jac3,Mom_ij_Dummy(1:4),s35,s45
 RETURN
 END SUBROUTINE
 
-SUBROUTINE EvalPhasespace_VBF_H4f(xchannel,xRnd,Energy,Mom,Jac,ids,swap34_56)
+SUBROUTINE EvalPhasespace_VBF_H4f(xchannel,xRnd,Energy,Mom,Jac,ids,swap34_56,id12_78)
 use ModParameters
 use ModPhasespace
 use ModMisc
@@ -6038,7 +6039,7 @@ real(8) :: s3H,s4H,s56,s78,s910,s34,s35,s46,Mom_Dummy(1:4),Mom_Dummy2(1:4),xRndL
 real(8), parameter :: RescaleWidth=1d0
 real(8) :: s1min, s2min
 integer :: NumChannels, it_chan, ch_ctr
-integer :: id12, id78, id17, id28, id18, id27
+integer :: id12, id78, id17, id28, id18, id27, id12_78
 logical :: swap34_56, isZH, isWH, isVBF
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
 
@@ -6046,6 +6047,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
    isWH = .false.
    isVBF = .false.
    swap34_56 = .false.
+   id12_78 = Not_a_particle_
 
 
    Mom(1:4,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
@@ -6069,7 +6071,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
       id27=CoupledVertex((/-ids(2),ids(7)/),-1)
 
       isZH = (id12.eq.Z0_ .and. id78.eq.id12)
-      isWH = (id12.eq.abs(Wp_) .and. id78.eq.-id12 .and. CoupledVertexIsDiagonal(ids(1:2),-1)) ! Must require W from diagonal elements of CKM as in the ME
+      isWH = (abs(id12).eq.abs(Wp_) .and. id78.eq.-id12 .and. CoupledVertexIsDiagonal(ids(1:2),-1)) ! Must require W from diagonal elements of CKM as in the ME
       isVBF = ( &
          ( (id17.eq.Z0_ .and. id28.eq.id17) ) .or. &
          ( (abs(id17).eq.abs(Wp_) .and. id28.eq.-id17) .and. CoupledVertexIsDiagonal((/-ids(1),ids(7)/),-1) ) .or. &
@@ -6077,7 +6079,10 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
          ( (abs(id18).eq.abs(Wp_) .and. id27.eq.-id18) .and. CoupledVertexIsDiagonal((/-ids(1),ids(8)/),-1) ) &
          )
 
+      if (((isWH .and. .not.isZH) .or. (isZH .and. .not.isWH)) .and. .not.isVBF) id12_78 = id78
+
       NumChannels = 0
+      if (.not.(isZH .or. isWH .or. isVBF)) call Error("EW off-shell process is not ZVV, WVV or VBF/VBS")
       if (isZH) NumChannels = NumChannels+1
       if (isWH) NumChannels = NumChannels+1
       if (isVBF) NumChannels = NumChannels+1
@@ -6440,7 +6445,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
    if( isNan(jac) ) then
       print *, "EvalPhasespace_VBF_H4f NaN"
       print *, Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7,Jac8,Jac9,ichannel
-      Jac = 0d0
+      if( isNan(jac) ) Jac = 0d0
 
       write(6,*) "ids=",ids
       write(6,*) "Various ids=",id12,id78,id17,id28,id18,id27
@@ -6448,15 +6453,14 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
       write(6,*) "isWH?",isWH
       write(6,*) "isVBF?",isVBF
       write(6,*) "iChannel = ",iChannel,"/",NumChannels,"(xchannel: ",xchannel,")"
-      write(6,*) "s34:",s56
-      write(6,*) "s78:",s78
-      write(6,*) "s910:",s910
-      write(6,*) "s34:",s34
+      write(6,*) "m56:",sqrt(s56)/GeV
+      write(6,*) "m78:",sqrt(s78)/GeV
+      write(6,*) "m910:",sqrt(s910)/GeV
+      write(6,*) "m34:",sqrt(s34)/GeV
       write(6,*) "Last case:",ch_ctr
       write(6,*) "MomExt:",Mom
 
       pause
-
    endif
 
 !    print *, "OS checker", dsqrt( dabs(Mom(1:4,3).dot.Mom(1:4,3) ))
@@ -6846,7 +6850,7 @@ subroutine SetRunningScales(p,id) ! p in JHU-GeV, id in JHUGen conventions
 use ModParameters
 use ModMisc
 implicit none
-real(dp), intent(in) :: p(1:4,4:6) ! No need to run the second index from 3 to 7: pH, pJ1, pJ2
+real(dp), intent(in) :: p(1:4,4:6) ! No need to run the second index from 4 to 7: pH, pJ1, pJ2
 integer, intent(in) :: id(4:7) ! id_JJH/id_JJVV, id_J1, id_J2, id_JJ (if applicable)
 real(8) :: polemass(3:7) ! mJJH, mH, mJ1, mJ2, mJJ (if applicable)
 real(8) :: pJJHstar(4),pHstar(4),pJ(4,2),pJJ(4),pJHstar(4),pTjet(5:6),maxpTjet,minpTjet
@@ -6999,7 +7003,7 @@ real(8) :: upv(1:2),dnv(1:2),usea(1:2),dsea(1:2),str(1:2),chm(1:2),bot(1:2),glu(
 integer,parameter :: swPDF_u=1, swPDF_d=1, swPDF_c=1, swPDF_s=1, swPDF_b=1, swPDF_g=1
 real(8) :: pdf(-6:6,1:2),NNpdf(1:2,-6:7)
 
-        PDFScale=Mu_Fact*100d0
+        PDFScale=Mu_Fact/GeV
         pdf(:,:) = 0d0
 
 #if useLHAPDF==1

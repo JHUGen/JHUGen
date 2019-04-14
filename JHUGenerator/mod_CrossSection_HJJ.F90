@@ -34,6 +34,7 @@ integer, pointer :: ijSel(:,:)
 integer :: iPartChannel,PartChannelAvg,NumPartonicChannels,iflip,i,j,k
 real(8) :: PreFac,VegasWeighted_HJJ_fulldecay,xRnd,LeptonAndVegasWeighted_HJJ_fulldecay
 logical :: applyPSCut,swap34_56
+integer :: id12_78
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
 include 'vegas_common.f'
 include 'maxwt.f'
@@ -78,7 +79,6 @@ m1ffwgt=1d0;m2ffwgt=1d0
       endif
    endif
 
-
    PartChannelAvg = NumPartonicChannels
    iPart_sel = convertToPartIndex(ijSel(iPartChannel,1))! convert to LHA convention
    jPart_sel = convertToPartIndex(ijSel(iPartChannel,2))
@@ -117,15 +117,17 @@ m1ffwgt=1d0;m2ffwgt=1d0
    !write(6,*) "p_MCFM:",p_MCFM
 
    if (IsNaN(VgsWgt)) then
+      write(6,*) "VegasWgt is NaN!"
       write(6,*) "PDFMapping args:",2,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi,dmax1(m4l_minmax(1),0d0)+mJJcut
       write(6,*) "EvalPhasespace_VBF_H4f args:",yRnd(3),yRnd(4:17),EHat,MomExt(1:4,1:10),PSWgt,id_MCFM(1:8)
       write(6,*) "CrossSec2 = ",CrossSec2(iPartChannel)
       write(6,*) "CrossSecMax2 = ",CrossSecMax2(iPartChannel)
       write(6,*) "CrossSectionWithWeights",CrossSectionWithWeights
+      !pause
    endif
 
    call PDFMapping(2,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi,EhatMin=dmax1(m4l_minmax(1),0d0)+mJJcut)
-   call EvalPhasespace_VBF_H4f(yRnd(3),yRnd(4:17),EHat,MomExt(1:4,1:10),PSWgt,id_MCFM(1:8),swap34_56)
+   call EvalPhasespace_VBF_H4f(yRnd(3),yRnd(4:17),EHat,MomExt(1:4,1:10),PSWgt,id_MCFM(1:8),swap34_56,id12_78)
    !write(6,*) "After EvalPS, MomExt:",MomExt,", Pwwgt:",PSWgt
 
 !       call genps(6,EHat,yRnd(3:16),(/0d0,0d0,0d0,0d0,0d0,0d0/),MomExt(1:4,3:8),PSWgt)
@@ -152,11 +154,12 @@ m1ffwgt=1d0;m2ffwgt=1d0
 
 !       EvalWeighted_HJJ_fulldecay=PSWgt *sHatJacobi  * ( MomExt(1:4,3).dot.MomExt(1:4,7) ) * ( MomExt(1:4,4).dot.MomExt(1:4,10) ) * ( MomExt(1:4,8).dot.MomExt(1:4,9) ) * ( MomExt(1:4,7).dot.MomExt(1:4,10) ) / EHat**8
 !       return
-
-   call SetRunningScales( (/MomExt(1:4,5)+MomExt(1:4,6),MomExt(1:4,3),MomExt(1:4,4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) )
+   !write(6,*) "SetRunningScales args:",(MomExt(1:4,5)+MomExt(1:4,6)),",",MomExt(1:4,3),",",MomExt(1:4,4),",",(/ id12_78,Not_a_particle_,Not_a_particle_,id12_78 /)
+   call SetRunningScales( (/MomExt(1:4,5)+MomExt(1:4,6),MomExt(1:4,3),MomExt(1:4,4) /) , (/ id12_78,Not_a_particle_,Not_a_particle_,id12_78 /) )
+   !write(6,*) "setPDFs args:",eta1,eta2,alphas,alphas_mz
    call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
-
+   !pause
 
    ! GeV conversion is now done inside EvalAmp_qqVVqq
    call convert_to_MCFM(-MomExt(1:4,inTop), p_MCFM(1,1:4))
@@ -209,38 +212,31 @@ m1ffwgt=1d0;m2ffwgt=1d0
 !       msq_VgsWgt(ipart,jpart)=msq_MCFM(ipart,jpart)*VgsWgt
 !    enddo; enddo
 
+   if ( &
+      !msq_MCFM(iPart_sel,jPart_sel) .le. 0d0 .or. &
+      !pdf(LHA2M_pdf(iPart_sel),1) .le. 0d0 .or. &
+      !pdf(LHA2M_pdf(jPart_sel),2) .le. 0d0 .or. &
+      IsNaN(msq_MCFM(iPart_sel,jPart_sel)) .or. &
+      IsNaN(pdf(LHA2M_pdf(iPart_sel),1)) .or. &
+      IsNaN(pdf(LHA2M_pdf(jPart_sel),2)) &
+      ) then
+      write(6,*) "msq_MCFM(",iPart_sel,",",jPart_sel,") =",msq_MCFM(iPart_sel,jPart_sel)
+      write(6,*) "pdf1 =",pdf(LHA2M_pdf(iPart_sel),1)
+      write(6,*) "pdf2 =",pdf(LHA2M_pdf(jPart_sel),2)
+      do jpart=1,8
+         write(6,*) "P_MCFM(",convertLHE(id_MCFM(jpart)),")=",p_MCFM(jpart,:)
+      enddo
+      pause
+      return
+    endif
 
    EvalWeighted_HJJ_fulldecay = msq_MCFM(iPart_sel,jPart_sel) * pdf(LHA2M_pdf(iPart_sel),1)*pdf(LHA2M_pdf(jPart_sel),2)
    VegasWeighted_HJJ_fulldecay = EvalWeighted_HJJ_fulldecay * VgsWgt
-
    !if (EvalWeighted_HJJ_fulldecay.eq.0d0) then
    !   write(6,*) "EvalWeighted_HJJ_fulldecay==0. Ids:",id_MCFM
    !endif
    !write(6,*) "originalprobability,EvalWeighted_HJJ_fulldecay,VgsWgt=",originalprobability,EvalWeighted_HJJ_fulldecay,VgsWgt
    !pause
-
-   if ( &
-      !msq_MCFM(iPart_sel,jPart_sel) .le. 0d0 .or. &
-      !pdf(LHA2M_pdf(iPart_sel),1) .le. 0d0 .or. &
-      !pdf(LHA2M_pdf(jPart_sel),2) .le. 0d0 .or. &
-      !EvalWeighted_HJJ_fulldecay .le. 0d0 .or. &
-      !VegasWeighted_HJJ_fulldecay .le. 0d0 .or. &
-      IsNaN(msq_MCFM(iPart_sel,jPart_sel)) .or. &
-      IsNaN(pdf(LHA2M_pdf(iPart_sel),1)) .or. &
-      IsNaN(pdf(LHA2M_pdf(jPart_sel),2)) .or. &
-      IsNaN(EvalWeighted_HJJ_fulldecay) .or. &
-      IsNaN(VegasWeighted_HJJ_fulldecay) &
-      ) then
-      write(6,*) "msq_MCFM(",iPart_sel,",",jPart_sel,") =",msq_MCFM(iPart_sel,jPart_sel)
-      write(6,*) "pdf1 =",pdf(LHA2M_pdf(iPart_sel),1)
-      write(6,*) "pdf2 =",pdf(LHA2M_pdf(jPart_sel),2)
-      write(6,*) "EvalWeighted_HJJ_fulldecay =",EvalWeighted_HJJ_fulldecay
-      write(6,*) "VegasWeighted_HJJ_fulldecay =",VegasWeighted_HJJ_fulldecay
-      do jpart=1,8
-         write(6,*) "P_MCFM(",convertLHE(id_MCFM(jpart)),")=",p_MCFM(jpart,:)
-      enddo
-      pause
-    endif
 
 
    if( unweighted ) then

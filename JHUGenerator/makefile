@@ -657,14 +657,14 @@ ifeq ($(linkMELA),Yes)
 	rm -f br.sm1
 	rm -f br.sm2
 endif
-	rm -f objects/*.o
-	rm -f objects/*.a
+	rm -f $(ObjectDir)/*.o
+	rm -f $(ObjectDir)/*.a
 	rm -f ff/*.o
 	rm -f ff/*.a
 	rm -f ql/*.o
 	rm -f ql/*.a
-	rm -f modules/*.mod
-	rm -f modules/*.f90
+	rm -f $(ModulesDir)/*.mod
+	rm -f $(ModulesDir)/*.f90
 	rm -f *.mod
 	rm -f *.o
 	rm -f $(Exec)
