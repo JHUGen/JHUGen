@@ -18,7 +18,7 @@ WebGeneratordir = os.path.join(Webdir, "Generator")
 if not os.path.isdir(WebGeneratordir):
      raise OSerror("You should run this from the Web directory")
 
-def uploadwebpage(dontupload=[], dontuploadifexists=[], dryrun=False, dont_overwrite_mcfm=False, dont_overwrite_tarballs=False, edit_cadaverrc=False):
+def uploadwebpage(dontupload=[], dontuploadifexists=[], dryrun=False, overwrite_mcfm=False, overwrite_tarballs=False, edit_cadaverrc=False):
     dontupload = ListOfRegexes(dontupload)
     dontuploadifexists = ListOfRegexes(dontuploadifexists)
 
@@ -27,9 +27,9 @@ def uploadwebpage(dontupload=[], dontuploadifexists=[], dryrun=False, dont_overw
     else:
         JHED = raw_input("Enter your JHED ID: ")
         password = getpass("Enter your JHED password: ")
-    if dont_overwrite_mcfm:
+    if not overwrite_mcfm:
         dontuploadifexists.append("MCFM-precompiled")
-    if dont_overwrite_tarballs:
+    if not overwrite_tarballs:
         dontuploadifexists.append("[.]tar[.]gz$")
         dontuploadifexists.append("[.]tgz$")
     with cd("Generator"):
@@ -312,8 +312,8 @@ websitebase = "http://spin.pha.jhu.edu"
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-n", "--dry-run", help="create all the tarballs but don't actually upload", action="store_true", dest="dryrun")
-    parser.add_argument("--dont-overwrite-mcfm", help="don't re-upload MCFM libraries that already exist", action="store_true")
-    parser.add_argument("--dont-overwrite-tarballs", help="don't re-upload JHUGen tarballs that already exist", action="store_true")
+    parser.add_argument("--overwrite-mcfm", help="re-upload MCFM libraries that already exist", action="store_true")
+    parser.add_argument("--overwrite-tarballs", help="re-upload JHUGen tarballs that already exist", action="store_true")
     parser.add_argument("--edit-cadaverrc", help="if you want to edit the .cadaverrc before actually uploading", action="store_true")
     args = parser.parse_args()
     uploadwebpage(dontupload=dontupload, **args.__dict__)
