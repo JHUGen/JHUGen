@@ -196,7 +196,7 @@ def create_Download(*versions):
             shutil.move("../NNPDF30_lo_as_0130.LHgrid.tgz", ".")
         check_call(["git", "checkout", MCFMprecompiledcommit])
         shutil.move("NNPDF30_lo_as_0130.LHgrid.tgz", "..")
-        
+
 
 @contextmanager
 def cd(newdir):
@@ -223,7 +223,7 @@ Download_template = """
     Download:<br>
     Latest version: {latest}
     <br>
-    Compiled MCFM libraries to interface with MELA that work for a good variety of software releases: <a href="MCFM-precompiled/v2/libmcfm_705.so">libmcfm_705.so</a><br>
+    Compiled MCFM libraries to interface with MELA that work for a good variety of software releases: <a href="MCFM-precompiled/v2/libmcfm_706.so">libmcfm_706.so</a><br>
     (See JHUGenMELA/ggZZ_MCFM/README for further information)
     <br>
     <br>

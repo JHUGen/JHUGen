@@ -2,6 +2,8 @@
 *.pyc
 __init__.py
 
+MELA/**/*ACLiC*
+
 MELA/data/*.tar.gz*
 MELA/data/*/*.tar.gz*
 MELA/data/*/*.so

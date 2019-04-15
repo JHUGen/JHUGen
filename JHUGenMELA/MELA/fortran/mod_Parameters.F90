@@ -805,17 +805,17 @@ real(8), public, parameter :: Lambda2 = 1000d0    *GeV      ! for second resonan
 !-- Anomalous coupling parameters in triple and quartic gauge couplings
 !     notation wrt paper: dV_N=d^{NWW}*d_1^N, dP_N=d^{NWW}*d_2^N, dM_N=d^{NWW}*d_3^N, dFour_N=d^{NWW}*d_4^N, for N=Z,\gamma
 !                         dZZWpWm = d^{ZZWW}*sw^2/cw^2, dZAWpWm = d^{Z\gammaWW}*sw/cw, dAAWpWm = d^{\gamma\gammaWW}
-   real(8),    public :: dV_A= (1.0d0,0d0)
-   real(8),    public :: dP_A= (1.0d0,0d0)
-   real(8),    public :: dM_A= (1.0d0,0d0)
-   real(8),    public :: dV_Z= (1.0d0,0d0)
-   real(8),    public :: dP_Z= (1.0d0,0d0)
-   real(8),    public :: dM_Z= (1.0d0,0d0)
-   real(8),    public :: dAAWpWm= (1.0d0,0d0)
-   real(8),    public :: dZAWpWm= (1.0d0,0d0)
-   real(8),    public :: dZZWpWm= (1.0d0,0d0)
-   real(8),    public :: dFour_A= (0.0d0,0d0)
-   real(8),    public :: dFour_Z= (0.0d0,0d0)
+   complex(8),    public :: dV_A= (1.0d0,0d0)
+   complex(8),    public :: dP_A= (1.0d0,0d0)
+   complex(8),    public :: dM_A= (1.0d0,0d0)
+   complex(8),    public :: dV_Z= (1.0d0,0d0)
+   complex(8),    public :: dP_Z= (1.0d0,0d0)
+   complex(8),    public :: dM_Z= (1.0d0,0d0)
+   complex(8),    public :: dAAWpWm= (1.0d0,0d0)
+   complex(8),    public :: dZAWpWm= (1.0d0,0d0)
+   complex(8),    public :: dZZWpWm= (1.0d0,0d0)
+   complex(8),    public :: dFour_A= (0.0d0,0d0)
+   complex(8),    public :: dFour_Z= (0.0d0,0d0)
 
 
 
@@ -992,7 +992,7 @@ real(dp), public           :: couplAZff
 real(dp), public           :: couplAffsq
 !----------------------------------------------------------------------------------
 
-real(8), public, parameter :: fbGeV2=0.389379d12/(100d0**2)
+real(8), public, parameter :: fbGeV2=0.389379d12*GeV**2
 real(8), public, parameter :: SymmFac=1d0/2d0, SpinAvg=1d0/4d0, QuarkColAvg=1d0/3d0, GluonColAvg=1d0/8d0
 integer, public, target :: Up_  = 1
 integer, public, target :: Dn_  = 2

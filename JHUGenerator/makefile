@@ -6,8 +6,7 @@ MELADir = ""
 MELAFortranDir = ""
 MELADataDir = ""
 MELALibDir = ""
-#libmcfm_705.so
-MCFMLib = mcfm_705
+MCFMLib = mcfm_706
 PDFDir = $(Here)/pdfs
 VegasDir = $(Here)/vegas
 CollierDir = $(Here)/../lib/COLLIER-1.2/

@@ -363,6 +363,7 @@ logical :: SetAnomalousSpin2gg, SetAnomalousSpin2qq, Setspin2qqleft, Setspin2qqr
 logical :: SetAnomalousHff, Setkappa
 logical :: SetZprimeff, SetWprimeff, SetHZprime, SetHWprime
 logical :: SetMZprime, SetGaZprime, SetMWprime, SetGaWprime
+logical :: SetATQGC
 logical :: SetCKM,SetCKMub,SetCKMcb,SetCKMtd
 logical :: SetpTjetcut, Setetajetcut, Setdetajetcut, SetdeltaRcut
 logical :: SetpTlepcut, Setetalepcut, SetMPhotonCutoff
@@ -428,6 +429,8 @@ type(SaveValues) :: tosave, oldsavevalues
    SetWprimeff=.false.
    SetMWprime=.false.
    SetGaWprime=.false.
+
+   SetATQGC=.false.
 
    SetpTjetcut=.false.
    Setetajetcut=.false.
@@ -1068,6 +1071,17 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "MWprime", success, M_Wprime, multiply=GeV, success2=SetMWprime, tosave=tosave)
     call ReadCommandLineArgument(arg, "GaWprime", success, Ga_Wprime, multiply=GeV, success2=SetGaWprime, tosave=tosave)
 
+    call ReadCommandLineArgument(arg, "dV_A", success, dV_A, success2=SetATQGC, tosave=tosave)
+    call ReadCommandLineArgument(arg, "dP_A", success, dP_A, success2=SetATQGC, tosave=tosave)
+    call ReadCommandLineArgument(arg, "dM_A", success, dM_A, success2=SetATQGC, tosave=tosave)
+    call ReadCommandLineArgument(arg, "dFour_A", success, dFour_A, success2=SetATQGC, tosave=tosave)
+    call ReadCommandLineArgument(arg, "dV_Z", success, dV_Z, success2=SetATQGC, tosave=tosave)
+    call ReadCommandLineArgument(arg, "dP_Z", success, dP_Z, success2=SetATQGC, tosave=tosave)
+    call ReadCommandLineArgument(arg, "dM_Z", success, dM_Z, success2=SetATQGC, tosave=tosave)
+    call ReadCommandLineArgument(arg, "dFour_Z", success, dFour_Z, success2=SetATQGC, tosave=tosave)
+    call ReadCommandLineArgument(arg, "dAAWpWm", success, dAAWpWm, success2=SetATQGC, tosave=tosave)
+    call ReadCommandLineArgument(arg, "dZAWpWm", success, dZAWpWm, success2=SetATQGC, tosave=tosave)
+    call ReadCommandLineArgument(arg, "dZZWpWm", success, dZZWpWm, success2=SetATQGC, tosave=tosave)
 
     ! CKM elements
     call ReadCommandLineArgument(arg, "Vud", success, VCKM_ud, success2=SetCKM, tosave=tosave)
@@ -1648,7 +1662,7 @@ type(SaveValues) :: tosave, oldsavevalues
             endif
         endif
     endif
-    if (Process.eq.60 .or. (Process.ge.66 .and. Process.lt.69) .or. (Process.ge.70 .and. Process.le.72)) then
+    if (Process.eq.60 .or. (Process.ge.66 .and. Process.le.68) .or. (Process.ge.70 .and. Process.le.72)) then
         if ((SetHZprime .and. .not.SetZprimeff) .or. (.not.SetHZprime .and. SetZprimeff)) then
             call Error("To use Z' contact terms, you have to set both HVZ' and Z'ff couplings")
         endif
@@ -1737,6 +1751,12 @@ type(SaveValues) :: tosave, oldsavevalues
     if( .not.Setghz1 .and. ((Process.ge.66 .and. Process.le.68) .or. (Process.ge.70 .and. Process.le.72)) ) then
         !note this implies .not. SetAnomalousSpin0VV because of earlier errors
         ghz1=(1d0,0d0)
+    endif
+
+
+    ! aTQGC
+    if (SetATQGC .and. .not.(Process.eq.67 .or. Process.eq.68 .or. Process.eq.71 .or. Process.eq.72)) then
+        call Error("Anomalous triple or quadruple gauge couplings are only implemented in EW VVJJ/LL background processes.")
     endif
 
 
@@ -1849,6 +1869,10 @@ SUBROUTINE InitPDFs()
      zmass_pdf = M_Z ! Take zmass_pdf=M_Z in pdfs that do not specify this value
 
      if( PDFSet.eq.1 ) then ! CTEQ6L1
+        write(io_stdout,*) " ************************"
+        write(io_stdout,*) " Initializing CTEQ6l1 PDF"
+        write(io_stdout,*) " ************************"
+
         call SetCtq6(4)  ! 4    CTEQ6L1  Leading Order cteq6l1.tbl
 
         alphas_mz=0.130d0
@@ -5679,15 +5703,14 @@ character :: arg*(500)
         endif
     endif
     if( Process.ge.66 .and. Process.le.72 ) then
-        write(TheUnit,"(4X,A)") "4l cuts:"
-        if( Process.ge.66 .and. Process.le.72 ) then
-            write(TheUnit,"(12X,A,F8.2,A)") "pT >= ", pTlepcut/GeV, " GeV"
-            write(TheUnit,"(9X,A,F8.2)") "|eta| <= ", etalepcut
-        endif
-        write(TheUnit,"(11X,A,F8.2,A)") "mll >= ", MPhotonCutoff/GeV, " GeV"
-        if( Process.ge.66 .and. Process.le.72 ) then
-            write(TheUnit,"(F10.2,A,F10.2,A)") m4l_minmax(1)/GeV, " GeV <= m4l <= ", m4l_minmax(2)/GeV, " GeV"
-        endif
+        write(TheUnit,"(4X,A)") "Lepton cuts:"
+        write(TheUnit,"(12X,A,F8.2,A)") "pT >= ", pTlepcut/GeV, " GeV"
+        write(TheUnit,"(9X,A,F8.2)") "|eta| <= ", etalepcut
+    endif
+    if( Process.ge.66 .and. Process.le.72 ) then
+        write(TheUnit,"(4X,A)") "Mass cuts:"
+        write(TheUnit,"(11X,A,F8.2,A)") "m(gammastar) >= ", MPhotonCutoff/GeV, " GeV"
+        write(TheUnit,"(F10.2,A,F10.2,A)") m4l_minmax(1)/GeV, " GeV <= m4f <= ", m4l_minmax(2)/GeV, " GeV"
     endif
     if( (Process.eq.0 .or. Process.eq.2 .or. Process.eq.50) .and. includeGammaStar ) then
         write(TheUnit,"(6X,A,F8.2,A)") "m(gammastar) >= ", MPhotonCutoff/GeV, " GeV"
@@ -5772,7 +5795,7 @@ character :: arg*(500)
         write(TheUnit,"(4X,A,I1)") "Reweighting events using the decay matrix element, using input WidthScheme ", WidthSchemeIn
     endif
     if(Process.ge.66 .and. Process.le.72 .and. ReweightInterference) then
-      write(TheUnit, "(4X,A)") "Interference: included through event weights"
+      write(TheUnit, "(4X,A)") "Interference: Included through event weights"
     elseif( Process.le.2 .or. (Process.ge.66 .and. Process.le.72) .or. ReadLHEFile ) then
       write(TheUnit,"(4X,A,L)") "Interference: ",includeInterference
     endif
@@ -5785,7 +5808,7 @@ character :: arg*(500)
 
     write(TheUnit,"(4X,A)") ""
     if( (Process.eq.0 .and. TauDecays.lt.0) .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.62 .or. Process.eq.66 .or. Process.eq.68 .or. Process.eq.70 .or. Process.eq.72 .or. Process.eq.50 .or. (Process.eq.51 .and. VH_PC.ne."bo") ) then
-        write(TheUnit,"(4X,A)") "spin-0-VV couplings: "
+        write(TheUnit,"(4X,A)") "Spin-0-VV couplings: "
         write(TheUnit,"(6X,A,L)") "generate_as=",generate_as
         if( generate_as ) then
             write(TheUnit,"(6X,A,2E16.8,A1)") "ahg1=",ahg1,"i"
@@ -6096,14 +6119,14 @@ character :: arg*(500)
         if( cdabs(kappa_tilde ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "kappa_tilde=",kappa_tilde,"i"
     endif
     if( Process.eq.1 ) then
-        write(TheUnit,"(4X,A)") "spin-1-VV couplings: "
+        write(TheUnit,"(4X,A)") "Spin-1-VV couplings: "
         write(TheUnit,"(6X,A,2E16.8,A1)") "zprime_qq_left =",zprime_qq_left,"i"
         write(TheUnit,"(6X,A,2E16.8,A1)") "zprime_qq_right=",zprime_qq_right,"i"
         write(TheUnit,"(6X,A,2E16.8,A1)") "zprime_zz_1=",zprime_zz_1,"i"
         write(TheUnit,"(6X,A,2E16.8,A1)") "zprime_zz_2=",zprime_zz_2,"i"
     endif
     if( Process.eq.2 ) then
-        write(TheUnit,"(4X,A)") "spin-2-VV couplings: "
+        write(TheUnit,"(4X,A)") "Spin-2-VV couplings: "
         write(TheUnit,"(6X,A,L)") "generate_bis=",generate_bis
         write(TheUnit,"(6X,A,L)") "use_dynamic_MG=",use_dynamic_MG
         write(TheUnit,"(6X,A,2E16.8,A1)") "a1 =",a1,"i"
@@ -6190,6 +6213,21 @@ character :: arg*(500)
         endif
     endif
     write(TheUnit,"(6X,A,2F8.1,A1)") "Lambda=",Lambda*100d0
+
+    if( Process.eq.67 .or. Process.eq.68 .or. Process.eq.71 .or. Process.eq.72 ) then
+        write(TheUnit,"(4X,A)") "Anomalous triple or quadruple gauge couplings: "
+        write(TheUnit,"(6X,A,2E16.8,A1)") "dV_A =",dV_A,"i"
+        write(TheUnit,"(6X,A,2E16.8,A1)") "dP_A =",dP_A,"i"
+        write(TheUnit,"(6X,A,2E16.8,A1)") "dM_A =",dM_A,"i"
+        write(TheUnit,"(6X,A,2E16.8,A1)") "dFour_A =",dFour_A,"i"
+        write(TheUnit,"(6X,A,2E16.8,A1)") "dV_Z =",dV_Z,"i"
+        write(TheUnit,"(6X,A,2E16.8,A1)") "dP_Z =",dP_Z,"i"
+        write(TheUnit,"(6X,A,2E16.8,A1)") "dM_Z =",dM_Z,"i"
+        write(TheUnit,"(6X,A,2E16.8,A1)") "dFour_Z =",dFour_Z,"i"
+        write(TheUnit,"(6X,A,2E16.8,A1)") "dAAWpWm =",dAAWpWm,"i"
+        write(TheUnit,"(6X,A,2E16.8,A1)") "dZAWpWm =",dZAWpWm,"i"
+        write(TheUnit,"(6X,A,2E16.8,A1)") "dZZWpWm =",dZZWpWm,"i"
+    endif
 
 
     write(TheUnit,"(4X,A)") ""

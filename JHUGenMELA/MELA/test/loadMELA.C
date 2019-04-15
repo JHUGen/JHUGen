@@ -2,7 +2,7 @@
   TString loadMELA = __FILE__;
   TString testdir = loadMELA(0, loadMELA.Last('/'));
   TString LIBMCFMPATH = testdir+"/../data/$SCRAM_ARCH/";
-  TString LIBMCFM="libmcfm_705.so";
+  TString LIBMCFM="libmcfm_706.so";
   TString LIBJHUGENMELA="libjhugenmela.so";
   TString LIBMELA="libMELA.so";
   TString LIBCOLLIER="libcollier.so";

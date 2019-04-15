@@ -1,24 +1,26 @@
-JHUGen
+**/JHUGen
 # for cygwin
-JHUGen.exe
+**/JHUGen.exe
 
 #JHUGen output
-*.lhe
-*.dat
-*.log
-*.grid
-*_CSmax.bin
-*_commandlineinfo.txt
-*_gridinfo.txt
-*_collierfiles
-PMZZdistribution.out
+**/*.lhe
+**/*.dat
+**/*.log
+**/*.grid
+**/*.out
+**/*.err
+**/*_CSmax.bin
+**/*_commandlineinfo.txt
+**/*_gridinfo.txt
+**/*_collierfiles
 
 #downloaded pdf
-NNPDF30_lo_as_0130.LHgrid
+**/NNPDF30_lo_as_0130.LHgrid
 
 # MCFM links
-*.DAT
-br.sm*
+**/*.DAT
+**/br.sm*
 
-*.job.out
-*.job.err
+# Test directory
+test/pdfs
+test/data

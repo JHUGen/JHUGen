@@ -110,7 +110,6 @@ C===========================================================================
       If ((Iparton .lt. -NfMx .or. Iparton .gt. NfMx)) Then
          If (Warn) Then
 C        put a warning for calling extra flavor.
-             Warn = .false.
              Print *, 'Warning: Iparton out of range in Ctq6Pdf! '
              Print *, 'Iparton, MxFlvN0: ', Iparton, NfMx
          Endif
@@ -120,6 +119,15 @@ C        put a warning for calling extra flavor.
 
       Ctq6Pdf = PartonX6 (Iparton, X, Q)
       if(Ctq6Pdf.lt.0.D0)  Ctq6Pdf = 0.D0
+      if(IsNaN(Ctq6Pdf)) then
+         if (Warn) then
+            Print *, 'Warning: Ctq6Pdf is NaN!'
+            Print *, 'Iparton, MxFlvN0, X, Q: ', Iparton, NfMx, X, Q
+         endif
+         Ctq6Pdf = 0.D0
+      endif
+
+      if (Warn) Warn = .false.
 
       Return
 
