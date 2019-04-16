@@ -22,9 +22,12 @@ def run(fileobject, sortkey=lambda x: x):
     if "Total unweighted xsec" in line:
       match = re.search(r"Total unweighted xsec \(used by Vegas\): *([^ ]*) *\+/- *([^ ]*) *fb", line)
       xsec = ufloat(match.group(1), match.group(2))
-      next(f)
-      line = next(f)
-      channel, id1, id2 = (int(_) for _ in line.split()[0:3])
+      match = None
+      while not match:
+        line = next(f)
+        if "Total unweighted xsec" in line: raise IOError("outputs are too mixed up, sorry...")
+        match = re.match(r"^([0-9]+) +([0-9-]+) +([0-9-]+) +[0-9e+-.]+ +[0-9]+$", line.strip())
+      channel, id1, id2 = (int(_) for _ in match.groups())
       result[channel] = id1, id2, xsec, xsec.s/xsec.n
 
   fmtheader = "{:>8} | {:>3} | {:3} | {:17} | {:10}"
