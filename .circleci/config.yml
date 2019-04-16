@@ -451,7 +451,7 @@ jobs:
       - run: "! $DOSYNTAX || grep -q 'Interference: F' $LHEDIR/tbarH_t_ZZ.lhe"
 
       - restore_cache:
-          key: v8-VBF-offshell-grids-66-syntax
+          key: v9-VBF-offshell-grids-66-syntax
       - run:
           name: VBF offshell grids
           command: |
@@ -464,7 +464,7 @@ jobs:
               fi
             done
       - save_cache:
-          key: v8-VBF-offshell-grids-66-syntax
+          key: v9-VBF-offshell-grids-66-syntax
           paths:
             - ~/JHUGen/JHUGenerator/VBFoffshell_66/
       - run:
