@@ -176,7 +176,7 @@ real(8), public :: MPhotonCutoff = -1d0*GeV                          ! minimum |
 real(8), public :: pTlepcut = -1d0*GeV
 real(8), public :: etalepcut = 999d0
 real(8), public :: pTHcut = 0d0*GeV
-logical, public :: JetsOppositeEta = .true.
+logical, public :: JetsOppositeEta = .false.
 !=====================================================
 
 !=====================================================

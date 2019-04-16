@@ -365,7 +365,7 @@ logical :: SetZprimeff, SetWprimeff, SetHZprime, SetHWprime
 logical :: SetMZprime, SetGaZprime, SetMWprime, SetGaWprime
 logical :: SetATQGC
 logical :: SetCKM,SetCKMub,SetCKMcb,SetCKMtd
-logical :: SetpTjetcut, Setetajetcut, Setdetajetcut, SetdeltaRcut
+logical :: SetpTjetcut, Setetajetcut, Setdetajetcut, SetdeltaRcut, SetJetsOppositeEta
 logical :: SetpTlepcut, Setetalepcut, SetMPhotonCutoff
 logical :: SetColliderEnergy
 logical :: Setm2l_min,Setm2l_max,SetmVH_min,SetmVH_max,SetpTHcut
@@ -431,6 +431,8 @@ type(SaveValues) :: tosave, oldsavevalues
    SetGaWprime=.false.
 
    SetATQGC=.false.
+
+   SetJetsOppositeEta=.false.
 
    SetpTjetcut=.false.
    Setetajetcut=.false.
@@ -1110,7 +1112,7 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "MPhotonCutoff", success, MPhotonCutoff, multiply=GeV, success2=SetMPhotonCutoff, tosave=tosave)
     call ReadCommandLineArgument(arg, "pTlepcut", success, pTlepcut, multiply=GeV, success2=SetpTlepcut, tosave=tosave)
     call ReadCommandLineArgument(arg, "etalepcut", success, etalepcut, success2=Setetalepcut, tosave=tosave)
-    call ReadCommandLineArgument(arg, "JetsOppositeEta", success, JetsOppositeEta, tosave=tosave)
+    call ReadCommandLineArgument(arg, "JetsOppositeEta", success, JetsOppositeEta, success2=SetJetsOppositeEta, tosave=tosave)
     call ReadCommandLineArgument(arg, "pTHcut", success, pTHcut, success2=SetpTHcut, tosave=tosave)
 
     if( .not.success ) then
@@ -1411,16 +1413,17 @@ type(SaveValues) :: tosave, oldsavevalues
     endif
     if(.not.Setetajetcut) then
         if(Process.ge.66 .and. Process.le.72) then
-            etajetcut = 4d0
+            etajetcut = 6.5d0
         else
             etajetcut = infinity()
         endif
     endif
     if(.not.Setdetajetcut) then
+        !if(Process.eq.60 .or. Process.eq.61 .or. (Process.ge.66 .and. Process.le.72)) then
         if(Process.ge.66 .and. Process.le.72) then
-            detajetcut = 2d0
+            detajetcut = -1d0
         else
-            detajetcut = 0d0
+            detajetcut = -1d0
         endif
     endif
     if(.not.SetdeltaRcut) then
@@ -1442,6 +1445,13 @@ type(SaveValues) :: tosave, oldsavevalues
             etalepcut = 2.7d0
         else
             etalepcut = infinity()
+        endif
+    endif
+    if(.not.SetJetsOppositeEta) then
+        if(Process.ge.66 .and. Process.le.72) then
+            SetJetsOppositeEta = .false.
+        else
+            SetJetsOppositeEta = .false.
         endif
     endif
     if(.not.SetMPhotonCutoff) then
@@ -5693,8 +5703,8 @@ character :: arg*(500)
         write(TheUnit,"(4X,A)") "Jet cuts:"
         write(TheUnit,"(12X,A,F8.2,A)") "pT >= ", pTjetcut/GeV, " GeV"
         if( Process.ge.66 .and. Process.le.72 ) then
-            write(TheUnit,"(9X,A,F8.2)") "|eta| <= ", etajetcut
-            write(TheUnit,"(4X,A,F8.2)") "|Deltaeta| >= ", detajetcut
+            if (etajetcut.gt.0d0) write(TheUnit,"(9X,A,F8.2)") "|eta| <= ", etajetcut
+            if (detajetcut.gt.0d0) write(TheUnit,"(4X,A,F8.2)") "|Deltaeta| >= ", detajetcut
             if (JetsOppositeEta) write(TheUnit,"(5X,A,F8.2)") "eta1*eta2 <= ", 0d0
         endif
         if( Process.eq.50 .or. Process.eq.60 .or. Process.eq.61 .or. (Process.ge.66 .and. Process.le.72) .or. Process.eq.80 .or. Process.eq.90) then

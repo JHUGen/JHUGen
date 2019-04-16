@@ -128,6 +128,7 @@ m1ffwgt=1d0;m2ffwgt=1d0
 
    call PDFMapping(2,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi,EhatMin=dmax1(m4l_minmax(1),0d0)+mJJcut)
    call EvalPhasespace_VBF_H4f(yRnd(3),yRnd(4:17),EHat,MomExt(1:4,1:10),PSWgt,id_MCFM(1:8),swap34_56,id12_78)
+   call boost2Lab(eta1,eta2,10,MomExt(1:4,1:10))
    !write(6,*) "After EvalPS, MomExt:",MomExt,", Pwwgt:",PSWgt
 
 !       call genps(6,EHat,yRnd(3:16),(/0d0,0d0,0d0,0d0,0d0,0d0/),MomExt(1:4,3:8),PSWgt)
@@ -143,7 +144,6 @@ m1ffwgt=1d0;m2ffwgt=1d0
 !       EvalWeighted_HJJ_fulldecay=PSWgt *sHatJacobi  * ( MomExt(1:4,3).dot.MomExt(1:4,7) ) * ( MomExt(1:4,4).dot.MomExt(1:4,10) ) * ( MomExt(1:4,8).dot.MomExt(1:4,9) ) * ( MomExt(1:4,7).dot.MomExt(1:4,10) ) / EHat**8
 !       return
 
-   call boost2Lab(eta1,eta2,10,MomExt(1:4,1:10))
    PSWgt = PSWgt * PartChannelAvg * FinalStateWeight
 
 
@@ -213,9 +213,9 @@ m1ffwgt=1d0;m2ffwgt=1d0
 !    enddo; enddo
 
    if ( &
-      !msq_MCFM(iPart_sel,jPart_sel) .le. 0d0 .or. &
-      !pdf(LHA2M_pdf(iPart_sel),1) .le. 0d0 .or. &
-      !pdf(LHA2M_pdf(jPart_sel),2) .le. 0d0 .or. &
+      msq_MCFM(iPart_sel,jPart_sel) .le. 0d0 .or. &
+      pdf(LHA2M_pdf(iPart_sel),1) .le. 0d0 .or. &
+      pdf(LHA2M_pdf(jPart_sel),2) .le. 0d0 .or. &
       IsNaN(msq_MCFM(iPart_sel,jPart_sel)) .or. &
       IsNaN(pdf(LHA2M_pdf(iPart_sel),1)) .or. &
       IsNaN(pdf(LHA2M_pdf(jPart_sel),2)) &

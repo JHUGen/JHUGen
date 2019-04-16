@@ -2140,7 +2140,7 @@ real(8) :: MomExt(:,:), mZ1, mZ2, MReso, mZ1alt, mZ2alt
 real(8) :: MomLepP(1:4),MomLepM(1:4),MomBoost(1:4),BeamAxis(1:4),ScatteringAxis(1:4),dummy(1:4)
 real(8) :: MomLept(1:4,1:4),MomLeptX(1:4,1:4),MomLeptPlane1(2:4),MomLeptPlane2(2:4),MomBeamScatterPlane(2:4)
 logical :: applyPSCut
-integer :: NBin(:),ids(1:8)
+integer :: NBin(:),ids(1:8),jpart
 real(8) :: m_jj,y_j1,y_j2,dphi_jj,dy_j1j2,pT_jl,pT_j1,pT_j2,pT_H,m_4l,dR_j1j2
 real(8) :: pT_l1,pT_l2,pT_l3,pT_l4,y_l1,y_l2,y_l3,y_l4
 real(8) :: Phi1,signPhi1,MomReso(1:4)
@@ -2177,6 +2177,12 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=8, 
        dphi_jj = abs( Get_PHI(MomExt(1:4,3)) - Get_PHI(MomExt(1:4,4)) )
        if( dphi_jj.gt.Pi ) dphi_jj=2d0*Pi-dphi_jj
 
+
+       if (doPrintFailReason) then
+         do jpart=1,10
+            write(6,*) "MomExt(",jpart,")=",MomExt(:,jpart)
+         enddo
+       endif
 
        ! Off-shell photon cut-offs
        if ( m_jj.lt.MPhotonCutoff .and. .not.IsANeutrino(ids(7)) .and. CoupledVertex(ids(7),ids(8)).eq.Z0_) then
@@ -2259,7 +2265,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=8, 
        endif
 
         if( IsAJet(ids(7)) .and. (abs(y_j1-y_j2).lt.detajetcut .or. (JetsOppositeEta .and. y_j1*y_j2.gt.0d0)) ) then
-           if (doPrintFailReason) write(6,*) "Failed detajet cutoff. deta=",y_j1,"-",y_j2,"<",etajetcut
+           if (doPrintFailReason) write(6,*) "Failed detajet cutoff. deta=",y_j1,"-",y_j2,"<",detajetcut
            applyPSCut=.true.
            return
         endif
@@ -6458,7 +6464,6 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
       write(6,*) "m910:",sqrt(s910)/GeV
       write(6,*) "m34:",sqrt(s34)/GeV
       write(6,*) "Last case:",ch_ctr
-      write(6,*) "MomExt:",Mom
 
       pause
    endif
