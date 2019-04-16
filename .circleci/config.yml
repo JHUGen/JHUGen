@@ -269,12 +269,12 @@ jobs:
           command: |
             if ! $DOREFERENCE ; then exit 0; fi
             mkdir -p VBFoffshell_66/
-            ./JHUGen.py Seed=$SEED Process=66 DecayMode1=0 DecayMode2=0 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 detajetcut=4 JetsOppositeEta=1 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=compare_to_reference/VBFoffshell_66.lhe CSmaxFile=VBFoffshell_66/output
+            ./JHUGen.py Seed=$SEED Process=66 DecayMode1=0 DecayMode2=0 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=compare_to_reference/VBFoffshell_66.lhe CSmaxFile=VBFoffshell_66/output
       - run:
           name: VBF offshell
           command: |
             if ! $DOREFERENCE ; then exit 0; fi
-            ./JHUGen.py Seed=$SEED Process=66 DecayMode1=0 DecayMode2=0                PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 detajetcut=4 JetsOppositeEta=1 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=compare_to_reference/VBFoffshell_66.lhe CSmaxFile=VBFoffshell_66/output ReadCSmax VegasNc2=10
+            ./JHUGen.py Seed=$SEED Process=66 DecayMode1=0 DecayMode2=0                PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=compare_to_reference/VBFoffshell_66.lhe CSmaxFile=VBFoffshell_66/output ReadCSmax VegasNc2=10
           no_output_timeout: 1h
 
       #now compare to reference
@@ -459,7 +459,7 @@ jobs:
             mkdir -p VBFoffshell_66/
             for i in {001..164}; do
               if ! [ -e VBFoffshell_66/output_${i}_step2.grid ]; then
-                ./JHUGen.py Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=66 DecayMode1=8 DecayMode2=8 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 detajetcut=4 JetsOppositeEta=1 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=$LHEDIR/VBFoffshell_66.lhe CSmaxFile=VBFoffshell_66/output
+                ./JHUGen.py Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=66 DecayMode1=8 DecayMode2=8 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=$LHEDIR/VBFoffshell_66.lhe CSmaxFile=VBFoffshell_66/output
                 break
               fi
             done
@@ -471,7 +471,7 @@ jobs:
           name: VBF offshell
           command: |
             if ! $DOSYNTAX ; then exit 0; fi
-            ./JHUGen.py Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=66 DecayMode1=8 DecayMode2=8 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 detajetcut=4 JetsOppositeEta=1 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=$LHEDIR/VBFoffshell_66.lhe CSmaxFile=VBFoffshell_66/output ReadCSmax VegasNc2=10
+            ./JHUGen.py Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=66 DecayMode1=8 DecayMode2=8 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=$LHEDIR/VBFoffshell_66.lhe CSmaxFile=VBFoffshell_66/output ReadCSmax VegasNc2=10
           no_output_timeout: 1h
 
       - run:
