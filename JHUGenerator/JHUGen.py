@@ -304,15 +304,16 @@ class JobSubmitter(object):
     result += ".job.log"
     return result
 
-  def resultfile(self, array_index=None):
+  def resultfile(self, array_index=None, isforgrid=None):
     if array_index is None: array_index = self.args.array_index
+    if isforgrid is None: isforgrid = self.isforgrid
 
     result = self.DataFile
 
     if array_index is not None:
       result += "_"+array_index
 
-    if self.isforgrid:
+    if isforgrid:
       result += "_step2.grid"
     else:
       result += ".lhe"
@@ -329,6 +330,12 @@ class JobRunner(JobSubmitter):
       p = multiprocessing.Pool()
       runjob = functools.partial(_callJHUGenFromRunner, runner=self)
       p.map_async(runjob, arrayjobs).get()
+
+    if self.isforgrid:
+      for arrayjob in arrayjobs:
+        lhefile = self.resultfile(array_index=arrayjob, isforgrid=False)
+        assert ".lhe" in lhefile
+        os.move(lhefile, lhefile.replace(".lhe", ".grid.lhe"))
 
     if self.hasmultiplejobs and self.VBFoffsh_run is None and not self.isforgrid:
       self.merge()
