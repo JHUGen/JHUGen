@@ -104,7 +104,7 @@ class LHEFile:
             if "--" in self.line and self.incomment:
                 self.raiseerror("-- in a comment! " + str(self.linenumber))
 
-            if self.incomment and "VegasNc2=" in self.line and not any("Process={}".format(_) in self.line for _ in (66,67,68,69)):
+            if self.incomment and "VegasNc2=" in self.line and ("VBFoffsh_run=*" in self.line or not any("Process={}".format(_) in self.line for _ in (66,67,68,69))):
                 for argument in self.line.split():
                     if argument.startswith("VegasNc2="):
                         self.VegasNc2 = int(argument.split("=")[-1])
