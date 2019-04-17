@@ -17,6 +17,7 @@ import datetime
 import functools
 import multiprocessing
 import os
+import random
 import re
 import signal
 import sys
@@ -34,6 +35,15 @@ def cd(newdir):
   finally:
     os.chdir(prevdir)
 
+@contextlib.contextmanager
+def opens(*filenames, **kwargs):
+  if not filenames: yield []; return
+
+  commonargs = kwargs.pop("commonargs", ())
+  if kwargs: raise ValueError("Unknown kwargs: "+", ".join(kwargs))
+
+  with open(filenames[0], *commonargs) as f, opens(*filenames[1:], commonargs=commonargs) as morefs:
+    yield [f]+morefs
 
 def JHUGen(*jhugenargs, **kwargs):
   hideoutput = kwargs.pop("hideoutput", False)
@@ -74,7 +84,7 @@ class JobSubmitter(object):
     else:
       array_index = self.args.array_index
 
-    if 66 <= self.Process <= 69:
+    if self.hasmultiplejobs:
       if array_index is not None:
         if self.VBFoffsh_run is not None: raise RuntimeError("With VBFoffsh_run set to {:d}, shouldn't have an array index".format(self.VBFoffsh_run))
         result.append("VBFoffsh_run={:d}".format(int(array_index)))
@@ -110,15 +120,23 @@ class JobSubmitter(object):
     finally:
       os.environ.update(bkp)
 
+  @property
+  def hasmultiplejobs(self):
+    return self.njobs is not None
+
+  @property
+  def njobs(self):
+    return {
+      66: 164,
+      67: 164,
+      68: 164,
+      69: 175,
+    }.get(self.Process, None)
+
   def submit(self):
-    if 66 <= self.Process <= 69 and self.VBFoffsh_run is None and self.args.array_index is None:
-      njobs = {
-        66: 164,
-        67: 164,
-        68: 164,
-        69: 175,
-      }[self.Process]
-      arrayjobs=["{:03d}".format(_) for _ in xrange(1, njobs+1)]
+    if self.hasmultiplejobs and self.VBFoffsh_run is None and self.args.array_index is None:
+      if self.Seed is None: raise ValueError("To run multiple jobs, please set a seed on the command line so it will be common to all jobs")
+      arrayjobs=["{:03d}".format(_) for _ in xrange(1, self.njobs+1)]
       with self.setenvandcd():
         for _ in arrayjobs:
           self.dodryrun(array_index=_)
@@ -136,7 +154,12 @@ class JobSubmitter(object):
       print "job{} {} {} already running".format("s" if plural else "", ", ".join(sorted(jobids)), "are" if plural else "is")
       for index in jobindicesrunning:
         arrayjobs.remove(index)
-    if not arrayjobs: return
+
+    if not self.args.overwrite:
+      for jobindex in arrayjobs[:]:
+        if os.path.exists(self.resultfile(jobindex)):
+          arrayjobs.remove(jobindex)
+
     return self.submittoqueue(arrayjobs=arrayjobs)
 
   @abc.abstractmethod
@@ -224,9 +247,17 @@ class JobSubmitter(object):
     return result
 
   @property
+  def Seed(self):
+    result = None
+    for arg in self.args.JHUGenarg:
+      if arg.startswith("Seed="):
+        result = int(arg.split("=", 1)[1])
+    return result
+
+  @property
   def isforgrid(self):
     if self.ReadCSmax: return False
-    if 66 <= self.Process <= 69: return True #because not self.ReadCSmax
+    if self.hasmultiplejobs: return True #because not self.ReadCSmax
     if self.args.grid: return True
     return False
 
@@ -234,7 +265,7 @@ class JobSubmitter(object):
   def outputfile(self):
     result = self.DataFile
 
-    if 66 <= self.Process <= 69 and self.VBFoffsh_run is None and self.args.array_index is None:
+    if self.hasmultiplejobs and self.VBFoffsh_run is None and self.args.array_index is None:
       result += "_"+self.jobindexforoutputfile
 
     if self.isforgrid:
@@ -247,7 +278,7 @@ class JobSubmitter(object):
   def errorfile(self):
     result = self.DataFile
 
-    if 66 <= self.Process <= 69 and self.VBFoffsh_run is None and self.args.array_index is None:
+    if self.hasmultiplejobs and self.VBFoffsh_run is None and self.args.array_index is None:
       result += "_"+self.jobindexforoutputfile
 
     if self.isforgrid:
@@ -259,7 +290,7 @@ class JobSubmitter(object):
   def logfile(self, array_index=None):
     if array_index is None: array_index = self.args.array_index
     if array_index is None and not self.args.on_queue:
-      if 66 <= self.Process <= 69 and self.VBFoffsh_run is None:
+      if self.hasmultiplejobs and self.VBFoffsh_run is None:
         array_index = self.jobindexforlogfile
 
     result = self.DataFile
@@ -273,6 +304,21 @@ class JobSubmitter(object):
     result += ".job.log"
     return result
 
+  def resultfile(self, array_index=None):
+    if array_index is None: array_index = self.args.array_index
+
+    result = self.DataFile
+
+    if array_index is not None:
+      result += "_"+array_index
+
+    if self.isforgrid:
+      result += "_step2.grid"
+    else:
+      result += ".lhe"
+
+    return result
+
   @abc.abstractmethod
   def jobindicesrunning(self, arrayjobs=None): pass
 
@@ -283,6 +329,9 @@ class JobRunner(JobSubmitter):
       p = multiprocessing.Pool()
       runjob = functools.partial(_callJHUGenFromRunner, runner=self)
       p.map_async(runjob, arrayjobs).get()
+
+    if self.hasmultiplejobs and self.VBFoffsh_run is None:
+      self.merge()
 
   def jobindicesrunning(self, arrayjobs=None): return [], []
 
@@ -298,8 +347,63 @@ class JobRunner(JobSubmitter):
   def jobindexforlogfile(self):
     assert False
 
+  def merge(self):
+    if not self.hasmultiplejobs:
+      raise ValueError("Nothing to merge for process {}".format(self.Process))
+    if self.args.on_queue: return
+    if not all(os.path.exists(self.resultfile("{:03d}".format(i))) for i in xrange(1, self.njobs+1)): raise ValueError("Can't merge, not all files exist")
+    if os.path.exists(self.resultfile(None)) and not self.args.overwrite: return
+    with opens(*(self.resultfile("{:03d}".format(i)) for i in xrange(1, self.njobs+1))) as fs, open(self.resultfile(None), "w") as newf:
+      wrotemergeheader = False
+      line = ""
+      while "</init>" not in line:
+        linesfound = set()
+        for f in fs:
+          line = next(f)
+          if "Command line:" in line: line = re.sub(r"(VBFoffsh_run=)[0-9]+", r"\1*", line)
+          if "LHE output:" in line or "Histogram output:" in line or "Log file:" in line:
+            line = re.sub(r"(:.*)_[0-9]+[.](lhe|log|dat *)$", r"s\1_*.\2", line, flags=re.MULTILINE)
+            if "LHE outputs:" in line:
+              line += re.match("^ +", line).group(0) + "Final LHE output: "+self.resultfile(None)+"\n"
+          if line not in linesfound:
+            newf.write(line)
+            linesfound.add(line)
+        if len(linesfound) > 1:
+          raise ValueError("Multiple lines found that are not the same:\n" + "\n".join(linesfound))
+        if "<!--" in line and not wrotemergeheader:
+          mergeheader = "Merged from {} jobs by JHUGen.py".format(self.njobs)
+          newf.write("="*len(mergeheader)+"\n")
+          newf.write(mergeheader+"\n")
+          newf.write("="*len(mergeheader)+"\n")
+          newf.write("\n")
+
+      footer = set()
+
+      filesleft = list(fs)
+
+      random.seed(self.Seed)
+
+      while filesleft:
+        f = random.choice(filesleft)
+        line = next(f)
+        if "</LesHouchesEvents>" in line:
+          footer.add(line + f.read())
+          filesleft.remove(f)
+          continue
+        if "<event" not in line:
+          raise ValueError("Expected <event> or </LesHouchesEvents>, found {}".format(line))
+        newf.write(line)
+        while "</event>" not in line:
+          line = next(f)
+          newf.write(line)
+
+      if len(footer) > 1:
+        raise ValueError("Multiple different footers:\n"+"\n".join(footers))
+      newf.write(footer.pop())
+
 class JobSubmitterSlurm(JobSubmitter):
   def submittoqueue(self, arrayjobs):
+    if not arrayjobs: return
     sbatchcommandline = [
       "sbatch",
       "--job-name", self.jobname,
@@ -358,6 +462,7 @@ class JobSubmitterCondor(JobSubmitter):
   def formattedjobtime(self):
     return "{:d}".format(int(self.jobtime.total_seconds()))
   def submittoqueue(self, arrayjobs):
+    if not arrayjobs: return
     commandline = self.commandline
     with tempfile.NamedTemporaryFile(bufsize=0) as f:
       f.write(
