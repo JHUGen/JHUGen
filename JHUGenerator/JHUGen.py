@@ -330,7 +330,7 @@ class JobRunner(JobSubmitter):
       runjob = functools.partial(_callJHUGenFromRunner, runner=self)
       p.map_async(runjob, arrayjobs).get()
 
-    if self.hasmultiplejobs and self.VBFoffsh_run is None:
+    if self.hasmultiplejobs and self.VBFoffsh_run is None and not self.isforgrid:
       self.merge()
 
   def jobindicesrunning(self, arrayjobs=None): return [], []
@@ -354,6 +354,15 @@ class JobRunner(JobSubmitter):
     if not all(os.path.exists(self.resultfile("{:03d}".format(i))) for i in xrange(1, self.njobs+1)): raise ValueError("Can't merge, not all files exist")
     if os.path.exists(self.resultfile(None)) and not self.args.overwrite: return
     with opens(*(self.resultfile("{:03d}".format(i)) for i in xrange(1, self.njobs+1))) as fs, open(self.resultfile(None), "w") as newf:
+      #find number of events in each file
+      fileswithevents = []
+      for f in fs:
+        for line in f:
+          if "<event>" in line:
+            fileswithevents.append(f)
+        f.seek(0, 0)  #go back to the beginning
+
+      #write the LHE header
       wrotemergeheader = False
       line = ""
       while "</init>" not in line:
@@ -377,29 +386,28 @@ class JobRunner(JobSubmitter):
           newf.write("="*len(mergeheader)+"\n")
           newf.write("\n")
 
-      footer = set()
-
-      filesleft = list(fs)
-
+      #write the events
       random.seed(self.Seed)
 
-      while filesleft:
-        f = random.choice(filesleft)
+      random.shuffle(fileswithevents)
+      for f in fileswithevents:
         line = next(f)
-        if "</LesHouchesEvents>" in line:
-          footer.add(line + f.read())
-          filesleft.remove(f)
-          continue
         if "<event" not in line:
-          raise ValueError("Expected <event> or </LesHouchesEvents>, found {}".format(line))
+          raise ValueError("Expected <event>, found {}".format(line))
         newf.write(line)
         while "</event>" not in line:
           line = next(f)
           newf.write(line)
 
-      if len(footer) > 1:
+      #write the LHE footer
+      footers = set()
+      for f in fs:
+        footer = "".join(iter(f))
+        footers.add(footer)
+
+      if len(footers) > 1:
         raise ValueError("Multiple different footers:\n"+"\n".join(footers))
-      newf.write(footer.pop())
+      newf.write(footer)
 
 class JobSubmitterSlurm(JobSubmitter):
   def submittoqueue(self, arrayjobs):
