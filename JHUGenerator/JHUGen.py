@@ -19,6 +19,7 @@ import multiprocessing
 import os
 import random
 import re
+import shutil
 import signal
 import sys
 import subprocess
@@ -335,7 +336,7 @@ class JobRunner(JobSubmitter):
       for arrayjob in arrayjobs:
         lhefile = self.resultfile(array_index=arrayjob, isforgrid=False)
         assert ".lhe" in lhefile
-        os.move(lhefile, lhefile.replace(".lhe", ".grid.lhe"))
+        shutil.move(lhefile, lhefile.replace(".lhe", ".grid.lhe"))
 
     if self.hasmultiplejobs and self.VBFoffsh_run is None and not self.isforgrid:
       self.merge()
