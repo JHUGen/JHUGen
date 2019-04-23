@@ -25,6 +25,7 @@ import sys
 import subprocess
 import tempfile
 import textwrap
+import traceback
 
 @contextlib.contextmanager
 def cd(newdir):
@@ -69,6 +70,12 @@ def _callJHUGenFromRunner(array_index, runner):
   except KeyboardInterrupt as e:
     class KeyboardInterruptException(KeyboardInterrupt, Exception): pass
     raise KeyboardInterruptException(e)
+  except BaseException as e:
+    tb = "".join(traceback.format_exception(*sys.exc_info()))
+    try:
+      raise type(e)(tb)
+    except TypeError:
+      raise Exception(tb)
 
 class JobSubmitter(object):
   __metaclass__ = abc.ABCMeta
@@ -81,7 +88,7 @@ class JobSubmitter(object):
     result = self.args.JHUGenarg
 
     if array_index is not None:
-      assert self.args.array_index in (None, array_index)
+      assert self.args.array_index is None or int(self.args.array_index) == int(array_index)
     else:
       array_index = self.args.array_index
 
@@ -142,8 +149,8 @@ class JobSubmitter(object):
         for _ in arrayjobs:
           self.dodryrun(array_index=_)
     else:
-      if self.args.array_index is not None:
-        arrayjobs = [self.args.array_index]
+      if self.hasmultiplejobs and self.args.array_index is not None:
+        arrayjobs = ["{:03d}".format(self.args.array_index)]
       else:
         arrayjobs = [None]
       with self.setenvandcd():
@@ -188,7 +195,7 @@ class JobSubmitter(object):
   def commandline(self):
     result = [__file__, "--on-queue", os.path.dirname(os.path.abspath(__file__))]
 
-    for varname in ("LD_LIBRARY_PATH",):
+    for varname in ("LD_LIBRARY_PATH", "LHAPDF_DATA_PATH"):
       try:
         result += ["--set-env-var", varname, os.environ[varname]]
       except KeyError:
@@ -332,14 +339,14 @@ class JobRunner(JobSubmitter):
       runjob = functools.partial(_callJHUGenFromRunner, runner=self)
       p.map_async(runjob, arrayjobs).get()
 
-    if self.isforgrid:
-      for arrayjob in arrayjobs:
-        lhefile = self.resultfile(array_index=arrayjob, isforgrid=False)
-        assert ".lhe" in lhefile
-        shutil.move(lhefile, lhefile.replace(".lhe", ".grid.lhe"))
+      if self.isforgrid:
+        for arrayjob in arrayjobs:
+          lhefile = self.resultfile(array_index=arrayjob, isforgrid=False)
+          assert ".lhe" in lhefile
+          shutil.move(lhefile, lhefile.replace(".lhe", ".grid.lhe"))
 
-    if self.hasmultiplejobs and self.VBFoffsh_run is None and not self.isforgrid:
-      self.merge()
+      if self.hasmultiplejobs and self.VBFoffsh_run is None and not self.isforgrid:
+        self.merge()
 
   def jobindicesrunning(self, arrayjobs=None): return [], []
 
@@ -511,7 +518,6 @@ class JobSubmitterCondor(JobSubmitter):
     for index in arrayjobs:
       jobids = set()
       try:
-        print self.logfile(index)
         with open(self.logfile(index)) as f:
           for line in f:
             match = re.search(r"^00. \(([0-9]+[.][0-9]+)", line)
