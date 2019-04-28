@@ -7,7 +7,7 @@ from getpass import getpass
 import os
 import re
 import shutil
-from subprocess import check_call
+from subprocess import CalledProcessError, check_call
 import tempfile
 import urllib2
 
@@ -120,7 +120,7 @@ def getuploadfiles(dir, dontupload, dontuploadifexists):
     return result
 
 class Version(object):
-    def __init__(self, version, gitcommit=None, tarballname=None, manualname=None, manualcommit=None, melacommit=None, visible=True):
+    def __init__(self, version, gitcommit=None, tarballname=None, manualname=None, manualcommit=None, melacommit=None, mcfmcommit=None, visible=True):
         self.version = version
         if gitcommit is None: gitcommit = version
         if tarballname is None: tarballname = "JHUGenerator.{}.tar.gz".format(self.version)
@@ -131,6 +131,7 @@ class Version(object):
         self.manualname = manualname
         self.manualcommit = manualcommit
         self.melacommit = melacommit
+        self.mcfmcommit = mcfmcommit
         self.visible = visible
 
     def getlink(self):
@@ -166,6 +167,14 @@ class Version(object):
             check_call(["git", "checkout", self.gitcommit])
             if self.melacommit is not None:
                 check_call(["git", "checkout", self.melacommit, "--", "JHUGenMELA"])
+            if self.mcfmcommit is not None:
+                try:
+                    check_call(["git", "checkout", self.mcfmcommit, "--", "MCFM-JHUGen"])
+                except CalledProcessError as e:
+                    if e.returncode == 1: #commit is valid but file doesn't exist
+                        shutil.rmtree("MCFM-JHUGen")
+                    else:                 #other error
+                        raise
             for folder in storefolders:
                 if os.path.exists(folder):
                     store.append(folder)
@@ -253,9 +262,12 @@ Download_template = """
 #       could use a later version if the manual is updated after the generator is tagged
 #   - melacommit, name of the commit to checkout for the JHUGenMELA folder.  Default is the same
 #       as the generator
+#   - mcfmcommit, name of the commit to checkout for the MCFM-JHUgen folder.  Default is the same
+#       as the generator
 versions = (
-            Version("v7.2.7", visible=False, gitcommit="05c4ea749698a25ccc789519f1dff84914b34411"),
-            Version("v7.2.6", visible=False),
+            Version("v7.3.0", visible=False, gitcommit="5b00360015fb3979f671eb480fb1d652e52c7359"),
+            Version("v7.2.7", visible=False, gitcommit="05c4ea749698a25ccc789519f1dff84914b34411", mcfmcommit="v7.2.4"),
+            Version("v7.2.6", visible=False, mcfmcommit="v7.2.4"),
             Version("v7.2.4"),
             Version("v7.2.3", visible=False),
             Version("v7.2.2", visible=False),
@@ -295,7 +307,7 @@ reallyold = (
 
 #things that get stored in the tarball if present
 #graviton and graviton_mod_off are in the really old versions
-storefolders = ["JHUGenerator", "JHUGenMELA", "AnalyticMELA", "graviton", "graviton_mod_off"]
+storefolders = ["JHUGenerator", "JHUGenMELA", "AnalyticMELA", "MCFM-JHUGen", "graviton", "graviton_mod_off"]
 #plus the manual which is treated separately
 
 #files in this directory that should not be uploaded to the spin page
