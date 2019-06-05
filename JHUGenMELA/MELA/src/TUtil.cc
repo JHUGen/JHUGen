@@ -271,8 +271,8 @@ void TUtil::computeAngles(
   TLorentzVector thep4Z2inXFrame(p4Z2);
   thep4Z1inXFrame.Boost(boostX);
   thep4Z2inXFrame.Boost(boostX);
-  TVector3 theZ1X_p3 = TVector3(thep4Z1inXFrame.X(), thep4Z1inXFrame.Y(), thep4Z1inXFrame.Z());
-  TVector3 theZ2X_p3 = TVector3(thep4Z2inXFrame.X(), thep4Z2inXFrame.Y(), thep4Z2inXFrame.Z());
+  TVector3 theZ1X_p3 = thep4Z1inXFrame.Vect();
+  TVector3 theZ2X_p3 = thep4Z2inXFrame.Vect();
   costhetastar = theZ1X_p3.CosTheta();
 
   TVector3 boostV1(0, 0, 0);
@@ -961,7 +961,8 @@ void TUtil::computeVHAngles(
   }
 
   //Find the incoming partons - first boost so the pT(HJJ) = 0, then boost away the pz.
-  //This preserves the z direction.  Then assume that the partons come in this z direction.
+  //This preserves the z direction. 
+  //Then, assume that the partons come in this z direction.
   //This is exactly correct at LO (since pT=0 anyway).
   //Then associate the one going forwards with jet1 and the one going backwards with jet2
   TLorentzRotation movingframe;
@@ -1043,6 +1044,241 @@ void TUtil::computeVHAngles(
   );
   m1 = (P1 + P2).M();
   m2 = (jet1massless + jet2massless).M();
+}
+void TUtil::computeTTHAngles(
+  // ttH system
+  float& hs,
+  float& hincoming,
+  float& hTT,
+  float& PhiTT,
+  float& Phi1,
+
+  // tt system
+  float& hbb,
+  float& hWW,
+  float& Phibb,
+  float& Phi1bb,
+
+  // Wplus system
+  float& hWplusf,
+  float& PhiWplusf
+
+  // Wminus system
+  float& hWminusf,
+  float& PhiWminusf,
+
+  TLorentzVector p4M11, int Z1_lept1Id,
+  TLorentzVector p4M12, int Z1_lept2Id,
+  TLorentzVector p4M21, int Z2_lept1Id,
+  TLorentzVector p4M22, int Z2_lept2Id,
+  TLorentzVector b, int bId,
+  TLorentzVector Wplusf, int WplusfId,
+  TLorentzVector Wplusfb, int WplusfbId,
+  TLorentzVector bbar, int bId,
+  TLorentzVector Wminusf, int WminusfId,
+  TLorentzVector Wminusfb, int WminusfbId,
+  TLorentzVector* injet1=0, int injet1Id=0, // Gen. partons in lab frame
+  TLorentzVector* injet2=0, int injet2Id=0
+){
+  TLorentzVector const nullFourVector(0, 0, 0, 0);
+  TVector3 const beamAxis(0, 0, 1);
+  TVector3 const xAxis(1, 0, 0);
+
+  if (p4M12==nullFourVector || p4M22==nullFourVector){
+    pair<TLorentzVector, TLorentzVector> f13Pair = TUtil::removeMassFromPair(p4M11, Z1_lept1Id, p4M21, Z2_lept1Id);
+    p4M11 = f13Pair.first;
+    p4M21 = f13Pair.second;
+  }
+  else if (p4M11==nullFourVector || p4M21==nullFourVector){
+    pair<TLorentzVector, TLorentzVector> f24Pair = TUtil::removeMassFromPair(p4M12, Z1_lept2Id, p4M22, Z2_lept2Id);
+    p4M12 = f24Pair.first;
+    p4M22 = f24Pair.second;
+  }
+  else{
+    pair<TLorentzVector, TLorentzVector> f12Pair = TUtil::removeMassFromPair(p4M11, Z1_lept1Id, p4M12, Z1_lept2Id);
+    pair<TLorentzVector, TLorentzVector> f34Pair = TUtil::removeMassFromPair(p4M21, Z2_lept1Id, p4M22, Z2_lept2Id);
+    p4M11 = f12Pair.first;
+    p4M12 = f12Pair.second;
+    p4M21 = f34Pair.first;
+    p4M22 = f34Pair.second;
+  }
+  {
+    pair<TLorentzVector, TLorentzVector> bbPair = TUtil::removeMassFromPair(b, bId, bbar, bbarId);
+    b = bbPair.first;
+    bbar = bbPair.second;
+  }
+  {
+    pair<TLorentzVector, TLorentzVector> tmp_pair = TUtil::removeMassFromPair(Wplusf, WplusfId, Wplusfb, WplusfbId);
+    Wplusf = tmp_pair.first;
+    Wplusfb = tmp_pair.second;
+  }
+  {
+    pair<TLorentzVector, TLorentzVector> tmp_pair = TUtil::removeMassFromPair(Wminusf, WminusfId, Wminusfb, WminusfbId);
+    Wminusf = tmp_pair.first;
+    Wminusfb = tmp_pair.second;
+  }
+
+  // Build Z 4-vectors
+  TLorentzVector p4Z1 = p4M11 + p4M12;
+  TLorentzVector p4Z2 = p4M21 + p4M22;
+  // No longer need to use p4Mxy
+  TLorentzVector pH = p4Z1 + p4Z2;
+
+  TLorentzVector pWplus = Wplusf + Wplusfb;
+  TLorentzVector pTop = b + Wplus;
+
+  TLorentzVector pWminus = Wminusf + Wminusfb;
+  TLorentzVector pATop = bbar + Wminus;
+
+  TLorentzVector pTT = pTop + pATop;
+  TLorentzVector pTTH = pTT + pH;
+
+  //Find the incoming partons - first boost so the pT(TTH) = 0, then boost away the pz.
+  //This preserves the z direction. 
+  //Then, assume that the partons come in this z direction.
+  //This is exactly correct at LO (since pT=0 anyway).
+  //Then associate the one going forwards with jet1 and the one going backwards with jet2
+  TLorentzRotation movingframe;
+  TLorentzVector pTTH_perp(pTTH.X(), pTTH.Y(), 0, pTTH.T());
+  movingframe.Boost(-pTTH_perp.BoostVector());
+  pTTH.Boost(-pTTH_perp.BoostVector());
+  movingframe.Boost(-pTTH.BoostVector());
+  pTTH.Boost(-pTTH.BoostVector());   //make sure to boost TTH AFTER boosting movingframe
+
+  TLorentzVector P1(0, 0, -pTTH.T()/2, pTTH.T()/2);
+  TLorentzVector P2(0, 0, pTTH.T()/2, pTTH.T()/2);
+  // Transform incoming partons back to the original frame
+  P1.Transform(movingframe.Inverse());
+  P2.Transform(movingframe.Inverse());
+  pTTH.Transform(movingframe.Inverse());
+  // movingframe and TTH_T will not be used anymore
+  // Handle gen. partons if they are available
+  if (injet1 && injet2 && fabs((*injet1+*injet2).P()-pTTH.P())<pTTH.P()*1e-4){
+    P1=*injet1;
+    P2=*injet2;
+    // Apply convention for incoming (!) particles
+    if (
+      (injet1Id*injet2Id<0 && injet1Id>0) // for OS pairs: parton 2 must be the particle
+      ||
+      (injet1Id*injet2Id>0 && P1.Z()>=P2.Z()) //for SS pairs: use random deterministic convention
+      ){
+      swap(P1, P2);
+      swap(injet1Id, injet2Id);
+    }
+  }
+
+  // Rotate every vector such that Z1 - Z2 axis is the "beam axis" analogue of decay
+  TLorentzRotation ZZframe;
+  bool applyZZframe=false;
+  if (p4Z1==nullFourVector || p4Z2==nullFourVector){ // Higgs is undecayed
+    TVector3 pNewAxis = (p4Z2-p4Z1).Vect().Unit(); // Let Z2 be in the z direction so that once the direction of H is reversed, Z1 is in the z direction
+    if (pNewAxis != nullFourVector.Vect()){
+      TVector3 pNewAxisPerp = pNewAxis.Cross(beamAxis);
+      ZZframe.Rotate(acos(pNewAxis.Dot(beamAxis)), pNewAxisPerp);
+      applyZZframe=true;
+    }
+  }
+  else{
+    TVector3 pHboost = pH.BoostVector();
+    ZZframe.Boost(-pHboost);
+    p4Z1.Boost(-pHboost);
+    p4Z2.Boost(-pHboost);
+    TVector3 pNewAxis = (p4Z2-p4Z1).Vect().Unit(); // Let Z2 be in the z direction so that once the direction of H is reversed, Z1 is in the z direction
+    TVector3 pNewAxisPerp = pNewAxis.Cross(beamAxis);
+    ZZframe.Rotate(acos(pNewAxis.Dot(beamAxis)), pNewAxisPerp);
+    p4Z1.Boost(pHboost);
+    p4Z2.Boost(pHboost);
+    applyZZframe=true;
+  }
+  if (applyZZframe){
+    P1.Transform(ZZframe); P2.Transform(ZZframe);
+    p4Z1 = -p4Z1; p4Z1.Transform(ZZframe); p4Z1 = -p4Z1;
+    p4Z2 = -p4Z2; p4Z2.Transform(ZZframe); p4Z2 = -p4Z2;
+    b = -b; b.Transform(ZZframe); b = -b;
+    Wplusf = -Wplusf; Wplusf.Transform(ZZframe); Wplusf = -Wplusf;
+    Wplusfb = -Wplusfb; Wplusfb.Transform(ZZframe); Wplusfb = -Wplusfb;
+    bbar = -bbar; bbar.Transform(ZZframe); bbar = -bbar;
+    Wminusf = -Wminusf; Wminusf.Transform(ZZframe); Wminusf = -Wminusf;
+    Wminusfb = -Wminusfb; Wminusfb.Transform(ZZframe); Wminusfb = -Wminusfb;
+  }
+  // Re-assign derived momenta
+  pH = p4Z1 + p4Z2;
+  pWplus = Wplusf + Wplusfb;
+  pTop = b + Wplus;
+  pWminus = Wminusf + Wminusfb;
+  pATop = bbar + Wminus;
+  pTT = pTop + pATop;
+  pTTH = pTT + pH;
+
+  TUtil::computeAngles(
+    hs,
+    hincoming,
+    hTT,
+    PhiTT,
+    Phi1,
+    mTTH,
+    mTT,
+    -P1, 23, // Id is 23 to avoid an attempt to remove quark mass
+    -P2, 0, // Id is 0 to avoid swapping
+    pTop, 23,
+    pATop, 0
+  );
+  // Boost everything to Higgs frame after angle computations
+  // This is to avoid an undetermined z axis in the above angles when Higgs is undecayed
+  {
+    TVector3 pHboost = pH.BoostVector();
+
+    P1.Boost(-pHboost);
+    P2.Boost(-pHboost);
+    // No need for Z1 and Z2
+    //p4Z1.Boost(-pHboost);
+    //p4Z2.Boost(-pHboost);
+    b.Boost(-pHboost);
+    Wplusf.Boost(-pHboost);
+    Wplusfb.Boost(-pHboost);
+    bbar.Boost(-pHboost);
+    Wminusf.Boost(-pHboost);
+    Wminusfb.Boost(-pHboost);
+
+    // Re-assign derived momenta
+    // No need for the Higgs in Higgs frame
+    //pH = p4Z1 + p4Z2;
+    pWplus = Wplusf + Wplusfb;
+    pTop = b + Wplus;
+    pWminus = Wminusf + Wminusfb;
+    pATop = bbar + Wminus;
+    pTT = pTop + pATop;
+    // No need for the TTH system in Higgs frame
+    //pTTH = pTT + pH;
+  }
+
+  {
+    TLorentzRotation TTframe;
+
+    // z rotation
+    TVector3 nNewZAxis = (-P1-P2-pTop-pATop).Vect().Unit(); // Let the z axis be formed by the (-P1-P2)--TT axis in the Higgs frame
+    if (nNewZAxis != nullFourVector.Vect()){
+      TVector3 nNewZAxisPerp = nNewZAxis.Cross(beamAxis);
+      TTframe.Rotate(acos(nNewZAxis.Dot(beamAxis)), nNewZAxisPerp);
+    }
+    {
+      TLorentzVector pTop_tmp = pTop;
+      TLorentzVector pATop_tmp = pATop;
+      TVector3 pTTboost = (pTop_tmp + pATop_tmp).BoostVector();
+      pTop_tmp.Boost(-pTTboost);
+      pATop_tmp.Boost(-pTTboost);
+      TTframe.Boost(-pTTboost);
+      TVector3 pTTaxis = (pTop_tmp-pATop_tmp).Vect();
+      TVector3 nNewXAxis = TVector3(pTTaxis.X(), pTTaxis.Y(), 0).Unit();
+      if (nNewXAxis != nullFourVector.Vect()){
+        TVector3 nNewXAxisPerp = nNewXAxis.Cross(xAxis);
+        TTframe.Rotate(acos(nNewXAxis.Dot(xAxis)), nNewXAxisPerp);
+      }
+    }
+  }
+
+
+
 }
 
 
