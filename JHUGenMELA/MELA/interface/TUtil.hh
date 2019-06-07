@@ -163,8 +163,6 @@ namespace TUtil{
     float& hTT,
     float& PhiTT,
     float& Phi1,
-    float& mTTH,
-    float& mTT,
 
     // tt system
     float& hbb,
@@ -174,7 +172,7 @@ namespace TUtil{
 
     // Wplus system
     float& hWplusf,
-    float& PhiWplusf
+    float& PhiWplusf,
 
     // Wminus system
     float& hWminusf,
@@ -191,7 +189,7 @@ namespace TUtil{
     TLorentzVector b, int bId,
     TLorentzVector Wplusf, int WplusfId,
     TLorentzVector Wplusfb, int WplusfbId,
-    TLorentzVector bbar, int bId,
+    TLorentzVector bbar, int bbarId,
     TLorentzVector Wminusf, int WminusfId,
     TLorentzVector Wminusfb, int WminusfbId,
     TLorentzVector* injet1=0, int injet1Id=0, // Gen. partons in lab frame
