@@ -482,7 +482,7 @@ MelaIO* Mela::getIORecord(){ return ZZME->get_IORecord(); }
 MELACandidate* Mela::getCurrentCandidate(){ return ZZME->get_CurrentCandidate(); }
 int Mela::getCurrentCandidateIndex(){ return ZZME->get_CurrentCandidateIndex(); }
 int Mela::getNCandidates(){ return ZZME->get_NCandidates(); }
-std::vector<MELATopCandidate*>* Mela::getTopCandidateCollection(){ return ZZME->get_TopCandidateCollection(); }
+std::vector<MELATopCandidate_t*>* Mela::getTopCandidateCollection(){ return ZZME->get_TopCandidateCollection(); }
 void Mela::reset_CandRef(){ melaCand=0; }
 
 

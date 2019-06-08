@@ -138,7 +138,7 @@ void TUtil::adjustTopDaughters(SimpleParticleCollection_t& daughters){ // Daught
   pair<TLorentzVector, TLorentzVector> corrbW = TUtil::removeMassFromPair(
     daughters.at(0).second, daughters.at(0).first,
     pW, -daughters.at(0).first, // Trick the function
-    0., pW.M() // Conserve W mass, ensures Wf+Wfb=W after re-boosting Wf and Wfb to te new W frame.
+    0., pW.M() // Conserve W mass, ensures Wf+Wfb=W after re-boosting Wf and Wfb to the new W frame.
     );
   daughters.at(0).second=corrbW.first;
   pW=corrbW.second;
@@ -1102,20 +1102,29 @@ void TUtil::computeTTHAngles(
     p4M21 = f34Pair.first;
     p4M22 = f34Pair.second;
   }
-  {
-    pair<TLorentzVector, TLorentzVector> bbPair = TUtil::removeMassFromPair(b, bId, bbar, bbarId);
-    b = bbPair.first;
-    bbar = bbPair.second;
+  // Correct the T daughters
+  if (bId!=-9000 && WplusfId!=-9000 && WplusfbId!=-9000){
+    SimpleParticleCollection_t tmp_daus;
+    tmp_daus.reserve(3);
+    tmp_daus.emplace_back(bId, b);
+    tmp_daus.emplace_back(WplusfId, Wplusf);
+    tmp_daus.emplace_back(WplusfbId, Wplusfb);
+    TUtil::adjustTopDaughters(tmp_daus);
+    b = tmp_daus.at(0).second;
+    Wplusf = tmp_daus.at(1).second;
+    Wplusfb = tmp_daus.at(2).second;
   }
-  {
-    pair<TLorentzVector, TLorentzVector> tmp_pair = TUtil::removeMassFromPair(Wplusf, WplusfId, Wplusfb, WplusfbId);
-    Wplusf = tmp_pair.first;
-    Wplusfb = tmp_pair.second;
-  }
-  {
-    pair<TLorentzVector, TLorentzVector> tmp_pair = TUtil::removeMassFromPair(Wminusf, WminusfId, Wminusfb, WminusfbId);
-    Wminusf = tmp_pair.first;
-    Wminusfb = tmp_pair.second;
+  // Correct the TBar daughters
+  if (bbarId!=-9000 && WminusfId!=-9000 && WminusfbId!=-9000){
+    SimpleParticleCollection_t tmp_daus;
+    tmp_daus.reserve(3);
+    tmp_daus.emplace_back(bbarId, bbar);
+    tmp_daus.emplace_back(WminusfId, Wminusf);
+    tmp_daus.emplace_back(WminusfbId, Wminusfb);
+    TUtil::adjustTopDaughters(tmp_daus);
+    bbar = tmp_daus.at(0).second;
+    Wminusf = tmp_daus.at(1).second;
+    Wminusfb = tmp_daus.at(2).second;
   }
 
   // Build Z 4-vectors
@@ -8111,15 +8120,15 @@ void TUtil::GetBoostedParticleVectors(
   SimpleParticleCollection_t stableTops;
   SimpleParticleCollection_t stableAntitops;
 
-  vector<MELATopCandidate*> tops;
-  vector<MELATopCandidate*> topbars;
-  vector<MELATopCandidate*> unknowntops;
+  vector<MELATopCandidate_t*> tops;
+  vector<MELATopCandidate_t*> topbars;
+  vector<MELATopCandidate_t*> unknowntops;
   if (code%TVar::kUseAssociated_StableTops==0 && code%TVar::kUseAssociated_UnstableTops==0 && verbosity>=TVar::INFO) MELAerr << "TUtil::GetBoostedParticleVectors: Stable and unstable tops are not supported at the same time!"  << endl;
   else if (code%TVar::kUseAssociated_StableTops==0 || code%TVar::kUseAssociated_UnstableTops==0){
 
-    for (MELATopCandidate* theTop:melaCand->getAssociatedTops()){
+    for (MELATopCandidate_t* theTop:melaCand->getAssociatedTops()){
       if (theTop!=0 && theTop->passSelection){
-        vector<MELATopCandidate*>* particleArray;
+        vector<MELATopCandidate_t*>* particleArray;
         if (theTop->id==6) particleArray = &tops;
         else if (theTop->id==-6) particleArray = &topbars;
         else particleArray = &unknowntops;
@@ -8127,13 +8136,13 @@ void TUtil::GetBoostedParticleVectors(
           (code%TVar::kUseAssociated_StableTops==0)
           ||
           (theTop->getNDaughters()==3 && code%TVar::kUseAssociated_UnstableTops==0)
-          ) particleArray->push_back((MELATopCandidate*)theTop);
+          ) particleArray->push_back((MELATopCandidate_t*)theTop);
       }
     }
     if (verbosity>=TVar::DEBUG){ MELAout << "TUtil::GetBoostedParticleVectors: tops.size=" << tops.size() << ", topbars.size=" << topbars.size() << ", unknowntops.size=" << unknowntops.size() << endl; }
 
     // Fill the stable/unstable top arrays
-    for (MELATopCandidate* theTop:tops){
+    for (MELATopCandidate_t* theTop:tops){
       if (code%TVar::kUseAssociated_StableTops==0 && nsatisfied_tops<mela_event.nRequested_Tops){ // Case with no daughters needed
         nsatisfied_tops++;
         stableTops.push_back(SimpleParticle_t(theTop->id, theTop->p4));
@@ -8153,7 +8162,7 @@ void TUtil::GetBoostedParticleVectors(
         if (vdaughters.size()==3) topDaughters.push_back(vdaughters);
       }
     }
-    for (MELATopCandidate* theTop:topbars){
+    for (MELATopCandidate_t* theTop:topbars){
       if (code%TVar::kUseAssociated_StableTops==0 && nsatisfied_antitops<mela_event.nRequested_Antitops){ // Case with no daughters needed
         nsatisfied_antitops++;
         stableAntitops.push_back(SimpleParticle_t(theTop->id, theTop->p4));
@@ -8176,7 +8185,7 @@ void TUtil::GetBoostedParticleVectors(
     }
     // Loop over the unknown-id tops
     // Fill tops, then antitops from the unknown tops
-    for (MELATopCandidate* theTop:unknowntops){
+    for (MELATopCandidate_t* theTop:unknowntops){
       // t, then tb cases with no daughters needed
       if (code%TVar::kUseAssociated_StableTops==0 && nsatisfied_tops<mela_event.nRequested_Tops){
         nsatisfied_tops++;
@@ -8462,44 +8471,40 @@ MELACandidate* TUtil::ConvertVectorFormat(
   return cand;
 }
 
-// Convert the vector of top daughters (as simple particles) to MELAParticles and create a MELATopCandidate
+// Convert the vector of three body decay daughters (as simple particles) to MELAParticles and create a MELAThreeBodyDecayCandidate
 // The output lists could be members of TEvtProb directly.
-MELATopCandidate* TUtil::ConvertTopCandidate(
+MELAThreeBodyDecayCandidate* TUtil::ConvertThreeBodyDecayCandidate(
   // Input
-  SimpleParticleCollection_t* TopDaughters,
+  SimpleParticleCollection_t* tbdDaughters,
   // Outputs
   std::vector<MELAParticle*>* particleList,
-  std::vector<MELATopCandidate*>* topCandList
+  std::vector<MELAThreeBodyDecayCandidate*>* tbdCandList
   ){
-  MELATopCandidate* cand=0;
+  MELAThreeBodyDecayCandidate* cand=nullptr;
 
-  if (TopDaughters==0){ MELAerr << "TUtil::ConvertTopCandidate: No daughters!" << endl; return cand; }
-  else if (TopDaughters->size()==0){ MELAerr << "TUtil::ConvertTopCandidate: Daughter size==0!" << endl; return cand; }
-  else if (!(TopDaughters->size()==1 || TopDaughters->size()==3)){ MELAerr << "TUtil::ConvertVectorFormat: Daughter size " << TopDaughters->size() << "!=1 or 3 is not supported!" << endl; return cand; }
+  if (!tbdDaughters){ MELAerr << "TUtil::ConvertThreeBodyDecayCandidate: No daughters!" << endl; return cand; }
+  else if (tbdDaughters->empty()){ MELAerr << "TUtil::ConvertThreeBodyDecayCandidate: Daughter size==0!" << endl; return cand; }
+  else if (!(tbdDaughters->size()==1 || tbdDaughters->size()==3)){ MELAerr << "TUtil::ConvertThreeBodyDecayCandidate: Daughter size " << tbdDaughters->size() << "!=1 or 3 is not supported!" << endl; return cand; }
 
-  if (TopDaughters->size()==1){
-    if (abs((TopDaughters->at(0)).first)==6 || (TopDaughters->at(0)).first==0){
-      cand = new MELATopCandidate((TopDaughters->at(0)).first, (TopDaughters->at(0)).second);
-      topCandList->push_back(cand);
+  if (tbdDaughters->size()==1){
+    if (abs((tbdDaughters->at(0)).first)==6 || (tbdDaughters->at(0)).first==0){
+      cand = new MELAThreeBodyDecayCandidate((tbdDaughters->at(0)).first, (tbdDaughters->at(0)).second);
+      tbdCandList->push_back(cand);
     }
   }
-  else if (TopDaughters->size()==3){
-    MELAParticle* bottom = new MELAParticle((TopDaughters->at(0)).first, (TopDaughters->at(0)).second);
-    MELAParticle* Wf = new MELAParticle((TopDaughters->at(1)).first, (TopDaughters->at(1)).second);
-    MELAParticle* Wfb = new MELAParticle((TopDaughters->at(2)).first, (TopDaughters->at(2)).second);
+  else if (tbdDaughters->size()==3){
+    MELAParticle* partnerPart = new MELAParticle((tbdDaughters->at(0)).first, (tbdDaughters->at(0)).second);
+    MELAParticle* Wf = new MELAParticle((tbdDaughters->at(1)).first, (tbdDaughters->at(1)).second);
+    MELAParticle* Wfb = new MELAParticle((tbdDaughters->at(2)).first, (tbdDaughters->at(2)).second);
 
-    if (Wf->id<0 || Wfb->id>0){
-      MELAParticle* parttmp = Wf;
-      Wf=Wfb;
-      Wfb=parttmp;
-    }
+    if (Wf->id<0 || Wfb->id>0) std::swap(Wf, Wfb);
 
-    particleList->push_back(bottom);
+    particleList->push_back(partnerPart);
     particleList->push_back(Wf);
     particleList->push_back(Wfb);
 
-    cand = new MELATopCandidate(bottom, Wf, Wfb);
-    topCandList->push_back(cand);
+    cand = new MELAThreeBodyDecayCandidate(partnerPart, Wf, Wfb);
+    tbdCandList->push_back(cand);
   }
   return cand;
 }

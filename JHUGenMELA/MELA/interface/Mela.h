@@ -90,7 +90,7 @@ public:
   MELACandidate* getCurrentCandidate();
   int getCurrentCandidateIndex();
   int getNCandidates();
-  std::vector<MELATopCandidate*>* getTopCandidateCollection();
+  std::vector<MELATopCandidate_t*>* getTopCandidateCollection();
 
 
   void getConstant(float& prob); // <ME> constants

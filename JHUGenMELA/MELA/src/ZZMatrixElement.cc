@@ -63,7 +63,7 @@ ZZMatrixElement::~ZZMatrixElement(){
 }
 
 
-vector<TLorentzVector> ZZMatrixElement::Calculate4Momentum(double Mx, double M1, double M2, double theta, double theta1, double theta2, double Phi1, double Phi){
+std::vector<TLorentzVector> ZZMatrixElement::Calculate4Momentum(double Mx, double M1, double M2, double theta, double theta1, double theta2, double Phi1, double Phi){
   double phi1, phi2;
   phi1=TMath::Pi()-Phi1;
   phi2=Phi1+Phi;
@@ -231,7 +231,7 @@ double ZZMatrixElement::get_HiggsWidthAtPoleMass(double mass){ return Xcal2.GetH
 MELACandidate* ZZMatrixElement::get_CurrentCandidate(){ return Xcal2.GetCurrentCandidate(); }
 int ZZMatrixElement::get_CurrentCandidateIndex(){ return Xcal2.GetCurrentCandidateIndex(); }
 int ZZMatrixElement::get_NCandidates(){ return Xcal2.GetNCandidates(); }
-vector<MELATopCandidate*>* ZZMatrixElement::get_TopCandidateCollection(){ return Xcal2.GetTopCandidates(); }
+std::vector<MELATopCandidate_t*>* ZZMatrixElement::get_TopCandidateCollection(){ return Xcal2.GetTopCandidates(); }
 
 
 void ZZMatrixElement::set_SpinZeroCouplings(

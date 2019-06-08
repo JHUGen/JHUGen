@@ -317,14 +317,14 @@ namespace TUtil{
     std::vector<MELAParticle*>* particleList,
     std::vector<MELACandidate*>* candList
     );
-  // Convert the vector of top daughters (as simple particles) to MELAParticles and create a MELATopCandidate
+  // Convert the vector of three body decay daughters (as simple particles) to MELAParticles and create a MELAThreeBodyDecayCandidate
   // The output lists could be members of TEvtProb directly.
-  MELATopCandidate* ConvertTopCandidate(
+  MELAThreeBodyDecayCandidate* ConvertThreeBodyDecayCandidate(
     // Input
-    SimpleParticleCollection_t* TopDaughters,
+    SimpleParticleCollection_t* tbdDaughters,
     // Outputs
     std::vector<MELAParticle*>* particleList,
-    std::vector<MELATopCandidate*>* topCandList
+    std::vector<MELAThreeBodyDecayCandidate*>* tbdCandList
     );
   void PrintCandidateSummary(MELACandidate* cand);
   void PrintCandidateSummary(TVar::simple_event_record* cand);

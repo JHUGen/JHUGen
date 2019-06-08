@@ -51,6 +51,30 @@ template<> MELAOutputStreamer& MELAOutputStreamer::operator<< <int, TLorentzVect
     << val.second.M() << " )";
   return *this;
 }
+template<> MELAOutputStreamer& MELAOutputStreamer::operator<< <MELAThreeBodyDecayCandidate>(MELAThreeBodyDecayCandidate const& val){
+  *this << "(" << val.id << ") (X,Y,Z,T,M)=( "
+    << val.x() << " , "
+    << val.y() << " , "
+    << val.z() << " , "
+    << val.t() << " , "
+    << val.m()
+    << " )"
+    << endl;
+
+  int ip=0;
+  *this << "\tHas " << val.getNMothers() << " mothers" << endl;
+  for (auto const& part:val.getMothers()){
+    *this << "\t\tV" << ip << ' ' << *part << endl;
+    ip++;
+  }
+
+  *this << "\tHas " << val.getNDaughters() << " daughters" << endl;
+  *this << "\t\tPartner particle "; if (val.getPartnerParticle()) *this << *(val.getPartnerParticle()); else *this << "N/A"; *this << endl;
+  *this << "\t\tW fermion "; if (val.getWFermion()) *this << *(val.getWFermion()); else *this << "N/A"; *this << endl;
+  *this << "\t\tW antifermion "; if (val.getWAntifermion()) *this << *(val.getWAntifermion()); else *this << "N/A"; *this << endl;
+
+  return *this;
+}
 template<> MELAOutputStreamer& MELAOutputStreamer::operator<< <MELACandidate>(MELACandidate const& val){
   int ip=0;
   *this << "\tHas " << val.getNMothers() << " mothers" << endl;
@@ -96,9 +120,9 @@ template<> MELAOutputStreamer& MELAOutputStreamer::operator<< <MELACandidate>(ME
   ip=0;
   for (auto const& part:val.getAssociatedTops()){
     *this << "\t\tTop" << ip << ' ' << static_cast<MELAParticle const>(*part) << endl;
-    if (part->getLightQuark()!=0) *this << "\t\t- Top" << ip << " b " <<  ' ' << *(part->getLightQuark()) << endl;
-    if (part->getWFermion()!=0) *this << "\t\t- Top" << ip << " Wf " << ' ' << *(part->getWFermion()) << endl;
-    if (part->getWAntifermion()!=0) *this << "\t\t- Top" << ip << " Wfb " <<  ' ' << *(part->getWAntifermion()) << endl;
+    { MELAParticle* bottom=part->getPartnerParticle(); if (bottom) *this << "\t\t- Top" << ip << " b " <<  ' ' << *bottom << endl; }
+    { MELAParticle* Wf=part->getWFermion(); if (Wf) *this << "\t\t- Top" << ip << " Wf " << ' ' << *Wf << endl; }
+    { MELAParticle* Wfb=part->getWAntifermion(); if (Wfb) *this << "\t\t- Top" << ip << " Wfb " <<  ' ' << *Wfb << endl; }
     ip++;
   }
 

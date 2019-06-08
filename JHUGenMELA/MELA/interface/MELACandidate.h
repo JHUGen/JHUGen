@@ -2,7 +2,7 @@
 #define MELACANDIDATE_H
 
 #include "MELAParticle.h"
-#include "MELATopCandidate.h"
+#include "MELAThreeBodyDecayCandidate.h"
 
 class MELACandidate : public MELAParticle{
 public:
@@ -23,7 +23,7 @@ public:
   MELAParticle* getAssociatedNeutrino(int index)const;
   MELAParticle* getAssociatedPhoton(int index)const;
   MELAParticle* getAssociatedJet(int index)const;
-  MELATopCandidate* getAssociatedTop(int index)const;
+  MELATopCandidate_t* getAssociatedTop(int index)const;
 
   std::vector<MELAParticle*>& getSortedDaughters();
   std::vector<MELAParticle*>& getSortedVs();
@@ -31,7 +31,7 @@ public:
   std::vector<MELAParticle*>& getAssociatedNeutrinos();
   std::vector<MELAParticle*>& getAssociatedPhotons();
   std::vector<MELAParticle*>& getAssociatedJets();
-  std::vector<MELATopCandidate*>& getAssociatedTops();
+  std::vector<MELATopCandidate_t*>& getAssociatedTops();
   
   const std::vector<MELAParticle*>& getSortedDaughters()const;
   const std::vector<MELAParticle*>& getSortedVs()const;
@@ -39,7 +39,7 @@ public:
   const std::vector<MELAParticle*>& getAssociatedNeutrinos()const;
   const std::vector<MELAParticle*>& getAssociatedPhotons()const;
   const std::vector<MELAParticle*>& getAssociatedJets()const;
-  const std::vector<MELATopCandidate*>& getAssociatedTops()const;
+  const std::vector<MELATopCandidate_t*>& getAssociatedTops()const;
 
   std::vector<MELAParticle*> getAssociatedSortedVs();
   std::vector<MELAParticle*> getAssociatedSortedVs()const;
@@ -64,7 +64,7 @@ public:
   void addAssociatedNeutrinos(MELAParticle* myParticle);
   void addAssociatedPhotons(MELAParticle* myParticle);
   void addAssociatedJets(MELAParticle* myParticle);
-  void addAssociatedTops(MELATopCandidate* myParticle);
+  void addAssociatedTops(MELATopCandidate_t* myParticle);
 
   void addSortedV(MELAParticle* myParticle){ sortedVs.push_back(myParticle); }
   void addAssociatedVs();
@@ -82,9 +82,9 @@ public:
   void setShallowCopy(bool flag);
 
   static void addUnordered(MELAParticle* myParticle, std::vector<MELAParticle*>& particleArray);
-  static void addUnordered(MELATopCandidate* myParticle, std::vector<MELATopCandidate*>& particleArray);
+  static void addUnordered(MELAThreeBodyDecayCandidate* myParticle, std::vector<MELAThreeBodyDecayCandidate*>& particleArray);
   static void addByHighestPt(MELAParticle* myParticle, std::vector<MELAParticle*>& particleArray);
-  static void addByHighestPt(MELATopCandidate* myParticle, std::vector<MELATopCandidate*>& particleArray);
+  static void addByHighestPt(MELAThreeBodyDecayCandidate* myParticle, std::vector<MELAThreeBodyDecayCandidate*>& particleArray);
 
 protected:
   bool associatedByHighestPt;
@@ -95,7 +95,7 @@ protected:
   std::vector<MELAParticle*> associatedNeutrinos;
   std::vector<MELAParticle*> associatedPhotons;
   std::vector<MELAParticle*> associatedJets;
-  std::vector<MELATopCandidate*> associatedTops;
+  std::vector<MELATopCandidate_t*> associatedTops;
 
   std::vector<MELAParticle*> sortedDaughters;
   std::vector<MELAParticle*> sortedVs;
@@ -107,7 +107,7 @@ protected:
   void createAssociatedVs(std::vector<MELAParticle*>& particleArray);
 
   void addAssociatedParticleToArray(MELAParticle* myParticle, std::vector<MELAParticle*>& particleArray);
-  void addAssociatedParticleToArray(MELATopCandidate* myParticle, std::vector<MELATopCandidate*>& particleArray);
+  void addAssociatedParticleToArray(MELAThreeBodyDecayCandidate* myParticle, std::vector<MELAThreeBodyDecayCandidate*>& particleArray);
 
 };
 

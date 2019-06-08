@@ -141,7 +141,7 @@ public:
   MELACandidate* get_CurrentCandidate();
   int get_CurrentCandidateIndex();
   int get_NCandidates();
-  std::vector<MELATopCandidate*>* get_TopCandidateCollection(); // Just so that the user can set MELATopCandidate::passSelection=true or false to omit some tops, in case tere are more than two
+  std::vector<MELATopCandidate_t*>* get_TopCandidateCollection(); // Just so that the user can set MELATopCandidate_t::passSelection=true or false to omit some tops, in case tere are more than two
 
 protected:
   
@@ -165,7 +165,7 @@ protected:
   MELACandidate* melaCand; // Pointer to current candidate object of Xcal2
   std::vector<MELAParticle*> tmpPartList; // Vector of pointers to the owned, temporary MELAParticles
   // Having a temporary top candidate list does not make much sense at the moment
-  //std::vector<MELATopCandidate*> tmpTopCandList; // Vector of pointers to the owned, temporary MELATopCandidates
+  //std::vector<MELATopCandidate_t*> tmpTopCandList; // Vector of pointers to the owned, temporary MELATopCandidates
   std::vector<MELACandidate*> tmpCandList; // Vector of pointers to the owned, temporary MELACandidates
 
   // Constructor wrapper

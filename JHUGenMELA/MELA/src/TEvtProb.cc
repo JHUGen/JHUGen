@@ -292,7 +292,7 @@ void TEvtProb::AppendTopCandidate(SimpleParticleCollection_t* TopDaughters){
     MELAerr << "TEvtProb::AppendTopCandidate: No MELACandidates are present to append this top!" << endl;
     return;
   }
-  MELATopCandidate* cand = ConvertTopCandidate(
+  MELATopCandidate_t* cand = ConvertThreeBodyDecayCandidate(
     TopDaughters,
     &particleList, &topCandList // push_back is done automatically
     );
@@ -346,9 +346,9 @@ void TEvtProb::ResetInputEvent(){
   for (MELACandidate* tmpPart:candList) delete tmpPart;
   candList.clear();
   // Clean MELATopCandidates next since they contain MELAParticles
-  for (MELATopCandidate* tmpPart:topCandList) delete tmpPart;
+  for (MELATopCandidate_t* tmpPart:topCandList) delete tmpPart;
   topCandList.clear();
-  // Clean all remaining MELAPArticles
+  // Clean all remaining MELAParticles
   for (MELAParticle* tmpPart:particleList) delete tmpPart;
   particleList.clear();
 }
@@ -383,7 +383,7 @@ int TEvtProb::GetCurrentCandidateIndex(){
   return -1;
 }
 int TEvtProb::GetNCandidates(){ return (static_cast<int>(candList.size())); }
-std::vector<MELATopCandidate*>* TEvtProb::GetTopCandidates(){ return &topCandList; }
+std::vector<MELATopCandidate_t*>* TEvtProb::GetTopCandidates(){ return &topCandList; }
 
 
 // Check/test functions
