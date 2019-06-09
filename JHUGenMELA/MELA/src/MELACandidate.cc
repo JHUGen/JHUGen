@@ -679,14 +679,24 @@ void MELACandidate::testPreSelectedDaughters(){
   }
 }
 
-void MELACandidate::getRelatedParticles(std::vector<MELAParticle*>& particles){
+void MELACandidate::getRelatedParticles(std::vector<MELAParticle*>& particles) const{
   MELAParticle::getRelatedParticles(particles);
-  for (auto& part:sortedDaughters) part->getRelatedParticles(particles); // Hopefully no particle gets added from here
-  for (auto& part:associatedTops) part->getRelatedParticles(particles);
-  for (auto& part:sortedVs) part->getRelatedParticles(particles);
-  for (auto& part:associatedLeptons) part->getRelatedParticles(particles);
-  for (auto& part:associatedPhotons) part->getRelatedParticles(particles);
-  for (auto& part:associatedJets) part->getRelatedParticles(particles);
+  for (auto* part:sortedDaughters){ if (part) part->getRelatedParticles(particles); } // Hopefully no particle gets added from here
+  for (auto* part:associatedTops){ if (part) part->getRelatedParticles(particles); }
+  for (auto* part:sortedVs){ if (part) part->getRelatedParticles(particles); }
+  for (auto* part:associatedLeptons){ if (part) part->getRelatedParticles(particles); }
+  for (auto* part:associatedPhotons){ if (part) part->getRelatedParticles(particles); }
+  for (auto* part:associatedJets){ if (part) part->getRelatedParticles(particles); }
+}
+void MELACandidate::getDaughterParticles(std::vector<MELAParticle*>& particles) const{
+  MELAParticle::getDaughterParticles(particles);
+  for (auto* part:sortedDaughters){ if (part) part->getDaughterParticles(particles); } // Hopefully no particle gets added from here
+  for (auto* sortedV:sortedVs){ // Only add sorted Vs that are actually the intermediates of the sorted daughters
+    if (!sortedV) continue;
+    bool doAddV=false;
+    for (auto& dau:sortedDaughters){ if (dau && sortedV->hasDaughter(dau)){ doAddV=true; break; } }
+    if (doAddV) sortedV->getDaughterParticles(particles);
+  }
 }
 
 void MELACandidate::addUnordered(MELAParticle* myParticle, std::vector<MELAParticle*>& particleArray){

@@ -52,7 +52,8 @@ public:
 
   MELAParticle* getMother(int index) const;
   MELAParticle* getDaughter(int index) const;
-  virtual void getRelatedParticles(std::vector<MELAParticle*>& particles);
+  virtual void getRelatedParticles(std::vector<MELAParticle*>& particles) const;
+  virtual void getDaughterParticles(std::vector<MELAParticle*>& particles) const;
 
   std::vector<MELAParticle*>& getMothers(){ return mothers; }
   std::vector<MELAParticle*>& getDaughters(){ return daughters; }
@@ -90,6 +91,7 @@ public:
 
   // Helper functions
   static bool checkParticleExists(MELAParticle const* myParticle, std::vector<MELAParticle*> const& particleArray);
+  static bool checkDeepDaughtership(MELAParticle const* part1, MELAParticle const* part2);
 
 };
 

@@ -74,10 +74,14 @@ std::vector<int> MELAParticle::getDaughterIds()const{
   for (auto& dau:daughters){ if (dau!=0) result.push_back(dau->id); }
   return result;
 }
-void MELAParticle::getRelatedParticles(std::vector<MELAParticle*>& particles){
-  for (std::vector<MELAParticle*>::iterator it = mothers.begin(); it<mothers.end(); it++) (*it)->getRelatedParticles(particles);
-  for (std::vector<MELAParticle*>::iterator it = daughters.begin(); it<daughters.end(); it++) (*it)->getRelatedParticles(particles);
-  if (!checkParticleExists(this, particles)) particles.push_back(this);
+void MELAParticle::getRelatedParticles(std::vector<MELAParticle*>& particles) const{
+  for (auto* part:mothers){ if (part) part->getRelatedParticles(particles); }
+  for (auto* part:daughters){ if (part) part->getRelatedParticles(particles); }
+  if (!checkParticleExists(this, particles)) particles.push_back((MELAParticle*) this);
+}
+void MELAParticle::getDaughterParticles(std::vector<MELAParticle*>& particles) const{
+  for (auto* part:daughters){ if (part) part->getDaughterParticles(particles); }
+  if (!checkParticleExists(this, particles)) particles.push_back((MELAParticle*) this); // A particle is its own daughter. This is to ensure that particle chains are reported properly.
 }
 
 bool MELAParticle::hasMother(MELAParticle const* part) const{ return MELAParticle::checkParticleExists(part, mothers); }
@@ -111,4 +115,11 @@ void MELAParticle::boost(const TVector3& vec, bool boostAll){
 
 bool MELAParticle::checkParticleExists(MELAParticle const* myParticle, std::vector<MELAParticle*> const& particleArray){
   return TUtilHelpers::checkElementExists<MELAParticle const*, MELAParticle*>(myParticle, particleArray);
+}
+bool MELAParticle::checkDeepDaughtership(MELAParticle const* part1, MELAParticle const* part2){
+  bool res = false;
+  if (!part1 || !part2) return res;
+  std::vector<MELAParticle*> daughters1; part1->getDaughterParticles(daughters1);
+  std::vector<MELAParticle*> daughters2; part2->getDaughterParticles(daughters2);
+  return TUtilHelpers::hasCommonElements(daughters1, daughters2);
 }

@@ -15,6 +15,7 @@ namespace TUtilHelpers{
 
   template<typename T> void copyVector(std::vector<T> const& input, std::vector<T>& target);
   template<typename T, typename U=T> bool checkElementExists(T const& element, std::vector<U> const& elementlist);
+  template<typename T> bool hasCommonElements(std::vector<T> const& v1, std::vector<T> const& v2);
 
 }
 
@@ -56,6 +57,15 @@ template bool TUtilHelpers::checkElementExists<long long>(long long const& eleme
 template bool TUtilHelpers::checkElementExists<float>(float const& element, std::vector<float> const& elementlist);
 template bool TUtilHelpers::checkElementExists<double>(double const& element, std::vector<double> const& elementlist);
 template bool TUtilHelpers::checkElementExists<TNumericUtil::intQuad_t>(TNumericUtil::intQuad_t const& element, std::vector<TNumericUtil::intQuad_t> const& elementlist);
+
+template<typename T> bool TUtilHelpers::hasCommonElements(std::vector<T> const& v1, std::vector<T> const& v2){
+  for (T const& el1:v1){
+    for (T const& el2:v2){
+      if (el1==el2) return true;
+    }
+  }
+  return false;
+}
 
 #endif
 
