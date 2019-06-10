@@ -51,6 +51,10 @@ bool PDGHelpers::isATopQuark(const int id){
   if (std::abs(id)==6) return true;
   else return false;
 }
+bool PDGHelpers::isATauLepton(const int id){
+  if (std::abs(id)==15) return true;
+  else return false;
+}
 bool PDGHelpers::isAGluon(const int id){
   if (std::abs(id)==21) return true;
   else return false;

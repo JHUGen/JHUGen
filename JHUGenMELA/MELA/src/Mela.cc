@@ -508,7 +508,7 @@ void Mela::computeDecayAngles(
 
   melaCand = getCurrentCandidate();
   if (melaCand){
-    TLorentzVector nullVector(0, 0, 0, 0);
+    TLorentzVector const nullVector(0, 0, 0, 0);
 
     int partIncCode=TVar::kNoAssociated; // Only use associated partons in the pT=0 frame boost
     simple_event_record mela_event;
@@ -569,7 +569,7 @@ void Mela::computeVBFAngles(
 
   melaCand = getCurrentCandidate();
   if (melaCand){
-    TLorentzVector nullVector(0, 0, 0, 0);
+    TLorentzVector const nullVector(0, 0, 0, 0);
 
     int nRequested_AssociatedJets=2;
     int partIncCode=TVar::kUseAssociated_Jets; // Only use associated partons in the pT=0 frame boost
@@ -651,7 +651,7 @@ void Mela::computeVBFAngles_ComplexBoost(
 
   melaCand = getCurrentCandidate();
   if (melaCand){
-    TLorentzVector nullVector(0, 0, 0, 0);
+    TLorentzVector const nullVector(0, 0, 0, 0);
 
     int nRequested_AssociatedJets=2;
     int partIncCode=TVar::kUseAssociated_Jets; // Only use associated partons in the pT=0 frame boost
@@ -735,7 +735,7 @@ void Mela::computeVHAngles(
 
   melaCand = getCurrentCandidate();
   if (melaCand){
-    TLorentzVector nullVector(0, 0, 0, 0);
+    TLorentzVector const nullVector(0, 0, 0, 0);
 
     if (!(myProduction_ == TVar::Lep_ZH || myProduction_ == TVar::Lep_WH || myProduction_ == TVar::Had_ZH || myProduction_ == TVar::Had_WH || myProduction_ == TVar::GammaH)){
       if (myVerbosity_>=TVar::ERROR) MELAerr << "Mela::computeVHAngles: Production is not supported! " << ProductionName(myProduction_) << endl;
@@ -826,6 +826,187 @@ void Mela::computeVHAngles(
 
   reset_CandRef();
   if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela: End computeVHAngles" << endl;
+}
+
+void Mela::computeTTHAngles(
+  int topDecay,
+
+  float& mT1,
+  float& mW1,
+  float& mT2,
+  float& mW2,
+
+  // TTH system
+  float& costheta1,
+  float& costheta2,
+  float& Phi,
+  float& costhetastar,
+  float& Phi1,
+
+  // TT system
+  float& hbb,
+  float& hWW,
+  float& Phibb,
+  float& Phi1bb,
+
+  // Wplus system
+  float& hWplusf,
+  float& PhiWplusf,
+
+  // Wminus system
+  float& hWminusf,
+  float& PhiWminusf
+){
+  using TVar::simple_event_record;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela: Begin computeVBFAngles" << endl;
+
+  mT1=mT2=mW1=mW2
+  =costheta1=costheta2=Phi=costhetastar=Phi1
+  =hbb=hWW=Phibb=Phi1bb
+  =hWplusf=PhiWplusf
+  =hWminusf=PhiWminusf=0;
+
+  melaCand = getCurrentCandidate();
+  if (melaCand){
+    TLorentzVector const nullVector(0, 0, 0, 0);
+
+    int partIncCode;
+    int nRequested_Tops=1;
+    int nRequested_Antitops=1;
+    if (topDecay>0) partIncCode=TVar::kUseAssociated_UnstableTops; // Look for unstable tops
+    else partIncCode=TVar::kUseAssociated_StableTops; // Look for stable tops
+
+    simple_event_record mela_event;
+    mela_event.AssociationCode=partIncCode;
+    mela_event.nRequested_Tops=nRequested_Tops;
+    mela_event.nRequested_Antitops=nRequested_Antitops;
+    TUtil::GetBoostedParticleVectors(melaCand, mela_event, myVerbosity_);
+    SimpleParticleCollection_t& mothers = mela_event.pMothers;
+    //SimpleParticleCollection_t& aparts = mela_event.pAssociated;
+    SimpleParticleCollection_t& daughters = mela_event.pDaughters;
+
+    SimpleParticleCollection_t topDaughters; topDaughters.reserve(3);
+    SimpleParticleCollection_t antitopDaughters; antitopDaughters.reserve(3);
+
+    if (topDecay>0){
+      // Daughters are assumed to have been ordered as b, Wf, Wfb already.
+      for (unsigned int itd=0; itd<mela_event.pTopDaughters.at(0).size(); itd++) topDaughters.push_back(mela_event.pTopDaughters.at(0).at(itd));
+      for (unsigned int itd=0; itd<mela_event.pAntitopDaughters.at(0).size(); itd++) antitopDaughters.push_back(mela_event.pAntitopDaughters.at(0).at(itd));
+    }
+    else{
+      for (unsigned int itop=0; itop<mela_event.pStableTops.size(); itop++) topDaughters.push_back(mela_event.pStableTops.at(itop));
+      for (unsigned int itop=0; itop<mela_event.pStableAntitops.size(); itop++) antitopDaughters.push_back(mela_event.pStableAntitops.at(itop));
+    }
+
+    if (topDecay==0 && (mela_event.pStableTops.size()<1 || mela_event.pStableAntitops.size()<1)){
+      if (myVerbosity_>=TVar::ERROR) MELAerr
+        << "TUtil::TTHiggsMatEl: Number of stable tops (" << mela_event.pStableTops.size() << ")"
+        << " and number of stable antitops (" << mela_event.pStableAntitops.size() << ")"
+        << " in ttH process are not 1!" << endl;
+      return;
+    }
+    else if (topDecay>0 && (mela_event.pTopDaughters.size()<1 || mela_event.pAntitopDaughters.size()<1)){
+      if (myVerbosity_>=TVar::ERROR) MELAerr
+        << "Mela::computeTTHAngles: Number of set of top daughters (" << mela_event.pTopDaughters.size() << ")"
+        << " and number of set of antitop daughters (" << mela_event.pAntitopDaughters.size() << ")"
+        << " in ttH process are not 1!" << endl;
+      return;
+    }
+    else if (topDecay>0 && (mela_event.pTopDaughters.at(0).size()!=3 || mela_event.pAntitopDaughters.at(0).size()!=3)){
+      if (myVerbosity_>=TVar::ERROR) MELAerr
+        << "Mela::computeTTHAngles: Number of top daughters (" << mela_event.pTopDaughters.at(0).size() << ")"
+        << " and number of antitop daughters (" << mela_event.pAntitopDaughters.at(0).size() << ")"
+        << " in ttH process are not 3!" << endl;
+      return;
+    }
+    if (topDaughters.size()<3){ for (size_t ip=topDaughters.size(); ip<3; ip++) topDaughters.emplace_back(-9000, nullVector); }
+    if (antitopDaughters.size()<3){ for (size_t ip=antitopDaughters.size(); ip<3; ip++) antitopDaughters.emplace_back(-9000, nullVector); }
+
+    // Make sure there are exactly 4 daughters, null or not
+    if (daughters.size()>4){ // Unsupported size, default to undecayed Higgs
+      SimpleParticle_t& firstPart = daughters.at(0);
+      firstPart.first=25;
+      for (auto it=daughters.cbegin()+1; it!=daughters.cend(); it++){ firstPart.second = firstPart.second + it->second; }
+      daughters.erase(daughters.begin()+4, daughters.end());
+    }
+    if (daughters.size()%2==1){ for (unsigned int ipar=daughters.size(); ipar<4; ipar++) daughters.push_back(SimpleParticle_t(-9000, nullVector)); }
+    else if (daughters.size()==2){
+      daughters.push_back(SimpleParticle_t(-9000, nullVector));
+      daughters.insert(daughters.begin()+1, SimpleParticle_t(-9000, nullVector));
+    }
+
+    // Compute masses
+    {
+      TLorentzVector pT;
+      TLorentzVector pW;
+      for (size_t ip=0; ip<topDaughters.size(); ip++){
+        if (ip>0){ pT += topDaughters.at(ip).second; pW += topDaughters.at(ip).second; }
+        else pT += topDaughters.at(ip).second;
+      }
+      mT1=pT.M();
+      mW1=pW.M();
+    }
+    {
+      TLorentzVector pT;
+      TLorentzVector pW;
+      for (size_t ip=0; ip<antitopDaughters.size(); ip++){
+        if (ip>0){ pT += antitopDaughters.at(ip).second; pW += antitopDaughters.at(ip).second; }
+        else pT += antitopDaughters.at(ip).second;
+      }
+      mT2=pT.M();
+      mW2=pW.M();
+    }
+
+    TUtil::computeTTHAngles(
+      costhetastar, costheta1, costheta2, Phi, Phi1,
+      hbb, hWW, Phibb, Phi1bb,
+      hWplusf, PhiWplusf,
+      hWminusf, PhiWminusf,
+
+      daughters.at(0).second, daughters.at(0).first,
+      daughters.at(1).second, daughters.at(1).first,
+      daughters.at(2).second, daughters.at(2).first,
+      daughters.at(3).second, daughters.at(3).first,
+
+      topDaughters.at(0).second, topDaughters.at(0).first,
+      topDaughters.at(1).second, topDaughters.at(1).first,
+      topDaughters.at(2).second, topDaughters.at(2).first,
+
+      antitopDaughters.at(0).second, antitopDaughters.at(0).first,
+      antitopDaughters.at(1).second, antitopDaughters.at(1).first,
+      antitopDaughters.at(2).second, antitopDaughters.at(2).first,
+
+      &(mothers.at(0).second), mothers.at(0).first,
+      &(mothers.at(1).second), mothers.at(1).first
+    );
+
+    // Protect against NaN
+    if (!std::isfinite(costhetastar)) costhetastar=0;
+    if (!std::isfinite(costheta1)) costheta1=0;
+    if (!std::isfinite(costheta2)) costheta2=0;
+    if (!std::isfinite(Phi)) Phi=0;
+    if (!std::isfinite(Phi1)) Phi1=0;
+
+    if (!std::isfinite(hbb)) hbb=0;
+    if (!std::isfinite(hWW)) hWW=0;
+    if (!std::isfinite(Phibb)) Phibb=0;
+    if (!std::isfinite(Phi1bb)) Phi1bb=0;
+
+    if (!std::isfinite(hWplusf)) hWplusf=0;
+    if (!std::isfinite(PhiWplusf)) PhiWplusf=0;
+
+    if (!std::isfinite(hWminusf)) hWminusf=0;
+    if (!std::isfinite(PhiWminusf)) PhiWminusf=0;
+
+    if (myVerbosity_>=TVar::DEBUG) MELAout
+      << "Mela::computeTTHAngles: (h1, h2, Phi, hs, Phi1) = "
+      << costheta1 << ", " << costheta2 << ", " << Phi << ", "
+      << costhetastar << ", " << Phi1 << endl;
+  }
+  else if (myVerbosity_>=TVar::DEBUG) MELAerr << "Mela::computeTTHAngles: No possible melaCand in TEvtProb to compute angles." << endl;
+
+  reset_CandRef();
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela: End computeTTHAngles" << endl;
 }
 
 // Regular probabilities
@@ -944,7 +1125,7 @@ void Mela::computeP(
 
   melaCand = getCurrentCandidate();
   if (melaCand){
-    TLorentzVector nullVector(0, 0, 0, 0);
+    TLorentzVector const nullVector(0, 0, 0, 0);
     float mZZ=0, mZ1=0, mZ2=0, costheta1=0, costheta2=0, Phi=0, costhetastar=0, Phi1=0;
 
     if (myME_ == TVar::ANALYTICAL){

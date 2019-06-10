@@ -137,6 +137,35 @@ public:
     float& costhetastar,
     float& Phi1
   );
+  void computeTTHAngles(
+    int topDecay,
+
+    float& mT1,
+    float& mW1,
+    float& mT2,
+    float& mW2,
+
+    // TTH system
+    float& costheta1,
+    float& costheta2,
+    float& Phi,
+    float& costhetastar,
+    float& Phi1,
+
+    // TT system
+    float& hbb,
+    float& hWW,
+    float& Phibb,
+    float& Phi1bb,
+
+    // Wplus system
+    float& hWplusf,
+    float& PhiWplusf,
+
+    // Wminus system
+    float& hWminusf,
+    float& PhiWminusf
+  );
 
   void computeP_selfDspin0(
     double selfDHvvcoupl_input[nSupportedHiggses][SIZE_HVV][2],

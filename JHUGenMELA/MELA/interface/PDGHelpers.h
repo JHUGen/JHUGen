@@ -35,6 +35,7 @@ namespace PDGHelpers{
   bool isUpTypeQuark(const int id); // |id|==2, 4, 6
   bool isDownTypeQuark(const int id); // |id|==1, 3, 5
   bool isATopQuark(const int id); // |id|==6
+  bool isATauLepton(const int id); // |id|==15
   bool isAGluon(const int id); // id==21
   bool isAPhoton(const int id); // id==22
   bool isAZBoson(const int id); // id==23
