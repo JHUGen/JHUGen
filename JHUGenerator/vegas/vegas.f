@@ -37,7 +37,7 @@ c
          parameter(mprod=250*mxdim)
          integer jj
          character*(200) gridline
-         double precision dmax(250,mxdim)! MARKUS array that saves maximum of the function fxn for each division            
+         double precision dmax(250,mxdim)! MARKUS array that saves maximum of the function fxn for each division
          dimension d(250,mxdim),di(250,mxdim),xin(250),r(250),
      1   dx(mxdim),dt(mxdim),x(mxdim),kg(mxdim),ia(mxdim)
          data ndmx/250/,alph/1.5d0/,one/1d0/,mds/0/
@@ -171,7 +171,7 @@ c        MARKUS: main loop starts here
          if( stopvegas ) then
            return
          endif
-         f=f*wgt         
+         f=f*wgt
          if( abs(f).gt.wtmax ) wtmax=f
          if( abs(f).lt.wtmin .and. f.ne.0d0 ) wtmin=f
          f2=f*f
@@ -179,13 +179,13 @@ c        MARKUS: main loop starts here
          f2b=f2b+f2
          do 16 j=1,ndim
          if( .not.evtgen .and. abs(f).gt.dmax(ia(j),j) ) then
-          dmax(ia(j),j)=f! MARKUS: setting max in this division        
+          dmax(ia(j),j)=f! MARKUS: setting max in this division
           if(nprn.lt.0) print *,"New maximum in division ",ia(j),j,f
          endif
          di(ia(j),j)=di(ia(j),j)+f
  16      if(mds.ge.0) d(ia(j),J)=d(ia(j),J)+f2
          if(k.lt.npg) go to 12
-c        MARKUS: main loop ends here         
+c        MARKUS: main loop ends here
 c
 888    FORMAT(1X,'F',G14.6,'F2',G14.6,'FB',G14.6,'F2B',G14.6)
          f2b= sqrt(f2b*      NPG)
@@ -219,16 +219,15 @@ c
         chi2a=sd*(schi/swgt-avgi*avgi)/(dble(it)-.999d0)
         sd=dsqrt(one/sd)
 c
-        if(nprn.eq.0)go to 21
         tsi=dsqrt(tsi)
 c        write(6,201)it,ti,tsi,avgi,sd,chi2a
-        write(6,201)it,ti,avgi,tsi,sd,wtmin,wtmax,chi2a
+        if (nprn .gt. 0) write(6,201)it,ti,avgi,tsi,sd,wtmin,wtmax,chi2a
         wtmin=1d14
         wtmax=-1d14
         !write(15,201)it,ti,avgi,tsi,sd,wtmax,chi2a
         call flush(6)
         !call flush(15)
-        
+
         if(nprn.ge.0)go to 21
 c        do 20 j=1,ndim
 c 20     write(6,202) j,(xi(i,j),di(i,j),d(i,j),i=1,nd)
@@ -242,23 +241,23 @@ c 20     write(6,202) j,(xi(i,j),di(i,j),d(i,j),i=1,nd)
 !         write(6,*) xi(i,j),di(i,j),d(i,j),dmax(i,j)
 !         enddo
 !         enddo
-        
-!---------------------------------------------------------------        
+
+!---------------------------------------------------------------
 ! ! !       graphical output of xi divisions
 !         do j=1,ndim
 !         do i=1,200
 !           gridline(i:i)=' '
-!         enddo 
+!         enddo
 !         do i=1,nd
 !             kk = int(xi(i,j)*150d0)
 !             gridline(kk:kk)="|"
 !         enddo
 !         write(*,'(I3,A,A)') j,":  |",gridline(1:150)
 !         enddo
-!---------------------------------------------------------------        
-        
-        
-        
+!---------------------------------------------------------------
+
+
+
 c
 c      refine grid
 c
@@ -361,9 +360,9 @@ c
         return
         end
 
-        
+
 !        MARKUS compute number of calls per iteration
-!                
+!
          subroutine vegas_get_calls(calls)
          implicit double precision (a-h,o-z)
          implicit integer (i-n)
@@ -376,7 +375,7 @@ c
      1   dx(mxdim),dt(mxdim),x(mxdim),kg(mxdim),ia(mxdim)
          data ndmx/250/,alph/1.5d0/,one/1d0/,mds/0/
 !          data idum/-113123/
-         
+
          nd=ndmx
          ng=1
          if(mds.eq.0)go to 2
@@ -391,13 +390,13 @@ c
          npg=ncall/k
          if(npg.lt.2)npg=2
          calls=dble(npg*k)
-        
+
          return
          end
 
-         
-         
-         
+
+
+
 
 
 ! ! C  (C) Copr. 1986-92 Numerical Recipes Software ]2w.1,r1..
@@ -411,7 +410,7 @@ c
 ! !       INTEGER j,k,iv(NTAB),iy
 ! !       DATA iv /NTAB*0/, iy /0/
 ! !       SAVE iv,iy
-! ! 
+! !
 ! !       if (idum.le.0.or.iy.eq.0) then
 ! !         idum=max(-idum,1)
 ! !         do 11 j=NTAB+8,1,-1
@@ -429,18 +428,18 @@ c
 ! !       iy=iv(j)
 ! !       iv(j)=idum
 ! !       ran1=min(AM*dble(iy),RNMX)
-! ! 
+! !
 ! ! c      write(6,*) 'idum',idum
 ! ! c      write(6,*) 'AM=',AM
 ! ! c      write(6,*) 'iy=',iy
 ! ! c      write(6,*) 'AM*dble(iy)',AM*dble(iy)
 ! ! c      write(6,*) 'ran1',ran1
-! ! 
+! !
 ! !       return
 ! !       end
-! ! 
+! !
 ! ! C  (C) Copr. 1986-92 Numerical Recipes Software ]2w.1,r1..
-! ! 
+! !
 ! ! C--- Version where idum is passed via common block
 ! !       double precision FUNCTION ran2()
 ! !       implicit none
@@ -452,7 +451,7 @@ c
 ! !       COMMON /ranno/ idum
 ! !       DATA iv /NTAB*0/, iy /0/
 ! !       SAVE iv,iy
-! ! 
+! !
 ! !       if (idum.le.0.or.iy.eq.0) then
 ! !         idum=max(-idum,1)
 ! !         do 11 j=NTAB+8,1,-1
@@ -470,12 +469,12 @@ c
 ! !       iy=iv(j)
 ! !       iv(j)=idum
 ! !       ran2=min(AM*dble(iy),RNMX)
-! ! 
+! !
 ! ! c      write(6,*) 'idum',idum
 ! ! c      write(6,*) 'AM=',AM
 ! ! c      write(6,*) 'iy=',iy
 ! ! c      write(6,*) 'AM*dble(iy)',AM*dble(iy)
 ! ! c      write(6,*) 'ran2',ran2
-! ! 
+! !
 ! !       return
 ! !       END
