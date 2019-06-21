@@ -370,6 +370,8 @@ logical :: SetpTlepcut, Setetalepcut, SetMPhotonCutoff
 logical :: SetColliderEnergy
 logical :: Setm2l_min,Setm2l_max,SetmVH_min,SetmVH_max,SetpTHcut
 logical :: SetCSmaxFile, SetVBFoffsh_run
+logical :: SetVegasVerbosity
+integer :: VegasVerbosity
 integer :: i
 type(SaveValues) :: tosave, oldsavevalues
 
@@ -448,7 +450,10 @@ type(SaveValues) :: tosave, oldsavevalues
    SetCSmaxFile=.false.
    SetVBFoffsh_run = .false.
 
+   SetVegasVerbosity = .false.
+
    DataFile="./data/output"
+   VegasVerbosity = 2
 
    tosave = SaveValuesConstructor()
 
@@ -543,6 +548,7 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "UnformattedRead", success, UseUnformattedRead)
     call ReadCommandLineArgument(arg, "WriteWeightedLHE", success, WriteWeightedLHE)
     call ReadCommandLineArgument(arg, "VBFoffsh_run", success, VBFoffsh_run, success2=setVBFoffsh_run)
+    call ReadCommandLineArgument(arg, "VegasVerbosity", success, VegasVerbosity, success2=setVegasVerbosity)
 
     !anomalous couplings
     !If any anomalous couplings are set, the default ones have to be set explicitly to keep them on or turn them off
@@ -1794,6 +1800,8 @@ type(SaveValues) :: tosave, oldsavevalues
      stop
    endif
 
+   call InitVegasVerbosity(VegasVerbosity)
+
 return
 END SUBROUTINE
 
@@ -2300,6 +2308,15 @@ include "vegas_common.f"
 
 END SUBROUTINE
 
+
+subroutine InitVegasVerbosity(verbosity)
+implicit none
+include "vegas_common.f"
+integer :: verbosity
+
+  if (verbosity.eq.0) nprn=0
+
+end subroutine
 
 #if linkMELA==1
 subroutine SetupMCFM(Process)
