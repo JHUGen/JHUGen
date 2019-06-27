@@ -432,8 +432,8 @@ It is also possible to reuse the output of the first step to run more jobs in th
 \end{itemize}
 \subsubsection{Lepton and jet filter}
 \begin{itemize}
-\item Any combination of \verb|FilterNLept|, \verb|FilterOSPairs|, \verb|FilterOSSFPairs| can be used in ReadLHE mode to filter the events.  \verb|CountTauAsAny|, off by default, counts each tau as an electron or muon of the same sign towards an OSSF pair.
-\item \verb|FilterNJets| can be used alone or in conjunction with the lepton filter (e.g. request two leptons and a jet).  It counts each final state quark or gluon as a jet.
+\item Any combination of \verb|NLepMin/Max|, \verb|NOSMin/Max|, \verb|NOSSFMin/Max| can be used in ReadLHE mode to filter the events.  \verb|CountTauAsAny|, off by default, counts each tau as an electron or muon of the same sign towards an OSSF pair.
+\item \verb|NJetMin/Max| can be used alone or in conjunction with the lepton filter (e.g. request two leptons and a jet).  It counts each final state quark or gluon as a jet.
 \item \verb|WriteFailedEvents|: By default, events that fail the lepton filter are not written to the LHE file.  If this option is set to 1, they are written, but their weight is set to 0.  If it is set to 2, they are written with a weight of zero and with no particles in the event (this saves disk space with  and is accepted by Pythia, but some parsers may not like it).  This option is useful if the same number of events are required to be in the input and the output.
 \end{itemize}
 \subsubsection{Higgs propagator and decay width}

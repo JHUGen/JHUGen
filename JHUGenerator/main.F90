@@ -1531,10 +1531,9 @@ type(SaveValues) :: tosave, oldsavevalues
     OffShellV2=.not.IsAPhoton(DecayMode2)
 
 
-    !lepton filter
-
+    !lepton filters
     if( RequestOS(1).lt.RequestOSSF(1) ) then
-        RequestOS(1) = RequestOSSF(1)
+        RequestOSSF(1) = RequestOS(1) ! Opt for looser filter, not tighter
     endif
     if( RequestOS(2).lt.RequestOSSF(2) ) then
         RequestOS(2) = RequestOSSF(2)
