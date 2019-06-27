@@ -21,7 +21,7 @@ MELADATADIR = $(MELADIR)/data
 MELALIBDIR = $(MELADATADIR)/${SCRAM_ARCH}
 
 ROOTCFLAGS = $(shell root-config --cflags)
-ROOTGLIBS = $(shell root-config --evelibs) -Lrootlib
+ROOTGLIBS = $(shell root-config --libs --evelibs) -Lrootlib
 NLIBS = $(ROOTGLIBS)
 NLIBS += -L$(ROOFITSYS)/lib -lMinuit -lRooFitCore -lRooFit -lgfortran
 LIBS = $(filter-out -lNew, $(NLIBS))

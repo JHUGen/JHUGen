@@ -336,8 +336,8 @@ SUBROUTINE SetJHUGenDefaults()
    GenerateEvents=.false.
    RequestNLeptons = -1
    RequestNJets = -1
-   RequestOS=-1
-   RequestOSSF=-1
+   RequestOS = -1
+   RequestOSSF = -1
    CountTauAsAny = .true.
    WriteFailedEvents=0
    VBFoffsh_run = -1
@@ -527,11 +527,15 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "PMZZEvals", success, PMZZEvals)   !undocumented, for compatibility
 
     call ReadCommandLineArgument(arg, "OffshellX", success, OffShellReson, tosave=tosave)
-    call ReadCommandLineArgument(arg, "FilterNLept", success, RequestNLeptons)
-    call ReadCommandLineArgument(arg, "FilterOSPairs", success, RequestOS)
-    call ReadCommandLineArgument(arg, "FilterOSSFPairs", success, RequestOSSF)
+    call ReadCommandLineArgument(arg, "NLepMin", success, RequestNLeptons(1))
+    call ReadCommandLineArgument(arg, "NLepMax", success, RequestNLeptons(2))
+    call ReadCommandLineArgument(arg, "NJetMin", success, RequestNJets(1))
+    call ReadCommandLineArgument(arg, "NJetMax", success, RequestNJets(2))
+    call ReadCommandLineArgument(arg, "NOSMin", success, RequestOS(1))
+    call ReadCommandLineArgument(arg, "NOSMax", success, RequestOS(2))
+    call ReadCommandLineArgument(arg, "NOSSFMin", success, RequestOSSF(1))
+    call ReadCommandLineArgument(arg, "NOSSFMax", success, RequestOSSF(2))
     call ReadCommandLineArgument(arg, "CountTauAsAny", success, CountTauAsAny)
-    call ReadCommandLineArgument(arg, "FilterNJets", success, RequestNJets)
     call ReadCommandLineArgument(arg, "Unweighted", success, Unweighted)
     call ReadCommandLineArgument(arg, "Interf", success, includeInterference, success2=interfSet, tosave=tosave)
     call ReadCommandLineArgument(arg, "ReweightInterf", success, reweightInterference, success2=interfSet, tosave=tosave)
@@ -1529,12 +1533,16 @@ type(SaveValues) :: tosave, oldsavevalues
 
     !lepton filter
 
-    if( RequestOS.lt.RequestOSSF ) then
-        RequestOS = RequestOSSF
+    if( RequestOS(1).lt.RequestOSSF(1) ) then
+        RequestOS(1) = RequestOSSF(1)
     endif
-    if( RequestNLeptons .lt. 2*RequestOS ) then
-        RequestNLeptons = 2*RequestOS
+    if( RequestOS(2).lt.RequestOSSF(2) ) then
+        RequestOS(2) = RequestOSSF(2)
     endif
+    if( RequestNLeptons(1) .lt. 2*RequestOS(1) ) then
+        RequestNLeptons(1) = 2*RequestOS(1)
+    endif
+    ! No max check on RequestNLeptons. You can have 3 leptons (l1- l2+ l3-) and 2 OSs (l1l2 and l3l2)
 
     !WidthScheme and reweighting
     if( (WidthScheme.eq.0 .or. WidthSchemeIn.eq.0) .and. .not.DoPrintPMZZ ) then
@@ -4018,7 +4026,7 @@ call InitReadLHE(BeginEventLine)
               tries = tries +1
               read(io_LHEInFile,fmt="(A160)",IOSTAT=stat,END=99) OtherLines(1:160)
               if(OtherLines(1:30).eq."</LesHouchesEvents>") then
-                  if( RequestNLeptons.gt.0 .or. RequestNJets.gt.0 ) then
+                  if( any(RequestNLeptons.ge.0) .or. any(RequestNJets.ge.0) ) then
                     write(io_LHEOutFile,"(A)") "<!-- Filter information:"
                     write(io_LHEOutFile,"(A,I8)") "     events processed:  ", NEvent
                     write(io_LHEOutFile,"(A,I8)") "     events accepted:   ", AccepCounter
@@ -4056,7 +4064,7 @@ call InitReadLHE(BeginEventLine)
         write(io_stdout,*) "       Increase CSMAX in main.F90 or VegasNc0."
     endif
    write(io_stdout,*)  "Event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
-   if( RequestNLeptons.gt.0 .or. RequestNJets.gt.0 ) write(io_stdout,"(A,1F6.2,A)") " Filter efficiency:",dble(AccepCounter)/dble(NEvent)*100d0," %"
+   if( any(RequestNLeptons.ge.0) .or. any(RequestNJets.ge.0) ) write(io_stdout,"(A,1F6.2,A)") " Filter efficiency:",dble(AccepCounter)/dble(NEvent)*100d0," %"
 
 
     write(io_LogFile,*) ""
@@ -4069,7 +4077,7 @@ call InitReadLHE(BeginEventLine)
         write(io_LogFile,*) "       Increase CSMAX in main.F90 or VegasNc0."
     endif
    write(io_LogFile,*)  "Event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
-   if( RequestNLeptons.gt.0 .or. RequestNJets.gt.0 ) write(io_LogFile,"(A,1F6.2,A)") " Filter efficiency:",dble(AccepCounter)/dble(NEvent)*100d0," %"
+   if( any(RequestNLeptons.ge.0) .or. any(RequestNJets.ge.0) ) write(io_LogFile,"(A,1F6.2,A)") " Filter efficiency:",dble(AccepCounter)/dble(NEvent)*100d0," %"
 
 
 
@@ -5742,54 +5750,22 @@ character :: arg*(500)
     if( (Process.eq.0 .or. Process.eq.2 .or. Process.eq.50) .and. includeGammaStar ) then
         write(TheUnit,"(6X,A,F8.2,A)") "m(gammastar) >= ", MPhotonCutoff/GeV, " GeV"
     endif
-    if( (ReadLHEFile) .and. (RequestNLeptons.gt.0) ) then
-        if ( RequestOS .le. 0 ) then
-            if ( RequestNLeptons .eq. 1 ) then
-                write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," lepton."
-            else
-                write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons."
-            endif
-        elseif ( RequestOSSF .le. 0 ) then
-            if ( RequestOS*2 .eq. RequestNLeptons ) then
-                if ( RequestOS .eq. 1 ) then
-                    write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons in an OS pair."
-                else
-                    write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons in OS pairs."
-                endif
-            else
-                if ( RequestOS .eq. 1 ) then
-                    write(TheUnit,"(4X,A,I2,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons including ", RequestOS, " OS pair."
-                else
-                    write(TheUnit,"(4X,A,I2,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons including ", RequestOS, " OS pairs."
-                endif
-            endif
-        elseif ( RequestOSSF*2 .eq. RequestNLeptons ) then
-            if ( RequestOSSF .eq. 1 ) then
-                write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons in an OSSF pair."
-            else
-                write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons in OSSF pairs."
-            endif
-        elseif ( RequestOSSF .eq. RequestOS ) then
-            if ( RequestOSSF .eq. 1 ) then
-                write(TheUnit,"(4X,A,I2,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons including ", RequestOSSF, " OSSF pair."
-            else
-                write(TheUnit,"(4X,A,I2,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons including ", RequestOSSF, " OSSF pairs."
-            endif
-        elseif ( RequestOS*2 .eq. RequestNLeptons ) then
-            write(TheUnit,"(4X,A,I2,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons in OS pairs, ", RequestOSSF, " of the pairs OSSF."
-        else ! this will never happen
-            write(TheUnit,"(4X,A,I2,A,I2,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons including ", RequestOS, " OS pairs, ", RequestOSSF, " of them OSSF."
+    if( ReadLHEFile ) then
+        if ( any(RequestNLeptons.ge.0) ) then
+           write(TheUnit,"(4X,A,I2,A,I2,A)") "Lepton filter activated. Requesting Nleptons=[",RequestNLeptons(1),",",RequestNLeptons(2),"]."
+        endif
+        if ( any(RequestNJets.ge.0) ) then
+           write(TheUnit,"(4X,A,I2,A,I2,A)") "Jet filter activated. Requesting Njets=[",RequestNJets(1),",",RequestNJets(2),"]."
+        endif
+        if ( any(RequestOS.ge.0) ) then
+           write(TheUnit,"(4X,A,I2,A,I2,A)") "OS lepton filter activated. Requesting NOS=[",RequestOS(1),",",RequestOS(2),"]."
+        endif
+        if ( any(RequestOSSF.ge.0) ) then
+           write(TheUnit,"(4X,A,I2,A,I2,A)") "OSSF lepton filter activated. Requesting NOSSF=[",RequestOSSF(1),",",RequestOSSF(2),"]."
         endif
     endif
-    if( CountTauAsAny .and. RequestOSSF.gt.0 ) then
+    if( CountTauAsAny .and. any(RequestOSSF.gt.0) ) then
         write(TheUnit,"(8X,A)") "(counting tau in place of e or mu of the same sign, if necessary)"
-    endif
-    if( (ReadLHEFile) .and. (RequestNJets.gt.0) ) then
-        if ( RequestNJets .eq. 1 ) then
-            write(TheUnit,"(4X,A,I2,A)") "Jet filter activated. Requesting ",RequestNJets," quark/gluon."
-        else
-            write(TheUnit,"(4X,A,I2,A)") "Jet filter activated. Requesting ",RequestNJets," quarks/gluons."
-        endif
     endif
     write(TheUnit,"(4X,A,20I11)") "Random seed: ",UserSeed
     write(TheUnit,"(4X,A)") "To reproduce results using this seed, JHUGen should be compiled with the same compiler:"
@@ -6582,15 +6558,20 @@ implicit none
         print *, "   RenScheme:         QCD renormalization scale scheme"
         print *, "   MuRenMultiplier:   Multiplier for the renormalization scale chosen by RenScheme"
         print *, " Lepton and jet filter:"
-        print *, "   FilterNLept:       For decay mode, reject events that have less than FilterNLept leptons"
-        print *, "   FilterOSPairs:     For decay mode, reject events that have less than FilterOSPairs pairs of"
-        print *, "                      sign leptons of any flavor."
-        print *, "   FilterOSSFPairs:   For decay mode, reject events that have less than FilterOSSFPairs pairs of"
-        print *, "                      opposite-sign-same-flavor leptons."
+        print *, "   NLepMin:       Reject events that have less than this many charged leptons"
+        print *, "   NLepMax:       Reject events that have more than this many charged leptons"
+        print *, "   NJetMin:       Reject events that have less than this many jets"
+        print *, "   NJetMax:       Reject events that have more than this many jets"
+        print *, "   NOSMin:       Reject events that have less than this many"
+        print *, "                 opposite-sign pairs of leptons of any flavor"
+        print *, "   NOSMax:       Reject events that have more than this many"
+        print *, "                 opposite-sign pairs of leptons of any flavor"
+        print *, "   NOSSFMin:       Reject events that have less than this many"
+        print *, "                   opposite-sign same-flavor pairs of leptons"
+        print *, "   NOSSFMax:       Reject events that have more than this many"
+        print *, "                   opposite-sign same-flavor pairs of leptons"
         print *, "   CountTauAsAny:     For FilterOSSFPairs, taus can stand in place of electrons or muons"
         print *, "                      of the same charge."
-        print *, "   FilterNJets:       For decay mode, reject events that have less than FilterNJets quarks"
-        print *, "                      and/or gluons"
         print *, "   WriteFailedEvents: Write events that fail in the LHE file, but with a weight of 0"
         print *, "                      (off by default)"
         print *, " Higgs propagator and decay width:"

@@ -2140,7 +2140,7 @@ real(8) :: MomExt(:,:), mZ1, mZ2, MReso, mZ1alt, mZ2alt
 real(8) :: MomLepP(1:4),MomLepM(1:4),MomBoost(1:4),BeamAxis(1:4),ScatteringAxis(1:4),dummy(1:4)
 real(8) :: MomLept(1:4,1:4),MomLeptX(1:4,1:4),MomLeptPlane1(2:4),MomLeptPlane2(2:4),MomBeamScatterPlane(2:4)
 logical :: applyPSCut
-integer :: NBin(:),ids(1:8),jpart
+integer :: NBin(:),ids(1:8),jpart,lepcount,jetcount
 real(8) :: m_jj,y_j1,y_j2,dphi_jj,dy_j1j2,pT_jl,pT_j1,pT_j2,pT_H,m_4l,dR_j1j2
 real(8) :: pT_l1,pT_l2,pT_l3,pT_l4,y_l1,y_l2,y_l3,y_l4
 real(8) :: Phi1,signPhi1,MomReso(1:4)
@@ -2149,6 +2149,25 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=8, 
 
 
        applyPSCut = .false.
+       lepcount=0
+       jetcount=0
+
+       if ( any(RequestNLeptons.ge.0) ) then
+          lepcount = CountLeptons(ids(3:8))
+          applyPSCut = ( (RequestNLeptons(1).ge.0 .and. lepcount .lt. RequestNLeptons(1)) .or. (RequestNLeptons(2).ge.0 .and. lepcount .gt. RequestNLeptons(2)) )
+          if (applyPSCut) then
+             if (doPrintFailReason) write(6,*) "Failed nlep cutoff (nleps=",lepcount,")"
+             return
+          endif
+       endif
+       if ( any(RequestNJets.ge.0) ) then
+          jetcount = CountJets(ids(3:8))
+          applyPSCut = ( (RequestNJets(1).ge.0 .and. jetcount .lt. RequestNJets(1)) .or. (RequestNJets(2).ge.0 .and. jetcount .gt. RequestNJets(2)) )
+          if (applyPSCut) then
+             if (doPrintFailReason) write(6,*) "Failed njet cutoff (njets=",jetcount,")"
+             return
+          endif
+       endif
 
        m_jj = get_MInv( MomExt(1:4,outTop)+MomExt(1:4,outBot) )
        m_4l = get_MInv( MomExt(1:4,Lep1P)+MomExt(1:4,Lep1M)+MomExt(1:4,Lep2P)+MomExt(1:4,Lep2M) )

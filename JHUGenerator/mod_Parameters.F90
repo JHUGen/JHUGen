@@ -3,7 +3,7 @@ implicit none
 save
 !
 !
-character(len=*),parameter :: JHUGen_Version="v7.3.0"
+character(len=*),parameter :: JHUGen_Version="v7.3.1"
 !
 !
 !=====================================================
@@ -20,7 +20,11 @@ real(8), public :: Collider_Energy
 integer, public :: FacScheme,RenScheme
 real(8), public :: MuFacMultiplier,MuRenMultiplier
 integer, public :: VegasIt1_default,VegasNc0_default,VegasNc1_default,VegasNc2_default
-integer, public :: NumHistograms,RequestNLeptons,RequestOS,RequestOSSF,RequestNJets
+integer, public :: NumHistograms
+integer, public :: RequestNLeptons(1:2) = -1
+integer, public :: RequestNJets(1:2) = -1
+integer, public :: RequestOS(1:2) = -1
+integer, public :: RequestOSSF(1:2) = -1
 logical, public :: Unweighted,OffShellReson,OffShellV1,OffShellV2,ReadLHEFile,ConvertLHEFile,DoPrintPMZZ
 logical, public :: ReadCSmax,GenerateEvents,CountTauAsAny,HasLeptonFilter, FoundHiggsMass, FoundHiggsWidth
 integer, public :: WriteFailedEvents
@@ -162,21 +166,21 @@ real(8), public :: alpha_dip = 1d0 !extra non physical degree of freedom for dip
 
 !=====================================================
 !cuts - should be set on the command line
-real(8), public :: pTjetcut = -1d0*GeV                        ! jet min pt, default is set in main (0 in VH, 15 GeV otherwise)
-real(8), public :: etajetcut = -1d0                           ! jet max |eta|, default is set in main (4 in offshell VBF, infinity elsewhere)
-real(8), public :: detajetcut = -1d0                          ! min difference in eta between jets (default 2 in VBF offshell, 0 elsewhere)
-real(8), public :: Rjet = -1d0                                ! jet deltaR, anti-kt algorithm, default is set in main (0 in VH, 0.3 otherwise)
-real(8), public :: mJJcut = 0d0*GeV                           ! minimum mJJ for VBF, HJJ, bbH, VH
-real(8), public :: m4l_minmax(1:2) = (/ -1d0,-1d0 /)*GeV      ! min and max for m_4l in off-shell VBF production;   default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
+real(8), public :: pTjetcut = -1d0*GeV                        ! jet min pt
+real(8), public :: etajetcut = -1d0                           ! jet max |eta|
+real(8), public :: detajetcut = -1d0                          ! min difference in eta between jets
+real(8), public :: Rjet = -1d0                                ! jet deltaR
+real(8), public :: mJJcut = 0d0*GeV                           ! minimum mJJ
+real(8), public :: m4l_minmax(1:2) = (/ -1d0,-1d0 /)*GeV      ! min and max for m_4l. default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
 real(8), public :: m2l_minmax(1:2) = (/ 0d0,14000d0 /)*GeV   ! min and max for m_V in VH production;
 real(8), public :: mVH_minmax(1:2) = (/ 0d0,14000d0 /)*GeV      ! min and max for m_VH in VH production;
 logical, public :: includeGammaStar = .false.                 ! include offshell photons?
 logical, public :: includeVprime = .false.
 real(8), public :: MPhotonCutoff = -1d0*GeV                          ! minimum |mass_ll| for offshell photons when includeGammaStar = .true. or in VBF bkg
-real(8), public :: pTlepcut = -1d0*GeV
-real(8), public :: etalepcut = 999d0
+real(8), public :: pTlepcut = -1d0*GeV                         ! lepton min pt
+real(8), public :: etalepcut = 999d0                           ! lepton max |eta|
 real(8), public :: pTHcut = 0d0*GeV
-logical, public :: JetsOppositeEta = .false.
+logical, public :: JetsOppositeEta = .false.                   ! Ensures associated jets are in opposite hemispheres. Useful to obtain VBF/VBS topology from inclusive production
 !=====================================================
 
 !=====================================================
@@ -2471,6 +2475,7 @@ end function CoupledVertexIsDiagonal
 
 
 
+! Counts *charged* leptons to be specific
 FUNCTION CountLeptons( MY_IDUP )
 implicit none
 integer :: MY_IDUP(:),CountLeptons
@@ -2479,6 +2484,21 @@ integer :: i
    CountLeptons = 0
    do i = 1,size(MY_IDUP)
       if( IsALepton( MY_IDUP(i) ) ) CountLeptons=CountLeptons+1
+   enddo
+
+
+RETURN
+END FUNCTION
+
+! Counts light jets
+FUNCTION CountJets( MY_IDUP )
+implicit none
+integer :: MY_IDUP(:),CountJets
+integer :: i
+
+   CountJets = 0
+   do i = 1,size(MY_IDUP)
+      if( IsAJet( MY_IDUP(i) ) ) CountJets=CountJets+1
    enddo
 
 

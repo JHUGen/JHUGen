@@ -579,7 +579,7 @@ IF( GENEVT ) THEN
 
       elseif( EvalUnWeighted_DecayToVV .gt. yRnd(14)*CS_max ) then
 
-         if( RequestNLeptons.gt.0 .or. RequestNJets.gt.0 ) then! lepton or jet filter
+         if( any(RequestNLeptons.ge.0) .or. any(RequestNJets.ge.0) ) then! lepton or jet filter
                 LeptInEvent_tmp(0:8) = LeptInEvent(0:8)
                 JetsInEvent_tmp(0:8) = JetsInEvent(0:8)
     !             print *, ""
@@ -600,17 +600,17 @@ IF( GENEVT ) THEN
 !   print *, "new order:",LeptInEvent_tmp( ordered_Lept(i1) )
 ! enddo
 ! pause
-                if( LeptInEvent_tmp(0) .lt. RequestNLeptons ) then
+                if( (RequestNLeptons(1).ge.0 .and. LeptInEvent_tmp(0) .lt. RequestNLeptons(1)) .or. (RequestNLeptons(2).ge.0 .and. LeptInEvent_tmp(0) .gt. RequestNLeptons(2)) ) then
     !                 print *,"not enough leptons, reject!" !,LeptInEvent_tmp(1: LeptInEvent_tmp(0))
                     Res = -1d0
                     return
                 endif
-                if( JetsInEvent_tmp(0) .lt. RequestNJets ) then
+                if( (RequestNJets(1).ge.0 .and. JetsInEvent_tmp(0) .lt. RequestNJets(1)) .or. (RequestNJets(2).ge.0 .and. JetsInEvent_tmp(0) .gt. RequestNJets(2)) ) then
     !                 print *,"not enough jets, reject!" !,JetsInEvent_tmp(1: JetsInEvent_tmp(0))
                     Res = -1d0
                     return
                 endif
-                if( RequestOS.gt.0 ) then
+                if( any(RequestOS.ge.0) .or. any(RequestOSSF.ge.0) ) then
                     OSPair = 0
                     OSSFPair = 0
 !                     do i1=1,LeptInEvent_tmp(0)-1
@@ -645,12 +645,12 @@ IF( GENEVT ) THEN
                     enddo
 !                     print *, "found ",OSPair," OS pairs"
 !                     print *, "found ",OSSFPair," OSSF pairs"
-                    if( OSPair.lt.RequestOS ) then
+                    if( (RequestOS(1).ge.0 .and. OSPair.lt.RequestOS(1)) .or. (RequestOS(2).ge.0 .and. OSPair.gt.RequestOS(2)) ) then
 !                         print *,"no OS pair, reject!" !,LeptInEvent_tmp(1: LeptInEvent_tmp(0))
                         Res = -1d0
                         return
                     endif
-                    if( OSSFPair.lt.RequestOSSF ) then
+                    if( (RequestOSSF(1).ge.0 .and. OSSFPair.lt.RequestOSSF(1)) .or. (RequestOSSF(2).ge.0 .and. OSSFPair.gt.RequestOSSF(2)) ) then
 !                         print *,"no OSSF pair, reject!" !,LeptInEvent_tmp(1: LeptInEvent_tmp(0))
                         Res = -1d0
                         return

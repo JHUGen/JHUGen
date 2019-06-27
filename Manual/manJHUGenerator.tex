@@ -299,15 +299,20 @@ This is the list of command line configurables (also defined in the \verb|README
     RenScheme:         QCD renormalization scale scheme
     MuRenMultiplier:   Multiplier for the renormalization scale chosen by RenScheme
   Lepton and jet filter:
-    FilterNLept:       For decay mode, reject events that have less than FilterNLept leptons
-    FilterOSPairs:     For decay mode, reject events that have less than FilterOSPairs pairs of
-                       sign leptons of any flavor.
-    FilterOSSFPairs:   For decay mode, reject events that have less than FilterOSSFPairs pairs of
-                       opposite-sign-same-flavor leptons.
+    NLepMin:       Reject events that have less than this many charged leptons
+    NLepMax:       Reject events that have more than this many charged leptons
+    NJetMin:       Reject events that have less than this many jets
+    NJetMax:       Reject events that have more than this many jets
+    NOSMin:       Reject events that have less than this many
+                  opposite-sign pairs of leptons of any flavor
+    NOSMax:       Reject events that have more than this many
+                  opposite-sign pairs of leptons of any flavor
+    NOSSFMin:       Reject events that have less than this many
+                    opposite-sign same-flavor pairs of leptons
+    NOSSFMax:       Reject events that have more than this many
+                    opposite-sign same-flavor pairs of leptons"
     CountTauAsAny:     For FilterOSSFPairs, taus can stand in place of electrons or muons
                        of the same charge.
-    FilterNJets:       For decay mode, reject events that have less than FilterNJets quarks
-                       and/or gluons
     WriteFailedEvents: Write events that fail in the LHE file, but with a weight of 0
                        (off by default)
   Higgs propagator and decay width:
