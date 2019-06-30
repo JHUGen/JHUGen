@@ -3205,7 +3205,9 @@ ELSEIF( Process.ge.66 .and. Process.le.72 ) THEN! special treatment for offshell
     call InitOutput(CrossSectionWithWeights, sqrt(CrossSectionWithWeightsErrorSquared))
 
     RequEvents2(:) = 0
-    call HouseOfRepresentatives2(CrossSec2, RequEvents2, VegasNc2)
+    if(sum(CrossSec2(:)).ne.0d0) then
+      call HouseOfRepresentatives2(CrossSec2, RequEvents2, VegasNc2)
+    endif
 
     if (Process.eq.69) then
        call getRef_MCFM_qqVVqqStrong_Hash(ijSel)
@@ -3224,7 +3226,11 @@ ELSEIF( Process.ge.66 .and. Process.le.72 ) THEN! special treatment for offshell
     enddo
 
 
-    write(io_stdout,"(2X,A,F18.3,I10)") "Sum        partonic xsec:",sum(CrossSec2(:))/VG_Result,sum(RequEvents2(:))
+    if (VG_Result.gt.0d0) then
+      write(io_stdout,"(2X,A,F18.3,I10)") "Sum partonic xsec:",sum(CrossSec2(:))/VG_Result,sum(RequEvents2(:))
+    else
+      write(io_stdout,"(2X,A,F18.3,I10)") "Sum partonic xsec:",0d0,sum(RequEvents2(:))
+    endif
 
 
     if( .not. ReadCSmax ) then! For ReadCSmax=.false. the program ends here
