@@ -708,6 +708,220 @@ RETURN
 END FUNCTION
 
 
+FUNCTION EvalWeighted_ggVV4f_fullproddec(yRnd,VgsWgt)
+#if linkMELA==1
+use ModKinematics
+use ModParameters
+use ModMisc
+use ModMCFMWrapper
+#if compiler==1
+use ifport
+#endif
+implicit none
+real(8) :: yRnd(1:17),VgsWgt, EvalWeighted_ggVV4f_fullproddec
+real(8) :: pdf(-6:6,1:2),me2(-5:5,-5:5)
+real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
+real(8) :: MomExt(1:4,1:10),MomShifted(1:4,1:10),PSWgt,FinalStateWeight,m1ffwgt,m2ffwgt
+real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5),msq_VgsWgt(-5:5,-5:5),Wgt_Ratio_Interf,originalprobability
+integer :: id_MCFM(mxpart),MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),NHisto,ipart,jpart
+integer :: i,j,k
+real(8) :: PreFac,VegasWeighted_fullproddec,xRnd,LeptonAndVegasWeighted_fullproddec
+logical :: applyPSCut,swap34_56
+integer,parameter :: inTop=1, inBot=2, V1=3, V2=4, Lep1P=5, Lep1M=6, Lep2P=7, Lep2M=8
+include 'vegas_common.f'
+include 'maxwt.f'
+
+   EvalWeighted_ggVV4f_fullproddec = 0d0
+   Wgt_Ratio_Interf = 1d0
+   m1ffwgt = 1d0
+   m2ffwgt = 1d0
+   iPart_sel = 0
+   jPart_sel = 0
+
+   !   throwing random number for accept-reject
+   if(.not. warmup) then
+       call random_number(xRnd)
+   endif
+
+   if( unweighted .and. .not.warmup .and.  sum(AccepCounter_part(:,:)) .eq. sum(RequEvents(:,:)) ) then
+      stopvegas=.true.
+   endif
+   if( unweighted .and. .not. warmup .and. AccepCounter_part(iPart_sel,jPart_sel) .ge. RequEvents(iPart_sel,jPart_Sel)  ) return
+
+
+   call VVBranchings(MY_IDUP(5:10),ICOLUP(1:2,7:10),FinalStateWeight,700)
+   call swap(MY_IDUP(Lep1P),MY_IDUP(Lep1M))
+   call swap(MY_IDUP(Lep2P),MY_IDUP(Lep2M))
+   MY_IDUP(1:2) = Glu_
+   id_MCFM(1:2) = MY_IDUP(1:2)
+   id_MCFM(3:6) = MY_IDUP(5:8)
+
+   if (IsNaN(VgsWgt)) then
+      write(6,*) "VegasWgt is NaN!"
+      !pause
+   endif
+
+   call PDFMapping(2,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi,EhatMin=dmax1(m4l_minmax(1),0d0))
+   !call EvalPhasespace_ggVV4f(yRnd(3),yRnd(4:17),EHat,MomExt(1:4,1:10),PSWgt,id_MCFM(1:8),swap34_56,id12_78)
+   call boost2Lab(eta1,eta2,10,MomExt(1:4,1:10))
+   PSWgt = PSWgt * FinalStateWeight
+
+
+   call Kinematics_VV4f_fullproddec(MomExt,id_MCFM,applyPSCut,NBin)
+   if( applyPSCut .or. PSWgt.lt.1d-33 ) then
+      return
+   endif
+
+   call SetRunningScales( (/ (MomExt(1:4,3)+MomExt(1:4,4)),Mom_Not_a_particle(1:4),Mom_Not_a_particle(1:4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) )
+   !write(6,*) "setPDFs args:",eta1,eta2,alphas,alphas_mz
+   call setPDFs(eta1,eta2,pdf)
+   FluxFac = 1d0/(2d0*EHat**2)
+   !pause
+
+   ! GeV conversion is now done inside EvalAmp_qqVVqq
+   call convert_to_MCFM(-MomExt(1:4,inTop), p_MCFM(1,1:4))
+   call convert_to_MCFM(-MomExt(1:4,inBot), p_MCFM(2,1:4))
+   call convert_to_MCFM(+MomExt(1:4,Lep1P), p_MCFM(3,1:4))
+   call convert_to_MCFM(+MomExt(1:4,Lep1M), p_MCFM(4,1:4))
+   call convert_to_MCFM(+MomExt(1:4,Lep2P), p_MCFM(5,1:4))
+   call convert_to_MCFM(+MomExt(1:4,Lep2M), p_MCFM(6,1:4))
+   msq_MCFM(:,:) = 0d0
+
+   MomShifted = MomExt
+   if (swap34_56) then
+      if(.not.IsAPhoton(DecayMode1)) then
+         call ShiftMass(MomExt(1:4,Lep1P),MomExt(1:4,Lep2M), GetMass(MY_IDUP(Lep1P)),GetMass(MY_IDUP(Lep2M)),MomShifted(1:4,Lep1P),MomShifted(1:4,Lep2M),MassWeight=m1ffwgt)
+      endif
+      if(.not.IsAPhoton(DecayMode2)) then
+         call ShiftMass(MomExt(1:4,Lep2P),MomExt(1:4,Lep1M), GetMass(MY_IDUP(Lep2P)),GetMass(MY_IDUP(Lep1M)),MomShifted(1:4,Lep2P),MomShifted(1:4,Lep1M),MassWeight=m2ffwgt)
+      endif
+   else
+      if(.not.IsAPhoton(DecayMode1)) then
+         call ShiftMass(MomExt(1:4,Lep1P),MomExt(1:4,Lep1M), GetMass(MY_IDUP(Lep1P)),GetMass(MY_IDUP(Lep1M)),MomShifted(1:4,Lep1P),MomShifted(1:4,Lep1M),MassWeight=m1ffwgt)
+      endif
+      if(.not.IsAPhoton(DecayMode2)) then
+         call ShiftMass(MomExt(1:4,Lep2P),MomExt(1:4,Lep2M), GetMass(MY_IDUP(Lep2P)),GetMass(MY_IDUP(Lep2M)),MomShifted(1:4,Lep2P),MomShifted(1:4,Lep2M),MassWeight=m2ffwgt)
+      endif
+   endif
+
+
+   !call EvalAmp_ggVV4f(id_MCFM, p_MCFM, msq_MCFM)
+
+   originalprobability = msq_MCFM(iPart_sel,jPart_sel)
+
+   PreFac = fbGeV2 * FluxFac * PSWgt * sHatJacobi * m1ffwgt * m2ffwgt
+   msq_MCFM = msq_MCFM * PreFac / (GeV**4)  ! adjust msq_MCFM for GeV units of MCFM mat.el.
+
+   if ( &
+      msq_MCFM(iPart_sel,jPart_sel) .le. 0d0 .or. &
+      pdf(LHA2M_pdf(iPart_sel),1) .le. 0d0 .or. &
+      pdf(LHA2M_pdf(jPart_sel),2) .le. 0d0 .or. &
+      IsNaN(msq_MCFM(iPart_sel,jPart_sel)) .or. &
+      IsNaN(pdf(LHA2M_pdf(iPart_sel),1)) .or. &
+      IsNaN(pdf(LHA2M_pdf(jPart_sel),2)) &
+      ) then
+      write(6,*) "Mu_Fact =",Mu_Fact
+      write(6,*) "Mu_Ren =",Mu_Ren
+      write(6,*) "alphas =",alphas
+      write(6,*) "alphas_mz =",alphas_mz
+      write(6,*) "msq_MCFM(",iPart_sel,",",jPart_sel,") =",msq_MCFM(iPart_sel,jPart_sel)
+      write(6,*) "pdf1 =",pdf(LHA2M_pdf(iPart_sel),1)
+      write(6,*) "pdf2 =",pdf(LHA2M_pdf(jPart_sel),2)
+      do jpart=1,6
+         write(6,*) "P_MCFM(",convertLHE(id_MCFM(jpart)),")=",p_MCFM(jpart,:)
+      enddo
+      pause
+      return
+    endif
+
+   EvalWeighted_ggVV4f_fullproddec = msq_MCFM(iPart_sel,jPart_sel) * pdf(LHA2M_pdf(iPart_sel),1)*pdf(LHA2M_pdf(jPart_sel),2)
+   VegasWeighted_fullproddec = EvalWeighted_ggVV4f_fullproddec * VgsWgt
+   !if (EvalWeighted_ggVV4f_fullproddec.eq.0d0) then
+   !   write(6,*) "EvalWeighted_ggVV4f_fullproddec==0. Ids:",id_MCFM
+   !endif
+   !write(6,*) "originalprobability,EvalWeighted_ggVV4f_fullproddec,VgsWgt=",originalprobability,EvalWeighted_ggVV4f_fullproddec,VgsWgt
+   !pause
+
+
+   if( unweighted ) then
+
+     if( warmup ) then
+
+!        if( VegasWeighted_fullproddec.gt.CrossSecMax(iPart_sel,jPart_sel) ) then
+!            print *, "New max",iPart_sel,jPart_sel,VegasWeighted_fullproddec
+!        endif
+
+       CrossSec(iPart_sel,jPart_sel) = CrossSec(iPart_sel,jPart_sel) + VegasWeighted_fullproddec
+       CrossSecMax(iPart_sel,jPart_sel) = max(CrossSecMax(iPart_sel,jPart_sel),VegasWeighted_fullproddec)
+
+       do NHisto=1,NumHistograms
+         call intoHisto(NHisto,NBin(NHisto),VegasWeighted_fullproddec)
+       enddo
+
+       !if (FindCrossSectionWithWeights) then
+       !  LeptonAndVegasWeighted_fullproddec = VegasWeighted_fullproddec * ReweightLeptonInterference(id_MCFM, p_MCFM, originalprobability)
+       !  CrossSectionWithWeights = CrossSectionWithWeights + LeptonAndVegasWeighted_fullproddec
+       !  CrossSectionWithWeightsErrorSquared = CrossSectionWithWeightsErrorSquared + LeptonAndVegasWeighted_fullproddec**2
+       !endif
+
+     else! not warmup
+
+       EvalCounter = EvalCounter+1
+
+       if( VegasWeighted_fullproddec.gt.CrossSecMax(iPart_sel,jPart_sel) ) then
+          write(io_LogFile,"(2X,A,1PE13.6,1PE13.6)") "CrossSecMax is too small.",VegasWeighted_fullproddec, CrossSecMax(iPart_sel,jPart_sel)
+          write(io_stdout, "(2X,A,1PE13.6,1PE13.6,1PE13.6,I4,I4)") "CrossSecMax is too small.",VegasWeighted_fullproddec, CrossSecMax(iPart_sel,jPart_sel),VegasWeighted_fullproddec/CrossSecMax(iPart_sel,jPart_sel),iPart_sel,jPart_sel
+          AlertCounter = AlertCounter + 1
+
+!          This dynamically increases the maximum in case it is exceeded
+          CrossSecMax(iPart_sel,jPart_sel) = VegasWeighted_fullproddec
+          write(io_LogFile,"(2X,A,1PE13.6)") "Increasing CrossSecMax to ",VegasWeighted_fullproddec
+          write(io_stdout, "(2X,A,1PE13.6)") "Increasing CrossSecMax to ",VegasWeighted_fullproddec
+
+       elseif( VegasWeighted_fullproddec .gt. xRnd*CrossSecMax(iPart_sel,jPart_sel) ) then
+          AccepCounter = AccepCounter + 1
+          AccepCounter_part(iPart_sel,jPart_sel) = AccepCounter_part(iPart_sel,jPart_sel) + 1
+
+          !Wgt_Ratio_Interf = ReweightLeptonInterference(id_MCFM, p_MCFM, originalprobability)
+
+          call WriteOutEvent_VV4f_fullproddec(MomShifted,MY_IDUP,ICOLUP,EventWeight=Wgt_Ratio_Interf)
+
+          do NHisto=1,NumHistograms
+            call intoHisto(NHisto,NBin(NHisto),1d0)
+          enddo
+       else
+          RejeCounter=RejeCounter+1
+       endif
+
+     endif! warmup
+
+   else! weighted
+
+      if( VegasWeighted_fullproddec.ne.0d0 ) then
+        AccepCounter=AccepCounter+1
+        if( writeWeightedLHE .and. (.not. warmup) ) then
+            call WriteOutEvent_VV4f_fullproddec(MomShifted,MY_IDUP,ICOLUP,EventWeight=VegasWeighted_fullproddec)
+        endif
+        do NHisto=1,NumHistograms
+          call intoHisto(NHisto,NBin(NHisto),VegasWeighted_fullproddec)
+        enddo
+
+      endif
+
+   endif! unweighted
+
+#else
+implicit none
+real(8) :: EvalWeighted_ggVV4f_fullproddec
+   EvalWeighted_ggVV4f_fullproddec = 0d0
+   print *, "To use this process, please set linkMELA=Yes in the makefile and recompile."
+   print *, "You will also need to have a compiled JHUGenMELA in the directory specified by JHUGenMELADir in the makefile."
+   stop 1
+#endif
+RETURN
+END FUNCTION
+
+
 !  FUNCTION EvalWeighted(yRnd,VgsWgt)    ! this is a function which is only for computations
 !  use ModKinematics                     ! with weighted events
 !  use ModParameters

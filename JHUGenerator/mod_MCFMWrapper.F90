@@ -5,7 +5,7 @@ private
 public :: MCFM_firsttime
 public :: Setup_MCFM_qqVVqq_firsttime,Setup_MCFM_qqVVqq,EvalAmp_qqVVqq,Check_APartHash_MCFM_qqVVqq
 
-integer, parameter :: mxpart=14
+integer, parameter, public :: mxpart=14
 integer, parameter :: mxdim=26
 integer, parameter :: nf=5
 character*30 :: MCFM_runstring
@@ -1833,7 +1833,7 @@ end function
 
 ! Subroutines to check and pass the ordering for the decay particles in the "main" system (e.g. H->4f decay)
 subroutine Check_DaughterOrdering_MCFM_qqVVqq(idPart,order,idV,idVswap,ZWcode)
-use ModParameters, only : includeInterference, Z0_, Wp_, Wm_, Top_, Not_a_particle_, CoupledVertex, IsALepton, IsDownTypeQuark, IsANeutrino, IsUpTypeQuark
+use ModParameters, only : includeInterference, Z0_, Wp_, Wm_, Top_, Not_a_particle_, CoupledVertex, IsALepton, IsDownTypeQuark, IsANeutrino, IsUpTypeQuark, convertLHE
 use ModMisc
 implicit none
 integer, intent(in) :: idPart(1:4)
@@ -1863,6 +1863,14 @@ common/runstring/runstring
    endif
    isZZ = (idV(1).eq.Z0_ .or. idV(1).eq.0) .and. (idV(2).eq.Z0_ .or. idV(2).eq.0)
    isWW = (abs(idV(1)).eq.abs(Wp_) .or. idV(1).eq.0) .and. (abs(idV(2)).eq.abs(Wp_) .or. idV(2).eq.0)
+
+   ! Swap 1-2 or 3-4 if their ordering is antiparticle-particle initially.
+   if (convertLHE(idPart(1)).lt.0 .and. convertLHE(idPart(2)).gt.0) then
+      call swap(order(1),order(2))
+   endif
+   if (convertLHE(idPart(3)).lt.0 .and. convertLHE(idPart(4)).gt.0) then
+      call swap(order(3),order(4))
+   endif
 
    if ( &
    isZZ .and. (&

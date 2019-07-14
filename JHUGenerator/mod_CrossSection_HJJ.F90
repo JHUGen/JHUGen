@@ -11,19 +11,15 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
 
 ! since the me2(:,:) array is defined from -5..+5, the iPart_sel,jPart_sel have to follow the LHE numbering convention
 FUNCTION EvalWeighted_HJJ_fulldecay(yRnd,VgsWgt)
+#if linkMELA==1
 use ModKinematics
 use ModParameters
-#if linkMELA==1
 use ModMCFMWrapper
-#endif
-use ModHiggsjj
-use ModHiggs
 use ModMisc
 #if compiler==1
 use ifport
 #endif
 implicit none
-integer,parameter :: mxpart=14 ! this has to match the MCFM parameter
 real(8) :: yRnd(1:17),VgsWgt, EvalWeighted_HJJ_fulldecay
 real(8) :: pdf(-6:6,1:2),me2(-5:5,-5:5)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
@@ -190,15 +186,7 @@ m1ffwgt=1d0;m2ffwgt=1d0
    endif
 
 
-#if linkMELA==1
-
    call EvalAmp_qqVVqq(id_MCFM, p_MCFM, msq_MCFM)
-
-#else
-   print *, "To use this process, please set linkMELA=Yes in the makefile and recompile."
-   print *, "You will also need to have a compiled JHUGenMELA in the directory specified by JHUGenMELADir in the makefile."
-   stop 1
-#endif
 
    !write(6,*) "msq_MCFM:",msq_MCFM
    !pause
@@ -310,6 +298,16 @@ m1ffwgt=1d0;m2ffwgt=1d0
 
    endif! unweighted
 
+#else
+
+implicit none
+real(8) :: EvalWeighted_HJJ_fulldecay
+   EvalWeighted_HJJ_fulldecay = 0d0
+   print *, "To use this process, please set linkMELA=Yes in the makefile and recompile."
+   print *, "You will also need to have a compiled JHUGenMELA in the directory specified by JHUGenMELADir in the makefile."
+   stop 1
+
+#endif
 
 RETURN
 END FUNCTION
@@ -1224,13 +1222,12 @@ END FUNCTION EvalUnWeighted_HJJ
 
 
 function ReweightLeptonInterference(id_MCFM, p_MCFM, originalprobability)
+#if linkMELA==1
+
 use ModMisc
 use ModParameters
-#if linkMELA==1
 use ModMCFMWrapper
-#endif
 implicit none
-integer,parameter :: mxpart=14 ! this has to match the MCFM parameter
 integer, intent(in) :: id_MCFM(mxpart)
 real(8), intent(in) :: p_MCFM(mxpart,1:4), originalprobability
 real(8) :: msq_MCFM_interf(-5:5,-5:5), msq_MCFM_swapped(-5:5,-5:5), p_MCFM_swapped(mxpart,1:4), numerator, denominator
@@ -1259,12 +1256,7 @@ real(8) :: ReweightLeptonInterference
       !We calculate it now.
 
       includeInterference=.true.
-#if linkMELA==1
       call EvalAmp_qqVVqq(id_MCFM, p_MCFM, msq_MCFM_interf)
-#else
-      print *, "this shouldn't be able to happen"
-      stop 1
-#endif
       includeInterference=.false.
       numerator = msq_MCFM_interf(iPart_sel,jPart_sel)
 
@@ -1310,6 +1302,16 @@ real(8) :: ReweightLeptonInterference
       if (denominator .gt. 0d0) ReweightLeptonInterference = numerator / denominator
 
    endif
+
+#else
+
+implicit none
+integer, intent(in) :: id_MCFM(mxpart)
+real(8), intent(in) :: p_MCFM(mxpart,1:4), originalprobability
+real(8) :: ReweightLeptonInterference
+   ReweightLeptonInterference = 1d0
+
+#endif
 
 end function ReweightLeptonInterference
 
