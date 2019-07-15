@@ -4985,7 +4985,7 @@ real(8), optional :: EhatMin
 
   elseif (MapType.eq.11) then ! delta-function map
 
-     etamin = M_Reso**2/Collider_Energy**2
+     etamin = (M_Reso/Collider_Energy)**2
      eta2 = etamin + (1d0-etamin)*yRnd(2)
      eta1 = etamin/eta2
      fmax = 0.5d0*pi/M_Reso**3/Ga_Reso
@@ -6730,6 +6730,93 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
 RETURN
 END SUBROUTINE
 
+SUBROUTINE EvalPhasespace_ggVV4f(xRnd,eta1,eta2,Energy,Mom,Jac,ids,swap34_56)
+use ModParameters
+use ModPhasespace
+use ModMisc
+implicit none
+integer,parameter :: inTop=1, inBot=2, V1=3, V2=4, Lep1P=5, Lep1M=6, Lep2P=7, Lep2M=8, NUP=8
+real(8) :: xRnd(:), eta1, eta2, Energy, Mom(:,:)
+integer :: ids(1:6)
+real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7,Jac8,Jac9
+real(8) :: sysY,s34,s56,s78,xRndLeptInterf,Emin,Emax
+real(8), parameter :: RescaleWidth=1d0
+real(8) :: s1min, s2min
+logical :: swap34_56
+
+   swap34_56 = .false.
+
+   EMin = 0d0
+   EMax = Collider_Energy
+   Jac = 0d0
+   if (m4l_minmax(1).ge.0d0) then
+      EMin = m4l_minmax(1)
+   endif
+   if (m4l_minmax(2).ge.0d0) then
+      EMax = m4l_minmax(2)
+   endif
+   if( EMin.gt.EMax ) call Error("m4l_minmax is not set correctly")
+
+   s1min = (max(MPhotonCutoff,0d0))**2
+   s2min = (max(MPhotonCutoff,0d0))**2
+   ! s1,2max=s34
+
+
+   ! Find s34 = Energy**2
+   if( Emin.gt.M_Reso+2*Ga_Reso .or. Emax.lt.M_Reso-2*Ga_Reso .or. Process.eq.67 ) then ! Create a 4f tail
+      Jac1 = k_l(xRnd(1),Emin**2,Emax**2,s34)
+   else ! Create an H boson around the BW
+      Jac1 = k_BreitWigner(xRnd(1),M_Reso**2,Ga_Reso*RescaleWidth,Emin**2,Emax**2,s34)
+   endif
+   if (s34.le.0d0) then
+      return
+   endif
+   Energy = sqrt(s34)
+
+   ! Find y and set eta1, eta2
+   Jac2 = rapidity_tan_map(xRnd(2),sysY,ywidthset=sqrt(2d0))
+   eta1 = sqrt(Energy/Collider_Energy)*exp(sysY) ! x1
+   eta2 = sqrt(Energy/Collider_Energy)*exp(-sysY) ! x2
+
+   ! Begin four-momenta
+   Mom(1:4,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
+   Mom(1:4,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
+
+   Jac3 = s_channel_propagator(M_V_ps**2,Ga_V_ps,s1min,s34,xRnd(3),s56) ! Find s56=m1**2
+   Jac4 = s_channel_propagator(M_V_ps**2,Ga_V_ps,s2min,(dsqrt(s34)-dsqrt(s56))**2,xRnd(4),s78) ! Find s78=m2**2
+   Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s56,s78,xRnd(5:6),Mom(:,V1),Mom(:,V2)) ! Decay pVV to pV1, pV2 in CoM
+   if( includeInterference .and. ids(3).eq.ids(5) .and. ids(4).eq.ids(6) ) then
+      call random_number(xRndLeptInterf)
+      if( xRndLeptInterf.gt.0.5d0 ) then ! Swap 46
+         swap34_56 = .true.
+      endif
+   endif
+
+   if( swap34_56 ) then ! Swapped config.
+      Jac6 = s_channel_decay(Mom(:,V1),0d0,0d0,xRnd(7:8),Mom(:,Lep1P),Mom(:,Lep2M)) ! Decay pV1
+      Jac7 = s_channel_decay(Mom(:,V2),0d0,0d0,xRnd(9:10),Mom(:,Lep2P),Mom(:,Lep1M)) ! Decay pV2
+   else ! Normal config
+      Jac6 = s_channel_decay(Mom(:,V1),0d0,0d0,xRnd(7:8),Mom(:,Lep1P),Mom(:,Lep1M)) ! Decay pV1
+      Jac7 = s_channel_decay(Mom(:,V2),0d0,0d0,xRnd(9:10),Mom(:,Lep2P),Mom(:,Lep2M)) ! Decay pV2
+   endif
+
+   Jac = Jac1*Jac2*Jac3*Jac4*Jac5*Jac6*Jac7 * PSNorm4
+
+   if( isNan(jac) ) then
+      print *, "EvalPhasespace_ggVV4f NaN"
+      print *, Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7
+      if( isNan(jac) ) Jac = 0d0
+
+      write(6,*) "ids=",ids
+      write(6,*) "m34:",sqrt(s34)/GeV
+      write(6,*) "m56:",sqrt(s56)/GeV
+      write(6,*) "m78:",sqrt(s78)/GeV
+
+      pause
+   endif
+
+RETURN
+END SUBROUTINE
 
 
 

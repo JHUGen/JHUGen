@@ -718,16 +718,16 @@ use ModMCFMWrapper
 use ifport
 #endif
 implicit none
-real(8) :: yRnd(1:17),VgsWgt, EvalWeighted_ggVV4f_fullproddec
+integer,parameter :: inTop=1, inBot=2, V1=3, V2=4, Lep1P=5, Lep1M=6, Lep2P=7, Lep2M=8, NUP=8
+real(8) :: yRnd(1:10),VgsWgt, EvalWeighted_ggVV4f_fullproddec
 real(8) :: pdf(-6:6,1:2),me2(-5:5,-5:5)
-real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
-real(8) :: MomExt(1:4,1:10),MomShifted(1:4,1:10),PSWgt,FinalStateWeight,m1ffwgt,m2ffwgt
+real(8) :: eta1, eta2, FluxFac, Ehat
+real(8) :: MomExt(1:4,1:NUP),MomShifted(1:4,1:NUP),PSWgt,FinalStateWeight,m1ffwgt,m2ffwgt
 real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5),msq_VgsWgt(-5:5,-5:5),Wgt_Ratio_Interf,originalprobability
-integer :: id_MCFM(mxpart),MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),NHisto,ipart,jpart
+integer :: id_MCFM(mxpart),MY_IDUP(1:NUP),ICOLUP(1:2,1:NUP),NBin(1:NumHistograms),NHisto,ipart,jpart
 integer :: i,j,k
 real(8) :: PreFac,VegasWeighted_fullproddec,xRnd,LeptonAndVegasWeighted_fullproddec
 logical :: applyPSCut,swap34_56
-integer,parameter :: inTop=1, inBot=2, V1=3, V2=4, Lep1P=5, Lep1M=6, Lep2P=7, Lep2M=8
 include 'vegas_common.f'
 include 'maxwt.f'
 
@@ -749,7 +749,7 @@ include 'maxwt.f'
    if( unweighted .and. .not. warmup .and. AccepCounter_part(iPart_sel,jPart_sel) .ge. RequEvents(iPart_sel,jPart_Sel)  ) return
 
 
-   call VVBranchings(MY_IDUP(5:10),ICOLUP(1:2,7:10),FinalStateWeight,700)
+   call VVBranchings(MY_IDUP(V1:NUP),ICOLUP(1:2,V2+1:NUP),FinalStateWeight,700)
    call swap(MY_IDUP(Lep1P),MY_IDUP(Lep1M))
    call swap(MY_IDUP(Lep2P),MY_IDUP(Lep2M))
    MY_IDUP(1:2) = Glu_
@@ -761,18 +761,16 @@ include 'maxwt.f'
       !pause
    endif
 
-   call PDFMapping(2,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi,EhatMin=dmax1(m4l_minmax(1),0d0))
-   !call EvalPhasespace_ggVV4f(yRnd(3),yRnd(4:17),EHat,MomExt(1:4,1:10),PSWgt,id_MCFM(1:8),swap34_56,id12_78)
-   call boost2Lab(eta1,eta2,10,MomExt(1:4,1:10))
+   call EvalPhasespace_ggVV4f(yRnd(1:10),eta1,eta2,EHat,MomExt(1:4,1:NUP),PSWgt,id_MCFM(1:6),swap34_56)
+   call boost2Lab(eta1,eta2,10,MomExt(1:4,1:NUP))
    PSWgt = PSWgt * FinalStateWeight
-
 
    call Kinematics_VV4f_fullproddec(MomExt,id_MCFM,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.lt.1d-33 ) then
       return
    endif
 
-   call SetRunningScales( (/ (MomExt(1:4,3)+MomExt(1:4,4)),Mom_Not_a_particle(1:4),Mom_Not_a_particle(1:4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) )
+   call SetRunningScales( (/ (MomExt(1:4,V1)+MomExt(1:4,V2)),Mom_Not_a_particle(1:4),Mom_Not_a_particle(1:4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) )
    !write(6,*) "setPDFs args:",eta1,eta2,alphas,alphas_mz
    call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
@@ -809,7 +807,7 @@ include 'maxwt.f'
 
    originalprobability = msq_MCFM(iPart_sel,jPart_sel)
 
-   PreFac = fbGeV2 * FluxFac * PSWgt * sHatJacobi * m1ffwgt * m2ffwgt
+   PreFac = fbGeV2 * FluxFac * PSWgt * m1ffwgt * m2ffwgt
    msq_MCFM = msq_MCFM * PreFac / (GeV**4)  ! adjust msq_MCFM for GeV units of MCFM mat.el.
 
    if ( &
