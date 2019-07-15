@@ -6763,7 +6763,7 @@ logical :: swap34_56
 
 
    ! Find s34 = Energy**2
-   if( Emin.gt.M_Reso+2*Ga_Reso .or. Emax.lt.M_Reso-2*Ga_Reso .or. Process.eq.67 ) then ! Create a 4f tail
+   if( Emin.gt.M_Reso+2*Ga_Reso .or. Emax.lt.M_Reso-2*Ga_Reso .or. Process.eq.74 ) then ! Create a 4f tail
       Jac1 = k_l(xRnd(1),Emin**2,Emax**2,s34)
    else ! Create an H boson around the BW
       Jac1 = k_BreitWigner(xRnd(1),M_Reso**2,Ga_Reso*RescaleWidth,Emin**2,Emax**2,s34)
