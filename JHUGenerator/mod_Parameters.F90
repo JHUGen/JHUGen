@@ -191,18 +191,21 @@ real(8), public            :: M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-
 real(8), public            :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-2011)
 real(8), public            :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
 real(8), public            :: Ga_W    = 2.085d0   *GeV      ! W boson width(PDG-2011)
-real(8), public            :: M_Reso  = 125.0d0   *GeV      ! X resonance mass (spin 0, spin 1, spin 2)     (can be overwritten by command line argument)
+real(8), public            :: M_Reso  = 125.0d0   *GeV      ! X resonance mass (spin 0, spin 1, spin 2, can be overwritten by command line argument)
 real(8), public            :: Ga_Reso = 0.00407d0 *GeV      ! X resonance width
-real(8), public            :: HiggsDecayLengthMM = 0d0      ! Higgs decay length in [mm]
-real(8), public            :: M_Reso2 = -1d0      *GeV      ! second resonance mass (spin 0 in off-shell VBF)     (can be overwritten by command line argument)
+real(8), public            :: M_Reso2 = -1d0      *GeV      ! second resonance mass (spin 0 in off-shell MCFM, can be overwritten by command line argument)
 real(8), public            :: Ga_Reso2= 0d0       *GeV      ! second resonance width
+
+real(8), public            :: HiggsDecayLengthMM = 0d0      ! Higgs decay length in [mm]
 
 real(8), public            :: m_bot = 4.75d0       *GeV     ! bottom quark mass
 real(8), public            :: m_charm = 1.275d0    *GeV     ! charm quark mass
 real(8), public            :: m_el = 0.00051100d0  *GeV     ! electron mass
 real(8), public            :: m_mu = 0.10566d0     *GeV     ! muon mass
 real(8), public            :: m_tau = 1.7768d0     *GeV     ! tau mass
-real(8), public            :: Ga_tau =2.267d-12    *GeV     ! tau width
+real(8), public            :: Ga_tau = 2.267d-12   *GeV     ! tau width
+real(8), public            :: m_bot_4gen = 100000d0*GeV     ! b mass for fourth-generation loop in gg MCFM
+real(8), public            :: m_top_4gen = 100000d0*GeV     ! t mass for fourth-generation loop in gg MCFM
 
 real(8), public            :: Gf = 1.16639d-5/GeV**2        ! Fermi constant
 real(8), public            :: alpha_QED = 1d0/128d0         ! el.magn. coupling
@@ -331,8 +334,13 @@ real(8), public, parameter :: Lambda2 = 1000d0    *GeV      ! for second resonan
    complex(8), public :: ghg3 = (0d0,0d0)
    complex(8), public :: ghg4 = (0d0,0d0)   ! pseudoscalar
 
+!-- Hgg couplings to gluons for point-like vertices (4th generation vertex for MCFM)
+   complex(8), public :: ghg2_4gen = (0d0,0d0)
+   complex(8), public :: ghg3_4gen = (0d0,0d0)
+   complex(8), public :: ghg4_4gen = (0d0,0d0)
+
 !-- HVV' couplings to ZZ/ZA/AA and WW
-   complex(8), public :: ghz1 = (2.0d0,0d0)   ! SM=2
+   complex(8), public :: ghz1 = (2.0d0,0d0) ! SM=2 (MCFM => =1)
    complex(8), public :: ghz2 = (0d0,0d0)
    complex(8), public :: ghz3 = (0d0,0d0)
    complex(8), public :: ghz4 = (0d0,0d0)   ! pseudoscalar
@@ -670,7 +678,17 @@ real(8), public, parameter :: Lambda2 = 1000d0    *GeV      ! for second resonan
 
 
 
-!-- second resonance (H2) couplings for off-shell VBF
+!-- second resonance (H2) couplings for MCFM interface
+!-- Hgg couplings to gluons for point-like vertices
+   complex(8), public :: gh2g2 = (0d0,0d0)
+   complex(8), public :: gh2g3 = (0d0,0d0)
+   complex(8), public :: gh2g4 = (0d0,0d0)   ! pseudoscalar
+
+!-- Hgg couplings to gluons for point-like vertices (4th generation vertex for MCFM)
+   complex(8), public :: gh2g2_4gen = (0d0,0d0)
+   complex(8), public :: gh2g3_4gen = (0d0,0d0)
+   complex(8), public :: gh2g4_4gen = (0d0,0d0)
+
 !-- HVV' couplings to ZZ/ZA/AA and WW
    complex(8), public :: gh2z1 = (0.0d0,0d0)
    complex(8), public :: gh2z2 = (0.0d0,0d0)
@@ -822,13 +840,32 @@ real(8), public, parameter :: Lambda2 = 1000d0    *GeV      ! for second resonan
    complex(8),    public :: dFour_Z= (0.0d0,0d0)
 
 
-
-
-
-
 !-- Hff couplings for ttbar+H and bbar+H
    complex(8), public :: kappa       = (1d0,0d0)
    complex(8), public :: kappa_tilde = (0d0,0d0)
+!-- first resonance (H) couplings
+   ! Usable in JHUGen-only processes
+   complex(8), public :: kappa_top       = (1d0,0d0)
+   complex(8), public :: kappa_tilde_top = (0d0,0d0)
+   complex(8), public :: kappa_bot       = (1d0,0d0)
+   complex(8), public :: kappa_tilde_bot = (0d0,0d0)
+   ! Extra MCFM couplings to fourth-generation quarks
+   complex(8), public :: kappa_4gen_top       = (0d0,0d0)
+   complex(8), public :: kappa_tilde_4gen_top = (0d0,0d0)
+   complex(8), public :: kappa_4gen_bot       = (0d0,0d0)
+   complex(8), public :: kappa_tilde_4gen_bot = (0d0,0d0)
+
+!-- seconds resonance (H2) couplings for MCFM interface
+   complex(8), public :: kappa2_top       = (0d0,0d0)
+   complex(8), public :: kappa2_tilde_top = (0d0,0d0)
+   complex(8), public :: kappa2_bot       = (0d0,0d0)
+   complex(8), public :: kappa2_tilde_bot = (0d0,0d0)
+
+   complex(8), public :: kappa2_4gen_top       = (0d0,0d0)
+   complex(8), public :: kappa2_tilde_4gen_top = (0d0,0d0)
+   complex(8), public :: kappa2_4gen_bot       = (0d0,0d0)
+   complex(8), public :: kappa2_tilde_4gen_bot = (0d0,0d0)
+
 
 !--------------------!
 !-----! Spin-1 !-----!

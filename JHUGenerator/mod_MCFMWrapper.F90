@@ -3,7 +3,7 @@ implicit none
 private
 
 public :: MCFM_firsttime
-public :: Setup_MCFM_qqVVqq_firsttime,Setup_MCFM_qqVVqq,EvalAmp_qqVVqq,Check_APartHash_MCFM_qqVVqq
+public :: Setup_MCFM_qqVVqq_firsttime,Setup_MCFM_gg4f_firsttime,Setup_MCFM_qqVVqq,EvalAmp_qqVVqq,Check_APartHash_MCFM_qqVVqq
 
 integer, parameter, public :: mxpart=14
 integer, parameter :: mxdim=26
@@ -173,6 +173,13 @@ subroutine MCFM_firsttime()
 
    integer separateWWZZcouplings
 
+   ! Second resonance couplings
+   double complex H2ggcoupl(1:SIZE_HGG)
+   double complex H2ttcoupl(1:SIZE_HQQ)
+   double complex H2bbcoupl(1:SIZE_HQQ)
+   double complex H2g4g4coupl(1:SIZE_HGG)
+   double complex H2t4t4coupl(1:SIZE_HQQ)
+   double complex H2b4b4coupl(1:SIZE_HQQ)
 
    double complex H2zzcoupl(1:SIZE_HVV)
    double complex H2wwcoupl(1:SIZE_HVV)
@@ -189,7 +196,7 @@ subroutine MCFM_firsttime()
    integer H2zzCLambda_qsq(1:SIZE_HVV_CQSQ)
    integer H2wwCLambda_qsq(1:SIZE_HVV_CQSQ)
 
-
+   ! EW continuum couplings
    double complex aTQGCcoupl(1:SIZE_ATQGC)
 
 
@@ -234,12 +241,9 @@ subroutine MCFM_firsttime()
 
    ! For Init_MCFMCommon_spinzerohiggs_anomcoupl
    call GetLambdaBSM(HLambdaBSM,H2LambdaBSM)
-   call GetSpinZeroGGCouplings(Hggcoupl)
-   call GetSpinZeroQQCouplings(Httcoupl)
-   Hbbcoupl(:)=Httcoupl(:)
-   Hg4g4coupl(:)=0d0
-   Ht4t4coupl(:)=0d0
-   Hb4b4coupl(:)=0d0
+   call GetSpinZeroGGCouplings(1, Hggcoupl, Hg4g4coupl)
+   call GetSpinZeroQQCouplings(1, 6, Httcoupl, Ht4t4coupl)
+   call GetSpinZeroQQCouplings(1, 5, Hbbcoupl, Hb4b4coupl)
    Ht4t4_mt_4gen=10000d0
    Hb4b4_mb_4gen=10000d0
    call GetSpinZeroVVCouplings(1, .false., Hzzcoupl, HzzCLambda_qsq, HzzLambda_qsq, HzzLambda, HLambda_zgs1, HLambda_Q)
@@ -247,6 +251,14 @@ subroutine MCFM_firsttime()
    call GetDistinguishWWCouplingsFlag(separateWWZZcouplings)
 
 !  second resonance
+   H2bbcoupl(:)=0d0
+   H2ttcoupl(:)=0d0
+   H2g4g4coupl(:)=0d0
+   H2t4t4coupl(:)=0d0
+   H2b4b4coupl(:)=0d0
+   call GetSpinZeroGGCouplings(2, H2ggcoupl, H2g4g4coupl)
+   call GetSpinZeroQQCouplings(2, 6, H2ttcoupl, H2t4t4coupl)
+   call GetSpinZeroQQCouplings(2, 5, H2bbcoupl, H2b4b4coupl)
    call GetSpinZeroVVCouplings(2, .false., H2zzcoupl, H2zzCLambda_qsq, H2zzLambda_qsq, H2zzLambda, H2Lambda_zgs1, H2Lambda_Q)
    call GetSpinZeroVVCouplings(2, .true.,  H2wwcoupl, H2wwCLambda_qsq, H2wwLambda_qsq, H2wwLambda, H2Lambda_zgs1, H2Lambda_Q)
 
@@ -256,15 +268,20 @@ subroutine MCFM_firsttime()
 
    call qlinit()
 
-   call Init_MCFMCommon_spinzerohiggs_anomcoupl(Hggcoupl,Httcoupl,Hbbcoupl,Hg4g4coupl,Ht4t4coupl,Hb4b4coupl,    &
+   call Init_MCFMCommon_spinzerohiggs_anomcoupl( &
+                                                Hggcoupl,Httcoupl,Hbbcoupl,          &
+                                                Hg4g4coupl,Ht4t4coupl,Hb4b4coupl,    &
                                                 Hzzcoupl,Hwwcoupl,     &
-                                                Hb4b4_mb_4gen,Ht4t4_mt_4gen,HLambdaBSM,HLambda_Q,HLambda_zgs1,HzzLambda,HwwLambda,    &
+                                                Hb4b4_mb_4gen,Ht4t4_mt_4gen, &
+                                                HLambdaBSM,HLambda_Q,HLambda_zgs1,HzzLambda,HwwLambda, &
                                                 HzzLambda_qsq,HwwLambda_qsq,HzzCLambda_qsq,HwwCLambda_qsq,   &
                                                 separateWWZZcouplings,  &
                                                 h2mass_in, h2width_in, &
+                                                H2ggcoupl,H2ttcoupl,H2bbcoupl,          &
+                                                H2g4g4coupl,H2t4t4coupl,H2b4b4coupl,    &
                                                 H2zzcoupl,H2wwcoupl,   &
-                                                H2zzCLambda_qsq,H2wwCLambda_qsq,H2zzLambda_qsq,H2wwLambda_qsq,H2zzLambda,  &
-                                                H2wwLambda,H2Lambda_zgs1,H2Lambda_Q,H2LambdaBSM, &
+                                                H2LambdaBSM,H2Lambda_Q,H2Lambda_zgs1,H2zzLambda,H2wwLambda, &
+                                                H2zzLambda_qsq,H2wwLambda_qsq,H2zzCLambda_qsq,H2wwCLambda_qsq, &
                                                 aTQGCcoupl &
                                                )
 
@@ -366,36 +383,19 @@ subroutine Init_MCFMCommon_masses( &
 end subroutine
 
 subroutine Init_MCFMCommon_spinzerohiggs_anomcoupl( &
-   Hggcoupl, &
-   Httcoupl, &
-   Hbbcoupl, &
-   Hg4g4coupl, &
-   Ht4t4coupl, &
-   Hb4b4coupl, &
-
-   Hzzcoupl, &
-   Hwwcoupl, &
-
-   Hb4b4_mb_4gen, &
-   Ht4t4_mt_4gen, &
-
-   HLambdaBSM, &
-   HLambda_Q, &
-   HLambda_zgs1, &
-   HzzLambda, &
-   HwwLambda, &
-
-   HzzLambda_qsq, &
-   HwwLambda_qsq, &
-   HzzCLambda_qsq, &
-   HwwCLambda_qsq, &
-
-   separateWWZZcouplings, &
-
+   Hggcoupl,Httcoupl,Hbbcoupl,          &
+   Hg4g4coupl,Ht4t4coupl,Hb4b4coupl,    &
+   Hzzcoupl,Hwwcoupl,     &
+   Hb4b4_mb_4gen,Ht4t4_mt_4gen, &
+   HLambdaBSM,HLambda_Q,HLambda_zgs1,HzzLambda,HwwLambda, &
+   HzzLambda_qsq,HwwLambda_qsq,HzzCLambda_qsq,HwwCLambda_qsq,   &
+   separateWWZZcouplings,  &
    h2mass_in, h2width_in, &
+   H2ggcoupl,H2ttcoupl,H2bbcoupl,          &
+   H2g4g4coupl,H2t4t4coupl,H2b4b4coupl,    &
    H2zzcoupl,H2wwcoupl,   &
-   H2zzCLambda_qsq,H2wwCLambda_qsq,H2zzLambda_qsq,H2wwLambda_qsq,H2zzLambda,H2wwLambda,H2Lambda_zgs1,H2Lambda_Q,H2LambdaBSM, &
-
+   H2LambdaBSM,H2Lambda_Q,H2Lambda_zgs1,H2zzLambda,H2wwLambda, &
+   H2zzLambda_qsq,H2wwLambda_qsq,H2zzCLambda_qsq,H2wwCLambda_qsq, &
    aTQGCcoupl &
    )
    implicit none
@@ -428,6 +428,14 @@ subroutine Init_MCFMCommon_spinzerohiggs_anomcoupl( &
 
    double precision h2mass_in, h2width_in
 
+   ! Secomd resonance couplings
+   double complex H2ggcoupl(1:SIZE_HGG)
+   double complex H2ttcoupl(1:SIZE_HQQ)
+   double complex H2bbcoupl(1:SIZE_HQQ)
+   double complex H2g4g4coupl(1:SIZE_HGG)
+   double complex H2t4t4coupl(1:SIZE_HQQ)
+   double complex H2b4b4coupl(1:SIZE_HQQ)
+
    double complex H2zzcoupl(1:SIZE_HVV)
    double complex H2wwcoupl(1:SIZE_HVV)
 
@@ -444,7 +452,6 @@ subroutine Init_MCFMCommon_spinzerohiggs_anomcoupl( &
    integer H2wwCLambda_qsq(1:SIZE_HVV_CQSQ)
 
    double complex aTQGCcoupl(1:SIZE_ATQGC)
-
 
 
    ! MCFM declarations: Needs to be a verbatim copy of spinzerohiggs_anomcoupl.f
@@ -659,6 +666,10 @@ subroutine Init_MCFMCommon_spinzerohiggs_anomcoupl( &
    channeltoggle_stu=2 ! s=0/t+u=1/s+t+u=2
    vvhvvtoggle_vbfvh=2 ! vbf=0/vh=1/vbf+vh=2
 
+   ! Common masses for fourth generation quarks
+   mb_4gen = Hb4b4_mb_4gen
+   mt_4gen = Ht4t4_mt_4gen
+
 !   /***** REGULAR RESONANCE *****/
    LambdaBSM = HLambdaBSM
    Lambda_Q = HLambda_Q
@@ -692,8 +703,6 @@ subroutine Init_MCFMCommon_spinzerohiggs_anomcoupl( &
    ghg2 = Hggcoupl(gHIGGS_GG_2)
    ghg3 = Hggcoupl(gHIGGS_GG_3)
    ghg4 = Hggcoupl(gHIGGS_GG_4)
-   mb_4gen = Hb4b4_mb_4gen
-   mt_4gen = Ht4t4_mt_4gen
    kappa_4gen_top = Ht4t4coupl(gHIGGS_KAPPA)
    kappa_4gen_bot = Hb4b4coupl(gHIGGS_KAPPA)
    kappa_tilde_4gen_top = Ht4t4coupl(gHIGGS_KAPPA_TILDE)
@@ -886,22 +895,20 @@ subroutine Init_MCFMCommon_spinzerohiggs_anomcoupl( &
    Lambda2_z30 = H2zzLambda_qsq(LambdaHIGGS_QSQ_VV_3,cLambdaHIGGS_VV_QSQ12)
    Lambda2_z40 = H2zzLambda_qsq(LambdaHIGGS_QSQ_VV_4,cLambdaHIGGS_VV_QSQ12)
 
-!    kappa_top = Httcoupl(gHIGGS_KAPPA)
-!    kappa_bot = Hbbcoupl(gHIGGS_KAPPA)
-!    kappa_tilde_top = Httcoupl(gHIGGS_KAPPA_TILDE)
-!    kappa_tilde_bot = Hbbcoupl(gHIGGS_KAPPA_TILDE)
-!    ghg2 = Hggcoupl(gHIGGS_GG_2)
-!    ghg3 = Hggcoupl(gHIGGS_GG_3)
-!    ghg4 = Hggcoupl(gHIGGS_GG_4)
-!    mb_4gen = Hb4b4_mb_4gen
-!    mt_4gen = Ht4t4_mt_4gen
-!    kappa_4gen_top = Ht4t4coupl(gHIGGS_KAPPA)
-!    kappa_4gen_bot = Hb4b4coupl(gHIGGS_KAPPA)
-!    kappa_tilde_4gen_top = Ht4t4coupl(gHIGGS_KAPPA_TILDE)
-!    kappa_tilde_4gen_bot = Hb4b4coupl(gHIGGS_KAPPA_TILDE)
-!    ghg2_4gen = Hg4g4coupl(gHIGGS_GG_2)
-!    ghg3_4gen = Hg4g4coupl(gHIGGS_GG_3)
-!    ghg4_4gen = Hg4g4coupl(gHIGGS_GG_4)
+   kappa2_top = H2ttcoupl(gHIGGS_KAPPA)
+   kappa2_bot = H2bbcoupl(gHIGGS_KAPPA)
+   kappa2_tilde_top = H2ttcoupl(gHIGGS_KAPPA_TILDE)
+   kappa2_tilde_bot = H2bbcoupl(gHIGGS_KAPPA_TILDE)
+   gh2g2 = H2ggcoupl(gHIGGS_GG_2)
+   gh2g3 = H2ggcoupl(gHIGGS_GG_3)
+   gh2g4 = H2ggcoupl(gHIGGS_GG_4)
+   kappa2_4gen_top = H2t4t4coupl(gHIGGS_KAPPA)
+   kappa2_4gen_bot = H2b4b4coupl(gHIGGS_KAPPA)
+   kappa2_tilde_4gen_top = H2t4t4coupl(gHIGGS_KAPPA_TILDE)
+   kappa2_tilde_4gen_bot = H2b4b4coupl(gHIGGS_KAPPA_TILDE)
+   gh2g2_4gen = H2g4g4coupl(gHIGGS_GG_2)
+   gh2g3_4gen = H2g4g4coupl(gHIGGS_GG_3)
+   gh2g4_4gen = H2g4g4coupl(gHIGGS_GG_4)
 
    gh2z1 = H2zzcoupl(gHIGGS_VV_1)
    gh2z2 = H2zzcoupl(gHIGGS_VV_2)
@@ -1314,6 +1321,7 @@ subroutine GetLambdaBSM(Lambda_BSM,Lambda2_BSM)
 end subroutine
 
 subroutine GetSpinZeroVVCouplings(NReso, useWWcoupl, vvcoupl, cqsq, Lambda_qsq, Lambdag, Lambdag_zgs1, Lambdag_Q)
+   use ModMisc
    use ModParameters
    implicit none
    integer, intent(in) :: NReso
@@ -1469,7 +1477,7 @@ subroutine GetSpinZeroVVCouplings(NReso, useWWcoupl, vvcoupl, cqsq, Lambda_qsq, 
          vvcoupl(gHIGGS_AA_4) = czero
       endif
 
-   else! second resonance
+   else if (NReso.eq.2) then! second resonance
       Lambdag_zgs1 = Lambda2_zgs1
       Lambdag_Q = Lambda2_Q
       if(.not.useWWcoupl) then
@@ -1608,6 +1616,8 @@ subroutine GetSpinZeroVVCouplings(NReso, useWWcoupl, vvcoupl, cqsq, Lambda_qsq, 
          vvcoupl(gHIGGS_AA_3) = czero
          vvcoupl(gHIGGS_AA_4) = czero
       endif
+   else
+      call error("Resonance not implemented")
    endif! end second resonance
 
    ! Scale lambdas by 1/GeV for MCFM units rather than JHUGen
@@ -1630,22 +1640,70 @@ subroutine GetDistinguishWWCouplingsFlag(doAllow)
 end subroutine
 
 
-subroutine GetSpinZeroGGCouplings(ggcoupl)
+subroutine GetSpinZeroGGCouplings(NReso, ggcoupl, ggcoupl_4gen)
+   use ModMisc
    use ModParameters
    implicit none
-   double complex, intent(out) :: ggcoupl(1:3)
+   integer, intent(in) :: NReso
+   double complex, intent(out) :: ggcoupl(1:3),ggcoupl_4gen(1:3)
 
-   ggcoupl(gHIGGS_GG_2) = dcmplx(ghg2)
-   ggcoupl(gHIGGS_GG_3) = dcmplx(ghg3)
-   ggcoupl(gHIGGS_GG_4) = dcmplx(ghg4)
+   if (NReso.eq.1) then
+      ggcoupl(gHIGGS_GG_2) = dcmplx(ghg2)
+      ggcoupl(gHIGGS_GG_3) = dcmplx(ghg3)
+      ggcoupl(gHIGGS_GG_4) = dcmplx(ghg4)
+
+      ggcoupl_4gen(gHIGGS_GG_2) = dcmplx(ghg2_4gen)
+      ggcoupl_4gen(gHIGGS_GG_3) = dcmplx(ghg3_4gen)
+      ggcoupl_4gen(gHIGGS_GG_4) = dcmplx(ghg4_4gen)
+   else if (NReso.eq.2) then
+      ggcoupl(gHIGGS_GG_2) = dcmplx(gh2g2)
+      ggcoupl(gHIGGS_GG_3) = dcmplx(gh2g3)
+      ggcoupl(gHIGGS_GG_4) = dcmplx(gh2g4)
+
+      ggcoupl_4gen(gHIGGS_GG_2) = dcmplx(gh2g2_4gen)
+      ggcoupl_4gen(gHIGGS_GG_3) = dcmplx(gh2g3_4gen)
+      ggcoupl_4gen(gHIGGS_GG_4) = dcmplx(gh2g4_4gen)
+   else
+      call error("Resonance not implemented")
+   endif
+
 end subroutine
-subroutine GetSpinZeroQQCouplings(qqcoupl)
+subroutine GetSpinZeroQQCouplings(NReso, quark_id, qqcoupl, qqcoupl_4gen)
+   use ModMisc
    use ModParameters
    implicit none
-   double complex, intent(out) :: qqcoupl(1:2)
+   integer, intent(in) :: NReso,quark_id
+   double complex, intent(out) :: qqcoupl(1:2),qqcoupl_4gen(1:2)
 
-   qqcoupl(gHIGGS_KAPPA) = dcmplx(kappa)
-   qqcoupl(gHIGGS_KAPPA_TILDE) = dcmplx(kappa_tilde)
+   if (NReso.eq.1) then
+      if (quark_id .eq. 6) then
+         qqcoupl(gHIGGS_KAPPA) = dcmplx(kappa_top)
+         qqcoupl(gHIGGS_KAPPA_TILDE) = dcmplx(kappa_tilde_top)
+         qqcoupl_4gen(gHIGGS_KAPPA) = dcmplx(kappa_4gen_top)
+         qqcoupl_4gen(gHIGGS_KAPPA_TILDE) = dcmplx(kappa_tilde_4gen_top)
+      else if (quark_id .eq. 5) then
+         qqcoupl(gHIGGS_KAPPA) = dcmplx(kappa_bot)
+         qqcoupl(gHIGGS_KAPPA_TILDE) = dcmplx(kappa_tilde_bot)
+         qqcoupl_4gen(gHIGGS_KAPPA) = dcmplx(kappa_4gen_bot)
+         qqcoupl_4gen(gHIGGS_KAPPA_TILDE) = dcmplx(kappa_tilde_4gen_bot)
+      endif
+   else if (NReso.eq.2) then
+      if (quark_id .eq. 6) then
+         qqcoupl(gHIGGS_KAPPA) = dcmplx(kappa2_top)
+         qqcoupl(gHIGGS_KAPPA_TILDE) = dcmplx(kappa2_tilde_top)
+         qqcoupl_4gen(gHIGGS_KAPPA) = dcmplx(kappa2_4gen_top)
+         qqcoupl_4gen(gHIGGS_KAPPA_TILDE) = dcmplx(kappa2_tilde_4gen_top)
+      else if (quark_id .eq. 5) then
+         qqcoupl(gHIGGS_KAPPA) = dcmplx(kappa2_bot)
+         qqcoupl(gHIGGS_KAPPA_TILDE) = dcmplx(kappa2_tilde_bot)
+         qqcoupl_4gen(gHIGGS_KAPPA) = dcmplx(kappa2_4gen_bot)
+         qqcoupl_4gen(gHIGGS_KAPPA_TILDE) = dcmplx(kappa2_tilde_4gen_bot)
+      endif
+   else
+      call error("Resonance not implemented")
+   endif
+
+
 end subroutine
 
 subroutine GetATQGCCouplings(coupl)
@@ -1689,9 +1747,9 @@ end subroutine
 !!!!!!!!!!!!
 ! Setup functions for specific MCFM processes
 ! qqZZqq/qqWWqq/qqVVqq (or _strong versions)
-subroutine Setup_MCFM_qqVVqq_firsttime(iProc)
+subroutine Setup_MCFM_qqVVqq_firsttime(iProc, dmode1, dmode2)
 implicit none
-integer, intent(in) :: iProc
+integer, intent(in) :: iProc, dmode1, dmode2
 integer npart
 common/npart/npart
 integer nwz
@@ -1728,12 +1786,14 @@ twidth, &
 tauwidth, &
 mtausq, mcsq, mbsq
 
-   if (iProc.eq.66) then ! Signal-only
+   if (iProc.eq.66 .or. iProc.eq.70) then ! Signal-only
       MCFM_runstring="wbfHO"
-   else if (iProc.eq.67) then ! Bkg-only
+   else if (iProc.eq.67 .or. iProc.eq.71) then ! Bkg-only
       MCFM_runstring="wbfBO"
-   else if (iProc.eq.68) then  ! Signal+bkg
+   else if (iProc.eq.68 .or. iProc.eq.72) then  ! Signal+bkg
       MCFM_runstring="wbfALL" ! Doesn't matter what it is
+   else if (iProc.eq.69) then  ! QCD bkg.
+      MCFM_runstring="sbfBO" ! Doesn't matter what it is
    else
       return ! Not qqVVqq, so skip this function
    endif
@@ -1745,10 +1805,97 @@ mtausq, mcsq, mbsq
    nqcdjets=2
    n2=1
    n3=1
-   mass2 =zmass
-   width2=zwidth
-   mass3 =zmass
-   width3=zwidth
+   if(abs(dmode1).eq.23) then
+      mass2 =zmass
+      width2=zwidth
+   else if (abs(dmode1).eq.24) then
+      mass2 =wmass
+      width2=wwidth
+   endif
+   if(abs(dmode2).eq.23) then
+      mass3 =zmass
+      width3=zwidth
+   else if (abs(dmode2).eq.24) then
+      mass3 =wmass
+      width3=wwidth
+   endif
+
+   ! These two flags are to be changed depending on the 4f flavor
+   vsymfact=1d0
+   interference=.false.
+
+end subroutine
+! gg4f
+subroutine Setup_MCFM_gg4f_firsttime(iProc, dmode1, dmode2)
+implicit none
+integer, intent(in) :: iProc, dmode1, dmode2
+integer npart
+common/npart/npart
+integer nwz
+common/nwz/nwz
+integer ndim,ncall,itmx,nprn
+double precision xl(mxdim),xu(mxdim),acc
+common/bveg1/xl,xu,acc,ndim,ncall,itmx,nprn
+integer nqcdjets,nqcdstart
+common/nqcdjets/nqcdjets,nqcdstart
+integer n2,n3
+double precision mass2,width2,mass3,width3
+common/breit/n2,n3,mass2,width2,mass3,width3
+logical interference,bw34_56
+common/interference/interference,bw34_56
+double precision vsymfact
+common/vsymfact/vsymfact
+double precision &
+md, mu, ms, mc, mb, mt, &
+mel, mmu, mtau, &
+hmass, hwidth, &
+h2mass, h2width, &
+wmass, wwidth, &
+zmass, zwidth, &
+twidth, &
+tauwidth, &
+mtausq, mcsq, mbsq
+common/masses/ &
+md, mu, ms, mc, mb, mt, &
+mel, mmu, mtau, &
+hmass, hwidth, &
+wmass, wwidth, &
+zmass, zwidth, &
+twidth, &
+tauwidth, &
+mtausq, mcsq, mbsq
+
+   if (iProc.eq.73) then ! Signal-only
+      MCFM_runstring="ggHO"
+   else if (iProc.eq.74) then ! Bkg-only
+      MCFM_runstring="ggBO"
+   else if (iProc.eq.75) then  ! Signal+bkg
+      MCFM_runstring="ggALL" ! Doesn't matter what it is
+   else
+      return ! Not qqVVqq, so skip this function
+   endif
+
+   npart=4
+   nwz=0
+   call ckmfill(nwz)
+   ndim=10
+   nqcdjets=0
+   n2=1
+   n3=1
+   if(abs(dmode1).eq.23) then
+      mass2 =zmass
+      width2=zwidth
+   else if (abs(dmode1).eq.24) then
+      mass2 =wmass
+      width2=wwidth
+   endif
+   if(abs(dmode2).eq.23) then
+      mass3 =zmass
+      width3=zwidth
+   else if (abs(dmode2).eq.24) then
+      mass3 =wmass
+      width3=wwidth
+   endif
 
    ! These two flags are to be changed depending on the 4f flavor
    vsymfact=1d0
