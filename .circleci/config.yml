@@ -95,19 +95,9 @@ jobs:
           key: v2_boost_1_61_0
           paths: ~/boost_1_61_0
       - persist_to_workspace:
-          root: ~/JHUGen
+          root: ~
           paths:
-            - .circleci
-            - .git
-            - AnalyticMELA
-            - JHUGenerator
-            - JHUGenMELA
-            - lib
-            - MCFM-JHUGen
-            - Manual
-            - README.md
-            - VH_NLO
-            - Web
+            - JHUGen
 
   build:
     <<: *env
