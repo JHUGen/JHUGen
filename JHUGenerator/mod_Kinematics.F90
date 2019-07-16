@@ -511,7 +511,7 @@ RETURN
 END SUBROUTINE
 
 
-SUBROUTINE WriteOutEvent_VV4f_fullproddec(Mom,MY_IDUP,ICOLUP,EventWeight)
+SUBROUTINE WriteOutEvent_gg4f_fullproddec(Mom,MY_IDUP,ICOLUP,EventWeight)
 use ModParameters
 use ModMisc
 implicit none
@@ -547,7 +547,7 @@ integer, parameter :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6,5/)
          ICOLUP(1:2,2) = (/501,000/)
          ICOLUP(1:2,1) = (/000,501/)
       else
-        print *, "Colors for the ggVV4f process cannot be resolved."
+        print *, "Colors for the gg4f process cannot be resolved."
         print *, MY_IDUP(inTop:inBot)
         stop 1
       endif
@@ -2179,7 +2179,7 @@ END SUBROUTINE
 
 
 
-SUBROUTINE Kinematics_VV4f_fullproddec(MomExt,ids,applyPSCut,NBin)
+SUBROUTINE Kinematics_gg4f_fullproddec(MomExt,ids,applyPSCut,NBin)
 use ModMisc
 use ModParameters
 implicit none
@@ -6730,7 +6730,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
 RETURN
 END SUBROUTINE
 
-SUBROUTINE EvalPhasespace_ggVV4f(xRnd,eta1,eta2,Energy,Mom,Jac,ids,swap34_56)
+SUBROUTINE EvalPhasespace_gg4f(xRnd,eta1,eta2,Energy,Mom,Jac,ids,swap34_56)
 use ModParameters
 use ModPhasespace
 use ModMisc
@@ -6803,7 +6803,7 @@ logical :: swap34_56
    Jac = Jac1*Jac2*Jac3*Jac4*Jac5*Jac6*Jac7 * PSNorm4
 
    if( isNan(jac) ) then
-      print *, "EvalPhasespace_ggVV4f NaN"
+      print *, "EvalPhasespace_gg4f NaN"
       print *, Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7
       if( isNan(jac) ) Jac = 0d0
 

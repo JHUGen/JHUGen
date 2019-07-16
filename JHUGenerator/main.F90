@@ -1456,7 +1456,7 @@ type(SaveValues) :: tosave, oldsavevalues
                     reweightInterference = .false.
                 endif
             endif
-    else
+    else if( .not.interfSet ) then
         includeInterference = .false.   ! no interference if decay mode does not allow 4 same flavor leptons
         reweightInterference = .false.
     endif
@@ -3028,7 +3028,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
 
       if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
       if( Process.ge.66 .and. Process.le.72 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
-      if( Process.ge.73 .and. Process.le.75 ) call vegas(EvalWeighted_ggVV4f_fullproddec,VG_Result,VG_Error,VG_Chi2)
+      if( Process.ge.73 .and. Process.le.75 ) call vegas(EvalWeighted_gg4f_fullproddec,VG_Result,VG_Error,VG_Chi2)
       if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
 
       if( Process.eq.110) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
@@ -3062,7 +3062,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
 
     if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
     if( Process.ge.66 .and. Process.le.72 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
-    if( Process.ge.73 .and. Process.le.75 ) call vegas1(EvalWeighted_ggVV4f_fullproddec,VG_Result,VG_Error,VG_Chi2)
+    if( Process.ge.73 .and. Process.le.75 ) call vegas1(EvalWeighted_gg4f_fullproddec,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
 
     if( Process.eq.110) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
@@ -3107,7 +3107,7 @@ IF( .NOT. (Process.ge.66 .and. Process.le.72) ) THEN! special treatment for offs
         if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-        if( Process.ge.72 .and. Process.le.75 ) call vegas(EvalWeighted_ggVV4f_fullproddec,VG_Result,VG_Error,VG_Chi2)
+        if( Process.ge.72 .and. Process.le.75 ) call vegas(EvalWeighted_gg4f_fullproddec,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.110) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.111) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.112) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
@@ -3122,7 +3122,7 @@ IF( .NOT. (Process.ge.66 .and. Process.le.72) ) THEN! special treatment for offs
 !         if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-        if( Process.ge.73 .and. Process.le.75 ) call vegas1(EvalWeighted_ggVV4f_fullproddec,VG_Result,VG_Error,VG_Chi2)
+        if( Process.ge.73 .and. Process.le.75 ) call vegas1(EvalWeighted_gg4f_fullproddec,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.110) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.111) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.112) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
@@ -3139,7 +3139,7 @@ IF( .NOT. (Process.ge.66 .and. Process.le.72) ) THEN! special treatment for offs
 !         if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-        if( Process.ge.72 .and. Process.le.75 ) call vegas1(EvalWeighted_ggVV4f_fullproddec,VG_Result,VG_Error,VG_Chi2)
+        if( Process.ge.72 .and. Process.le.75 ) call vegas1(EvalWeighted_gg4f_fullproddec,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.110) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.111) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.112) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
@@ -3236,7 +3236,7 @@ IF( .NOT. (Process.ge.66 .and. Process.le.72) ) THEN! special treatment for offs
     !     if( Process.eq.90 ) call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-        if( Process.ge.73 .and. Process.le.75 ) call vegas1(EvalWeighted_ggVV4f_fullproddec,VG_Result,VG_Error,VG_Chi2)
+        if( Process.ge.73 .and. Process.le.75 ) call vegas1(EvalWeighted_gg4f_fullproddec,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.110) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.111) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.112) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)

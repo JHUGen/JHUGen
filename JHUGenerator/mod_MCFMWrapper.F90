@@ -3,7 +3,7 @@ implicit none
 private
 
 public :: MCFM_firsttime
-public :: Setup_MCFM_qqVVqq_firsttime,Setup_MCFM_gg4f_firsttime,Setup_MCFM_qqVVqq,EvalAmp_qqVVqq,Check_APartHash_MCFM_qqVVqq
+public :: Setup_MCFM_qqVVqq_firsttime,Setup_MCFM_gg4f_firsttime,Setup_MCFM_qqVVqq,Setup_MCFM_gg4f,Check_APartHash_MCFM_qqVVqq,EvalAmp_qqVVqq,EvalAmp_gg4f
 
 integer, parameter, public :: mxpart=14
 integer, parameter :: mxdim=26
@@ -1742,12 +1742,11 @@ end subroutine
 
 
 
-!!!!!!!!!!!!
-!! qqVVqq !!
-!!!!!!!!!!!!
 ! Setup functions for specific MCFM processes
+
 ! qqZZqq/qqWWqq/qqVVqq (or _strong versions)
 subroutine Setup_MCFM_qqVVqq_firsttime(iProc, dmode1, dmode2)
+use ModMisc, only : Error
 implicit none
 integer, intent(in) :: iProc, dmode1, dmode2
 integer npart
@@ -1795,7 +1794,7 @@ mtausq, mcsq, mbsq
    else if (iProc.eq.69) then  ! QCD bkg.
       MCFM_runstring="sbfBO" ! Doesn't matter what it is
    else
-      return ! Not qqVVqq, so skip this function
+      call Error("Setup_MCFM_qqVVqq_firsttime: Process undefined")
    endif
 
    npart=6
@@ -1825,8 +1824,10 @@ mtausq, mcsq, mbsq
    interference=.false.
 
 end subroutine
+
 ! gg4f
 subroutine Setup_MCFM_gg4f_firsttime(iProc, dmode1, dmode2)
+use ModMisc, only : Error
 implicit none
 integer, intent(in) :: iProc, dmode1, dmode2
 integer npart
@@ -1872,7 +1873,7 @@ mtausq, mcsq, mbsq
    else if (iProc.eq.75) then  ! Signal+bkg
       MCFM_runstring="ggALL" ! Doesn't matter what it is
    else
-      return ! Not qqVVqq, so skip this function
+      call Error("Setup_MCFM_gg4f_firsttime: Process undefined")
    endif
 
    npart=4
@@ -1978,6 +1979,63 @@ common/zcouple/l,r,q1,l1,r1,q2,l2,r2,le,ln,re,rn,sin2w
 
 end function
 
+function Setup_MCFM_gg4f(pid_MCFM_in,p_MCFM_in,pid_MCFM,p_MCFM,ZWcode)
+use ModParameters, only : Z0_, includeInterference
+implicit none
+logical :: Setup_MCFM_gg4f
+integer, intent(in) :: pid_MCFM_in(1:mxpart)
+real(8), intent(in) :: p_MCFM_in(1:mxpart,1:4)
+integer, intent(out) :: pid_MCFM(1:mxpart),ZWcode
+real(8), intent(out) :: p_MCFM(1:mxpart,1:4)
+integer :: decayOrdering(1:4),idV(1:2),idVswap(1:2)
+integer :: ip
+
+logical interference,bw34_56
+common/interference/interference,bw34_56
+double precision vsymfact
+common/vsymfact/vsymfact
+
+double precision l(nf),r(nf),le,ln,re,rn,sin2w,q1,l1,r1,q2,l2,r2
+common/zcouple/l,r,q1,l1,r1,q2,l2,r2,le,ln,re,rn,sin2w
+
+   Setup_MCFM_gg4f=.false.
+   pid_MCFM(:) = pid_MCFM_in(:)
+   p_MCFM(:,:) = p_MCFM_in(:,:)
+
+   ! Assign ordered daughter momenta
+   call Check_DaughterOrdering_MCFM_gg4f(pid_MCFM_in(3:6),decayOrdering,idV,idVswap,ZWcode)
+   if (any(decayOrdering .lt. 0)) then
+      write(6,*) "Decay ordering could not be determined:",decayOrdering
+      return
+   endif
+   do ip=0,3
+      p_MCFM(3+ip,:) = p_MCFM_in(3+decayOrdering(ip+1),:)
+      pid_MCFM(3+ip) = pid_MCFM_in(3+decayOrdering(ip+1))
+   enddo
+
+   ! Turn 4f interference on as needed
+   if( includeInterference .and. idV(1).eq.idV(2) .and. idVswap(1).eq.idVswap(2) .and. idVswap(1).eq.idV(1) .and. idV(1).eq.Z0_ ) then
+      vsymfact=0.5d0
+      interference=.true.
+   else
+      vsymfact=1d0
+      interference=.false.
+   endif
+
+   ! Set l1, l2
+   l1=0d0;r1=0d0;q1=0d0
+   l2=0d0;r2=0d0;q2=0d0
+   if (pid_MCFM(3).eq.-pid_MCFM(4)) then
+      call Set_MCFMCommon_DecayZCouple_Wrapper(pid_MCFM(3),1)
+   endif
+   if (pid_MCFM(5).eq.-pid_MCFM(6)) then
+      call Set_MCFMCommon_DecayZCouple_Wrapper(pid_MCFM(5),2)
+   endif
+   Setup_MCFM_gg4f = .true.
+
+end function
+
+
 ! Subroutines to check and pass the ordering for the decay particles in the "main" system (e.g. H->4f decay)
 subroutine Check_DaughterOrdering_MCFM_qqVVqq(idPart,order,idV,idVswap,ZWcode)
 use ModParameters, only : includeInterference, Z0_, Wp_, Wm_, Top_, Not_a_particle_, CoupledVertex, IsALepton, IsDownTypeQuark, IsANeutrino, IsUpTypeQuark, convertLHE
@@ -2062,6 +2120,14 @@ common/runstring/runstring
          ZWcode=doZZorWW
       endif
    endif
+end subroutine
+
+subroutine Check_DaughterOrdering_MCFM_gg4f(idPart,order,idV,idVswap,ZWcode)
+implicit none
+integer, intent(in) :: idPart(1:4)
+integer, intent(out) :: order(1:4),idV(1:2),idVswap(1:2),ZWcode
+   ! Daughter ordering does not change wrt. qqVVqq
+   call Check_DaughterOrdering_MCFM_qqVVqq(idPart,order,idV,idVswap,ZWcode)
 end subroutine
 
 ! Subroutines to check and pass the ordering for the associated particles
@@ -2254,6 +2320,8 @@ integer :: i,j,ip
                enddo
                enddo
             endif
+         else
+            call Error("EvalAmp_qqVVqq: Process not implemented!")
          endif
       else if(ZWcode.eq.doWW) then
          if ((Process.ge.66 .and. Process.le.68) .or. (Process.ge.70 .and. Process.le.72)) then
@@ -2307,6 +2375,8 @@ integer :: i,j,ip
                enddo
                enddo
             endif
+         else
+            call Error("EvalAmp_qqVVqq: Process not implemented!")
          endif
       else if(ZWcode.eq.doZZorWW) then
          if ((Process.ge.66 .and. Process.le.68) .or. (Process.ge.70 .and. Process.le.72)) then
@@ -2331,7 +2401,11 @@ integer :: i,j,ip
                enddo
                enddo
             endif
+         else
+            call Error("EvalAmp_qqVVqq: Process not implemented!")
          endif
+      else
+         call Error("EvalAmp_qqVVqq: ZWcode not implemented!")
       endif
 
       ! Wipe the MEs that are not supposed to exist
@@ -2342,7 +2416,7 @@ integer :: i,j,ip
          ( id_MCFM(2).eq.0 .or. id_MCFM(2).eq.convertFromPartIndex(j) ) &
          ) then
             idDummy(1)=convertFromPartIndex(i); idDummy(2)=convertFromPartIndex(j)
-            doNotWipe = Setup_MCFM_qqVVqq(idDummy,pin_MCFMconv,id_MCFM_78swap,p_MCFM,ZWcode) ! no longer using the last threee arguments
+            doNotWipe = Setup_MCFM_qqVVqq(idDummy,pin_MCFMconv,id_MCFM_78swap,p_MCFM,ZWcode) ! no longer using the last three arguments
          endif
          if (.not. doNotWipe) then
             msq(i,j)=0d0
@@ -2352,5 +2426,82 @@ integer :: i,j,ip
    endif
 
 end subroutine
+
+subroutine EvalAmp_gg4f(idin, pin, msq)
+use ModParameters
+use ModMisc
+implicit none
+integer, intent(in) :: idin(1:mxpart)
+real(8), intent(in) :: pin(1:mxpart,1:4)
+real(8)             :: pin_MCFMconv(1:mxpart,1:4)
+integer :: ZWcode
+integer :: id_MCFM(1:mxpart),idDummy(1:mxpart)
+real(8) :: p_MCFM(1:mxpart,1:4)
+real(8) :: msq(-5:5,-5:5),msq_tmp(-5:5,-5:5),msqgg
+integer, parameter :: doZZ=1,doWW=2,doZZorWW=3
+logical :: doCompute,doNotWipe
+integer :: i,j,ip
+
+   msq(:,:)=0d0
+   msq_tmp(:,:)=0d0
+   msqgg=0d0
+
+   pin_MCFMconv(:,:)=pin(:,:)/GeV
+
+   doCompute = Setup_MCFM_gg4f(idin,pin_MCFMconv,id_MCFM,p_MCFM,ZWcode)
+   if (.not.doCompute) then
+      write(6,*) "mod_MCFMWrapper::EvalAmp_gg4f: Setup failed for idin:",idin,"(id_MCFM:",id_MCFM,")"
+      pause
+   endif
+   if (doCompute) then
+      idDummy=idin
+
+      if(ZWcode.eq.doZZ) then
+         if ((Process.ge.73 .and. Process.le.75)) then
+            call SetupParticleLabels(id_MCFM,1,6,.false.,.true.) ! Assign plabels
+            if (Process.eq.73) then
+               call gg_hzz_tb(p_MCFM,msqgg)
+            else if (Process.eq.74) then
+               call gg_zz(p_MCFM,msqgg)
+            else if (Process.eq.75) then
+               call gg_zz_all(p_MCFM,msqgg)
+            else
+               call Error("EvalAmp_gg4f: Process not implemented!")
+            endif
+         endif
+      else if(ZWcode.eq.doWW .or. ZWcode.eq.doZZorWW) then
+         if ((Process.ge.73 .and. Process.le.75)) then
+            call SetupParticleLabels(id_MCFM,1,6,.false.,.true.) ! Assign plabels
+            if (Process.eq.73) then
+               call gg_hvv_tb(p_MCFM,msqgg)
+            else if (Process.eq.74) then
+               call gg_vv(p_MCFM,msqgg)
+            else if (Process.eq.75) then
+               call gg_vv_all(p_MCFM,msqgg)
+            else
+               call Error("EvalAmp_gg4f: Process not implemented!")
+            endif
+         endif
+      else
+         call Error("EvalAmp_gg4f: ZWcode not implemented!")
+      endif
+
+      ! Wipe the ME if it is not supposed to exist
+      if ( &
+      .not.(&
+      ( id_MCFM(1).eq.0 .or. id_MCFM(1).eq.convertFromPartIndex(0) ) .and. &
+      ( id_MCFM(2).eq.0 .or. id_MCFM(2).eq.convertFromPartIndex(0) ) &
+      ) &
+      ) then
+         msqgg=0d0
+      endif
+
+      ! Assign the gg ME value to msq
+      msq(0,0)=msqgg
+
+   endif
+
+end subroutine
+
 
 END MODULE

@@ -708,7 +708,7 @@ RETURN
 END FUNCTION
 
 
-FUNCTION EvalWeighted_ggVV4f_fullproddec(yRnd,VgsWgt)
+FUNCTION EvalWeighted_gg4f_fullproddec(yRnd,VgsWgt)
 #if linkMELA==1
 use ModKinematics
 use ModParameters
@@ -719,7 +719,7 @@ use ifport
 #endif
 implicit none
 integer,parameter :: inTop=1, inBot=2, V1=3, V2=4, Lep1P=5, Lep1M=6, Lep2P=7, Lep2M=8, NUP=8
-real(8) :: yRnd(1:10),VgsWgt, EvalWeighted_ggVV4f_fullproddec
+real(8) :: yRnd(1:10),VgsWgt, EvalWeighted_gg4f_fullproddec
 real(8) :: pdf(-6:6,1:2),me2(-5:5,-5:5)
 real(8) :: eta1, eta2, FluxFac, Ehat
 real(8) :: MomExt(1:4,1:NUP),MomShifted(1:4,1:NUP),PSWgt,FinalStateWeight,m1ffwgt,m2ffwgt
@@ -731,7 +731,7 @@ logical :: applyPSCut,swap34_56
 include 'vegas_common.f'
 include 'maxwt.f'
 
-   EvalWeighted_ggVV4f_fullproddec = 0d0
+   EvalWeighted_gg4f_fullproddec = 0d0
    Wgt_Ratio_Interf = 1d0
    m1ffwgt = 1d0
    m2ffwgt = 1d0
@@ -761,11 +761,11 @@ include 'maxwt.f'
       !pause
    endif
 
-   call EvalPhasespace_ggVV4f(yRnd(1:10),eta1,eta2,EHat,MomExt(1:4,1:NUP),PSWgt,id_MCFM(1:6),swap34_56)
+   call EvalPhasespace_gg4f(yRnd(1:10),eta1,eta2,EHat,MomExt(1:4,1:NUP),PSWgt,id_MCFM(1:6),swap34_56)
    call boost2Lab(eta1,eta2,10,MomExt(1:4,1:NUP))
    PSWgt = PSWgt * FinalStateWeight
 
-   call Kinematics_VV4f_fullproddec(MomExt,id_MCFM,applyPSCut,NBin)
+   call Kinematics_gg4f_fullproddec(MomExt,id_MCFM,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.lt.1d-33 ) then
       return
    endif
@@ -803,7 +803,7 @@ include 'maxwt.f'
    endif
 
 
-   !call EvalAmp_ggVV4f(id_MCFM, p_MCFM, msq_MCFM)
+   call EvalAmp_gg4f(id_MCFM, p_MCFM, msq_MCFM)
 
    originalprobability = msq_MCFM(iPart_sel,jPart_sel)
 
@@ -832,12 +832,12 @@ include 'maxwt.f'
       return
     endif
 
-   EvalWeighted_ggVV4f_fullproddec = msq_MCFM(iPart_sel,jPart_sel) * pdf(LHA2M_pdf(iPart_sel),1)*pdf(LHA2M_pdf(jPart_sel),2)
-   VegasWeighted_fullproddec = EvalWeighted_ggVV4f_fullproddec * VgsWgt
-   !if (EvalWeighted_ggVV4f_fullproddec.eq.0d0) then
-   !   write(6,*) "EvalWeighted_ggVV4f_fullproddec==0. Ids:",id_MCFM
+   EvalWeighted_gg4f_fullproddec = msq_MCFM(iPart_sel,jPart_sel) * pdf(LHA2M_pdf(iPart_sel),1)*pdf(LHA2M_pdf(jPart_sel),2)
+   VegasWeighted_fullproddec = EvalWeighted_gg4f_fullproddec * VgsWgt
+   !if (EvalWeighted_gg4f_fullproddec.eq.0d0) then
+   !   write(6,*) "EvalWeighted_gg4f_fullproddec==0. Ids:",id_MCFM
    !endif
-   !write(6,*) "originalprobability,EvalWeighted_ggVV4f_fullproddec,VgsWgt=",originalprobability,EvalWeighted_ggVV4f_fullproddec,VgsWgt
+   !write(6,*) "originalprobability,EvalWeighted_gg4f_fullproddec,VgsWgt=",originalprobability,EvalWeighted_gg4f_fullproddec,VgsWgt
    !pause
 
 
@@ -882,7 +882,7 @@ include 'maxwt.f'
 
           !Wgt_Ratio_Interf = ReweightLeptonInterference(id_MCFM, p_MCFM, originalprobability)
 
-          call WriteOutEvent_VV4f_fullproddec(MomShifted,MY_IDUP,ICOLUP,EventWeight=Wgt_Ratio_Interf)
+          call WriteOutEvent_gg4f_fullproddec(MomShifted,MY_IDUP,ICOLUP,EventWeight=Wgt_Ratio_Interf)
 
           do NHisto=1,NumHistograms
             call intoHisto(NHisto,NBin(NHisto),1d0)
@@ -898,7 +898,7 @@ include 'maxwt.f'
       if( VegasWeighted_fullproddec.ne.0d0 ) then
         AccepCounter=AccepCounter+1
         if( writeWeightedLHE .and. (.not. warmup) ) then
-            call WriteOutEvent_VV4f_fullproddec(MomShifted,MY_IDUP,ICOLUP,EventWeight=VegasWeighted_fullproddec)
+            call WriteOutEvent_gg4f_fullproddec(MomShifted,MY_IDUP,ICOLUP,EventWeight=VegasWeighted_fullproddec)
         endif
         do NHisto=1,NumHistograms
           call intoHisto(NHisto,NBin(NHisto),VegasWeighted_fullproddec)
@@ -910,8 +910,8 @@ include 'maxwt.f'
 
 #else
 implicit none
-real(8) :: EvalWeighted_ggVV4f_fullproddec
-   EvalWeighted_ggVV4f_fullproddec = 0d0
+real(8) :: EvalWeighted_gg4f_fullproddec
+   EvalWeighted_gg4f_fullproddec = 0d0
    print *, "To use this process, please set linkMELA=Yes in the makefile and recompile."
    print *, "You will also need to have a compiled JHUGenMELA in the directory specified by JHUGenMELADir in the makefile."
    stop 1
