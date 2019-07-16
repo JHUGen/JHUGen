@@ -910,7 +910,7 @@ include 'maxwt.f'
 
 #else
 implicit none
-real(8) :: EvalWeighted_gg4f_fullproddec
+real(8) :: yRnd(1:10),VgsWgt, EvalWeighted_gg4f_fullproddec
    EvalWeighted_gg4f_fullproddec = 0d0
    print *, "To use this process, please set linkMELA=Yes in the makefile and recompile."
    print *, "You will also need to have a compiled JHUGenMELA in the directory specified by JHUGenMELADir in the makefile."

@@ -1791,13 +1791,13 @@ type(SaveValues) :: tosave, oldsavevalues
          if (.not.(Setkappatop .or. Setkappabot .or. SetAnomalousSpin0gg .or. Setkappa4gentop .or. Setkappa4genbot .or. SetAnomalousSpin0gg4gen)) then
             call Error("ggH or ffH vertex couplings need to be set for the first resonance.")
          endif
-         if (.not.SetAnomalousSpin0VV) then
-            call Error("HVV anomalous couplings for the first resonance need to be set.")
-         endif
-      else if (Process.eq.66 .or. Process.eq.68) then
-         if (.not.SetAnomalousSpin0VV) then
-            call Error("HVV anomalous couplings for the first resonance need to be set.")
-         endif
+!         if (.not.SetAnomalousSpin0VV) then
+!            call Error("HVV anomalous couplings for the first resonance need to be set.")
+!         endif
+!      else if (Process.eq.66 .or. Process.eq.68) then
+!         if (.not.SetAnomalousSpin0VV) then
+!            call Error("HVV anomalous couplings for the first resonance need to be set.")
+!         endif
       endif
    endif
 
