@@ -240,22 +240,18 @@ subroutine MCFM_firsttime()
    call couplzajk()
 
    ! For Init_MCFMCommon_spinzerohiggs_anomcoupl
+   call GetGen4QuarkMasses(Hb4b4_mb_4gen,Ht4t4_mt_4gen)
    call GetLambdaBSM(HLambdaBSM,H2LambdaBSM)
+   call GetDistinguishWWCouplingsFlag(separateWWZZcouplings)
+
+!  first resonance
    call GetSpinZeroGGCouplings(1, Hggcoupl, Hg4g4coupl)
    call GetSpinZeroQQCouplings(1, 6, Httcoupl, Ht4t4coupl)
    call GetSpinZeroQQCouplings(1, 5, Hbbcoupl, Hb4b4coupl)
-   Ht4t4_mt_4gen=10000d0
-   Hb4b4_mb_4gen=10000d0
    call GetSpinZeroVVCouplings(1, .false., Hzzcoupl, HzzCLambda_qsq, HzzLambda_qsq, HzzLambda, HLambda_zgs1, HLambda_Q)
    call GetSpinZeroVVCouplings(1, .true., Hwwcoupl, HwwCLambda_qsq, HwwLambda_qsq, HwwLambda, HLambda_zgs1, HLambda_Q)
-   call GetDistinguishWWCouplingsFlag(separateWWZZcouplings)
 
 !  second resonance
-   H2bbcoupl(:)=0d0
-   H2ttcoupl(:)=0d0
-   H2g4g4coupl(:)=0d0
-   H2t4t4coupl(:)=0d0
-   H2b4b4coupl(:)=0d0
    call GetSpinZeroGGCouplings(2, H2ggcoupl, H2g4g4coupl)
    call GetSpinZeroQQCouplings(2, 6, H2ttcoupl, H2t4t4coupl)
    call GetSpinZeroQQCouplings(2, 5, H2bbcoupl, H2b4b4coupl)
@@ -1310,6 +1306,18 @@ subroutine GetMassesWidths( &
 end subroutine
 
 
+
+subroutine GetGen4QuarkMasses(Hb4b4_mb_4gen,Ht4t4_mt_4gen)
+   use ModMisc
+   use ModParameters
+   implicit none
+   double precision Hb4b4_mb_4gen
+   double precision Ht4t4_mt_4gen
+
+   Hb4b4_mb_4gen = m_bot_4gen
+   Ht4t4_mt_4gen = m_top_4gen
+
+end subroutine
 
 subroutine GetLambdaBSM(Lambda_BSM,Lambda2_BSM)
    use ModParameters
