@@ -139,6 +139,9 @@ class JobSubmitter(object):
       67: 164,
       68: 164,
       69: 175,
+      70: 84,
+      71: 84,
+      72: 84,
     }.get(self.Process, None)
 
   def submit(self):
