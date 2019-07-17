@@ -1185,17 +1185,17 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "MWprime", success, M_Wprime, multiply=GeV, success2=SetMWprime, tosave=tosave)
     call ReadCommandLineArgument(arg, "GaWprime", success, Ga_Wprime, multiply=GeV, success2=SetGaWprime, tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "dV_A", success, dV_A, success2=SetATQGC, tosave=tosave)
-    call ReadCommandLineArgument(arg, "dP_A", success, dP_A, success2=SetATQGC, tosave=tosave)
-    call ReadCommandLineArgument(arg, "dM_A", success, dM_A, success2=SetATQGC, tosave=tosave)
-    call ReadCommandLineArgument(arg, "dFour_A", success, dFour_A, success2=SetATQGC, tosave=tosave)
-    call ReadCommandLineArgument(arg, "dV_Z", success, dV_Z, success2=SetATQGC, tosave=tosave)
-    call ReadCommandLineArgument(arg, "dP_Z", success, dP_Z, success2=SetATQGC, tosave=tosave)
-    call ReadCommandLineArgument(arg, "dM_Z", success, dM_Z, success2=SetATQGC, tosave=tosave)
-    call ReadCommandLineArgument(arg, "dFour_Z", success, dFour_Z, success2=SetATQGC, tosave=tosave)
-    call ReadCommandLineArgument(arg, "dAAWpWm", success, dAAWpWm, success2=SetATQGC, tosave=tosave)
-    call ReadCommandLineArgument(arg, "dZAWpWm", success, dZAWpWm, success2=SetATQGC, tosave=tosave)
-    call ReadCommandLineArgument(arg, "dZZWpWm", success, dZZWpWm, success2=SetATQGC, tosave=tosave)
+    call ReadCommandLineArgument(arg, "dV_A", success, dV_A, success2=SetATQGC, tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "dP_A", success, dP_A, success2=SetATQGC, tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "dM_A", success, dM_A, success2=SetATQGC, tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "dFour_A", success, dFour_A, success2=SetATQGC, tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "dV_Z", success, dV_Z, success2=SetATQGC, tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "dP_Z", success, dP_Z, success2=SetATQGC, tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "dM_Z", success, dM_Z, success2=SetATQGC, tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "dFour_Z", success, dFour_Z, success2=SetATQGC, tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "dAAWpWm", success, dAAWpWm, success2=SetATQGC, tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "dZAWpWm", success, dZAWpWm, success2=SetATQGC, tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "dZZWpWm", success, dZZWpWm, success2=SetATQGC, tosave=tosave) !undocumented, pending chapter in manual
 
     ! CKM elements
     call ReadCommandLineArgument(arg, "Vud", success, VCKM_ud, success2=SetCKM, tosave=tosave)
@@ -6028,6 +6028,10 @@ character :: arg*(500)
             write(TheUnit,"(6X,A,2E16.8,A1)") "ahz2=",ahz2,"i"
             write(TheUnit,"(6X,A,2E16.8,A1)") "ahz3=",ahz3,"i"
         else
+            if( cdabs(kappa_top ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "kappa_top=",kappa_top,"i"
+            if( cdabs(kappa_bot ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "kappa_bot=",kappa_bot,"i"
+            if( cdabs(kappa_4gen_top ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "kappa_4gen_top=",kappa_4gen_top,"i"
+            if( cdabs(kappa_4gen_bot ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "kappa_4gen_bot=",kappa_4gen_bot,"i"
             if( cdabs(ghg2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghg2=",ghg2,"i"
             if( cdabs(ghg3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghg3=",ghg3,"i"
             if( cdabs(ghg4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghg4=",ghg4,"i"
@@ -6778,7 +6782,7 @@ implicit none
         print *, "                   opposite-sign same-flavor pairs of leptons"
         print *, "   NOSSFMax:       Reject events that have more than this many"
         print *, "                   opposite-sign same-flavor pairs of leptons"
-        print *, "   CountTauAsAny:     For FilterOSSFPairs, taus can stand in place of electrons or muons"
+        print *, "   CountTauAsAny:     For OSSF pairs, taus can stand in place of electrons or muons"
         print *, "                      of the same charge."
         print *, "   WriteFailedEvents: Write events that fail in the LHE file, but with a weight of 0"
         print *, "                      (off by default)"
