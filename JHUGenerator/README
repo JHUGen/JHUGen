@@ -22,6 +22,7 @@ Command line parameters for quick reference:
                        66=EW VVJJ sig., 67=EW VVJJ bkg., 68=EW VVJJ tot.,
                        69=QCD VVJJ bkg.,
                        70=EW VVLL sig., 71=EW VVLL bkg., 72=EW VVLL tot.,
+                       73=gg 4f sig., 74=gg 4f bkg., 75=gg 4f tot.,
                        80=ttH, 90=bbH,
                        110=t+H t channel, 111=tbar+H t channel,
                        112=t+H s channel, 113=tbar+H s channel
@@ -162,5 +163,6 @@ Command line parameters for quick reference:
                        Use DecayMode1 to specify the decay.
                        (should be a Z or W mode, depending on the input file)
     UnformattedRead:   Turn this on if the normal, faster reading fails
+    VegasVerbosity:    Turn on or off verbose vegas printout (1: on, 0: off; default: 1)
   Couplings:
     See manual for the full list

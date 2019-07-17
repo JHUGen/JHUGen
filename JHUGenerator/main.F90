@@ -6814,6 +6814,7 @@ implicit none
         print *, "                      Use DecayMode1 to specify the decay."
         print *, "                      (should be a Z or W mode, depending on the input file)"
         print *, "   UnformattedRead:   Turn this on if the normal, faster reading fails"
+        print *, "   VegasVerbosity:   Turn on or off verbose vegas printout (1: on, 0: off; default: 1)"
         print *, " Couplings:"
         print *, "   See manual for the full list"
         print *, ""
