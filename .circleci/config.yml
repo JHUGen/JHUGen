@@ -269,13 +269,17 @@ jobs:
           name: VBF offshell grids
           command: |
             if ! $DOREFERENCE ; then exit 0; fi
-            mkdir -p VBFoffshell_66/
-            ./JHUGen.py Seed=$SEED Process=66 DecayMode1=0 DecayMode2=0 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=compare_to_reference/VBFoffshell_66.lhe CSmaxFile=VBFoffshell_66/output
+            for igrid in {66..69}; do
+              mkdir -p VBFoffshell_${igrid}/
+              ./JHUGen.py Seed=$SEED Process=${igrid} DecayMode1=0 DecayMode2=0 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=compare_to_reference/VBFoffshell_${igrid}.lhe CSmaxFile=VBFoffshell_${igrid}/output
+            done
       - run:
           name: VBF offshell
           command: |
             if ! $DOREFERENCE ; then exit 0; fi
-            ./JHUGen.py Seed=$SEED Process=66 DecayMode1=0 DecayMode2=0                PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=compare_to_reference/VBFoffshell_66.lhe CSmaxFile=VBFoffshell_66/output ReadCSmax VegasNc2=10
+            for igrid in {66..69}; do
+              ./JHUGen.py Seed=$SEED Process=${igrid} DecayMode1=0 DecayMode2=0                PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=compare_to_reference/VBFoffshell_${igrid}.lhe CSmaxFile=VBFoffshell_${igrid}/output ReadCSmax VegasNc2=10
+            done
           no_output_timeout: 1h
 
       #now compare to reference
@@ -452,28 +456,48 @@ jobs:
       - run: "! $DOSYNTAX || grep -q 'Interference: F' $LHEDIR/tbarH_t_ZZ.lhe"
 
       - restore_cache:
-          key: v9-VBF-offshell-grids-66-syntax
+          key: v10-VBF-offshell-grids-66-72-syntax
       - run:
           name: VBF offshell grids
           command: |
             if ! $DOSYNTAX ; then exit 0; fi
-            mkdir -p VBFoffshell_66/
-            for i in {001..164}; do
-              if ! [ -e VBFoffshell_66/output_${i}_step2.grid ]; then
-                ./JHUGen.py Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=66 DecayMode1=8 DecayMode2=8 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=$LHEDIR/VBFoffshell_66.lhe CSmaxFile=VBFoffshell_66/output
+            for igrid in {66..69}; do
+              mkdir -p VBFoffshell_${igrid}/
+              for i in {001..164}; do
+                if ! [ -e VBFoffshell_${igrid}/output_${i}_step2.grid ]; then
+                  ./JHUGen.py Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=66 DecayMode1=8 DecayMode2=8 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=$LHEDIR/VBFoffshell_${igrid}.lhe CSmaxFile=VBFoffshell_${igrid}/output
+                  break
+                fi
+              done
+            done
+            mkdir -p VBFoffshell_69/
+            for i in {001..175}; do
+              if ! [ -e VBFoffshell_69/output_${i}_step2.grid ]; then
+                ./JHUGen.py Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=66 DecayMode1=8 DecayMode2=8 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=$LHEDIR/VBFoffshell_69.lhe CSmaxFile=VBFoffshell_69/output
                 break
               fi
             done
+            for igrid in {70..72}; do
+              mkdir -p VBFoffshell_${igrid}/
+              for i in {001..084}; do
+                if ! [ -e VBFoffshell_${igrid}/output_${i}_step2.grid ]; then
+                  ./JHUGen.py Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=66 DecayMode1=8 DecayMode2=8 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=$LHEDIR/VBFoffshell_${igrid}.lhe CSmaxFile=VBFoffshell_${igrid}/output
+                  break
+                fi
+              done
+            done
       - save_cache:
-          key: v9-VBF-offshell-grids-66-syntax
+          key: v10-VBF-offshell-grids-66-72-syntax
           paths:
             - ~/JHUGen/JHUGenerator/VBFoffshell_66/
       - run:
           name: VBF offshell
           command: |
             if ! $DOSYNTAX ; then exit 0; fi
-            ./JHUGen.py Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=66 DecayMode1=8 DecayMode2=8 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=$LHEDIR/VBFoffshell_66.lhe CSmaxFile=VBFoffshell_66/output ReadCSmax VegasNc2=10
-          no_output_timeout: 1h
+            for igrid in {66..72}; do
+              ./JHUGen.py Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=${igrid} DecayMode1=8 DecayMode2=8 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=$LHEDIR/VBFoffshell_${igrid}.lhe CSmaxFile=VBFoffshell_${igrid}/output ReadCSmax VegasNc2=10
+            done
+          no_output_timeout: 2h
 
       - run:
           name: checklhe
