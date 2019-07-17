@@ -831,7 +831,13 @@ include 'maxwt.f'
       do jpart=1,6
          write(6,*) "P_MCFM(",convertLHE(id_MCFM(jpart)),")=",p_MCFM(jpart,:)
       enddo
-      pause
+      if ( &
+            IsNaN(msq_MCFM(iPart_sel,jPart_sel)) .or. &
+            IsNaN(pdf(LHA2M_pdf(iPart_sel),1)) .or. &
+            IsNaN(pdf(LHA2M_pdf(jPart_sel),2)) &
+         ) then
+         pause
+      endif
       return
     endif
 

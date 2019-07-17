@@ -213,12 +213,18 @@ m1ffwgt=1d0;m2ffwgt=1d0
       write(6,*) "alphas =",alphas
       write(6,*) "alphas_mz =",alphas_mz
       write(6,*) "msq_MCFM(",iPart_sel,",",jPart_sel,") =",msq_MCFM(iPart_sel,jPart_sel)
-      write(6,*) "pdf1 =",pdf(LHA2M_pdf(iPart_sel),1)
-      write(6,*) "pdf2 =",pdf(LHA2M_pdf(jPart_sel),2)
+      write(6,*) "pdf1 =",pdf(LHA2M_pdf(iPart_sel),1)," (x1=",eta1,")"
+      write(6,*) "pdf2 =",pdf(LHA2M_pdf(jPart_sel),2)," (x2=",eta2,")"
       do jpart=1,8
          write(6,*) "P_MCFM(",convertLHE(id_MCFM(jpart)),")=",p_MCFM(jpart,:)
       enddo
-      pause
+      if ( &
+            IsNaN(msq_MCFM(iPart_sel,jPart_sel)) .or. &
+            IsNaN(pdf(LHA2M_pdf(iPart_sel),1)) .or. &
+            IsNaN(pdf(LHA2M_pdf(jPart_sel),2)) &
+         ) then
+         pause
+      endif
       return
     endif
 
