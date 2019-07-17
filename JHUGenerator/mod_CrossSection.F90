@@ -762,11 +762,14 @@ include 'maxwt.f'
    endif
 
    call EvalPhasespace_gg4f(yRnd(1:10),eta1,eta2,EHat,MomExt(1:4,1:NUP),PSWgt,id_MCFM(1:6),swap34_56)
-   call boost2Lab(eta1,eta2,10,MomExt(1:4,1:NUP))
    PSWgt = PSWgt * FinalStateWeight
+   if( PSWgt.lt.1d-33 ) then
+      return
+   endif
+   call boost2Lab(eta1,eta2,10,MomExt(1:4,1:NUP))
 
    call Kinematics_gg4f_fullproddec(MomExt,id_MCFM,applyPSCut,NBin)
-   if( applyPSCut .or. PSWgt.lt.1d-33 ) then
+   if( applyPSCut ) then
       return
    endif
 

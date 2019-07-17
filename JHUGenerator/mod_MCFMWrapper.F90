@@ -258,11 +258,11 @@ subroutine MCFM_firsttime()
    call GetSpinZeroVVCouplings(2, .false., H2zzcoupl, H2zzCLambda_qsq, H2zzLambda_qsq, H2zzLambda, H2Lambda_zgs1, H2Lambda_Q)
    call GetSpinZeroVVCouplings(2, .true.,  H2wwcoupl, H2wwCLambda_qsq, H2wwLambda_qsq, H2wwLambda, H2Lambda_zgs1, H2Lambda_Q)
 
-! aTQGC
+!  aTQGC
    call GetATQGCCouplings(aTQGCcoupl)
 
 
-   call qlinit()
+   call Init_MCFMCommon_ql()
 
    call Init_MCFMCommon_spinzerohiggs_anomcoupl( &
                                                 Hggcoupl,Httcoupl,Hbbcoupl,          &
@@ -1097,6 +1097,14 @@ subroutine Init_MCFMCommon_ewinput(Gf_inp_in,aemmz_inp_in,xw_inp_in,wmass_inp_in
    zmass_inp=zmass_inp_in
 end subroutine
 
+subroutine Init_MCFMCommon_ql()
+   implicit none
+   logical qlfirst
+   common/qlfirst/qlfirst
+   qlfirst=.true.
+   call qlinit()
+   qlfirst=.false.
+end subroutine
 
 
 function MCFMParticleLabel(pid, useQJ, useExtendedConventions)
@@ -2443,15 +2451,14 @@ integer, intent(in) :: idin(1:mxpart)
 real(8), intent(in) :: pin(1:mxpart,1:4)
 real(8)             :: pin_MCFMconv(1:mxpart,1:4)
 integer :: ZWcode
-integer :: id_MCFM(1:mxpart),idDummy(1:mxpart)
+integer :: id_MCFM(1:mxpart)
 real(8) :: p_MCFM(1:mxpart,1:4)
-real(8) :: msq(-5:5,-5:5),msq_tmp(-5:5,-5:5),msqgg
+real(8) :: msq(-5:5,-5:5),msqgg
 integer, parameter :: doZZ=1,doWW=2,doZZorWW=3
 logical :: doCompute,doNotWipe
 integer :: i,j,ip
 
    msq(:,:)=0d0
-   msq_tmp(:,:)=0d0
    msqgg=0d0
 
    pin_MCFMconv(:,:)=pin(:,:)/GeV
@@ -2462,30 +2469,35 @@ integer :: i,j,ip
       pause
    endif
    if (doCompute) then
-      idDummy=idin
 
       if(ZWcode.eq.doZZ) then
          if ((Process.ge.73 .and. Process.le.75)) then
             call SetupParticleLabels(id_MCFM,1,6,.false.,.true.) ! Assign plabels
+            !do i=1,6
+            !   write(6,*) "Particle",i,"id | momentum =",convertLHE(id_MCFM(i))," | ",p_MCFM(i,:)
+            !enddo
             if (Process.eq.73) then
-               call gg_hzz_tb(p_MCFM,msqgg)
+               call gg_hzz_tb(p_MCFM,msq)
             else if (Process.eq.74) then
                call gg_zz(p_MCFM,msqgg)
+               msq(0,0)=msqgg
             else if (Process.eq.75) then
-               call gg_zz_all(p_MCFM,msqgg)
+               call gg_zz_all(p_MCFM,msq)
             else
                call Error("EvalAmp_gg4f: Process not implemented!")
             endif
+            !pause
          endif
       else if(ZWcode.eq.doWW .or. ZWcode.eq.doZZorWW) then
          if ((Process.ge.73 .and. Process.le.75)) then
             call SetupParticleLabels(id_MCFM,1,6,.false.,.true.) ! Assign plabels
             if (Process.eq.73) then
-               call gg_hvv_tb(p_MCFM,msqgg)
+               call gg_hvv_tb(p_MCFM,msq)
             else if (Process.eq.74) then
                call gg_vv(p_MCFM,msqgg)
+               msq(0,0)=msqgg
             else if (Process.eq.75) then
-               call gg_vv_all(p_MCFM,msqgg)
+               call gg_vv_all(p_MCFM,msq)
             else
                call Error("EvalAmp_gg4f: Process not implemented!")
             endif
@@ -2501,11 +2513,8 @@ integer :: i,j,ip
       ( id_MCFM(2).eq.0 .or. id_MCFM(2).eq.convertFromPartIndex(0) ) &
       ) &
       ) then
-         msqgg=0d0
+         msq(0,0)=0d0
       endif
-
-      ! Assign the gg ME value to msq
-      msq(0,0)=msqgg
 
    endif
 

@@ -1554,6 +1554,7 @@ function CalculatesXsec(Process)
   implicit none
   integer :: Process
   logical :: CalculatesXsec
+  CalculatesXsec=.false.
   if (Process.le.2) then
     CalculatesXsec=.true.
   elseif (Process.eq.50) then
@@ -1566,14 +1567,14 @@ function CalculatesXsec(Process)
     CalculatesXsec=.true.
   elseif (Process.eq.62) then
     CalculatesXsec=.false.
-  elseif (Process.ge.66 .and. Process.le.72) then
+  elseif (Process.ge.66 .and. Process.le.75) then
     CalculatesXsec=.true.
   elseif (Process.eq.80 .or. Process.eq.90) then
     CalculatesXsec=.false.
   elseif (Process.ge.110 .and. Process.le.114) then
     CalculatesXsec=.true.
   else
-    print *, "Unknown process in CalculatesXsec", process
+    print *, "Unknown process in CalculatesXsec", process, "; setting CalculatesXsec=false."
   endif
 end function CalculatesXsec
 

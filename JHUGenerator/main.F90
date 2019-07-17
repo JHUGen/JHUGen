@@ -66,7 +66,7 @@ integer :: iddk1_mcfm,iddk2_mcfm
         call PrintMZZdistribution()
    else
         if( Process.eq.0 .or. Process.eq.1  .or. Process.eq.2 .or. Process.eq.80 &
-                         .or. Process.eq.60 .or. Process.eq.61 .or. (Process.ge.66 .and. Process.le.72) &
+                         .or. Process.eq.60 .or. Process.eq.61 .or. (Process.ge.66 .and. Process.le.75) &
                          .or. Process.eq.90 .or. Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113 .or. Process.eq.114 ) then
            call StartVegas_NEW(VG_Result,VG_Error)
         else
@@ -1775,7 +1775,7 @@ type(SaveValues) :: tosave, oldsavevalues
     endif
     if (Process.eq.73 .or. Process.eq.75) then
       if (.not.Setghg2) then
-         call Error("For gg4f processes with first spin-0 resonance contribution, you must set ghg2. Notice that the convention of MCFM MEs is to take that in SM, ghg2~1, not 2 for infinite top mass.")
+         call Error("For gg4f processes with spin-0 first resonance contribution, you must set ghg2. Notice that the convention of MCFM MEs is to take that in SM, ghg2~1, not 2 for infinite top mass.")
       endif
       if (SetAnomalousHffMCFM_mtop4gen .neqv. (Setkappa4gentop .or. Setkappa24gentop)) then
         call Error("Anomalous fourth-generation HTT kappa couplings and the mass of the fourth-generation T quark needs to be set concurrently.")
@@ -2961,725 +2961,725 @@ real(8) :: VG_Result_in(1:VBFoffsh_run_maxsize),VG_Error_in(1:VBFoffsh_run_maxsi
 real(8) :: CrossSec2_in(1:VBFoffsh_run_maxsize,1:NMAXCHANNELS),CrossSecMax2_in(1:VBFoffsh_run_maxsize,NMAXCHANNELS),CrossSectionWithWeights_in(1:VBFoffsh_run_maxsize),CrossSectionWithWeightsErrorSquared_in(1:VBFoffsh_run_maxsize)
 character(len=len(CSmaxFile)+20) :: FileToRead
 
-    VBFoffsh_Hash_Size = 0
-    VBFoffsh_run_size = 0
-    VG_Result = -13d0
-    VG_Error  = -13d0
+   VBFoffsh_Hash_Size = 0
+   VBFoffsh_run_size = 0
+   VG_Result = -13d0
+   VG_Error  = -13d0
 
-    if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
-    if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
-    if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 .and.  (unweighted) ) then
-          VegasNc1 = VegasNc1_default
-          VegasNc2 = VegasNc2_default
-    endif
-    if( VegasNc1.eq.-1 .and.  .not. (unweighted) ) VegasNc1 = VegasNc1_default
-    if( VegasNc2.eq.-1 .and.  .not. (unweighted) ) VegasNc2 = VegasNc2_default
+   if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
+   if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
+   if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 .and.  (unweighted) ) then
+      VegasNc1 = VegasNc1_default
+      VegasNc2 = VegasNc2_default
+   endif
+   if( VegasNc1.eq.-1 .and.  .not. (unweighted) ) VegasNc1 = VegasNc1_default
+   if( VegasNc2.eq.-1 .and.  .not. (unweighted) ) VegasNc2 = VegasNc2_default
 
 
 
-    if(Process.lt.10) then
+   if(Process.lt.10) then
       write(ProcessStr,"(I1)") Process
       ProcessStr="0"//trim(ProcessStr)
-    elseif(Process.lt.100) then
+   elseif(Process.lt.100) then
       write(ProcessStr,"(I2)") Process
-    else
+   else
       write(ProcessStr,"(I3)") Process
-    endif
+   endif
 
 ! nprn = -1
 
 
-    call cpu_time(time_start)
-    warmup = .false.
-    itmx = VegasIt1
-    ncall= VegasNc1
-    PChannel_aux = PChannel
+   call cpu_time(time_start)
+   warmup = .false.
+   itmx = VegasIt1
+   ncall= VegasNc1
+   PChannel_aux = PChannel
 
 
-    outgridfile=trim(CSmaxFile)//'.grid'
-    ingridfile=trim(outgridfile)
+   outgridfile=trim(CSmaxFile)//'.grid'
+   ingridfile=trim(outgridfile)
 
 
-    if( Process.gt.72 .and. Process.le.79 ) call Error("Missing ChannelHash for the process") !can change 79 if we add more processes in between
+   if( Process.gt.75 .and. Process.le.79 ) call Error("Missing ChannelHash for the process") !can change 79 if we add more processes in between
 
-if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !----------------------- weighted events
-
-
-    if( (GenerateEvents.eqv..true.) ) then
-        itmx = 1
-        ncall= VegasNc1
-        call vegas(EvalOnlyPS,VG_Result,VG_Error,VG_Chi2)
-        return
-    endif
-
-
-
-    ! WARM-UP RUN
-    if( .not. ReadCSmax ) then
-      readin=.false.
-      writeout=.true.
-
-      itmx = VegasIt1
-      ncall= VegasNc1
-      warmup = .true.
-      if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
-      if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
-      if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
-
-      if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-      if( Process.ge.66 .and. Process.le.72 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
-      if( Process.ge.73 .and. Process.le.75 ) call vegas(EvalWeighted_gg4f_fullproddec,VG_Result,VG_Error,VG_Chi2)
-      if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-
-      if( Process.eq.110) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-      if( Process.eq.111) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-      if( Process.eq.112) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-      if( Process.eq.113) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-      if( Process.eq.114) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-    endif
-
-    !DATA RUN
-    writeout=.false.
-    if( ReadCSmax ) then
-        readin=.true.
-    else
-        readin=.false.
-    endif
-
-    call ClearHisto()
-    warmup = .false.
-    Br_counter(:,:) = 0
-    EvalCounter=0
-    RejeCounter=0
-    AccepCounter=0
-    AlertCounter=0
-    avgcs = 0d0
-    itmx = 2
-    ncall= VegasNc2
-    if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.90 ) call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
-
-    if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-    if( Process.ge.66 .and. Process.le.72 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
-    if( Process.ge.73 .and. Process.le.75 ) call vegas1(EvalWeighted_gg4f_fullproddec,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-
-    if( Process.eq.110) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.111) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.112) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.113) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.114) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-
-
-
-
-elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
-
-UseBetaVersion = CalculatesXsec(Process)
-
-
-if( UseBetaVersion ) then
-! !-------------------new stuff -------------------
-
-IF( .NOT. (Process.ge.66 .and. Process.le.72) ) THEN! special treatment for offshell VBF
-
-    write(io_stdout,"(2X,A)")  "Scanning the integrand"
-    warmup = .true.
-    itmx = 10
-    ncall= VegasNc0
-
-
-    if( ReadCSmax ) then
-        readin=.true.
-        writeout=.false.
-        ingridfile = trim(CSmaxFile)//'_step2.grid'
-        open(unit=io_TmpFile,file=trim(CSmaxFile)//'_gridinfo.txt',form='formatted',status='old')
-        read(io_TmpFile,fmt=*) calls1
-        read(io_TmpFile,fmt=*) CrossSec
-        read(io_TmpFile,fmt=*) CrossSecMax
-        read(io_TmpFile,fmt=*) VG_Result
-        read(io_TmpFile,fmt=*) VG_Error
-        close(unit=io_TmpFile)
-    else
-        readin=.false.
-        writeout=.true.
-        if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-        if( Process.ge.72 .and. Process.le.75 ) call vegas(EvalWeighted_gg4f_fullproddec,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.110) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.111) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.112) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.113) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.114) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-
-        itmx = 2
-        writeout=.true.
-        outgridfile = trim(CSmaxFile)//'_step2.grid'
-        if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
-!         if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2) ! adjust to LHE format
-!         if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-        if( Process.ge.73 .and. Process.le.75 ) call vegas1(EvalWeighted_gg4f_fullproddec,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.110) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.111) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.112) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.113) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.114) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-
-
-        CrossSecMax(:,:) = 0d0
-        CrossSec(:,:) = 0d0
-        print *, "resetting CrossSecMax(:,:)"
-        itmx = 1
-        if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
-!         if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2) ! adjust to LHE format
-!         if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-        if( Process.ge.72 .and. Process.le.75 ) call vegas1(EvalWeighted_gg4f_fullproddec,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.110) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.111) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.112) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.113) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.114) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-        writeout=.false.
-        ingridfile=trim(outgridfile)
-
-        call vegas_get_calls(calls1)
-        CrossSec(:,:) = CrossSec(:,:)/dble(itmx)
-
-        open(unit=io_TmpFile,file=trim(CSmaxFile)//'_gridinfo.txt',form='formatted',status='replace')
-        write(io_TmpFile,fmt=*) calls1
-        write(io_TmpFile,fmt=*) CrossSec
-        write(io_TmpFile,fmt=*) CrossSecMax
-        write(io_TmpFile,fmt=*) VG_Result
-        write(io_TmpFile,fmt=*) VG_Error
-        close(unit=io_TmpFile)
-    endif
-
-    write(io_stdout,"(A)")  ""
-    write(io_stdout,*) "Total xsec: ",VG_Result, " +/-",VG_Error, " fb    vs.",sum(CrossSec(:,:))
-    call InitOutput(VG_Result, VG_Error)
-
-
-    RequEvents(:,:) = 0
-    if (VegasNc2.ne.-1) then
-      call HouseOfRepresentatives(CrossSec(-5:5,-5:5), RequEvents(-5:5,-5:5), VegasNc2)
-    endif
-
-    if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2) then
-       call getRef_PPXchannelHash(ijSel)
-    elseif( Process.eq.60 ) then
-       call getRef_VBFchannelHash(ijSel)
-    elseif( Process.eq.61 ) then
-       call getRef_HJJchannelHash(ijSel)
-    elseif( Process.ge.110 .and. Process .le.114 ) then
-       call getRef_THchannelHash(ijSel)
-    else
-       call getRef_GENchannelHash(ijSel)
-    endif
-
-    do i=1,121
-         i1 = ijSel(i,1)
-         j1 = ijSel(i,2)
-         if( RequEvents(i1,j1).gt.0 .and. ijSel(i,3).ge.0 ) write(io_stdout,"(1X,I3,A,I3,I3,I4,A,3X,F8.3,I9)") i," Fractional partonic xsec ",i1,j1,ijSel(i,3)," "//getLHEParticle(i1)//" "//getLHEParticle(j1)//" ",CrossSec(i1,j1)/VG_Result,RequEvents(i1,j1)
-    enddo
-    write(io_stdout,"(2X,A,F8.3,I9)") "Sum        partonic xsec   x   x    ",sum(CrossSec(:,:))/VG_Result,sum(RequEvents(:,:))
-
-
-
-
-
-
-    write(io_stdout,"(A)")  ""
-    write(io_stdout,"(2X,A)")  "Event generation"
-
-    call ClearHisto()
-    warmup = .false.
-    evtgen = .true.
-    itmx = 1
-!     nprn = 0
-    EvalCounter = 0
-    Br_counter(:,:) = 0
-    RejeCounter = 0
-    AlertCounter = 0
-    AccepCounter_part(:,:) = 0
-    StatusPercent = 0d0
-
-    CrossSecMax(:,:) = 1.0d0 * CrossSecMax(:,:)    !  adjustment factor
-    call cpu_time(time_start)
-
-
-
-    itmx=1
-    ncall= VegasNc0    !/10     dmax inside vegas needs to be adapted for this. or at least thisdmax inside mod_Crosssection
-    nprn =-1 !0
-    writeout=.false.
-
-    call vegas_get_calls(calls2)
-    calls_rescale = calls1/calls2
-    CrossSecMax(:,:) = CrossSecMax(:,:) * calls_rescale
-    print *, "Rescale CrossSecMax by ",calls_rescale
-
-    PreviousSum = 0
-    if( sum(RequEvents(:,:)).eq.0 ) StatusPercent = 100d0
-    do while( StatusPercent.lt.100d0  )
-!     do while( AccepCounter_part(iPart_sel,jPart_sel).lt.RequEvents(iPart_sel,jPart_sel) )
-        call cpu_time(time_start)
-        readin=.true.  ! this prevents adapting the grid during this while-loop
-
-        if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
-!         if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)! adjust to LHE format
-    !     if( Process.eq.90 ) call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-        if( Process.ge.73 .and. Process.le.75 ) call vegas1(EvalWeighted_gg4f_fullproddec,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.110) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.111) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.112) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.113) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.114) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-
-
-!         call system('clear')
-        write(io_stdout,*) ""
-        do i1=-5,5
-        do j1=-5,5
-            if( RequEvents(i1,j1).gt.0 .and. AccepCounter_part(i1,j1).lt.RequEvents(i1,j1)  ) then
-!                write(io_stdout,"(1X,A,I4,I4,2X,I7,2X,I7,2X,F8.3,1X,A)") "Generated events ", i1,j1,(AccepCounter_part(i1,j1)),(RequEvents(i1,j1)),dble(AccepCounter_part(i1,j1))/dble(RequEvents(i1,j1))*100d0,"%"
-!                call PrintStatusBar2(int(dble(AccepCounter_part(i1,j1))/(dble(RequEvents(i1,j1)))*100),"channel "//getLHEParticle(i1)//" "//getLHEParticle(j1)//" ")
-               write(*,"(I3,I3,I7,I7,F16.6,E16.3)") i1,j1, &
-               AccepCounter_part(i1,j1), RequEvents(i1,j1), &
-               dble(AccepCounter_part(i1,j1))/dble(RejeCounter_part(i1,j1))*100d0, &
-               CrossSecMax(i1,j1)
-            endif
-        enddo
-        enddo
-        write(*,"(A,I10,I10,F16.6)") "PS gen eff. ",DebugCounter(10),DebugCounter(9),dble(DebugCounter(10))/dble(DebugCounter(9))*100d0
-        DebugCounter(9:10)=0
-        StatusPercent = int(100d0*dble(sum(AccepCounter_part(:,:)))/dble(sum(RequEvents(:,:)))  )
-        print *, "StatusPercent=",StatusPercent, "  Events=",sum(AccepCounter_part(:,:))
-        call cpu_time(time_end)
-        write(io_stdout,*)  "Event generation rate (events,events/sec)",sum(AccepCounter_part(:,:))-PreviousSum,dble(sum(AccepCounter_part(:,:))-PreviousSum)/(time_end-time_start+1d-10)
-        PreviousSum = sum(AccepCounter_part(:,:))
-    enddo
-
-! enddo
-
-
-
-    print *, " Alert  Counter: ",AlertCounter
-    if( dble(AlertCounter)/dble(AccepCounter+1d-10) .gt. 1d0*percent ) then
-        write(io_LogFile,*) "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
-        write(io_LogFile,*) "       Increase CSMAX in main.F90."
-        write(io_stdout, *) "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
-        write(io_stdout, *) "       Increase CSMAX in main.F90."
-    endif
-    write(io_stdout,*)  " event generation rate (events/sec)",dble(sum(AccepCounter_part(:,:)))/(time_end-time_start+1d-10)
-
-
-
-
-ELSEIF( Process.ge.66 .and. Process.le.72 ) THEN! special treatment for offshell VBF
-    if (Process.ge.66 .and. Process.le.68) then
-       VBFoffsh_Hash_Size = Hash_MCFM_qqVVqq_Size
-       VBFoffsh_run_size = Hash_MCFM_qqVVqq_Size
-    elseif (Process.ge.70 .and. Process.le.72) then
-       VBFoffsh_Hash_Size = Hash_MCFM_qqVVll_Size
-       VBFoffsh_run_size = Hash_MCFM_qqVVll_Size
-    else
-       VBFoffsh_Hash_Size = Hash_MCFM_qqVVqqStrong_Size
-       VBFoffsh_run_size = Hash_MCFM_qqVVqqStrong_Size
-    endif
-
-    if (VBFoffsh_run_size .gt. VBFoffsh_run_maxsize) call Error("This should never be able to happen")
-
-    !write(6,*) "VBFoffsh_Hash_Size, VBFoffsh_run_size", VBFoffsh_Hash_Size, VBFoffsh_run_size
-
-    if( .not.(VBFoffsh_run.ge.1 .and. VBFoffsh_run.le.VBFoffsh_run_size) ) call Error("Please specify VBFoffsh_run")
-    print *, "VBFoffsh_run = ",VBFoffsh_run
-
-    write(io_stdout,"(2X,A)")  "Scanning the integrand"
-    warmup = .true.
-
-    if( ReadCSmax ) then
-        i=len(trim(CSmaxFile))
-        do j=1,VBFoffsh_run_size
-            write(FileToRead, "(A,I0.3,A)") trim(CSmaxFile(1:i-3)), j, "_gridinfo.txt"
-            open(unit=io_TmpFile,file=FileToRead,form='formatted',status='old',iostat=ios)
-            read(io_TmpFile,fmt=*) calls1_array(j)
-            read(io_TmpFile,fmt=*) CrossSec2_in(j,1:VBFoffsh_Hash_Size)
-            read(io_TmpFile,fmt=*) CrossSecMax2_in(j,1:VBFoffsh_Hash_Size)
-            read(io_TmpFile,fmt=*) VG_Result_in(j)
-            read(io_TmpFile,fmt=*) VG_Error_in(j)
-            read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(j), CrossSectionWithWeightsErrorSquared_in(j)
-            close(unit=io_TmpFile)
-            if( ios.eq.0 ) print *, "read ",FileToRead
-        enddo
-
-        !write(6,*) "calls1_array:",calls1_array
-
-        CrossSec2(:) = -1d0
-        do i=1,VBFoffsh_Hash_Size
-            do j=1,VBFoffsh_run_size
-               if( CrossSec2_in(j,i).ne.0d0 .and. CrossSec2(i).eq.-1d0 ) CrossSec2(i) = CrossSec2_in(j,i)
-            enddo
-            if( CrossSec2(i).lt.0d0 ) then
-                print *, "WARNING: CrossSec2(i) has not been filled",i,CrossSec2_in(1:VBFoffsh_run_size,i)
-                CrossSec2(i) = 0d0
-            !else
-            !    print *, "Filled CrossSec2(i) with",i,CrossSec2_in(1:VBFoffsh_run_size,i)
-            endif
-        enddo
-        if (VBFoffsh_Hash_Size .lt. NMAXCHANNELS) CrossSec2(VBFoffsh_Hash_Size+1:NMAXCHANNELS)=0d0
-
-
-        CrossSecMax2(:) = -1d0
-        do i=1,VBFoffsh_Hash_Size
-            CrossSecMax2(i) = CrossSecMax2_in( max(1,VBFoffsh_run),i) * calls1_array(VBFoffsh_run)
-        enddo
-        if (VBFoffsh_Hash_Size .lt. NMAXCHANNELS) CrossSecMax2(VBFoffsh_Hash_Size+1:NMAXCHANNELS)=0d0
-
-        VG_Result = 0d0; VG_Error = 0d0
-        CrossSectionWithWeights = 0d0; CrossSectionWithWeightsErrorSquared = 0d0
-        do j=1,VBFoffsh_run_size
-           VG_Result = VG_Result_in(j) + VG_Result
-           VG_Error  = VG_Error_in(j)**2 + VG_Error
-           CrossSectionWithWeights = CrossSectionWithWeights_in(j) + CrossSectionWithWeights
-           CrossSectionWithWeightsErrorSquared = CrossSectionWithWeightsErrorSquared_in(j) + CrossSectionWithWeightsErrorSquared
-        enddo
-        VG_Error = dsqrt(VG_Error)
-
-        !write(6,*) "CrossSec2:",CrossSec2
-        !write(6,*) "CrossSecMax2:",CrossSecMax2
-        !write(6,*) "CrossSectionWithWeights_in:",CrossSectionWithWeights_in
-        !write(6,*) "CrossSectionWithWeightsErrorSquared_in:",CrossSectionWithWeightsErrorSquared_in
-        !write(6,*) "CrossSectionWithWeights,CrossSectionWithWeightsErrorSquared:",CrossSectionWithWeights,CrossSectionWithWeightsErrorSquared
-        !write(6,*) "VG_Result,VG_Error:",VG_Result,VG_Error
-        !pause
-
-
-    else
-        itmx = 10
-        ncall= VegasNc0
-        readin=.false.
-        writeout=.true.
-        if( Process.ge.66 .and. Process.le.72 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
-
-        itmx = 2
-        writeout=.true.
-        outgridfile = trim(CSmaxFile)//'_step2.grid'
-        if( Process.ge.66 .and. Process.le.72 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
-
-
-        CrossSecMax2(:) = 0d0
-        CrossSec2(:) = 0d0
-        print *, "resetting CrossSecMax2(:)"
-        itmx = 1
-        call ClearHisto()
-        FindCrossSectionWithWeights = .true.
-        CrossSectionWithWeights = 0d0
-        CrossSectionWithWeightsErrorSquared = 0d0
-        if( Process.ge.66 .and. Process.le.72 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
-        FindCrossSectionWithWeights = .false.
-        writeout=.false.
-        ingridfile=trim(outgridfile)
-
-        call vegas_get_calls(calls1_array(VBFoffsh_run))
-        CrossSec2(:) = CrossSec2(:)/dble(itmx)
-
-        open(unit=io_TmpFile,file=trim(CSmaxFile)//'_gridinfo.txt',form='formatted',status='replace')
-        write(io_TmpFile,fmt=*) calls1_array(VBFoffsh_run)
-        write(io_TmpFile,fmt=*) CrossSec2(1:VBFoffsh_Hash_Size)
-        write(io_TmpFile,fmt=*) CrossSecMax2(1:VBFoffsh_Hash_Size)
-        write(io_TmpFile,fmt=*) VG_Result
-        write(io_TmpFile,fmt=*) VG_Error
-        write(io_TmpFile,fmt=*) CrossSectionWithWeights, CrossSectionWithWeightsErrorSquared
-        close(unit=io_TmpFile)
-    endif
-
-    write(io_stdout,"(A)")  ""
-    write(io_stdout,*) "Total unweighted xsec (used by Vegas): ", VG_Result, " +/-", VG_Error, " fb    vs.",sum(CrossSec2(:))
-    write(io_stdout,*) "Total xsec with weights (use for physics): ", CrossSectionWithWeights, " +/-", sqrt(CrossSectionWithWeightsErrorSquared)
-    call InitOutput(CrossSectionWithWeights, sqrt(CrossSectionWithWeightsErrorSquared))
-
-    RequEvents2(:) = 0
-    if(sum(CrossSec2(:)).ne.0d0) then
-      call HouseOfRepresentatives2(CrossSec2, RequEvents2, VegasNc2)
-    endif
-
-    if (Process.eq.69) then
-       call getRef_MCFM_qqVVqqStrong_Hash(ijSel)
-    elseif (Process.ge.66 .and. Process.le.68) then
-       call getRef_MCFM_qqVVqq_Hash(ijSel)
-    elseif (Process.ge.70 .and. Process.le.72) then
-       call getRef_MCFM_qqVVll_Hash(ijSel)
-    else
-       call Error("Process hash unidentified!")
-    endif
-    !RequEvents(:,:) = 0d0 ! This variable is not used here
-    do i=1,VBFoffsh_Hash_Size
-         i1 = convertToPartIndex(ijSel(i,1))
-         j1 = convertToPartIndex(ijSel(i,2))
-         if( RequEvents2(i).ne.0 ) write(*,"(I4,I4,I4,F18.8,I10,I10)") i, i1,j1,CrossSec2(i),RequEvents2(i)
-    enddo
-
-
-    if (VG_Result.gt.0d0) then
-      write(io_stdout,"(2X,A,F18.3,I10)") "Sum partonic xsec:",sum(CrossSec2(:))/VG_Result,sum(RequEvents2(:))
-    else
-      write(io_stdout,"(2X,A,F18.3,I10)") "Sum partonic xsec:",0d0,sum(RequEvents2(:))
-    endif
-
-
-    if( .not. ReadCSmax ) then! For ReadCSmax=.false. the program ends here
-       if( VBFoffsh_run.ge.1 .and. VBFoffsh_run.le.VBFoffsh_run_size ) print *, "WARNING: These are not the final number of events because the total cross section needs to be assembled from all the VBFoffsh_runs"
-       RETURN
-    endif
-
-    !removing the requested events for the wrong VBFoffsh_run
-    RequEvents2(1:VBFoffsh_run-1) = 0
-    RequEvents2(VBFoffsh_run+1:VBFoffsh_Hash_Size) = 0
-    NumPartonicChannels = 1
-
-    ingridfile = trim(CSmaxFile)//'_step2.grid'
-
-    !write(6,*) "NumPartonicChannels | RequEvents2",NumPartonicChannels," | ",RequEvents2
-
-
-!     print *, "New sorted hash for VBFoffsh_run=",VBFoffsh_run
-!     do i=1,VBFoffsh_Hash_Size
-!          i1 = convertToPartIndex(ijSel(i,1))
-!          j1 = convertToPartIndex(ijSel(i,2))
-!          if( RequEvents2(i).ne.0 ) write(*,"(I4,I4,I4,I4,F18.8,I10,I10)") i,SortedHash(i), i1,j1,CrossSec2(i)/VG_Result,RequEvents2(i)
-! !         write(*,"(I4,I4,I4,I4,F18.8,I10,I10)") i, SortedHash(i), i1,j1,CrossSec2(i)/VG_Result,RequEvents2(i)
-!     enddo
-
-
-!--------------------------------------------------------------------
-    write(io_stdout,"(A)")  ""
-    write(io_stdout,"(2X,A)")  "Event generation"
-
-    call ClearHisto()
-    warmup = .false.
-    evtgen = .true.
-!     nprn = 0
-    EvalCounter = 0
-    Br_counter(:,:) = 0
-    RejeCounter = 0
-    AlertCounter = 0
-    AccepCounter_part2(:) = 0
-    StatusPercent = 0d0
-
-    CrossSecMax2(:) = 1.5d0 * CrossSecMax2(:)    !  adjustment factor
-    call cpu_time(time_start)
-
-
-
-    itmx=1
-    ncall= VegasNc0    !/10     dmax inside vegas needs to be adapted for this. or at least thisdmax inside mod_Crosssection
-    nprn =-1 !0
-    writeout=.false.
-
-    call vegas_get_calls(calls2)
-    calls_rescale = 1d0/calls2
-    CrossSecMax2(:) = CrossSecMax2(:) * calls_rescale
-
-    PreviousSum = 0
-    if( sum(RequEvents2(:)).eq.0 ) StatusPercent = 100d0
-    do while( StatusPercent.lt.100d0  )
-        call cpu_time(time_start)
-        readin=.true.  ! this prevents adapting the grid during this while-loop
-
-        if( Process.ge.66 .and. Process.le.72 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
-        write(io_stdout,*) ""
-
-        do i1=1,VBFoffsh_Hash_Size
-            if( RequEvents2(i1).gt.0 .and. AccepCounter_part2(i1).lt.RequEvents2(i1)  ) then
-               write(*,"(I3,I7,I7,E16.3)") i1, &
-               AccepCounter_part2(i1), RequEvents2(i1), &
-               CrossSecMax2(i1)
-            endif
-        enddo
-
-        StatusPercent = int(100d0*dble(sum(AccepCounter_part2(:)))/dble(sum(RequEvents2(:)))  )
-        print *, "StatusPercent=",StatusPercent, "  Events=",sum(AccepCounter_part2(:))
-        call cpu_time(time_end)
-        write(io_stdout,*)  "Event generation rate (events,events/sec)",sum(AccepCounter_part2(:))-PreviousSum,dble(sum(AccepCounter_part2(:))-PreviousSum)/(time_end-time_start+1d-10)
-        PreviousSum = sum(AccepCounter_part2(:))
-    enddo
-
-
-
-
-
-    print *, " Alert  Counter: ",AlertCounter
-    if( dble(AlertCounter)/dble(AccepCounter+1d-10) .gt. 1d0*percent ) then
-        write(io_LogFile,*) "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
-        write(io_LogFile,*) "       Increase CSMAX in main.F90."
-        write(io_stdout, *) "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
-        write(io_stdout, *) "       Increase CSMAX in main.F90."
-    endif
-    write(io_stdout,*)  " event generation rate (events/sec)",dble(sum(AccepCounter_part(:,:)))/(time_end-time_start+1d-10)
-
-
-
-
-    !pause
-
-
-ENDIF
-
-
-else! not beta version
-
-
-
-
-!-------------------old stuff -------------------
-    VG(:,:) = zero
-    CSmax(:,:) = zero
-
-    if( .not. ReadCSmax ) then
-        print *, " finding maximal weight with ",VegasNc0," evaluations"
-        do i=1,VegasNc0
-                call random_number(yRnd)
-                RES(:,:) = 0d0
-                if( Process.eq.80 ) then
-                    dum = EvalUnWeighted_TTBH(yRnd,.false.,(/-99,-99/),RES)
-                elseif( Process.eq.90 ) then
-                    dum = EvalUnWeighted_BBBH(yRnd,.false.,(/-99,-99/),RES)
-                elseif( Process.eq.60 ) then
-                    dum = EvalUnWeighted_HJJ(yRnd,.false.,(/-99,-99/),RES)
-                elseif( Process.eq.61 ) then
-                    dum = EvalUnWeighted_HJJ(yRnd,.false.,(/-99,-99/),RES)
-                elseif( Process.ge.66 .and. Process.le.72 ) then
-                    dum = EvalUnWeighted_HJJ_fulldecay(yRnd,.false.,(/-99,-99/),RES)
-                elseif( Process.eq.110 ) then
-                    dum = EvalUnWeighted_TH(yRnd,.false.,(/-99,-99/),RES)
-                elseif( Process.eq.111 ) then
-                    dum = EvalUnWeighted_TH(yRnd,.false.,(/-99,-99/),RES)
-                elseif( Process.eq.112 ) then
-                    dum = EvalUnWeighted_TH(yRnd,.false.,(/-99,-99/),RES)
-                elseif( Process.eq.113 ) then
-                    dum = EvalUnWeighted_TH(yRnd,.false.,(/-99,-99/),RES)
-                endif
-                VG(:,:) = VG(:,:) + RES(:,:)
-                PChannel = PChannel_aux
-        enddo
-        open(unit=io_CSmaxFile,file=trim(CSmaxFile)//'_CSmax.bin',form='unformatted',status='replace')
-        WRITE(io_CSmaxFile) CSMAX,VG
-        close(io_CSmaxFile)
-    else
-        open(unit=io_CSmaxFile,file=trim(CSmaxFile)//'_CSmax.bin',form='unformatted')
-        READ(io_CSmaxFile) CSMAX,VG
-        close(io_CSmaxFile)
-    endif
-
-   CSmax(:,:)   = 1.5d0 * CSmax(:,:)    !  adjustment factor
-
-   VG(:,:) = VG(:,:)/dble(VegasNc0)
-   TotalXSec = sum(  VG(:,:) )
-   print *, ""
-   write(io_stdout,"(1X,A,F10.3)") "Total xsec: ",TotalXSec
-
-
-    RequEvents(:,:) = 0
-    if (VegasNc2.ne.-1) then
-      call HouseOfRepresentatives(VG(:,:), RequEvents(-5:5,-5:5), VegasNc2)
-    endif
-
-    do i1=-5,5
-    do j1=-5,5
-         if( VG(i1,j1).gt.1d-9 ) write(io_stdout,"(1X,A,I4,I4,F8.3,I9)") "Fractional partonic xsec ", i1,j1,VG(i1,j1)/TotalXSec,RequEvents(i1,j1)
-    enddo
-    enddo
-
-
-
-
-
-!------------------------------- set counts to zero for actual evaluation
-
-    EvalCounter = 0
-    AccepCounter = 0
-    RejeCounter = 0
-    AlertCounter = 0
-    AccepCounter_part(:,:) = 0
-
-    call cpu_time(time_start)
-
-
-    do i1=-5,5!! idea: instead of these 2 do-loop introduce randomized loop
-    do j1=-5,5
-    if(RequEvents(i1,j1).ne.0) then
-          if( (PChannel.eq.0) .and. (abs(i1)+abs(j1).ne.0) ) cycle
-          if( (PChannel.eq.1) .and. i1*j1.eq.0 ) cycle
-
-          write(io_stdout,*) ""
-          write(io_stdout,*) ""
-          write(io_stdout,"(X,A,I8,A,I4,I4,A)",advance='no') "generating ",RequEvents(i1,j1)," events for channel",i1,j1,":  "
-          flush(io_stdout)
-
-          do while( AccepCounter_part(i1,j1)  .lt. RequEvents(i1,j1) )
-              call random_number(yRnd)
-              if( Process.eq.80 ) then
-                  dum = EvalUnWeighted_TTBH(yRnd,.true.,(/i1,j1/),RES)
-              elseif( Process.eq.90 ) then
-                  dum = EvalUnWeighted_BBBH(yRnd,.true.,(/i1,j1/),RES)
-              elseif( Process.eq.60 ) then
-                  dum = EvalUnWeighted_HJJ(yRnd,.true.,(/i1,j1/),RES)
-              elseif( Process.ge.66 .and. Process.le.72 ) then
-                  dum = EvalUnWeighted_HJJ_fulldecay(yRnd,.true.,(/i1,j1/),RES)
-              elseif( Process.eq.61 ) then
-                  dum = EvalUnWeighted_HJJ(yRnd,.true.,(/i1,j1/),RES)
-              elseif( Process.eq.110 ) then
-                  dum = EvalUnWeighted_TH(yRnd,.true.,(/i1,j1/),RES)
-              elseif( Process.eq.111 ) then
-                  dum = EvalUnWeighted_TH(yRnd,.true.,(/i1,j1/),RES)
-              elseif( Process.eq.112 ) then
-                  dum = EvalUnWeighted_TH(yRnd,.true.,(/i1,j1/),RES)
-              elseif( Process.eq.113 ) then
-                  dum = EvalUnWeighted_TH(yRnd,.true.,(/i1,j1/),RES)
-              endif
-              StatusPercent = int(100d0*(AccepCounter_part(i1,j1))  /  dble(RequEvents(i1,j1))  )
-              call PrintStatusBar( StatusPercent )
+   if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !----------------------- weighted events
+
+
+       if( (GenerateEvents.eqv..true.) ) then
+           itmx = 1
+           ncall= VegasNc1
+           call vegas(EvalOnlyPS,VG_Result,VG_Error,VG_Chi2)
+           return
+       endif
+
+
+
+       ! WARM-UP RUN
+       if( .not. ReadCSmax ) then
+         readin=.false.
+         writeout=.true.
+
+         itmx = VegasIt1
+         ncall= VegasNc1
+         warmup = .true.
+         if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
+         if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
+         if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
+
+         if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+         if( Process.ge.66 .and. Process.le.72 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+         if( Process.ge.73 .and. Process.le.75 ) call vegas(EvalWeighted_gg4f_fullproddec,VG_Result,VG_Error,VG_Chi2)
+         if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+
+         if( Process.eq.110) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+         if( Process.eq.111) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+         if( Process.eq.112) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+         if( Process.eq.113) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+         if( Process.eq.114) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+       endif
+
+       !DATA RUN
+       writeout=.false.
+       if( ReadCSmax ) then
+           readin=.true.
+       else
+           readin=.false.
+       endif
+
+       call ClearHisto()
+       warmup = .false.
+       Br_counter(:,:) = 0
+       EvalCounter=0
+       RejeCounter=0
+       AccepCounter=0
+       AlertCounter=0
+       avgcs = 0d0
+       itmx = 2
+       ncall= VegasNc2
+       if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
+       if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
+       if( Process.eq.90 ) call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
+
+       if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+       if( Process.ge.66 .and. Process.le.72 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+       if( Process.ge.73 .and. Process.le.75 ) call vegas1(EvalWeighted_gg4f_fullproddec,VG_Result,VG_Error,VG_Chi2)
+       if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+
+       if( Process.eq.110) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+       if( Process.eq.111) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+       if( Process.eq.112) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+       if( Process.eq.113) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+       if( Process.eq.114) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+
+
+
+
+   elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
+
+   UseBetaVersion = CalculatesXsec(Process)
+
+
+      if( UseBetaVersion ) then
+      ! !-------------------new stuff -------------------
+
+         IF( .NOT. (Process.ge.66 .and. Process.le.72) ) THEN! special treatment for offshell VBF
+
+             write(io_stdout,"(2X,A)")  "Scanning the integrand"
+             warmup = .true.
+             itmx = 10
+             ncall= VegasNc0
+
+
+             if( ReadCSmax ) then
+                 readin=.true.
+                 writeout=.false.
+                 ingridfile = trim(CSmaxFile)//'_step2.grid'
+                 open(unit=io_TmpFile,file=trim(CSmaxFile)//'_gridinfo.txt',form='formatted',status='old')
+                 read(io_TmpFile,fmt=*) calls1
+                 read(io_TmpFile,fmt=*) CrossSec
+                 read(io_TmpFile,fmt=*) CrossSecMax
+                 read(io_TmpFile,fmt=*) VG_Result
+                 read(io_TmpFile,fmt=*) VG_Error
+                 close(unit=io_TmpFile)
+             else
+                 readin=.false.
+                 writeout=.true.
+                 if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.ge.72 .and. Process.le.75 ) call vegas(EvalWeighted_gg4f_fullproddec,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.110) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.111) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.112) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.113) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.114) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+
+                 itmx = 2
+                 writeout=.true.
+                 outgridfile = trim(CSmaxFile)//'_step2.grid'
+                 if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
+         !         if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2) ! adjust to LHE format
+         !         if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.ge.73 .and. Process.le.75 ) call vegas1(EvalWeighted_gg4f_fullproddec,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.110) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.111) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.112) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.113) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.114) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+
+
+                 CrossSecMax(:,:) = 0d0
+                 CrossSec(:,:) = 0d0
+                 print *, "resetting CrossSecMax(:,:)"
+                 itmx = 1
+                 if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
+         !         if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2) ! adjust to LHE format
+         !         if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.ge.72 .and. Process.le.75 ) call vegas1(EvalWeighted_gg4f_fullproddec,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.110) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.111) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.112) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.113) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.114) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                 writeout=.false.
+                 ingridfile=trim(outgridfile)
+
+                 call vegas_get_calls(calls1)
+                 CrossSec(:,:) = CrossSec(:,:)/dble(itmx)
+
+                 open(unit=io_TmpFile,file=trim(CSmaxFile)//'_gridinfo.txt',form='formatted',status='replace')
+                 write(io_TmpFile,fmt=*) calls1
+                 write(io_TmpFile,fmt=*) CrossSec
+                 write(io_TmpFile,fmt=*) CrossSecMax
+                 write(io_TmpFile,fmt=*) VG_Result
+                 write(io_TmpFile,fmt=*) VG_Error
+                 close(unit=io_TmpFile)
+             endif
+
+             write(io_stdout,"(A)")  ""
+             write(io_stdout,*) "Total xsec: ",VG_Result, " +/-",VG_Error, " fb    vs.",sum(CrossSec(:,:))
+             call InitOutput(VG_Result, VG_Error)
+
+
+             RequEvents(:,:) = 0
+             if (VegasNc2.ne.-1) then
+               call HouseOfRepresentatives(CrossSec(-5:5,-5:5), RequEvents(-5:5,-5:5), VegasNc2)
+             endif
+
+             if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2) then
+                call getRef_PPXchannelHash(ijSel)
+             elseif( Process.eq.60 ) then
+                call getRef_VBFchannelHash(ijSel)
+             elseif( Process.eq.61 ) then
+                call getRef_HJJchannelHash(ijSel)
+             elseif( Process.ge.110 .and. Process .le.114 ) then
+                call getRef_THchannelHash(ijSel)
+             else
+                call getRef_GENchannelHash(ijSel)
+             endif
+
+             do i=1,121
+                  i1 = ijSel(i,1)
+                  j1 = ijSel(i,2)
+                  if( RequEvents(i1,j1).gt.0 .and. ijSel(i,3).ge.0 ) write(io_stdout,"(1X,I3,A,I3,I3,I4,A,3X,F8.3,I9)") i," Fractional partonic xsec ",i1,j1,ijSel(i,3)," "//getLHEParticle(i1)//" "//getLHEParticle(j1)//" ",CrossSec(i1,j1)/VG_Result,RequEvents(i1,j1)
+             enddo
+             write(io_stdout,"(2X,A,F8.3,I9)") "Sum        partonic xsec   x   x    ",sum(CrossSec(:,:))/VG_Result,sum(RequEvents(:,:))
+
+
+
+
+
+
+             write(io_stdout,"(A)")  ""
+             write(io_stdout,"(2X,A)")  "Event generation"
+
+             call ClearHisto()
+             warmup = .false.
+             evtgen = .true.
+             itmx = 1
+         !     nprn = 0
+             EvalCounter = 0
+             Br_counter(:,:) = 0
+             RejeCounter = 0
+             AlertCounter = 0
+             AccepCounter_part(:,:) = 0
+             StatusPercent = 0d0
+
+             CrossSecMax(:,:) = 1.0d0 * CrossSecMax(:,:)    !  adjustment factor
+             call cpu_time(time_start)
+
+
+
+             itmx=1
+             ncall= VegasNc0    !/10     dmax inside vegas needs to be adapted for this. or at least thisdmax inside mod_Crosssection
+             nprn =-1 !0
+             writeout=.false.
+
+             call vegas_get_calls(calls2)
+             calls_rescale = calls1/calls2
+             CrossSecMax(:,:) = CrossSecMax(:,:) * calls_rescale
+             print *, "Rescale CrossSecMax by ",calls_rescale
+
+             PreviousSum = 0
+             if( sum(RequEvents(:,:)).eq.0 ) StatusPercent = 100d0
+             do while( StatusPercent.lt.100d0  )
+         !     do while( AccepCounter_part(iPart_sel,jPart_sel).lt.RequEvents(iPart_sel,jPart_sel) )
+                 call cpu_time(time_start)
+                 readin=.true.  ! this prevents adapting the grid during this while-loop
+
+                 if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
+         !         if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)! adjust to LHE format
+             !     if( Process.eq.90 ) call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.ge.73 .and. Process.le.75 ) call vegas1(EvalWeighted_gg4f_fullproddec,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.110) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.111) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.112) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.113) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.114) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+
+
+         !         call system('clear')
+                 write(io_stdout,*) ""
+                 do i1=-5,5
+                 do j1=-5,5
+                     if( RequEvents(i1,j1).gt.0 .and. AccepCounter_part(i1,j1).lt.RequEvents(i1,j1)  ) then
+         !                write(io_stdout,"(1X,A,I4,I4,2X,I7,2X,I7,2X,F8.3,1X,A)") "Generated events ", i1,j1,(AccepCounter_part(i1,j1)),(RequEvents(i1,j1)),dble(AccepCounter_part(i1,j1))/dble(RequEvents(i1,j1))*100d0,"%"
+         !                call PrintStatusBar2(int(dble(AccepCounter_part(i1,j1))/(dble(RequEvents(i1,j1)))*100),"channel "//getLHEParticle(i1)//" "//getLHEParticle(j1)//" ")
+                        write(*,"(I3,I3,I7,I7,F16.6,E16.3)") i1,j1, &
+                        AccepCounter_part(i1,j1), RequEvents(i1,j1), &
+                        dble(AccepCounter_part(i1,j1))/dble(RejeCounter_part(i1,j1))*100d0, &
+                        CrossSecMax(i1,j1)
+                     endif
+                 enddo
+                 enddo
+                 write(*,"(A,I10,I10,F16.6)") "PS gen eff. ",DebugCounter(10),DebugCounter(9),dble(DebugCounter(10))/dble(DebugCounter(9))*100d0
+                 DebugCounter(9:10)=0
+                 StatusPercent = int(100d0*dble(sum(AccepCounter_part(:,:)))/dble(sum(RequEvents(:,:)))  )
+                 print *, "StatusPercent=",StatusPercent, "  Events=",sum(AccepCounter_part(:,:))
+                 call cpu_time(time_end)
+                 write(io_stdout,*)  "Event generation rate (events,events/sec)",sum(AccepCounter_part(:,:))-PreviousSum,dble(sum(AccepCounter_part(:,:))-PreviousSum)/(time_end-time_start+1d-10)
+                 PreviousSum = sum(AccepCounter_part(:,:))
+             enddo
+
+         ! enddo
+
+
+
+             print *, " Alert  Counter: ",AlertCounter
+             if( dble(AlertCounter)/dble(AccepCounter+1d-10) .gt. 1d0*percent ) then
+                 write(io_LogFile,*) "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
+                 write(io_LogFile,*) "       Increase CSMAX in main.F90."
+                 write(io_stdout, *) "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
+                 write(io_stdout, *) "       Increase CSMAX in main.F90."
+             endif
+             write(io_stdout,*)  " event generation rate (events/sec)",dble(sum(AccepCounter_part(:,:)))/(time_end-time_start+1d-10)
+
+
+
+
+         ELSEIF( Process.ge.66 .and. Process.le.72 ) THEN! special treatment for offshell VBF
+             if (Process.ge.66 .and. Process.le.68) then
+                VBFoffsh_Hash_Size = Hash_MCFM_qqVVqq_Size
+                VBFoffsh_run_size = Hash_MCFM_qqVVqq_Size
+             elseif (Process.ge.70 .and. Process.le.72) then
+                VBFoffsh_Hash_Size = Hash_MCFM_qqVVll_Size
+                VBFoffsh_run_size = Hash_MCFM_qqVVll_Size
+             else
+                VBFoffsh_Hash_Size = Hash_MCFM_qqVVqqStrong_Size
+                VBFoffsh_run_size = Hash_MCFM_qqVVqqStrong_Size
+             endif
+
+             if (VBFoffsh_run_size .gt. VBFoffsh_run_maxsize) call Error("This should never be able to happen")
+
+             !write(6,*) "VBFoffsh_Hash_Size, VBFoffsh_run_size", VBFoffsh_Hash_Size, VBFoffsh_run_size
+
+             if( .not.(VBFoffsh_run.ge.1 .and. VBFoffsh_run.le.VBFoffsh_run_size) ) call Error("Please specify VBFoffsh_run")
+             print *, "VBFoffsh_run = ",VBFoffsh_run
+
+             write(io_stdout,"(2X,A)")  "Scanning the integrand"
+             warmup = .true.
+
+             if( ReadCSmax ) then
+                 i=len(trim(CSmaxFile))
+                 do j=1,VBFoffsh_run_size
+                     write(FileToRead, "(A,I0.3,A)") trim(CSmaxFile(1:i-3)), j, "_gridinfo.txt"
+                     open(unit=io_TmpFile,file=FileToRead,form='formatted',status='old',iostat=ios)
+                     read(io_TmpFile,fmt=*) calls1_array(j)
+                     read(io_TmpFile,fmt=*) CrossSec2_in(j,1:VBFoffsh_Hash_Size)
+                     read(io_TmpFile,fmt=*) CrossSecMax2_in(j,1:VBFoffsh_Hash_Size)
+                     read(io_TmpFile,fmt=*) VG_Result_in(j)
+                     read(io_TmpFile,fmt=*) VG_Error_in(j)
+                     read(io_TmpFile,fmt=*) CrossSectionWithWeights_in(j), CrossSectionWithWeightsErrorSquared_in(j)
+                     close(unit=io_TmpFile)
+                     if( ios.eq.0 ) print *, "read ",FileToRead
+                 enddo
+
+                 !write(6,*) "calls1_array:",calls1_array
+
+                 CrossSec2(:) = -1d0
+                 do i=1,VBFoffsh_Hash_Size
+                     do j=1,VBFoffsh_run_size
+                        if( CrossSec2_in(j,i).ne.0d0 .and. CrossSec2(i).eq.-1d0 ) CrossSec2(i) = CrossSec2_in(j,i)
+                     enddo
+                     if( CrossSec2(i).lt.0d0 ) then
+                         print *, "WARNING: CrossSec2(i) has not been filled",i,CrossSec2_in(1:VBFoffsh_run_size,i)
+                         CrossSec2(i) = 0d0
+                     !else
+                     !    print *, "Filled CrossSec2(i) with",i,CrossSec2_in(1:VBFoffsh_run_size,i)
+                     endif
+                 enddo
+                 if (VBFoffsh_Hash_Size .lt. NMAXCHANNELS) CrossSec2(VBFoffsh_Hash_Size+1:NMAXCHANNELS)=0d0
+
+
+                 CrossSecMax2(:) = -1d0
+                 do i=1,VBFoffsh_Hash_Size
+                     CrossSecMax2(i) = CrossSecMax2_in( max(1,VBFoffsh_run),i) * calls1_array(VBFoffsh_run)
+                 enddo
+                 if (VBFoffsh_Hash_Size .lt. NMAXCHANNELS) CrossSecMax2(VBFoffsh_Hash_Size+1:NMAXCHANNELS)=0d0
+
+                 VG_Result = 0d0; VG_Error = 0d0
+                 CrossSectionWithWeights = 0d0; CrossSectionWithWeightsErrorSquared = 0d0
+                 do j=1,VBFoffsh_run_size
+                    VG_Result = VG_Result_in(j) + VG_Result
+                    VG_Error  = VG_Error_in(j)**2 + VG_Error
+                    CrossSectionWithWeights = CrossSectionWithWeights_in(j) + CrossSectionWithWeights
+                    CrossSectionWithWeightsErrorSquared = CrossSectionWithWeightsErrorSquared_in(j) + CrossSectionWithWeightsErrorSquared
+                 enddo
+                 VG_Error = dsqrt(VG_Error)
+
+                 !write(6,*) "CrossSec2:",CrossSec2
+                 !write(6,*) "CrossSecMax2:",CrossSecMax2
+                 !write(6,*) "CrossSectionWithWeights_in:",CrossSectionWithWeights_in
+                 !write(6,*) "CrossSectionWithWeightsErrorSquared_in:",CrossSectionWithWeightsErrorSquared_in
+                 !write(6,*) "CrossSectionWithWeights,CrossSectionWithWeightsErrorSquared:",CrossSectionWithWeights,CrossSectionWithWeightsErrorSquared
+                 !write(6,*) "VG_Result,VG_Error:",VG_Result,VG_Error
+                 !pause
+
+
+             else
+                 itmx = 10
+                 ncall= VegasNc0
+                 readin=.false.
+                 writeout=.true.
+                 if( Process.ge.66 .and. Process.le.72 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+
+                 itmx = 2
+                 writeout=.true.
+                 outgridfile = trim(CSmaxFile)//'_step2.grid'
+                 if( Process.ge.66 .and. Process.le.72 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+
+
+                 CrossSecMax2(:) = 0d0
+                 CrossSec2(:) = 0d0
+                 print *, "resetting CrossSecMax2(:)"
+                 itmx = 1
+                 call ClearHisto()
+                 FindCrossSectionWithWeights = .true.
+                 CrossSectionWithWeights = 0d0
+                 CrossSectionWithWeightsErrorSquared = 0d0
+                 if( Process.ge.66 .and. Process.le.72 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+                 FindCrossSectionWithWeights = .false.
+                 writeout=.false.
+                 ingridfile=trim(outgridfile)
+
+                 call vegas_get_calls(calls1_array(VBFoffsh_run))
+                 CrossSec2(:) = CrossSec2(:)/dble(itmx)
+
+                 open(unit=io_TmpFile,file=trim(CSmaxFile)//'_gridinfo.txt',form='formatted',status='replace')
+                 write(io_TmpFile,fmt=*) calls1_array(VBFoffsh_run)
+                 write(io_TmpFile,fmt=*) CrossSec2(1:VBFoffsh_Hash_Size)
+                 write(io_TmpFile,fmt=*) CrossSecMax2(1:VBFoffsh_Hash_Size)
+                 write(io_TmpFile,fmt=*) VG_Result
+                 write(io_TmpFile,fmt=*) VG_Error
+                 write(io_TmpFile,fmt=*) CrossSectionWithWeights, CrossSectionWithWeightsErrorSquared
+                 close(unit=io_TmpFile)
+             endif
+
+             write(io_stdout,"(A)")  ""
+             write(io_stdout,*) "Total unweighted xsec (used by Vegas): ", VG_Result, " +/-", VG_Error, " fb    vs.",sum(CrossSec2(:))
+             write(io_stdout,*) "Total xsec with weights (use for physics): ", CrossSectionWithWeights, " +/-", sqrt(CrossSectionWithWeightsErrorSquared)
+             call InitOutput(CrossSectionWithWeights, sqrt(CrossSectionWithWeightsErrorSquared))
+
+             RequEvents2(:) = 0
+             if(sum(CrossSec2(:)).ne.0d0) then
+               call HouseOfRepresentatives2(CrossSec2, RequEvents2, VegasNc2)
+             endif
+
+             if (Process.eq.69) then
+                call getRef_MCFM_qqVVqqStrong_Hash(ijSel)
+             elseif (Process.ge.66 .and. Process.le.68) then
+                call getRef_MCFM_qqVVqq_Hash(ijSel)
+             elseif (Process.ge.70 .and. Process.le.72) then
+                call getRef_MCFM_qqVVll_Hash(ijSel)
+             else
+                call Error("Process hash unidentified!")
+             endif
+             !RequEvents(:,:) = 0d0 ! This variable is not used here
+             do i=1,VBFoffsh_Hash_Size
+                  i1 = convertToPartIndex(ijSel(i,1))
+                  j1 = convertToPartIndex(ijSel(i,2))
+                  if( RequEvents2(i).ne.0 ) write(*,"(I4,I4,I4,F18.8,I10,I10)") i, i1,j1,CrossSec2(i),RequEvents2(i)
+             enddo
+
+
+             if (VG_Result.gt.0d0) then
+               write(io_stdout,"(2X,A,F18.3,I10)") "Sum partonic xsec:",sum(CrossSec2(:))/VG_Result,sum(RequEvents2(:))
+             else
+               write(io_stdout,"(2X,A,F18.3,I10)") "Sum partonic xsec:",0d0,sum(RequEvents2(:))
+             endif
+
+
+             if( .not. ReadCSmax ) then! For ReadCSmax=.false. the program ends here
+                if( VBFoffsh_run.ge.1 .and. VBFoffsh_run.le.VBFoffsh_run_size ) print *, "WARNING: These are not the final number of events because the total cross section needs to be assembled from all the VBFoffsh_runs"
+                RETURN
+             endif
+
+             !removing the requested events for the wrong VBFoffsh_run
+             RequEvents2(1:VBFoffsh_run-1) = 0
+             RequEvents2(VBFoffsh_run+1:VBFoffsh_Hash_Size) = 0
+             NumPartonicChannels = 1
+
+             ingridfile = trim(CSmaxFile)//'_step2.grid'
+
+             !write(6,*) "NumPartonicChannels | RequEvents2",NumPartonicChannels," | ",RequEvents2
+
+
+         !     print *, "New sorted hash for VBFoffsh_run=",VBFoffsh_run
+         !     do i=1,VBFoffsh_Hash_Size
+         !          i1 = convertToPartIndex(ijSel(i,1))
+         !          j1 = convertToPartIndex(ijSel(i,2))
+         !          if( RequEvents2(i).ne.0 ) write(*,"(I4,I4,I4,I4,F18.8,I10,I10)") i,SortedHash(i), i1,j1,CrossSec2(i)/VG_Result,RequEvents2(i)
+         ! !         write(*,"(I4,I4,I4,I4,F18.8,I10,I10)") i, SortedHash(i), i1,j1,CrossSec2(i)/VG_Result,RequEvents2(i)
+         !     enddo
+
+
+         !--------------------------------------------------------------------
+             write(io_stdout,"(A)")  ""
+             write(io_stdout,"(2X,A)")  "Event generation"
+
+             call ClearHisto()
+             warmup = .false.
+             evtgen = .true.
+         !     nprn = 0
+             EvalCounter = 0
+             Br_counter(:,:) = 0
+             RejeCounter = 0
+             AlertCounter = 0
+             AccepCounter_part2(:) = 0
+             StatusPercent = 0d0
+
+             CrossSecMax2(:) = 1.5d0 * CrossSecMax2(:)    !  adjustment factor
+             call cpu_time(time_start)
+
+
+
+             itmx=1
+             ncall= VegasNc0    !/10     dmax inside vegas needs to be adapted for this. or at least thisdmax inside mod_Crosssection
+             nprn =-1 !0
+             writeout=.false.
+
+             call vegas_get_calls(calls2)
+             calls_rescale = 1d0/calls2
+             CrossSecMax2(:) = CrossSecMax2(:) * calls_rescale
+
+             PreviousSum = 0
+             if( sum(RequEvents2(:)).eq.0 ) StatusPercent = 100d0
+             do while( StatusPercent.lt.100d0  )
+                 call cpu_time(time_start)
+                 readin=.true.  ! this prevents adapting the grid during this while-loop
+
+                 if( Process.ge.66 .and. Process.le.72 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+                 write(io_stdout,*) ""
+
+                 do i1=1,VBFoffsh_Hash_Size
+                     if( RequEvents2(i1).gt.0 .and. AccepCounter_part2(i1).lt.RequEvents2(i1)  ) then
+                        write(*,"(I3,I7,I7,E16.3)") i1, &
+                        AccepCounter_part2(i1), RequEvents2(i1), &
+                        CrossSecMax2(i1)
+                     endif
+                 enddo
+
+                 StatusPercent = int(100d0*dble(sum(AccepCounter_part2(:)))/dble(sum(RequEvents2(:)))  )
+                 print *, "StatusPercent=",StatusPercent, "  Events=",sum(AccepCounter_part2(:))
+                 call cpu_time(time_end)
+                 write(io_stdout,*)  "Event generation rate (events,events/sec)",sum(AccepCounter_part2(:))-PreviousSum,dble(sum(AccepCounter_part2(:))-PreviousSum)/(time_end-time_start+1d-10)
+                 PreviousSum = sum(AccepCounter_part2(:))
+             enddo
+
+
+
+
+
+             print *, " Alert  Counter: ",AlertCounter
+             if( dble(AlertCounter)/dble(AccepCounter+1d-10) .gt. 1d0*percent ) then
+                 write(io_LogFile,*) "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
+                 write(io_LogFile,*) "       Increase CSMAX in main.F90."
+                 write(io_stdout, *) "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
+                 write(io_stdout, *) "       Increase CSMAX in main.F90."
+             endif
+             write(io_stdout,*)  " event generation rate (events/sec)",dble(sum(AccepCounter_part(:,:)))/(time_end-time_start+1d-10)
+
+
+
+
+             !pause
+
+
+         ENDIF
+
+
+      else! not beta version
+
+
+
+
+      !-------------------old stuff -------------------
+          VG(:,:) = zero
+          CSmax(:,:) = zero
+
+          if( .not. ReadCSmax ) then
+              print *, " finding maximal weight with ",VegasNc0," evaluations"
+              do i=1,VegasNc0
+                      call random_number(yRnd)
+                      RES(:,:) = 0d0
+                      if( Process.eq.80 ) then
+                          dum = EvalUnWeighted_TTBH(yRnd,.false.,(/-99,-99/),RES)
+                      elseif( Process.eq.90 ) then
+                          dum = EvalUnWeighted_BBBH(yRnd,.false.,(/-99,-99/),RES)
+                      elseif( Process.eq.60 ) then
+                          dum = EvalUnWeighted_HJJ(yRnd,.false.,(/-99,-99/),RES)
+                      elseif( Process.eq.61 ) then
+                          dum = EvalUnWeighted_HJJ(yRnd,.false.,(/-99,-99/),RES)
+                      elseif( Process.ge.66 .and. Process.le.72 ) then
+                          dum = EvalUnWeighted_HJJ_fulldecay(yRnd,.false.,(/-99,-99/),RES)
+                      elseif( Process.eq.110 ) then
+                          dum = EvalUnWeighted_TH(yRnd,.false.,(/-99,-99/),RES)
+                      elseif( Process.eq.111 ) then
+                          dum = EvalUnWeighted_TH(yRnd,.false.,(/-99,-99/),RES)
+                      elseif( Process.eq.112 ) then
+                          dum = EvalUnWeighted_TH(yRnd,.false.,(/-99,-99/),RES)
+                      elseif( Process.eq.113 ) then
+                          dum = EvalUnWeighted_TH(yRnd,.false.,(/-99,-99/),RES)
+                      endif
+                      VG(:,:) = VG(:,:) + RES(:,:)
+                      PChannel = PChannel_aux
+              enddo
+              open(unit=io_CSmaxFile,file=trim(CSmaxFile)//'_CSmax.bin',form='unformatted',status='replace')
+              WRITE(io_CSmaxFile) CSMAX,VG
+              close(io_CSmaxFile)
+          else
+              open(unit=io_CSmaxFile,file=trim(CSmaxFile)//'_CSmax.bin',form='unformatted')
+              READ(io_CSmaxFile) CSMAX,VG
+              close(io_CSmaxFile)
+          endif
+
+         CSmax(:,:)   = 1.5d0 * CSmax(:,:)    !  adjustment factor
+
+         VG(:,:) = VG(:,:)/dble(VegasNc0)
+         TotalXSec = sum(  VG(:,:) )
+         print *, ""
+         write(io_stdout,"(1X,A,F10.3)") "Total xsec: ",TotalXSec
+
+
+          RequEvents(:,:) = 0
+          if (VegasNc2.ne.-1) then
+            call HouseOfRepresentatives(VG(:,:), RequEvents(-5:5,-5:5), VegasNc2)
+          endif
+
+          do i1=-5,5
+          do j1=-5,5
+               if( VG(i1,j1).gt.1d-9 ) write(io_stdout,"(1X,A,I4,I4,F8.3,I9)") "Fractional partonic xsec ", i1,j1,VG(i1,j1)/TotalXSec,RequEvents(i1,j1)
+          enddo
           enddo
 
-    endif
-    enddo
-    enddo
 
 
 
 
-    call cpu_time(time_end)
-    print *, ""
-    print *, ""
-    print *, " Evaluation Counter: ",EvalCounter
-    print *, " Acceptance Counter: ",AccepCounter
-    do i1=-5,+5
-    do j1=-5,+5
-      if( AccepCounter_part(i1,j1).ne.0 ) print *, " Acceptance  Counter_part: ", i1,j1, AccepCounter_part(i1,j1)
-    enddo
-    enddo
-    print *, " Alert  Counter: ",AlertCounter
-    print *, " gg/qqb ratio = ", dble(AccepCounter_part(0,0))/dble(sum(AccepCounter_part(:,:))-AccepCounter_part(0,0)+1d-10)
-    if( dble(AlertCounter)/dble(AccepCounter+1d-10) .gt. 1d0*percent ) then
-        write(io_LogFile,*) "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
-        write(io_LogFile,*) "       Increase CSMAX in main.F90."
-        write(io_stdout, *) "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
-        write(io_stdout, *) "       Increase CSMAX in main.F90."
-    endif
-    write(io_stdout,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start+1d-10)
+      !------------------------------- set counts to zero for actual evaluation
+
+          EvalCounter = 0
+          AccepCounter = 0
+          RejeCounter = 0
+          AlertCounter = 0
+          AccepCounter_part(:,:) = 0
+
+          call cpu_time(time_start)
 
 
-endif! beta version
+          do i1=-5,5!! idea: instead of these 2 do-loop introduce randomized loop
+          do j1=-5,5
+          if(RequEvents(i1,j1).ne.0) then
+                if( (PChannel.eq.0) .and. (abs(i1)+abs(j1).ne.0) ) cycle
+                if( (PChannel.eq.1) .and. i1*j1.eq.0 ) cycle
 
-  endif! unweighted
+                write(io_stdout,*) ""
+                write(io_stdout,*) ""
+                write(io_stdout,"(X,A,I8,A,I4,I4,A)",advance='no') "generating ",RequEvents(i1,j1)," events for channel",i1,j1,":  "
+                flush(io_stdout)
+
+                do while( AccepCounter_part(i1,j1)  .lt. RequEvents(i1,j1) )
+                    call random_number(yRnd)
+                    if( Process.eq.80 ) then
+                        dum = EvalUnWeighted_TTBH(yRnd,.true.,(/i1,j1/),RES)
+                    elseif( Process.eq.90 ) then
+                        dum = EvalUnWeighted_BBBH(yRnd,.true.,(/i1,j1/),RES)
+                    elseif( Process.eq.60 ) then
+                        dum = EvalUnWeighted_HJJ(yRnd,.true.,(/i1,j1/),RES)
+                    elseif( Process.ge.66 .and. Process.le.72 ) then
+                        dum = EvalUnWeighted_HJJ_fulldecay(yRnd,.true.,(/i1,j1/),RES)
+                    elseif( Process.eq.61 ) then
+                        dum = EvalUnWeighted_HJJ(yRnd,.true.,(/i1,j1/),RES)
+                    elseif( Process.eq.110 ) then
+                        dum = EvalUnWeighted_TH(yRnd,.true.,(/i1,j1/),RES)
+                    elseif( Process.eq.111 ) then
+                        dum = EvalUnWeighted_TH(yRnd,.true.,(/i1,j1/),RES)
+                    elseif( Process.eq.112 ) then
+                        dum = EvalUnWeighted_TH(yRnd,.true.,(/i1,j1/),RES)
+                    elseif( Process.eq.113 ) then
+                        dum = EvalUnWeighted_TH(yRnd,.true.,(/i1,j1/),RES)
+                    endif
+                    StatusPercent = int(100d0*(AccepCounter_part(i1,j1))  /  dble(RequEvents(i1,j1))  )
+                    call PrintStatusBar( StatusPercent )
+                enddo
+
+          endif
+          enddo
+          enddo
+
+
+
+
+          call cpu_time(time_end)
+          print *, ""
+          print *, ""
+          print *, " Evaluation Counter: ",EvalCounter
+          print *, " Acceptance Counter: ",AccepCounter
+          do i1=-5,+5
+          do j1=-5,+5
+            if( AccepCounter_part(i1,j1).ne.0 ) print *, " Acceptance  Counter_part: ", i1,j1, AccepCounter_part(i1,j1)
+          enddo
+          enddo
+          print *, " Alert  Counter: ",AlertCounter
+          print *, " gg/qqb ratio = ", dble(AccepCounter_part(0,0))/dble(sum(AccepCounter_part(:,:))-AccepCounter_part(0,0)+1d-10)
+          if( dble(AlertCounter)/dble(AccepCounter+1d-10) .gt. 1d0*percent ) then
+              write(io_LogFile,*) "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
+              write(io_LogFile,*) "       Increase CSMAX in main.F90."
+              write(io_stdout, *) "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
+              write(io_stdout, *) "       Increase CSMAX in main.F90."
+          endif
+          write(io_stdout,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start+1d-10)
+
+
+      endif! beta version
+
+   endif! unweighted
 
 
 
@@ -5883,7 +5883,7 @@ SUBROUTINE WriteParameters(TheUnit)
 use ModParameters
 implicit none
 integer :: TheUnit
-character :: arg*(500)
+character :: arg*(1000)
 
     call Get_Command(arg)
     write(TheUnit,"(3X,A)") ""
@@ -5894,23 +5894,23 @@ character :: arg*(500)
     if( Collider.eq.0 ) write(TheUnit,"(4X,A,1F8.2)") "Collider: e+ e-, sqrt(s)=",Collider_Energy*100d0
     if( Collider.eq.1 ) write(TheUnit,"(4X,A,1F8.2)") "Collider: P-P, sqrt(s)=",Collider_Energy*100d0
     if( Collider.eq.2 ) write(TheUnit,"(4X,A,1F8.2)") "Collider: P-Pbar, sqrt(s)=",Collider_Energy*100d0
-    if( Process.eq.0 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.1 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=1, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.2 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=2, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.60) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.61) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.62) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( (Process.eq.66 .or. Process.eq.68 .or. Process.eq.70 .or. Process.eq.72 .or. Process.eq.73 .or. Process.eq.75) .and. M_Reso.ge.0d0  ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "1st Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( (Process.eq.66 .or. Process.eq.68 .or. Process.eq.70 .or. Process.eq.72 .or. Process.eq.73 .or. Process.eq.75) .and. M_Reso2.ge.0d0 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "2nd Resonance: spin=0, mass=",M_Reso2*100d0," width=",Ga_Reso2*100d0
-    if( Process.eq.50) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.51) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.80) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.90) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.110) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.111) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.112) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.113) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.114) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.0 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.1 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-1 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.2 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-2 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.60) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.61) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.62) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( (Process.eq.66 .or. Process.eq.68 .or. Process.eq.70 .or. Process.eq.72 .or. Process.eq.73 .or. Process.eq.75) .and. M_Reso.ge.0d0  ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance 1, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( (Process.eq.66 .or. Process.eq.68 .or. Process.eq.70 .or. Process.eq.72 .or. Process.eq.73 .or. Process.eq.75) .and. M_Reso2.ge.0d0 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance 2, mass=",M_Reso2/GeV," width=",Ga_Reso2/GeV
+    if( Process.eq.50) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.51) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.80) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.90) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.110) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.111) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.112) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.113) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.114) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
     if( ReadLHEFile )    write(TheUnit,"(4X,A)") "           (This is ReadLHEFile mode. Resonance mass/width are read from LHE input parameters.)"
     if( ConvertLHEFile ) write(TheUnit,"(4X,A)") "           (This is ConvertLHEFile mode. Resonance mass/width are read from LHE input parameters.)"
     if( HiggsDecayLengthMM.ne.0d0 ) write(TheUnit,"(4X,A,F10.5,A)") "           ctau=", HiggsDecayLengthMM, " mm"
@@ -5927,9 +5927,17 @@ character :: arg*(500)
         if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.75) .or. IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z boson: mass=",M_Z*100d0,", width=",Ga_Z*100d0
         if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.75) .or. IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W boson: mass=",M_W*100d0,", width=",Ga_W*100d0
     endif
-    if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or.Process.eq.112 .or. Process.eq.113 .or. Process.eq.114) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Top quark mass=",m_top*100d0,", width=",Ga_top*100d0
+    if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or.Process.eq.112 .or. Process.eq.113 .or. Process.eq.114) then
+        write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Top quark mass=",m_top/GeV,", width=",Ga_top/GeV
+    else if( Process.ge.73 .and. Process.le.75) then
+        write(TheUnit,"(4X,A,F8.4)") "Top quark mass=",m_top/GeV
+    endif
     if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113 .or. Process.eq.114) write(TheUnit,"(4X,A,I2)") "Top quark decay=",TOPDECAYS
-    if( Process.eq.90 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Bottom quark mass=",m_top*100d0
+    if( Process.eq.90 .or. (Process.ge.73 .and. Process.le.75) ) write(TheUnit,"(4X,A,F8.4)") "Bottom quark mass=",m_bot/GeV
+    if( Process.ge.73 .and. Process.le.75 ) then
+        if ((abs(kappa_4gen_top)+abs(kappa2_4gen_top)).gt.0d0) write(TheUnit,"(4X,A,F8.4)") "4th gen. top quark mass=",m_top_4gen/GeV
+        if ((abs(kappa_4gen_bot)+abs(kappa2_4gen_bot)).gt.0d0) write(TheUnit,"(4X,A,F8.4)") "4th gen. bot quark mass=",m_bot_4gen/GeV
+    endif
     if( Process.eq.50 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.62 .or. (Process.ge.66 .and. Process.le.75) .or. Process.eq.90 .or. &
        ((Process.eq.80 .or. (Process.ge.110 .and. Process.le.114)) .and. m_Top.lt.10d0*GeV) ) then
         write(TheUnit,"(4X,A)") "Jet cuts:"
@@ -6028,260 +6036,386 @@ character :: arg*(500)
             write(TheUnit,"(6X,A,2E16.8,A1)") "ahz2=",ahz2,"i"
             write(TheUnit,"(6X,A,2E16.8,A1)") "ahz3=",ahz3,"i"
         else
-            if( cdabs(kappa_top ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "kappa_top=",kappa_top,"i"
-            if( cdabs(kappa_bot ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "kappa_bot=",kappa_bot,"i"
-            if( cdabs(kappa_4gen_top ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "kappa_4gen_top=",kappa_4gen_top,"i"
-            if( cdabs(kappa_4gen_bot ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "kappa_4gen_bot=",kappa_4gen_bot,"i"
-            if( cdabs(ghg2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghg2=",ghg2,"i"
-            if( cdabs(ghg3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghg3=",ghg3,"i"
-            if( cdabs(ghg4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghg4=",ghg4,"i"
-            if( cdabs(ghz1 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghz1=",ghz1,"i"
-            if( cdabs(ghz2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghz2=",ghz2,"i"
-            if( cdabs(ghz3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghz3=",ghz3,"i"
-            if( cdabs(ghz4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghz4=",ghz4,"i"
-            if( cdabs(ghz1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime= ",ghz1_prime ,"i,","Lambda_z1=",Lambda_z1/GeV
-            if( cdabs(ghz1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime2=",ghz1_prime2,"i,","Lambda_z1=",Lambda_z1/GeV
-            if( cdabs(ghz1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime3=",ghz1_prime3,"i,","Lambda_z1=",Lambda_z1/GeV
-            if( cdabs(ghz1_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime4=",ghz1_prime4,"i,","Lambda_z1=",Lambda_z1/GeV
-            if( cdabs(ghz1_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime5=",ghz1_prime5,"i,","Lambda_z1=",Lambda_z1/GeV
-            if( cdabs(ghz1_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime6=",ghz1_prime6,"i,","Lambda_z1=",Lambda_z1/GeV
-            if( cdabs(ghz1_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime7=",ghz1_prime7,"i,","Lambda_z1=",Lambda_z1/GeV
-            if( cdabs(ghz2_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz2_prime= ",ghz2_prime ,"i,","Lambda_z2=",Lambda_z2/GeV
-            if( cdabs(ghz2_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz2_prime2=",ghz2_prime2,"i,","Lambda_z2=",Lambda_z2/GeV
-            if( cdabs(ghz2_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz2_prime3=",ghz2_prime3,"i,","Lambda_z2=",Lambda_z2/GeV
-            if( cdabs(ghz2_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz2_prime4=",ghz2_prime4,"i,","Lambda_z2=",Lambda_z2/GeV
-            if( cdabs(ghz2_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz2_prime5=",ghz2_prime5,"i,","Lambda_z2=",Lambda_z2/GeV
-            if( cdabs(ghz2_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz2_prime6=",ghz2_prime6,"i,","Lambda_z2=",Lambda_z2/GeV
-            if( cdabs(ghz2_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz2_prime7=",ghz2_prime7,"i,","Lambda_z2=",Lambda_z2/GeV
-            if( cdabs(ghz3_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz3_prime= ",ghz3_prime ,"i,","Lambda_z3=",Lambda_z3/GeV
-            if( cdabs(ghz3_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz3_prime2=",ghz3_prime2,"i,","Lambda_z3=",Lambda_z3/GeV
-            if( cdabs(ghz3_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz3_prime3=",ghz3_prime3,"i,","Lambda_z3=",Lambda_z3/GeV
-            if( cdabs(ghz3_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz3_prime4=",ghz3_prime4,"i,","Lambda_z3=",Lambda_z3/GeV
-            if( cdabs(ghz3_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz3_prime5=",ghz3_prime5,"i,","Lambda_z3=",Lambda_z3/GeV
-            if( cdabs(ghz3_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz3_prime6=",ghz3_prime6,"i,","Lambda_z3=",Lambda_z3/GeV
-            if( cdabs(ghz3_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz3_prime7=",ghz3_prime7,"i,","Lambda_z3=",Lambda_z3/GeV
-            if( cdabs(ghz4_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime= ",ghz4_prime ,"i,","Lambda_z4=",Lambda_z4/GeV
-            if( cdabs(ghz4_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime2=",ghz4_prime2,"i,","Lambda_z4=",Lambda_z4/GeV
-            if( cdabs(ghz4_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime3=",ghz4_prime3,"i,","Lambda_z4=",Lambda_z4/GeV
-            if( cdabs(ghz4_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime4=",ghz4_prime4,"i,","Lambda_z4=",Lambda_z4/GeV
-            if( cdabs(ghz4_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime5=",ghz4_prime5,"i,","Lambda_z4=",Lambda_z4/GeV
-            if( cdabs(ghz4_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime6=",ghz4_prime6,"i,","Lambda_z4=",Lambda_z4/GeV
-            if( cdabs(ghz4_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime7=",ghz4_prime7,"i,","Lambda_z4=",Lambda_z4/GeV
-            if( cdabs(ghzgs2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs2=",ghzgs2,"i"
-            if( cdabs(ghzgs3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs3=",ghzgs3,"i"
-            if( cdabs(ghzgs4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs4=",ghzgs4,"i"
-            if( cdabs(ghzgs1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,2X,A,1PE12.4)") "ghzgs1_prime2=",ghzgs1_prime2,"i,","Lambda_zgs1=",Lambda_zgs1/GeV
-            if( cdabs(ghgsgs2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs2=",ghgsgs2,"i"
-            if( cdabs(ghgsgs3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs3=",ghgsgs3,"i"
-            if( cdabs(ghgsgs4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs4=",ghgsgs4,"i"
-            if( cdabs(ghzzp1 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzzp1=",ghzzp1,"i"
-            if( cdabs(ghzzp2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzzp2=",ghzzp2,"i"
-            if( cdabs(ghzzp3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzzp3=",ghzzp3,"i"
-            if( cdabs(ghzzp4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzzp4=",ghzzp4,"i"
-            if( cdabs(ghzzp1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp1_prime= ",ghzzp1_prime ,"i,","Lambda_z1=",Lambda_z1/GeV
-            if( cdabs(ghzzp1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp1_prime2=",ghzzp1_prime2,"i,","Lambda_z1=",Lambda_z1/GeV
-            if( cdabs(ghzzp1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp1_prime3=",ghzzp1_prime3,"i,","Lambda_z1=",Lambda_z1/GeV
-            if( cdabs(ghzzp1_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp1_prime4=",ghzzp1_prime4,"i,","Lambda_z1=",Lambda_z1/GeV
-            if( cdabs(ghzzp1_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp1_prime5=",ghzzp1_prime5,"i,","Lambda_z1=",Lambda_z1/GeV
-            if( cdabs(ghzzp1_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp1_prime6=",ghzzp1_prime6,"i,","Lambda_z1=",Lambda_z1/GeV
-            if( cdabs(ghzzp1_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp1_prime7=",ghzzp1_prime7,"i,","Lambda_z1=",Lambda_z1/GeV
-            if( cdabs(ghzzp2_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp2_prime= ",ghzzp2_prime ,"i,","Lambda_z2=",Lambda_z2/GeV
-            if( cdabs(ghzzp2_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp2_prime2=",ghzzp2_prime2,"i,","Lambda_z2=",Lambda_z2/GeV
-            if( cdabs(ghzzp2_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp2_prime3=",ghzzp2_prime3,"i,","Lambda_z2=",Lambda_z2/GeV
-            if( cdabs(ghzzp2_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp2_prime4=",ghzzp2_prime4,"i,","Lambda_z2=",Lambda_z2/GeV
-            if( cdabs(ghzzp2_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp2_prime5=",ghzzp2_prime5,"i,","Lambda_z2=",Lambda_z2/GeV
-            if( cdabs(ghzzp2_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp2_prime6=",ghzzp2_prime6,"i,","Lambda_z2=",Lambda_z2/GeV
-            if( cdabs(ghzzp2_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp2_prime7=",ghzzp2_prime7,"i,","Lambda_z2=",Lambda_z2/GeV
-            if( cdabs(ghzzp3_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp3_prime= ",ghzzp3_prime ,"i,","Lambda_z3=",Lambda_z3/GeV
-            if( cdabs(ghzzp3_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp3_prime2=",ghzzp3_prime2,"i,","Lambda_z3=",Lambda_z3/GeV
-            if( cdabs(ghzzp3_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp3_prime3=",ghzzp3_prime3,"i,","Lambda_z3=",Lambda_z3/GeV
-            if( cdabs(ghzzp3_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp3_prime4=",ghzzp3_prime4,"i,","Lambda_z3=",Lambda_z3/GeV
-            if( cdabs(ghzzp3_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp3_prime5=",ghzzp3_prime5,"i,","Lambda_z3=",Lambda_z3/GeV
-            if( cdabs(ghzzp3_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp3_prime6=",ghzzp3_prime6,"i,","Lambda_z3=",Lambda_z3/GeV
-            if( cdabs(ghzzp3_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp3_prime7=",ghzzp3_prime7,"i,","Lambda_z3=",Lambda_z3/GeV
-            if( cdabs(ghzzp4_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp4_prime= ",ghzzp4_prime ,"i,","Lambda_z4=",Lambda_z4/GeV
-            if( cdabs(ghzzp4_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp4_prime2=",ghzzp4_prime2,"i,","Lambda_z4=",Lambda_z4/GeV
-            if( cdabs(ghzzp4_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp4_prime3=",ghzzp4_prime3,"i,","Lambda_z4=",Lambda_z4/GeV
-            if( cdabs(ghzzp4_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp4_prime4=",ghzzp4_prime4,"i,","Lambda_z4=",Lambda_z4/GeV
-            if( cdabs(ghzzp4_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp4_prime5=",ghzzp4_prime5,"i,","Lambda_z4=",Lambda_z4/GeV
-            if( cdabs(ghzzp4_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp4_prime6=",ghzzp4_prime6,"i,","Lambda_z4=",Lambda_z4/GeV
-            if( cdabs(ghzzp4_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp4_prime7=",ghzzp4_prime7,"i,","Lambda_z4=",Lambda_z4/GeV
-            if( cdabs(ghzpgs2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpgs2=",ghzpgs2,"i"
-            if( cdabs(ghzpgs3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpgs3=",ghzpgs3,"i"
-            if( cdabs(ghzpgs4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpgs4=",ghzpgs4,"i"
-            if( cdabs(ghzpgs1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,2X,A,1PE12.4)") "ghzpgs1_prime2=",ghzpgs1_prime2,"i,","Lambda_zgs1=",Lambda_zgs1/GeV
-            if( cdabs(ghzpzp1 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpzp1=",ghzpzp1,"i"
-            if( cdabs(ghzpzp2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpzp2=",ghzpzp2,"i"
-            if( cdabs(ghzpzp3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpzp3=",ghzpzp3,"i"
-            if( cdabs(ghzpzp4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpzp4=",ghzpzp4,"i"
-            if( cdabs(ghzpzp1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime= ",ghzpzp1_prime ,"i,","Lambda_z1=",Lambda_z1/GeV
-            if( cdabs(ghzpzp1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime2=",ghzpzp1_prime2,"i,","Lambda_z1=",Lambda_z1/GeV
-            if( cdabs(ghzpzp1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime3=",ghzpzp1_prime3,"i,","Lambda_z1=",Lambda_z1/GeV
-            if( cdabs(ghzpzp1_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime4=",ghzpzp1_prime4,"i,","Lambda_z1=",Lambda_z1/GeV
-            if( cdabs(ghzpzp1_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime5=",ghzpzp1_prime5,"i,","Lambda_z1=",Lambda_z1/GeV
-            if( cdabs(ghzpzp1_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime6=",ghzpzp1_prime6,"i,","Lambda_z1=",Lambda_z1/GeV
-            if( cdabs(ghzpzp1_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime7=",ghzpzp1_prime7,"i,","Lambda_z1=",Lambda_z1/GeV
-            if( cdabs(ghzpzp2_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp2_prime= ",ghzpzp2_prime ,"i,","Lambda_z2=",Lambda_z2/GeV
-            if( cdabs(ghzpzp2_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp2_prime2=",ghzpzp2_prime2,"i,","Lambda_z2=",Lambda_z2/GeV
-            if( cdabs(ghzpzp2_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp2_prime3=",ghzpzp2_prime3,"i,","Lambda_z2=",Lambda_z2/GeV
-            if( cdabs(ghzpzp2_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp2_prime4=",ghzpzp2_prime4,"i,","Lambda_z2=",Lambda_z2/GeV
-            if( cdabs(ghzpzp2_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp2_prime5=",ghzpzp2_prime5,"i,","Lambda_z2=",Lambda_z2/GeV
-            if( cdabs(ghzpzp2_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp2_prime6=",ghzpzp2_prime6,"i,","Lambda_z2=",Lambda_z2/GeV
-            if( cdabs(ghzpzp2_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp2_prime7=",ghzpzp2_prime7,"i,","Lambda_z2=",Lambda_z2/GeV
-            if( cdabs(ghzpzp3_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp3_prime= ",ghzpzp3_prime ,"i,","Lambda_z3=",Lambda_z3/GeV
-            if( cdabs(ghzpzp3_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp3_prime2=",ghzpzp3_prime2,"i,","Lambda_z3=",Lambda_z3/GeV
-            if( cdabs(ghzpzp3_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp3_prime3=",ghzpzp3_prime3,"i,","Lambda_z3=",Lambda_z3/GeV
-            if( cdabs(ghzpzp3_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp3_prime4=",ghzpzp3_prime4,"i,","Lambda_z3=",Lambda_z3/GeV
-            if( cdabs(ghzpzp3_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp3_prime5=",ghzpzp3_prime5,"i,","Lambda_z3=",Lambda_z3/GeV
-            if( cdabs(ghzpzp3_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp3_prime6=",ghzpzp3_prime6,"i,","Lambda_z3=",Lambda_z3/GeV
-            if( cdabs(ghzpzp3_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp3_prime7=",ghzpzp3_prime7,"i,","Lambda_z3=",Lambda_z3/GeV
-            if( cdabs(ghzpzp4_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp4_prime= ",ghzpzp4_prime ,"i,","Lambda_z4=",Lambda_z4/GeV
-            if( cdabs(ghzpzp4_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp4_prime2=",ghzpzp4_prime2,"i,","Lambda_z4=",Lambda_z4/GeV
-            if( cdabs(ghzpzp4_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp4_prime3=",ghzpzp4_prime3,"i,","Lambda_z4=",Lambda_z4/GeV
-            if( cdabs(ghzpzp4_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp4_prime4=",ghzpzp4_prime4,"i,","Lambda_z4=",Lambda_z4/GeV
-            if( cdabs(ghzpzp4_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp4_prime5=",ghzpzp4_prime5,"i,","Lambda_z4=",Lambda_z4/GeV
-            if( cdabs(ghzpzp4_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp4_prime6=",ghzpzp4_prime6,"i,","Lambda_z4=",Lambda_z4/GeV
-            if( cdabs(ghzpzp4_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp4_prime7=",ghzpzp4_prime7,"i,","Lambda_z4=",Lambda_z4/GeV
-            if( cz_q1sq.ne.0) then
-               write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z11= ",Lambda_z11/GeV
-               write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z21= ",Lambda_z21/GeV
-               write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z31= ",Lambda_z31/GeV
-               write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z41= ",Lambda_z41/GeV
+            if( M_Reso.ge.0d0 ) then
+               if( cdabs(kappa_top ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "kappa_top=",kappa_top,"i"
+               if( cdabs(kappa_bot ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "kappa_bot=",kappa_bot,"i"
+               if( cdabs(kappa_4gen_top ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "kappa_4gen_top=",kappa_4gen_top,"i"
+               if( cdabs(kappa_4gen_bot ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "kappa_4gen_bot=",kappa_4gen_bot,"i"
+               if( cdabs(ghg2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghg2=",ghg2,"i"
+               if( cdabs(ghg3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghg3=",ghg3,"i"
+               if( cdabs(ghg4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghg4=",ghg4,"i"
+               if( cdabs(ghz1 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghz1=",ghz1,"i"
+               if( cdabs(ghz2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghz2=",ghz2,"i"
+               if( cdabs(ghz3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghz3=",ghz3,"i"
+               if( cdabs(ghz4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghz4=",ghz4,"i"
+               if( cdabs(ghz1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime= ",ghz1_prime ,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(ghz1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime2=",ghz1_prime2,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(ghz1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime3=",ghz1_prime3,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(ghz1_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime4=",ghz1_prime4,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(ghz1_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime5=",ghz1_prime5,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(ghz1_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime6=",ghz1_prime6,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(ghz1_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime7=",ghz1_prime7,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(ghz2_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz2_prime= ",ghz2_prime ,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(ghz2_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz2_prime2=",ghz2_prime2,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(ghz2_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz2_prime3=",ghz2_prime3,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(ghz2_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz2_prime4=",ghz2_prime4,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(ghz2_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz2_prime5=",ghz2_prime5,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(ghz2_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz2_prime6=",ghz2_prime6,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(ghz2_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz2_prime7=",ghz2_prime7,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(ghz3_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz3_prime= ",ghz3_prime ,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(ghz3_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz3_prime2=",ghz3_prime2,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(ghz3_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz3_prime3=",ghz3_prime3,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(ghz3_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz3_prime4=",ghz3_prime4,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(ghz3_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz3_prime5=",ghz3_prime5,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(ghz3_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz3_prime6=",ghz3_prime6,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(ghz3_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz3_prime7=",ghz3_prime7,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(ghz4_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime= ",ghz4_prime ,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(ghz4_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime2=",ghz4_prime2,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(ghz4_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime3=",ghz4_prime3,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(ghz4_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime4=",ghz4_prime4,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(ghz4_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime5=",ghz4_prime5,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(ghz4_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime6=",ghz4_prime6,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(ghz4_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime7=",ghz4_prime7,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(ghzgs2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs2=",ghzgs2,"i"
+               if( cdabs(ghzgs3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs3=",ghzgs3,"i"
+               if( cdabs(ghzgs4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs4=",ghzgs4,"i"
+               if( cdabs(ghzgs1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,2X,A,1PE12.4)") "ghzgs1_prime2=",ghzgs1_prime2,"i,","Lambda_zgs1=",Lambda_zgs1/GeV
+               if( cdabs(ghgsgs2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs2=",ghgsgs2,"i"
+               if( cdabs(ghgsgs3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs3=",ghgsgs3,"i"
+               if( cdabs(ghgsgs4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs4=",ghgsgs4,"i"
+               if( cdabs(ghzzp1 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzzp1=",ghzzp1,"i"
+               if( cdabs(ghzzp2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzzp2=",ghzzp2,"i"
+               if( cdabs(ghzzp3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzzp3=",ghzzp3,"i"
+               if( cdabs(ghzzp4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzzp4=",ghzzp4,"i"
+               if( cdabs(ghzzp1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp1_prime= ",ghzzp1_prime ,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(ghzzp1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp1_prime2=",ghzzp1_prime2,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(ghzzp1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp1_prime3=",ghzzp1_prime3,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(ghzzp1_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp1_prime4=",ghzzp1_prime4,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(ghzzp1_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp1_prime5=",ghzzp1_prime5,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(ghzzp1_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp1_prime6=",ghzzp1_prime6,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(ghzzp1_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp1_prime7=",ghzzp1_prime7,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(ghzzp2_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp2_prime= ",ghzzp2_prime ,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(ghzzp2_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp2_prime2=",ghzzp2_prime2,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(ghzzp2_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp2_prime3=",ghzzp2_prime3,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(ghzzp2_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp2_prime4=",ghzzp2_prime4,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(ghzzp2_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp2_prime5=",ghzzp2_prime5,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(ghzzp2_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp2_prime6=",ghzzp2_prime6,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(ghzzp2_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp2_prime7=",ghzzp2_prime7,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(ghzzp3_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp3_prime= ",ghzzp3_prime ,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(ghzzp3_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp3_prime2=",ghzzp3_prime2,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(ghzzp3_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp3_prime3=",ghzzp3_prime3,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(ghzzp3_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp3_prime4=",ghzzp3_prime4,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(ghzzp3_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp3_prime5=",ghzzp3_prime5,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(ghzzp3_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp3_prime6=",ghzzp3_prime6,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(ghzzp3_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp3_prime7=",ghzzp3_prime7,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(ghzzp4_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp4_prime= ",ghzzp4_prime ,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(ghzzp4_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp4_prime2=",ghzzp4_prime2,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(ghzzp4_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp4_prime3=",ghzzp4_prime3,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(ghzzp4_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp4_prime4=",ghzzp4_prime4,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(ghzzp4_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp4_prime5=",ghzzp4_prime5,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(ghzzp4_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp4_prime6=",ghzzp4_prime6,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(ghzzp4_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp4_prime7=",ghzzp4_prime7,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(ghzpgs2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpgs2=",ghzpgs2,"i"
+               if( cdabs(ghzpgs3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpgs3=",ghzpgs3,"i"
+               if( cdabs(ghzpgs4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpgs4=",ghzpgs4,"i"
+               if( cdabs(ghzpgs1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,2X,A,1PE12.4)") "ghzpgs1_prime2=",ghzpgs1_prime2,"i,","Lambda_zgs1=",Lambda_zgs1/GeV
+               if( cdabs(ghzpzp1 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpzp1=",ghzpzp1,"i"
+               if( cdabs(ghzpzp2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpzp2=",ghzpzp2,"i"
+               if( cdabs(ghzpzp3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpzp3=",ghzpzp3,"i"
+               if( cdabs(ghzpzp4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpzp4=",ghzpzp4,"i"
+               if( cdabs(ghzpzp1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime= ",ghzpzp1_prime ,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(ghzpzp1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime2=",ghzpzp1_prime2,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(ghzpzp1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime3=",ghzpzp1_prime3,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(ghzpzp1_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime4=",ghzpzp1_prime4,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(ghzpzp1_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime5=",ghzpzp1_prime5,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(ghzpzp1_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime6=",ghzpzp1_prime6,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(ghzpzp1_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime7=",ghzpzp1_prime7,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(ghzpzp2_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp2_prime= ",ghzpzp2_prime ,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(ghzpzp2_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp2_prime2=",ghzpzp2_prime2,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(ghzpzp2_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp2_prime3=",ghzpzp2_prime3,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(ghzpzp2_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp2_prime4=",ghzpzp2_prime4,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(ghzpzp2_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp2_prime5=",ghzpzp2_prime5,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(ghzpzp2_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp2_prime6=",ghzpzp2_prime6,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(ghzpzp2_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp2_prime7=",ghzpzp2_prime7,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(ghzpzp3_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp3_prime= ",ghzpzp3_prime ,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(ghzpzp3_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp3_prime2=",ghzpzp3_prime2,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(ghzpzp3_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp3_prime3=",ghzpzp3_prime3,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(ghzpzp3_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp3_prime4=",ghzpzp3_prime4,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(ghzpzp3_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp3_prime5=",ghzpzp3_prime5,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(ghzpzp3_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp3_prime6=",ghzpzp3_prime6,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(ghzpzp3_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp3_prime7=",ghzpzp3_prime7,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(ghzpzp4_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp4_prime= ",ghzpzp4_prime ,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(ghzpzp4_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp4_prime2=",ghzpzp4_prime2,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(ghzpzp4_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp4_prime3=",ghzpzp4_prime3,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(ghzpzp4_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp4_prime4=",ghzpzp4_prime4,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(ghzpzp4_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp4_prime5=",ghzpzp4_prime5,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(ghzpzp4_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp4_prime6=",ghzpzp4_prime6,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(ghzpzp4_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp4_prime7=",ghzpzp4_prime7,"i,","Lambda_z4=",Lambda_z4/GeV
+               write(TheUnit,"(6X,A,2F8.1,A1)") "Lambda=",Lambda/GeV
+               write(TheUnit,"(6X,A,2F8.1,A1)") "Lambda_Q= ",Lambda_Q/GeV
+               if( cz_q1sq.ne.0) then
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z11= ",Lambda_z11/GeV
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z21= ",Lambda_z21/GeV
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z31= ",Lambda_z31/GeV
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z41= ",Lambda_z41/GeV
+               endif
+               if( cz_q2sq.ne.0) then
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z12= ",Lambda_z12/GeV
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z22= ",Lambda_z22/GeV
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z32= ",Lambda_z32/GeV
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z42= ",Lambda_z42/GeV
+               endif
+               if( cz_q12sq.ne.0) then
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z10= ",Lambda_z10/GeV
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z20= ",Lambda_z20/GeV
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z30= ",Lambda_z30/GeV
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z40= ",Lambda_z40/GeV
+               endif
             endif
-            if( cz_q2sq.ne.0) then
-               write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z12= ",Lambda_z12/GeV
-               write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z22= ",Lambda_z22/GeV
-               write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z32= ",Lambda_z32/GeV
-               write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z42= ",Lambda_z42/GeV
-            endif
-            if( cz_q12sq.ne.0) then
-               write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z10= ",Lambda_z10/GeV
-               write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z20= ",Lambda_z20/GeV
-               write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z30= ",Lambda_z30/GeV
-               write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z40= ",Lambda_z40/GeV
+            if( M_Reso2.ge.0d0 ) then
+               if( cdabs(kappa2_top ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "kappa2_top=",kappa2_top,"i"
+               if( cdabs(kappa2_bot ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "kappa2_bot=",kappa2_bot,"i"
+               if( cdabs(kappa2_4gen_top ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "kappa2_4gen_top=",kappa2_4gen_top,"i"
+               if( cdabs(kappa2_4gen_bot ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "kappa2_4gen_bot=",kappa2_4gen_bot,"i"
+               if( cdabs(gh2g2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "gh2g2=",gh2g2,"i"
+               if( cdabs(gh2g3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "gh2g3=",gh2g3,"i"
+               if( cdabs(gh2g4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "gh2g4=",gh2g4,"i"
+               if( cdabs(gh2z1 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "gh2z1=",gh2z1,"i"
+               if( cdabs(gh2z2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "gh2z2=",gh2z2,"i"
+               if( cdabs(gh2z3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "gh2z3=",gh2z3,"i"
+               if( cdabs(gh2z4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "gh2z4=",gh2z4,"i"
+               if( cdabs(gh2z1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2z1_prime= ",gh2z1_prime ,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(gh2z1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2z1_prime2=",gh2z1_prime2,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(gh2z1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2z1_prime3=",gh2z1_prime3,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(gh2z1_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2z1_prime4=",gh2z1_prime4,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(gh2z1_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2z1_prime5=",gh2z1_prime5,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(gh2z1_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2z1_prime6=",gh2z1_prime6,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(gh2z1_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2z1_prime7=",gh2z1_prime7,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(gh2z2_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2z2_prime= ",gh2z2_prime ,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(gh2z2_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2z2_prime2=",gh2z2_prime2,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(gh2z2_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2z2_prime3=",gh2z2_prime3,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(gh2z2_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2z2_prime4=",gh2z2_prime4,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(gh2z2_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2z2_prime5=",gh2z2_prime5,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(gh2z2_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2z2_prime6=",gh2z2_prime6,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(gh2z2_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2z2_prime7=",gh2z2_prime7,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(gh2z3_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2z3_prime= ",gh2z3_prime ,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(gh2z3_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2z3_prime2=",gh2z3_prime2,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(gh2z3_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2z3_prime3=",gh2z3_prime3,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(gh2z3_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2z3_prime4=",gh2z3_prime4,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(gh2z3_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2z3_prime5=",gh2z3_prime5,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(gh2z3_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2z3_prime6=",gh2z3_prime6,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(gh2z3_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2z3_prime7=",gh2z3_prime7,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(gh2z4_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2z4_prime= ",gh2z4_prime ,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(gh2z4_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2z4_prime2=",gh2z4_prime2,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(gh2z4_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2z4_prime3=",gh2z4_prime3,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(gh2z4_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2z4_prime4=",gh2z4_prime4,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(gh2z4_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2z4_prime5=",gh2z4_prime5,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(gh2z4_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2z4_prime6=",gh2z4_prime6,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(gh2z4_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2z4_prime7=",gh2z4_prime7,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(gh2zgs2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "gh2zgs2=",gh2zgs2,"i"
+               if( cdabs(gh2zgs3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "gh2zgs3=",gh2zgs3,"i"
+               if( cdabs(gh2zgs4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "gh2zgs4=",gh2zgs4,"i"
+               if( cdabs(gh2zgs1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,2X,A,1PE12.4)") "gh2zgs1_prime2=",gh2zgs1_prime2,"i,","Lambda_zgs1=",Lambda_zgs1/GeV
+               if( cdabs(gh2gsgs2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "gh2gsgs2=",gh2gsgs2,"i"
+               if( cdabs(gh2gsgs3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "gh2gsgs3=",gh2gsgs3,"i"
+               if( cdabs(gh2gsgs4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "gh2gsgs4=",gh2gsgs4,"i"
+               write(TheUnit,"(6X,A,2F8.1,A1)") "Lambda2=",Lambda2/GeV
+               write(TheUnit,"(6X,A,2F8.1,A1)") "Lambda2_Q= ",Lambda2_Q/GeV
+               if( c2z_q1sq.ne.0) then
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda2_z11= ",Lambda2_z11/GeV
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda2_z21= ",Lambda2_z21/GeV
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda2_z31= ",Lambda2_z31/GeV
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda2_z41= ",Lambda2_z41/GeV
+               endif
+               if( c2z_q2sq.ne.0) then
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda2_z12= ",Lambda2_z12/GeV
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda2_z22= ",Lambda2_z22/GeV
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda2_z32= ",Lambda2_z32/GeV
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda2_z42= ",Lambda2_z42/GeV
+               endif
+               if( c2z_q12sq.ne.0) then
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda2_z10= ",Lambda2_z10/GeV
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda2_z20= ",Lambda2_z20/GeV
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda2_z30= ",Lambda2_z30/GeV
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda2_z40= ",Lambda2_z40/GeV
+               endif
             endif
 
             if(distinguish_HWWcouplings) then
-               if( cdabs(ghw1 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghw1=",ghw1,"i"
-               if( cdabs(ghw2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghw2=",ghw2,"i"
-               if( cdabs(ghw3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghw3=",ghw3,"i"
-               if( cdabs(ghw4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghw4=",ghw4,"i"
-               if( cdabs(ghw1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw1_prime= ",ghw1_prime ,"i,","Lambda_w1=",Lambda_w1/GeV
-               if( cdabs(ghw1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw1_prime2=",ghw1_prime2,"i,","Lambda_w1=",Lambda_w1/GeV
-               if( cdabs(ghw1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw1_prime3=",ghw1_prime3,"i,","Lambda_w1=",Lambda_w1/GeV
-               if( cdabs(ghw1_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw1_prime4=",ghw1_prime4,"i,","Lambda_w1=",Lambda_w1/GeV
-               if( cdabs(ghw1_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw1_prime5=",ghw1_prime5,"i,","Lambda_w1=",Lambda_w1/GeV
-               if( cdabs(ghw1_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw1_prime6=",ghw1_prime6,"i,","Lambda_w1=",Lambda_w1/GeV
-               if( cdabs(ghw1_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw1_prime7=",ghw1_prime7,"i,","Lambda_w1=",Lambda_w1/GeV
-               if( cdabs(ghw2_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw2_prime= ",ghw2_prime ,"i,","Lambda_w2=",Lambda_w2/GeV
-               if( cdabs(ghw2_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw2_prime2=",ghw2_prime2,"i,","Lambda_w2=",Lambda_w2/GeV
-               if( cdabs(ghw2_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw2_prime3=",ghw2_prime3,"i,","Lambda_w2=",Lambda_w2/GeV
-               if( cdabs(ghw2_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw2_prime4=",ghw2_prime4,"i,","Lambda_w2=",Lambda_w2/GeV
-               if( cdabs(ghw2_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw2_prime5=",ghw2_prime5,"i,","Lambda_w2=",Lambda_w2/GeV
-               if( cdabs(ghw2_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw2_prime6=",ghw2_prime6,"i,","Lambda_w2=",Lambda_w2/GeV
-               if( cdabs(ghw2_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw2_prime7=",ghw2_prime7,"i,","Lambda_w2=",Lambda_w2/GeV
-               if( cdabs(ghw3_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw3_prime= ",ghw3_prime ,"i,","Lambda_w3=",Lambda_w3/GeV
-               if( cdabs(ghw3_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw3_prime2=",ghw3_prime2,"i,","Lambda_w3=",Lambda_w3/GeV
-               if( cdabs(ghw3_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw3_prime3=",ghw3_prime3,"i,","Lambda_w3=",Lambda_w3/GeV
-               if( cdabs(ghw3_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw3_prime4=",ghw3_prime4,"i,","Lambda_w3=",Lambda_w3/GeV
-               if( cdabs(ghw3_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw3_prime5=",ghw3_prime5,"i,","Lambda_w3=",Lambda_w3/GeV
-               if( cdabs(ghw3_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw3_prime6=",ghw3_prime6,"i,","Lambda_w3=",Lambda_w3/GeV
-               if( cdabs(ghw3_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw3_prime7=",ghw3_prime7,"i,","Lambda_w3=",Lambda_w3/GeV
-               if( cdabs(ghw4_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw4_prime= ",ghw4_prime ,"i,","Lambda_w4=",Lambda_w4/GeV
-               if( cdabs(ghw4_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw4_prime2=",ghw4_prime2,"i,","Lambda_w4=",Lambda_w4/GeV
-               if( cdabs(ghw4_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw4_prime3=",ghw4_prime3,"i,","Lambda_w4=",Lambda_w4/GeV
-               if( cdabs(ghw4_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw4_prime4=",ghw4_prime4,"i,","Lambda_w4=",Lambda_w4/GeV
-               if( cdabs(ghw4_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw4_prime5=",ghw4_prime5,"i,","Lambda_w4=",Lambda_w4/GeV
-               if( cdabs(ghw4_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw4_prime6=",ghw4_prime6,"i,","Lambda_w4=",Lambda_w4/GeV
-               if( cdabs(ghw4_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw4_prime7=",ghw4_prime7,"i,","Lambda_w4=",Lambda_w4/GeV
-               if( cdabs(ghwwp1 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwwp1=",ghwwp1,"i"
-               if( cdabs(ghwwp2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwwp2=",ghwwp2,"i"
-               if( cdabs(ghwwp3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwwp3=",ghwwp3,"i"
-               if( cdabs(ghwwp4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwwp4=",ghwwp4,"i"
-               if( cdabs(ghwwp1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp1_prime= ",ghwwp1_prime ,"i,","Lambda_w1=",Lambda_w1/GeV
-               if( cdabs(ghwwp1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp1_prime2=",ghwwp1_prime2,"i,","Lambda_w1=",Lambda_w1/GeV
-               if( cdabs(ghwwp1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp1_prime3=",ghwwp1_prime3,"i,","Lambda_w1=",Lambda_w1/GeV
-               if( cdabs(ghwwp1_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp1_prime4=",ghwwp1_prime4,"i,","Lambda_w1=",Lambda_w1/GeV
-               if( cdabs(ghwwp1_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp1_prime5=",ghwwp1_prime5,"i,","Lambda_w1=",Lambda_w1/GeV
-               if( cdabs(ghwwp1_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp1_prime6=",ghwwp1_prime6,"i,","Lambda_w1=",Lambda_w1/GeV
-               if( cdabs(ghwwp1_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp1_prime7=",ghwwp1_prime7,"i,","Lambda_w1=",Lambda_w1/GeV
-               if( cdabs(ghwwp2_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp2_prime= ",ghwwp2_prime ,"i,","Lambda_w2=",Lambda_w2/GeV
-               if( cdabs(ghwwp2_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp2_prime2=",ghwwp2_prime2,"i,","Lambda_w2=",Lambda_w2/GeV
-               if( cdabs(ghwwp2_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp2_prime3=",ghwwp2_prime3,"i,","Lambda_w2=",Lambda_w2/GeV
-               if( cdabs(ghwwp2_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp2_prime4=",ghwwp2_prime4,"i,","Lambda_w2=",Lambda_w2/GeV
-               if( cdabs(ghwwp2_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp2_prime5=",ghwwp2_prime5,"i,","Lambda_w2=",Lambda_w2/GeV
-               if( cdabs(ghwwp2_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp2_prime6=",ghwwp2_prime6,"i,","Lambda_w2=",Lambda_w2/GeV
-               if( cdabs(ghwwp2_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp2_prime7=",ghwwp2_prime7,"i,","Lambda_w2=",Lambda_w2/GeV
-               if( cdabs(ghwwp3_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp3_prime= ",ghwwp3_prime ,"i,","Lambda_w3=",Lambda_w3/GeV
-               if( cdabs(ghwwp3_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp3_prime2=",ghwwp3_prime2,"i,","Lambda_w3=",Lambda_w3/GeV
-               if( cdabs(ghwwp3_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp3_prime3=",ghwwp3_prime3,"i,","Lambda_w3=",Lambda_w3/GeV
-               if( cdabs(ghwwp3_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp3_prime4=",ghwwp3_prime4,"i,","Lambda_w3=",Lambda_w3/GeV
-               if( cdabs(ghwwp3_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp3_prime5=",ghwwp3_prime5,"i,","Lambda_w3=",Lambda_w3/GeV
-               if( cdabs(ghwwp3_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp3_prime6=",ghwwp3_prime6,"i,","Lambda_w3=",Lambda_w3/GeV
-               if( cdabs(ghwwp3_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp3_prime7=",ghwwp3_prime7,"i,","Lambda_w3=",Lambda_w3/GeV
-               if( cdabs(ghwwp4_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp4_prime= ",ghwwp4_prime ,"i,","Lambda_w4=",Lambda_w4/GeV
-               if( cdabs(ghwwp4_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp4_prime2=",ghwwp4_prime2,"i,","Lambda_w4=",Lambda_w4/GeV
-               if( cdabs(ghwwp4_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp4_prime3=",ghwwp4_prime3,"i,","Lambda_w4=",Lambda_w4/GeV
-               if( cdabs(ghwwp4_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp4_prime4=",ghwwp4_prime4,"i,","Lambda_w4=",Lambda_w4/GeV
-               if( cdabs(ghwwp4_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp4_prime5=",ghwwp4_prime5,"i,","Lambda_w4=",Lambda_w4/GeV
-               if( cdabs(ghwwp4_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp4_prime6=",ghwwp4_prime6,"i,","Lambda_w4=",Lambda_w4/GeV
-               if( cdabs(ghwwp4_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp4_prime7=",ghwwp4_prime7,"i,","Lambda_w4=",Lambda_w4/GeV
-               if( cdabs(ghwpwp1 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwpwp1=",ghwpwp1,"i"
-               if( cdabs(ghwpwp2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwpwp2=",ghwpwp2,"i"
-               if( cdabs(ghwpwp3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwpwp3=",ghwpwp3,"i"
-               if( cdabs(ghwpwp4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwpwp4=",ghwpwp4,"i"
-               if( cdabs(ghwpwp1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp1_prime= ",ghwpwp1_prime ,"i,","Lambda_w1=",Lambda_w1/GeV
-               if( cdabs(ghwpwp1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp1_prime2=",ghwpwp1_prime2,"i,","Lambda_w1=",Lambda_w1/GeV
-               if( cdabs(ghwpwp1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp1_prime3=",ghwpwp1_prime3,"i,","Lambda_w1=",Lambda_w1/GeV
-               if( cdabs(ghwpwp1_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp1_prime4=",ghwpwp1_prime4,"i,","Lambda_w1=",Lambda_w1/GeV
-               if( cdabs(ghwpwp1_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp1_prime5=",ghwpwp1_prime5,"i,","Lambda_w1=",Lambda_w1/GeV
-               if( cdabs(ghwpwp1_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp1_prime6=",ghwpwp1_prime6,"i,","Lambda_w1=",Lambda_w1/GeV
-               if( cdabs(ghwpwp1_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp1_prime7=",ghwpwp1_prime7,"i,","Lambda_w1=",Lambda_w1/GeV
-               if( cdabs(ghwpwp2_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp2_prime= ",ghwpwp2_prime ,"i,","Lambda_w2=",Lambda_w2/GeV
-               if( cdabs(ghwpwp2_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp2_prime2=",ghwpwp2_prime2,"i,","Lambda_w2=",Lambda_w2/GeV
-               if( cdabs(ghwpwp2_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp2_prime3=",ghwpwp2_prime3,"i,","Lambda_w2=",Lambda_w2/GeV
-               if( cdabs(ghwpwp2_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp2_prime4=",ghwpwp2_prime4,"i,","Lambda_w2=",Lambda_w2/GeV
-               if( cdabs(ghwpwp2_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp2_prime5=",ghwpwp2_prime5,"i,","Lambda_w2=",Lambda_w2/GeV
-               if( cdabs(ghwpwp2_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp2_prime6=",ghwpwp2_prime6,"i,","Lambda_w2=",Lambda_w2/GeV
-               if( cdabs(ghwpwp2_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp2_prime7=",ghwpwp2_prime7,"i,","Lambda_w2=",Lambda_w2/GeV
-               if( cdabs(ghwpwp3_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp3_prime= ",ghwpwp3_prime ,"i,","Lambda_w3=",Lambda_w3/GeV
-               if( cdabs(ghwpwp3_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp3_prime2=",ghwpwp3_prime2,"i,","Lambda_w3=",Lambda_w3/GeV
-               if( cdabs(ghwpwp3_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp3_prime3=",ghwpwp3_prime3,"i,","Lambda_w3=",Lambda_w3/GeV
-               if( cdabs(ghwpwp3_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp3_prime4=",ghwpwp3_prime4,"i,","Lambda_w3=",Lambda_w3/GeV
-               if( cdabs(ghwpwp3_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp3_prime5=",ghwpwp3_prime5,"i,","Lambda_w3=",Lambda_w3/GeV
-               if( cdabs(ghwpwp3_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp3_prime6=",ghwpwp3_prime6,"i,","Lambda_w3=",Lambda_w3/GeV
-               if( cdabs(ghwpwp3_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp3_prime7=",ghwpwp3_prime7,"i,","Lambda_w3=",Lambda_w3/GeV
-               if( cdabs(ghwpwp4_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp4_prime= ",ghwpwp4_prime ,"i,","Lambda_w4=",Lambda_w4/GeV
-               if( cdabs(ghwpwp4_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp4_prime2=",ghwpwp4_prime2,"i,","Lambda_w4=",Lambda_w4/GeV
-               if( cdabs(ghwpwp4_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp4_prime3=",ghwpwp4_prime3,"i,","Lambda_w4=",Lambda_w4/GeV
-               if( cdabs(ghwpwp4_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp4_prime4=",ghwpwp4_prime4,"i,","Lambda_w4=",Lambda_w4/GeV
-               if( cdabs(ghwpwp4_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp4_prime5=",ghwpwp4_prime5,"i,","Lambda_w4=",Lambda_w4/GeV
-               if( cdabs(ghwpwp4_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp4_prime6=",ghwpwp4_prime6,"i,","Lambda_w4=",Lambda_w4/GeV
-               if( cdabs(ghwpwp4_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp4_prime7=",ghwpwp4_prime7,"i,","Lambda_w4=",Lambda_w4/GeV
-               if( cw_q1sq.ne.0) then
-                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w11= ",Lambda_w11/GeV
-                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w21= ",Lambda_w21/GeV
-                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w31= ",Lambda_w31/GeV
-                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w41= ",Lambda_w41/GeV
+               if( M_Reso.ge.0d0 ) then
+                  if( cdabs(ghw1 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghw1=",ghw1,"i"
+                  if( cdabs(ghw2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghw2=",ghw2,"i"
+                  if( cdabs(ghw3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghw3=",ghw3,"i"
+                  if( cdabs(ghw4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghw4=",ghw4,"i"
+                  if( cdabs(ghw1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw1_prime= ",ghw1_prime ,"i,","Lambda_w1=",Lambda_w1/GeV
+                  if( cdabs(ghw1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw1_prime2=",ghw1_prime2,"i,","Lambda_w1=",Lambda_w1/GeV
+                  if( cdabs(ghw1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw1_prime3=",ghw1_prime3,"i,","Lambda_w1=",Lambda_w1/GeV
+                  if( cdabs(ghw1_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw1_prime4=",ghw1_prime4,"i,","Lambda_w1=",Lambda_w1/GeV
+                  if( cdabs(ghw1_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw1_prime5=",ghw1_prime5,"i,","Lambda_w1=",Lambda_w1/GeV
+                  if( cdabs(ghw1_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw1_prime6=",ghw1_prime6,"i,","Lambda_w1=",Lambda_w1/GeV
+                  if( cdabs(ghw1_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw1_prime7=",ghw1_prime7,"i,","Lambda_w1=",Lambda_w1/GeV
+                  if( cdabs(ghw2_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw2_prime= ",ghw2_prime ,"i,","Lambda_w2=",Lambda_w2/GeV
+                  if( cdabs(ghw2_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw2_prime2=",ghw2_prime2,"i,","Lambda_w2=",Lambda_w2/GeV
+                  if( cdabs(ghw2_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw2_prime3=",ghw2_prime3,"i,","Lambda_w2=",Lambda_w2/GeV
+                  if( cdabs(ghw2_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw2_prime4=",ghw2_prime4,"i,","Lambda_w2=",Lambda_w2/GeV
+                  if( cdabs(ghw2_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw2_prime5=",ghw2_prime5,"i,","Lambda_w2=",Lambda_w2/GeV
+                  if( cdabs(ghw2_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw2_prime6=",ghw2_prime6,"i,","Lambda_w2=",Lambda_w2/GeV
+                  if( cdabs(ghw2_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw2_prime7=",ghw2_prime7,"i,","Lambda_w2=",Lambda_w2/GeV
+                  if( cdabs(ghw3_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw3_prime= ",ghw3_prime ,"i,","Lambda_w3=",Lambda_w3/GeV
+                  if( cdabs(ghw3_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw3_prime2=",ghw3_prime2,"i,","Lambda_w3=",Lambda_w3/GeV
+                  if( cdabs(ghw3_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw3_prime3=",ghw3_prime3,"i,","Lambda_w3=",Lambda_w3/GeV
+                  if( cdabs(ghw3_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw3_prime4=",ghw3_prime4,"i,","Lambda_w3=",Lambda_w3/GeV
+                  if( cdabs(ghw3_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw3_prime5=",ghw3_prime5,"i,","Lambda_w3=",Lambda_w3/GeV
+                  if( cdabs(ghw3_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw3_prime6=",ghw3_prime6,"i,","Lambda_w3=",Lambda_w3/GeV
+                  if( cdabs(ghw3_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw3_prime7=",ghw3_prime7,"i,","Lambda_w3=",Lambda_w3/GeV
+                  if( cdabs(ghw4_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw4_prime= ",ghw4_prime ,"i,","Lambda_w4=",Lambda_w4/GeV
+                  if( cdabs(ghw4_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw4_prime2=",ghw4_prime2,"i,","Lambda_w4=",Lambda_w4/GeV
+                  if( cdabs(ghw4_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw4_prime3=",ghw4_prime3,"i,","Lambda_w4=",Lambda_w4/GeV
+                  if( cdabs(ghw4_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw4_prime4=",ghw4_prime4,"i,","Lambda_w4=",Lambda_w4/GeV
+                  if( cdabs(ghw4_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw4_prime5=",ghw4_prime5,"i,","Lambda_w4=",Lambda_w4/GeV
+                  if( cdabs(ghw4_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw4_prime6=",ghw4_prime6,"i,","Lambda_w4=",Lambda_w4/GeV
+                  if( cdabs(ghw4_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw4_prime7=",ghw4_prime7,"i,","Lambda_w4=",Lambda_w4/GeV
+                  if( cdabs(ghwwp1 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwwp1=",ghwwp1,"i"
+                  if( cdabs(ghwwp2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwwp2=",ghwwp2,"i"
+                  if( cdabs(ghwwp3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwwp3=",ghwwp3,"i"
+                  if( cdabs(ghwwp4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwwp4=",ghwwp4,"i"
+                  if( cdabs(ghwwp1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp1_prime= ",ghwwp1_prime ,"i,","Lambda_w1=",Lambda_w1/GeV
+                  if( cdabs(ghwwp1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp1_prime2=",ghwwp1_prime2,"i,","Lambda_w1=",Lambda_w1/GeV
+                  if( cdabs(ghwwp1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp1_prime3=",ghwwp1_prime3,"i,","Lambda_w1=",Lambda_w1/GeV
+                  if( cdabs(ghwwp1_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp1_prime4=",ghwwp1_prime4,"i,","Lambda_w1=",Lambda_w1/GeV
+                  if( cdabs(ghwwp1_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp1_prime5=",ghwwp1_prime5,"i,","Lambda_w1=",Lambda_w1/GeV
+                  if( cdabs(ghwwp1_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp1_prime6=",ghwwp1_prime6,"i,","Lambda_w1=",Lambda_w1/GeV
+                  if( cdabs(ghwwp1_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp1_prime7=",ghwwp1_prime7,"i,","Lambda_w1=",Lambda_w1/GeV
+                  if( cdabs(ghwwp2_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp2_prime= ",ghwwp2_prime ,"i,","Lambda_w2=",Lambda_w2/GeV
+                  if( cdabs(ghwwp2_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp2_prime2=",ghwwp2_prime2,"i,","Lambda_w2=",Lambda_w2/GeV
+                  if( cdabs(ghwwp2_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp2_prime3=",ghwwp2_prime3,"i,","Lambda_w2=",Lambda_w2/GeV
+                  if( cdabs(ghwwp2_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp2_prime4=",ghwwp2_prime4,"i,","Lambda_w2=",Lambda_w2/GeV
+                  if( cdabs(ghwwp2_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp2_prime5=",ghwwp2_prime5,"i,","Lambda_w2=",Lambda_w2/GeV
+                  if( cdabs(ghwwp2_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp2_prime6=",ghwwp2_prime6,"i,","Lambda_w2=",Lambda_w2/GeV
+                  if( cdabs(ghwwp2_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp2_prime7=",ghwwp2_prime7,"i,","Lambda_w2=",Lambda_w2/GeV
+                  if( cdabs(ghwwp3_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp3_prime= ",ghwwp3_prime ,"i,","Lambda_w3=",Lambda_w3/GeV
+                  if( cdabs(ghwwp3_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp3_prime2=",ghwwp3_prime2,"i,","Lambda_w3=",Lambda_w3/GeV
+                  if( cdabs(ghwwp3_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp3_prime3=",ghwwp3_prime3,"i,","Lambda_w3=",Lambda_w3/GeV
+                  if( cdabs(ghwwp3_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp3_prime4=",ghwwp3_prime4,"i,","Lambda_w3=",Lambda_w3/GeV
+                  if( cdabs(ghwwp3_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp3_prime5=",ghwwp3_prime5,"i,","Lambda_w3=",Lambda_w3/GeV
+                  if( cdabs(ghwwp3_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp3_prime6=",ghwwp3_prime6,"i,","Lambda_w3=",Lambda_w3/GeV
+                  if( cdabs(ghwwp3_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp3_prime7=",ghwwp3_prime7,"i,","Lambda_w3=",Lambda_w3/GeV
+                  if( cdabs(ghwwp4_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp4_prime= ",ghwwp4_prime ,"i,","Lambda_w4=",Lambda_w4/GeV
+                  if( cdabs(ghwwp4_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp4_prime2=",ghwwp4_prime2,"i,","Lambda_w4=",Lambda_w4/GeV
+                  if( cdabs(ghwwp4_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp4_prime3=",ghwwp4_prime3,"i,","Lambda_w4=",Lambda_w4/GeV
+                  if( cdabs(ghwwp4_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp4_prime4=",ghwwp4_prime4,"i,","Lambda_w4=",Lambda_w4/GeV
+                  if( cdabs(ghwwp4_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp4_prime5=",ghwwp4_prime5,"i,","Lambda_w4=",Lambda_w4/GeV
+                  if( cdabs(ghwwp4_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp4_prime6=",ghwwp4_prime6,"i,","Lambda_w4=",Lambda_w4/GeV
+                  if( cdabs(ghwwp4_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp4_prime7=",ghwwp4_prime7,"i,","Lambda_w4=",Lambda_w4/GeV
+                  if( cdabs(ghwpwp1 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwpwp1=",ghwpwp1,"i"
+                  if( cdabs(ghwpwp2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwpwp2=",ghwpwp2,"i"
+                  if( cdabs(ghwpwp3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwpwp3=",ghwpwp3,"i"
+                  if( cdabs(ghwpwp4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwpwp4=",ghwpwp4,"i"
+                  if( cdabs(ghwpwp1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp1_prime= ",ghwpwp1_prime ,"i,","Lambda_w1=",Lambda_w1/GeV
+                  if( cdabs(ghwpwp1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp1_prime2=",ghwpwp1_prime2,"i,","Lambda_w1=",Lambda_w1/GeV
+                  if( cdabs(ghwpwp1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp1_prime3=",ghwpwp1_prime3,"i,","Lambda_w1=",Lambda_w1/GeV
+                  if( cdabs(ghwpwp1_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp1_prime4=",ghwpwp1_prime4,"i,","Lambda_w1=",Lambda_w1/GeV
+                  if( cdabs(ghwpwp1_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp1_prime5=",ghwpwp1_prime5,"i,","Lambda_w1=",Lambda_w1/GeV
+                  if( cdabs(ghwpwp1_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp1_prime6=",ghwpwp1_prime6,"i,","Lambda_w1=",Lambda_w1/GeV
+                  if( cdabs(ghwpwp1_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp1_prime7=",ghwpwp1_prime7,"i,","Lambda_w1=",Lambda_w1/GeV
+                  if( cdabs(ghwpwp2_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp2_prime= ",ghwpwp2_prime ,"i,","Lambda_w2=",Lambda_w2/GeV
+                  if( cdabs(ghwpwp2_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp2_prime2=",ghwpwp2_prime2,"i,","Lambda_w2=",Lambda_w2/GeV
+                  if( cdabs(ghwpwp2_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp2_prime3=",ghwpwp2_prime3,"i,","Lambda_w2=",Lambda_w2/GeV
+                  if( cdabs(ghwpwp2_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp2_prime4=",ghwpwp2_prime4,"i,","Lambda_w2=",Lambda_w2/GeV
+                  if( cdabs(ghwpwp2_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp2_prime5=",ghwpwp2_prime5,"i,","Lambda_w2=",Lambda_w2/GeV
+                  if( cdabs(ghwpwp2_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp2_prime6=",ghwpwp2_prime6,"i,","Lambda_w2=",Lambda_w2/GeV
+                  if( cdabs(ghwpwp2_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp2_prime7=",ghwpwp2_prime7,"i,","Lambda_w2=",Lambda_w2/GeV
+                  if( cdabs(ghwpwp3_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp3_prime= ",ghwpwp3_prime ,"i,","Lambda_w3=",Lambda_w3/GeV
+                  if( cdabs(ghwpwp3_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp3_prime2=",ghwpwp3_prime2,"i,","Lambda_w3=",Lambda_w3/GeV
+                  if( cdabs(ghwpwp3_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp3_prime3=",ghwpwp3_prime3,"i,","Lambda_w3=",Lambda_w3/GeV
+                  if( cdabs(ghwpwp3_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp3_prime4=",ghwpwp3_prime4,"i,","Lambda_w3=",Lambda_w3/GeV
+                  if( cdabs(ghwpwp3_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp3_prime5=",ghwpwp3_prime5,"i,","Lambda_w3=",Lambda_w3/GeV
+                  if( cdabs(ghwpwp3_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp3_prime6=",ghwpwp3_prime6,"i,","Lambda_w3=",Lambda_w3/GeV
+                  if( cdabs(ghwpwp3_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp3_prime7=",ghwpwp3_prime7,"i,","Lambda_w3=",Lambda_w3/GeV
+                  if( cdabs(ghwpwp4_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp4_prime= ",ghwpwp4_prime ,"i,","Lambda_w4=",Lambda_w4/GeV
+                  if( cdabs(ghwpwp4_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp4_prime2=",ghwpwp4_prime2,"i,","Lambda_w4=",Lambda_w4/GeV
+                  if( cdabs(ghwpwp4_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp4_prime3=",ghwpwp4_prime3,"i,","Lambda_w4=",Lambda_w4/GeV
+                  if( cdabs(ghwpwp4_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp4_prime4=",ghwpwp4_prime4,"i,","Lambda_w4=",Lambda_w4/GeV
+                  if( cdabs(ghwpwp4_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp4_prime5=",ghwpwp4_prime5,"i,","Lambda_w4=",Lambda_w4/GeV
+                  if( cdabs(ghwpwp4_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp4_prime6=",ghwpwp4_prime6,"i,","Lambda_w4=",Lambda_w4/GeV
+                  if( cdabs(ghwpwp4_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp4_prime7=",ghwpwp4_prime7,"i,","Lambda_w4=",Lambda_w4/GeV
+                  if( cw_q1sq.ne.0) then
+                     write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w11= ",Lambda_w11/GeV
+                     write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w21= ",Lambda_w21/GeV
+                     write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w31= ",Lambda_w31/GeV
+                     write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w41= ",Lambda_w41/GeV
+                  endif
+                  if( cw_q2sq.ne.0) then
+                     write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w12= ",Lambda_w12/GeV
+                     write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w22= ",Lambda_w22/GeV
+                     write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w32= ",Lambda_w32/GeV
+                     write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w42= ",Lambda_w42/GeV
+                  endif
+                  if( cw_q12sq.ne.0) then
+                     write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w10= ",Lambda_w10/GeV
+                     write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w20= ",Lambda_w20/GeV
+                     write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w30= ",Lambda_w30/GeV
+                     write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w40= ",Lambda_w40/GeV
+                  endif
                endif
-               if( cw_q2sq.ne.0) then
-                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w12= ",Lambda_w12/GeV
-                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w22= ",Lambda_w22/GeV
-                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w32= ",Lambda_w32/GeV
-                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w42= ",Lambda_w42/GeV
-               endif
-               if( cw_q12sq.ne.0) then
-                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w10= ",Lambda_w10/GeV
-                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w20= ",Lambda_w20/GeV
-                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w30= ",Lambda_w30/GeV
-                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w40= ",Lambda_w40/GeV
+               if( M_Reso2.ge.0d0 ) then
+                  if( cdabs(gh2w1 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "gh2w1=",gh2w1,"i"
+                  if( cdabs(gh2w2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "gh2w2=",gh2w2,"i"
+                  if( cdabs(gh2w3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "gh2w3=",gh2w3,"i"
+                  if( cdabs(gh2w4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "gh2w4=",gh2w4,"i"
+                  if( cdabs(gh2w1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2w1_prime= ",gh2w1_prime ,"i,","Lambda2_w1=",Lambda2_w1/GeV
+                  if( cdabs(gh2w1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2w1_prime2=",gh2w1_prime2,"i,","Lambda2_w1=",Lambda2_w1/GeV
+                  if( cdabs(gh2w1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2w1_prime3=",gh2w1_prime3,"i,","Lambda2_w1=",Lambda2_w1/GeV
+                  if( cdabs(gh2w1_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2w1_prime4=",gh2w1_prime4,"i,","Lambda2_w1=",Lambda2_w1/GeV
+                  if( cdabs(gh2w1_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2w1_prime5=",gh2w1_prime5,"i,","Lambda2_w1=",Lambda2_w1/GeV
+                  if( cdabs(gh2w1_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2w1_prime6=",gh2w1_prime6,"i,","Lambda2_w1=",Lambda2_w1/GeV
+                  if( cdabs(gh2w1_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2w1_prime7=",gh2w1_prime7,"i,","Lambda2_w1=",Lambda2_w1/GeV
+                  if( cdabs(gh2w2_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2w2_prime= ",gh2w2_prime ,"i,","Lambda2_w2=",Lambda2_w2/GeV
+                  if( cdabs(gh2w2_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2w2_prime2=",gh2w2_prime2,"i,","Lambda2_w2=",Lambda2_w2/GeV
+                  if( cdabs(gh2w2_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2w2_prime3=",gh2w2_prime3,"i,","Lambda2_w2=",Lambda2_w2/GeV
+                  if( cdabs(gh2w2_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2w2_prime4=",gh2w2_prime4,"i,","Lambda2_w2=",Lambda2_w2/GeV
+                  if( cdabs(gh2w2_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2w2_prime5=",gh2w2_prime5,"i,","Lambda2_w2=",Lambda2_w2/GeV
+                  if( cdabs(gh2w2_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2w2_prime6=",gh2w2_prime6,"i,","Lambda2_w2=",Lambda2_w2/GeV
+                  if( cdabs(gh2w2_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2w2_prime7=",gh2w2_prime7,"i,","Lambda2_w2=",Lambda2_w2/GeV
+                  if( cdabs(gh2w3_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2w3_prime= ",gh2w3_prime ,"i,","Lambda2_w3=",Lambda2_w3/GeV
+                  if( cdabs(gh2w3_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2w3_prime2=",gh2w3_prime2,"i,","Lambda2_w3=",Lambda2_w3/GeV
+                  if( cdabs(gh2w3_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2w3_prime3=",gh2w3_prime3,"i,","Lambda2_w3=",Lambda2_w3/GeV
+                  if( cdabs(gh2w3_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2w3_prime4=",gh2w3_prime4,"i,","Lambda2_w3=",Lambda2_w3/GeV
+                  if( cdabs(gh2w3_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2w3_prime5=",gh2w3_prime5,"i,","Lambda2_w3=",Lambda2_w3/GeV
+                  if( cdabs(gh2w3_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2w3_prime6=",gh2w3_prime6,"i,","Lambda2_w3=",Lambda2_w3/GeV
+                  if( cdabs(gh2w3_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2w3_prime7=",gh2w3_prime7,"i,","Lambda2_w3=",Lambda2_w3/GeV
+                  if( cdabs(gh2w4_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2w4_prime= ",gh2w4_prime ,"i,","Lambda2_w4=",Lambda2_w4/GeV
+                  if( cdabs(gh2w4_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2w4_prime2=",gh2w4_prime2,"i,","Lambda2_w4=",Lambda2_w4/GeV
+                  if( cdabs(gh2w4_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2w4_prime3=",gh2w4_prime3,"i,","Lambda2_w4=",Lambda2_w4/GeV
+                  if( cdabs(gh2w4_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2w4_prime4=",gh2w4_prime4,"i,","Lambda2_w4=",Lambda2_w4/GeV
+                  if( cdabs(gh2w4_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2w4_prime5=",gh2w4_prime5,"i,","Lambda2_w4=",Lambda2_w4/GeV
+                  if( cdabs(gh2w4_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2w4_prime6=",gh2w4_prime6,"i,","Lambda2_w4=",Lambda2_w4/GeV
+                  if( cdabs(gh2w4_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "gh2w4_prime7=",gh2w4_prime7,"i,","Lambda2_w4=",Lambda2_w4/GeV
+                  if( c2w_q1sq.ne.0) then
+                     write(TheUnit,"(6X,A,1PE12.4)") "Lambda2_w11= ",Lambda2_w11/GeV
+                     write(TheUnit,"(6X,A,1PE12.4)") "Lambda2_w21= ",Lambda2_w21/GeV
+                     write(TheUnit,"(6X,A,1PE12.4)") "Lambda2_w31= ",Lambda2_w31/GeV
+                     write(TheUnit,"(6X,A,1PE12.4)") "Lambda2_w41= ",Lambda2_w41/GeV
+                  endif
+                  if( c2w_q2sq.ne.0) then
+                     write(TheUnit,"(6X,A,1PE12.4)") "Lambda2_w12= ",Lambda2_w12/GeV
+                     write(TheUnit,"(6X,A,1PE12.4)") "Lambda2_w22= ",Lambda2_w22/GeV
+                     write(TheUnit,"(6X,A,1PE12.4)") "Lambda2_w32= ",Lambda2_w32/GeV
+                     write(TheUnit,"(6X,A,1PE12.4)") "Lambda2_w42= ",Lambda2_w42/GeV
+                  endif
+                  if( c2w_q12sq.ne.0) then
+                     write(TheUnit,"(6X,A,1PE12.4)") "Lambda2_w10= ",Lambda2_w10/GeV
+                     write(TheUnit,"(6X,A,1PE12.4)") "Lambda2_w20= ",Lambda2_w20/GeV
+                     write(TheUnit,"(6X,A,1PE12.4)") "Lambda2_w30= ",Lambda2_w30/GeV
+                     write(TheUnit,"(6X,A,1PE12.4)") "Lambda2_w40= ",Lambda2_w40/GeV
+                  endif
                endif
             endif
         endif
         if(includeVprime) then
-            if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.75) .or. IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) then
-                if(M_Zprime.gt.0d0) then
-                  write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z' boson: mass=",M_Zprime*100d0,", width=",Ga_Zprime*100d0
+            if( IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) then
+                if(M_Zprime.ge.0d0) then
+                  write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z' boson: mass=",M_Zprime/GeV,", width=",Ga_Zprime/GeV
                 else
                   write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z' boson: heavy mass limit (contact interaction)"
                 endif
@@ -6306,9 +6440,9 @@ character :: arg*(500)
                 if( cdabs(ezp_Top_left ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Top_left= ",ezp_Top_left ,"i"
                 if( cdabs(ezp_Top_right).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Top_right=",ezp_Top_right,"i"
             endif
-            if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.75) .or. IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) then
-                if(M_Wprime.gt.0d0) then
-                  write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W' boson: mass=",M_Wprime*100d0,", width=",Ga_Wprime*100d0
+            if( IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) then
+                if(M_Wprime.ge.0d0) then
+                  write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W' boson: mass=",M_Wprime/GeV,", width=",Ga_Wprime/GeV
                 else
                   write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W' boson: mass=heavy (contact interaction)"
                 endif
@@ -6426,7 +6560,6 @@ character :: arg*(500)
             write(TheUnit,"(6X,A,2E16.8,A1)") "c7 =",c7,"i"
         endif
     endif
-    write(TheUnit,"(6X,A,2F8.1,A1)") "Lambda=",Lambda*100d0
 
     if( Process.eq.67 .or. Process.eq.68 .or. Process.eq.71 .or. Process.eq.72 ) then
         write(TheUnit,"(4X,A)") "Anomalous triple or quadruple gauge couplings: "

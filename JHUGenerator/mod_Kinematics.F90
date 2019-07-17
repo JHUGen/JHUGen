@@ -2197,8 +2197,9 @@ logical, parameter :: doPrintFailReason=.false.
       jetcount=0
 
       if (doPrintFailReason) then
+         write(6,*) "Begin debugging of Kinematics_gg4f_fullproddec"
          do jpart=1,6
-            write(6,*) "id(",jpart,")=",ids(jpart)
+            write(6,*) "id(",jpart,")=",convertLHE(ids(jpart))
          enddo
          do jpart=1,NUP
             write(6,*) "MomExt(",jpart,")=",MomExt(:,jpart)
@@ -2287,6 +2288,9 @@ logical, parameter :: doPrintFailReason=.false.
 
 !     binning
       NBin(:) = 1
+
+
+   if (doPrintFailReason) write(6,*) "End debugging of Kinematics_gg4f_fullproddec"
 
 RETURN
 END SUBROUTINE
@@ -6775,8 +6779,11 @@ logical :: swap34_56
 
    ! Find y and set eta1, eta2
    Jac2 = rapidity_tan_map(xRnd(2),sysY,ywidthset=sqrt(2d0))
-   eta1 = sqrt(Energy/Collider_Energy)*exp(sysY) ! x1
-   eta2 = sqrt(Energy/Collider_Energy)*exp(-sysY) ! x2
+   eta1 = Energy/Collider_Energy*exp(sysY) ! x1
+   eta2 = Energy/Collider_Energy*exp(-sysY) ! x2
+   if (eta1.ge.1d0 .or. eta2.ge.1d0) then
+      return
+   endif
 
    ! Begin four-momenta
    Mom(1:4,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
