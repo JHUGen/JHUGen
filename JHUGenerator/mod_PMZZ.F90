@@ -26,7 +26,7 @@ integer :: evals
          CalcMZZProbability = CalcMZZProbability + DecayWeight
      enddo
      CalcMZZProbability = CalcMZZProbability/dble(PMZZEvals)
-     !print *, EHat*100d0, CalcMZZProbability
+     !print *, EHat/GeV, CalcMZZProbability
 
 RETURN
 END FUNCTION
@@ -86,25 +86,25 @@ real(8) :: minm4l, maxm4l, total, progress
     endif
 
     !this is approximate, but just for printing
-    total = 2*Ga_Reso/(1*GeV) + (maxinputmHstar - mininputmHstar + 30*GeV - 2*Ga_Reso)/(5*GeV)
+    total = 2d0*Ga_Reso/(1d0*GeV) + (maxinputmHstar - mininputmHstar + 30d0*GeV - 2d0*Ga_Reso)/(5d0*GeV)
     !extend out to Gamma in steps of 1 GeV
-    call ExtendMZZdistribution(M_Reso+Ga_Reso,   1*GeV)
-    progress = Ga_Reso/(1*Gev)
-    print *, progress/total*100, "%"
-    call ExtendMZZdistribution(M_Reso-Ga_Reso,   1*GeV)
-    progress = 2*progress
-    print *, progress/total*100, "%"
+    call ExtendMZZdistribution(M_Reso+Ga_Reso,   1d0*GeV)
+    progress = Ga_Reso/(1d0*Gev)
+    print *, progress/total*100d0, "%"
+    call ExtendMZZdistribution(M_Reso-Ga_Reso,   1d0*GeV)
+    progress = 2d0*progress
+    print *, progress/total*100d0, "%"
     !then out to the edge of the distribution in intervals of 5 GeV
     !  with 3 extra points to avoid boundary effects
-    call ExtendMZZdistribution(maxinputmHstar+15*GeV, 5*GeV)
-    progress = progress+(maxinputmHstar+15*GeV-M_Reso-Ga_Reso)/(5*GeV)
-    print *, progress/total*100, "%"
-    call ExtendMZZdistribution(mininputmHstar-15*GeV, 5*GeV)
+    call ExtendMZZdistribution(maxinputmHstar+15d0*GeV, 5d0*GeV)
+    progress = progress+(maxinputmHstar+15d0*GeV-M_Reso-Ga_Reso)/(5d0*GeV)
+    print *, progress/total*100d0, "%"
+    call ExtendMZZdistribution(mininputmHstar-15d0*GeV, 5d0*GeV)
     print *, 100d0, "%"
     !make sure there are a few data points even for a tiny width
     !so that we don't get NaN
-    call ExtendMZZdistribution(M_Reso+2*GeV,     1*GeV)
-    call ExtendMZZdistribution(M_Reso-2*GeV,     1*GeV)
+    call ExtendMZZdistribution(M_Reso+2d0*GeV,     1d0*GeV)
+    call ExtendMZZdistribution(M_Reso-2d0*GeV,     1d0*GeV)
     !leave it at that for now
 
     call WriteMZZdistribution(PMZZfile)
@@ -171,12 +171,12 @@ logical :: usespline
          if( usespline ) then
              if( intervalsize.gt.0d0 ) then
                  !shouldn't need this anymore, with maxinputmHstar and mininputmHstar above
-                 call ExtendMZZdistribution(EHat+3*intervalsize, intervalsize)
-                 call ExtendMZZdistribution(EHat-3*intervalsize, intervalsize)
+                 call ExtendMZZdistribution(EHat+3d0*intervalsize, intervalsize)
+                 call ExtendMZZdistribution(EHat-3d0*intervalsize, intervalsize)
              else
                  !shouldn't need this anymore, with maxinputmHstar and mininputmHstar above
-                 call ExtendMZZdistribution(EHat+15*GeV,         5*GeV)
-                 call ExtendMZZdistribution(EHat-15*GeV,         5*GeV)
+                 call ExtendMZZdistribution(EHat+15d0*GeV,         5*GeV)
+                 call ExtendMZZdistribution(EHat-15d0*GeV,         5*GeV)
              endif
              call EvaluateSpline(EHat, PMZZdistribution(PMZZminindex:PMZZmaxindex,1:2), PMZZmaxindex-PMZZminindex+1, PMZZ)
              GetMZZProbability = GetMZZProbability * PMZZ
@@ -268,7 +268,7 @@ real(8),parameter :: ScanRange=120d0*GeV
      EHat = minEhat+nscan*(maxEhat-minEhat)/PrintPMZZIntervals
      if( PrintPMZZIntervals.eq.0 ) EHat = minEhat
      DecayWidth = GetMZZProbability(EHat,-1d0,ReadPMZZ)
-     write(*,"(1F10.5,1PE16.9)") EHat*100d0,DecayWidth/DecayWidth0
+     write(*,"(1F10.5,1PE16.9)") EHat/GeV,DecayWidth/DecayWidth0
 
   enddo
 

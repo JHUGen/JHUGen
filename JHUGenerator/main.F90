@@ -1683,7 +1683,7 @@ type(SaveValues) :: tosave, oldsavevalues
 
     if( PMZZEvals.lt.0 ) then
         !more evals for a lower mass Higgs because the integration converges slower there
-        PMZZEvals = int(200000 * (1 + 24*dexp((1d0-m_Reso/(125d0*GeV))*4d0)))
+        PMZZEvals = int(200000d0 * (1d0 + 24d0*dexp((1d0-m_Reso/(125d0*GeV))*4d0)))
         if( PMZZEvals.gt.10000000 ) PMZZEvals = 10000000
     endif
 
@@ -3994,18 +3994,18 @@ character(len=100), intent(out) :: BeginEventLine
     enddo
 
     if( .not. FoundHiggsMass ) then
-       write(io_stdout,"(2X,A,1F7.2)")  "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
-       write(io_LogFile,"(2X,A,1F7.2)") "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
+       write(io_stdout,"(2X,A,1F7.2)")  "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso/GeV
+       write(io_LogFile,"(2X,A,1F7.2)") "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso/GeV
     else
-       write(io_stdout,"(2X,A,1F7.2,A)") "A Higgs mass of ",M_Reso*100d0," GeV was determined from the LHE input file."
-       write(io_LogFile,"(2X,A,1F7.2,A)") "A Higgs mass of ",M_Reso*100d0," GeV was determined from the LHE input file."
+       write(io_stdout,"(2X,A,1F7.2,A)") "A Higgs mass of ",M_Reso/GeV," GeV was determined from the LHE input file."
+       write(io_LogFile,"(2X,A,1F7.2,A)") "A Higgs mass of ",M_Reso/GeV," GeV was determined from the LHE input file."
     endif
     if( .not. FoundHiggsWidth ) then
-       write(io_stdout,"(2X,A,1F10.5)")  "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
-       write(io_LogFile,"(2X,A,1F10.5)") "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
+       write(io_stdout,"(2X,A,1F10.5)")  "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso/GeV
+       write(io_LogFile,"(2X,A,1F10.5)") "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso/GeV
     else
-       write(io_stdout,"(2X,A,1F10.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
-       write(io_LogFile,"(2X,A,1F10.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
+       write(io_stdout,"(2X,A,1F10.5,A)") "A Higgs width of ",Ga_Reso/GeV," GeV was determined from the LHE input file."
+       write(io_LogFile,"(2X,A,1F10.5,A)") "A Higgs width of ",Ga_Reso/GeV," GeV was determined from the LHE input file."
     endif
     write(io_stdout,"(A)") ""
     write(io_LogFile,"(A)") ""
@@ -5891,9 +5891,9 @@ character :: arg*(1000)
     write(TheUnit,"(3X,A)") ""
 
     write(TheUnit,"(3X,A)") "Input Parameter:"
-    if( Collider.eq.0 ) write(TheUnit,"(4X,A,1F8.2)") "Collider: e+ e-, sqrt(s)=",Collider_Energy*100d0
-    if( Collider.eq.1 ) write(TheUnit,"(4X,A,1F8.2)") "Collider: P-P, sqrt(s)=",Collider_Energy*100d0
-    if( Collider.eq.2 ) write(TheUnit,"(4X,A,1F8.2)") "Collider: P-Pbar, sqrt(s)=",Collider_Energy*100d0
+    if( Collider.eq.0 ) write(TheUnit,"(4X,A,1F8.2)") "Collider: e+ e-, sqrt(s)=",Collider_Energy/GeV
+    if( Collider.eq.1 ) write(TheUnit,"(4X,A,1F8.2)") "Collider: P-P, sqrt(s)=",Collider_Energy/GeV
+    if( Collider.eq.2 ) write(TheUnit,"(4X,A,1F8.2)") "Collider: P-Pbar, sqrt(s)=",Collider_Energy/GeV
     if( Process.eq.0 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
     if( Process.eq.1 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-1 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
     if( Process.eq.2 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-2 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
@@ -5924,8 +5924,8 @@ character :: arg*(1000)
         else if( ReadLHEFile .or. Process.le.2 .or. Process .eq. 80 ) then
             write(TheUnit,"(4X,A,I2,2X,A,I2)") "DecayMode1:",DecayMode1, "DecayMode2:",DecayMode2
         endif
-        if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.75) .or. IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z boson: mass=",M_Z*100d0,", width=",Ga_Z*100d0
-        if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.75) .or. IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W boson: mass=",M_W*100d0,", width=",Ga_W*100d0
+        if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.75) .or. IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z boson: mass=",M_Z/GeV,", width=",Ga_Z/GeV
+        if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.75) .or. IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W boson: mass=",M_W/GeV,", width=",Ga_W/GeV
     endif
     if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or.Process.eq.112 .or. Process.eq.113 .or. Process.eq.114) then
         write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Top quark mass=",m_top/GeV,", width=",Ga_top/GeV
@@ -6509,13 +6509,13 @@ character :: arg*(1000)
             if (includeVprime) then
                 if (IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2)) then
                     if(M_Zprime.gt.0d0) then
-                      write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z' boson: mass=",M_Zprime*100d0,", width=",Ga_Zprime*100d0
+                      write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z' boson: mass=",M_Zprime/GeV,", width=",Ga_Zprime/GeV
                     else
                       write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z' boson: heavy mass limit (contact interaction)"
                     endif
                 elseif (IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2)) then
                     if(M_Wprime.gt.0d0) then
-                      write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W' boson: mass=",M_Wprime*100d0,", width=",Ga_Wprime*100d0
+                      write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W' boson: mass=",M_Wprime/GeV,", width=",Ga_Wprime/GeV
                     else
                       write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W' boson: heavy mass limit (contact interaction)"
                     endif
@@ -6599,7 +6599,6 @@ implicit none
 include "vegas_common.f"
 integer :: NBin,Hits,NHisto
 real(8) :: BinSize,LowVal,BinVal,Value,Error,Integral
-real(8),parameter :: ToGeV=1d2, ToPb=1d-3
 real(8) :: VG_Result,VG_Error,RunTime
 
 
