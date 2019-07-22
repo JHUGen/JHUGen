@@ -1038,25 +1038,29 @@ logical :: canbeVBF, canbeVH, isVHlike
             endif
          elseif (MY_IDUP(1).eq.MY_IDUP(3)) then
             ICOLUP(1:2,1) = (/501,000/)
-            ICOLUP(1:2,2) = (/000,502/)
+            ICOLUP(1:2,2) = (/502,000/)
             ICOLUP(1:2,3) = (/501,000/)
-            ICOLUP(1:2,4) = (/000,502/)
+            ICOLUP(1:2,4) = (/502,000/)
             if (MY_IDUP(1).lt.0) then
-               do j=1,2
-                  call swap(ICOLUP(j,1),ICOLUP(j,2))
-                  call swap(ICOLUP(j,3),ICOLUP(j,4))
-               enddo
+               call swap(ICOLUP(1,1),ICOLUP(2,1))
+               call swap(ICOLUP(1,3),ICOLUP(2,3))
+            endif
+            if (MY_IDUP(2).lt.0) then
+               call swap(ICOLUP(1,2),ICOLUP(2,2))
+               call swap(ICOLUP(1,4),ICOLUP(2,4))
             endif
          elseif (MY_IDUP(1).eq.MY_IDUP(4)) then
             ICOLUP(1:2,1) = (/501,000/)
-            ICOLUP(1:2,2) = (/000,502/)
-            ICOLUP(1:2,3) = (/000,502/)
+            ICOLUP(1:2,2) = (/502,000/)
+            ICOLUP(1:2,3) = (/502,000/)
             ICOLUP(1:2,4) = (/501,000/)
             if (MY_IDUP(1).lt.0) then
-               do j=1,2
-                  call swap(ICOLUP(j,1),ICOLUP(j,2))
-                  call swap(ICOLUP(j,3),ICOLUP(j,4))
-               enddo
+               call swap(ICOLUP(1,1),ICOLUP(2,1))
+               call swap(ICOLUP(1,4),ICOLUP(2,4))
+            endif
+            if (MY_IDUP(2).lt.0) then
+               call swap(ICOLUP(1,2),ICOLUP(2,2))
+               call swap(ICOLUP(1,3),ICOLUP(2,3))
             endif
          else
            print *, "Color for this Process 69 configuration cannot be resolved"
