@@ -6296,6 +6296,7 @@ integer :: NumChannels, it_chan, ch_ctr
 integer :: id12, id78, id17, id28, id18, id27, id12_78
 logical :: swap34_56, isZH, isWH, isVBF
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
+logical,parameter :: includeNewBWPSinEW = .true.
 
    isZH = .false.
    isWH = .false.
@@ -6351,46 +6352,53 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
       !write(6,*) "iChannel = ",iChannel,"/",NumChannels,"(xchannel: ",xchannel,")"
       !pause
 
-      if (Process.eq.67 .or. Process.eq.71) then
-         ! This is almost flat but not quite
-         BWmass_ps = M_Z
-         BWwidth_ps = 4d0*M_V_ps-BWmass_ps ! Since 2*M_V needs to be covered
-         if (Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.gt.(BWmass_ps+10d0*BWwidth_ps)) then
-            BWmass_ps = -1d0
-            BWwidth_ps = -1d0
+      if (includeNewBWPSinEW) then
+         if (Process.eq.67 .or. Process.eq.71) then
+            ! This is almost flat but not quite
+            BWmass_ps = M_Z
+            BWwidth_ps = 4d0*M_V_ps-BWmass_ps ! Since 2*M_V needs to be covered
+            if (Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.gt.(BWmass_ps+10d0*BWwidth_ps)) then
+               BWmass_ps = -1d0
+               BWwidth_ps = -1d0
+            endif
+         else if (Process.eq.66 .or. Process.eq.70) then
+            if( M_Reso.ge.0d0 .and. M_Reso2.ge.0d0 ) then ! Both resonances are present
+               BWmass_ps = max(M_Reso,M_Reso2)
+               BWwidth_ps = max(max(abs(M_Reso-M_Reso2),Ga_Reso), Ga_Reso2) ! Cover the full mass difference
+            else if( M_Reso.ge.0d0 ) then
+               BWmass_ps = M_Reso
+               BWwidth_ps = Ga_Reso
+            else if( M_Reso2.ge.0d0 ) then
+               BWmass_ps = M_Reso2
+               BWwidth_ps = Ga_Reso2
+            endif
+            if (Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.gt.(BWmass_ps+10d0*BWwidth_ps)) then
+               BWmass_ps = -1d0
+               BWwidth_ps = -1d0
+            endif
+         else if (Process.eq.68 .or. Process.eq.72) then
+            if( M_Reso.ge.0d0 .and. M_Reso2.ge.0d0 ) then ! Both resonances are present
+               BWmass_ps = max(M_Reso,M_Reso2)
+               BWwidth_ps = max(max(abs(M_Reso-M_Reso2),Ga_Reso), Ga_Reso2) ! Cover the full mass difference
+            else if( M_Reso.ge.0d0 ) then
+               BWmass_ps = M_Reso
+               BWwidth_ps = Ga_Reso
+            else if( M_Reso2.ge.0d0 ) then
+               BWmass_ps = M_Reso2
+               BWwidth_ps = Ga_Reso2
+            endif
+            if ( &
+               Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.gt.(BWmass_ps+10d0*BWwidth_ps) &
+               .or. (Emin.lt.M_Z .and. abs(BWmass_ps-M_Z).gt.10d0*BWwidth_ps) & ! Check distance from M_Z as well for BSI
+               ) then
+               BWmass_ps = -1d0
+               BWwidth_ps = -1d0
+            endif
          endif
-      else if (Process.eq.66 .or. Process.eq.70) then
-         if( M_Reso.ge.0d0 .and. M_Reso2.ge.0d0 ) then ! Both resonances are present
-            BWmass_ps = max(M_Reso,M_Reso2)
-            BWwidth_ps = max(max(abs(M_Reso-M_Reso2),Ga_Reso), Ga_Reso2) ! Cover the full mass difference
-         else if( M_Reso.ge.0d0 ) then
+      else
+         if( .not.(Emin.gt.M_Reso+2d0*Ga_Reso .or. Emax.lt.M_Reso-2d0*Ga_Reso .or. Process.eq.67 .or. Process.eq.71) ) then
             BWmass_ps = M_Reso
             BWwidth_ps = Ga_Reso
-         else if( M_Reso2.ge.0d0 ) then
-            BWmass_ps = M_Reso2
-            BWwidth_ps = Ga_Reso2
-         endif
-         if (Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.gt.(BWmass_ps+10d0*BWwidth_ps)) then
-            BWmass_ps = -1d0
-            BWwidth_ps = -1d0
-         endif
-      else if (Process.eq.68 .or. Process.eq.72) then
-         if( M_Reso.ge.0d0 .and. M_Reso2.ge.0d0 ) then ! Both resonances are present
-            BWmass_ps = max(M_Reso,M_Reso2)
-            BWwidth_ps = max(max(abs(M_Reso-M_Reso2),Ga_Reso), Ga_Reso2) ! Cover the full mass difference
-         else if( M_Reso.ge.0d0 ) then
-            BWmass_ps = M_Reso
-            BWwidth_ps = Ga_Reso
-         else if( M_Reso2.ge.0d0 ) then
-            BWmass_ps = M_Reso2
-            BWwidth_ps = Ga_Reso2
-         endif
-         if ( &
-            Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.gt.(BWmass_ps+10d0*BWwidth_ps) &
-            .or. (Emin.lt.M_Z .and. abs(BWmass_ps-M_Z).gt.10d0*BWwidth_ps) & ! Check distance from M_Z as well for BSI
-            ) then
-            BWmass_ps = -1d0
-            BWwidth_ps = -1d0
          endif
       endif
       if( BWmass_ps.lt.0d0 .or. BWwidth_ps.lt.0d0 ) then ! Create flat 4f mass
