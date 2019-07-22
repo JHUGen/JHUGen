@@ -6355,7 +6355,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
          ! This is almost flat but not quite
          BWmass_ps = M_Z
          BWwidth_ps = 4d0*M_V_ps-BWmass_ps ! Since 2*M_V needs to be covered
-         if (Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.lt.(BWmass_ps+10d0*BWwidth_ps)) then
+         if (Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.gt.(BWmass_ps+10d0*BWwidth_ps)) then
             BWmass_ps = -1d0
             BWwidth_ps = -1d0
          endif
@@ -6370,7 +6370,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
             BWmass_ps = M_Reso2
             BWwidth_ps = Ga_Reso2
          endif
-         if (Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.lt.(BWmass_ps+10d0*BWwidth_ps)) then
+         if (Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.gt.(BWmass_ps+10d0*BWwidth_ps)) then
             BWmass_ps = -1d0
             BWwidth_ps = -1d0
          endif
@@ -6386,7 +6386,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
             BWwidth_ps = Ga_Reso2
          endif
          if ( &
-            Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.lt.(BWmass_ps+10d0*BWwidth_ps) &
+            Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.gt.(BWmass_ps+10d0*BWwidth_ps) &
             .or. (Emin.lt.M_Z .and. abs(BWmass_ps-M_Z).gt.10d0*BWwidth_ps) & ! Check distance from M_Z as well for BSI
             ) then
             BWmass_ps = -1d0
@@ -6459,7 +6459,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
 
       BWmass_ps = M_Z
       BWwidth_ps = 4d0*M_V_ps-BWmass_ps ! Since 2*M_V needs to be covered
-      if (Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.lt.(BWmass_ps+10d0*BWwidth_ps)) then
+      if (Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.gt.(BWmass_ps+10d0*BWwidth_ps)) then
          BWmass_ps = -1d0
          BWwidth_ps = -1d0
       endif
@@ -6837,7 +6837,7 @@ logical :: swap34_56
          BWmass_ps = M_Reso2
          BWwidth_ps = Ga_Reso2
       endif
-      if (Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.lt.(BWmass_ps+10d0*BWwidth_ps)) then
+      if (Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.gt.(BWmass_ps+10d0*BWwidth_ps)) then
          BWmass_ps = -1d0
          BWwidth_ps = -1d0
       endif
@@ -6852,7 +6852,7 @@ logical :: swap34_56
          BWmass_ps = M_Reso2
          BWwidth_ps = Ga_Reso2
       endif
-      if (Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.lt.(BWmass_ps+10d0*BWwidth_ps)) then
+      if (Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.gt.(BWmass_ps+10d0*BWwidth_ps)) then
          BWmass_ps = -1d0
          BWwidth_ps = -1d0
       endif
