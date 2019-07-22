@@ -9,7 +9,7 @@ to run: ./JHUGen Parameter1=value1 Parameter2=value2 ...
 
 See the manual for more details
 
-command line parameter quick reference:
+Command line parameters for quick reference:
   help:                Print all command line options
   DryRun:              Check that the command line is valid, then exit
   Process configuration:
@@ -22,6 +22,7 @@ command line parameter quick reference:
                        66=EW VVJJ sig., 67=EW VVJJ bkg., 68=EW VVJJ tot.,
                        69=QCD VVJJ bkg.,
                        70=EW VVLL sig., 71=EW VVLL bkg., 72=EW VVLL tot.,
+                       73=gg 4f sig., 74=gg 4f bkg., 75=gg 4f tot.,
                        80=ttH, 90=bbH,
                        110=t+H t channel, 111=tbar+H t channel,
                        112=t+H s channel, 113=tbar+H s channel
@@ -118,15 +119,20 @@ command line parameter quick reference:
     RenScheme:         QCD renormalization scale scheme
     MuRenMultiplier:   Multiplier for the renormalization scale chosen by RenScheme
   Lepton and jet filter:
-    FilterNLept:       For decay mode, reject events that have less than FilterNLept leptons
-    FilterOSPairs:     For decay mode, reject events that have less than FilterOSPairs pairs of
-                       sign leptons of any flavor.
-    FilterOSSFPairs:   For decay mode, reject events that have less than FilterOSSFPairs pairs of
-                       opposite-sign-same-flavor leptons.
-    CountTauAsAny:     For FilterOSSFPairs, taus can stand in place of electrons or muons
+    NLepMin:           Reject events that have less than this many charged leptons
+    NLepMax:           Reject events that have more than this many charged leptons
+    NJetMin:           Reject events that have less than this many jets
+    NJetMax:           Reject events that have more than this many jets
+    NOSMin:            Reject events that have less than this many
+                       opposite-sign pairs of leptons of any flavor
+    NOSMax:            Reject events that have more than this many
+                       opposite-sign pairs of leptons of any flavor
+    NOSSFMin:          Reject events that have less than this many
+                       opposite-sign same-flavor pairs of leptons
+    NOSSFMax:          Reject events that have more than this many
+                       opposite-sign same-flavor pairs of leptons
+    CountTauAsAny:     For OSSF pairs, taus can stand in place of electrons or muons
                        of the same charge.
-    FilterNJets:       For decay mode, reject events that have less than FilterNJets quarks
-                       and/or gluons
     WriteFailedEvents: Write events that fail in the LHE file, but with a weight of 0
                        (off by default)
   Higgs propagator and decay width:
@@ -157,5 +163,6 @@ command line parameter quick reference:
                        Use DecayMode1 to specify the decay.
                        (should be a Z or W mode, depending on the input file)
     UnformattedRead:   Turn this on if the normal, faster reading fails
+    VegasVerbosity:    Turn on or off verbose vegas printout (1: on, 0: off; default: 1)
   Couplings:
     See manual for the full list

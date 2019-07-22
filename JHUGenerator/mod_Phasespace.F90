@@ -15,6 +15,7 @@ MODULE ModPhasespace
   public  :: k_t
   public  :: k_l
   public  :: k_BreitWigner ,k_BreitWigner_Quadr
+  public  :: rapidity_tan_map
 
   public :: get_minmax_s
   public :: get_minmax_t
@@ -590,6 +591,25 @@ MODULE ModPhasespace
   END FUNCTION
 
 
+  FUNCTION rapidity_tan_map(r,y,ywidthset)
+  implicit none
+  real(8) :: rapidity_tan_map,r,y,ywidth
+  real(8), optional :: ywidthset
+  real(8), parameter :: rthr = 0.49999d0
+    if (present(ywidthset)) then
+      ywidth = abs(ywidthset)
+    else
+      ywidth = 1d0
+    endif
+
+    y = tan(pi*(min(max(r-0.5d0,-rthr),rthr))) ! Unitless at the moment
+    rapidity_tan_map = (1d0 + y**2)
+    ! Multiply by the actual y width
+    rapidity_tan_map = ywidth*rapidity_tan_map
+    y = ywidth*y
+
+  RETURN
+  END FUNCTION
 
 
 ! smooth interpolation between Breit-Wigner and a quadratic mapping: (good for integration range that includes BW and non-BW propagators(to the left and right))
