@@ -2040,7 +2040,7 @@ SUBROUTINE InitPDFValues()
 
    Mu_Fact = M_Reso ! Set pdf scale to resonance mass by default, later changed as necessary in the EvalWeighted/EvalUnweighted subroutines
    Mu_Ren = M_Reso ! Set renorm. scale to resonance mass by default, later changed as necessary in the EvalWeighted/EvalUnweighted subroutines
-   if (.not.ReadLHEFile .and. .not.ConvertLHEFile) call EvalAlphaS() ! Set alphas at default Mu_Ren. Notice ModParameters::ComputeQCDVariables is automatically called!
+   if (.not.ConvertLHEFile) call EvalAlphaS() ! Set alphas at default Mu_Ren. Notice ModParameters::ComputeQCDVariables is automatically called!
    return
 END SUBROUTINE
 
@@ -2054,7 +2054,7 @@ SUBROUTINE InitPDFs()
    DOUBLE PRECISION alphasPDF
    character(len=5) :: LHAPDFversionnumber
 
-   if (.not.ReadLHEFile .and. .not.ConvertLHEFile) then
+   if (.not.ConvertLHEFile) then
      call LHAPDFversion(LHAPDFversionnumber)
      if (LHAPDFversionnumber .ge. "6.2.1") then
        call InitPDFSetByName(trim(LHAPDFString)) ! Let LHAPDF handle everything
@@ -2076,7 +2076,7 @@ SUBROUTINE InitPDFs()
    implicit none
    character :: pdftable*(100)
 
-   if (.not.ReadLHEFile .and. .not.ConvertLHEFile) then
+   if (.not.ConvertLHEFile) then
 
      zmass_pdf = M_Z ! Take zmass_pdf=M_Z in pdfs that do not specify this value
 
@@ -5894,23 +5894,23 @@ character :: arg*(1000)
     if( Collider.eq.0 ) write(TheUnit,"(4X,A,1F8.2)") "Collider: e+ e-, sqrt(s)=",Collider_Energy/GeV
     if( Collider.eq.1 ) write(TheUnit,"(4X,A,1F8.2)") "Collider: P-P, sqrt(s)=",Collider_Energy/GeV
     if( Collider.eq.2 ) write(TheUnit,"(4X,A,1F8.2)") "Collider: P-Pbar, sqrt(s)=",Collider_Energy/GeV
-    if( Process.eq.0 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
-    if( Process.eq.1 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-1 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
-    if( Process.eq.2 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-2 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
-    if( Process.eq.60) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
-    if( Process.eq.61) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
-    if( Process.eq.62) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
-    if( (Process.eq.66 .or. Process.eq.68 .or. Process.eq.70 .or. Process.eq.72 .or. Process.eq.73 .or. Process.eq.75) .and. M_Reso.ge.0d0  ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance 1, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
-    if( (Process.eq.66 .or. Process.eq.68 .or. Process.eq.70 .or. Process.eq.72 .or. Process.eq.73 .or. Process.eq.75) .and. M_Reso2.ge.0d0 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance 2, mass=",M_Reso2/GeV," width=",Ga_Reso2/GeV
-    if( Process.eq.50) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
-    if( Process.eq.51) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
-    if( Process.eq.80) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
-    if( Process.eq.90) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
-    if( Process.eq.110) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
-    if( Process.eq.111) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
-    if( Process.eq.112) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
-    if( Process.eq.113) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
-    if( Process.eq.114) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Spin-0 resonance, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.0 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.1 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=1, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.2 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=2, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.60) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.61) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.62) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( (Process.eq.66 .or. Process.eq.68 .or. Process.eq.70 .or. Process.eq.72 .or. Process.eq.73 .or. Process.eq.75) .and. M_Reso.ge.0d0  ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance 1: spin=0, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( (Process.eq.66 .or. Process.eq.68 .or. Process.eq.70 .or. Process.eq.72 .or. Process.eq.73 .or. Process.eq.75) .and. M_Reso2.ge.0d0 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance 2: spin=0, mass=",M_Reso2/GeV," width=",Ga_Reso2/GeV
+    if( Process.eq.50) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.51) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.80) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.90) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.110) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.111) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.112) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.113) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.114) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
     if( ReadLHEFile )    write(TheUnit,"(4X,A)") "           (This is ReadLHEFile mode. Resonance mass/width are read from LHE input parameters.)"
     if( ConvertLHEFile ) write(TheUnit,"(4X,A)") "           (This is ConvertLHEFile mode. Resonance mass/width are read from LHE input parameters.)"
     if( HiggsDecayLengthMM.ne.0d0 ) write(TheUnit,"(4X,A,F10.5,A)") "           ctau=", HiggsDecayLengthMM, " mm"

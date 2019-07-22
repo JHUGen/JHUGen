@@ -6286,7 +6286,7 @@ integer :: EqualLeptons,ids(1:8)
 integer :: iChannel
 real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7,Jac8,Jac9
 real(8) :: s3H,s4H,s56,s78,s910,s34,s35,s46,Mom_Dummy(1:4),Mom_Dummy2(1:4),xRndLeptInterf,Emin,Emax
-real(8), parameter :: RescaleWidth=1d0
+real(8) :: BWmass_ps, BWwidth_ps
 real(8) :: s1min, s2min
 integer :: NumChannels, it_chan, ch_ctr
 integer :: id12, id78, id17, id28, id18, id27, id12_78
@@ -6298,7 +6298,8 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
    isVBF = .false.
    swap34_56 = .false.
    id12_78 = Not_a_particle_
-
+   BWmass_ps=-1d0
+   BWwidth_ps=-1d0
 
    Mom(1:4,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
    Mom(1:4,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
@@ -6312,7 +6313,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
    if( EMin.lt.0d0 .or. EMin.gt.EMax ) call Error("m4l_minmax is not set correctly")
 
 
-   if ( Process.ne. 69) then
+   if ( Process .ne. 69) then
       id12=CoupledVertex((/-ids(1),-ids(2)/),-1)
       id78=CoupledVertex(ids(7:8),-1)
       id17=CoupledVertex((/-ids(1),ids(7)/),-1)
@@ -6346,10 +6347,48 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
       !write(6,*) "iChannel = ",iChannel,"/",NumChannels,"(xchannel: ",xchannel,")"
       !pause
 
-      if( Emin.gt.M_Reso+2*Ga_Reso .or. Emax.lt.M_Reso-2*Ga_Reso .or. Process.eq.67 ) then ! Create a 4f tail
+      if (Process.eq.67 .or. Process.eq.71) then
+         ! This is almost flat but not quite
+         BWmass_ps = M_Z
+         BWwidth_ps = 4d0*M_V_ps-BWmass_ps ! Since 2*M_V needs to be covered
+      else if (Process.eq.66 .or. Process.eq.70) then
+         if( M_Reso.ge.0d0 .and. M_Reso2.ge.0d0 ) then ! Both resonances are present
+            BWmass_ps = max(M_Reso,M_Reso2)
+            BWwidth_ps = max(max(abs(M_Reso-M_Reso2),Ga_Reso), Ga_Reso2) ! Cover the full mass difference
+         else if( M_Reso.ge.0d0 ) then
+            BWmass_ps = M_Reso
+            BWwidth_ps = Ga_Reso
+         else if( M_Reso2.ge.0d0 ) then
+            BWmass_ps = M_Reso2
+            BWwidth_ps = Ga_Reso2
+         endif
+         if (Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.lt.(BWmass_ps+10d0*BWwidth_ps)) then
+            BWmass_ps = -1d0
+            BWwidth_ps = -1d0
+         endif
+      else if (Process.eq.68 .or. Process.eq.72) then
+         if( M_Reso.ge.0d0 .and. M_Reso2.ge.0d0 ) then ! Both resonances are present
+            BWmass_ps = max(M_Reso,M_Reso2)
+            BWwidth_ps = max(max(abs(M_Reso-M_Reso2),Ga_Reso), Ga_Reso2) ! Cover the full mass difference
+         else if( M_Reso.ge.0d0 ) then
+            BWmass_ps = M_Reso
+            BWwidth_ps = Ga_Reso
+         else if( M_Reso2.ge.0d0 ) then
+            BWmass_ps = M_Reso2
+            BWwidth_ps = Ga_Reso2
+         endif
+         if ( &
+            Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.lt.(BWmass_ps+10d0*BWwidth_ps) &
+            .or. (Emin.lt.M_Z .and. abs(BWmass_ps-M_Z).gt.10d0*BWwidth_ps) & ! Check distance from M_Z as well for BSI
+            ) then
+            BWmass_ps = -1d0
+            BWwidth_ps = -1d0
+         endif
+      endif
+      if( BWmass_ps.lt.0d0 .or. BWwidth_ps.lt.0d0 ) then ! Create flat 4f mass
          Jac1 = k_l(xRnd(1),Emin**2,Emax**2,s56)
-      else ! Create an H boson around the BW
-         Jac1 = k_BreitWigner(xRnd(1),M_Reso**2,Ga_Reso*RescaleWidth,Emin**2,Emax**2,s56)
+      else ! Create a BW 4f mass
+         Jac1 = k_BreitWigner(xRnd(1),BWmass_ps**2,BWwidth_ps,Emin**2,Emax**2,s56)
       endif
       Jac3 = s_channel_propagator(M_V_ps**2,Ga_V_ps,s1min,s56,xRnd(3),s78) ! m1
       Jac4 = s_channel_propagator(M_V_ps**2,Ga_V_ps,s2min,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910) ! m2
@@ -6410,11 +6449,17 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
    else
       NumChannels=1
 
-      if( Emin.gt.M_Z+2*Ga_Z .or. Emax.lt.M_Z-2*Ga_Z ) then ! Create a VV->4f tail
+      BWmass_ps = M_Z
+      BWwidth_ps = 4d0*M_V_ps-BWmass_ps ! Since 2*M_V needs to be covered
+      if( &
+         BWmass_ps.lt.0d0 .or. BWwidth_ps.lt.0d0 .or. &
+         Emin.gt.BWmass_ps+10d0*BWwidth_ps .or. Emax.lt.BWmass_ps-10d0*BWwidth_ps &
+         ) then ! Create flat 4f mass
          Jac1 = k_l(xRnd(1),Emin**2,Emax**2,s56)
-      else ! Create an H boson around the BW
-         Jac1 = k_BreitWigner(xRnd(1),M_Z**2,Ga_Z*RescaleWidth,Emin**2,Emax**2,s56)
+      else ! Create a BW 4f mass
+         Jac1 = k_BreitWigner(xRnd(1),BWmass_ps**2,BWwidth_ps,Emin**2,Emax**2,s56)
       endif
+
       Jac3 = s_channel_propagator(M_V_ps**2,Ga_V_ps,0d0,s56,xRnd(3),s78) ! m1
       Jac4 = s_channel_propagator(M_V_ps**2,Ga_V_ps,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910) ! m2
 
@@ -6744,7 +6789,7 @@ real(8) :: xRnd(:), eta1, eta2, Energy, Mom(:,:)
 integer :: ids(1:6)
 real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7,Jac8,Jac9
 real(8) :: sysY,s34,s56,s78,xRndLeptInterf,Emin,Emax
-real(8), parameter :: RescaleWidth=1d0
+real(8) :: BWmass_ps, BWwidth_ps
 real(8) :: s1min, s2min
 logical :: swap34_56
 
@@ -6767,10 +6812,43 @@ logical :: swap34_56
 
 
    ! Find s34 = Energy**2
-   if( Emin.gt.M_Reso+2*Ga_Reso .or. Emax.lt.M_Reso-2*Ga_Reso .or. Process.eq.74 ) then ! Create a 4f tail
+   BWmass_ps=-1d0
+   BWwidth_ps=-1d0
+   if (Process.eq.73) then
+      if( M_Reso.ge.0d0 .and. M_Reso2.ge.0d0 ) then ! Both resonances are present
+         BWmass_ps = max(M_Reso,M_Reso2)
+         BWwidth_ps = max(max(abs(M_Reso-M_Reso2),Ga_Reso), Ga_Reso2) ! Cover the full mass difference
+      else if( M_Reso.ge.0d0 ) then
+         BWmass_ps = M_Reso
+         BWwidth_ps = Ga_Reso
+      else if( M_Reso2.ge.0d0 ) then
+         BWmass_ps = M_Reso2
+         BWwidth_ps = Ga_Reso2
+      endif
+      if (Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.lt.(BWmass_ps+10d0*BWwidth_ps)) then
+         BWmass_ps = -1d0
+         BWwidth_ps = -1d0
+      endif
+   else if (Process.eq.75) then
+      if( M_Reso.ge.0d0 .and. M_Reso2.ge.0d0 ) then ! Both resonances are present
+         BWmass_ps = max(M_Reso,M_Reso2)
+         BWwidth_ps = max(max(abs(M_Reso-M_Reso2),Ga_Reso), Ga_Reso2) ! Cover the full mass difference
+      else if( M_Reso.ge.0d0 ) then
+         BWmass_ps = M_Reso
+         BWwidth_ps = Ga_Reso
+      else if( M_Reso2.ge.0d0 ) then
+         BWmass_ps = M_Reso2
+         BWwidth_ps = Ga_Reso2
+      endif
+      if (Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.lt.(BWmass_ps+10d0*BWwidth_ps)) then
+         BWmass_ps = -1d0
+         BWwidth_ps = -1d0
+      endif
+   endif
+   if( BWmass_ps.lt.0d0 .or. BWwidth_ps.lt.0d0 ) then ! Create flat 4f mass
       Jac1 = k_l(xRnd(1),Emin**2,Emax**2,s34)
-   else ! Create an H boson around the BW
-      Jac1 = k_BreitWigner(xRnd(1),M_Reso**2,Ga_Reso*RescaleWidth,Emin**2,Emax**2,s34)
+   else ! Create a BW 4f mass
+      Jac1 = k_BreitWigner(xRnd(1),BWmass_ps**2,BWwidth_ps,Emin**2,Emax**2,s34)
    endif
    if (s34.le.0d0) then
       return
