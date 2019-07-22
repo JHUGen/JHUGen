@@ -428,6 +428,9 @@ type(SaveValues) :: tosave, oldsavevalues
    WidthScheme=-1
    WidthSchemeIn=-1
 
+   includeInterference = .false.   ! no interference by default
+   reweightInterference = .false.
+
    interfSet = .false.
    SetMuFacMultiplier = .false.
    SetMuRenMultiplier = .false.
@@ -1430,35 +1433,34 @@ type(SaveValues) :: tosave, oldsavevalues
     endif
 
     !interference, photon couplings, ...
-    if( (DecayMode1.eq.DecayMode2 .and. IsAZDecay(DecayMode1)) .or.  &
+    if(                                                              &
+        (DecayMode1.eq.DecayMode2 .and. IsAZDecay(DecayMode1)) .or.  &
         (DecayMode1.eq.9) .or. (DecayMode2.eq.9)               .or.  &
         (DecayMode1.eq.8  .and. DecayMode2.eq.0)               .or.  &
         (DecayMode1.eq.8  .and. DecayMode2.eq.2)               .or.  &
         (DecayMode1.eq.0  .and. DecayMode2.eq.8)               .or.  &
-        (DecayMode1.eq.2  .and. DecayMode2.eq.8)               ) then !  allow interference
-            if( .not.interfSet ) then!  set default interference switch
-                if (Process.ge.66 .and. Process.le.72) then
-                    if (Unweighted) then
-                        includeInterference = .false.
-                        reweightInterference = .true.
-                    else if (m4l_minmax(1) .gt. 2d0*M_Z) then
-                        includeInterference = .false.
-                        reweightInterference = .false.
-                    else
-                        includeInterference = .true.
-                        reweightInterference = .false.
-                    endif
-                elseif( M_Reso.gt.2d0*M_Z ) then
-                    includeInterference = .false.
-                    reweightInterference = .false.
-                else
-                    includeInterference = .true.
-                    reweightInterference = .false.
-                endif
-            endif
-    else if( .not.interfSet ) then
-        includeInterference = .false.   ! no interference if decay mode does not allow 4 same flavor leptons
-        reweightInterference = .false.
+        (DecayMode1.eq.2  .and. DecayMode2.eq.8)                     &
+      ) then !  allow interference
+      if( .not.interfSet ) then!  set default interference switch
+          if (Process.ge.66 .and. Process.le.72) then
+              if (Unweighted) then
+                  includeInterference = .false.
+                  reweightInterference = .true.
+              else if (m4l_minmax(1) .gt. 2d0*M_Z) then
+                  includeInterference = .false.
+                  reweightInterference = .false.
+              else
+                  includeInterference = .true.
+                  reweightInterference = .false.
+              endif
+          elseif( M_Reso.gt.2d0*M_Z ) then
+              includeInterference = .false.
+              reweightInterference = .false.
+          else
+              includeInterference = .true.
+              reweightInterference = .false.
+          endif
+      endif
     endif
 
     if (reweightInterference .and. includeInterference) call Error("Can't set both Interf and ReweightInterf")
