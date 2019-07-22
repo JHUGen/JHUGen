@@ -6355,6 +6355,10 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
          ! This is almost flat but not quite
          BWmass_ps = M_Z
          BWwidth_ps = 4d0*M_V_ps-BWmass_ps ! Since 2*M_V needs to be covered
+         if (Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.lt.(BWmass_ps+10d0*BWwidth_ps)) then
+            BWmass_ps = -1d0
+            BWwidth_ps = -1d0
+         endif
       else if (Process.eq.66 .or. Process.eq.70) then
          if( M_Reso.ge.0d0 .and. M_Reso2.ge.0d0 ) then ! Both resonances are present
             BWmass_ps = max(M_Reso,M_Reso2)
@@ -6455,6 +6459,10 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
 
       BWmass_ps = M_Z
       BWwidth_ps = 4d0*M_V_ps-BWmass_ps ! Since 2*M_V needs to be covered
+      if (Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.lt.(BWmass_ps+10d0*BWwidth_ps)) then
+         BWmass_ps = -1d0
+         BWwidth_ps = -1d0
+      endif
       if( &
          BWmass_ps.lt.0d0 .or. BWwidth_ps.lt.0d0 .or. &
          Emin.gt.BWmass_ps+10d0*BWwidth_ps .or. Emax.lt.BWmass_ps-10d0*BWwidth_ps &
