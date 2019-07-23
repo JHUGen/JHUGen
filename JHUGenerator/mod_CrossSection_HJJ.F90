@@ -501,8 +501,14 @@ use ifport
                MY_IDUP(3:4) = (/Bot_,ABot_/)
             endif
          else! gg->gg
-            ICOLUP(1:2,3) = (/504,502/)
-            ICOLUP(1:2,4) = (/503,504/)
+            call random_number(xRnd)
+            if (xRnd.gt.0.5) then
+               ICOLUP(1:2,3) = (/504,502/)
+               ICOLUP(1:2,4) = (/503,504/)
+            else
+               ICOLUP(1:2,4) = (/504,502/)
+               ICOLUP(1:2,3) = (/503,504/)
+            endif
          endif
       elseif( MY_IDUP(1).ne.Glu_ .and. MY_IDUP(1).gt.0 .and. MY_IDUP(2).eq.Glu_ ) then! qg->qg
          ICOLUP(1:2,1) = (/501,000/)
@@ -819,8 +825,14 @@ END FUNCTION
                 MY_IDUP(3:4) = (/Bot_,ABot_/)
              endif
           else! gg->gg
-             ICOLUP(1:2,3) = (/504,502/)
-             ICOLUP(1:2,4) = (/503,504/)
+             call random_number(xRnd)
+             if (xRnd.gt.0.5) then
+               ICOLUP(1:2,3) = (/504,502/)
+               ICOLUP(1:2,4) = (/503,504/)
+             else
+               ICOLUP(1:2,4) = (/504,502/)
+               ICOLUP(1:2,3) = (/503,504/)
+             endif
           endif
       elseif( MY_IDUP(1).ne.Glu_ .and. MY_IDUP(1).gt.0 .and. MY_IDUP(2).eq.Glu_ ) then! qg->qg
           ICOLUP(1:2,1) = (/501,000/)
@@ -992,7 +1004,7 @@ END FUNCTION
 implicit none
 real(8) :: yRnd(:),VgsWgt, EvalUnWeighted_HJJ,RES(-5:5,-5:5)
 real(8) :: pdf(-6:6,1:2)
-real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
+real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi, xRnd
 real(8) :: MomExt(1:4,1:5), PSWgt
 real(8) :: me2(-5:5,-5:5)
 integer :: i,j,k,iPartons(1:2)
@@ -1107,8 +1119,14 @@ IF( GENEVT ) THEN
       if( MY_IDUP(1).eq.Glu_ .and. MY_IDUP(2).eq.Glu_ ) then! gg->gg
           ICOLUP(1:2,1) = (/501,502/)
           ICOLUP(1:2,2) = (/503,501/)
-          ICOLUP(1:2,3) = (/504,502/)
-          ICOLUP(1:2,4) = (/503,504/)
+          call random_number(xRnd)
+          if (xRnd.gt.0.5) then
+            ICOLUP(1:2,3) = (/504,502/)
+            ICOLUP(1:2,4) = (/503,504/)
+          else
+            ICOLUP(1:2,4) = (/504,502/)
+            ICOLUP(1:2,3) = (/503,504/)
+          endif
       elseif( MY_IDUP(1).ne.Glu_ .and. MY_IDUP(1).gt.0 .and. MY_IDUP(2).eq.Glu_ ) then! qg->qg
           ICOLUP(1:2,1) = (/501,000/)
           ICOLUP(1:2,2) = (/502,501/)

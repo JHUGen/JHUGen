@@ -974,8 +974,14 @@ logical :: canbeVBF, canbeVH, isVHlike
             ICOLUP(1:2,1) = (/501,502/)
             ICOLUP(1:2,2) = (/503,501/)
             if (IsAGluon(MY_IDUP(3))) then ! gg->gg
-               ICOLUP(1:2,3) = (/504,502/)
-               ICOLUP(1:2,4) = (/503,504/)
+               call random_number(xRnd)
+               if (xRnd.gt.0.5) then
+                  ICOLUP(1:2,3) = (/504,502/)
+                  ICOLUP(1:2,4) = (/503,504/)
+               else
+                  ICOLUP(1:2,4) = (/504,502/)
+                  ICOLUP(1:2,3) = (/503,504/)
+               endif
             elseif (MY_IDUP(3).gt.0) then  ! gg->qqb
                ICOLUP(1:2,3) = (/503,000/)
                ICOLUP(1:2,4) = (/000,502/)
@@ -993,7 +999,7 @@ logical :: canbeVBF, canbeVH, isVHlike
                ICOLUP(1:2,2) = (/503,000/)
                ICOLUP(1:2,1) = (/000,502/)
             endif
-         elseif( (IsAQuark(MY_IDUP(1)) .and. IsAGluon(MY_IDUP(2))) .or. (IsAQuark(MY_IDUP(2)) .and. IsAGluon(MY_IDUP(1))) ) then! qg->qg
+         elseif( (IsAQuark(MY_IDUP(1)) .and. IsAGluon(MY_IDUP(2))) .or. (IsAQuark(MY_IDUP(2)) .and. IsAGluon(MY_IDUP(1))) ) then! qg/gq->qg/gq or qbg/gqb->qbg/gqb
             ICOLUP(1:2,1) = (/501,000/)
             ICOLUP(1:2,2) = (/502,501/)
             ICOLUP(1:2,3) = (/503,000/)
@@ -1025,42 +1031,77 @@ logical :: canbeVBF, canbeVH, isVHlike
               endif
             endif
          ! qq->qq
-         elseif (MY_IDUP(1).eq.MY_IDUP(2)) then
+         elseif (abs(MY_IDUP(1)).eq.abs(MY_IDUP(2))) then
             ICOLUP(1:2,1) = (/501,000/)
             ICOLUP(1:2,2) = (/501,000/)
-            ICOLUP(1:2,3) = (/000,502/)
-            ICOLUP(1:2,4) = (/000,502/)
-            if (MY_IDUP(1).lt.0) then
-               do j=1,2
-                  call swap(ICOLUP(j,1),ICOLUP(j,3))
-                  call swap(ICOLUP(j,2),ICOLUP(j,4))
-               enddo
+            ICOLUP(1:2,3) = (/502,000/)
+            ICOLUP(1:2,4) = (/502,000/)
+            if (MY_IDUP(1).eq.MY_IDUP(3) .and. MY_IDUP(1).eq.MY_IDUP(4)) then
+               call random_number(xRnd)
+               if (xRnd.lt.1d0/3d0) then
+                  call swap(ICOLUP(1,2),ICOLUP(2,3))
+               else if (xRnd.lt.2d0/3d0) then
+                  call swap(ICOLUP(1,2),ICOLUP(2,4))
+               ! else leave colors alone
+               endif
+            else if (MY_IDUP(1).eq.MY_IDUP(3)) then
+               call random_number(xRnd)
+               if (xRnd.lt.0.5d0) then
+                  call swap(ICOLUP(1,2),ICOLUP(2,3))
+               ! else leave colors alone
+               endif
+            else if (MY_IDUP(1).eq.MY_IDUP(4)) then
+               call random_number(xRnd)
+               if (xRnd.lt.0.5d0) then
+                  call swap(ICOLUP(1,2),ICOLUP(2,4))
+               ! else leave colors alone
+               endif
             endif
-         elseif (MY_IDUP(1).eq.MY_IDUP(3)) then
+            if (MY_IDUP(1).lt.0) then
+               call swap(ICOLUP(1,1),ICOLUP(2,1))
+            endif
+            if (MY_IDUP(2).lt.0) then
+               call swap(ICOLUP(1,2),ICOLUP(2,2))
+            endif
+            if (MY_IDUP(3).lt.0) then
+               call swap(ICOLUP(1,3),ICOLUP(2,3))
+            endif
+            if (MY_IDUP(4).lt.0) then
+               call swap(ICOLUP(1,4),ICOLUP(2,4))
+            endif
+         elseif (abs(MY_IDUP(1)).eq.abs(MY_IDUP(3))) then
             ICOLUP(1:2,1) = (/501,000/)
             ICOLUP(1:2,2) = (/502,000/)
             ICOLUP(1:2,3) = (/501,000/)
             ICOLUP(1:2,4) = (/502,000/)
             if (MY_IDUP(1).lt.0) then
                call swap(ICOLUP(1,1),ICOLUP(2,1))
-               call swap(ICOLUP(1,3),ICOLUP(2,3))
             endif
             if (MY_IDUP(2).lt.0) then
                call swap(ICOLUP(1,2),ICOLUP(2,2))
+            endif
+            if (MY_IDUP(3).lt.0) then
+               call swap(ICOLUP(1,3),ICOLUP(2,3))
+            endif
+            if (MY_IDUP(4).lt.0) then
                call swap(ICOLUP(1,4),ICOLUP(2,4))
             endif
-         elseif (MY_IDUP(1).eq.MY_IDUP(4)) then
+         elseif (abs(MY_IDUP(1)).eq.abs(MY_IDUP(4))) then
             ICOLUP(1:2,1) = (/501,000/)
             ICOLUP(1:2,2) = (/502,000/)
             ICOLUP(1:2,3) = (/502,000/)
             ICOLUP(1:2,4) = (/501,000/)
             if (MY_IDUP(1).lt.0) then
                call swap(ICOLUP(1,1),ICOLUP(2,1))
-               call swap(ICOLUP(1,4),ICOLUP(2,4))
             endif
             if (MY_IDUP(2).lt.0) then
                call swap(ICOLUP(1,2),ICOLUP(2,2))
+            endif
+            if (MY_IDUP(3).lt.0) then
                call swap(ICOLUP(1,3),ICOLUP(2,3))
+            endif
+            if (MY_IDUP(4).lt.0) then
+               call swap(ICOLUP(1,4),ICOLUP(2,4))
             endif
          else
            print *, "Color for this Process 69 configuration cannot be resolved"
