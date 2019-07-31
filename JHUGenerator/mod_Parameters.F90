@@ -2800,9 +2800,14 @@ subroutine EvalAlphaS()
    INTEGER, PARAMETER :: NF3=3
    INTEGER, PARAMETER :: NF2=2
    INTEGER, PARAMETER :: NF1=1
+   INTEGER, PARAMETER :: NF0=0
 
       IF (Mu_Ren .LE. 0d0) THEN
          WRITE(6,*) 'ModParameters::EvalAlphaS: Mu_Ren .le. 0, Mu_Ren (GeV) = ',(Mu_Ren*GeV)
+         stop
+      ENDIF
+      IF (nQflavors_pdf .GT. NF6 .OR. nQflavors_pdf .LT. NF0) THEN
+         WRITE(6,*) 'ModParameters::EvalAlphaS: nQflavors_pdf has to be between 0 and 6. nQflavors_pdf = ',nQflavors_pdf
          stop
       ENDIF
       IF (nQflavors_pdf .NE. NF5) THEN
