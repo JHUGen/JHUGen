@@ -6321,7 +6321,7 @@ real(8) :: Jac,Jac1,Jac2,Jac3,Mom_ij_Dummy(1:4),s35,s45
 RETURN
 END SUBROUTINE
 
-SUBROUTINE EvalPhasespace_VBF_H4f(xchannel,xRnd,Energy,Mom,Jac,ids,swap34_56,id12_78)
+SUBROUTINE EvalPhasespace_VBF_H4f(xchannel,xRnd,Energy,Mom,Jac,ids,swap34_56,do78,id12_78)
 use ModParameters
 use ModPhasespace
 use ModMisc
@@ -6335,7 +6335,7 @@ real(8) :: BWmass_ps, BWwidth_ps
 real(8) :: s1min, s2min
 integer :: NumChannels, it_chan, ch_ctr
 integer :: id12, id78, id17, id28, id18, id27, id12_78
-logical :: swap34_56, isZH, isWH, isVBF
+logical :: swap34_56, do78, isZH, isWH, isVBF
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
 logical,parameter :: includeNewBWPSinEW = .true.
 
@@ -6343,6 +6343,7 @@ logical,parameter :: includeNewBWPSinEW = .true.
    isWH = .false.
    isVBF = .false.
    swap34_56 = .false.
+   do78 = .false.
    id12_78 = Not_a_particle_
    BWmass_ps=-1d0
    BWwidth_ps=-1d0
@@ -6462,6 +6463,7 @@ logical,parameter :: includeNewBWPSinEW = .true.
                cycle
             endif
 
+            do78 = .true.
             Jac2 = s_channel_propagator(M_Z**2,Ga_Z*5,mJJcut**2,(Energy-dsqrt(s56))**2,xRnd(2),s34) ! Associated mZ for Z->ff
             Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:))
             Jac6 = s_channel_decay(Mom_Dummy(:),0d0,0d0,xRnd(7:8),Mom(:,3),Mom(:,4))
@@ -6477,6 +6479,7 @@ logical,parameter :: includeNewBWPSinEW = .true.
                cycle
             endif
 
+            do78 = .true.
             Jac2 = s_channel_propagator(M_W**2,Ga_W*5,mJJcut**2,(Energy-dsqrt(s56))**2,xRnd(2),s34) ! Associated mW for W->ff
             Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:))
             Jac6 = s_channel_decay(Mom_Dummy(:),0d0,0d0,xRnd(7:8),Mom(:,3),Mom(:,4))
@@ -6492,6 +6495,7 @@ logical,parameter :: includeNewBWPSinEW = .true.
                cycle
             endif
 
+            do78 = .true.
             Jac2 = k_l(xRnd(2),mJJcut**2,(Energy-dsqrt(s56))**2,s34)
             Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:))
             Jac6 = s_channel_decay(Mom_Dummy(:),0d0,0d0,xRnd(7:8),Mom(:,3),Mom(:,4))
@@ -6524,6 +6528,7 @@ logical,parameter :: includeNewBWPSinEW = .true.
       Jac3 = s_channel_propagator(M_V_ps**2,Ga_V_ps,0d0,s56,xRnd(3),s78) ! m1
       Jac4 = s_channel_propagator(M_V_ps**2,Ga_V_ps,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910) ! m2
 
+      do78 = .true.
       Jac2 = k_l(xRnd(2),mJJcut**2,(Energy-dsqrt(s56))**2,s34)
       Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:))
       Jac6 = s_channel_decay(Mom_Dummy(:),0d0,0d0,xRnd(7:8),Mom(:,3),Mom(:,4))

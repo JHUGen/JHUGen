@@ -23,19 +23,19 @@ implicit none
 real(8) :: yRnd(1:17),VgsWgt, EvalWeighted_HJJ_fulldecay
 real(8) :: pdf(-6:6,1:2),me2(-5:5,-5:5)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
-real(8) :: MomExt(1:4,1:10),MomShifted(1:4,1:10),PSWgt,FinalStateWeight,m1ffwgt,m2ffwgt
+real(8) :: MomExt(1:4,1:10),MomShifted(1:4,1:10),PSWgt,FinalStateWeight,m1ffwgt,m2ffwgt,m3ffwgt
 real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5),msq_VgsWgt(-5:5,-5:5),Wgt_Ratio_Interf,originalprobability
 integer :: id_MCFM(mxpart),MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),NHisto,ipart,jpart
 integer, pointer :: ijSel(:,:)
 integer :: iPartChannel,PartChannelAvg,NumPartonicChannels,iflip,i,j,k
 real(8) :: PreFac,VegasWeighted_HJJ_fulldecay,xRnd,LeptonAndVegasWeighted_HJJ_fulldecay
-logical :: applyPSCut,swap34_56
+logical :: applyPSCut,swap34_56,do78
 integer :: id12_78
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
 include 'vegas_common.f'
 include 'maxwt.f'
 EvalWeighted_HJJ_fulldecay = 0d0
-m1ffwgt=1d0;m2ffwgt=1d0
+m1ffwgt=1d0;m2ffwgt=1d0;m3ffwgt=1d0
 
    if (Process.eq.69) then
       call getRef_MCFM_qqVVqqStrong_Hash(ijSel) ! ijSel is in JHU convention
@@ -123,7 +123,7 @@ m1ffwgt=1d0;m2ffwgt=1d0
    endif
 
    call PDFMapping(2,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi,EhatMin=dmax1(m4l_minmax(1),0d0)+mJJcut)
-   call EvalPhasespace_VBF_H4f(yRnd(3),yRnd(4:17),EHat,MomExt(1:4,1:10),PSWgt,id_MCFM(1:8),swap34_56,id12_78)
+   call EvalPhasespace_VBF_H4f(yRnd(3),yRnd(4:17),EHat,MomExt(1:4,1:10),PSWgt,id_MCFM(1:8),swap34_56,do78,id12_78)
    call boost2Lab(eta1,eta2,10,MomExt(1:4,1:10))
    !write(6,*) "After EvalPS, MomExt:",MomExt,", Pwwgt:",PSWgt
 
@@ -151,7 +151,7 @@ m1ffwgt=1d0;m2ffwgt=1d0
 !       EvalWeighted_HJJ_fulldecay=PSWgt *sHatJacobi  * ( MomExt(1:4,3).dot.MomExt(1:4,7) ) * ( MomExt(1:4,4).dot.MomExt(1:4,10) ) * ( MomExt(1:4,8).dot.MomExt(1:4,9) ) * ( MomExt(1:4,7).dot.MomExt(1:4,10) ) / EHat**8
 !       return
    !write(6,*) "SetRunningScales args:",(MomExt(1:4,5)+MomExt(1:4,6)),",",MomExt(1:4,3),",",MomExt(1:4,4),",",(/ id12_78,Not_a_particle_,Not_a_particle_,id12_78 /)
-   call SetRunningScales( (/MomExt(1:4,5)+MomExt(1:4,6),MomExt(1:4,3),MomExt(1:4,4) /) , (/ id12_78,Not_a_particle_,Not_a_particle_,id12_78 /) )
+   call SetRunningScales( (/MomExt(1:4,V1)+MomExt(1:4,V2),MomExt(1:4,outTop),MomExt(1:4,outBot) /) , (/ id12_78,Not_a_particle_,Not_a_particle_,id12_78 /) )
    !write(6,*) "setPDFs args:",eta1,eta2,alphas,alphas_mz
    call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
@@ -184,6 +184,14 @@ m1ffwgt=1d0;m2ffwgt=1d0
          call ShiftMass(MomExt(1:4,Lep2P),MomExt(1:4,Lep2M), GetMass(MY_IDUP(Lep2P)),GetMass(MY_IDUP(Lep2M)),MomShifted(1:4,Lep2P),MomShifted(1:4,Lep2M),MassWeight=m2ffwgt)
       endif
    endif
+   if (do78) then
+      call ShiftMass(MomExt(1:4,outTop),MomExt(1:4,outBot), GetMass(MY_IDUP(outTop)),GetMass(MY_IDUP(outBot)),MomShifted(1:4,outTop),MomShifted(1:4,outBot),MassWeight=m3ffwgt)
+   else
+      call ShiftMass(MomExt(1:4,outTop),MomExt(1:4,outBot), GetMass(MY_IDUP(outTop)),GetMass(MY_IDUP(outBot)),MomShifted(1:4,outTop),MomShifted(1:4,outBot),MassWeight=m3ffwgt)
+      if (m3ffwgt.gt.0d0) then ! This means no reweighting should be applied. The case with wgt=0 occurs when q78<=(m7+m8).
+         m3ffwgt = 1d0
+      endif
+   endif
 
 
    call EvalAmp_qqVVqq(id_MCFM, p_MCFM, msq_MCFM)
@@ -193,7 +201,7 @@ m1ffwgt=1d0;m2ffwgt=1d0
 
    originalprobability = msq_MCFM(iPart_sel,jPart_sel)
 
-   PreFac = fbGeV2 * FluxFac * PSWgt * sHatJacobi * m1ffwgt * m2ffwgt
+   PreFac = fbGeV2 * FluxFac * PSWgt * sHatJacobi * m1ffwgt * m2ffwgt * m3ffwgt
    msq_MCFM = msq_MCFM * PreFac / (GeV**8)  ! adjust msq_MCFM for GeV units of MCFM mat.el.
 !    do ipart=-5,5; do jpart=-5,5
 !       msq_MCFM(ipart,jpart)=msq_MCFM(ipart,jpart) * pdf(LHA2M_pdf(ipart),1)*pdf(LHA2M_pdf(jpart),2)
