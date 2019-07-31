@@ -13,7 +13,7 @@ MODULE ModJHUGen
 
 
 
-SUBROUTINE InitFirstTime(pdftable,pdfstrlength,pdfmember)
+SUBROUTINE InitFirstTime(pdftable,pdfstrlength,pdfmember,collider_sqrts)
    use ModParameters
    use ModKinematics
    use ModMisc
@@ -21,6 +21,7 @@ SUBROUTINE InitFirstTime(pdftable,pdfstrlength,pdfmember)
    integer :: pdfstrlength
    character(len=pdfstrlength) pdftable
    integer :: pdfmember
+   real(8), intent(in) :: collider_sqrts
 
    call SetJHUGenDefaults()
 
@@ -77,7 +78,7 @@ SUBROUTINE InitFirstTime(pdftable,pdfstrlength,pdfmember)
 
    call InitPDFs()
    IF( COLLIDER.EQ.1) THEN
-      Collider_Energy  = LHC_Energy
+      Collider_Energy  = collider_sqrts
    ELSE
       print *,"Collider not implemented."
       stop
