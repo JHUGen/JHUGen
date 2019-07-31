@@ -943,20 +943,19 @@ write(io_LHEOutFile,"(A)") "</event>"
 END SUBROUTINE
 
 
-SUBROUTINE WriteOutEvent_HJJ_fulldecay(Mom,MY_IDUP,ICOLUP,EventWeight)
+SUBROUTINE WriteOutEvent_HJJ_fulldecay(Mom,MY_IDUP,ICOLUP,do78,EventWeight)
 use ModParameters
 use ModMisc
 implicit none
-integer,parameter :: NUP=10
+integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10, NUP=10
 real(8) :: Mom(1:4,1:NUP),xRnd,s34,s36,s45,s56
 real(8),optional :: EventWeight
 integer :: MY_IDUP(1:NUP),ICOLUP(1:2,1:NUP),LHE_IDUP(1:NUP),ISTUP(1:NUP),MOTHUP(1:2,1:NUP)
 integer :: IDPRUP,i,smallestInv,j
 real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,Lifetime,Spin,MomDummy(1:4,1:NUP),TheMass,mjj
 character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
-integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
 integer, parameter :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6,5/)
-logical :: canbeVBF, canbeVH, isVHlike
+logical :: do78, canbeVBF, canbeVH, isVHlike
 ! For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
 ! The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
 
@@ -1277,7 +1276,7 @@ write(io_LHEOutFile,"(I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7)") NUP
 
 do i=1,NUP
      TheMass = get_Minv(MomDummy(:,i))
-     if( i.le.4  ) TheMass = 0.0d0  ! setting quark masses to zero
+     if( i.le.inbot .or. (.not. do78 .and. i.le.outBot)  ) TheMass = 0.0d0  ! setting quark masses to zero
      write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),TheMass,Lifetime,Spin
 enddo
 

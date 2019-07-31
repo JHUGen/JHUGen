@@ -286,7 +286,7 @@ m1ffwgt=1d0;m2ffwgt=1d0;m3ffwgt=1d0
 
           Wgt_Ratio_Interf = ReweightLeptonInterference_qqVVqq(id_MCFM, p_MCFM, originalprobability)
 
-          call WriteOutEvent_HJJ_fulldecay(MomShifted,MY_IDUP,ICOLUP,EventWeight=Wgt_Ratio_Interf)
+          call WriteOutEvent_HJJ_fulldecay(MomShifted,MY_IDUP,ICOLUP,do78,EventWeight=Wgt_Ratio_Interf)
 
           do NHisto=1,NumHistograms
             call intoHisto(NHisto,NBin(NHisto),1d0)
@@ -302,7 +302,7 @@ m1ffwgt=1d0;m2ffwgt=1d0;m3ffwgt=1d0
       if( VegasWeighted_HJJ_fulldecay.ne.0d0 ) then
         AccepCounter=AccepCounter+1
         if( writeWeightedLHE .and. (.not. warmup) ) then
-            call WriteOutEvent_HJJ_fulldecay(MomShifted,MY_IDUP,ICOLUP,EventWeight=VegasWeighted_HJJ_fulldecay)
+            call WriteOutEvent_HJJ_fulldecay(MomShifted,MY_IDUP,ICOLUP,do78,EventWeight=VegasWeighted_HJJ_fulldecay)
         endif
         do NHisto=1,NumHistograms
           call intoHisto(NHisto,NBin(NHisto),VegasWeighted_HJJ_fulldecay)
