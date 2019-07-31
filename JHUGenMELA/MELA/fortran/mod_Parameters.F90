@@ -2816,7 +2816,7 @@ subroutine EvalAlphaS()
          stop
       ENDIF
 
-      alphas=alphas_mz/(1.0_dp+alphas_mz*B0_PDF(NF5)*2.0_dp*dlog((Mu_Ren/zmass_pdf)))
+      alphas=alphas_mz/(1.0_dp+alphas_mz*B0_PDF(nQflavors_pdf)*2.0_dp*dlog((Mu_Ren/zmass_pdf)))
 #endif
       ! Calculate the derived couplings
       call ComputeQCDVariables()
