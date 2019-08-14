@@ -586,20 +586,20 @@ bool MELACandidate::checkDaughtership(MELAParticle const* myParticle)const{
   return hasDaughter(myParticle);
 }
 
-void MELACandidate::addAssociatedLeptons(MELAParticle* myParticle){
+void MELACandidate::addAssociatedLepton(MELAParticle* myParticle){
   addAssociatedParticleToArray(myParticle, associatedLeptons);
 }
-void MELACandidate::addAssociatedNeutrinos(MELAParticle* myParticle){
+void MELACandidate::addAssociatedNeutrino(MELAParticle* myParticle){
   addAssociatedParticleToArray(myParticle, associatedLeptons); // Neutrinos are leptons at the ZZ candidate level
   addAssociatedParticleToArray(myParticle, associatedNeutrinos);
 }
-void MELACandidate::addAssociatedPhotons(MELAParticle* myParticle){
+void MELACandidate::addAssociatedPhoton(MELAParticle* myParticle){
   addAssociatedParticleToArray(myParticle, associatedPhotons);
 }
-void MELACandidate::addAssociatedJets(MELAParticle* myParticle){
+void MELACandidate::addAssociatedJet(MELAParticle* myParticle){
   addAssociatedParticleToArray(myParticle, associatedJets);
 }
-void MELACandidate::addAssociatedTops(MELATopCandidate_t* myParticle){
+void MELACandidate::addAssociatedTop(MELATopCandidate_t* myParticle){
   addAssociatedParticleToArray(myParticle, associatedTops);
 }
 void MELACandidate::addAssociatedParticleToArray(MELAParticle* myParticle, std::vector<MELAParticle*>& particleArray){

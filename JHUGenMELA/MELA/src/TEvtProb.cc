@@ -296,7 +296,7 @@ void TEvtProb::AppendTopCandidate(SimpleParticleCollection_t* TopDaughters){
     TopDaughters,
     &particleList, &topCandList // push_back is done automatically
     );
-  if (cand) melaCand->addAssociatedTops(cand);
+  if (cand) melaCand->addAssociatedTop(cand);
 }
 void TEvtProb::SetRcdCandPtr(){ RcdME.melaCand = melaCand; }
 void TEvtProb::SetCurrentCandidateFromIndex(unsigned int icand){

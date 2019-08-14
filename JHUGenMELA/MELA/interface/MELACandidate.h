@@ -61,11 +61,11 @@ public:
   int getNAssociatedTops()const{ return associatedTops.size(); }
   int getNSortedVs()const{ return sortedVs.size(); }
 
-  void addAssociatedLeptons(MELAParticle* myParticle);
-  void addAssociatedNeutrinos(MELAParticle* myParticle);
-  void addAssociatedPhotons(MELAParticle* myParticle);
-  void addAssociatedJets(MELAParticle* myParticle);
-  void addAssociatedTops(MELATopCandidate_t* myParticle);
+  void addAssociatedLepton(MELAParticle* myParticle);
+  void addAssociatedNeutrino(MELAParticle* myParticle);
+  void addAssociatedPhoton(MELAParticle* myParticle);
+  void addAssociatedJet(MELAParticle* myParticle);
+  void addAssociatedTop(MELATopCandidate_t* myParticle);
 
   void addSortedV(MELAParticle* myParticle){ sortedVs.push_back(myParticle); }
   void addAssociatedVs();

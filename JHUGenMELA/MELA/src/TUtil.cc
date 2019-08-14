@@ -167,12 +167,11 @@ std::pair<TLorentzVector, TLorentzVector> TUtil::ComplexBoost(TVector3 const& be
   double bx=beta.X();
   double by=beta.Y();
   double bz=beta.Z();
-
-  double bp = bx*p4.X() + by*p4.Y() + bz*p4.Z();
   double b2 = bx*bx + by*by + bz*bz;
   double gammasqinv = 1.-b2;
-
   double gamma=0.;
+
+  double bp = bx*p4.X() + by*p4.Y() + bz*p4.Z();
   double gammap_real=0;
   double gammap_imag=0;
   TLorentzVector p4new_real(0, 0, 0, 0), p4new_imag(0, 0, 0, 0);
@@ -687,7 +686,7 @@ void TUtil::computeVBFAngles(
   TLorentzVector fermion1, fermion2, antifermion1, antifermion2;
   // Consider cases with gen. partons
   // By default, fermion1/2 are jet1/2 unless incoming partons are specifically anti-quarks!
-  if (injet1!=0 && injet1Id<0){
+  if (injet1 && injet1Id<0){
     fermion1=-P1;
     antifermion1 = jet1massless;
   }
@@ -695,7 +694,7 @@ void TUtil::computeVBFAngles(
     fermion1 = jet1massless;
     antifermion1=-P1;
   }
-  if (injet2!=0 && injet2Id<0){
+  if (injet2 && injet2Id<0){
     fermion2=-P2;
     antifermion2 = jet2massless;
   }
@@ -821,7 +820,7 @@ void TUtil::computeVBFAngles_ComplexBoost(
   TLorentzVector fermion1, fermion2, antifermion1, antifermion2;
   // Consider cases with gen. partons
   // By default, fermion1/2 are jet1/2 unless incoming partons are specifically anti-quarks!
-  if (injet1!=0 && injet1Id<0){
+  if (injet1 && injet1Id<0){
     fermion1=-P1;
     antifermion1 = jet1massless;
   }
@@ -829,7 +828,7 @@ void TUtil::computeVBFAngles_ComplexBoost(
     fermion1 = jet1massless;
     antifermion1=-P1;
   }
-  if (injet2!=0 && injet2Id<0){
+  if (injet2 && injet2Id<0){
     fermion2=-P2;
     antifermion2 = jet2massless;
   }
@@ -956,12 +955,8 @@ void TUtil::computeVHAngles(
 
       P1.Transform(ZZframe);
       P2.Transform(ZZframe);
-      jet1massless = -jet1massless;
-      jet2massless = -jet2massless;
-      jet1massless.Transform(ZZframe);
-      jet2massless.Transform(ZZframe);
-      jet1massless = -jet1massless;
-      jet2massless = -jet2massless;
+      jet1massless = -jet1massless; jet1massless.Transform(ZZframe); jet1massless = -jet1massless;
+      jet2massless = -jet2massless; jet2massless.Transform(ZZframe); jet2massless = -jet2massless;
     }
   }
   else{
@@ -974,7 +969,7 @@ void TUtil::computeVHAngles(
     P1.Transform(ZZframe);
     P2.Transform(ZZframe);
     jet1massless = -jet1massless; jet1massless.Transform(ZZframe); jet1massless = -jet1massless;
-    jet1massless = -jet1massless; jet2massless.Transform(ZZframe); jet2massless = -jet2massless;
+    jet2massless = -jet2massless; jet2massless.Transform(ZZframe); jet2massless = -jet2massless;
   }
 
   TUtil::computeAngles(
@@ -7876,13 +7871,13 @@ void TUtil::GetBoostedParticleVectors(
   if (verbosity>=TVar::DEBUG) MELAout << "Begin GetBoostedParticleVectors" << endl;
   // This is the beginning of one long function.
 
-  int code = mela_event.AssociationCode;
+  int const& code = mela_event.AssociationCode;
   if (verbosity>=TVar::DEBUG) MELAout << "TUtil::GetBoostedParticleVectors: code=" << code << endl;
-  int aVhypo = mela_event.AssociationVCompatibility;
+  int const& aVhypo = mela_event.AssociationVCompatibility;
   TLorentzVector const nullFourVector(0, 0, 0, 0);
 
   SimpleParticleCollection_t daughters;
-  vector<int> idVstar;
+  vector<int> idVstar; idVstar.reserve(2);
   if (melaCand->getNDaughters()==0){
     // Undecayed Higgs has V1=H, V2=empty, no sortedDaughters!
     daughters.push_back(SimpleParticle_t(melaCand->id, melaCand->p4));
@@ -7894,9 +7889,9 @@ void TUtil::GetBoostedParticleVectors(
     // H->GG has V1=G->G, V2=G->G
     // H->ZG has V1=Z->ffb, V2=G->G
     // Everything else is as expected.
-    for (int iv=0; iv<2; iv++){ // 2 Vs are guaranteed in MELACandidate.
+    for (unsigned char iv=0; iv<2; iv++){ // 2 Vs are guaranteed in MELACandidate.
       MELAParticle* Vdau = melaCand->getSortedV(iv);
-      if (Vdau!=0){
+      if (Vdau){
         int idtmp = Vdau->id;
         for (MELAParticle* Vdau_i:Vdau->getDaughters()){
           if (Vdau_i && Vdau_i->passSelection) daughters.push_back(SimpleParticle_t(Vdau_i->id, Vdau_i->p4));
@@ -7910,8 +7905,8 @@ void TUtil::GetBoostedParticleVectors(
     }
   }
   if (daughters.size()>=2){
-    unsigned int nffs = daughters.size()/2;
-    for (unsigned int iv=0; iv<nffs; iv++){
+    size_t nffs = daughters.size()/2;
+    for (size_t iv=0; iv<nffs; iv++){
       pair<TLorentzVector, TLorentzVector> corrPair = TUtil::removeMassFromPair(
         daughters.at(2*iv+0).second, daughters.at(2*iv+0).first,
         daughters.at(2*iv+1).second, daughters.at(2*iv+1).first
@@ -7921,11 +7916,12 @@ void TUtil::GetBoostedParticleVectors(
     }
     if (2*nffs<daughters.size()){
       TLorentzVector tmp = nullFourVector;
+      SimpleParticle_t& lastDau = daughters.back();
       pair<TLorentzVector, TLorentzVector> corrPair = TUtil::removeMassFromPair(
-        daughters.at(daughters.size()-1).second, daughters.at(daughters.size()-1).first,
+        lastDau.second, lastDau.first,
         tmp, -9000
         );
-      daughters.at(daughters.size()-1).second = corrPair.first;
+      lastDau.second = corrPair.first;
     }
   }
 
@@ -7945,13 +7941,13 @@ void TUtil::GetBoostedParticleVectors(
 
     vector<MELAParticle*> asortedVs = melaCand->getAssociatedSortedVs();
     for (MELAParticle* Vdau:asortedVs){ // Loop over associated Vs
-      if (Vdau!=0){
+      if (Vdau){
         bool doAdd=false;
         int idV = Vdau->id;
         if ((abs(idV)==aVhypo || idV==0) && Vdau->getNDaughters()>0 && Vdau->passSelection){ // If the V is unknown or compatible with the requested hypothesis
           doAdd=true;
           for (MELAParticle* Vdau_i:Vdau->getDaughters()){ // Loop over the daughters of V
-            if (Vdau_i==0){ doAdd=false; break; }
+            if (!Vdau_i){ doAdd=false; break; }
             else if (
               (mela_event.nRequested_AssociatedLeptons==0 && (PDGHelpers::isALepton(Vdau_i->id) || PDGHelpers::isANeutrino(Vdau_i->id)))
               ||
@@ -8028,7 +8024,7 @@ void TUtil::GetBoostedParticleVectors(
     if (code%TVar::kUseAssociated_Leptons==0){
       SimpleParticleCollection_t associated_tmp;
       for (MELAParticle* part:melaCand->getAssociatedLeptons()){
-        if (part!=0 && part->passSelection && nsatisfied_lnus<mela_event.nRequested_AssociatedLeptons){
+        if (part && part->passSelection && nsatisfied_lnus<mela_event.nRequested_AssociatedLeptons){
           nsatisfied_lnus++;
           associated_tmp.push_back(SimpleParticle_t(part->id, part->p4));
         }
@@ -8038,8 +8034,8 @@ void TUtil::GetBoostedParticleVectors(
 
       // Adjust the kinematics of associated non-V-originating particles
       if (associated_tmp.size()>=1){
-        unsigned int nffs = associated_tmp.size()/2;
-        for (unsigned int iv=0; iv<nffs; iv++){
+        size_t nffs = associated_tmp.size()/2;
+        for (size_t iv=0; iv<nffs; iv++){
           if (verbosity>=TVar::DEBUG) MELAout << "TUtil::GetBoostedParticleVectors: Removing mass from lepton pair " << 2*iv+0 << '\t' << 2*iv+1 << endl;
           pair<TLorentzVector, TLorentzVector> corrPair = TUtil::removeMassFromPair(
             associated_tmp.at(2*iv+0).second, associated_tmp.at(2*iv+0).first,
@@ -8051,11 +8047,12 @@ void TUtil::GetBoostedParticleVectors(
         if (2*nffs<associated_tmp.size()){
           if (verbosity>=TVar::DEBUG) MELAout << "TUtil::GetBoostedParticleVectors: Removing mass from last lepton  " << associated_tmp.size()-1 << endl;
           TLorentzVector tmp = nullFourVector;
+          SimpleParticle_t& lastAssociated = associated_tmp.at(associated_tmp.size()-1);
           pair<TLorentzVector, TLorentzVector> corrPair = TUtil::removeMassFromPair(
-            associated_tmp.at(associated_tmp.size()-1).second, associated_tmp.at(associated_tmp.size()-1).first,
+            lastAssociated.second, lastAssociated.first,
             tmp, -9000
             );
-          associated_tmp.at(associated_tmp.size()-1).second = corrPair.first;
+          lastAssociated.second = corrPair.first;
         }
       }
       for (SimpleParticle_t& sp:associated_tmp) associated.push_back(sp); // Fill associated at the last step
@@ -8064,7 +8061,7 @@ void TUtil::GetBoostedParticleVectors(
     if (code%TVar::kUseAssociated_Jets==0){
       SimpleParticleCollection_t associated_tmp;
       for (MELAParticle* part:melaCand->getAssociatedJets()){
-        if (part!=0 && part->passSelection && nsatisfied_jets<mela_event.nRequested_AssociatedJets){
+        if (part && part->passSelection && nsatisfied_jets<mela_event.nRequested_AssociatedJets){
           nsatisfied_jets++;
           associated_tmp.push_back(SimpleParticle_t(part->id, part->p4));
         }
@@ -8087,11 +8084,12 @@ void TUtil::GetBoostedParticleVectors(
         if (2*nffs<associated_tmp.size()){
           if (verbosity>=TVar::DEBUG) MELAout << "TUtil::GetBoostedParticleVectors: Removing mass from last jet  " << associated_tmp.size()-1 << endl;
           TLorentzVector tmp = nullFourVector;
+          SimpleParticle_t& lastAssociated = associated_tmp.at(associated_tmp.size()-1);
           pair<TLorentzVector, TLorentzVector> corrPair = TUtil::removeMassFromPair(
-            associated_tmp.at(associated_tmp.size()-1).second, associated_tmp.at(associated_tmp.size()-1).first,
+            lastAssociated.second, lastAssociated.first,
             tmp, -9000
             );
-          associated_tmp.at(associated_tmp.size()-1).second = corrPair.first;
+          lastAssociated.second = corrPair.first;
         }
       }
       for (SimpleParticle_t& sp:associated_tmp) associated.push_back(sp); // Fill associated at the last step
@@ -8101,7 +8099,7 @@ void TUtil::GetBoostedParticleVectors(
 
   if (code%TVar::kUseAssociated_Photons==0){
     for (MELAParticle* part:melaCand->getAssociatedPhotons()){
-      if (part!=0 && part->passSelection && nsatisfied_gammas<mela_event.nRequested_AssociatedPhotons){
+      if (part && part->passSelection && nsatisfied_gammas<mela_event.nRequested_AssociatedPhotons){
         nsatisfied_gammas++;
         associated.push_back(SimpleParticle_t(part->id, part->p4));
       }
@@ -8126,7 +8124,7 @@ void TUtil::GetBoostedParticleVectors(
   else if (code%TVar::kUseAssociated_StableTops==0 || code%TVar::kUseAssociated_UnstableTops==0){
 
     for (MELATopCandidate_t* theTop:melaCand->getAssociatedTops()){
-      if (theTop!=0 && theTop->passSelection){
+      if (theTop && theTop->passSelection){
         vector<MELATopCandidate_t*>* particleArray;
         if (theTop->id==6) particleArray = &tops;
         else if (theTop->id==-6) particleArray = &topbars;
@@ -8135,7 +8133,7 @@ void TUtil::GetBoostedParticleVectors(
           (code%TVar::kUseAssociated_StableTops==0)
           ||
           (theTop->getNDaughters()==3 && code%TVar::kUseAssociated_UnstableTops==0)
-          ) particleArray->push_back((MELATopCandidate_t*)theTop);
+          ) particleArray->push_back(theTop);
       }
     }
     if (verbosity>=TVar::DEBUG){ MELAout << "TUtil::GetBoostedParticleVectors: tops.size=" << tops.size() << ", topbars.size=" << topbars.size() << ", unknowntops.size=" << unknowntops.size() << endl; }
@@ -8153,9 +8151,9 @@ void TUtil::GetBoostedParticleVectors(
         MELAParticle* bottom = theTop->getPartnerParticle();
         MELAParticle* Wf = theTop->getWFermion();
         MELAParticle* Wfb = theTop->getWAntifermion();
-        if (bottom!=0) vdaughters.push_back(SimpleParticle_t(bottom->id, bottom->p4));
-        if (Wf!=0) vdaughters.push_back(SimpleParticle_t(Wf->id, Wf->p4));
-        if (Wfb!=0) vdaughters.push_back(SimpleParticle_t(Wfb->id, Wfb->p4));
+        if (bottom) vdaughters.push_back(SimpleParticle_t(bottom->id, bottom->p4));
+        if (Wf) vdaughters.push_back(SimpleParticle_t(Wf->id, Wf->p4));
+        if (Wfb) vdaughters.push_back(SimpleParticle_t(Wfb->id, Wfb->p4));
 
         TUtil::adjustTopDaughters(vdaughters); // Adjust top daughter kinematics
         if (vdaughters.size()==3) topDaughters.push_back(vdaughters);
@@ -8173,9 +8171,9 @@ void TUtil::GetBoostedParticleVectors(
         MELAParticle* bottom = theTop->getPartnerParticle();
         MELAParticle* Wf = theTop->getWFermion();
         MELAParticle* Wfb = theTop->getWAntifermion();
-        if (bottom!=0) vdaughters.push_back(SimpleParticle_t(bottom->id, bottom->p4));
-        if (Wf!=0) vdaughters.push_back(SimpleParticle_t(Wf->id, Wf->p4));
-        if (Wfb!=0) vdaughters.push_back(SimpleParticle_t(Wfb->id, Wfb->p4));
+        if (bottom) vdaughters.push_back(SimpleParticle_t(bottom->id, bottom->p4));
+        if (Wf) vdaughters.push_back(SimpleParticle_t(Wf->id, Wf->p4));
+        if (Wfb) vdaughters.push_back(SimpleParticle_t(Wfb->id, Wfb->p4));
 
         TUtil::adjustTopDaughters(vdaughters); // Adjust top daughter kinematics
         if (vdaughters.size()==3) antitopDaughters.push_back(vdaughters);
@@ -8202,9 +8200,9 @@ void TUtil::GetBoostedParticleVectors(
         MELAParticle* bottom = theTop->getPartnerParticle();
         MELAParticle* Wf = theTop->getWFermion();
         MELAParticle* Wfb = theTop->getWAntifermion();
-        if (bottom!=0) vdaughters.push_back(SimpleParticle_t(bottom->id, bottom->p4));
-        if (Wf!=0) vdaughters.push_back(SimpleParticle_t(Wf->id, Wf->p4));
-        if (Wfb!=0) vdaughters.push_back(SimpleParticle_t(Wfb->id, Wfb->p4));
+        if (bottom) vdaughters.push_back(SimpleParticle_t(bottom->id, bottom->p4));
+        if (Wf) vdaughters.push_back(SimpleParticle_t(Wf->id, Wf->p4));
+        if (Wfb) vdaughters.push_back(SimpleParticle_t(Wfb->id, Wfb->p4));
 
         TUtil::adjustTopDaughters(vdaughters); // Adjust top daughter kinematics
         if (vdaughters.size()==3) topDaughters.push_back(vdaughters);
@@ -8216,9 +8214,9 @@ void TUtil::GetBoostedParticleVectors(
         MELAParticle* bottom = theTop->getPartnerParticle();
         MELAParticle* Wf = theTop->getWFermion();
         MELAParticle* Wfb = theTop->getWAntifermion();
-        if (bottom!=0) vdaughters.push_back(SimpleParticle_t(bottom->id, bottom->p4));
-        if (Wf!=0) vdaughters.push_back(SimpleParticle_t(Wf->id, Wf->p4));
-        if (Wfb!=0) vdaughters.push_back(SimpleParticle_t(Wfb->id, Wfb->p4));
+        if (bottom) vdaughters.push_back(SimpleParticle_t(bottom->id, bottom->p4));
+        if (Wf) vdaughters.push_back(SimpleParticle_t(Wf->id, Wf->p4));
+        if (Wfb) vdaughters.push_back(SimpleParticle_t(Wfb->id, Wfb->p4));
 
         TUtil::adjustTopDaughters(vdaughters); // Adjust top daughter kinematics
         if (vdaughters.size()==3) antitopDaughters.push_back(vdaughters);
@@ -8338,12 +8336,12 @@ MELACandidate* TUtil::ConvertVectorFormat(
   std::vector<MELAParticle*>* particleList,
   std::vector<MELACandidate*>* candList
   ){
-  MELACandidate* cand=0;
+  MELACandidate* cand=nullptr;
 
-  if (pDaughters==0){ MELAerr << "TUtil::ConvertVectorFormat: No daughters!" << endl; return cand; }
+  if (!pDaughters){ MELAerr << "TUtil::ConvertVectorFormat: No daughters!" << endl; return cand; }
   else if (pDaughters->size()==0){ MELAerr << "TUtil::ConvertVectorFormat: Daughter size==0!" << endl; return cand; }
   else if (pDaughters->size()>4){ MELAerr << "TUtil::ConvertVectorFormat: Daughter size " << pDaughters->size() << ">4 is not supported!" << endl; return cand; }
-  if (pMothers!=0 && pMothers->size()!=2){ MELAerr << "TUtil::ConvertVectorFormat: Mothers momentum size (" << pMothers->size() << ") has to have had been 2! Continuing by omitting mothers." << endl; /*return cand;*/ }
+  if (pMothers && pMothers->size()!=2){ MELAerr << "TUtil::ConvertVectorFormat: Mothers momentum size (" << pMothers->size() << ") has to have had been 2! Continuing by omitting mothers." << endl; /*return cand;*/ }
 
   // Create mother, daughter and associated particle MELAParticle objects
   std::vector<MELAParticle*> daughters;
@@ -8352,22 +8350,22 @@ MELACandidate* TUtil::ConvertVectorFormat(
   for (auto& spart:(*pDaughters)){
     MELAParticle* onePart = new MELAParticle(spart.first, spart.second);
     onePart->setGenStatus(1); // Final state status
-    if (particleList!=0) particleList->push_back(onePart);
+    if (particleList) particleList->push_back(onePart);
     daughters.push_back(onePart);
   }
-  if (pAssociated!=0){
+  if (pAssociated){
     for (auto& spart:(*pAssociated)){
       MELAParticle* onePart = new MELAParticle(spart.first, spart.second);
       onePart->setGenStatus(1); // Final state status
-      if (particleList!=0) particleList->push_back(onePart);
+      if (particleList) particleList->push_back(onePart);
       aparticles.push_back(onePart);
     }
   }
-  if (pMothers!=0 && pMothers->size()==2){
+  if (pMothers && pMothers->size()==2){
     for (auto& spart:(*pMothers)){
       MELAParticle* onePart = new MELAParticle(spart.first, spart.second);
       onePart->setGenStatus(-1); // Mother status
-      if (particleList!=0) particleList->push_back(onePart);
+      if (particleList) particleList->push_back(onePart);
       mothers.push_back(onePart);
     }
   }
@@ -8430,9 +8428,9 @@ MELACandidate* TUtil::ConvertVectorFormat(
   else/* if (daughters.size()==4)*/{
     TLorentzVector pH(0, 0, 0, 0);
     double charge = 0.;
-    for (int ip=0; ip<4; ip++){ pH = pH + (daughters.at(ip))->p4; charge += (daughters.at(ip))->charge(); }
+    for (unsigned char ip=0; ip<4; ip++){ pH = pH + (daughters.at(ip))->p4; charge += (daughters.at(ip))->charge(); }
     cand = new MELACandidate(25, pH);
-    for (int ip=0; ip<4; ip++) cand->addDaughter(daughters.at(ip));
+    for (unsigned char ip=0; ip<4; ip++) cand->addDaughter(daughters.at(ip));
     // FIXME/REIMPLEMENT: ZW trickier than I thought: Summing over charges over all 4f is not enough, affects SSSF pairing in ZZ
     //TVar::CandidateDecayMode defaultHDecayMode = PDGHelpers::HDecayMode;
     //if (fabs(charge)>0.01) PDGHelpers::setCandidateDecayMode(TVar::CandidateDecay_ZW);
@@ -8450,23 +8448,23 @@ MELACandidate* TUtil::ConvertVectorFormat(
   }
 
   /***** Adaptation of LHEAnalyzer::Event::addVVCandidateMother *****/
-  if (mothers.size()>0){ // ==2
+  if (!mothers.empty()){ // ==2
     for (auto& part:mothers) cand->addMother(part);
     if (isGen) cand->setGenStatus(-1); // Candidate is a gen. particle!
   }
   /***** Adaptation of LHEAnalyzer::Event::addVVCandidateAppendages *****/
-  if (aparticles.size()>0){
+  if (!aparticles.empty()){
     for (auto& part:aparticles){
       const int& partId = part->id;
-      if (PDGHelpers::isALepton(partId)) cand->addAssociatedLeptons(part);
-      else if (PDGHelpers::isANeutrino(partId)) cand->addAssociatedNeutrinos(part); // Be careful: Neutrinos are neutrinos, but also "leptons" in MELACandidate!
-      else if (PDGHelpers::isAPhoton(partId)) cand->addAssociatedPhotons(part);
-      else if (PDGHelpers::isAJet(partId)) cand->addAssociatedJets(part);
+      if (PDGHelpers::isALepton(partId)) cand->addAssociatedLepton(part);
+      else if (PDGHelpers::isANeutrino(partId)) cand->addAssociatedNeutrino(part); // Be careful: Neutrinos are neutrinos, but also "leptons" in MELACandidate!
+      else if (PDGHelpers::isAPhoton(partId)) cand->addAssociatedPhoton(part);
+      else if (PDGHelpers::isAJet(partId)) cand->addAssociatedJet(part);
     }
     cand->addAssociatedVs(); // For the VH topology
   }
 
-  if (candList!=0 && cand!=0) candList->push_back(cand);
+  if (candList && cand) candList->push_back(cand);
   return cand;
 }
 
@@ -8517,7 +8515,7 @@ void TUtil::PrintCandidateSummary(MELACandidate* cand){
 void TUtil::PrintCandidateSummary(simple_event_record* cand){
   MELAout << "***** TUtil::PrintCandidateSummary (Simple Event Record) *****" << endl;
   MELAout << "Candidate: " << cand << endl;
-  if (cand!=0){
+  if (cand){
     MELAout << "\tAssociationCode: " << cand->AssociationCode << endl;
     MELAout << "\tAssociationVCompatibility: " << cand->AssociationVCompatibility << endl;
     MELAout << "\tnRequested_AssociatedJets: " << cand->nRequested_AssociatedJets << endl;

@@ -1516,7 +1516,7 @@ void Mela::computeProdP(
         MELAParticle* firstJet = candCopy->getAssociatedJet(firstJetIndex);
         firstJet->p4.SetXYZT(jet1massless.X(), jet1massless.Y(), jet1massless.Z(), jet1massless.T()); // Re-assign momenta of the first jet. Be careful, it changes candOriginal as well!
         MELAParticle fakeJet(0, jet2massless); // jet2massless is the unknown jet
-        candCopy->addAssociatedJets(&fakeJet);
+        candCopy->addAssociatedJet(&fakeJet);
         setCurrentCandidate(candCopy);
 
         if (myModel_ == TVar::SelfDefine_spin0) setSpinZeroCouplings();
