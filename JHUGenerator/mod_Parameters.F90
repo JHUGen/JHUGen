@@ -3,7 +3,7 @@ implicit none
 save
 !
 !
-character(len=*),parameter :: JHUGen_Version="v7.3.2"
+character(len=*),parameter :: JHUGen_Version="v7.3.3"
 !
 !
 !=====================================================
@@ -197,6 +197,7 @@ real(8), public            :: M_Reso2 = -1d0      *GeV      ! second resonance m
 real(8), public            :: Ga_Reso2= 0d0       *GeV      ! second resonance width
 
 real(8), public            :: HiggsDecayLengthMM = 0d0      ! Higgs decay length in [mm]
+real(8), public            :: VprimeDecayLengthMM = 0d0     ! Vprime decay length in [mm]
 
 real(8), public            :: m_bot = 4.75d0       *GeV     ! bottom quark mass
 real(8), public            :: m_charm = 1.275d0    *GeV     ! charm quark mass

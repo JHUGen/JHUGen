@@ -557,6 +557,7 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "GaReso2", success, Ga_Reso2, success2=SetGaReso2, multiply=GeV, tosave=tosave)
 
     call ReadCommandLineArgument(arg, "ctauReso", success, HiggsDecayLengthMM, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ctauVprime", success, VprimeDecayLengthMM, tosave=tosave)
     call ReadCommandLineArgument(arg, "VegasNc0", success, VegasNc0)
     call ReadCommandLineArgument(arg, "VegasNc1", success, VegasNc1)
     call ReadCommandLineArgument(arg, "VegasNc2", success, VegasNc2)
@@ -1820,7 +1821,7 @@ type(SaveValues) :: tosave, oldsavevalues
    endif
 
     ! Contact terms
-    if (Process.le.2 .or. Process.eq.50) then
+    if (Process.le.2 .or. Process.eq.50 .or. Process.eq.60) then
         if (IsAZDecay(DecayMode1) .or. (Process.eq.50 .and. IsAPhoton(DecayMode1))) then
             if ((SetHZprime .and. .not.SetZprimeff) .or. (.not.SetHZprime .and. SetZprimeff)) then
                 call Error("To use Z' contact terms, you have to set both HVZ' and Z'ff couplings")
@@ -1830,6 +1831,9 @@ type(SaveValues) :: tosave, oldsavevalues
             endif
             if (SetMWprime .or. SetGaWprime) then
                 call Error("Don't set the W' mass and width in ZZ decay")
+            endif
+            if (VprimeDecayLengthMM.gt.0d0 .and. Ga_Zprime.le.0d0) then
+                call Error("Z' width has to have a positive value for nonzero lifetime.")
             endif
         elseif (IsAWDecay(DecayMode1)) then
             if ((SetHZprime .and. .not.SetWprimeff) .or. (.not.SetHZprime .and. SetWprimeff)) then
@@ -1841,40 +1845,19 @@ type(SaveValues) :: tosave, oldsavevalues
             if (SetMZprime .or. SetGaZprime) then
                 call Error("Don't set the Z' mass and width in WW decay")
             endif
+            if (VprimeDecayLengthMM.gt.0d0 .and. Ga_Wprime.le.0d0) then
+                call Error("W' width has to have a positive value for nonzero lifetime.")
+            endif
         endif
     endif
 
-    if( (Process.eq.50 .or. Process.eq.60) .and. SetZprimegammacoupling ) then
+    if( Process.eq.50 .and. SetZprimegammacoupling ) then
         call Error("Z'gamma couplings are not implemented for VBF or VH")
         !If you implement them and remove this error, also edit the Vprimekwargs function
-        !in MELA/test/testME_more.py to not remove the Z'gamma couplings for process = 50 or 60
+        !in MELA/test/testME_more.py to not remove the Z'gamma couplings for process = 50
     endif
 
-    ! Contact terms
-    if (Process.le.2 .or. Process.eq.50) then
-        if (IsAZDecay(DecayMode1) .or. (Process.eq.50 .and. IsAPhoton(DecayMode1))) then
-            if ((SetHZprime .and. .not.SetZprimeff) .or. (.not.SetHZprime .and. SetZprimeff)) then
-                call Error("To use Z' contact terms, you have to set both HVZ' and Z'ff couplings")
-            endif
-            if ((SetMZprime.or.SetGaZprime) .and. .not.SetHZprime) then
-                call Error("Setting the mass and width of Z' doesn't do anything if you don't set HVZ' couplings")
-            endif
-            if (SetMWprime .or. SetGaWprime) then
-                call Error("Don't set the W' mass and width in ZZ decay")
-            endif
-        elseif (IsAWDecay(DecayMode1)) then
-            if ((SetHZprime .and. .not.SetWprimeff) .or. (.not.SetHZprime .and. SetWprimeff)) then
-                call Error("To use W' contact terms, you have to set both HZZ'/HZ'Z' (which are used for HWW'/HW'W') and W'ff couplings")
-            endif
-            if ((SetMWprime.or.SetGaWprime) .and. .not.SetHZprime) then
-                call Error("Setting the mass and width of W' doesn't do anything if you don't set HZZ'/HZ'Z' couplings (which are used for HWW'/HW'W')")
-            endif
-            if (SetMZprime .or. SetGaZprime) then
-                call Error("Don't set the Z' mass and width in WW decay")
-            endif
-        endif
-    endif
-    if (Process.eq.60 .or. (Process.ge.66 .and. Process.le.68) .or. (Process.ge.70 .and. Process.le.72)) then
+    if ((Process.ge.66 .and. Process.le.68) .or. (Process.ge.70 .and. Process.le.72)) then
         if ((SetHZprime .and. .not.SetZprimeff) .or. (.not.SetHZprime .and. SetZprimeff)) then
             call Error("To use Z' contact terms, you have to set both HVZ' and Z'ff couplings")
         endif
@@ -5915,7 +5898,8 @@ character :: arg*(1000)
     if( Process.eq.114) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
     if( ReadLHEFile )    write(TheUnit,"(4X,A)") "           (This is ReadLHEFile mode. Resonance mass/width are read from LHE input parameters.)"
     if( ConvertLHEFile ) write(TheUnit,"(4X,A)") "           (This is ConvertLHEFile mode. Resonance mass/width are read from LHE input parameters.)"
-    if( HiggsDecayLengthMM.ne.0d0 ) write(TheUnit,"(4X,A,F10.5,A)") "           ctau=", HiggsDecayLengthMM, " mm"
+    if( HiggsDecayLengthMM.ne.0d0 ) write(TheUnit,"(4X,A,F10.5,A)") "           Resonance ctau=", HiggsDecayLengthMM, " mm"
+    if( VprimeDecayLengthMM.ne.0d0 ) write(TheUnit,"(4X,A,F10.5,A)") "           Vprime ctau=", VprimeDecayLengthMM, " mm"
     if( &
          (.not.ReadLHEFile .and. (Process.le.2 .or. Process.eq.50 .or. Process.eq.60 .or. (Process.ge.66 .and. Process.le.75) .or. ((TopDecays.eq.1).and.Process.eq.80) .or. (Process.ge.110 .and. Process.le.113))) &
     .or. (ReadLHEFile .and. TauDecays.ne.0) &

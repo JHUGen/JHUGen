@@ -1038,21 +1038,25 @@ logical :: do78, canbeVBF, canbeVH, isVHlike
             if (MY_IDUP(1).eq.MY_IDUP(3) .and. MY_IDUP(1).eq.MY_IDUP(4)) then
                call random_number(xRnd)
                if (xRnd.lt.1d0/3d0) then
-                  call swap(ICOLUP(1,2),ICOLUP(2,3))
+                  call swap(ICOLUP(1,2),ICOLUP(1,3))
+                  call swap(ICOLUP(2,2),ICOLUP(2,3))
                else if (xRnd.lt.2d0/3d0) then
-                  call swap(ICOLUP(1,2),ICOLUP(2,4))
+                  call swap(ICOLUP(1,2),ICOLUP(1,4))
+                  call swap(ICOLUP(2,2),ICOLUP(2,4))
                ! else leave colors alone
                endif
             else if (MY_IDUP(1).eq.MY_IDUP(3)) then
                call random_number(xRnd)
                if (xRnd.lt.0.5d0) then
-                  call swap(ICOLUP(1,2),ICOLUP(2,3))
+                  call swap(ICOLUP(1,2),ICOLUP(1,3))
+                  call swap(ICOLUP(2,2),ICOLUP(2,3))
                ! else leave colors alone
                endif
             else if (MY_IDUP(1).eq.MY_IDUP(4)) then
                call random_number(xRnd)
                if (xRnd.lt.0.5d0) then
-                  call swap(ICOLUP(1,2),ICOLUP(2,4))
+                  call swap(ICOLUP(1,2),ICOLUP(1,4))
+                  call swap(ICOLUP(2,2),ICOLUP(2,4))
                ! else leave colors alone
                endif
             endif
@@ -4950,6 +4954,30 @@ integer :: loop
 RETURN
 END SUBROUTINE
 
+SUBROUTINE getVprimeDecayLength(ctau)
+use ModParameters
+implicit none
+real(8) :: x,xp,xpp,Len0,propa,ctau,ctau0
+integer :: loop
+
+     ctau  = 0d0
+     ctau0 = VprimeDecayLengthMM
+     if( ctau0.lt.1d-16 ) RETURN
+
+     do loop=1,4000000!  4Mio. tries otherwise return zero
+          call random_number(x)
+          xp = 10*x*ctau0             ! scan between 0..10*ctau0
+
+          propa = dexp( -xp/(ctau0) ) ! the max of propa is 1.0
+          call random_number(xpp)
+          if( xpp.lt.propa ) then!   accept
+                ctau = xp
+                RETURN
+          endif
+     enddo
+
+RETURN
+END SUBROUTINE
 
 
 
