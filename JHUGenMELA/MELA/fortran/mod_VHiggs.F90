@@ -549,19 +549,33 @@ end subroutine EvalAmp_VHiggs
          ghz2_dyn = HVVSpinZeroDynamicCoupling(6,0d0,q3_q3,q5_q5)
          ghz3_dyn = HVVSpinZeroDynamicCoupling(7,0d0,q3_q3,q5_q5)
          ghz4_dyn = HVVSpinZeroDynamicCoupling(8,0d0,q3_q3,q5_q5)
+
+         if (includeVprime) then
+            ghzzp1_dyn = HVVSpinZeroDynamicCoupling(20,0d0,q3_q3,q5_q5)
+            ghzzp2_dyn = HVVSpinZeroDynamicCoupling(21,0d0,q3_q3,q5_q5)
+            ghzzp3_dyn = HVVSpinZeroDynamicCoupling(22,0d0,q3_q3,q5_q5)
+            ghzzp4_dyn = HVVSpinZeroDynamicCoupling(23,0d0,q3_q3,q5_q5)
+         endif
       else !if(useA(2)) then
          ghz1_dyn = HVVSpinZeroDynamicCoupling(5,0d0,q4_q4,q5_q5)
          ghz2_dyn = HVVSpinZeroDynamicCoupling(6,0d0,q4_q4,q5_q5)
          ghz3_dyn = HVVSpinZeroDynamicCoupling(7,0d0,q4_q4,q5_q5)
          ghz4_dyn = HVVSpinZeroDynamicCoupling(8,0d0,q4_q4,q5_q5)
+
+         if (includeVprime) then
+            ghzpz1_dyn = HVVSpinZeroDynamicCoupling(20,0d0,q4_q4,q5_q5)
+            ghzpz2_dyn = HVVSpinZeroDynamicCoupling(21,0d0,q4_q4,q5_q5)
+            ghzpz3_dyn = HVVSpinZeroDynamicCoupling(22,0d0,q4_q4,q5_q5)
+            ghzpz4_dyn = HVVSpinZeroDynamicCoupling(23,0d0,q4_q4,q5_q5)
+         endif
       endif
 
       gVVS1 = ghz1_dyn*(mass(3,1)**2) + qq * ( 2d0*ghz2_dyn + ghz3_dyn*qq/Lambda**2 )
       gVVS2 = -( 2d0*ghz2_dyn + ghz3_dyn*qq/Lambda**2 )
       gVVP = -2d0*ghz4_dyn
 
-      if(.not.useA(1) .and. .not.useA(2)) then
-         if (includeVprime) then
+      if (includeVprime) then
+         if(.not.useA(1) .and. .not.useA(2)) then
             gVVpS1 = ghzzp1_dyn*(mass(3,1)**2) + qq * ( 2d0*ghzzp2_dyn + ghzzp3_dyn*qq/Lambda**2 )
             gVVpS2 = -( 2d0*ghzzp2_dyn + ghzzp3_dyn*qq/Lambda**2 )
             gVVpP = -2d0*ghzzp4_dyn
@@ -573,6 +587,14 @@ end subroutine EvalAmp_VHiggs
             gVpVpS1 = ghzpzp1_dyn*(mass(3,1)**2) + qq * ( 2d0*ghzpzp2_dyn + ghzpzp3_dyn*qq/Lambda**2 )
             gVpVpS2 = -( 2d0*ghzpzp2_dyn + ghzpzp3_dyn*qq/Lambda**2 )
             gVpVpP = -2d0*ghzpzp4_dyn
+         else if (useA(1)) then
+            gVVpS1 = ghzzp1_dyn*(mass(3,1)**2) + qq * ( 2d0*ghzzp2_dyn + ghzzp3_dyn*qq/Lambda**2 )
+            gVVpS2 = -( 2d0*ghzzp2_dyn + ghzzp3_dyn*qq/Lambda**2 )
+            gVVpP = -2d0*ghzzp4_dyn
+         else! if (useA(2)) then
+            gVpVS1 = ghzpz1_dyn*(mass(3,1)**2) + qq * ( 2d0*ghzpz2_dyn + ghzpz3_dyn*qq/Lambda**2 )
+            gVpVS2 = -( 2d0*ghzpz2_dyn + ghzpz3_dyn*qq/Lambda**2 )
+            gVpVP = -2d0*ghzpz4_dyn
          endif
       endif
 

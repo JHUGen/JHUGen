@@ -137,7 +137,7 @@ class TestMela(unittest.TestCase):
 
   def Vprimekwargs(self, process, usevpvp):
       def couplings():
-          if process in (0, 50):
+          if process in (0, 50, 60):
               for i in range(1, 5):
                   for j in range(8):
                       if j in (3, 6) and not usevpvp: continue #for ZZ', q1^2-q2^2 is defined differently

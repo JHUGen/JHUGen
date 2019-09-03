@@ -41,7 +41,7 @@ integer :: a,b,c,NumFSPartons
 integer :: MY_IDUP(:),ICOLUP(:,:)
 integer :: LHE_IDUP(1:7+maxpart),i,ISTUP(1:7+maxpart),MOTHUP(1:2,1:7+maxpart)
 integer :: NUP,IDPRUP
-real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,mZ1,mZ2,HiggsDKLength
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,mZ1,mZ2,HiggsDKLength,VprimeDKLength(1:2)
 character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
 
 
@@ -55,11 +55,20 @@ do i=1,9
     LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
 enddo
 
-! NUP changes for gamma gamma final state
+SCALUP=Mu_Fact/GeV
+AQEDUP=alpha_QED
+AQCDUP=alphas
+
+ISTUP(1:2) = -1 ! Mother status
+ISTUP(3:5) = 2 ! Intermediate particle status
+ISTUP(6:9) = 1 ! Final hard process particle status
 if ( LHE_IDUP(4).eq.22 .and. LHE_IDUP(5).eq.22 ) then! photon+photon FS
     NUP=5
+    ISTUP(4:5) = 1
 elseif ( LHE_IDUP(4).ne.22 .and. LHE_IDUP(5).eq.22 ) then! Z+photon FS
     NUP=7
+    ISTUP(4) = 2
+    ISTUP(5:7) = 1
 else! ZZ or WW FS
     NUP=9
 endif
@@ -71,21 +80,6 @@ if( present(EventWeight) ) then
     XWGTUP=EventWeight
 else
     XWGTUP=1.0d0
-endif
-
-SCALUP=Mu_Fact/GeV
-AQEDUP=alpha_QED
-AQCDUP=alphas
-
-ISTUP(1:2) = -1 ! Mother status
-ISTUP(3:5) = 2 ! Intermediate particle status
-ISTUP(6:9) = 1 ! Final hard process particle status
-
-if ( LHE_IDUP(4).eq.22 .and. LHE_IDUP(5).eq.22 ) then! photon+photon FS
-    ISTUP(4:5) = 1
-elseif ( LHE_IDUP(4).ne.22 .and. LHE_IDUP(5).eq.22 ) then! Z+photon FS
-    ISTUP(4) = 2
-    ISTUP(5:7) = 1
 endif
 
 
@@ -132,6 +126,7 @@ endif
 LHE_IDUP(3) = 25
 if( Process.eq.1 ) LHE_IDUP(3) = 32
 if( Process.eq.2 ) LHE_IDUP(3) = 39
+VprimeDKLength(:) = 0d0
 Lifetime = 0.0d0
 Spin = 0.1d0
 call getHiggsDecayLength(HiggsDKLength)
@@ -274,11 +269,17 @@ write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(
 
 ! V1
 i=4
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),Z1FV(2:4),Z1FV(1),V1Mass,Lifetime,Spin
+if (includeVprime .and. Ga_Vprime .gt. 0d0 .and. M_Vprime .ge. 0d0 .and. abs(V1Mass*GeV-M_Vprime).lt.10d0*Ga_Vprime .and. LHE_IDUP(6) .ne. Not_a_particle_ .and. LHE_IDUP(7) .ne. Not_a_particle_) then
+  call getVprimeDecayLength(VprimeDKLength(1))
+endif
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),Z1FV(2:4),Z1FV(1),V1Mass,VprimeDKLength(1),Spin
 
 ! V2
 i=5
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),Z2FV(2:4),Z2FV(1),V2Mass,Lifetime,Spin
+if (includeVprime .and. Ga_Vprime .gt. 0d0 .and. M_Vprime .ge. 0d0 .and. abs(V2Mass*GeV-M_Vprime).lt.10d0*Ga_Vprime .and. LHE_IDUP(8) .ne. Not_a_particle_ .and. LHE_IDUP(9) .ne. Not_a_particle_) then
+   call getVprimeDecayLength(VprimeDKLength(2))
+endif
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),Z2FV(2:4),Z2FV(1),V2Mass,VprimeDKLength(2),Spin
 
 ! decay product 1 (V1): l-, nu or q
 i=7
@@ -345,12 +346,12 @@ real(8),optional :: EventScaleAqedAqcd(1:3)
 character(len=*),optional :: BeginEventLine
 character(len=*),optional :: InputFmt0
 ! integer,optional :: MOTHUP_Parton(:,:)
-real(8) :: Spin, Lifetime, s34,s56,s36,s45,smallestInv
+real(8) :: Spin, s34,s56,s36,s45,smallestInv
 integer :: IDUP(:),ISTUP(:),MOTHUP(:,:),ICOLUP(:,:)
 integer :: HiggsDK_IDUP(:),HiggsDK_ICOLUP(:,:),HiggsDK_ISTUP(4:9),HiggsDK_MOTHUP(1:2,4:9)
 integer :: i,iHiggs
 integer :: NUP,NUP_NEW,IDPRUP
-real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,HiggsDKLength
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,Lifetime(3:9)
 character(len=*),parameter :: DefaultFmt0 = "I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7"
 character(len=*),parameter :: Fmt1 = "6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0"
 integer :: indent
@@ -430,11 +431,11 @@ logical :: IsEmpty
         HiggsDK_MOTHUP(1:2,9) = (/2,2/) + NUP
     endif
 
-    Lifetime = 0.0d0
+    Lifetime(:) = 0d0
     Spin = 0.1d0
-    call getHiggsDecayLength(HiggsDKLength)
+    call getHiggsDecayLength(Lifetime(3))
 
-    !  associte lepton pairs to MOTHUP
+    !  associate lepton pairs to MOTHUP
     if( (IsAZDecay(DecayMode1)).and.(IsAZDecay(DecayMode2)) .and. abs(HiggsDK_IDUP(7)).eq.abs(HiggsDK_IDUP(9)) ) then
         s34 = Get_MInv( HiggsDK_Mom(1:4,3)+HiggsDK_Mom(1:4,4) )
         s56 = Get_MInv( HiggsDK_Mom(1:4,5)+HiggsDK_Mom(1:4,6) )
@@ -450,6 +451,14 @@ logical :: IsEmpty
             HiggsDK_Mom(1:4,2) = HiggsDK_Mom(1:4,4)+ HiggsDK_Mom(1:4,5)
         endif
     endif
+
+    if (includeVprime .and. Ga_Vprime .gt. 0d0 .and. M_Vprime .ge. 0d0 .and. abs(Get_MInv(HiggsDK_Mom(1:4,1)) - M_Vprime).lt.10d0*Ga_Vprime .and. .not.IsAPhoton(DecayMode1)) then
+      call getVprimeDecayLength(Lifetime(4))
+    endif
+    if (includeVprime .and. Ga_Vprime .gt. 0d0 .and. M_Vprime .ge. 0d0 .and. abs(Get_MInv(HiggsDK_Mom(1:4,2)) - M_Vprime).lt.10d0*Ga_Vprime .and. .not.IsAPhoton(DecayMode2)) then
+      call getVprimeDecayLength(Lifetime(5))
+    endif
+
 
     if (present(BeginEventLine)) then
         write(io_LHEOutFile, "(A)") trim(BeginEventLine)
@@ -490,10 +499,10 @@ logical :: IsEmpty
         do i = 1, NUP
             if( i.eq.iHiggs ) then
                write(io_LHEOutFile,IndentedFmt1) IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),  &
-                                                 Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,HiggsDKLength, Spin
+                                                 Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,Lifetime(3), Spin
             else
                write(io_LHEOutFile,IndentedFmt1) IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),  &
-                                                 Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,Lifetime, Spin
+                                                 Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,0d0, Spin
             endif
         enddo
 
@@ -503,7 +512,7 @@ logical :: IsEmpty
         !call swap_mom(HiggsDK_Mom(1:4,5),HiggsDK_Mom(1:4,6))! swap to account for flipped asignments
         do i = 4,4 + (NUP_NEW-1)
             write(io_LHEOutFile,IndentedFmt1) HiggsDK_IDUP(i),HiggsDK_ISTUP(i), HiggsDK_MOTHUP(1,i),HiggsDK_MOTHUP(2,i), HiggsDK_ICOLUP(1,i),HiggsDK_ICOLUP(2,i),  &
-                                              HiggsDK_Mom(2:4,i-3)/GeV,HiggsDK_Mom(1,i-3)/GeV, get_MInv(HiggsDK_Mom(1:4,i-3))/GeV, Lifetime, Spin
+                                              HiggsDK_Mom(2:4,i-3)/GeV,HiggsDK_Mom(1,i-3)/GeV, get_MInv(HiggsDK_Mom(1:4,i-3))/GeV, Lifetime(i), Spin
         enddo
     endif
 
@@ -4932,36 +4941,25 @@ END SUBROUTINE
 SUBROUTINE getHiggsDecayLength(ctau)
 use ModParameters
 implicit none
-real(8) :: x,xp,xpp,Len0,propa,ctau,ctau0
-integer :: loop
-
-     ctau  = 0d0
-     ctau0 = HiggsDecayLengthMM
-     if( ctau0.lt.1d-16 ) RETURN
-
-     do loop=1,4000000!  4Mio. tries otherwise return zero
-          call random_number(x)
-          xp = 10*x*ctau0             ! scan between 0..10*ctau0
-
-          propa = dexp( -xp/(ctau0) ) ! the max of propa is 1.0
-          call random_number(xpp)
-          if( xpp.lt.propa ) then!   accept
-                ctau = xp
-                RETURN
-          endif
-     enddo
-
-RETURN
+real(8),intent(out) :: ctau
+   call getSimpleDecayLength(HiggsDecayLengthMM,ctau)
 END SUBROUTINE
 
 SUBROUTINE getVprimeDecayLength(ctau)
 use ModParameters
 implicit none
-real(8) :: x,xp,xpp,Len0,propa,ctau,ctau0
+real(8),intent(out) :: ctau
+   call getSimpleDecayLength(VprimeDecayLengthMM,ctau)
+END SUBROUTINE
+
+subroutine getSimpleDecayLength(ctau0,ctau)
+implicit none
+real(8), intent(in) :: ctau0
+real(8), intent(out) :: ctau
+real(8) :: x,xp,xpp,Len0,propa
 integer :: loop
 
      ctau  = 0d0
-     ctau0 = VprimeDecayLengthMM
      if( ctau0.lt.1d-16 ) RETURN
 
      do loop=1,4000000!  4Mio. tries otherwise return zero
@@ -4977,8 +4975,7 @@ integer :: loop
      enddo
 
 RETURN
-END SUBROUTINE
-
+end subroutine
 
 
 SUBROUTINE SmearExternal(xRnd,Mass,Width,MinEnergy,MaxEnergy,invMass,Jacobi)

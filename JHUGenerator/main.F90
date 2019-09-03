@@ -1851,12 +1851,6 @@ type(SaveValues) :: tosave, oldsavevalues
         endif
     endif
 
-    if( Process.eq.50 .and. SetZprimegammacoupling ) then
-        call Error("Z'gamma couplings are not implemented for VBF or VH")
-        !If you implement them and remove this error, also edit the Vprimekwargs function
-        !in MELA/test/testME_more.py to not remove the Z'gamma couplings for process = 50
-    endif
-
     if ((Process.ge.66 .and. Process.le.68) .or. (Process.ge.70 .and. Process.le.72)) then
         if ((SetHZprime .and. .not.SetZprimeff) .or. (.not.SetHZprime .and. SetZprimeff)) then
             call Error("To use Z' contact terms, you have to set both HVZ' and Z'ff couplings")
