@@ -75,8 +75,38 @@ integer, public :: Collier_maxRank = -1
 #endif
 logical, public :: includeInterference, ReweightInterference, writegit
 real(8), public :: M_V,Ga_V, M_Vprime,Ga_Vprime, M_V_ps,Ga_V_ps, M_Z_ps,Ga_Z_ps, M_W_ps,Ga_W_ps
-real(8), public, parameter :: GeV=1d0/100d0 ! we are using units of 100GeV, i.e. Lambda=10 is 1TeV
+real(dp), public, parameter :: pi =3.141592653589793238462643383279502884197_dp
+real(dp), public, parameter :: sqrt2 = 1.4142135623730950488016887242096980786_dp
+real(dp), public, parameter :: gamma_0 = 0.5772156649015328606065120900824024310421_dp  !Euler–Mascheroni constant
+real(dp), public, parameter :: pisq = pi**2
+real(8), public, parameter :: one = 1.0d0, mone = -1.0d0
+real(8), public, parameter :: half  = 0.5d0,two = 2.0d0
+real(8), public, parameter :: zero  = 0d0
+complex(8), parameter, public :: czero = (0d0,0d0)
+complex(8), parameter, public :: cone = 1.0d0
+complex(8), parameter, public :: ci=(0d0,1.0d0)
+complex(8), parameter, public :: ne=(0d0,1.0d0)
 real(8), public, parameter :: percent=1d0/100d0
+real(8), public, parameter :: SymmFac=1d0/2d0, SpinAvg=1d0/4d0, QuarkColAvg=1d0/3d0, GluonColAvg=1d0/8d0
+real(8), public, parameter :: GeV=1d0/100d0 ! we are using units of 100GeV, i.e. Lambda=10 is 1TeV
+real(8), public, parameter :: MeV=1d-3*GeV
+real(8), public, parameter :: keV=1d-6*GeV
+real(8), public, parameter :: eV=1d-9*GeV
+real(8), public, parameter :: meter=1d6
+real(8), public, parameter :: milimeter=1d-3*meter
+real(8), public, parameter :: ctauUnit=milimeter
+real(8), public, parameter :: barn=1d-28*(meter**2)
+real(8), public, parameter :: picobarn=1e-12*barn
+real(8), public, parameter :: femtobarn=1e-15*barn
+real(8), public, parameter :: attobarn=1e-18*barn
+real(8), public, parameter :: second=1d15
+real(8), public, parameter :: milisecond=1d-3*second
+real(8), public, parameter :: SpeedOfLight=299792458*meter/second
+real(8), public, parameter :: PlanckConstant=4.13567d-15*eV*second
+real(8), public, parameter :: hbar=PlanckConstant/(2d0*pi)
+real(8), public, parameter :: hbarc=hbar*SpeedOfLight/(2d0*pi)
+real(8), public, parameter :: hbarc2_fbGeV2 = (hbarc**2)/(femtobarn*(GeV**2))
+real(8), public, parameter :: hbarc2_pbGeV2 = (hbarc**2)/(picobarn*(GeV**2))
 ! real(8),public :: GlobalMax=-1d99
 ! real(8),public :: GlobalMin=+1d99
 ! integer,parameter :: NPart=200
@@ -1034,8 +1064,6 @@ real(dp), public           :: couplAZff
 real(dp), public           :: couplAffsq
 !----------------------------------------------------------------------------------
 
-real(8), public, parameter :: fbGeV2=0.389379d12*GeV**2
-real(8), public, parameter :: SymmFac=1d0/2d0, SpinAvg=1d0/4d0, QuarkColAvg=1d0/3d0, GluonColAvg=1d0/8d0
 integer, public, target :: Up_  = 1
 integer, public, target :: Dn_  = 2
 integer, public, target :: Chm_ = 3
@@ -1089,18 +1117,6 @@ integer, public, parameter :: pdfAStr_ = -3
 integer, public, parameter :: pdfAChm_ = -4
 integer, public, parameter :: pdfABot_ = -5
 integer, public, parameter :: pdfATop_ = -6 ! Dummy
-
-real(dp), public, parameter :: pi =3.141592653589793238462643383279502884197_dp
-real(dp), public, parameter :: sqrt2 = 1.4142135623730950488016887242096980786_dp
-real(dp), public, parameter :: gamma_0 = 0.5772156649015328606065120900824024310421_dp  !Euler–Mascheroni constant
-real(dp), public, parameter :: pisq = pi**2
-real(8), public, parameter :: one = 1.0d0, mone = -1.0d0
-real(8), public, parameter :: half  = 0.5d0,two = 2.0d0
-real(8), public, parameter :: zero  = 0d0
-complex(8), parameter, public :: czero = (0d0,0d0)
-complex(8), parameter, public :: cone = 1.0d0
-complex(8), parameter, public :: ci=(0d0,1.0d0)
-complex(8), parameter, public :: ne=(0d0,1.0d0)
 
 integer,parameter :: io_stdout=6
 integer,parameter :: io_LHEOutFile=14

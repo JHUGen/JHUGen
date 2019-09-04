@@ -171,7 +171,7 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
 
    FluxFac = 1d0/(2d0*EHat**2)
    PDFFac = pdf(LHA2M_pdf(iPart_sel),1)  *  pdf(LHA2M_pdf(jPart_sel),2)
-   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * VgsWgt * PartChannelAvg * FinalStateWeight
+   PreFac = hbarc2_fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * VgsWgt * PartChannelAvg * FinalStateWeight
 
    !print *,"Mom1: ",MomExt(1:4,1)
    !print *,"Mom2: ",MomExt(1:4,2)
@@ -566,7 +566,7 @@ IF( GENEVT ) THEN
       endif
 
 
-      PreFac = 2d0 * fbGeV2 * sHatJacobi * PSWgt * SymmFac * FinalStateWeight
+      PreFac = 2d0 * hbarc2_fbGeV2 * sHatJacobi * PSWgt * SymmFac * FinalStateWeight
       EvalUnWeighted_DecayToVV = LO_Res_Unpol * PreFac
 
       CS_max = csmax(0,0)
@@ -691,7 +691,7 @@ ELSE! NOT GENEVT
          endif
       endif
 
-     PreFac = 2d0 * fbGeV2 * sHatJacobi * PSWgt * SymmFac * FinalStateWeight
+     PreFac = 2d0 * hbarc2_fbGeV2 * sHatJacobi * PSWgt * SymmFac * FinalStateWeight
      EvalUnWeighted_DecayToVV = LO_Res_Unpol * PreFac
      Res = EvalUnWeighted_DecayToVV
 
@@ -810,7 +810,7 @@ include 'maxwt.f'
 
    originalprobability = msq_MCFM(iPart_sel,jPart_sel)
 
-   PreFac = fbGeV2 * FluxFac * PSWgt * m1ffwgt * m2ffwgt
+   PreFac = hbarc2_fbGeV2 * FluxFac * PSWgt * m1ffwgt * m2ffwgt
    msq_MCFM = msq_MCFM * PreFac / (GeV**4)  ! adjust msq_MCFM for GeV units of MCFM mat.el.
 
    if ( &
@@ -1155,7 +1155,7 @@ END FUNCTION
 !       endif
 !
 !       LO_Res_Unpol = LO_Res_Unpol * SpinAvg * GluonColAvg**2
-!       PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * SymmFac * FinalStateWeight
+!       PreFac = 2d0 * hbarc2_fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * SymmFac * FinalStateWeight
 !       EvalWeighted = LO_Res_Unpol * PreFac
 !
 ! ! EvalWeighted = PreFac  ! for PS output   (only run 1 iteration without vegas adaptation)
@@ -1203,7 +1203,7 @@ END FUNCTION
 !       LO_Res_Unpol1 = LO_Res_Unpol1 * SpinAvg * QuarkColAvg**2 * PDFFac1
 !       LO_Res_Unpol2 = LO_Res_Unpol2 * SpinAvg * QuarkColAvg**2 * PDFFac2
 !       LO_Res_Unpol = LO_Res_Unpol1 + LO_Res_Unpol2
-!       PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * SymmFac * FinalStateWeight
+!       PreFac = 2d0 * hbarc2_fbGeV2 * FluxFac * sHatJacobi * PSWgt * SymmFac * FinalStateWeight
 !
 !       EvalWeighted = LO_Res_Unpol * PreFac
 !    endif
@@ -1675,7 +1675,7 @@ IF( GENEVT ) THEN
        CS_max = csmax(i2,-i2)
    endif
 
-   PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * SymmFac * FinalStateWeight
+   PreFac = 2d0 * hbarc2_fbGeV2 * FluxFac * sHatJacobi * PSWgt * SymmFac * FinalStateWeight
    EvalUnWeighted = LO_Res_Unpol * PreFac
    if( WidthScheme.ne.2 ) EvalUnWeighted = EvalUnWeighted * ReweightBWPropagator( Get_MInv2( MomExt(1:4,3)+MomExt(1:4,4) ) )
 
@@ -1766,7 +1766,7 @@ ELSE! NOT GENEVT
       LO_Res_Unpol = LO_Res_Unpol * SpinAvg * GluonColAvg**2
 
 
-      PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * SymmFac * FinalStateWeight
+      PreFac = 2d0 * hbarc2_fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * SymmFac * FinalStateWeight
       EvalUnWeighted = LO_Res_Unpol * PreFac
       if( WidthScheme.ne.2 ) EvalUnWeighted = EvalUnWeighted * ReweightBWPropagator( Get_MInv2( MomExt(1:4,3)+MomExt(1:4,4) ) )
       RES(0,0) = EvalUnWeighted
@@ -1811,7 +1811,7 @@ ELSE! NOT GENEVT
 
       LO_Res_Unpol1 = LO_Res_Unpol1 * SpinAvg * QuarkColAvg**2
       LO_Res_Unpol2 = LO_Res_Unpol2 * SpinAvg * QuarkColAvg**2
-      PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt *   SymmFac
+      PreFac = 2d0 * hbarc2_fbGeV2 * FluxFac * sHatJacobi * PSWgt *   SymmFac
 
       do i1 = -5,5
          if (i1.eq.-5) then
@@ -1913,7 +1913,7 @@ Function EvalWeighted_HJ(yRnd,VgsWgt)
     enddo
 !print *, me2(0,0)*pdf(LHA2M_pdf(0),1)*pdf(LHA2M_pdf(0),2), me2(0,1)*pdf(LHA2M_pdf(0),1)*pdf(LHA2M_pdf(1),2)
     FluxFac = 1d0/(2d0*(EHat)**2)
-    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt
+    PreFac = hbarc2_fbGeV2 * FluxFac * sHatJacobi * PSWgt
     EvalWeighted_HJ = LO_Res_Unpol * PreFac
 
     AccepCounter=AccepCounter+1
@@ -2055,7 +2055,7 @@ IF( GENEVT ) THEN
       call setPDFs(eta1,eta2,pdf)
       call EvalAmp_HJ(MomExt,me2)
 
-      PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt
+      PreFac = hbarc2_fbGeV2 * FluxFac * sHatJacobi * PSWgt
 
       LO_Res_Unpol =  me2(ifound,jfound) * pdf(LHA2M_pdf(ifound),1)*pdf(LHA2M_pdf(jfound),2)
       EvalUnWeighted_HJ = LO_Res_Unpol * PreFac
@@ -2090,7 +2090,7 @@ ELSE! NOT GENEVT
    call EvalAlphaS()
    call setPDFs(eta1,eta2,pdf)
    call EvalAmp_HJ(MomExt,me2)
-   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt
+   PreFac = hbarc2_fbGeV2 * FluxFac * sHatJacobi * PSWgt
 
 
    LO_Res_Unpol = 0d0
@@ -2444,7 +2444,7 @@ if( IsAZDecay(DecayMode1) ) then
       call SetRunningScales( (/ MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
       call setPDFs(eta1,eta2,pdf)
       FluxFac = 1d0/(2d0*EHat**2)
-      PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt *6d0 !2 for e and mu, 3 for colors of b
+      PreFac = hbarc2_fbGeV2 * FluxFac * sHatJacobi * PSWgt *6d0 !2 for e and mu, 3 for colors of b
       LO_Res_Unpol=0d0
       EvalWeighted_VHiggs=0d0
       do i = -6,6
@@ -2493,7 +2493,7 @@ if( IsAZDecay(DecayMode1) ) then
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
       FluxFac = 1d0/(2d0*ILC_Energy**2)
-      PreFac = fbGeV2 * FluxFac * PSWgt *6d0 !2 for e and mu, 3 for colors of b
+      PreFac = hbarc2_fbGeV2 * FluxFac * PSWgt *6d0 !2 for e and mu, 3 for colors of b
       LO_Res_Unpol=0d0
       EvalWeighted_VHiggs=0d0
       id(2)=convertLHE(ElM_)
@@ -2528,7 +2528,7 @@ elseif( IsAWDecay(DecayMode1) ) then
       call SetRunningScales( (/ MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
       call setPDFs(eta1,eta2,pdf)
       FluxFac = 1d0/(2d0*EHat**2)
-      PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt *6d0 !2 for e and mu, 3 for colors of b
+      PreFac = hbarc2_fbGeV2 * FluxFac * sHatJacobi * PSWgt *6d0 !2 for e and mu, 3 for colors of b
       LO_Res_Unpol=0d0
       EvalWeighted_VHiggs=0d0
       do i = -5,5
@@ -2588,7 +2588,7 @@ elseif( IsAPhoton(DecayMode1) ) then
       call SetRunningScales( (/ MomExt(1:4,5),MomExt(1:4,6),Mom_Not_a_particle(1:4) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),Not_a_particle_,convertLHEreverse(id(4)) /) )
       call setPDFs(eta1,eta2,pdf)
       FluxFac = 1d0/(2d0*EHat**2)
-      PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt *6d0 !2 for e and mu, 3 for colors of b
+      PreFac = hbarc2_fbGeV2 * FluxFac * sHatJacobi * PSWgt *6d0 !2 for e and mu, 3 for colors of b
       LO_Res_Unpol=0d0
       EvalWeighted_VHiggs=0d0
       do i = -6,6
@@ -2624,7 +2624,7 @@ elseif( IsAPhoton(DecayMode1) ) then
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
       FluxFac = 1d0/(2d0*ILC_Energy**2)
-      PreFac = fbGeV2 * FluxFac * PSWgt *6d0 !2 for e and mu, 3 for colors of b
+      PreFac = hbarc2_fbGeV2 * FluxFac * PSWgt *6d0 !2 for e and mu, 3 for colors of b
       LO_Res_Unpol=0d0
       EvalWeighted_VHiggs=0d0
       id(2)=convertLHE(ElM_)
@@ -2987,7 +2987,7 @@ if( IsAZDecay(DecayMode1) ) then
       call SetRunningScales( (/ MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
       call setPDFs(eta1,eta2,pdf)
       FluxFac = 1d0/(2d0*EHat**2)
-      PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt/3d0! *6d0 !2 for e and mu, 3 for colors of b
+      PreFac = hbarc2_fbGeV2 * FluxFac * sHatJacobi * PSWgt/3d0! *6d0 !2 for e and mu, 3 for colors of b
 
 !if e+ e- collider
     else if(Collider.eq.0)then
@@ -3010,7 +3010,7 @@ if( IsAZDecay(DecayMode1) ) then
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
       FluxFac = 1d0/(2d0*ILC_Energy**2)
-      PreFac = fbGeV2 * FluxFac * PSWgt
+      PreFac = hbarc2_fbGeV2 * FluxFac * PSWgt
     endif
 
 elseif( IsAWDecay(DecayMode1) ) then
@@ -3037,7 +3037,7 @@ elseif( IsAWDecay(DecayMode1) ) then
       call SetRunningScales( (/ MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
       call setPDFs(eta1,eta2,pdf)
       FluxFac = 1d0/(2d0*EHat**2)
-      PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt/3d0! *6d0 !2 for e and mu, 3 for colors of qqb
+      PreFac = hbarc2_fbGeV2 * FluxFac * sHatJacobi * PSWgt/3d0! *6d0 !2 for e and mu, 3 for colors of qqb
 
 elseif( IsAPhoton(DecayMode1) ) then
 !if pp collider
@@ -3065,7 +3065,7 @@ elseif( IsAPhoton(DecayMode1) ) then
       call SetRunningScales( (/ MomExt(1:4,5),MomExt(1:4,6),Mom_Not_a_particle(1:4) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),Not_a_particle_,convertLHEreverse(id(4)) /) )
       call setPDFs(eta1,eta2,pdf)
       FluxFac = 1d0/(2d0*EHat**2)
-      PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt/3d0! *6d0 !2 for e and mu, 3 for colors of b
+      PreFac = hbarc2_fbGeV2 * FluxFac * sHatJacobi * PSWgt/3d0! *6d0 !2 for e and mu, 3 for colors of b
 
 !if e+ e- collider
     else if(Collider.eq.0)then
@@ -3088,7 +3088,7 @@ elseif( IsAPhoton(DecayMode1) ) then
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
       FluxFac = 1d0/(2d0*ILC_Energy**2)
-      PreFac = fbGeV2 * FluxFac * PSWgt
+      PreFac = hbarc2_fbGeV2 * FluxFac * PSWgt
     endif
 
 endif
@@ -3321,7 +3321,7 @@ ENDIF! GENEVT
 
 
       LO_Res_Unpol = LO_Res_Unpol * SpinAvg * GluonColAvg**2
-      PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * SymmFac
+      PreFac = 2d0 * hbarc2_fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * SymmFac
       if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
       if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
       EvalWeighted_tautau = LO_Res_Unpol * PreFac
@@ -3386,7 +3386,7 @@ m2ffwgt=1d0
       EvalUnWeighted_DecayToTauTau = 0d0
       return
   endif
-  PreFac = fbGeV2 * PSWgt * FinalStateWeight
+  PreFac = hbarc2_fbGeV2 * PSWgt * FinalStateWeight
 
   call SetRunningScales( (/ pHiggs(1:4),Mom_Not_a_particle(1:4),Mom_Not_a_particle(1:4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) ) ! Call anyway
 

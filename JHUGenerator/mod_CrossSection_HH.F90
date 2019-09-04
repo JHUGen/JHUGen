@@ -113,7 +113,7 @@ Function EvalWeighted_HH(yRnd,VgsWgt)
   call Kinematics_HH(id,Mom,NBin,applyPSCut)
   if( applyPSCut .or. PSWgt.eq.zero ) return    
   FluxFac = 1d0/(2d0*Ehat**2)
-  PreFac = fbGeV2 * FluxFac * PSWgt
+  PreFac = hbarc2_fbGeV2 * FluxFac * PSWgt
 
   id(1:2)=(/convertLHE(Glu_),convertLHE(Glu_)/)
   amp=0d0
@@ -270,7 +270,7 @@ Function EvalUnWeighted_HH(yRnd,genEvt,RES)
   call Kinematics_HH(id,Mom,NBin,applyPSCut)
   if( applyPSCut .or. PSWgt.eq.zero ) return    
   FluxFac = 1d0/(2d0*Ehat**2)
-  PreFac = fbGeV2 * FluxFac * PSWgt
+  PreFac = hbarc2_fbGeV2 * FluxFac * PSWgt
 
   
   IF( GENEVT ) THEN

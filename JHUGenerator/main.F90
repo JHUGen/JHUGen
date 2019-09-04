@@ -556,8 +556,8 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "MReso2", success, M_Reso2, success2=SetMReso2, multiply=GeV, tosave=tosave)
     call ReadCommandLineArgument(arg, "GaReso2", success, Ga_Reso2, success2=SetGaReso2, multiply=GeV, tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ctauReso", success, HiggsDecayLengthMM, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ctauVprime", success, VprimeDecayLengthMM, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ctauReso", success, HiggsDecayLengthMM, multiply=ctauUnit, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ctauVprime", success, VprimeDecayLengthMM, multiply=ctauUnit, tosave=tosave)
     call ReadCommandLineArgument(arg, "VegasNc0", success, VegasNc0)
     call ReadCommandLineArgument(arg, "VegasNc1", success, VegasNc1)
     call ReadCommandLineArgument(arg, "VegasNc2", success, VegasNc2)
@@ -5892,8 +5892,8 @@ character :: arg*(1000)
     if( Process.eq.114) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
     if( ReadLHEFile )    write(TheUnit,"(4X,A)") "           (This is ReadLHEFile mode. Resonance mass/width are read from LHE input parameters.)"
     if( ConvertLHEFile ) write(TheUnit,"(4X,A)") "           (This is ConvertLHEFile mode. Resonance mass/width are read from LHE input parameters.)"
-    if( HiggsDecayLengthMM.ne.0d0 ) write(TheUnit,"(4X,A,F10.5,A)") "           Resonance ctau=", HiggsDecayLengthMM, " mm"
-    if( VprimeDecayLengthMM.ne.0d0 ) write(TheUnit,"(4X,A,F10.5,A)") "           Vprime ctau=", VprimeDecayLengthMM, " mm"
+    if( HiggsDecayLengthMM.ne.0d0 ) write(TheUnit,"(4X,A,F10.5,A)") "           Resonance ctau=", HiggsDecayLengthMM/ctauUnit, " mm"
+    if( VprimeDecayLengthMM.ne.0d0 ) write(TheUnit,"(4X,A,F10.5,A)") "           Vprime ctau=", VprimeDecayLengthMM/ctauUnit, " mm"
     if( &
          (.not.ReadLHEFile .and. (Process.le.2 .or. Process.eq.50 .or. Process.eq.60 .or. (Process.ge.66 .and. Process.le.75) .or. ((TopDecays.eq.1).and.Process.eq.80) .or. (Process.ge.110 .and. Process.le.113))) &
     .or. (ReadLHEFile .and. TauDecays.ne.0) &
