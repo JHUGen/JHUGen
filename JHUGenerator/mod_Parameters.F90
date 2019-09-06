@@ -88,6 +88,7 @@ complex(8), parameter, public :: ci=(0d0,1.0d0)
 complex(8), parameter, public :: ne=(0d0,1.0d0)
 real(8), public, parameter :: percent=1d0/100d0
 real(8), public, parameter :: SymmFac=1d0/2d0, SpinAvg=1d0/4d0, QuarkColAvg=1d0/3d0, GluonColAvg=1d0/8d0
+! Units
 real(8), public, parameter :: GeV=1d0/100d0 ! we are using units of 100GeV, i.e. Lambda=10 is 1TeV
 real(8), public, parameter :: MeV=1d-3*GeV
 real(8), public, parameter :: keV=1d-6*GeV
@@ -104,9 +105,11 @@ real(8), public, parameter :: milisecond=1d-3*second
 real(8), public, parameter :: SpeedOfLight=299792458*meter/second
 real(8), public, parameter :: PlanckConstant=4.13567d-15*eV*second
 real(8), public, parameter :: hbar=PlanckConstant/(2d0*pi)
-real(8), public, parameter :: hbarc=hbar*SpeedOfLight/(2d0*pi)
-real(8), public, parameter :: hbarc2_fbGeV2 = (hbarc**2)/(femtobarn*(GeV**2))
-real(8), public, parameter :: hbarc2_pbGeV2 = (hbarc**2)/(picobarn*(GeV**2))
+real(8), public, parameter :: hbarc=hbar*SpeedOfLight
+real(8), public, parameter :: hbarc2=hbarc**2
+real(8), public, parameter :: hbarc2_fbGeV2 = hbarc2/(femtobarn*(GeV**2))
+real(8), public, parameter :: hbarc2_pbGeV2 = hbarc2/(picobarn*(GeV**2))
+real(8), public, parameter :: hbarc2XsecUnit = hbarc2_pbGeV2 ! Units of xsec are reported in pb, consistent with MCFM.
 ! real(8),public :: GlobalMax=-1d99
 ! real(8),public :: GlobalMin=+1d99
 ! integer,parameter :: NPart=200

@@ -201,7 +201,7 @@ m1ffwgt=1d0;m2ffwgt=1d0;m3ffwgt=1d0
 
    originalprobability = msq_MCFM(iPart_sel,jPart_sel)
 
-   PreFac = hbarc2_fbGeV2 * FluxFac * PSWgt * sHatJacobi * m1ffwgt * m2ffwgt * m3ffwgt
+   PreFac = hbarc2XsecUnit * FluxFac * PSWgt * sHatJacobi * m1ffwgt * m2ffwgt * m3ffwgt
    msq_MCFM = msq_MCFM * PreFac / (GeV**8)  ! adjust msq_MCFM for GeV units of MCFM mat.el.
 !    do ipart=-5,5; do jpart=-5,5
 !       msq_MCFM(ipart,jpart)=msq_MCFM(ipart,jpart) * pdf(LHA2M_pdf(ipart),1)*pdf(LHA2M_pdf(jpart),2)
@@ -478,7 +478,7 @@ use ifport
       call Kinematics_HVBF(5,MomExt,applyPSCut,NBin)
       if( applyPSCut .or. PSWgt.eq.zero ) return
       EvalCounter = EvalCounter+1
-      PreFac = hbarc2_fbGeV2 * FluxFac * sHatJacobi * PSWgt  * PartChannelAvg
+      PreFac = hbarc2XsecUnit * FluxFac * sHatJacobi * PSWgt  * PartChannelAvg
       if( iStore.ne.jStore ) PreFac = PreFac*2d0
 
       call EvalAmp_WBFH_UnSymm_SA_Select_exact( MomExt,iPart_sel,jPart_sel,rPart_Sel,sPart_Sel,me2(iPart_sel,jPart_sel))
@@ -623,7 +623,7 @@ use ifport
       call Kinematics_HJJ(5,MomExt,applyPSCut,NBin)
       if( applyPSCut .or. PSWgt.eq.zero ) return
       EvalCounter = EvalCounter+1
-      PreFac = hbarc2_fbGeV2 * FluxFac * sHatJacobi * PSWgt  * PartChannelAvg
+      PreFac = hbarc2XsecUnit * FluxFac * sHatJacobi * PSWgt  * PartChannelAvg
       if( iStore.ne.jStore ) PreFac = PreFac*2d0
 
       call EvalAmp_SBFH_UnSymm_SA_Select_exact(MomExt,iPart_sel,jPart_sel,rPart_sel,sPart_sel,me2(iPart_sel,jPart_sel))
@@ -746,7 +746,7 @@ END FUNCTION
    EvalCounter = EvalCounter+1
 
    FluxFac = 1d0/(2d0*EHat**2)
-   PreFac = hbarc2_fbGeV2 * FluxFac * sHatJacobi * PSWgt  * PartChannelAvg
+   PreFac = hbarc2XsecUnit * FluxFac * sHatJacobi * PSWgt  * PartChannelAvg
    call random_number(partonic_flip)
    if( partonic_flip.gt.0.5d0 ) call swapi(iPart_sel,jPart_sel)
    if( iPart_sel.ne.jPart_sel ) PreFac = PreFac*2d0
@@ -1044,7 +1044,7 @@ include 'csmaxvalue.f'
    FluxFac = 1d0/(2d0*EHat**2)
    EvalCounter = EvalCounter+1
 
-   PreFac = hbarc2_fbGeV2 * FluxFac * sHatJacobi * PSWgt
+   PreFac = hbarc2XsecUnit * FluxFac * sHatJacobi * PSWgt
 
 
 

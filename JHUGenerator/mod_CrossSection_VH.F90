@@ -390,7 +390,7 @@ Function EvalWeighted_VH(yRnd,VgsWgt)
     call kinematics_eeVH(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
     if( applyPSCut .or. PSWgt.le.zero ) return    
     FluxFac = 1d0/(2d0*ILC_Energy**2)
-    PreFac = hbarc2_fbGeV2 * FluxFac * PSWgt
+    PreFac = hbarc2XsecUnit * FluxFac * PSWgt
     EvalWeighted_VH=0d0
     id(1:2)=(/convertLHE(ElP_),convertLHE(ElM_)/)
     call amp_VH_LO(Mom(:,1:9),mass(3:5,:),helicity(1:9),id(1:9),amp_dummy)
@@ -488,7 +488,7 @@ Function EvalWeighted_VH(yRnd,VgsWgt)
         enddo!i_x
         FluxFac_x = 1d0/(2d0*shat_x)
         sHatJacobi_x = sHatJacobi * 1d0!!!!may change if PDFMapping gets improved.
-        PreFac_x = hbarc2_fbGeV2 * FluxFac_x * sHatJacobi_x * PSWgt_x 
+        PreFac_x = hbarc2XsecUnit * FluxFac_x * sHatJacobi_x * PSWgt_x 
       endif
     endif
 
@@ -526,7 +526,7 @@ Function EvalWeighted_VH(yRnd,VgsWgt)
         call setPDFs(eta1,eta2,pdf_dip(-6:6,1:2,i_dipole))
       enddo
       FluxFac = 1d0/(2d0*Ehat**2)
-      PreFac_real = hbarc2_fbGeV2 * FluxFac * sHatJacobi * PSWgt_real
+      PreFac_real = hbarc2XsecUnit * FluxFac * sHatJacobi * PSWgt_real
 
     endif
 
@@ -537,7 +537,7 @@ Function EvalWeighted_VH(yRnd,VgsWgt)
     alphas = alphas_save
 
     FluxFac = 1d0/(2d0*EHat**2)
-    PreFac = hbarc2_fbGeV2 * FluxFac * sHatJacobi * PSWgt
+    PreFac = hbarc2XsecUnit * FluxFac * sHatJacobi * PSWgt
 
     EvalWeighted_VH=0d0
 
@@ -1715,7 +1715,7 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
     if( applyPSCut .or. PSWgt.le.zero ) return    
 
     FluxFac = 1d0/(2d0*ILC_Energy**2)
-    PreFac = hbarc2_fbGeV2 * FluxFac * PSWgt
+    PreFac = hbarc2XsecUnit * FluxFac * PSWgt
 !    EvalWeighted_VH=0d0
 !    id(2)=convertLHE(ElM_)
 !    id(1)=-id(2)
@@ -1759,7 +1759,7 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
     !PDF
     call setPDFs(eta1,eta2,pdf)
     FluxFac = 1d0/(2d0*EHat**2)
-    PreFac = hbarc2_fbGeV2 * FluxFac * sHatJacobi * PSWgt
+    PreFac = hbarc2XsecUnit * FluxFac * sHatJacobi * PSWgt
 
   endif
 

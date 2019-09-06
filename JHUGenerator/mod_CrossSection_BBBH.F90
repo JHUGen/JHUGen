@@ -36,7 +36,7 @@ EvalWeighted_BBBH = 0d0
 !    call EvalPhasespace_HDecay(MomExt(1:4,3),yRnd(16:17),MomExt(1:4,12:13),PSWgt4)
 !    PSWgt = PSWgt * PSWgt4
    FluxFac = 1d0/(2d0*EHat**2)
-   PreFac = hbarc2_fbGeV2 * FluxFac * sHatJacobi * PSWgt
+   PreFac = hbarc2XsecUnit * FluxFac * sHatJacobi * PSWgt
 
    call Kinematics_BBBH(MomExt,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return
@@ -155,7 +155,7 @@ EvalUnWeighted_BBBH = 0d0
 !    call EvalPhasespace_HDecay(MomExt(1:4,3),yRnd(16:17),MomExt(1:4,12:13),PSWgt4)
 !    PSWgt = PSWgt * PSWgt4
    FluxFac = 1d0/(2d0*EHat**2)
-   PreFac = hbarc2_fbGeV2 * FluxFac * sHatJacobi * PSWgt
+   PreFac = hbarc2XsecUnit * FluxFac * sHatJacobi * PSWgt
 
    call Kinematics_BBBH(MomExt,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return
