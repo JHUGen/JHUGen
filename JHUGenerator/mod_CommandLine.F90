@@ -270,7 +270,7 @@ end subroutine CompareSaveValues
 !ReadCommandLineArgument is overloaded.  Pass the type needed as "dest"
 !success is set to true if the argument passed matches argumentname, otherwise it's left alone
 !same for success2, success3, success4, success5, and success6 (optional, can be used for other things, see main.F90)
-!checkdestchange (optional) modifies how success* are set by checking if the destination value has changed.
+!checkdestchange (optional) modifies how success[2-6] are set by checking if the destination value has changed.
 !SetLastArgument (optional) is set to true if the argument matches, otherwise it's set to false
 !for examples of all of them see main.F90
 
@@ -299,7 +299,6 @@ integer :: length, temp_int
         if (present(checkdestchange)) then
            successval = (.not. checkdestchange .or. dest .neqv. dest_store)
         endif
-        success=success .or. successval
         if (present(SetLastArgument)) SetLastArgument=successval
         if (present(success2)) success2=success2 .or. successval
         if (present(success3)) success3=success3 .or. successval
@@ -307,12 +306,12 @@ integer :: length, temp_int
         if (present(success5)) success5=success5 .or. successval
         if (present(success6)) success6=success6 .or. successval
         if (successval .and. present(tosave)) call tosave%savevalue_logical(argumentname, dest)
+        success = .true.
     elseif( trim(argument).eq."No"//trim(argumentname) ) then
         dest=.false.
         if (present(checkdestchange)) then
            successval = (.not. checkdestchange .or. dest .neqv. dest_store)
         endif
-        success=success .or. successval
         if (present(SetLastArgument)) SetLastArgument=successval
         if (present(success2)) success2=success2 .or. successval
         if (present(success3)) success3=success3 .or. successval
@@ -320,6 +319,7 @@ integer :: length, temp_int
         if (present(success5)) success5=success5 .or. successval
         if (present(success6)) success6=success6 .or. successval
         if (successval .and. present(tosave)) call tosave%savevalue_logical(argumentname, dest)
+        success = .true.
     elseif( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
         if( Index(numbers, argument(length+2:length+2)) .ne. 0 ) then
             read(argument(length+2:len(argument)), *) temp_int
@@ -327,7 +327,6 @@ integer :: length, temp_int
             if (present(checkdestchange)) then
                successval = (.not. checkdestchange .or. dest .neqv. dest_store)
             endif
-            success=success .or. successval
             if (present(SetLastArgument)) SetLastArgument=successval
             if (present(success2)) success2=success2 .or. successval
             if (present(success3)) success3=success3 .or. successval
@@ -340,7 +339,6 @@ integer :: length, temp_int
             if (present(checkdestchange)) then
                successval = (.not. checkdestchange .or. dest .neqv. dest_store)
             endif
-            success=success .or. successval
             if (present(SetLastArgument)) SetLastArgument=successval
             if (present(success2)) success2=success2 .or. successval
             if (present(success3)) success3=success3 .or. successval
@@ -349,6 +347,7 @@ integer :: length, temp_int
             if (present(success6)) success6=success6 .or. successval
             if (successval .and. present(tosave)) call tosave%savevalue_logical(argumentname, dest)
         endif
+        success = .true.
     endif
 
 end subroutine ReadCommandLineArgument_logical
@@ -380,7 +379,6 @@ integer :: length, dest_store
         if (present(checkdestchange)) then
            successval = (.not. checkdestchange .or. dest.ne.dest_store)
         endif
-        success=success .or. successval
         if (present(SetLastArgument)) SetLastArgument=successval
         if (present(success2)) success2=success2 .or. successval
         if (present(success3)) success3=success3 .or. successval
@@ -388,6 +386,7 @@ integer :: length, dest_store
         if (present(success5)) success5=success5 .or. successval
         if (present(success6)) success6=success6 .or. successval
         if (successval .and. present(tosave)) call tosave%savevalue_integer(argumentname, dest)
+        success = .true.
     endif
 
 end subroutine ReadCommandLineArgument_integer
@@ -420,7 +419,6 @@ real(8) :: dest_store
         if (present(checkdestchange)) then
            successval = (.not. checkdestchange .or. dest.ne.dest_store)
         endif
-        success=success .or. successval
         if (present(SetLastArgument)) SetLastArgument=successval
         if (present(success2)) success2=success2 .or. successval
         if (present(success3)) success3=success3 .or. successval
@@ -428,6 +426,7 @@ real(8) :: dest_store
         if (present(success5)) success5=success5 .or. successval
         if (present(success6)) success6=success6 .or. successval
         if (successval .and. present(tosave)) call tosave%savevalue_real8(argumentname, dest)
+        success = .true.
     endif
 
 end subroutine ReadCommandLineArgument_real8
@@ -471,9 +470,9 @@ complex(8) :: dest_store
         if (present(multiplyreal)) dest = dest*multiplyreal
         ! Checkdestchange after all multiplications are done!
         if (present(checkdestchange)) then
+           !print *, argumentname,": checkdestchange, dest_store, dest",checkdestchange,dest_store,dest
            successval = (.not. checkdestchange .or. dest.ne.dest_store)
         endif
-        success=success .or. successval
         if (present(SetLastArgument)) SetLastArgument=successval
         if (present(success2)) success2=success2 .or. successval
         if (present(success3)) success3=success3 .or. successval
@@ -481,6 +480,7 @@ complex(8) :: dest_store
         if (present(success5)) success5=success5 .or. successval
         if (present(success6)) success6=success6 .or. successval
         if (successval .and. present(tosave)) call tosave%savevalue_complex8(argumentname, dest)
+        success = .true.
     endif
 
 end subroutine ReadCommandLineArgument_complex8
@@ -496,7 +496,7 @@ logical, optional, intent(in) :: checkdestchange
 type(SaveValues), optional :: tosave
 logical :: successval
 integer :: length
-character(len=len(trim(dest))) :: dest_store
+character(len=len(dest)) :: dest_store
 
     successval = .true.
     dest_store = trim(dest)
@@ -514,7 +514,6 @@ character(len=len(trim(dest))) :: dest_store
         if (present(checkdestchange)) then
            successval = (.not. checkdestchange .or. trim(dest)==dest_store)
         endif
-        success=success .or. successval
         if (present(SetLastArgument)) SetLastArgument=successval
         if (present(success2)) success2=success2 .or. successval
         if (present(success3)) success3=success3 .or. successval
@@ -522,6 +521,7 @@ character(len=len(trim(dest))) :: dest_store
         if (present(success5)) success5=success5 .or. successval
         if (present(success6)) success6=success6 .or. successval
         if (successval .and. present(tosave)) call tosave%savevalue_string(argumentname, dest)
+        success = .true.
     endif
 
 end subroutine ReadCommandLineArgument_string
