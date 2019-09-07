@@ -141,6 +141,7 @@ complex(8), public :: PrintPMZZ   !real part is the minimum, imaginary part is t
 integer, public :: PrintPMZZIntervals
 integer, public :: VBFoffsh_run=-1
 logical, public :: FindCrossSectionWithWeights = .false.
+real(8), public :: VprimeDecayLengthMassCutoffFactor = -1d0 ! x Ga_Vprime
 real(8), public :: CrossSectionWithWeights = 0d0, CrossSectionWithWeightsErrorSquared = 0d0
 !=====================================================
 

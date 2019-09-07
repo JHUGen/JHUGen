@@ -269,14 +269,14 @@ write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(
 
 ! V1
 i=4
-if (includeVprime .and. Ga_Vprime .gt. 0d0 .and. M_Vprime .ge. 0d0 .and. abs(V1Mass*GeV-M_Vprime).lt.10d0*Ga_Vprime .and. LHE_IDUP(6) .ne. Not_a_particle_ .and. LHE_IDUP(7) .ne. Not_a_particle_) then
+if (includeVprime .and. M_Vprime .ge. 0d0 .and. (VprimeDecayLengthMassCutoffFactor.le.0d0 .or. abs(V1Mass*GeV-M_Vprime).lt.VprimeDecayLengthMassCutoffFactor*Ga_Vprime) .and. LHE_IDUP(6) .ne. Not_a_particle_ .and. LHE_IDUP(7) .ne. Not_a_particle_) then
   call getVprimeDecayLength(VprimeDKLength(1))
 endif
 write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),Z1FV(2:4),Z1FV(1),V1Mass,VprimeDKLength(1)/ctauUnit,Spin
 
 ! V2
 i=5
-if (includeVprime .and. Ga_Vprime .gt. 0d0 .and. M_Vprime .ge. 0d0 .and. abs(V2Mass*GeV-M_Vprime).lt.10d0*Ga_Vprime .and. LHE_IDUP(8) .ne. Not_a_particle_ .and. LHE_IDUP(9) .ne. Not_a_particle_) then
+if (includeVprime .and. M_Vprime .ge. 0d0 .and. (VprimeDecayLengthMassCutoffFactor.le.0d0 .or. abs(V2Mass*GeV-M_Vprime).lt.VprimeDecayLengthMassCutoffFactor*Ga_Vprime) .and. LHE_IDUP(8) .ne. Not_a_particle_ .and. LHE_IDUP(9) .ne. Not_a_particle_) then
    call getVprimeDecayLength(VprimeDKLength(2))
 endif
 write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),Z2FV(2:4),Z2FV(1),V2Mass,VprimeDKLength(2)/ctauUnit,Spin
@@ -452,10 +452,10 @@ logical :: IsEmpty
         endif
     endif
 
-    if (includeVprime .and. Ga_Vprime .gt. 0d0 .and. M_Vprime .ge. 0d0 .and. abs(Get_MInv(HiggsDK_Mom(1:4,1)) - M_Vprime).lt.10d0*Ga_Vprime .and. .not.IsAPhoton(DecayMode1)) then
+    if (includeVprime .and. M_Vprime .ge. 0d0 .and. (VprimeDecayLengthMassCutoffFactor.le.0d0 .or. abs(Get_MInv(HiggsDK_Mom(1:4,1)) - M_Vprime).lt.VprimeDecayLengthMassCutoffFactor*Ga_Vprime) .and. .not.IsAPhoton(DecayMode1)) then
       call getVprimeDecayLength(Lifetime(4))
     endif
-    if (includeVprime .and. Ga_Vprime .gt. 0d0 .and. M_Vprime .ge. 0d0 .and. abs(Get_MInv(HiggsDK_Mom(1:4,2)) - M_Vprime).lt.10d0*Ga_Vprime .and. .not.IsAPhoton(DecayMode2)) then
+    if (includeVprime .and. M_Vprime .ge. 0d0 .and. (VprimeDecayLengthMassCutoffFactor.le.0d0 .or. abs(Get_MInv(HiggsDK_Mom(1:4,2)) - M_Vprime).lt.VprimeDecayLengthMassCutoffFactor*Ga_Vprime) .and. .not.IsAPhoton(DecayMode2)) then
       call getVprimeDecayLength(Lifetime(5))
     endif
 
