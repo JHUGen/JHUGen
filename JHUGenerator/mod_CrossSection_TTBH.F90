@@ -104,7 +104,7 @@ FinalStateWeight = 1d0
    call Kinematics_TTBH(MomOffShell,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return
    FluxFac = 1d0/(2d0*EHat**2)
-   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * PartChannelAvg * WdecayKfactor * FinalStateWeight
+   PreFac = hbarc2XsecUnit * FluxFac * sHatJacobi * PSWgt * PartChannelAvg * WdecayKfactor * FinalStateWeight
    call SetRunningScales( (/ MomExt(1:4,Hbos),MomExt(1:4,tbar),MomExt(1:4,t) /) , (/ Not_a_particle_,ATop_,Top_,Not_a_particle_ /) )
    call EvalAlphaS()
    call setPDFs(eta1,eta2,pdf)
@@ -302,7 +302,7 @@ FinalStateWeight = 1d0
 !    call EvalPhasespace_HDecay(MomExt(1:4,3),yRnd(16:17),MomExt(1:4,12:13),PSWgt4)
 !    PSWgt = PSWgt * PSWgt4
    FluxFac = 1d0/(2d0*EHat**2)
-   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * WdecayKfactor * FinalStateWeight
+   PreFac = hbarc2XsecUnit * FluxFac * sHatJacobi * PSWgt * WdecayKfactor * FinalStateWeight
 
    call Kinematics_TTBH(MomOffShell,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return

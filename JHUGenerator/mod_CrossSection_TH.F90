@@ -173,7 +173,7 @@ FinalStateWeight = 1d0
    ENDIF
 
    FluxFac = 1d0/(2d0*EHat**2)
-   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * WdecayKfactor * PartChannelAvg * FinalStateWeight
+   PreFac = hbarc2XsecUnit * FluxFac * sHatJacobi * PSWgt * WdecayKfactor * PartChannelAvg * FinalStateWeight
 
    call Kinematics_TH(MomOffShell,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return
@@ -327,7 +327,7 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
       EvalWeighted_TH = 0d0
       return
    endif
-   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt
+   PreFac = hbarc2XsecUnit * FluxFac * sHatJacobi * PSWgt
 
    IF( PROCESS.EQ.110 ) THEN        ! t-channel production of t H
       call EvalAmp_QB_TH(MomExt,LO_Res_Unpol)
@@ -528,7 +528,7 @@ FinalStateWeight = 1d0
    ENDIF
 
    FluxFac = 1d0/(2d0*EHat**2)
-   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * WdecayKfactor * FinalStateWeight
+   PreFac = hbarc2XsecUnit * FluxFac * sHatJacobi * PSWgt * WdecayKfactor * FinalStateWeight
 
    call Kinematics_TH(MomOffShell,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return

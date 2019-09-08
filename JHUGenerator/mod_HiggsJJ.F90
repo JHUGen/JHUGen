@@ -2365,17 +2365,21 @@ module modHiggsJJ
     complex(dp) :: za(4,4),zb(4,4)
     real(dp) :: sprod(4,4)
     real(dp) :: mhsq,q1q2,kcoupl,q12sq,q34sq
-    complex(dp) :: a1_zz,a2_zz,a3_zz,struc_zz(3)
-    complex(dp) :: a1_aa,a2_aa,a3_aa,a1_az,a2_az,a3_az,a1_za,a2_za,a3_za
-    complex(dp) :: a1_zzp,a2_zzp,a3_zzp,struc_zzp(3)
-    complex(dp) :: a1_zpz,a2_zpz,a3_zpz,struc_zpz(3)
-    complex(dp) :: a1_zpzp,a2_zpzp,a3_zpzp,struc_zpzp(3)
-    complex(dp) :: struc_aa(3),struc_az(3),struc_za(3)
+    complex(dp) :: a1_zz,a2_zz,a3_zz,struc_zz(3),fac_zz(-1:1,-1:1)
+    complex(dp) :: a1_az,a2_az,a3_az,struc_az(3),fac_az(-1:1,-1:1)
+    complex(dp) :: a1_za,a2_za,a3_za,struc_za(3),fac_za(-1:1,-1:1)
+    complex(dp) :: a1_aa,a2_aa,a3_aa,struc_aa(3),fac_aa(-1:1,-1:1)
+    complex(dp) :: a1_zzp,a2_zzp,a3_zzp,struc_zzp(3),fac_zzp(-1:1,-1:1)
+    complex(dp) :: a1_zpz,a2_zpz,a3_zpz,struc_zpz(3),fac_zpz(-1:1,-1:1)
+    complex(dp) :: a1_azp,a2_azp,a3_azp,struc_azp(3),fac_azp(-1:1,-1:1)
+    complex(dp) :: a1_zpa,a2_zpa,a3_zpa,struc_zpa(3),fac_zpa(-1:1,-1:1)
+    complex(dp) :: a1_zpzp,a2_zpzp,a3_zpzp,struc_zpzp(3),fac_zpzp(-1:1,-1:1)
     complex(dp) :: helcoup(1:3,-1:1,-1:1)
     complex(dp) :: zab2
     complex(dp) :: iprop12,iprop34, zpprop12,zpprop34
     complex(dp) :: vvcoupl_prime_zz(4),vvcoupl_prime_az(4),vvcoupl_prime_za(4),vvcoupl_prime_aa(2:4)
     complex(dp) :: vvcoupl_prime_zzp(4),vvcoupl_prime_zpz(4),vvcoupl_prime_zpzp(4)
+    complex(dp) :: vvcoupl_prime_azp(4),vvcoupl_prime_zpa(4)
     integer :: vv_it
     integer :: i,j,k,l
 
@@ -2383,6 +2387,24 @@ module modHiggsJJ
 
     A0_ZZ_4f = czero
     helcoup(:,:,:)=czero
+    struc_zz(:)=czero
+    struc_az(:)=czero
+    struc_za(:)=czero
+    struc_aa(:)=czero
+    struc_zzp(:)=czero
+    struc_zpz(:)=czero
+    struc_azp(:)=czero
+    struc_zpa(:)=czero
+    struc_zpzp(:)=czero
+    fac_zz(:,:)=czero
+    fac_az(:,:)=czero
+    fac_za(:,:)=czero
+    fac_aa(:,:)=czero
+    fac_zzp(:,:)=czero
+    fac_zpz(:,:)=czero
+    fac_azp(:,:)=czero
+    fac_zpa(:,:)=czero
+    fac_zpzp(:,:)=czero
 
     Lz = (/aL_Qdn,aL_Qup,aL_Qdn,aL_Qup,aL_Qdn/)
     Rz = (/aR_Qdn,aR_Qup,aR_Qdn,aR_Qup,aR_Qdn/)
@@ -2417,6 +2439,11 @@ module modHiggsJJ
     struc_zz(2) = (a2_zz + ci * a3_zz)
     struc_zz(3) = two * ci * a3_zz
     struc_zz(:) = struc_zz(:) * couplZffsq
+
+    fac_zz(-1,-1) = Lz(line1) * Lz(line2)/iprop12/iprop34
+    fac_zz(-1,+1) = Lz(line1) * Rz(line2)/iprop12/iprop34
+    fac_zz(+1,-1) = Rz(line1) * Lz(line2)/iprop12/iprop34
+    fac_zz(+1,+1) = Rz(line1) * Rz(line2)/iprop12/iprop34
 
     if( includeGammaStar ) then
 
@@ -2455,32 +2482,20 @@ module modHiggsJJ
        struc_za(3) = two * ci * a3_za
        struc_za(:) = struc_za(:) * couplAZff
 
-       helcoup(1:3,-1,-1) = struc_zz(1:3) * Lz(line1) * Lz(line2)/iprop12/iprop34 + &
-                            struc_aa(1:3) * La(line1) * La(line2)/q12sq  /q34sq   + &
-                            struc_az(1:3) * La(line1) * Lz(line2)/q12sq  /iprop34 + &
-                            struc_za(1:3) * Lz(line1) * La(line2)/iprop12/q34sq
+       fac_aa(-1,-1) = La(line1) * La(line2)/q12sq/q34sq
+       fac_aa(-1,+1) = La(line1) * Ra(line2)/q12sq/q34sq
+       fac_aa(+1,-1) = Ra(line1) * La(line2)/q12sq/q34sq
+       fac_aa(+1,+1) = Ra(line1) * Ra(line2)/q12sq/q34sq
 
-       helcoup(1:3,-1,+1) = struc_zz(1:3) * Lz(line1) * Rz(line2)/iprop12/iprop34 + &
-                            struc_aa(1:3) * La(line1) * Ra(line2)/q12sq  /q34sq   + &
-                            struc_az(1:3) * La(line1) * Rz(line2)/q12sq  /iprop34 + &
-                            struc_za(1:3) * Lz(line1) * Ra(line2)/iprop12/q34sq
+       fac_az(-1,-1) = La(line1) * Lz(line2)/q12sq/iprop34
+       fac_az(-1,+1) = La(line1) * Rz(line2)/q12sq/iprop34
+       fac_az(+1,-1) = Ra(line1) * Lz(line2)/q12sq/iprop34
+       fac_az(+1,+1) = Ra(line1) * Rz(line2)/q12sq/iprop34
 
-       helcoup(1:3,+1,-1) = struc_zz(1:3) * Rz(line1) * Lz(line2)/iprop12/iprop34 + &
-                            struc_aa(1:3) * Ra(line1) * La(line2)/q12sq  /q34sq   + &
-                            struc_az(1:3) * Ra(line1) * Lz(line2)/q12sq  /iprop34 + &
-                            struc_za(1:3) * Rz(line1) * La(line2)/iprop12/q34sq
-
-       helcoup(1:3,+1,+1) = struc_zz(1:3) * Rz(line1) * Rz(line2)/iprop12/iprop34 + &
-                            struc_aa(1:3) * Ra(line1) * Ra(line2)/q12sq  /q34sq   + &
-                            struc_az(1:3) * Ra(line1) * Rz(line2)/q12sq  /iprop34 + &
-                            struc_za(1:3) * Rz(line1) * Ra(line2)/iprop12/q34sq
-
-    else
-
-       helcoup(1:3,-1,-1) = struc_zz(1:3) * Lz(line1) * Lz(line2)/iprop12/iprop34
-       helcoup(1:3,-1,+1) = struc_zz(1:3) * Lz(line1) * Rz(line2)/iprop12/iprop34
-       helcoup(1:3,+1,-1) = struc_zz(1:3) * Rz(line1) * Lz(line2)/iprop12/iprop34
-       helcoup(1:3,+1,+1) = struc_zz(1:3) * Rz(line1) * Rz(line2)/iprop12/iprop34
+       fac_za(-1,-1) = Lz(line1) * La(line2)/iprop12/q34sq
+       fac_za(-1,+1) = Lz(line1) * Ra(line2)/iprop12/q34sq
+       fac_za(+1,-1) = Rz(line1) * La(line2)/iprop12/q34sq
+       fac_za(+1,+1) = Rz(line1) * Ra(line2)/iprop12/q34sq
 
     endif
 
@@ -2531,28 +2546,72 @@ module modHiggsJJ
        struc_zpz(:) = struc_zpz(:) * couplZffsq
        struc_zpzp(:) = struc_zpzp(:) * couplZffsq
 
-       helcoup(1:3,-1,-1) = helcoup(1:3,-1,-1) + &
-                            struc_zpzp(1:3) * LCT(line1) * LCT(line2)/zpprop12  /zpprop34   + &
-                            struc_zpz(1:3) * LCT(line1) * Lz(line2)/zpprop12  /iprop34 + &
-                            struc_zzp(1:3) * Lz(line1) * LCT(line2)/iprop12/zpprop34
+       fac_zpzp(-1,-1) = LCT(line1) * LCT(line2)/zpprop12/zpprop34
+       fac_zpzp(-1,+1) = LCT(line1) * RCT(line2)/zpprop12/zpprop34
+       fac_zpzp(+1,-1) = RCT(line1) * LCT(line2)/zpprop12/zpprop34
+       fac_zpzp(+1,+1) = RCT(line1) * RCT(line2)/zpprop12/zpprop34
 
-       helcoup(1:3,-1,+1) = helcoup(1:3,-1,+1) + &
-                            struc_zpzp(1:3) * LCT(line1) * RCT(line2)/zpprop12  /zpprop34   + &
-                            struc_zpz(1:3) * LCT(line1) * Rz(line2)/zpprop12  /iprop34 + &
-                            struc_zzp(1:3) * Lz(line1) * RCT(line2)/iprop12/zpprop34
+       fac_zpz(-1,-1) = LCT(line1) * Lz(line2)/zpprop12/iprop34
+       fac_zpz(-1,+1) = LCT(line1) * Rz(line2)/zpprop12/iprop34
+       fac_zpz(+1,-1) = RCT(line1) * Lz(line2)/zpprop12/iprop34
+       fac_zpz(+1,+1) = RCT(line1) * Rz(line2)/zpprop12/iprop34
 
-       helcoup(1:3,+1,-1) = helcoup(1:3,+1,-1) + &
-                            struc_zpzp(1:3) * RCT(line1) * LCT(line2)/zpprop12  /zpprop34   + &
-                            struc_zpz(1:3) * RCT(line1) * Lz(line2)/zpprop12  /iprop34 + &
-                            struc_zzp(1:3) * Rz(line1) * LCT(line2)/iprop12/zpprop34
+       fac_zzp(-1,-1) = Lz(line1) * LCT(line2)/iprop12/zpprop34
+       fac_zzp(-1,+1) = Lz(line1) * RCT(line2)/iprop12/zpprop34
+       fac_zzp(+1,-1) = Rz(line1) * LCT(line2)/iprop12/zpprop34
+       fac_zzp(+1,+1) = Rz(line1) * RCT(line2)/iprop12/zpprop34
 
-       helcoup(1:3,+1,+1) = helcoup(1:3,+1,+1) + &
-                            struc_zpzp(1:3) * RCT(line1) * RCT(line2)/zpprop12  /zpprop34   + &
-                            struc_zpz(1:3) * RCT(line1) * Rz(line2)/zpprop12  /iprop34 + &
-                            struc_zzp(1:3) * Rz(line1) * RCT(line2)/iprop12/zpprop34
+
+       if( includeGammaStar ) then
+          do vv_it=1,4
+             vvcoupl_prime_azp(vv_it) = HVVSpinZeroDynamicCoupling(19+vv_it,q12sq,q34sq,mhsq)
+             vvcoupl_prime_zpa(vv_it) = HVVSpinZeroDynamicCoupling(19+vv_it,q34sq,q12sq,mhsq)
+          enddo
+
+          a1_azp = vvcoupl_prime_azp(1) * M_Z**2/mhsq + vvcoupl_prime_azp(2) * two * q1q2/mhsq + vvcoupl_prime_azp(3) * kcoupl * q1q2/mhsq
+          a2_azp = -two * vvcoupl_prime_azp(2) - kcoupl * vvcoupl_prime_azp(3)
+          a3_azp = -two * vvcoupl_prime_azp(4)
+
+          a1_zpa = vvcoupl_prime_zpa(1) * M_Z**2/mhsq + vvcoupl_prime_zpa(2) * two * q1q2/mhsq + vvcoupl_prime_zpa(3) * kcoupl * q1q2/mhsq
+          a2_zpa = -two * vvcoupl_prime_zpa(2) - kcoupl * vvcoupl_prime_zpa(3)
+          a3_zpa = -two * vvcoupl_prime_zpa(4)
+
+          struc_azp(1) = two * (a1_azp * mhsq - ci * a3_azp * q1q2)
+          struc_azp(2) = (a2_azp + ci * a3_azp)
+          struc_azp(3) = two * ci * a3_azp
+          struc_azp(:) = struc_azp(:) * couplAZff
+
+          struc_zpa(1) = two * (a1_zpa * mhsq - ci * a3_zpa * q1q2)
+          struc_zpa(2) = (a2_zpa + ci * a3_zpa)
+          struc_zpa(3) = two * ci * a3_zpa
+          struc_zpa(:) = struc_zpa(:) * couplAZff
+
+          fac_zpa(-1,-1) = LCT(line1) * La(line2)/zpprop12/q34sq
+          fac_zpa(-1,+1) = LCT(line1) * Ra(line2)/zpprop12/q34sq
+          fac_zpa(+1,-1) = RCT(line1) * La(line2)/zpprop12/q34sq
+          fac_zpa(+1,+1) = RCT(line1) * Ra(line2)/zpprop12/q34sq
+
+          fac_azp(-1,-1) = La(line1) * LCT(line2)/q12sq/zpprop34
+          fac_azp(-1,+1) = La(line1) * RCT(line2)/q12sq/zpprop34
+          fac_azp(+1,-1) = Ra(line1) * LCT(line2)/q12sq/zpprop34
+          fac_azp(+1,+1) = Ra(line1) * RCT(line2)/q12sq/zpprop34
+       endif
 
     endif
 
+    do i=-1,1,2
+    do j=-1,1,2
+       helcoup(1:3,i,j) = struc_zz(1:3) * fac_zz(i,j) + &
+                          struc_az(1:3) * fac_az(i,j) + &
+                          struc_za(1:3) * fac_za(i,j) + &
+                          struc_zpz(1:3) * fac_zpz(i,j) + &
+                          struc_zzp(1:3) * fac_zzp(i,j) + &
+                          struc_zpa(1:3) * fac_zpa(i,j) + &
+                          struc_azp(1:3) * fac_azp(i,j) + &
+                          struc_aa(1:3) * fac_aa(i,j) + &
+                          struc_zpzp(1:3) * fac_zpzp(i,j)
+    enddo
+    enddo
 
 
     A0_ZZ_4f(-1,-1) = za(j1,j3)*zb(j4,j2) * helcoup(1,-1,-1) + &

@@ -556,7 +556,9 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "MReso2", success, M_Reso2, success2=SetMReso2, multiply=GeV, tosave=tosave)
     call ReadCommandLineArgument(arg, "GaReso2", success, Ga_Reso2, success2=SetGaReso2, multiply=GeV, tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ctauReso", success, HiggsDecayLengthMM, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ctauReso", success, HiggsDecayLengthMM, multiply=ctauUnit, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ctauVprime", success, VprimeDecayLengthMM, multiply=ctauUnit, tosave=tosave)
+    call ReadCommandLineArgument(arg, "VprimeDecayLengthMassCutoffFactor", success, VprimeDecayLengthMassCutoffFactor, tosave=tosave)
     call ReadCommandLineArgument(arg, "VegasNc0", success, VegasNc0)
     call ReadCommandLineArgument(arg, "VegasNc1", success, VegasNc1)
     call ReadCommandLineArgument(arg, "VegasNc2", success, VegasNc2)
@@ -626,101 +628,101 @@ type(SaveValues) :: tosave, oldsavevalues
     !e.g. just setting ghz4=0.2982,0 is ambiguous if you mean to leave g1 on (so fa3=0.5)
     !                                                      or to turn it off (fa3=1 with a weird prefactor)
     ! 4th-generation quark masses for MCFM, common to first and second resonance
-    call ReadCommandLineArgument(arg, "m_bot_4gen", success, m_bot_4gen, success2=SetAnomalousHffMCFM_mbot4gen, tosave=tosave)
-    call ReadCommandLineArgument(arg, "m_top_4gen", success, m_top_4gen, success2=SetAnomalousHffMCFM_mtop4gen, tosave=tosave)
+    call ReadCommandLineArgument(arg, "m_bot_4gen", success, m_bot_4gen, success2=SetAnomalousHffMCFM_mbot4gen, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "m_top_4gen", success, m_top_4gen, success2=SetAnomalousHffMCFM_mtop4gen, checkdestchange=.true., tosave=tosave)
 
     !spin 0 Hff couplings
     call ReadCommandLineArgument(arg, "kappa", success, kappa, success2=SetAnomalousHff, success3=Setkappa, tosave=tosave)
-    call ReadCommandLineArgument(arg, "kappa_tilde", success, kappa_tilde, success2=SetAnomalousHff, tosave=tosave)
+    call ReadCommandLineArgument(arg, "kappa_tilde", success, kappa_tilde, success2=SetAnomalousHff, checkdestchange=.true., tosave=tosave)
 
     call ReadCommandLineArgument(arg, "kappa_top", success, kappa_top, success2=SetAnomalousHffMCFM, success3=Setkappatop, tosave=tosave)
-    call ReadCommandLineArgument(arg, "kappa_tilde_top", success, kappa_tilde_top, success2=SetAnomalousHffMCFM, tosave=tosave)
+    call ReadCommandLineArgument(arg, "kappa_tilde_top", success, kappa_tilde_top, success2=SetAnomalousHffMCFM, checkdestchange=.true., tosave=tosave)
     call ReadCommandLineArgument(arg, "kappa_bot", success, kappa_top, success2=SetAnomalousHffMCFM, success3=Setkappabot, tosave=tosave)
-    call ReadCommandLineArgument(arg, "kappa_tilde_bot", success, kappa_tilde_top, success2=SetAnomalousHffMCFM, tosave=tosave)
-    call ReadCommandLineArgument(arg, "kappa_4gen_top", success, kappa_4gen_top, success2=SetAnomalousHffMCFM, success3=Setkappa4gentop, tosave=tosave)
-    call ReadCommandLineArgument(arg, "kappa_tilde_4gen_top", success, kappa_tilde_4gen_top, success2=SetAnomalousHffMCFM, success3=Setkappa4gentop, tosave=tosave)
-    call ReadCommandLineArgument(arg, "kappa_4gen_bot", success, kappa_4gen_top, success2=SetAnomalousHffMCFM, success3=Setkappa4genbot, tosave=tosave)
-    call ReadCommandLineArgument(arg, "kappa_tilde_4gen_bot", success, kappa_tilde_4gen_top, success2=SetAnomalousHffMCFM, success3=Setkappa4genbot, tosave=tosave)
+    call ReadCommandLineArgument(arg, "kappa_tilde_bot", success, kappa_tilde_top, success2=SetAnomalousHffMCFM, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "kappa_4gen_top", success, kappa_4gen_top, success2=SetAnomalousHffMCFM, success3=Setkappa4gentop, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "kappa_tilde_4gen_top", success, kappa_tilde_4gen_top, success2=SetAnomalousHffMCFM, success3=Setkappa4gentop, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "kappa_4gen_bot", success, kappa_4gen_top, success2=SetAnomalousHffMCFM, success3=Setkappa4genbot, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "kappa_tilde_4gen_bot", success, kappa_tilde_4gen_top, success2=SetAnomalousHffMCFM, success3=Setkappa4genbot, checkdestchange=.true., tosave=tosave)
 
     !spin 0 gg couplings
     call ReadCommandLineArgument(arg, "ghg2", success, ghg2, success2=SetAnomalousSpin0gg, success3=Setghg2, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghg3", success, ghg3, success2=SetAnomalousSpin0gg, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghg4", success, ghg4, success2=SetAnomalousSpin0gg, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghg3", success, ghg3, success2=SetAnomalousSpin0gg, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghg4", success, ghg4, success2=SetAnomalousSpin0gg, checkdestchange=.true., tosave=tosave)
 
     !spin 0 gg couplings (second point-like vertex for MCFM)
-    call ReadCommandLineArgument(arg, "ghg2_4gen", success, ghg2_4gen, success2=SetAnomalousSpin0gg4gen, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghg3_4gen", success, ghg3_4gen, success2=SetAnomalousSpin0gg4gen, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghg4_4gen", success, ghg4_4gen, success2=SetAnomalousSpin0gg4gen, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghg2_4gen", success, ghg2_4gen, success2=SetAnomalousSpin0gg4gen, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghg3_4gen", success, ghg3_4gen, success2=SetAnomalousSpin0gg4gen, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghg4_4gen", success, ghg4_4gen, success2=SetAnomalousSpin0gg4gen, checkdestchange=.true., tosave=tosave)
 
     !spin 0 ZZ couplings
     call ReadCommandLineArgument(arg, "ghz1", success, ghz1, success2=SetAnomalousSpin0VV, success3=Setghz1, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghz2", success, ghz2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghz3", success, ghz3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghz4", success, ghz4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz2", success, ghz2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz3", success, ghz3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz4", success, ghz4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
 
     !spin 0 Zgamma couplings
-    call ReadCommandLineArgument(arg, "ghzgs2", success, ghzgs2, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzgs3", success, ghzgs3, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzgs4", success, ghzgs4, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzgs2", success, ghzgs2, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzgs3", success, ghzgs3, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzgs4", success, ghzgs4, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling, checkdestchange=.true., tosave=tosave)
 
     !spin 0 gammagamma couplings
-    call ReadCommandLineArgument(arg, "ghgsgs2", success, ghgsgs2, success2=SetAnomalousSpin0VV, success3=Setgammagammacoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghgsgs3", success, ghgsgs3, success2=SetAnomalousSpin0VV, success3=Setgammagammacoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghgsgs4", success, ghgsgs4, success2=SetAnomalousSpin0VV, success3=Setgammagammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghgsgs2", success, ghgsgs2, success2=SetAnomalousSpin0VV, success3=Setgammagammacoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghgsgs3", success, ghgsgs3, success2=SetAnomalousSpin0VV, success3=Setgammagammacoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghgsgs4", success, ghgsgs4, success2=SetAnomalousSpin0VV, success3=Setgammagammacoupling, checkdestchange=.true., tosave=tosave)
 
     !spin 0 ZZ momentum dependent couplings
-    call ReadCommandLineArgument(arg, "ghz1_prime", success, ghz1_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghz1_prime2", success, ghz1_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghz1_prime3", success, ghz1_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghz1_prime4", success, ghz1_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghz1_prime5", success, ghz1_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghz1_prime6", success, ghz1_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghz1_prime7", success, ghz1_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz1_prime", success, ghz1_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz1_prime2", success, ghz1_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz1_prime3", success, ghz1_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz1_prime4", success, ghz1_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz1_prime5", success, ghz1_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz1_prime6", success, ghz1_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz1_prime7", success, ghz1_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghz2_prime", success, ghz2_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghz2_prime2", success, ghz2_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghz2_prime3", success, ghz2_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghz2_prime4", success, ghz2_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghz2_prime5", success, ghz2_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghz2_prime6", success, ghz2_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghz2_prime7", success, ghz2_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz2_prime", success, ghz2_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz2_prime2", success, ghz2_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz2_prime3", success, ghz2_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz2_prime4", success, ghz2_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz2_prime5", success, ghz2_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz2_prime6", success, ghz2_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz2_prime7", success, ghz2_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghz3_prime", success, ghz3_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghz3_prime2", success, ghz3_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghz3_prime3", success, ghz3_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghz3_prime4", success, ghz3_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghz3_prime5", success, ghz3_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghz3_prime6", success, ghz3_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghz3_prime7", success, ghz3_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz3_prime", success, ghz3_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz3_prime2", success, ghz3_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz3_prime3", success, ghz3_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz3_prime4", success, ghz3_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz3_prime5", success, ghz3_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz3_prime6", success, ghz3_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz3_prime7", success, ghz3_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghz4_prime", success, ghz4_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghz4_prime2", success, ghz4_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghz4_prime3", success, ghz4_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghz4_prime4", success, ghz4_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghz4_prime5", success, ghz4_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghz4_prime6", success, ghz4_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghz4_prime7", success, ghz4_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz4_prime", success, ghz4_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz4_prime2", success, ghz4_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz4_prime3", success, ghz4_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz4_prime4", success, ghz4_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz4_prime5", success, ghz4_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz4_prime6", success, ghz4_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghz4_prime7", success, ghz4_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
 
     !spin 0 Zgamma momentum dependent coupling
-    call ReadCommandLineArgument(arg, "ghzgs1_prime2", success, ghzgs1_prime2, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzgs1_prime2", success, ghzgs1_prime2, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling, checkdestchange=.true., tosave=tosave)
 
     ! Sign of q1,2,12**2 for the Lambda's, set to 1 or -1 to get q**2-dependence from these form factor Lambdas
-    call ReadCommandLineArgument(arg, "cz_q1sq", success, cz_q1sq, success2=SetAnomalousSpin0VV, tosave=tosave)
-    call ReadCommandLineArgument(arg, "cz_q2sq", success, cz_q2sq, success2=SetAnomalousSpin0VV, tosave=tosave)
-    call ReadCommandLineArgument(arg, "cz_q12sq", success, cz_q12sq, success2=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "cz_q1sq", success, cz_q1sq, success2=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "cz_q2sq", success, cz_q2sq, success2=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "cz_q12sq", success, cz_q12sq, success2=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
     ! Lambda's for q1,2,12**2 for the Lambda's
-    call ReadCommandLineArgument(arg, "Lambda_z11", success, Lambda_z11, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda_z21", success, Lambda_z21, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda_z31", success, Lambda_z31, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda_z41", success, Lambda_z41, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda_z12", success, Lambda_z12, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda_z22", success, Lambda_z22, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda_z32", success, Lambda_z32, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda_z42", success, Lambda_z42, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda_z10", success, Lambda_z10, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda_z20", success, Lambda_z20, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda_z30", success, Lambda_z30, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda_z40", success, Lambda_z40, multiply=GeV, success2=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_z11", success, Lambda_z11, multiply=GeV, success2=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_z21", success, Lambda_z21, multiply=GeV, success2=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_z31", success, Lambda_z31, multiply=GeV, success2=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_z41", success, Lambda_z41, multiply=GeV, success2=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_z12", success, Lambda_z12, multiply=GeV, success2=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_z22", success, Lambda_z22, multiply=GeV, success2=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_z32", success, Lambda_z32, multiply=GeV, success2=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_z42", success, Lambda_z42, multiply=GeV, success2=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_z10", success, Lambda_z10, multiply=GeV, success2=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_z20", success, Lambda_z20, multiply=GeV, success2=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_z30", success, Lambda_z30, multiply=GeV, success2=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_z40", success, Lambda_z40, multiply=GeV, success2=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
 
     !spin 0 WW couplings
     call ReadCommandLineArgument(arg, "ghw1", success, ghw1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
@@ -779,132 +781,132 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "Lambda_w40", success, Lambda_w40, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
 
     !spin 1
-    call ReadCommandLineArgument(arg, "zprime_qq_left", success, zprime_qq_left, success2=SetAnomalousSpin1qq, success3=Setspin1qqleft, tosave=tosave)
-    call ReadCommandLineArgument(arg, "zprime_qq_right", success, zprime_qq_right, success2=SetAnomalousSpin1qq, success3=Setspin1qqright, tosave=tosave)
-    call ReadCommandLineArgument(arg, "zprime_zz_1", success, zprime_zz_1, success2=SetSpin1VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "zprime_zz_2", success, zprime_zz_2, success2=SetSpin1VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "zprime_qq_left", success, zprime_qq_left, success2=SetAnomalousSpin1qq, success3=Setspin1qqleft, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "zprime_qq_right", success, zprime_qq_right, success2=SetAnomalousSpin1qq, success3=Setspin1qqright, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "zprime_zz_1", success, zprime_zz_1, success2=SetSpin1VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "zprime_zz_2", success, zprime_zz_2, success2=SetSpin1VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
 
     !spin 2
-    call ReadCommandLineArgument(arg, "a1", success, a1, success2=SetAnomalousSpin2gg, tosave=tosave)
-    call ReadCommandLineArgument(arg, "a2", success, a2, success2=SetAnomalousSpin2gg, tosave=tosave)
-    call ReadCommandLineArgument(arg, "a3", success, a3, success2=SetAnomalousSpin2gg, tosave=tosave)
-    call ReadCommandLineArgument(arg, "a4", success, a4, success2=SetAnomalousSpin2gg, tosave=tosave)
-    call ReadCommandLineArgument(arg, "a5", success, a5, success2=SetAnomalousSpin2gg, tosave=tosave)
-    call ReadCommandLineArgument(arg, "graviton_qq_left", success, graviton_qq_left, success2=SetAnomalousSpin2qq, success3=Setspin2qqleft, tosave=tosave)
-    call ReadCommandLineArgument(arg, "graviton_qq_right", success, graviton_qq_right, success2=SetAnomalousSpin2qq, success3=Setspin2qqright, tosave=tosave)
-    call ReadCommandLineArgument(arg, "b1", success, b1, success2=SetSpin2VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "b2", success, b2, success2=SetSpin2VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "b3", success, b3, success2=SetSpin2VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "b4", success, b4, success2=SetSpin2VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "b5", success, b5, success2=SetSpin2VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "b6", success, b6, success2=SetSpin2VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "b7", success, b7, success2=SetSpin2VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "b8", success, b8, success2=SetSpin2VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "b9", success, b9, success2=SetSpin2VV, success3=SetZZcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "b10", success, b10, success2=SetSpin2VV, success3=SetZZcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "a1", success, a1, success2=SetAnomalousSpin2gg, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "a2", success, a2, success2=SetAnomalousSpin2gg, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "a3", success, a3, success2=SetAnomalousSpin2gg, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "a4", success, a4, success2=SetAnomalousSpin2gg, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "a5", success, a5, success2=SetAnomalousSpin2gg, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "graviton_qq_left", success, graviton_qq_left, success2=SetAnomalousSpin2qq, success3=Setspin2qqleft, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "graviton_qq_right", success, graviton_qq_right, success2=SetAnomalousSpin2qq, success3=Setspin2qqright, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "b1", success, b1, success2=SetSpin2VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "b2", success, b2, success2=SetSpin2VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "b3", success, b3, success2=SetSpin2VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "b4", success, b4, success2=SetSpin2VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "b5", success, b5, success2=SetSpin2VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "b6", success, b6, success2=SetSpin2VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "b7", success, b7, success2=SetSpin2VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "b8", success, b8, success2=SetSpin2VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "b9", success, b9, success2=SetSpin2VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "b10", success, b10, success2=SetSpin2VV, success3=SetZZcoupling, checkdestchange=.true., tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "bzgs1", success, bzgs1, success2=SetSpin2VV, success3=SetZgammacoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bzgs2", success, bzgs2, success2=SetSpin2VV, success3=SetZgammacoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bzgs3", success, bzgs3, success2=SetSpin2VV, success3=SetZgammacoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bzgs4", success, bzgs4, success2=SetSpin2VV, success3=SetZgammacoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bzgs8", success, bzgs8, success2=SetSpin2VV, success3=SetZgammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzgs1", success, bzgs1, success2=SetSpin2VV, success3=SetZgammacoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzgs2", success, bzgs2, success2=SetSpin2VV, success3=SetZgammacoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzgs3", success, bzgs3, success2=SetSpin2VV, success3=SetZgammacoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzgs4", success, bzgs4, success2=SetSpin2VV, success3=SetZgammacoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzgs8", success, bzgs8, success2=SetSpin2VV, success3=SetZgammacoupling, checkdestchange=.true., tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "bgsgs1", success, bgsgs1, success2=SetSpin2VV, success3=Setgammagammacoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bgsgs2", success, bgsgs2, success2=SetSpin2VV, success3=Setgammagammacoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bgsgs3", success, bgsgs3, success2=SetSpin2VV, success3=Setgammagammacoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bgsgs4", success, bgsgs4, success2=SetSpin2VV, success3=Setgammagammacoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bgsgs8", success, bgsgs8, success2=SetSpin2VV, success3=Setgammagammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bgsgs1", success, bgsgs1, success2=SetSpin2VV, success3=Setgammagammacoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bgsgs2", success, bgsgs2, success2=SetSpin2VV, success3=Setgammagammacoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bgsgs3", success, bgsgs3, success2=SetSpin2VV, success3=Setgammagammacoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bgsgs4", success, bgsgs4, success2=SetSpin2VV, success3=Setgammagammacoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bgsgs8", success, bgsgs8, success2=SetSpin2VV, success3=Setgammagammacoupling, checkdestchange=.true., tosave=tosave)
 
 !   similar as above for the 2nd resonance in offshell VBF
     !spin 0 Hff couplings
-    call ReadCommandLineArgument(arg, "kappa2_top", success, kappa2_top, success2=SetAnomalousHffMCFM, success3=Setkappa2top, tosave=tosave)
-    call ReadCommandLineArgument(arg, "kappa2_tilde_top", success, kappa2_tilde_top, success2=SetAnomalousHffMCFM, success3=Setkappa2top, tosave=tosave)
-    call ReadCommandLineArgument(arg, "kappa2_bot", success, kappa2_top, success2=SetAnomalousHffMCFM, success3=Setkappa2bot, tosave=tosave)
-    call ReadCommandLineArgument(arg, "kappa2_tilde_bot", success, kappa2_tilde_top, success2=SetAnomalousHffMCFM, success3=Setkappa2bot, tosave=tosave)
-    call ReadCommandLineArgument(arg, "kappa2_4gen_top", success, kappa2_4gen_top, success2=SetAnomalousHffMCFM, success3=Setkappa24gentop, tosave=tosave)
-    call ReadCommandLineArgument(arg, "kappa2_tilde_4gen_top", success, kappa2_tilde_4gen_top, success2=SetAnomalousHffMCFM, success3=Setkappa24gentop, tosave=tosave)
-    call ReadCommandLineArgument(arg, "kappa2_4gen_bot", success, kappa2_4gen_top, success2=SetAnomalousHffMCFM, success3=Setkappa24genbot, tosave=tosave)
-    call ReadCommandLineArgument(arg, "kappa2_tilde_4gen_bot", success, kappa2_tilde_4gen_top, success2=SetAnomalousHffMCFM, success3=Setkappa24genbot, tosave=tosave)
+    call ReadCommandLineArgument(arg, "kappa2_top", success, kappa2_top, success2=SetAnomalousHffMCFM, success3=Setkappa2top, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "kappa2_tilde_top", success, kappa2_tilde_top, success2=SetAnomalousHffMCFM, success3=Setkappa2top, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "kappa2_bot", success, kappa2_top, success2=SetAnomalousHffMCFM, success3=Setkappa2bot, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "kappa2_tilde_bot", success, kappa2_tilde_top, success2=SetAnomalousHffMCFM, success3=Setkappa2bot, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "kappa2_4gen_top", success, kappa2_4gen_top, success2=SetAnomalousHffMCFM, success3=Setkappa24gentop, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "kappa2_tilde_4gen_top", success, kappa2_tilde_4gen_top, success2=SetAnomalousHffMCFM, success3=Setkappa24gentop, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "kappa2_4gen_bot", success, kappa2_4gen_top, success2=SetAnomalousHffMCFM, success3=Setkappa24genbot, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "kappa2_tilde_4gen_bot", success, kappa2_tilde_4gen_top, success2=SetAnomalousHffMCFM, success3=Setkappa24genbot, checkdestchange=.true., tosave=tosave)
 
     !second resonance spin 0 gg couplings
-    call ReadCommandLineArgument(arg, "gh2g2", success, gh2g2, success2=SetAnomalousSpin0Res2gg, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2g3", success, gh2g3, success2=SetAnomalousSpin0Res2gg, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2g4", success, gh2g4, success2=SetAnomalousSpin0Res2gg, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2g2", success, gh2g2, success2=SetAnomalousSpin0Res2gg, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2g3", success, gh2g3, success2=SetAnomalousSpin0Res2gg, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2g4", success, gh2g4, success2=SetAnomalousSpin0Res2gg, checkdestchange=.true., tosave=tosave)
 
     !second resonance spin 0 gg couplings (second point-like vertex for MCFM)
-    call ReadCommandLineArgument(arg, "gh2g2_4gen", success, gh2g2_4gen, success2=SetAnomalousSpin0Res2gg4gen, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2g3_4gen", success, gh2g3_4gen, success2=SetAnomalousSpin0Res2gg4gen, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2g4_4gen", success, gh2g4_4gen, success2=SetAnomalousSpin0Res2gg4gen, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2g2_4gen", success, gh2g2_4gen, success2=SetAnomalousSpin0Res2gg4gen, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2g3_4gen", success, gh2g3_4gen, success2=SetAnomalousSpin0Res2gg4gen, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2g4_4gen", success, gh2g4_4gen, success2=SetAnomalousSpin0Res2gg4gen, checkdestchange=.true., tosave=tosave)
 
     !spin 0 ZZ couplings
-    call ReadCommandLineArgument(arg, "gh2z1", success, gh2z1, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2z2", success, gh2z2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2z3", success, gh2z3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2z4", success, gh2z4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z1", success, gh2z1, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z2", success, gh2z2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z3", success, gh2z3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z4", success, gh2z4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
 
     !spin 0 Zgamma couplings
-    call ReadCommandLineArgument(arg, "gh2zgs2", success, gh2zgs2, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2zgs3", success, gh2zgs3, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2zgs4", success, gh2zgs4, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2zgs2", success, gh2zgs2, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2zgs3", success, gh2zgs3, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2zgs4", success, gh2zgs4, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
 
     !spin 0 gammagamma couplings
-    call ReadCommandLineArgument(arg, "gh2gsgs2", success, gh2gsgs2, success2=SetAnomalousSpin0VV, success3=Setgammagammacoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2gsgs3", success, gh2gsgs3, success2=SetAnomalousSpin0VV, success3=Setgammagammacoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2gsgs4", success, gh2gsgs4, success2=SetAnomalousSpin0VV, success3=Setgammagammacoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2gsgs2", success, gh2gsgs2, success2=SetAnomalousSpin0VV, success3=Setgammagammacoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2gsgs3", success, gh2gsgs3, success2=SetAnomalousSpin0VV, success3=Setgammagammacoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2gsgs4", success, gh2gsgs4, success2=SetAnomalousSpin0VV, success3=Setgammagammacoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
 
     !spin 0 ZZ momentum dependent couplings
-    call ReadCommandLineArgument(arg, "gh2z1_prime", success, gh2z1_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2z1_prime2", success, gh2z1_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2z1_prime3", success, gh2z1_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2z1_prime4", success, gh2z1_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2z1_prime5", success, gh2z1_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2z1_prime6", success, gh2z1_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2z1_prime7", success, gh2z1_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z1_prime", success, gh2z1_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z1_prime2", success, gh2z1_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z1_prime3", success, gh2z1_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z1_prime4", success, gh2z1_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z1_prime5", success, gh2z1_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z1_prime6", success, gh2z1_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z1_prime7", success, gh2z1_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "gh2z2_prime", success, gh2z2_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2z2_prime2", success, gh2z2_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2z2_prime3", success, gh2z2_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2z2_prime4", success, gh2z2_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2z2_prime5", success, gh2z2_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2z2_prime6", success, gh2z2_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2z2_prime7", success, gh2z2_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z2_prime", success, gh2z2_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z2_prime2", success, gh2z2_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z2_prime3", success, gh2z2_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z2_prime4", success, gh2z2_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z2_prime5", success, gh2z2_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z2_prime6", success, gh2z2_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z2_prime7", success, gh2z2_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "gh2z3_prime", success, gh2z3_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2z3_prime2", success, gh2z3_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2z3_prime3", success, gh2z3_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2z3_prime4", success, gh2z3_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2z3_prime5", success, gh2z3_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2z3_prime6", success, gh2z3_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2z3_prime7", success, gh2z3_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z3_prime", success, gh2z3_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z3_prime2", success, gh2z3_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z3_prime3", success, gh2z3_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z3_prime4", success, gh2z3_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z3_prime5", success, gh2z3_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z3_prime6", success, gh2z3_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z3_prime7", success, gh2z3_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "gh2z4_prime", success, gh2z4_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2z4_prime2", success, gh2z4_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2z4_prime3", success, gh2z4_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2z4_prime4", success, gh2z4_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2z4_prime5", success, gh2z4_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2z4_prime6", success, gh2z4_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2z4_prime7", success, gh2z4_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z4_prime", success, gh2z4_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z4_prime2", success, gh2z4_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z4_prime3", success, gh2z4_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z4_prime4", success, gh2z4_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z4_prime5", success, gh2z4_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z4_prime6", success, gh2z4_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2z4_prime7", success, gh2z4_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
 
     !spin 0 Zgamma momentum dependent coupling
-    call ReadCommandLineArgument(arg, "gh2zgs1_prime2", success, gh2zgs1_prime2, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling, success4=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2zgs1_prime2", success, gh2zgs1_prime2, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
 
     ! Sign of q1,2,12**2 for the Lambda's, set to 1 or -1 to get q**2-dependence from these form factor Lambdas
-    call ReadCommandLineArgument(arg, "c2z_q1sq", success, c2z_q1sq, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "c2z_q2sq", success, c2z_q2sq, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "c2z_q12sq", success, c2z_q12sq, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "c2z_q1sq", success, c2z_q1sq, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "c2z_q2sq", success, c2z_q2sq, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "c2z_q12sq", success, c2z_q12sq, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
     ! Lambda's for q1,2,12**2 for the Lambda's
-    call ReadCommandLineArgument(arg, "Lambda2_z11", success, Lambda2_z11, multiply=GeV, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda2_z21", success, Lambda2_z21, multiply=GeV, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda2_z31", success, Lambda2_z31, multiply=GeV, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda2_z41", success, Lambda2_z41, multiply=GeV, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda2_z12", success, Lambda2_z12, multiply=GeV, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda2_z22", success, Lambda2_z22, multiply=GeV, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda2_z32", success, Lambda2_z32, multiply=GeV, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda2_z42", success, Lambda2_z42, multiply=GeV, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda2_z10", success, Lambda2_z10, multiply=GeV, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda2_z20", success, Lambda2_z20, multiply=GeV, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda2_z30", success, Lambda2_z30, multiply=GeV, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda2_z40", success, Lambda2_z40, multiply=GeV, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_z11", success, Lambda2_z11, multiply=GeV, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_z21", success, Lambda2_z21, multiply=GeV, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_z31", success, Lambda2_z31, multiply=GeV, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_z41", success, Lambda2_z41, multiply=GeV, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_z12", success, Lambda2_z12, multiply=GeV, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_z22", success, Lambda2_z22, multiply=GeV, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_z32", success, Lambda2_z32, multiply=GeV, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_z42", success, Lambda2_z42, multiply=GeV, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_z10", success, Lambda2_z10, multiply=GeV, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_z20", success, Lambda2_z20, multiply=GeV, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_z30", success, Lambda2_z30, multiply=GeV, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_z40", success, Lambda2_z40, multiply=GeV, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
 
     !spin 0 WW couplings
     call ReadCommandLineArgument(arg, "gh2w1", success, gh2w1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
@@ -965,137 +967,137 @@ type(SaveValues) :: tosave, oldsavevalues
 
     !contact interactions
     !spin 0 ZZp couplings
-    call ReadCommandLineArgument(arg, "ghzzp1", success, ghzzp1, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzzp2", success, ghzzp2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzzp3", success, ghzzp3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzzp4", success, ghzzp4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp1", success, ghzzp1, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp2", success, ghzzp2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp3", success, ghzzp3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp4", success, ghzzp4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghzzp1_prime", success, ghzzp1_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzzp1_prime2", success, ghzzp1_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzzp1_prime3", success, ghzzp1_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzzp1_prime4", success, ghzzp1_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzzp1_prime5", success, ghzzp1_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzzp1_prime6", success, ghzzp1_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzzp1_prime7", success, ghzzp1_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp1_prime", success, ghzzp1_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp1_prime2", success, ghzzp1_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp1_prime3", success, ghzzp1_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp1_prime4", success, ghzzp1_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp1_prime5", success, ghzzp1_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp1_prime6", success, ghzzp1_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp1_prime7", success, ghzzp1_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghzzp2_prime", success, ghzzp2_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzzp2_prime2", success, ghzzp2_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzzp2_prime3", success, ghzzp2_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzzp2_prime4", success, ghzzp2_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzzp2_prime5", success, ghzzp2_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzzp2_prime6", success, ghzzp2_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzzp2_prime7", success, ghzzp2_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp2_prime", success, ghzzp2_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp2_prime2", success, ghzzp2_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp2_prime3", success, ghzzp2_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp2_prime4", success, ghzzp2_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp2_prime5", success, ghzzp2_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp2_prime6", success, ghzzp2_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp2_prime7", success, ghzzp2_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghzzp3_prime", success, ghzzp3_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzzp3_prime2", success, ghzzp3_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzzp3_prime3", success, ghzzp3_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzzp3_prime4", success, ghzzp3_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzzp3_prime5", success, ghzzp3_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzzp3_prime6", success, ghzzp3_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzzp3_prime7", success, ghzzp3_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp3_prime", success, ghzzp3_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp3_prime2", success, ghzzp3_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp3_prime3", success, ghzzp3_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp3_prime4", success, ghzzp3_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp3_prime5", success, ghzzp3_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp3_prime6", success, ghzzp3_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp3_prime7", success, ghzzp3_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghzzp4_prime", success, ghzzp4_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzzp4_prime2", success, ghzzp4_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzzp4_prime3", success, ghzzp4_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzzp4_prime4", success, ghzzp4_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzzp4_prime5", success, ghzzp4_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzzp4_prime6", success, ghzzp4_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzzp4_prime7", success, ghzzp4_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp4_prime", success, ghzzp4_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp4_prime2", success, ghzzp4_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp4_prime3", success, ghzzp4_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp4_prime4", success, ghzzp4_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp4_prime5", success, ghzzp4_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp4_prime6", success, ghzzp4_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzzp4_prime7", success, ghzzp4_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
 
     !spin 0 Zpgamma couplings
-    call ReadCommandLineArgument(arg, "ghzpgs1_prime2", success, ghzpgs1_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimegammacoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpgs2", success, ghzpgs2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimegammacoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpgs3", success, ghzpgs3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimegammacoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpgs4", success, ghzpgs4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimegammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpgs1_prime2", success, ghzpgs1_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimegammacoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpgs2", success, ghzpgs2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimegammacoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpgs3", success, ghzpgs3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimegammacoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpgs4", success, ghzpgs4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimegammacoupling, checkdestchange=.true., tosave=tosave)
 
     !spin 0 ZpZp couplings
-    call ReadCommandLineArgument(arg, "ghzpzp1", success, ghzpzp1, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpzp2", success, ghzpzp2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpzp3", success, ghzpzp3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpzp4", success, ghzpzp4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp1", success, ghzpzp1, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp2", success, ghzpzp2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp3", success, ghzpzp3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp4", success, ghzpzp4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghzpzp1_prime", success, ghzpzp1_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpzp1_prime2", success, ghzpzp1_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpzp1_prime3", success, ghzpzp1_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpzp1_prime4", success, ghzpzp1_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpzp1_prime5", success, ghzpzp1_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpzp1_prime6", success, ghzpzp1_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpzp1_prime7", success, ghzpzp1_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp1_prime", success, ghzpzp1_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp1_prime2", success, ghzpzp1_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp1_prime3", success, ghzpzp1_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp1_prime4", success, ghzpzp1_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp1_prime5", success, ghzpzp1_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp1_prime6", success, ghzpzp1_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp1_prime7", success, ghzpzp1_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghzpzp2_prime", success, ghzpzp2_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpzp2_prime2", success, ghzpzp2_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpzp2_prime3", success, ghzpzp2_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpzp2_prime4", success, ghzpzp2_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpzp2_prime5", success, ghzpzp2_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpzp2_prime6", success, ghzpzp2_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpzp2_prime7", success, ghzpzp2_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp2_prime", success, ghzpzp2_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp2_prime2", success, ghzpzp2_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp2_prime3", success, ghzpzp2_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp2_prime4", success, ghzpzp2_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp2_prime5", success, ghzpzp2_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp2_prime6", success, ghzpzp2_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp2_prime7", success, ghzpzp2_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghzpzp3_prime", success, ghzpzp3_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpzp3_prime2", success, ghzpzp3_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpzp3_prime3", success, ghzpzp3_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpzp3_prime4", success, ghzpzp3_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpzp3_prime5", success, ghzpzp3_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpzp3_prime6", success, ghzpzp3_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpzp3_prime7", success, ghzpzp3_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp3_prime", success, ghzpzp3_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp3_prime2", success, ghzpzp3_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp3_prime3", success, ghzpzp3_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp3_prime4", success, ghzpzp3_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp3_prime5", success, ghzpzp3_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp3_prime6", success, ghzpzp3_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp3_prime7", success, ghzpzp3_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghzpzp4_prime", success, ghzpzp4_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpzp4_prime2", success, ghzpzp4_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpzp4_prime3", success, ghzpzp4_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpzp4_prime4", success, ghzpzp4_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpzp4_prime5", success, ghzpzp4_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpzp4_prime6", success, ghzpzp4_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghzpzp4_prime7", success, ghzpzp4_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp4_prime", success, ghzpzp4_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp4_prime2", success, ghzpzp4_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp4_prime3", success, ghzpzp4_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp4_prime4", success, ghzpzp4_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp4_prime5", success, ghzpzp4_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp4_prime6", success, ghzpzp4_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghzpzp4_prime7", success, ghzpzp4_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "bzzp1", success, bzzp1, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bzzp2", success, bzzp2, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bzzp3", success, bzzp3, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bzzp4", success, bzzp4, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bzzp5", success, bzzp5, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bzzp6", success, bzzp6, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bzzp7", success, bzzp7, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bzzp8", success, bzzp8, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bzzp9", success, bzzp9, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bzzp10", success, bzzp10, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzzp1", success, bzzp1, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzzp2", success, bzzp2, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzzp3", success, bzzp3, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzzp4", success, bzzp4, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzzp5", success, bzzp5, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzzp6", success, bzzp6, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzzp7", success, bzzp7, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzzp8", success, bzzp8, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzzp9", success, bzzp9, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzzp10", success, bzzp10, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling, checkdestchange=.true., tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "bzpzp1", success, bzpzp1, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bzpzp2", success, bzpzp2, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bzpzp3", success, bzpzp3, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bzpzp4", success, bzpzp4, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bzpzp5", success, bzpzp5, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bzpzp6", success, bzpzp6, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bzpzp7", success, bzpzp7, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bzpzp8", success, bzpzp8, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bzpzp9", success, bzpzp9, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bzpzp10", success, bzpzp10, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzpzp1", success, bzpzp1, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzpzp2", success, bzpzp2, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzpzp3", success, bzpzp3, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzpzp4", success, bzpzp4, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzpzp5", success, bzpzp5, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzpzp6", success, bzpzp6, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzpzp7", success, bzpzp7, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzpzp8", success, bzpzp8, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzpzp9", success, bzpzp9, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzpzp10", success, bzpzp10, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling, checkdestchange=.true., tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "bzpgs1", success, bzpgs1, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimegammacoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bzpgs2", success, bzpgs2, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimegammacoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bzpgs3", success, bzpgs3, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimegammacoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bzpgs4", success, bzpgs4, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimegammacoupling, tosave=tosave)
-    call ReadCommandLineArgument(arg, "bzpgs8", success, bzpgs8, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimegammacoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzpgs1", success, bzpgs1, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimegammacoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzpgs2", success, bzpgs2, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimegammacoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzpgs3", success, bzpgs3, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimegammacoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzpgs4", success, bzpgs4, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimegammacoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "bzpgs8", success, bzpgs8, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimegammacoupling, checkdestchange=.true., tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ezp_El_left", success, ezp_El_left, success2=SetZprimeff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ezp_El_right", success, ezp_El_right, success2=SetZprimeff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ezp_Mu_left", success, ezp_Mu_left, success2=SetZprimeff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ezp_Mu_right", success, ezp_Mu_right, success2=SetZprimeff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ezp_Ta_left", success, ezp_Ta_left, success2=SetZprimeff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ezp_Ta_right", success, ezp_Ta_right, success2=SetZprimeff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ezp_Up_left", success, ezp_Up_left, success2=SetZprimeff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ezp_Up_right", success, ezp_Up_right, success2=SetZprimeff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ezp_Chm_left", success, ezp_Chm_left, success2=SetZprimeff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ezp_Chm_right", success, ezp_Chm_right, success2=SetZprimeff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ezp_Top_left", success, ezp_Top_left, success2=SetZprimeff, tosave=tosave)    !undocumented because it's useless
-    call ReadCommandLineArgument(arg, "ezp_Top_right", success, ezp_Top_right, success2=SetZprimeff, tosave=tosave)  !undocumented because it's useless
-    call ReadCommandLineArgument(arg, "ezp_Dn_left", success, ezp_Dn_left, success2=SetZprimeff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ezp_Dn_right", success, ezp_Dn_right, success2=SetZprimeff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ezp_Str_left", success, ezp_Str_left, success2=SetZprimeff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ezp_Str_right", success, ezp_Str_right, success2=SetZprimeff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ezp_Bot_left", success, ezp_Bot_left, success2=SetZprimeff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ezp_Bot_right", success, ezp_Bot_right, success2=SetZprimeff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ezp_NuE_left", success, ezp_NuE_left, success2=SetZprimeff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ezp_NuE_right", success, ezp_NuE_right, success2=SetZprimeff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "MZprime", success, M_Zprime, multiply=GeV, success2=SetMZprime, tosave=tosave)
-    call ReadCommandLineArgument(arg, "GaZprime", success, Ga_Zprime, multiply=GeV, success2=SetGaZprime, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_El_left", success, ezp_El_left, success2=SetZprimeff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_El_right", success, ezp_El_right, success2=SetZprimeff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_Mu_left", success, ezp_Mu_left, success2=SetZprimeff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_Mu_right", success, ezp_Mu_right, success2=SetZprimeff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_Ta_left", success, ezp_Ta_left, success2=SetZprimeff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_Ta_right", success, ezp_Ta_right, success2=SetZprimeff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_Up_left", success, ezp_Up_left, success2=SetZprimeff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_Up_right", success, ezp_Up_right, success2=SetZprimeff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_Chm_left", success, ezp_Chm_left, success2=SetZprimeff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_Chm_right", success, ezp_Chm_right, success2=SetZprimeff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_Top_left", success, ezp_Top_left, success2=SetZprimeff, checkdestchange=.true., tosave=tosave)    !undocumented because it's useless
+    call ReadCommandLineArgument(arg, "ezp_Top_right", success, ezp_Top_right, success2=SetZprimeff, checkdestchange=.true., tosave=tosave)  !undocumented because it's useless
+    call ReadCommandLineArgument(arg, "ezp_Dn_left", success, ezp_Dn_left, success2=SetZprimeff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_Dn_right", success, ezp_Dn_right, success2=SetZprimeff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_Str_left", success, ezp_Str_left, success2=SetZprimeff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_Str_right", success, ezp_Str_right, success2=SetZprimeff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_Bot_left", success, ezp_Bot_left, success2=SetZprimeff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_Bot_right", success, ezp_Bot_right, success2=SetZprimeff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_NuE_left", success, ezp_NuE_left, success2=SetZprimeff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ezp_NuE_right", success, ezp_NuE_right, success2=SetZprimeff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "MZprime", success, M_Zprime, multiply=GeV, success2=SetMZprime, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "GaZprime", success, Ga_Zprime, multiply=GeV, success2=SetGaZprime, checkdestchange=.true., tosave=tosave)
 
     !spin 0 WWp couplings
     call ReadCommandLineArgument(arg, "ghwwp1", success, ghwwp1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
@@ -1173,32 +1175,32 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "ghwpwp4_prime6", success, ghwpwp4_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
     call ReadCommandLineArgument(arg, "ghwpwp4_prime7", success, ghwpwp4_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ewp_El_left", success, ewp_El_left, success2=SetWprimeff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ewp_El_right", success, ewp_El_right, success2=SetWprimeff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ewp_Mu_left", success, ewp_Mu_left, success2=SetWprimeff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ewp_Mu_right", success, ewp_Mu_right, success2=SetWprimeff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ewp_Ta_left", success, ewp_Ta_left, success2=SetWprimeff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ewp_Ta_right", success, ewp_Ta_right, success2=SetWprimeff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ewp_Up_left", success, ewp_Up_left, success2=SetWprimeff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ewp_Up_right", success, ewp_Up_right, success2=SetWprimeff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ewp_Chm_left", success, ewp_Chm_left, success2=SetWprimeff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ewp_Chm_right", success, ewp_Chm_right, success2=SetWprimeff, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ewp_Top_left", success, ewp_Top_left, success2=SetWprimeff, tosave=tosave)    !undocumented because it's useless (until contact terms are included in tH)
-    call ReadCommandLineArgument(arg, "ewp_Top_right", success, ewp_Top_right, success2=SetWprimeff, tosave=tosave)  !undocumented because it's useless (until contact terms are included in tH)
-    call ReadCommandLineArgument(arg, "MWprime", success, M_Wprime, multiply=GeV, success2=SetMWprime, tosave=tosave)
-    call ReadCommandLineArgument(arg, "GaWprime", success, Ga_Wprime, multiply=GeV, success2=SetGaWprime, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ewp_El_left", success, ewp_El_left, success2=SetWprimeff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ewp_El_right", success, ewp_El_right, success2=SetWprimeff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ewp_Mu_left", success, ewp_Mu_left, success2=SetWprimeff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ewp_Mu_right", success, ewp_Mu_right, success2=SetWprimeff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ewp_Ta_left", success, ewp_Ta_left, success2=SetWprimeff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ewp_Ta_right", success, ewp_Ta_right, success2=SetWprimeff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ewp_Up_left", success, ewp_Up_left, success2=SetWprimeff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ewp_Up_right", success, ewp_Up_right, success2=SetWprimeff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ewp_Chm_left", success, ewp_Chm_left, success2=SetWprimeff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ewp_Chm_right", success, ewp_Chm_right, success2=SetWprimeff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ewp_Top_left", success, ewp_Top_left, success2=SetWprimeff, checkdestchange=.true., tosave=tosave)    !undocumented because it's useless (until contact terms are included in tH)
+    call ReadCommandLineArgument(arg, "ewp_Top_right", success, ewp_Top_right, success2=SetWprimeff, checkdestchange=.true., tosave=tosave)  !undocumented because it's useless (until contact terms are included in tH)
+    call ReadCommandLineArgument(arg, "MWprime", success, M_Wprime, multiply=GeV, success2=SetMWprime, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "GaWprime", success, Ga_Wprime, multiply=GeV, success2=SetGaWprime, checkdestchange=.true., tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "dV_A", success, dV_A, success2=SetATQGC, tosave=tosave) !undocumented, pending chapter in manual
-    call ReadCommandLineArgument(arg, "dP_A", success, dP_A, success2=SetATQGC, tosave=tosave) !undocumented, pending chapter in manual
-    call ReadCommandLineArgument(arg, "dM_A", success, dM_A, success2=SetATQGC, tosave=tosave) !undocumented, pending chapter in manual
-    call ReadCommandLineArgument(arg, "dFour_A", success, dFour_A, success2=SetATQGC, tosave=tosave) !undocumented, pending chapter in manual
-    call ReadCommandLineArgument(arg, "dV_Z", success, dV_Z, success2=SetATQGC, tosave=tosave) !undocumented, pending chapter in manual
-    call ReadCommandLineArgument(arg, "dP_Z", success, dP_Z, success2=SetATQGC, tosave=tosave) !undocumented, pending chapter in manual
-    call ReadCommandLineArgument(arg, "dM_Z", success, dM_Z, success2=SetATQGC, tosave=tosave) !undocumented, pending chapter in manual
-    call ReadCommandLineArgument(arg, "dFour_Z", success, dFour_Z, success2=SetATQGC, tosave=tosave) !undocumented, pending chapter in manual
-    call ReadCommandLineArgument(arg, "dAAWpWm", success, dAAWpWm, success2=SetATQGC, tosave=tosave) !undocumented, pending chapter in manual
-    call ReadCommandLineArgument(arg, "dZAWpWm", success, dZAWpWm, success2=SetATQGC, tosave=tosave) !undocumented, pending chapter in manual
-    call ReadCommandLineArgument(arg, "dZZWpWm", success, dZZWpWm, success2=SetATQGC, tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "dV_A", success, dV_A, success2=SetATQGC, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "dP_A", success, dP_A, success2=SetATQGC, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "dM_A", success, dM_A, success2=SetATQGC, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "dFour_A", success, dFour_A, success2=SetATQGC, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "dV_Z", success, dV_Z, success2=SetATQGC, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "dP_Z", success, dP_Z, success2=SetATQGC, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "dM_Z", success, dM_Z, success2=SetATQGC, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "dFour_Z", success, dFour_Z, success2=SetATQGC, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "dAAWpWm", success, dAAWpWm, success2=SetATQGC, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "dZAWpWm", success, dZAWpWm, success2=SetATQGC, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "dZZWpWm", success, dZZWpWm, success2=SetATQGC, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
 
     ! CKM elements
     call ReadCommandLineArgument(arg, "Vud", success, VCKM_ud, success2=SetCKM, tosave=tosave)
@@ -1360,18 +1362,7 @@ type(SaveValues) :: tosave, oldsavevalues
        DecayMode1 = DecayMode1 - DecayMode2
     endif
 
-    if( IsAZDecay(DecayMode1) .or. (Process.eq.51.and.IsAPhoton(DecayMode1)) ) then
-       M_V = M_Z
-       Ga_V= Ga_Z
-    elseif( IsAWDecay(DecayMode1) ) then
-       M_V = M_W
-       Ga_V= Ga_W
-    elseif( IsAPhoton(DecayMode1) ) then
-       M_V = 0d0
-       Ga_V= 0d0
-    endif
-
-    if( IsAZDecay(DecayMode1) .or. (Process.eq.50.and.IsAPhoton(DecayMode1)) ) then
+    if( IsAZDecay(DecayMode1) .or. ((Process.eq.50 .or. Process.eq.51).and.IsAPhoton(DecayMode1)) ) then
        M_V = M_Z
        Ga_V= Ga_Z
        M_Vprime = M_Zprime
@@ -1395,17 +1386,45 @@ type(SaveValues) :: tosave, oldsavevalues
     M_W_ps = M_W
     Ga_W_ps = Ga_W
 
-    if(      .not.SetZZcoupling .and. .not.SetZgammacoupling .and. .not.SetZZprimecoupling &
-       .and. (Process.ne.0 .or. ghz1.eq.0d0) &    !for Process=0 you have to have explicitly turned off the SM coupling
-       .and. (SetZprimeZprimecoupling .or. SetZprimegammacoupling) &
-       .and. Process.le.2 .and. (SetMZprime.and.IsAZDecay(DecayMode1) .or. SetMWprime.and.IsAWDecay(DecayMode1))) then
-       !need more complicated logic here if this is done for VBF
-       M_V_ps = M_Vprime
-       Ga_V_ps = Ga_Vprime
-       M_Z_ps = M_Zprime
-       Ga_Z_ps = Ga_Zprime
-       M_W_ps = M_Wprime
-       Ga_W_ps = Ga_Wprime
+    if (M_Zprime.gt.0d0 .and. Ga_Zprime.le.0d0) then
+        call Error("M_Zprime>0 requires Ga_Zprime>0.")
+    endif
+    if (M_Wprime.gt.0d0 .and. Ga_Wprime.le.0d0) then
+        call Error("M_Wprime>0 requires Ga_Wprime>0.")
+    endif
+    ! Check/set Vprime phase space quantities when no 'ZZ/ZA' couplings are present
+    ! The following Set*coupling assume the user did not set those couplings to 0, which is in fact a trivial possibility.
+    if( &
+       (SetZZcoupling .or. SetZgammacoupling .or. ghz1.ne.czero) .and. SetHZprime &
+       .and. (Process.le.2 .or. Process.eq.50 .or. Process.eq.51) &
+       .and. (M_Zprime.ge.0d0 .and. IsAZDecay(DecayMode1) .or. M_Wprime.ge.0d0 .and. IsAWDecay(DecayMode1)) &
+    ) then
+       if (VprimeDecayLengthMassCutoffFactor.le.0d0) then
+          VprimeDecayLengthMassCutoffFactor = 10d0
+       endif
+    else if( &
+       .not.SetZZcoupling .and. .not.SetZgammacoupling .and. SetHZprime &
+       .and. (Process.le.2 .or. Process.eq.50 .or. Process.eq.51) &
+       .and. ((Process.eq.1 .or. Process.eq.2) .or. ghz1.eq.czero) &    !for the spin-0 resonances, you have to have explicitly turned off the SM ghz1 coupling
+       .and. (M_Zprime.ge.0d0 .and. IsAZDecay(DecayMode1) .or. M_Wprime.ge.0d0 .and. IsAWDecay(DecayMode1)) &
+       ) then
+       if (.not. SetZZprimecoupling) then
+          M_V_ps = M_Vprime
+          Ga_V_ps = Ga_Vprime
+          M_Z_ps = M_Zprime
+          Ga_Z_ps = Ga_Zprime
+          M_W_ps = M_Wprime
+          Ga_W_ps = Ga_Wprime
+          if (.not.SetZprimeZprimecoupling .and. VprimeDecayLengthMassCutoffFactor.le.0d0) then
+             VprimeDecayLengthMassCutoffFactor = 10d0
+          else if (.not.SetZprimegammacoupling) then ! Ignore whatever is specified through the command line option
+             VprimeDecayLengthMassCutoffFactor = -1d0
+          endif
+       else
+          if (VprimeDecayLengthMassCutoffFactor.le.0d0) then
+             VprimeDecayLengthMassCutoffFactor = 10d0
+          endif
+       endif
     endif
 
     !ReadLHE and ConvertLHE
@@ -1820,8 +1839,8 @@ type(SaveValues) :: tosave, oldsavevalues
    endif
 
     ! Contact terms
-    if (Process.le.2 .or. Process.eq.50) then
-        if (IsAZDecay(DecayMode1) .or. (Process.eq.50 .and. IsAPhoton(DecayMode1))) then
+    if (Process.le.2 .or. Process.eq.50 .or. Process.eq.51 .or. Process.eq.60) then
+        if (IsAZDecay(DecayMode1) .or. ((Process.eq.50 .or. Process.eq.51) .and. IsAPhoton(DecayMode1))) then
             if ((SetHZprime .and. .not.SetZprimeff) .or. (.not.SetHZprime .and. SetZprimeff)) then
                 call Error("To use Z' contact terms, you have to set both HVZ' and Z'ff couplings")
             endif
@@ -1830,6 +1849,9 @@ type(SaveValues) :: tosave, oldsavevalues
             endif
             if (SetMWprime .or. SetGaWprime) then
                 call Error("Don't set the W' mass and width in ZZ decay")
+            endif
+            if (VprimeDecayLengthMM.gt.0d0 .and. Ga_Zprime.le.0d0) then
+                call Error("Z' width has to have a positive value for nonzero lifetime.")
             endif
         elseif (IsAWDecay(DecayMode1)) then
             if ((SetHZprime .and. .not.SetWprimeff) .or. (.not.SetHZprime .and. SetWprimeff)) then
@@ -1841,40 +1863,13 @@ type(SaveValues) :: tosave, oldsavevalues
             if (SetMZprime .or. SetGaZprime) then
                 call Error("Don't set the Z' mass and width in WW decay")
             endif
-        endif
-    endif
-
-    if( (Process.eq.50 .or. Process.eq.60) .and. SetZprimegammacoupling ) then
-        call Error("Z'gamma couplings are not implemented for VBF or VH")
-        !If you implement them and remove this error, also edit the Vprimekwargs function
-        !in MELA/test/testME_more.py to not remove the Z'gamma couplings for process = 50 or 60
-    endif
-
-    ! Contact terms
-    if (Process.le.2 .or. Process.eq.50) then
-        if (IsAZDecay(DecayMode1) .or. (Process.eq.50 .and. IsAPhoton(DecayMode1))) then
-            if ((SetHZprime .and. .not.SetZprimeff) .or. (.not.SetHZprime .and. SetZprimeff)) then
-                call Error("To use Z' contact terms, you have to set both HVZ' and Z'ff couplings")
-            endif
-            if ((SetMZprime.or.SetGaZprime) .and. .not.SetHZprime) then
-                call Error("Setting the mass and width of Z' doesn't do anything if you don't set HVZ' couplings")
-            endif
-            if (SetMWprime .or. SetGaWprime) then
-                call Error("Don't set the W' mass and width in ZZ decay")
-            endif
-        elseif (IsAWDecay(DecayMode1)) then
-            if ((SetHZprime .and. .not.SetWprimeff) .or. (.not.SetHZprime .and. SetWprimeff)) then
-                call Error("To use W' contact terms, you have to set both HZZ'/HZ'Z' (which are used for HWW'/HW'W') and W'ff couplings")
-            endif
-            if ((SetMWprime.or.SetGaWprime) .and. .not.SetHZprime) then
-                call Error("Setting the mass and width of W' doesn't do anything if you don't set HZZ'/HZ'Z' couplings (which are used for HWW'/HW'W')")
-            endif
-            if (SetMZprime .or. SetGaZprime) then
-                call Error("Don't set the Z' mass and width in WW decay")
+            if (VprimeDecayLengthMM.gt.0d0 .and. Ga_Wprime.le.0d0) then
+                call Error("W' width has to have a positive value for nonzero lifetime.")
             endif
         endif
     endif
-    if (Process.eq.60 .or. (Process.ge.66 .and. Process.le.68) .or. (Process.ge.70 .and. Process.le.72)) then
+
+    if ((Process.ge.66 .and. Process.le.68) .or. (Process.ge.70 .and. Process.le.72)) then
         if ((SetHZprime .and. .not.SetZprimeff) .or. (.not.SetHZprime .and. SetZprimeff)) then
             call Error("To use Z' contact terms, you have to set both HVZ' and Z'ff couplings")
         endif
@@ -5915,7 +5910,7 @@ character :: arg*(1000)
     if( Process.eq.114) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
     if( ReadLHEFile )    write(TheUnit,"(4X,A)") "           (This is ReadLHEFile mode. Resonance mass/width are read from LHE input parameters.)"
     if( ConvertLHEFile ) write(TheUnit,"(4X,A)") "           (This is ConvertLHEFile mode. Resonance mass/width are read from LHE input parameters.)"
-    if( HiggsDecayLengthMM.ne.0d0 ) write(TheUnit,"(4X,A,F10.5,A)") "           ctau=", HiggsDecayLengthMM, " mm"
+    if( HiggsDecayLengthMM.ne.0d0 ) write(TheUnit,"(4X,A,F10.5,A)") "           Resonance ctau=", HiggsDecayLengthMM/ctauUnit, " mm"
     if( &
          (.not.ReadLHEFile .and. (Process.le.2 .or. Process.eq.50 .or. Process.eq.60 .or. (Process.ge.66 .and. Process.le.75) .or. ((TopDecays.eq.1).and.Process.eq.80) .or. (Process.ge.110 .and. Process.le.113))) &
     .or. (ReadLHEFile .and. TauDecays.ne.0) &
@@ -6421,6 +6416,10 @@ character :: arg*(1000)
                 else
                   write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z' boson: heavy mass limit (contact interaction)"
                 endif
+                if( VprimeDecayLengthMM.ne.0d0 ) then
+                   write(TheUnit,"(4X,A,F10.5,A)") "          ctau=", VprimeDecayLengthMM/ctauUnit, " mm"
+                   write(TheUnit,"(4X,A,F10.5)")   "          ctau BW cutoff=", VprimeDecayLengthMassCutoffFactor
+                endif
                 if( cdabs(ezp_El_left  ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_El_left=  ",ezp_El_left  ,"i"
                 if( cdabs(ezp_El_right ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_El_right= ",ezp_El_right ,"i"
                 if( cdabs(ezp_Mu_left  ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Mu_left=  ",ezp_Mu_left  ,"i"
@@ -6447,6 +6446,10 @@ character :: arg*(1000)
                   write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W' boson: mass=",M_Wprime/GeV,", width=",Ga_Wprime/GeV
                 else
                   write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W' boson: mass=heavy (contact interaction)"
+                endif
+                if( VprimeDecayLengthMM.ne.0d0 ) then
+                   write(TheUnit,"(4X,A,F10.5,A)") "          ctau=", VprimeDecayLengthMM/ctauUnit, " mm"
+                   write(TheUnit,"(4X,A,F10.5)")   "          ctau BW cutoff=", VprimeDecayLengthMassCutoffFactor
                 endif
                 if( cdabs(ewp_El_left  ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_El_left=  ",ewp_El_left  ,"i"
                 if( cdabs(ewp_El_right ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_El_right= ",ewp_El_right ,"i"
@@ -6510,13 +6513,13 @@ character :: arg*(1000)
 
             if (includeVprime) then
                 if (IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2)) then
-                    if(M_Zprime.gt.0d0) then
+                    if(M_Zprime.ge.0d0) then
                       write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z' boson: mass=",M_Zprime/GeV,", width=",Ga_Zprime/GeV
                     else
                       write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z' boson: heavy mass limit (contact interaction)"
                     endif
                 elseif (IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2)) then
-                    if(M_Wprime.gt.0d0) then
+                    if(M_Wprime.ge.0d0) then
                       write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W' boson: mass=",M_Wprime/GeV,", width=",Ga_Wprime/GeV
                     else
                       write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W' boson: heavy mass limit (contact interaction)"
