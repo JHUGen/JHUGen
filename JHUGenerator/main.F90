@@ -1400,7 +1400,6 @@ type(SaveValues) :: tosave, oldsavevalues
        .and. (M_Zprime.ge.0d0 .and. IsAZDecay(DecayMode1) .or. M_Wprime.ge.0d0 .and. IsAWDecay(DecayMode1)) &
     ) then
        if (VprimeDecayLengthMassCutoffFactor.le.0d0) then
-          print *,"Case 0: Setting VprimeDecayLengthMassCutoffFactor=10"
           VprimeDecayLengthMassCutoffFactor = 10d0
        endif
     else if( &
@@ -1417,28 +1416,16 @@ type(SaveValues) :: tosave, oldsavevalues
           M_W_ps = M_Wprime
           Ga_W_ps = Ga_Wprime
           if (.not.SetZprimeZprimecoupling .and. VprimeDecayLengthMassCutoffFactor.le.0d0) then
-             print *,"Case 1: Setting VprimeDecayLengthMassCutoffFactor=10"
              VprimeDecayLengthMassCutoffFactor = 10d0
           else if (.not.SetZprimegammacoupling) then ! Ignore whatever is specified through the command line option
-             print *,"Case 2: Setting VprimeDecayLengthMassCutoffFactor=-1"
              VprimeDecayLengthMassCutoffFactor = -1d0
           endif
        else
           if (VprimeDecayLengthMassCutoffFactor.le.0d0) then
-             print *,"Case 3: Setting VprimeDecayLengthMassCutoffFactor=10"
              VprimeDecayLengthMassCutoffFactor = 10d0
           endif
        endif
     endif
-    print *,"SetZZcoupling=",SetZZcoupling
-    print *,"SetZgammacoupling=",SetZgammacoupling
-    print *,"SetHZprime=",SetHZprime
-    print *,"Process=",Process
-    print *,"ghz1=",ghz1
-    print *,"M_Zprime=",M_Zprime
-    print *,"M_Wprime=",M_Wprime
-    print *,"DecayMode2=",DecayMode2
-    print *,"VprimeDecayLengthMassCutoffFactor=",VprimeDecayLengthMassCutoffFactor
 
     !ReadLHE and ConvertLHE
     !MUST HAPPEN BEFORE DETERMINING INTERFERENCE
@@ -5924,7 +5911,6 @@ character :: arg*(1000)
     if( ReadLHEFile )    write(TheUnit,"(4X,A)") "           (This is ReadLHEFile mode. Resonance mass/width are read from LHE input parameters.)"
     if( ConvertLHEFile ) write(TheUnit,"(4X,A)") "           (This is ConvertLHEFile mode. Resonance mass/width are read from LHE input parameters.)"
     if( HiggsDecayLengthMM.ne.0d0 ) write(TheUnit,"(4X,A,F10.5,A)") "           Resonance ctau=", HiggsDecayLengthMM/ctauUnit, " mm"
-    if( VprimeDecayLengthMM.ne.0d0 ) write(TheUnit,"(4X,A,F10.5,A)") "           Vprime ctau=", VprimeDecayLengthMM/ctauUnit, " mm"
     if( &
          (.not.ReadLHEFile .and. (Process.le.2 .or. Process.eq.50 .or. Process.eq.60 .or. (Process.ge.66 .and. Process.le.75) .or. ((TopDecays.eq.1).and.Process.eq.80) .or. (Process.ge.110 .and. Process.le.113))) &
     .or. (ReadLHEFile .and. TauDecays.ne.0) &
@@ -6430,6 +6416,10 @@ character :: arg*(1000)
                 else
                   write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z' boson: heavy mass limit (contact interaction)"
                 endif
+                if( VprimeDecayLengthMM.ne.0d0 ) then
+                   write(TheUnit,"(4X,A,F10.5,A)") "          ctau=", VprimeDecayLengthMM/ctauUnit, " mm"
+                   write(TheUnit,"(4X,A,F10.5)")   "          ctau BW cutoff=", VprimeDecayLengthMassCutoffFactor
+                endif
                 if( cdabs(ezp_El_left  ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_El_left=  ",ezp_El_left  ,"i"
                 if( cdabs(ezp_El_right ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_El_right= ",ezp_El_right ,"i"
                 if( cdabs(ezp_Mu_left  ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Mu_left=  ",ezp_Mu_left  ,"i"
@@ -6456,6 +6446,10 @@ character :: arg*(1000)
                   write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W' boson: mass=",M_Wprime/GeV,", width=",Ga_Wprime/GeV
                 else
                   write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W' boson: mass=heavy (contact interaction)"
+                endif
+                if( VprimeDecayLengthMM.ne.0d0 ) then
+                   write(TheUnit,"(4X,A,F10.5,A)") "          ctau=", VprimeDecayLengthMM/ctauUnit, " mm"
+                   write(TheUnit,"(4X,A,F10.5)")   "          ctau BW cutoff=", VprimeDecayLengthMassCutoffFactor
                 endif
                 if( cdabs(ewp_El_left  ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_El_left=  ",ewp_El_left  ,"i"
                 if( cdabs(ewp_El_right ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_El_right= ",ewp_El_right ,"i"
