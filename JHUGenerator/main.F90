@@ -725,60 +725,60 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "Lambda_z40", success, Lambda_z40, multiply=GeV, success2=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
 
     !spin 0 WW couplings
-    call ReadCommandLineArgument(arg, "ghw1", success, ghw1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghw2", success, ghw2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghw3", success, ghw3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghw4", success, ghw4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw1", success, ghw1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw2", success, ghw2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw3", success, ghw3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw4", success, ghw4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghw1_prime", success, ghw1_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghw1_prime2", success, ghw1_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghw1_prime3", success, ghw1_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghw1_prime4", success, ghw1_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghw1_prime5", success, ghw1_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghw1_prime6", success, ghw1_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghw1_prime7", success, ghw1_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw1_prime", success, ghw1_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw1_prime2", success, ghw1_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw1_prime3", success, ghw1_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw1_prime4", success, ghw1_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw1_prime5", success, ghw1_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw1_prime6", success, ghw1_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw1_prime7", success, ghw1_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghw2_prime", success, ghw2_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghw2_prime2", success, ghw2_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghw2_prime3", success, ghw2_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghw2_prime4", success, ghw2_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghw2_prime5", success, ghw2_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghw2_prime6", success, ghw2_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghw2_prime7", success, ghw2_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw2_prime", success, ghw2_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw2_prime2", success, ghw2_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw2_prime3", success, ghw2_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw2_prime4", success, ghw2_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw2_prime5", success, ghw2_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw2_prime6", success, ghw2_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw2_prime7", success, ghw2_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghw3_prime", success, ghw3_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghw3_prime2", success, ghw3_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghw3_prime3", success, ghw3_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghw3_prime4", success, ghw3_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghw3_prime5", success, ghw3_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghw3_prime6", success, ghw3_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghw3_prime7", success, ghw3_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw3_prime", success, ghw3_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw3_prime2", success, ghw3_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw3_prime3", success, ghw3_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw3_prime4", success, ghw3_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw3_prime5", success, ghw3_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw3_prime6", success, ghw3_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw3_prime7", success, ghw3_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghw4_prime", success, ghw4_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghw4_prime2", success, ghw4_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghw4_prime3", success, ghw4_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghw4_prime4", success, ghw4_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghw4_prime5", success, ghw4_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghw4_prime6", success, ghw4_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghw4_prime7", success, ghw4_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw4_prime", success, ghw4_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw4_prime2", success, ghw4_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw4_prime3", success, ghw4_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw4_prime4", success, ghw4_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw4_prime5", success, ghw4_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw4_prime6", success, ghw4_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghw4_prime7", success, ghw4_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, tosave=tosave)
 
     ! Sign of q1,2,12**2 for the Lambda's, set to 1 or -1 to get q**2-dependence from these form factor Lambdas
-    call ReadCommandLineArgument(arg, "cw_q1sq", success, cw_q1sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "cw_q2sq", success, cw_q2sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "cw_q12sq", success, cw_q12sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "cw_q1sq", success, cw_q1sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "cw_q2sq", success, cw_q2sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "cw_q12sq", success, cw_q12sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
     ! Lambda's for q1,2,12**2 for the Lambda's
-    call ReadCommandLineArgument(arg, "Lambda_w11", success, Lambda_w11, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda_w21", success, Lambda_w21, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda_w31", success, Lambda_w31, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda_w41", success, Lambda_w41, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda_w12", success, Lambda_w12, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda_w22", success, Lambda_w22, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda_w32", success, Lambda_w32, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda_w42", success, Lambda_w42, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda_w10", success, Lambda_w10, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda_w20", success, Lambda_w20, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda_w30", success, Lambda_w30, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda_w40", success, Lambda_w40, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_w11", success, Lambda_w11, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_w21", success, Lambda_w21, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_w31", success, Lambda_w31, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_w41", success, Lambda_w41, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_w12", success, Lambda_w12, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_w22", success, Lambda_w22, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_w32", success, Lambda_w32, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_w42", success, Lambda_w42, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_w10", success, Lambda_w10, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_w20", success, Lambda_w20, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_w30", success, Lambda_w30, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda_w40", success, Lambda_w40, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, tosave=tosave)
 
     !spin 1
     call ReadCommandLineArgument(arg, "zprime_qq_left", success, zprime_qq_left, success2=SetAnomalousSpin1qq, success3=Setspin1qqleft, checkdestchange=.true., tosave=tosave)
@@ -909,60 +909,60 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "Lambda2_z40", success, Lambda2_z40, multiply=GeV, success2=SetAnomalousSpin0VV, success4=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
 
     !spin 0 WW couplings
-    call ReadCommandLineArgument(arg, "gh2w1", success, gh2w1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2w2", success, gh2w2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2w3", success, gh2w3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2w4", success, gh2w4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w1", success, gh2w1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w2", success, gh2w2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w3", success, gh2w3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w4", success, gh2w4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "gh2w1_prime", success, gh2w1_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2w1_prime2", success, gh2w1_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2w1_prime3", success, gh2w1_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2w1_prime4", success, gh2w1_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2w1_prime5", success, gh2w1_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2w1_prime6", success, gh2w1_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2w1_prime7", success, gh2w1_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w1_prime", success, gh2w1_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w1_prime2", success, gh2w1_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w1_prime3", success, gh2w1_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w1_prime4", success, gh2w1_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w1_prime5", success, gh2w1_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w1_prime6", success, gh2w1_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w1_prime7", success, gh2w1_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "gh2w2_prime", success, gh2w2_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2w2_prime2", success, gh2w2_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2w2_prime3", success, gh2w2_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2w2_prime4", success, gh2w2_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2w2_prime5", success, gh2w2_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2w2_prime6", success, gh2w2_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2w2_prime7", success, gh2w2_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w2_prime", success, gh2w2_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w2_prime2", success, gh2w2_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w2_prime3", success, gh2w2_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w2_prime4", success, gh2w2_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w2_prime5", success, gh2w2_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w2_prime6", success, gh2w2_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w2_prime7", success, gh2w2_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "gh2w3_prime", success, gh2w3_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2w3_prime2", success, gh2w3_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2w3_prime3", success, gh2w3_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2w3_prime4", success, gh2w3_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2w3_prime5", success, gh2w3_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2w3_prime6", success, gh2w3_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2w3_prime7", success, gh2w3_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w3_prime", success, gh2w3_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w3_prime2", success, gh2w3_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w3_prime3", success, gh2w3_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w3_prime4", success, gh2w3_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w3_prime5", success, gh2w3_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w3_prime6", success, gh2w3_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w3_prime7", success, gh2w3_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "gh2w4_prime", success, gh2w4_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2w4_prime2", success, gh2w4_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2w4_prime3", success, gh2w4_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2w4_prime4", success, gh2w4_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2w4_prime5", success, gh2w4_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2w4_prime6", success, gh2w4_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "gh2w4_prime7", success, gh2w4_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w4_prime", success, gh2w4_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w4_prime2", success, gh2w4_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w4_prime3", success, gh2w4_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w4_prime4", success, gh2w4_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w4_prime5", success, gh2w4_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w4_prime6", success, gh2w4_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "gh2w4_prime7", success, gh2w4_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling, success5=SetSpin0Res2VVcoupling, tosave=tosave)
 
     ! Sign of q1,2,12**2 for the Lambda's, set to 1 or -1 to get q**2-dependence from these form factor Lambdas
-    call ReadCommandLineArgument(arg, "c2w_q1sq", success, c2w_q1sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "c2w_q2sq", success, c2w_q2sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "c2w_q12sq", success, c2w_q12sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "c2w_q1sq", success, c2w_q1sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "c2w_q2sq", success, c2w_q2sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "c2w_q12sq", success, c2w_q12sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, tosave=tosave)
     ! Lambda's for q1,2,12**2 for the Lambda's
-    call ReadCommandLineArgument(arg, "Lambda2_w11", success, Lambda2_w11, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda2_w21", success, Lambda2_w21, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda2_w31", success, Lambda2_w31, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda2_w41", success, Lambda2_w41, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda2_w12", success, Lambda2_w12, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda2_w22", success, Lambda2_w22, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda2_w32", success, Lambda2_w32, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda2_w42", success, Lambda2_w42, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda2_w10", success, Lambda2_w10, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda2_w20", success, Lambda2_w20, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda2_w30", success, Lambda2_w30, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "Lambda2_w40", success, Lambda2_w40, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_w11", success, Lambda2_w11, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_w21", success, Lambda2_w21, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_w31", success, Lambda2_w31, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_w41", success, Lambda2_w41, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_w12", success, Lambda2_w12, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_w22", success, Lambda2_w22, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_w32", success, Lambda2_w32, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_w42", success, Lambda2_w42, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_w10", success, Lambda2_w10, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_w20", success, Lambda2_w20, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_w30", success, Lambda2_w30, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "Lambda2_w40", success, Lambda2_w40, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success5=SetSpin0Res2VVcoupling, tosave=tosave)
 
 
     !contact interactions
@@ -1100,80 +1100,80 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "GaZprime", success, Ga_Zprime, multiply=GeV, success2=SetGaZprime, checkdestchange=.true., tosave=tosave)
 
     !spin 0 WWp couplings
-    call ReadCommandLineArgument(arg, "ghwwp1", success, ghwwp1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwwp2", success, ghwwp2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwwp3", success, ghwwp3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwwp4", success, ghwwp4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp1", success, ghwwp1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp2", success, ghwwp2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp3", success, ghwwp3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp4", success, ghwwp4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghwwp1_prime", success, ghwwp1_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwwp1_prime2", success, ghwwp1_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwwp1_prime3", success, ghwwp1_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwwp1_prime4", success, ghwwp1_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwwp1_prime5", success, ghwwp1_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwwp1_prime6", success, ghwwp1_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwwp1_prime7", success, ghwwp1_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp1_prime", success, ghwwp1_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp1_prime2", success, ghwwp1_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp1_prime3", success, ghwwp1_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp1_prime4", success, ghwwp1_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp1_prime5", success, ghwwp1_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp1_prime6", success, ghwwp1_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp1_prime7", success, ghwwp1_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghwwp2_prime", success, ghwwp2_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwwp2_prime2", success, ghwwp2_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwwp2_prime3", success, ghwwp2_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwwp2_prime4", success, ghwwp2_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwwp2_prime5", success, ghwwp2_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwwp2_prime6", success, ghwwp2_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwwp2_prime7", success, ghwwp2_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp2_prime", success, ghwwp2_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp2_prime2", success, ghwwp2_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp2_prime3", success, ghwwp2_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp2_prime4", success, ghwwp2_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp2_prime5", success, ghwwp2_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp2_prime6", success, ghwwp2_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp2_prime7", success, ghwwp2_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghwwp3_prime", success, ghwwp3_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwwp3_prime2", success, ghwwp3_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwwp3_prime3", success, ghwwp3_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwwp3_prime4", success, ghwwp3_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwwp3_prime5", success, ghwwp3_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwwp3_prime6", success, ghwwp3_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwwp3_prime7", success, ghwwp3_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp3_prime", success, ghwwp3_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp3_prime2", success, ghwwp3_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp3_prime3", success, ghwwp3_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp3_prime4", success, ghwwp3_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp3_prime5", success, ghwwp3_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp3_prime6", success, ghwwp3_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp3_prime7", success, ghwwp3_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghwwp4_prime", success, ghwwp4_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwwp4_prime2", success, ghwwp4_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwwp4_prime3", success, ghwwp4_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwwp4_prime4", success, ghwwp4_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwwp4_prime5", success, ghwwp4_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwwp4_prime6", success, ghwwp4_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwwp4_prime7", success, ghwwp4_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp4_prime", success, ghwwp4_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp4_prime2", success, ghwwp4_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp4_prime3", success, ghwwp4_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp4_prime4", success, ghwwp4_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp4_prime5", success, ghwwp4_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp4_prime6", success, ghwwp4_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwwp4_prime7", success, ghwwp4_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling, tosave=tosave)
 
     !spin 0 WpWp couplings
-    call ReadCommandLineArgument(arg, "ghwpwp1", success, ghwpwp1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwpwp2", success, ghwpwp2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwpwp3", success, ghwpwp3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwpwp4", success, ghwpwp4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp1", success, ghwpwp1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp2", success, ghwpwp2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp3", success, ghwpwp3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp4", success, ghwpwp4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghwpwp1_prime", success, ghwpwp1_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwpwp1_prime2", success, ghwpwp1_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwpwp1_prime3", success, ghwpwp1_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwpwp1_prime4", success, ghwpwp1_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwpwp1_prime5", success, ghwpwp1_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwpwp1_prime6", success, ghwpwp1_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwpwp1_prime7", success, ghwpwp1_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp1_prime", success, ghwpwp1_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp1_prime2", success, ghwpwp1_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp1_prime3", success, ghwpwp1_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp1_prime4", success, ghwpwp1_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp1_prime5", success, ghwpwp1_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp1_prime6", success, ghwpwp1_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp1_prime7", success, ghwpwp1_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghwpwp2_prime", success, ghwpwp2_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwpwp2_prime2", success, ghwpwp2_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwpwp2_prime3", success, ghwpwp2_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwpwp2_prime4", success, ghwpwp2_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwpwp2_prime5", success, ghwpwp2_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwpwp2_prime6", success, ghwpwp2_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwpwp2_prime7", success, ghwpwp2_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp2_prime", success, ghwpwp2_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp2_prime2", success, ghwpwp2_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp2_prime3", success, ghwpwp2_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp2_prime4", success, ghwpwp2_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp2_prime5", success, ghwpwp2_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp2_prime6", success, ghwpwp2_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp2_prime7", success, ghwpwp2_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghwpwp3_prime", success, ghwpwp3_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwpwp3_prime2", success, ghwpwp3_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwpwp3_prime3", success, ghwpwp3_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwpwp3_prime4", success, ghwpwp3_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwpwp3_prime5", success, ghwpwp3_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwpwp3_prime6", success, ghwpwp3_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwpwp3_prime7", success, ghwpwp3_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp3_prime", success, ghwpwp3_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp3_prime2", success, ghwpwp3_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp3_prime3", success, ghwpwp3_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp3_prime4", success, ghwpwp3_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp3_prime5", success, ghwpwp3_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp3_prime6", success, ghwpwp3_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp3_prime7", success, ghwpwp3_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
 
-    call ReadCommandLineArgument(arg, "ghwpwp4_prime", success, ghwpwp4_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwpwp4_prime2", success, ghwpwp4_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwpwp4_prime3", success, ghwpwp4_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwpwp4_prime4", success, ghwpwp4_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwpwp4_prime5", success, ghwpwp4_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwpwp4_prime6", success, ghwpwp4_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "ghwpwp4_prime7", success, ghwpwp4_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp4_prime", success, ghwpwp4_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp4_prime2", success, ghwpwp4_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp4_prime3", success, ghwpwp4_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp4_prime4", success, ghwpwp4_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp4_prime5", success, ghwpwp4_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp4_prime6", success, ghwpwp4_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ghwpwp4_prime7", success, ghwpwp4_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling, tosave=tosave)
 
     call ReadCommandLineArgument(arg, "ewp_El_left", success, ewp_El_left, success2=SetWprimeff, checkdestchange=.true., tosave=tosave)
     call ReadCommandLineArgument(arg, "ewp_El_right", success, ewp_El_right, success2=SetWprimeff, checkdestchange=.true., tosave=tosave)
@@ -1395,6 +1395,15 @@ type(SaveValues) :: tosave, oldsavevalues
     ! Check/set Vprime phase space quantities when no 'ZZ/ZA' couplings are present
     ! The following Set*coupling assume the user did not set those couplings to 0, which is in fact a trivial possibility.
     if( &
+       (SetZZcoupling .or. SetZgammacoupling .or. ghz1.ne.czero) .and. SetHZprime &
+       .and. (Process.le.2 .or. Process.eq.50 .or. Process.eq.51) &
+       .and. (M_Zprime.ge.0d0 .and. IsAZDecay(DecayMode1) .or. M_Wprime.ge.0d0 .and. IsAWDecay(DecayMode1)) &
+    ) then
+       if (VprimeDecayLengthMassCutoffFactor.le.0d0) then
+          print *,"Case 0: Setting VprimeDecayLengthMassCutoffFactor=10"
+          VprimeDecayLengthMassCutoffFactor = 10d0
+       endif
+    else if( &
        .not.SetZZcoupling .and. .not.SetZgammacoupling .and. SetHZprime &
        .and. (Process.le.2 .or. Process.eq.50 .or. Process.eq.51) &
        .and. ((Process.eq.1 .or. Process.eq.2) .or. ghz1.eq.czero) &    !for the spin-0 resonances, you have to have explicitly turned off the SM ghz1 coupling
@@ -1408,16 +1417,28 @@ type(SaveValues) :: tosave, oldsavevalues
           M_W_ps = M_Wprime
           Ga_W_ps = Ga_Wprime
           if (.not.SetZprimeZprimecoupling .and. VprimeDecayLengthMassCutoffFactor.le.0d0) then
+             print *,"Case 1: Setting VprimeDecayLengthMassCutoffFactor=10"
              VprimeDecayLengthMassCutoffFactor = 10d0
           else if (.not.SetZprimegammacoupling) then ! Ignore whatever is specified through the command line option
+             print *,"Case 2: Setting VprimeDecayLengthMassCutoffFactor=-1"
              VprimeDecayLengthMassCutoffFactor = -1d0
           endif
        else
           if (VprimeDecayLengthMassCutoffFactor.le.0d0) then
+             print *,"Case 3: Setting VprimeDecayLengthMassCutoffFactor=10"
              VprimeDecayLengthMassCutoffFactor = 10d0
           endif
        endif
     endif
+    print *,"SetZZcoupling=",SetZZcoupling
+    print *,"SetZgammacoupling=",SetZgammacoupling
+    print *,"SetHZprime=",SetHZprime
+    print *,"Process=",Process
+    print *,"ghz1=",ghz1
+    print *,"M_Zprime=",M_Zprime
+    print *,"M_Wprime=",M_Wprime
+    print *,"DecayMode2=",DecayMode2
+    print *,"VprimeDecayLengthMassCutoffFactor=",VprimeDecayLengthMassCutoffFactor
 
     !ReadLHE and ConvertLHE
     !MUST HAPPEN BEFORE DETERMINING INTERFERENCE
