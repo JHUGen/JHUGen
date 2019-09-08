@@ -131,6 +131,7 @@ TVector3 MELAParticle::calculateTotalDisplacement()const{
 
   // Calculate displacement
   if (part_mass>0.) res = part_vec * (lifetime/part_mass);
+  //MELAout << "Displacement for id=" << this->id << " = " << res.X() << ", " << res.Y() << ", " << res.Z() << " [mom: " << this->p4 << ", lifetime: " << lifetime << "]" << std::endl;
 
   // Add mother displacement
   if (this->getNMothers()==1) res += this->getMother(0)->calculateTotalDisplacement();

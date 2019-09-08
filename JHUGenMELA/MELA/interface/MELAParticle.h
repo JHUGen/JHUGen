@@ -41,7 +41,7 @@ public:
 
   void setSelected(bool isSelected=true){ passSelection = isSelected; }
   void setGenStatus(int status_){ genStatus=status_; }
-  void setLifetime(int life_){ lifetime=life_; }
+  void setLifetime(double life_){ lifetime=life_; }
 
   void addMother(MELAParticle* myParticle);
   void addDaughter(MELAParticle* myParticle);
