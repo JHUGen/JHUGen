@@ -85,6 +85,9 @@ public:
   void boost(const TVector3& vec, bool boostAll=false);
   TVector3 vect()const{ return p4.Vect(); }
 
+  // Function to calculate displacements from lifetimes
+  TVector3 calculateTotalDisplacement()const;
+
   // Operators
   MELAParticle& operator+=(MELAParticle* part){ if (part){ p4 += part->p4; addDaughter(part); } return *this; }
   MELAParticle& operator+=(const TLorentzVector& mom){ p4 += mom; return *this; }

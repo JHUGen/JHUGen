@@ -71,7 +71,7 @@ MELAParticle* MELAParticle::getDaughter(int index)const{
 }
 std::vector<int> MELAParticle::getDaughterIds()const{
   std::vector<int> result;
-  for (auto& dau:daughters){ if (dau!=0) result.push_back(dau->id); }
+  for (auto& dau:daughters){ if (dau) result.push_back(dau->id); }
   return result;
 }
 void MELAParticle::getRelatedParticles(std::vector<MELAParticle*>& particles) const{
@@ -123,3 +123,18 @@ bool MELAParticle::checkDeepDaughtership(MELAParticle const* part1, MELAParticle
   std::vector<MELAParticle*> daughters2; part2->getDaughterParticles(daughters2);
   return TUtilHelpers::hasCommonElements(daughters1, daughters2);
 }
+
+TVector3 MELAParticle::calculateTotalDisplacement()const{
+  TVector3 res;
+  double const part_mass = this->m();
+  TVector3 const part_vec = this->vect();
+
+  // Calculate displacement
+  if (part_mass>0.) res = part_vec * (lifetime/part_mass);
+
+  // Add mother displacement
+  if (this->getNMothers()==1) res += this->getMother(0)->calculateTotalDisplacement();
+
+  return res;
+}
+
