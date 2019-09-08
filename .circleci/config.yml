@@ -508,7 +508,7 @@ jobs:
               echo "The generator is unchanged from $(cat no-need-for-generator-syntax) when the last syntax test was done."
               exit 0
             fi
-            ../.circleci/checklhe/checklhe.py $(find $LHEDIR -name *.lhe) | tee checklheoutput.txt
+            ../.circleci/checklhe/checklhe.py $(find $LHEDIR -name *.lhe) |& tee checklheoutput.txt
             ! grep -q '!' checklheoutput.txt
           when: always
       - store_artifacts:
