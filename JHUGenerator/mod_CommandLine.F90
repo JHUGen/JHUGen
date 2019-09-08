@@ -499,7 +499,7 @@ integer :: length
 character(len=len(dest)) :: dest_store
 
     successval = .true.
-    dest_store = trim(dest)
+    dest_store = dest
 
     if (present(SetLastArgument)) SetLastArgument=.false.
 
@@ -512,7 +512,7 @@ character(len=len(dest)) :: dest_store
         endif
         dest = argument(length+2:len(argument))
         if (present(checkdestchange)) then
-           successval = (.not. checkdestchange .or. trim(dest)==dest_store)
+           successval = (.not. checkdestchange .or. trim(dest)==trim(dest_store))
         endif
         if (present(SetLastArgument)) SetLastArgument=successval
         if (present(success2)) success2=success2 .or. successval
