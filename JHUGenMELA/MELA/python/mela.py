@@ -38,7 +38,7 @@ See examples at the bottom.
 from __future__ import print_function
 from collections import namedtuple
 import ROOT
-from pythonmelautils import MultiDimensionalCppArray, NamedTemporaryMacro, SelfDParameter, SelfDCoupling
+from pythonmelautils import MultiDimensionalCppArray, SelfDParameter, SelfDCoupling
 from ROOT import TUtil, TVar
 
 try:
@@ -174,6 +174,40 @@ class Mela(object):
       mela.computeDijetConvBW(result, useTrueBW);
       return result;
     }
+
+    vector<vector<double>> getWeightedMEArray(MelaIO& melaio) {
+      double resultarray[nmsq][nmsq] = {{0}};
+      melaio.getWeightedMEArray(resultarray);
+      vector<vector<double>> result;
+      for (const auto& lst : resultarray) {
+        vector<double> vctr;
+        for (const auto& number : lst) {
+          vctr.push_back(number);
+        }
+        result.push_back(vctr);
+      }
+      return result;
+    }
+    vector<vector<double>> getUnweightedMEArray(MelaIO& melaio) {
+      double resultarray[nmsq][nmsq];
+      melaio.getUnweightedMEArray(resultarray);
+      vector<vector<double>> result;
+      for (const auto& lst : resultarray) {
+        vector<double> vctr;
+        for (const auto& number : lst) {
+          vctr.push_back(number);
+        }
+        result.push_back(vctr);
+      }
+      return result;
+    }
+    std::pair<vector<double>, vector<double>> getPartonWeights(MelaIO& melaio) {
+      std::pair<vector<double>, vector<double>> result;
+      result.first.resize(nmsq);
+      result.second.resize(nmsq);
+      melaio.getPartonWeights(result.first.data(), result.second.data());
+      return result;
+    }
   """
   def __init__(self, *args, **kwargs):
     self.__mela = ROOT.Mela(*args, **kwargs)
@@ -294,6 +328,23 @@ class Mela(object):
   def computeProdP_ttH(self, topProcess=2, topDecay=0, useConstant=True): return ROOT.computeProdP_ttH(self.__mela, topProcess, topDecay, useConstant)
   def getConstant(self): return ROOT.getConstant(self.__mela)
   def computeDijetConvBW(self, useTrueBW=False): return ROOT.computeDijetConvBW(self.__mela, useTrueBW)
+
+  def getIORecord(self): return self.MelaIO(self.__mela.getIORecord())
+
+  class MelaIO(object):
+    def __init__(self, cppmelaio):
+      self.__melaio = cppmelaio
+    def __getattr__(self, attr):
+      return getattr(self.__melaio, attr)
+    def getWeightedMEArray(self):
+      result = ROOT.getWeightedMEArray(self.__melaio)
+      return [list(_) for _ in result]
+    def getUnweightedMEArray(self):
+      result = ROOT.getUnweightedMEArray(self.__melaio)
+      return [list(_) for _ in result]
+    def getPartonWeights(self):
+      result = ROOT.getPartonWeights(self.__melaio)
+      return list(result.first), list(result.second)
 
   ghg2 = SelfDCoupling("selfDHggcoupl", 0, ROOT.py_gHIGGS_GG_2)
   ghg3 = SelfDCoupling("selfDHggcoupl", 0, ROOT.py_gHIGGS_GG_3)
@@ -646,7 +697,7 @@ def SimpleParticle_t(lineorid, pxortlv=None, py=None, pz=None, e=None):
     elif len(lineorid) == 5:
       id, px, py, pz, e = (f(_) for f, _ in zip((int, float, float, float, float), lineorid))
     elif len(lineorid) == 2:
-      pxortlv = lineorid[1]
+      id, pxortlv = lineorid
     else:
       raise ValueError("len(lineorid) has to be 5 or 13, not {}".format(len(lineorid)))
   else:
@@ -748,11 +799,11 @@ if __name__ == "__main__":
               )
   for _ in couplings:
     m.ghz1, m.ghz2, m.ghz4, m.ghz1_prime2 = _
-    m.setProcess(TVar.SelfDefine_spin0, TVar.JHUGen, TVar.Had_WH)
-    prod = m.computeProdP(False)
-    m.ghz1, m.ghz2, m.ghz4, m.ghz1_prime2 = _
     m.setProcess(TVar.SelfDefine_spin0, TVar.JHUGen, TVar.ZZINDEPENDENT)
     dec = m.computeP(False)
+    m.ghz1, m.ghz2, m.ghz4, m.ghz1_prime2 = _
+    m.setProcess(TVar.SelfDefine_spin0, TVar.JHUGen, TVar.Had_WH)
+    prod = m.computeProdP(False)
     print(prod, dec, prod*dec)
 
   print(m.computeDecayAngles())
@@ -762,3 +813,6 @@ if __name__ == "__main__":
   print("propagator:")
   print("   BW:", m.getXPropagator(TVar.FixedWidth))
   print("  CPS:", m.getXPropagator(TVar.CPS))
+  print(m.getIORecord().getWeightedMEArray())
+  print(m.getIORecord().getUnweightedMEArray())
+  print(m.getIORecord().getPartonWeights())
