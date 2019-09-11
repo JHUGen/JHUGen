@@ -27,7 +27,7 @@ Manual for the JHU generator and MELA package
 \begin{center}
 \small
 For simulation, reweighting, and analysis of a single-produced resonance at hadron colliders \\
-(version v7.3.3, release date September 7, 2019) \\
+(version v7.3.4, release date September 11, 2019) \\
 \normalsize
 \end{center}
 
@@ -214,6 +214,11 @@ This is the list of command line configurables (also defined in the \verb|README
                          4=W->lnu, 5=W->2q, 6=W->taunu,
                          7=gamma, 8=Z->2l+2tau,
                          9=Z->anything, 10=W->lnu+taunu, 11=W->anything
+                         Exclusive difermion modes other than those with the tau flavor:
+                         The numbers p=(1; 2, 3; 5, 7, 11, 13, 17)
+                         represent f=(nu; e, mu; d, u, s, c, b). In order to have a
+                         V->f1 f2 decay, please specify the decay mode as -p1*p2
+                         for the p1 and p2 that match f1 and f2.
     Interf:            0=neglect interference for 4f final states,
                        1=include interference
     ReweightInterf:    if true, include interference as LHE event weights for

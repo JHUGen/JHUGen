@@ -3,7 +3,7 @@ implicit none
 save
 !
 !
-character(len=*),parameter :: JHUGen_Version="v7.3.3"
+character(len=*),parameter :: JHUGen_Version="v7.3.4"
 !
 !
 !=====================================================
@@ -2244,6 +2244,16 @@ integer :: DKMode
      IsAZDecay = .true.
   elseif( DKMode.eq.9 ) then
      IsAZDecay = .true.
+  elseif( DKMode.lt.0 ) then
+     IsAZDecay = (            &
+        DKMode.eq.-2*2   .or. & ! Z->ee
+        DKMode.eq.-3*3   .or. & ! Z->mumu
+        DKMode.eq.-5*5   .or. & ! Z->dd
+        DKMode.eq.-7*7   .or. & ! Z->uu
+        DKMode.eq.-11*11 .or. & ! Z->ss
+        DKMode.eq.-13*13 .or. & ! Z->cc
+        DKMode.eq.-17*17      & ! Z->bb
+     )
   else
      IsAZDecay=.false.
   endif
@@ -2267,6 +2277,17 @@ integer :: DKMode
      IsAWDecay = .true.
   elseif( DKMode.eq.11 ) then
      IsAWDecay = .true.
+  elseif( DKMode.lt.0 ) then
+     IsAWDecay = (            &
+        DKMode.eq.-2*1   .or. & ! W->enu
+        DKMode.eq.-3*1   .or. & ! W->munu
+        DKMode.eq.-5*7   .or. & ! W->du
+        DKMode.eq.-5*13  .or. & ! W->dc
+        DKMode.eq.-11*7  .or. & ! W->su
+        DKMode.eq.-11*13 .or. & ! W->sc
+        DKMode.eq.-17*7  .or. & ! W->bu
+        DKMode.eq.-17*13      & ! W->bc
+     )
   else
      IsAWDecay=.false.
   endif

@@ -80,7 +80,6 @@ complex(8)             :: MinkowskyProductRC
                       - p1(4)*p2(4)
 END FUNCTION MinkowskyProductRC
 
-
 FUNCTION MinkowskyProductCR(p1,p2)
 implicit none
 real(8),    intent(in) :: p2(1:4)
@@ -92,6 +91,19 @@ complex(8)             :: MinkowskyProductCR
                       - p1(3)*p2(3)  &
                       - p1(4)*p2(4)
 END FUNCTION MinkowskyProductCR
+
+
+function LogicalToInteger(var)
+implicit none
+logical :: var
+integer :: LogicalToInteger
+   if (var) then
+      LogicalToInteger = 1
+   else
+      LogicalToInteger = 0
+   endif
+end function
+
 
 double complex function et1(e1,e2,e3,e4)
 implicit none

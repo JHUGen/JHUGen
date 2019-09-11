@@ -1499,7 +1499,11 @@ type(SaveValues) :: tosave, oldsavevalues
         includeGammaStar = .true. ! Not really gamma*, but rather gamma* or gluon, set to true to manipulate phasespace generation
     endif
 
-    if( (DecayMode1.ge.12) .or. (DecayMode2.ge.12) .or. (DecayMode1.lt..0) .or. (DecayMode2.lt.0) ) then
+    if( &
+       .not.(IsAZDecay(DecayMode1) .or. IsAWDecay(DecayMode1) .or. IsAPhoton(DecayMode1)) &
+       .or. &
+       .not.(IsAZDecay(DecayMode2) .or. IsAWDecay(DecayMode2) .or. IsAPhoton(DecayMode2)) &
+       ) then
        print *," DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
        stop 1
     endif
@@ -3158,7 +3162,7 @@ character(len=len(CSmaxFile)+20) :: FileToRead
              endif
 
              write(io_stdout,"(A)")  ""
-             write(io_stdout,*) "Total xsec: ",VG_Result, " +/-",VG_Error, " fb    vs.",sum(CrossSec(:,:))
+             write(io_stdout,*) "Total xsec: ",VG_Result, " +/-",VG_Error, " pb    vs.",sum(CrossSec(:,:))
              call InitOutput(VG_Result, VG_Error)
 
 
@@ -3399,7 +3403,7 @@ character(len=len(CSmaxFile)+20) :: FileToRead
              endif
 
              write(io_stdout,"(A)")  ""
-             write(io_stdout,*) "Total unweighted xsec (used by Vegas): ", VG_Result, " +/-", VG_Error, " fb    vs.",sum(CrossSec2(:))
+             write(io_stdout,*) "Total unweighted xsec (used by Vegas): ", VG_Result, " +/-", VG_Error, " pb    vs.",sum(CrossSec2(:))
              write(io_stdout,*) "Total xsec with weights (use for physics): ", CrossSectionWithWeights, " +/-", sqrt(CrossSectionWithWeightsErrorSquared)
              call InitOutput(CrossSectionWithWeights, sqrt(CrossSectionWithWeightsErrorSquared))
 
@@ -6821,6 +6825,11 @@ implicit none
         print *, "                        4=W->lnu, 5=W->2q, 6=W->taunu,"
         print *, "                        7=gamma, 8=Z->2l+2tau,"
         print *, "                        9=Z->anything, 10=W->lnu+taunu, 11=W->anything"
+        print *, "                        Exclusive difermion modes other than those with the tau flavor:"
+        print *, "                        The numbers p=(1; 2, 3; 5, 7, 11, 13, 17)"
+        print *, "                        represent f=(nu; e, mu; d, u, s, c, b). In order to have a"
+        print *, "                        V->f1 f2 decay, please specify the decay mode as -p1*p2"
+        print *, "                        for the p1 and p2 that match f1 and f2."
         print *, "   Interf:            0=neglect interference for 4f final states,"
         print *, "                      1=include interference"
         print *, "   ReweightInterf:    if true, include interference as LHE event weights for"
