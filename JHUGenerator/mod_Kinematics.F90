@@ -1046,13 +1046,12 @@ logical :: do78, canbeVBF, canbeVH, isVHlike
             ICOLUP(1:2,4) = (/502,000/)
             if (MY_IDUP(1).eq.MY_IDUP(3) .and. MY_IDUP(1).eq.MY_IDUP(4)) then
                call random_number(xRnd)
-               if (xRnd.lt.1d0/3d0) then
+               if (xRnd.lt.0.5d0) then
                   call swap(ICOLUP(1,2),ICOLUP(1,3))
                   call swap(ICOLUP(2,2),ICOLUP(2,3))
-               else if (xRnd.lt.2d0/3d0) then
+               else
                   call swap(ICOLUP(1,2),ICOLUP(1,4))
                   call swap(ICOLUP(2,2),ICOLUP(2,4))
-               ! else leave colors alone
                endif
             else if (MY_IDUP(1).eq.MY_IDUP(3)) then
                call random_number(xRnd)
