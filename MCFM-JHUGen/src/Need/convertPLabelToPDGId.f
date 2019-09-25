@@ -28,6 +28,8 @@
          convertPLabelToPDGId=21
          elseif (plabel(j) .eq. 'gj') then
          convertPLabelToPDGId=21
+         elseif (plabel(j) .eq. 'ga') then
+         convertPLabelToPDGId=22
 
          elseif (plabel(j) .eq. 'uq') then
          convertPLabelToPDGId=2
