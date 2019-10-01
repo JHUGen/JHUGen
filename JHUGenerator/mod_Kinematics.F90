@@ -2244,8 +2244,8 @@ real(8), intent(in) :: MomExt(1:4,1:NUP)
 integer, intent(in) :: ids(1:NUP-2) ! excludes V1, V2
 logical, intent(out) :: applyPSCut
 integer, intent(inout) :: NBin(:)
-integer :: ipart,jpart,lepcount,jetcount
-real(8) :: m_4l,pT_part,eta_part,eta_jpart,dphi_ij,deta_ij,dR_ij,m_ij
+integer :: ipart,jpart,lepcount,jetcount,id_ij,idpho_ij
+real(8) :: m_4l,pT_part,eta_part,eta_jpart,dphi_ij,deta_ij,dR_ij,m_ij,pT_ij
 logical, parameter :: doPrintFailReason=.false.
 
       applyPSCut = .false.
@@ -2318,10 +2318,46 @@ logical, parameter :: doPrintFailReason=.false.
             deta_ij = abs(eta_part - eta_jpart)
             dR_ij = sqrt(deta_ij**2 + dphi_ij**2)
             m_ij = get_MInv(MomExt(1:4,ipart)+MomExt(1:4,jpart))
+            pT_ij = get_PT(MomExt(1:4,ipart)+MomExt(1:4,jpart))
 
-            if (CoupledVertex((/ids(ipart-2),ids(jpart-2)/),-1,useAHcoupl=1).eq.Pho_) then
+            idpho_ij = CoupledVertex((/ids(ipart-2),ids(jpart-2)/),-1,useAHcoupl=1)
+            id_ij = CoupledVertex((/ids(ipart-2),ids(jpart-2)/),-1)
+            if (idpho_ij.eq.Pho_) then
                if (m_ij.lt.MPhotonCutoff) then
-                  if (doPrintFailReason) write(6,*) "Failed mphoton cutoff. m(",ipart,jpart,")=",get_MInv(MomExt(1:4,ipart)+MomExt(1:4,jpart)),"<",MPhotonCutoff
+                  if (doPrintFailReason) write(6,*) "Failed mphoton cutoff. m(",ipart,jpart,")=",m_ij,"<",MPhotonCutoff
+                  applyPSCut=.true.
+                  return
+               endif
+            endif
+
+            if ( &
+               id_ij.eq.Z0_ .and. (                       &
+                  (ipart.eq.Lep1P .and. jpart.eq.Lep1M) .or. &
+                  (ipart.eq.Lep2P .and. jpart.eq.Lep2M) .or. &
+                  includeInterference .and. ( &
+                     (ipart.eq.Lep1P .and. jpart.eq.Lep2M) .or. &
+                     (ipart.eq.Lep2P .and. jpart.eq.Lep1M)      &
+                  ) &
+               ) &
+               ) then
+               if (pT_ij.lt.0.1d0*GeV) then
+                  if (doPrintFailReason) write(6,*) "MCFM does not allow p_T^Z<0.1 GeV. pT(",ipart,jpart,")=",pT_ij,"<0.1 GeV"
+                  applyPSCut=.true.
+                  return
+               endif
+            endif
+            if ( &
+               abs(id_ij).eq.abs(Wp_) .and. ( &
+                  (ipart.eq.Lep1P .and. jpart.eq.Lep1M) .or. &
+                  (ipart.eq.Lep2P .and. jpart.eq.Lep2M) .or. &
+                  includeInterference .and. ( &
+                     (ipart.eq.Lep1P .and. jpart.eq.Lep2M) .or. &
+                     (ipart.eq.Lep2P .and. jpart.eq.Lep1M)      &
+                  ) &
+               ) &
+               ) then
+               if (pT_ij.lt.0.05d0*GeV) then
+                  if (doPrintFailReason) write(6,*) "MCFM does not allow p_T^W<0.05 GeV. pT(",ipart,jpart,")=",pT_ij,"<0.05 GeV"
                   applyPSCut=.true.
                   return
                endif
@@ -6683,7 +6719,7 @@ logical,parameter :: includeNewBWPSinEW = .true.
       Jac7 = s_channel_decay(Mom_Dummy2(:),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))
    endif
 
-   if( includeInterference .and. ids(3).eq.ids(5) .and. ids(4).eq.ids(6) ) then!   EqualLeptons=0 means equal leptons
+   if( includeInterference .and. ids(3).eq.ids(5) .and. ids(4).eq.ids(6) ) then
       call random_number(xRndLeptInterf)
       if( xRndLeptInterf.gt.0.5d0 ) then ! Swapped config.
          Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,9),Mom(:,8))       !   Z --> ffbar
@@ -7016,14 +7052,44 @@ logical :: swap34_56
       EMin = m4l_minmax(1)
    endif
    if (m4l_minmax(2).ge.0d0) then
-      EMax = m4l_minmax(2)
+      EMax = min(m4l_minmax(2),Emax)
    endif
    if( EMin.gt.EMax ) call Error("m4l_minmax is not set correctly")
 
-   s1min = (max(MPhotonCutoff,0d0))**2
-   s2min = (max(MPhotonCutoff,0d0))**2
+   if( &
+      includeInterference .and. &
+      (CoupledVertex((/ids(3),ids(6)/),-1).ne.Not_a_particle_ .and. CoupledVertex((/ids(5),ids(4)/),-1).ne.Not_a_particle_) &
+      ) then
+      call random_number(xRndLeptInterf)
+      if( xRndLeptInterf.gt.0.5d0 ) then ! Swap 46
+         swap34_56 = .true.
+      endif
+   endif
+   if (.not. swap34_56) then
+      if (CoupledVertex(ids(3:4),-1,useAHcoupl=1).eq.Pho_) then
+         s1min = (max(MPhotonCutoff,getMass(ids(3))+getMass(ids(4))))**2
+      else
+         s1min = getMass(ids(3))+getMass(ids(4))
+      endif
+      if (CoupledVertex(ids(5:6),-1,useAHcoupl=1).eq.Pho_) then
+         s2min = (max(MPhotonCutoff,getMass(ids(5))+getMass(ids(6))))**2
+      else
+         s2min = getMass(ids(5))+getMass(ids(6))
+      endif
+   else
+      if (CoupledVertex((/ids(3),ids(6)/),-1,useAHcoupl=1).eq.Pho_) then
+         s1min = (max(MPhotonCutoff,getMass(ids(3))+getMass(ids(6))))**2
+      else
+         s1min = getMass(ids(3))+getMass(ids(6))
+      endif
+      if (CoupledVertex((/ids(5),ids(4)/),-1,useAHcoupl=1).eq.Pho_) then
+         s2min = (max(MPhotonCutoff,getMass(ids(5))+getMass(ids(4))))**2
+      else
+         s2min = getMass(ids(5))+getMass(ids(4))
+      endif
+   endif
+   Emin = max(Emin,sqrt(max(s1min,s2min)))
    ! s1,2max=s34
-
 
    ! Find s34 = Energy**2
    BWmass_ps=-1d0
@@ -7032,29 +7098,52 @@ logical :: swap34_56
       if( M_Reso.ge.0d0 .and. M_Reso2.ge.0d0 ) then ! Both resonances are present
          BWmass_ps = max(M_Reso,M_Reso2)
          BWwidth_ps = max(max(abs(M_Reso-M_Reso2),Ga_Reso), Ga_Reso2) ! Cover the full mass difference
+         if (Emin.gt.max(M_Reso+10d0*Ga_Reso,M_Reso2+10d0*Ga_Reso2) .or. Emax.lt.min(M_Reso-10d0*Ga_Reso,M_Reso2-10d0*Ga_Reso2)) then
+            BWmass_ps = -1d0
+            BWwidth_ps = -1d0
+         endif
       else if( M_Reso.ge.0d0 ) then
          BWmass_ps = M_Reso
          BWwidth_ps = Ga_Reso
+         if (Emin.gt.(BWmass_ps+10d0*BWwidth_ps) .or. Emax.lt.(BWmass_ps-10d0*BWwidth_ps)) then
+            BWmass_ps = -1d0
+            BWwidth_ps = -1d0
+         endif
       else if( M_Reso2.ge.0d0 ) then
          BWmass_ps = M_Reso2
          BWwidth_ps = Ga_Reso2
-      endif
-      if (Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.gt.(BWmass_ps+10d0*BWwidth_ps)) then
-         BWmass_ps = -1d0
-         BWwidth_ps = -1d0
+         if (Emin.gt.(BWmass_ps+10d0*BWwidth_ps) .or. Emax.lt.(BWmass_ps-10d0*BWwidth_ps)) then
+            BWmass_ps = -1d0
+            BWwidth_ps = -1d0
+         endif
       endif
    else if (Process.eq.75) then
       if( M_Reso.ge.0d0 .and. M_Reso2.ge.0d0 ) then ! Both resonances are present
          BWmass_ps = max(M_Reso,M_Reso2)
-         BWwidth_ps = max(max(abs(M_Reso-M_Reso2),Ga_Reso), Ga_Reso2) ! Cover the full mass difference
+         BWwidth_ps = max(abs(M_Reso-M_Reso2), abs(M_Reso-2d0*M_V_ps), abs(M_Reso2-2d0*M_V_ps), Ga_Reso, Ga_Reso2) ! Cover the full mass difference
+         if (Emin.gt.max(M_Reso+10d0*Ga_Reso,M_Reso2+10d0*Ga_Reso2) .or. Emax.lt.min(M_Reso-10d0*Ga_Reso,M_Reso2-10d0*Ga_Reso2)) then
+            BWmass_ps = -1d0
+            BWwidth_ps = -1d0
+         endif
       else if( M_Reso.ge.0d0 ) then
          BWmass_ps = M_Reso
-         BWwidth_ps = Ga_Reso
+         BWwidth_ps = max(abs(M_Reso-2d0*M_V_ps), Ga_Reso)
+         if (Emin.gt.(BWmass_ps+10d0*BWwidth_ps) .or. Emax.lt.(BWmass_ps-10d0*BWwidth_ps)) then
+            BWmass_ps = -1d0
+            BWwidth_ps = -1d0
+         endif
       else if( M_Reso2.ge.0d0 ) then
          BWmass_ps = M_Reso2
-         BWwidth_ps = Ga_Reso2
+         BWwidth_ps = max(abs(M_Reso2-2d0*M_V_ps), Ga_Reso2)
+         if (Emin.gt.(BWmass_ps+10d0*BWwidth_ps) .or. Emax.lt.(BWmass_ps-10d0*BWwidth_ps)) then
+            BWmass_ps = -1d0
+            BWwidth_ps = -1d0
+         endif
       endif
-      if (Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.gt.(BWmass_ps+10d0*BWwidth_ps)) then
+   else if (Process.eq.74) then
+      BWmass_ps = 2d0*M_V_ps
+      BWwidth_ps = max(2d0*M_V_ps, Ga_V_ps)
+      if (Emin.gt.max(M_Reso+10d0*Ga_Reso,M_Reso2+10d0*Ga_Reso2) .or. Emax.lt.min(M_Reso-10d0*Ga_Reso,M_Reso2-10d0*Ga_Reso2)) then
          BWmass_ps = -1d0
          BWwidth_ps = -1d0
       endif
@@ -7084,13 +7173,6 @@ logical :: swap34_56
    Jac3 = s_channel_propagator(M_V_ps**2,Ga_V_ps,s1min,s34,xRnd(3),s56) ! Find s56=m1**2
    Jac4 = s_channel_propagator(M_V_ps**2,Ga_V_ps,s2min,(dsqrt(s34)-dsqrt(s56))**2,xRnd(4),s78) ! Find s78=m2**2
    Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s56,s78,xRnd(5:6),Mom(:,V1),Mom(:,V2)) ! Decay pVV to pV1, pV2 in CoM
-   if( includeInterference .and. ids(3).eq.ids(5) .and. ids(4).eq.ids(6) ) then
-      call random_number(xRndLeptInterf)
-      if( xRndLeptInterf.gt.0.5d0 ) then ! Swap 46
-         swap34_56 = .true.
-      endif
-   endif
-
    if( swap34_56 ) then ! Swapped config.
       Jac6 = s_channel_decay(Mom(:,V1),0d0,0d0,xRnd(7:8),Mom(:,Lep1P),Mom(:,Lep2M)) ! Decay pV1
       Jac7 = s_channel_decay(Mom(:,V2),0d0,0d0,xRnd(9:10),Mom(:,Lep2P),Mom(:,Lep1M)) ! Decay pV2

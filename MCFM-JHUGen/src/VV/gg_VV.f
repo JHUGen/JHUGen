@@ -54,12 +54,12 @@ c--- compute all gg->WW and gg->ZZ amplitudes
      & Mloop_uptype,Mloop_dntype,Mloop_bquark,Mloop_tquark)
 
 c--- pt cut to reproduce Kauer paper
-      if (pttwo(3,4,p) .lt. 1d0) then
-        faczz=czip
-      endif
-      if (pttwo(4,5,p) .lt. 1d0) then
-        facww=czip
-      endif
+      !if (pttwo(3,4,p) .lt. 1d0) then
+      !  faczz=czip
+      !endif
+      !if (pttwo(4,5,p) .lt. 1d0) then
+      !  facww=czip
+      !endif
 
 c--- Hack to isolate different pieces depending on runstring
       if(index(runstring,'_ww') .gt. 0) faczz=czip

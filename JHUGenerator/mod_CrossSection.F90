@@ -714,6 +714,7 @@ use ModKinematics
 use ModParameters
 use ModMisc
 use ModMCFMWrapper
+!use ModHiggs
 #if compiler==1
 use ifport
 #endif
@@ -726,7 +727,7 @@ real(8) :: MomExt(1:4,1:NUP),MomShifted(1:4,1:NUP),PSWgt,FinalStateWeight,m1ffwg
 real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5),msq_VgsWgt(-5:5,-5:5),Wgt_Ratio_Interf,originalprobability
 integer :: id_MCFM(mxpart),MY_IDUP(1:NUP),ICOLUP(1:2,1:NUP),NBin(1:NumHistograms),NHisto,ipart,jpart
 integer :: i,j,k
-real(8) :: PreFac,VegasWeighted_fullproddec,xRnd,LeptonAndVegasWeighted_fullproddec
+real(8) :: PreFac,VegasWeighted_fullproddec,xRnd,LeptonAndVegasWeighted_fullproddec,LO_Res_Unpol
 logical :: applyPSCut,swap34_56
 include 'vegas_common.f'
 include 'maxwt.f'
@@ -807,6 +808,21 @@ include 'maxwt.f'
 
 
    call EvalAmp_gg4f(id_MCFM, p_MCFM, msq_MCFM)
+   !call EvalAmp_gg_H_VV( &
+   !   (/-MomExt(1:4,inTop),-MomExt(1:4,inBot),MomExt(1:4,Lep1P),MomExt(1:4,Lep1M),MomExt(1:4,Lep2P),MomExt(1:4,Lep2M)/), &
+   !   id_MCFM(3:6), &
+   !   LO_Res_Unpol &
+   !   )
+   !do i=1,2
+   !   print *,"Mom",i,"=",MomExt(1:4,i)
+   !enddo
+   !do i=Lep1P,Lep2M
+   !   print *,"Mom",i,"=",MomExt(1:4,i)
+   !enddo
+   !print *,"MCFM ME = ",msq_MCFM(0,0)
+   !print *,"JHU ME = ",LO_Res_Unpol
+   !pause
+
 
    originalprobability = msq_MCFM(iPart_sel,jPart_sel)
 

@@ -1846,6 +1846,8 @@ subroutine Setup_MCFM_gg4f_firsttime(iProc, dmode1, dmode2)
 use ModMisc, only : Error
 implicit none
 integer, intent(in) :: iProc, dmode1, dmode2
+integer nuflav
+common/nuflav/nuflav
 integer npart
 common/npart/npart
 integer nwz
@@ -1892,6 +1894,7 @@ mtausq, mcsq, mbsq
       call Error("Setup_MCFM_gg4f_firsttime: Process undefined")
    endif
 
+   nuflav=1
    npart=4
    nwz=0
    call ckmfill(nwz)
@@ -2464,10 +2467,6 @@ integer :: i,j,ip
    pin_MCFMconv(:,:)=pin(:,:)/GeV
 
    doCompute = Setup_MCFM_gg4f(idin,pin_MCFMconv,id_MCFM,p_MCFM,ZWcode)
-   if (.not.doCompute) then
-      write(6,*) "mod_MCFMWrapper::EvalAmp_gg4f: Setup failed for idin:",idin,"(id_MCFM:",id_MCFM,")"
-      pause
-   endif
    if (doCompute) then
 
       if(ZWcode.eq.doZZ) then
@@ -2491,6 +2490,9 @@ integer :: i,j,ip
       else if(ZWcode.eq.doWW .or. ZWcode.eq.doZZorWW) then
          if ((Process.ge.73 .and. Process.le.75)) then
             call SetupParticleLabels(id_MCFM,1,6,.false.,.true.) ! Assign plabels
+            !do i=1,6
+            !   write(6,*) "Particle",i,"id | momentum =",convertLHE(id_MCFM(i))," | ",p_MCFM(i,:)
+            !enddo
             if (Process.eq.73) then
                call gg_hvv_tb(p_MCFM,msq)
             else if (Process.eq.74) then
@@ -2501,6 +2503,7 @@ integer :: i,j,ip
             else
                call Error("EvalAmp_gg4f: Process not implemented!")
             endif
+            !pause
          endif
       else
          call Error("EvalAmp_gg4f: ZWcode not implemented!")
@@ -2516,6 +2519,9 @@ integer :: i,j,ip
          msq(0,0)=0d0
       endif
 
+   else
+      write(6,*) "mod_MCFMWrapper::EvalAmp_gg4f: Setup failed for idin:",idin,"(id_MCFM:",id_MCFM,")"
+      pause
    endif
 
 end subroutine

@@ -542,7 +542,7 @@ type(SaveValues) :: tosave, oldsavevalues
     ! is correct.
     call ReadCommandLineArgument(arg, "DryRun", success, DryRun)
     call ReadCommandLineArgument(arg, "Collider", success, Collider, tosave=tosave)
-    call ReadCommandLineArgument(arg, "ColliderEnergy", success, Collider_Energy, multiply=1000*GeV, success2=SetColliderEnergy, tosave=tosave)
+    call ReadCommandLineArgument(arg, "ColliderEnergy", success, Collider_Energy, multiply=TeV, success2=SetColliderEnergy, tosave=tosave)
     call ReadCommandLineArgument(arg, "epPolarization", success, POL_A, tosave=tosave)
     call ReadCommandLineArgument(arg, "emPolarization", success, POL_B, tosave=tosave)
 #if useLHAPDF==1
