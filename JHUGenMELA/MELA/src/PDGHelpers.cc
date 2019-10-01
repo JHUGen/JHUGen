@@ -237,11 +237,11 @@ int PDGHelpers::getCoupledVertex(const int idfirst, const int idsecond, int* hel
   int ids_jhu[2]={ -9000, -9000 };
   for (unsigned int ip=0; ip<2; ip++){ if (!PDGHelpers::isInvalid(ids[ip])) ids_jhu[ip] = convertLHEreverse(&(ids[ip])); }
   int zahswitch=0;
-  if (useAHcoupl!=0) zahswitch = *useAHcoupl;
+  if (useAHcoupl) zahswitch = *useAHcoupl;
   // Left-handed couplings always exist; right handed ones may or may not exist. This is why the default below is -1 for left-handed.
   // Example: Z->nu nub does not have Z->nu_R nub_L counterpart because nu_R or nub_L do not exist!
   int heleff=-1;
-  if (hel!=0) heleff = *hel;
+  if (hel) heleff = *hel;
   int Vid_jhu = CoupledVertex(ids_jhu, &heleff, &zahswitch);
   return convertLHE(&Vid_jhu);
 }

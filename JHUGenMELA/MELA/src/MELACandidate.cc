@@ -557,16 +557,33 @@ TLorentzVector MELACandidate::getAlternativeVMomentum(int index)const{
   else if (beginWithWPair) HVVmass = PDGHelpers::Wmass;
 
   TLorentzVector nullFourVector(0, 0, 0, 0);
-  if (sortedDaughters.size()>=3){
-    TLorentzVector pZ1 = sortedDaughters.at(0)->p4;
-    if (sortedDaughters.size()>3) pZ1 = pZ1 + sortedDaughters.at(3)->p4;
-    TLorentzVector pZ2 = sortedDaughters.at(2)->p4+sortedDaughters.at(1)->p4;
-    if (std::abs(pZ1.M() - HVVmass)>std::abs(pZ2.M() - HVVmass)){
-      TLorentzVector pZtmp = pZ1;
-      pZ1 = pZ2;
-      pZ2 = pZtmp;
+  if (sortedDaughters.size()>=4){
+    if (beginWithWPair){
+      TLorentzVector pUU = sortedDaughters.at(0)->p4 + sortedDaughters.at(3)->p4;
+      TLorentzVector pDD = sortedDaughters.at(2)->p4 + sortedDaughters.at(1)->p4;
+      return (index==0 ? pDD : pUU);
     }
-    return (index==0 ? pZ1 : pZ2);
+    else{
+      TLorentzVector pWp = sortedDaughters.at(2)->p4 + sortedDaughters.at(1)->p4;
+      TLorentzVector pWm = sortedDaughters.at(0)->p4 + sortedDaughters.at(3)->p4;
+      if (
+        (
+          (isALepton(sortedDaughters.at(0)->id) && isALepton(sortedDaughters.at(2)->id))
+          ||
+          (isANeutrino(sortedDaughters.at(0)->id) && isANeutrino(sortedDaughters.at(2)->id))
+          ||
+          (isAJet(sortedDaughters.at(0)->id) && isAJet(sortedDaughters.at(2)->id))
+        )
+        &&
+        std::abs(pWp.M() - HVVmass) > std::abs(pWm.M() - HVVmass)
+        ) std::swap(pWp, pWm);
+      return (index==0 ? pWp : pWm);
+    }
+  }
+  else if (sortedDaughters.size()==3){
+    TLorentzVector pVa = sortedDaughters.at(0)->p4 + sortedDaughters.at(2)->p4;
+    TLorentzVector pVb = sortedDaughters.at(1)->p4 + sortedDaughters.at(2)->p4;
+    return (index==0 ? pVa : pVb);
   }
   else return nullFourVector;
 }
