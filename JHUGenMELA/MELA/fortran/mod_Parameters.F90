@@ -3,7 +3,7 @@ implicit none
 save
 !
 !
-character(len=*),parameter :: JHUGen_Version="v7.3.4"
+character(len=*),parameter :: JHUGen_Version="v7.3.5"
 !
 !
 !=====================================================
@@ -90,6 +90,7 @@ real(8), public, parameter :: percent=1d0/100d0
 real(8), public, parameter :: SymmFac=1d0/2d0, SpinAvg=1d0/4d0, QuarkColAvg=1d0/3d0, GluonColAvg=1d0/8d0
 ! Units
 real(8), public, parameter :: GeV=1d0/100d0 ! we are using units of 100GeV, i.e. Lambda=10 is 1TeV
+real(8), public, parameter :: TeV=1d+3*GeV
 real(8), public, parameter :: MeV=1d-3*GeV
 real(8), public, parameter :: keV=1d-6*GeV
 real(8), public, parameter :: eV=1d-9*GeV
@@ -251,8 +252,8 @@ real(dp), public           :: esq ! = 4.0d0 * pi * alpha_QED  ! Fundamental char
 real(8), public            :: xw = 0.23119d0                ! sin**2(Theta_Weinberg) (PDG-2008)
 real(8), public            :: sitW ! = dsqrt(xw)            ! sin(Theta_Weinberg) (PDG-2008)
 real(8), public            :: twosc ! = sqrt(4.0_dp*xw*(1.0_dp-xw))
-real(8), public, parameter :: LHC_Energy=13000d0  *GeV      ! LHC hadronic center of mass energy
-real(8), public, parameter :: TEV_Energy=1960d0  *GeV       ! Tevatron hadronic center of mass energy
+real(8), public, parameter :: LHC_Energy=13d0  *TeV      ! LHC hadronic center of mass energy
+real(8), public, parameter :: TEV_Energy=1.96d0  *TeV       ! Tevatron hadronic center of mass energy
 real(8), public, parameter :: ILC_Energy=250d0  *GeV        ! Linear collider center of mass energy
 !command line: epPolarization, emPolarization
 real(8), public            :: POL_A = 0d0                   ! e+ polarization. 0: no polarization, 100: helicity = 1, -100: helicity = -1
