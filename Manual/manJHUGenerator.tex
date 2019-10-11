@@ -8,6 +8,7 @@
 % % \usepackage{cprotect}
 \usepackage{amsmath}
 \usepackage[hidelinks]{hyperref}
+\usepackage{wasysym}
 
 % \textwidth18cm
 % \addtolength{\oddsidemargin}{-2cm}
@@ -54,6 +55,125 @@ The latter was also introduced in Ref.~\cite{Chatrchyan:2012ufa}. The matrix ele
 \vspace{0.5cm}
 
 %\newpage
+
+
+\section{Notation}
+
+The notation has been set in Refs.~\cite{Gao:2010qx,Bolognesi:2012,Anderson:2013,Gritsan:2016} ,
+the $HVV$ scattering amplitude of a spin-zero boson $H$ and two vector bosons with polarization vectors 
+$\varepsilon_{1}^\mu(q_1)$ and $\varepsilon_{2}^\mu(q_2)$
+is parameterized by
+\begin{eqnarray}
+  A({H V V}) \!=\! \frac{1}{v} &\bigg\{  &
+                          M_V^2 \bigg(g_{1}^{VV} 
++ \frac{\kappa_1^{VV}q_{1}^2 + \kappa_2^{VV} q_{2}^{2}}{\left(\Lambda_{1}^{VV} \right)^{2}} + \frac{\kappa_3^{VV} (q_1+q_2)^2}{\left(\Lambda_{Q}^{VV} \right)^{2}} 
++ \frac{2 q_1\cdot q_2}{M_V^2} g_2^{VV}\bigg) (\varepsilon_1 \cdot \varepsilon_2) 
+\nonumber \\ &&
+                        -2 g_2^{VV} \, {(\varepsilon_1 \cdot q_2)(\varepsilon_2 \cdot q_1)}
+                        -2  g_4^{VV} \, {\varepsilon^{\varepsilon_1\,\varepsilon_2\,q_1\,q_2}}
+                               \bigg\}.
+\label{eq:HVV}
+\end{eqnarray}
+This parametrization represents the most general Lorentz-invariant form. 
+The couplings used in Eq.~(\ref{eq:HVV}) are the direct input to the JHU generator, as discussed
+in the rest of this manual. 
+
+The parameterization of the amplitude in Eq.~(\ref{eq:HVV}) can be related to a fundamental Lagrange density function,
+using effective field theory coefficients of the so-called Higgs basis \cite{deFlorian:2016spz}:
+\begin{eqnarray}
+\label{eq:EFT_hvv}
+ {\cal L}_{\rm hvv} =& & {h \over v} \left [ 
+  \left (1 +  \delta c_z \right )  {(g^2+g^{\prime 2}) v^2 \over 4} Z_\mu Z_\mu
++ c_{zz} {g^2 + g'{}^2 \over  4} Z_{\mu \nu} Z_{\mu\nu}  
++c_{z \Box} g^2 Z_\mu \partial_\nu Z_{\mu \nu}
++ \tilde c_{zz}  {g^2 + g'{}^2  \over  4} Z_{\mu \nu} \tilde Z_{\mu\nu}
+\right . \nonumber \\ & & \left . 
+% 
+% 
+ +\left (1 +  \delta c_w \right )  {g^2 v^2 \over 2} W_\mu^+ W_\mu^- 
++ c_{ww}  {g^2 \over  2} W_{\mu \nu}^+  W_{\mu\nu}^- 
++ c_{w \Box} g^2 \left (W_\mu^- \partial_\nu W_{\mu \nu}^+ + {\mathrm h.c.} \right )  
+ + \tilde c_{ww}  {g^2 \over  2} W_{\mu \nu}^+   \tilde W_{\mu\nu}^- 
+ \right . \nonumber \\ & & \left . 
+% 
+% 
++ c_{z \gamma} {e \sqrt{g^2 + g'{}^2}  \over  2} Z_{\mu \nu} A_{\mu\nu} 
++ \tilde c_{z \gamma} {e \sqrt{g^2 + g'{}^2} \over  2} Z_{\mu \nu} \tilde A_{\mu\nu}
++ c_{\gamma \Box} g g' Z_\mu \partial_\nu A_{\mu \nu}
+\right . \nonumber \\ & & \left . 
+% 
+% 
++ c_{\gamma \gamma} {e^2 \over 4} A_{\mu \nu} A_{\mu \nu} 
++ \tilde c_{\gamma \gamma} {e^2 \over 4} A_{\mu \nu} \tilde A_{\mu \nu} 
++  c_{gg} {g_s^2 \over 4 } G_{\mu \nu}^a G_{\mu \nu}^a   
++  \tilde c_{gg} {g_s^2 \over 4} G_{\mu \nu}^a \tilde G_{\mu \nu}^a  
+\right ],
+\end{eqnarray} 
+in accordance with Eq.~(II.2.20) in Ref.~\cite{deFlorian:2016spz}.
+
+There is unique representation of each EFT coefficient in Eq.~(\ref{eq:EFT_hvv}) by couplings in Eq.~(\ref{eq:HVV}),
+as shown below:
+\begin{eqnarray}  &&
+\label{eq:EFT_ci}
+    \delta c_z  = \frac12 g_1^{ZZ} - 1,
+    \quad\quad
+    c_{zz} = -\frac{2 s_w^2 c_w^2}{e^2} g_2^{ZZ},
+    \quad\quad
+    c_{z \Box} = \frac{M_Z^2 s_w^2}{e^2} \, \frac{\kappa_1^{ZZ}}{(\Lambda_1^{ZZ})^2},
+    \quad\quad
+    \tilde c_{zz} = -\frac{2 s_w^2 c_w^2}{e^2} g_4^{ZZ},
+    \nonumber \\ &&
+     \delta c_w = \frac12 g_1^{WW} - 1,
+    \quad\quad
+    c_{ww} = -\frac{2 s_w^2 }{e^2} g_2^{WW},
+    \quad\quad
+    c_{w \Box} = \frac{M_W^2 s_w^2}{e^2} \, \frac{\kappa_1^{WW}}{(\Lambda_1^{WW})^2},
+    \quad\quad
+    \tilde c_{ww} = -\frac{2 s_w^2}{e^2} g_4^{WW},
+    \nonumber\\ &&
+     c_{z \gamma} = -\frac{2 s_w c_w}{e^2} g_2^{Z\gamma},
+    \quad\quad
+    \tilde c_{z \gamma} = -\frac{2 s_w c_w}{e^2} g_4^{Z\gamma},
+    \quad\quad
+    c_{\gamma \Box} = \frac{s_w c_w}{e^2} \, \frac{M_Z^2}{(\Lambda_1^{Z\gamma})^2} \kappa_2^{Z\gamma},
+   \nonumber\\ &&
+     c_{\gamma \gamma} = -\frac{2}{e^2} g_2^{\gamma\gamma},   
+    \quad\quad
+   \tilde c_{\gamma \gamma} = -\frac{2}{e^2} g_4^{\gamma\gamma},
+    \quad\quad
+     c_{gg} = -\frac{2}{g_s^2} g_2^{gg},
+   \quad\quad
+   \tilde c_{gg} = -\frac{2}{g_s^2} g_4^{gg}.
+\end{eqnarray} 
+
+Enforcing linear relations for the dependent coefficients~\cite{deFlorian:2016spz} allows a unique relationship based on a minimal set of degrees of freedom:
+\begin{eqnarray}
+  g_1^{WW} &=& g_1^{ZZ} 
+  %+ \frac{\Delta M_W}{M_W}
+  ,    
+  \label{eq:deltaMW}
+  \\
+  g_2^{WW} &=& c_w^2 g_2^{ZZ} + s_w^2 g_2^{\gamma\gamma} + 2 s_w c_w g_2^{Z\gamma},
+  \label{eq:g2WW}
+  \\
+  g_4^{WW} &=& c_w^2 g_4^{ZZ} + s_w^2 g_4^{\gamma\gamma} + 2 s_w c_w g_4^{Z\gamma},
+  \label{eq:g4WW}
+  \\
+  \frac{\kappa_1^{WW}}{(\Lambda_1^{WW})^2} (c_w^2-s_w^2) &=& \frac{\kappa_1^{ZZ}}{(\Lambda_1^{ZZ})^2},
+                                                           +2 s_w^2 \frac{g_2^{\gamma\gamma}-g_2^{ZZ}}{M_Z^2} 
+                                                          +2 \frac{s_w}{c_w} (c_w^2-s_w^2) \frac{g_2^{Z\gamma}}{M_Z^2},
+ \label{eq:kappa1WW}
+  \\
+  \frac{\kappa_2^{Z\gamma}}{(\Lambda_1^{Z\gamma})^2} (c_w^2-s_w^2) &=&  2 s_w c_w \left( \frac{\kappa_1^{ZZ}}{(\Lambda_1^{ZZ})^2} 
+                                                                              + \frac{ g_2^{\gamma\gamma} - g_2^{ZZ}}{M_Z^2}  \right)
+                                                                               +2 (c_w^2-s_w^2) \frac{g_2^{Z\gamma}}{M_Z^2}.
+ \label{eq:kappa2Zgamma}
+ \end{eqnarray}
+
+Automatic relationship of couplings in the EFT approach discussed here is not implemented directly in the generator, 
+but could be obtained with a script following the formulas above. 
+There is a one-to-one correspondence of the couplings used in the generator settings in Eq.~(\ref{eq:HVV}) 
+and the couplings used in the Higgs basis~\cite{deFlorian:2016spz}. 
 
 \section{Installation}
 
@@ -872,13 +992,17 @@ Since text processing is simple in Python, the Python MELA interface is especial
 
 \section{Release notes}
 \noindent
-In going from \verb|v7.2.4| to \verb|v7.2.7| (January 31, 2018), the updates are as follows:
+In going to \verb|v7.3.0| (April 28, 2019), the updates are as follows:
+\begin{itemize}
+\item Faster option for generating interference in \(4\ell\) final states in offshell VBF production, 164 jobs per step.
+\end{itemize}
+\noindent
+In going from \verb|v7.2.4| to \verb|v7.2.7| (January 31, 2019), the updates are as follows:
 \begin{itemize}
 \item $gg\to ZH$ with anomalous couplings using Process 51, using the same syntax as for other processes.
 \item Faster option for generating interference in \(4\ell\) final states in offshell VBF production.
 \item Additional options for the renormalization and factorization scales in JHUGen and MELA.
 \end{itemize}
-
 \noindent
 In going from \verb|v7.1.4| to \verb|v7.2.4| (November 15, 2018), the updates are as follows:
 \begin{itemize}
@@ -1131,6 +1255,10 @@ See webpage: \url{http://spin.pha.jhu.edu}
   Nucl.\ Phys.\ Proc.\ Suppl.\  {\bf 205-206}, 10 (2010)
   [arXiv:1007.3492 [hep-ph]].
   See also http://mcfm.fnal.gov
+\bibitem{deFlorian:2016spz}
+``Handbook of LHC Higgs Cross Sections: 4. Deciphering the Nature of the Higgs Sector,''
+CERN Yellow Report 10.23731/CYRM-2017-002.
+[arXiv:1610.07922 [hep-ph]].
 \bibitem{Goria:2011wa}
   S.~Goria, G.~Passarino and D.~Rosco,
   ``The Higgs-boson lineshape,''
