@@ -1214,8 +1214,6 @@ logical :: isZlep,isZnu,isZup,isZdn
    call Set_MCFMCommon_DecayZCouple(isZlep, isZnu, isZup, isZdn, whichZ)
 end subroutine
 
-
-
 subroutine Set_MCFMCommon_DecayZCouple(isZlep, isZnu, isZup, isZdn, ip)
 logical, intent(in) :: isZlep, isZnu, isZup, isZdn
 integer, intent(in) :: ip
@@ -1251,6 +1249,18 @@ common/zcouple/l,r,q1,l1,r1,q2,l2,r2,le,ln,re,rn,sin2w
          l2=l(2);r2=r(2);q2=q(2)
       endif
    endif
+end subroutine
+
+
+subroutine Set_MCFMQCDCoupl_QCDCouplings(as_inp,asmz_inp)
+use ModParameters, only : pi
+double precision as_inp,asmz_inp
+double precision gsq,as,ason2pi,ason4pi
+common/qcdcouple/gsq,as,ason2pi,ason4pi
+   as = as_inp
+   gsq = 4.0*pi*as
+   ason2pi = as/(2d0*pi)
+   ason4pi = as/(4d0*pi)
 end subroutine
 
 
@@ -1754,6 +1764,13 @@ subroutine GetEWInputs(Gf_inp_in,aemmz_inp_in,xw_inp_in,wmass_inp_in,zmass_inp_i
    zmass_inp_in=M_Z/GeV
 end subroutine
 
+subroutine GetQCDCouplings(as_inp,asmz_inp)
+   use ModParameters
+   implicit none
+   double precision, intent(out) :: as_inp,asmz_inp
+   as_inp=alphas
+   asmz_inp=alphas_mz
+end subroutine
 
 
 
@@ -1939,6 +1956,8 @@ integer :: decayOrdering(1:4),idV(1:2),idVswap(1:2)
 integer :: apartOrdering(1:2)
 integer :: ip
 
+double precision as_inp, asmz_inp
+
 logical interference,bw34_56
 common/interference/interference,bw34_56
 double precision vsymfact
@@ -1948,6 +1967,10 @@ double precision l(nf),r(nf),le,ln,re,rn,sin2w,q1,l1,r1,q2,l2,r2
 common/zcouple/l,r,q1,l1,r1,q2,l2,r2,le,ln,re,rn,sin2w
 
    Setup_MCFM_qqVVqq=.false.
+
+   call GetQCDCouplings(as_inp,asmz_inp)
+   call Set_MCFMQCDCoupl_QCDCouplings(as_inp,asmz_inp)
+
    pid_MCFM(:) = pid_MCFM_in(:)
    p_MCFM(:,:) = p_MCFM_in(:,:)
 
@@ -2009,6 +2032,8 @@ real(8), intent(out) :: p_MCFM(1:mxpart,1:4)
 integer :: decayOrdering(1:4),idV(1:2),idVswap(1:2)
 integer :: ip
 
+double precision as_inp, asmz_inp
+
 logical interference,bw34_56
 common/interference/interference,bw34_56
 double precision vsymfact
@@ -2018,6 +2043,10 @@ double precision l(nf),r(nf),le,ln,re,rn,sin2w,q1,l1,r1,q2,l2,r2
 common/zcouple/l,r,q1,l1,r1,q2,l2,r2,le,ln,re,rn,sin2w
 
    Setup_MCFM_gg4f=.false.
+
+      call GetQCDCouplings(as_inp,asmz_inp)
+   call Set_MCFMQCDCoupl_QCDCouplings(as_inp,asmz_inp)
+
    pid_MCFM(:) = pid_MCFM_in(:)
    p_MCFM(:,:) = p_MCFM_in(:,:)
 
@@ -2498,6 +2527,9 @@ integer :: i,j,ip
             else if (Process.eq.74) then
                call gg_vv(p_MCFM,msqgg)
                msq(0,0)=msqgg
+               !call gg_ww(p_MCFM,msqgg)
+               !print *,"vv vs ww:",msq(0,0)," | ",msqgg
+               !pause
             else if (Process.eq.75) then
                call gg_vv_all(p_MCFM,msq)
             else
