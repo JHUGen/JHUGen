@@ -2594,6 +2594,8 @@ if( VegasNc2.eq.-1 .and.  .not. (unweighted) ) VegasNc2 = VegasNc2_default
 
    PChannel_aux = PChannel
 
+   !print *, "StartVegas: unweighted=",unweighted,"GenerateEvents=",GenerateEvents
+
 if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !----------------------- weighted events
 
 
@@ -2979,6 +2981,7 @@ character(len=len(CSmaxFile)+20) :: FileToRead
    if( VegasNc2.eq.-1 .and.  .not. (unweighted) ) VegasNc2 = VegasNc2_default
 
 
+   !print *, "StartVegas_NEW: unweighted=",unweighted,"GenerateEvents=",GenerateEvents
 
    if(Process.lt.10) then
       write(ProcessStr,"(I1)") Process
@@ -3081,6 +3084,7 @@ character(len=len(CSmaxFile)+20) :: FileToRead
    elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 
    UseBetaVersion = CalculatesXsec(Process)
+   !print *, "StartVegas_NEW: UseBetaVersion=",UseBetaVersion
 
 
       if( UseBetaVersion ) then
