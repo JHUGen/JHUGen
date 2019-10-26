@@ -7143,7 +7143,7 @@ logical :: swap34_56
    else if (Process.eq.74) then
       BWmass_ps = 2d0*M_V_ps
       BWwidth_ps = max(2d0*M_V_ps, Ga_V_ps)
-      if (Emin.gt.max(M_Reso+10d0*Ga_Reso,M_Reso2+10d0*Ga_Reso2) .or. Emax.lt.min(M_Reso-10d0*Ga_Reso,M_Reso2-10d0*Ga_Reso2)) then
+      if (Emin.gt.(BWmass_ps+2d0*BWwidth_ps) .or. Emax.lt.(BWmass_ps-10d0*Ga_V_ps)) then
          BWmass_ps = -1d0
          BWwidth_ps = -1d0
       endif
@@ -7153,6 +7153,7 @@ logical :: swap34_56
    else ! Create a BW 4f mass
       Jac1 = k_BreitWigner(xRnd(1),BWmass_ps**2,BWwidth_ps,Emin**2,Emax**2,s34)
    endif
+   Jac1 = Jac1 / (Collider_Energy**2) ! This is because Jac1*Jac2 should be divided by s
    if (s34.le.0d0) then
       return
    endif
@@ -7160,7 +7161,7 @@ logical :: swap34_56
 
    ! Find y and set eta1, eta2
    Jac2 = rapidity_tan_map(xRnd(2),sysY,ywidthset=sqrt(2d0))
-   eta1 = Energy/Collider_Energy*exp(sysY) ! x1
+   eta1 = Energy/Collider_Energy*exp(sysY)  ! x1
    eta2 = Energy/Collider_Energy*exp(-sysY) ! x2
    if (eta1.ge.1d0 .or. eta2.ge.1d0) then
       return

@@ -727,7 +727,7 @@ real(8) :: MomExt(1:4,1:NUP),MomShifted(1:4,1:NUP),PSWgt,FinalStateWeight,m1ffwg
 real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5),msq_VgsWgt(-5:5,-5:5),Wgt_Ratio_Interf,originalprobability
 integer :: id_MCFM(mxpart),MY_IDUP(1:NUP),ICOLUP(1:2,1:NUP),NBin(1:NumHistograms),NHisto,ipart,jpart
 integer :: i,j,k
-real(8) :: PreFac,VegasWeighted_fullproddec,xRnd,LeptonAndVegasWeighted_fullproddec,LO_Res_Unpol
+real(8) :: PreFac,VegasWeighted_fullproddec,xRnd,LeptonAndVegasWeighted_fullproddec!,LO_Res_Unpol
 logical :: applyPSCut,swap34_56
 include 'vegas_common.f'
 include 'maxwt.f'
@@ -744,7 +744,7 @@ include 'maxwt.f'
        call random_number(xRnd)
    endif
 
-   if( unweighted .and. .not.warmup .and.  sum(AccepCounter_part(:,:)) .eq. sum(RequEvents(:,:)) ) then
+   if( unweighted .and. .not. warmup .and. sum(AccepCounter_part(:,:)) .eq. sum(RequEvents(:,:)) ) then
       stopvegas=.true.
    endif
    if( unweighted .and. .not. warmup .and. AccepCounter_part(iPart_sel,jPart_sel) .ge. RequEvents(iPart_sel,jPart_Sel)  ) return
@@ -767,14 +767,18 @@ include 'maxwt.f'
    if( PSWgt.lt.1d-33 ) then
       return
    endif
-   call boost2Lab(eta1,eta2,10,MomExt(1:4,1:NUP))
+   call boost2Lab(eta1,eta2,NUP,MomExt(1:4,1:NUP))
 
    call Kinematics_gg4f_fullproddec(MomExt,id_MCFM,applyPSCut,NBin)
    if( applyPSCut ) then
       return
    endif
 
-   call SetRunningScales( (/ (MomExt(1:4,V1)+MomExt(1:4,V2)),Mom_Not_a_particle(1:4),Mom_Not_a_particle(1:4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) )
+   call SetRunningScales( &
+      (/ (MomExt(1:4,V1)+MomExt(1:4,V2)), Mom_Not_a_particle(1:4), Mom_Not_a_particle(1:4) /), &
+      (/ Not_a_particle_, Not_a_particle_, Not_a_particle_, Not_a_particle_ /) &
+      )
+   call EvalAlphaS()
    !write(6,*) "setPDFs args:",eta1,eta2,alphas,alphas_mz
    call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
@@ -805,29 +809,40 @@ include 'maxwt.f'
          call ShiftMass(MomExt(1:4,Lep2P),MomExt(1:4,Lep2M), GetMass(MY_IDUP(Lep2P)),GetMass(MY_IDUP(Lep2M)),MomShifted(1:4,Lep2P),MomShifted(1:4,Lep2M),MassWeight=m2ffwgt)
       endif
    endif
+   PSWgt = PSWgt * m1ffwgt * m2ffwgt
 
 
    call EvalAmp_gg4f(id_MCFM, p_MCFM, msq_MCFM)
+   !msq_MCFM(iPart_sel,jPart_sel) = 1d0
    !call EvalAmp_gg_H_VV( &
    !   (/-MomExt(1:4,inTop),-MomExt(1:4,inBot),MomExt(1:4,Lep1P),MomExt(1:4,Lep1M),MomExt(1:4,Lep2P),MomExt(1:4,Lep2M)/), &
    !   id_MCFM(3:6), &
    !   LO_Res_Unpol &
    !   )
+   !do i=1,6
+   !   print *,"id(",i,"):",convertLHE(id_MCFM(i))
+   !enddo
    !do i=1,2
-   !   print *,"Mom",i,"=",MomExt(1:4,i)
+   !   print *,"Mom",i,"=",MomExt(1:4,i)/GeV
    !enddo
    !do i=Lep1P,Lep2M
-   !   print *,"Mom",i,"=",MomExt(1:4,i)
+   !   print *,"Mom",i,"=",MomExt(1:4,i)/GeV
    !enddo
    !print *,"MCFM ME = ",msq_MCFM(0,0)
-   !print *,"JHU ME = ",LO_Res_Unpol
+   !!print *,"JHU ME = ",LO_Res_Unpol
+   !write(6,*) "Mu_Fact =",Mu_Fact
+   !write(6,*) "Mu_Ren =",Mu_Ren
+   !write(6,*) "alphas =",alphas
+   !write(6,*) "alphas_mz =",alphas_mz
+   !write(6,*) "pdf1 =",pdf(LHA2M_pdf(iPart_sel),1)
+   !write(6,*) "pdf2 =",pdf(LHA2M_pdf(jPart_sel),2)
    !pause
 
 
    originalprobability = msq_MCFM(iPart_sel,jPart_sel)
 
-   PreFac = hbarc2XsecUnit * FluxFac * PSWgt * m1ffwgt * m2ffwgt
-   msq_MCFM = msq_MCFM * PreFac / (GeV**4)  ! adjust msq_MCFM for GeV units of MCFM mat.el.
+   PreFac = hbarc2XsecUnit / (GeV**4)  ! adjust msq_MCFM for GeV units of MCFM mat.el.
+   msq_MCFM = msq_MCFM * PreFac
 
    if ( &
       msq_MCFM(iPart_sel,jPart_sel) .le. 0d0 .or. &
@@ -857,7 +872,8 @@ include 'maxwt.f'
       return
     endif
 
-   EvalWeighted_gg4f_fullproddec = msq_MCFM(iPart_sel,jPart_sel) * pdf(LHA2M_pdf(iPart_sel),1)*pdf(LHA2M_pdf(jPart_sel),2)
+   !EvalWeighted_gg4f_fullproddec = msq_MCFM(iPart_sel,jPart_sel) * pdf(LHA2M_pdf(iPart_sel),1)*pdf(LHA2M_pdf(jPart_sel),2)
+   EvalWeighted_gg4f_fullproddec = PSWgt * FluxFac * msq_MCFM(iPart_sel,jPart_sel) * pdf(LHA2M_pdf(iPart_sel),1)*pdf(LHA2M_pdf(jPart_sel),2)
    VegasWeighted_fullproddec = EvalWeighted_gg4f_fullproddec * VgsWgt
    !if (EvalWeighted_gg4f_fullproddec.eq.0d0) then
    !   write(6,*) "EvalWeighted_gg4f_fullproddec==0. Ids:",id_MCFM
