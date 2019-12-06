@@ -637,12 +637,12 @@ type(SaveValues) :: tosave, oldsavevalues
 
     call ReadCommandLineArgument(arg, "kappa_top", success, kappa_top, success2=SetAnomalousHffMCFM, success3=Setkappatop, tosave=tosave)
     call ReadCommandLineArgument(arg, "kappa_tilde_top", success, kappa_tilde_top, success2=SetAnomalousHffMCFM, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "kappa_bot", success, kappa_top, success2=SetAnomalousHffMCFM, success3=Setkappabot, tosave=tosave)
-    call ReadCommandLineArgument(arg, "kappa_tilde_bot", success, kappa_tilde_top, success2=SetAnomalousHffMCFM, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "kappa_bot", success, kappa_bot, success2=SetAnomalousHffMCFM, success3=Setkappabot, tosave=tosave)
+    call ReadCommandLineArgument(arg, "kappa_tilde_bot", success, kappa_tilde_bot, success2=SetAnomalousHffMCFM, checkdestchange=.true., tosave=tosave)
     call ReadCommandLineArgument(arg, "kappa_4gen_top", success, kappa_4gen_top, success2=SetAnomalousHffMCFM, success3=Setkappa4gentop, checkdestchange=.true., tosave=tosave)
     call ReadCommandLineArgument(arg, "kappa_tilde_4gen_top", success, kappa_tilde_4gen_top, success2=SetAnomalousHffMCFM, success3=Setkappa4gentop, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "kappa_4gen_bot", success, kappa_4gen_top, success2=SetAnomalousHffMCFM, success3=Setkappa4genbot, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "kappa_tilde_4gen_bot", success, kappa_tilde_4gen_top, success2=SetAnomalousHffMCFM, success3=Setkappa4genbot, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "kappa_4gen_bot", success, kappa_4gen_bot, success2=SetAnomalousHffMCFM, success3=Setkappa4genbot, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "kappa_tilde_4gen_bot", success, kappa_tilde_4gen_bot, success2=SetAnomalousHffMCFM, success3=Setkappa4genbot, checkdestchange=.true., tosave=tosave)
 
     !spin 0 gg couplings
     call ReadCommandLineArgument(arg, "ghg2", success, ghg2, success2=SetAnomalousSpin0gg, success3=Setghg2, tosave=tosave)
