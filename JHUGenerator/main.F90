@@ -821,12 +821,12 @@ type(SaveValues) :: tosave, oldsavevalues
     !spin 0 Hff couplings
     call ReadCommandLineArgument(arg, "kappa2_top", success, kappa2_top, success2=SetAnomalousHffMCFM, success3=Setkappa2top, checkdestchange=.true., tosave=tosave)
     call ReadCommandLineArgument(arg, "kappa2_tilde_top", success, kappa2_tilde_top, success2=SetAnomalousHffMCFM, success3=Setkappa2top, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "kappa2_bot", success, kappa2_top, success2=SetAnomalousHffMCFM, success3=Setkappa2bot, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "kappa2_tilde_bot", success, kappa2_tilde_top, success2=SetAnomalousHffMCFM, success3=Setkappa2bot, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "kappa2_bot", success, kappa2_bot, success2=SetAnomalousHffMCFM, success3=Setkappa2bot, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "kappa2_tilde_bot", success, kappa2_tilde_bot, success2=SetAnomalousHffMCFM, success3=Setkappa2bot, checkdestchange=.true., tosave=tosave)
     call ReadCommandLineArgument(arg, "kappa2_4gen_top", success, kappa2_4gen_top, success2=SetAnomalousHffMCFM, success3=Setkappa24gentop, checkdestchange=.true., tosave=tosave)
     call ReadCommandLineArgument(arg, "kappa2_tilde_4gen_top", success, kappa2_tilde_4gen_top, success2=SetAnomalousHffMCFM, success3=Setkappa24gentop, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "kappa2_4gen_bot", success, kappa2_4gen_top, success2=SetAnomalousHffMCFM, success3=Setkappa24genbot, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "kappa2_tilde_4gen_bot", success, kappa2_tilde_4gen_top, success2=SetAnomalousHffMCFM, success3=Setkappa24genbot, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "kappa2_4gen_bot", success, kappa2_4gen_bot, success2=SetAnomalousHffMCFM, success3=Setkappa24genbot, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "kappa2_tilde_4gen_bot", success, kappa2_tilde_4gen_bot, success2=SetAnomalousHffMCFM, success3=Setkappa24genbot, checkdestchange=.true., tosave=tosave)
 
     !second resonance spin 0 gg couplings
     call ReadCommandLineArgument(arg, "gh2g2", success, gh2g2, success2=SetAnomalousSpin0Res2gg, checkdestchange=.true., tosave=tosave)
