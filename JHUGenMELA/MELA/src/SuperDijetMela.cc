@@ -62,7 +62,7 @@ void SuperDijetMela::SetupResolutionModel(TVar::Production prod){
     int iprod = (int)prod;
     ResolutionModelMap[iprod] = model;
   }
-  else MELAerr << "SuperDijetMela::SetupResolutionModel: Model for production " << TVar::ProductionName(prod) << " cannot be built." << endl;
+  else MELAerr << "SuperDijetMela::SetupResolutionModel: Model MELADifermionResolutionModel(" << TVar::ProductionName(prod) << ", " << sqrts << ", " << path << ", " << appendName << ") cannot be built." << endl;
 }
 float SuperDijetMela::GetConvBW(TVar::Production prod, MELACandidate* cand, bool useTrueBW){
   float result=-1;
