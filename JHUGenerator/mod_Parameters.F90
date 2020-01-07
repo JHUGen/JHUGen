@@ -3,7 +3,7 @@ implicit none
 save
 !
 !
-character(len=*),parameter :: JHUGen_Version="v7.3.6"
+character(len=*),parameter :: JHUGen_Version="v7.3.7"
 !
 !
 !=====================================================
@@ -110,7 +110,7 @@ real(8), public, parameter :: hbarc=hbar*SpeedOfLight
 real(8), public, parameter :: hbarc2=hbarc**2
 real(8), public, parameter :: hbarc2_fbGeV2 = hbarc2/(femtobarn*(GeV**2))
 real(8), public, parameter :: hbarc2_pbGeV2 = hbarc2/(picobarn*(GeV**2))
-real(8), public, parameter :: hbarc2XsecUnit = hbarc2_pbGeV2 ! Units of xsec are reported in pb, consistent with MCFM.
+real(8), public, parameter :: hbarc2XsecUnit = hbarc2_fbGeV2*(GeV**2) ! Units of xsec are reported in fb. Mutliplication by GeV**2 is to cancel out the units of ME*PS.
 ! real(8),public :: GlobalMax=-1d99
 ! real(8),public :: GlobalMin=+1d99
 ! integer,parameter :: NPart=200
