@@ -274,7 +274,7 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       subroutine jeppe1_2004(nx,my,xx,yy,ff,cc)
       implicit real*8(a-h,o-z)
       parameter(nnx=49,mmy=37)
-      dimension xx(nx),yy(my),ff(nnx,mmy),ff1(nnx,mmy),ff2(nnx,mmy),
+      dimension xx(nx),yy(my),ff(nx,my),ff1(nnx,mmy),ff2(nnx,mmy),
      xff12(nnx,mmy),yy0(4),yy1(4),yy2(4),yy12(4),z(16),wt(16,16),
      xcl(16),cc(nx,my,4,4),iwt(16,16)
 
