@@ -19,8 +19,10 @@
 
 #pragma link C++ class MELAParticle;
 #pragma link C++ class std::vector<MELAParticle*>;
-#pragma link C++ class MELATopCandidate;
+#pragma link C++ class MELAThreeBodyDecayCandidate;
+#pragma link C++ class std::vector<MELAThreeBodyDecayCandidate*>;
 #pragma link C++ class MELACandidate;
+#pragma link C++ class std::vector<MELACandidate*>;
 #pragma link C++ class MelaIO;
 #pragma link C++ namespace TVar;
 
@@ -53,7 +55,7 @@
 //
 #pragma link C++ function TUtil::GetBoostedParticleVectors;
 #pragma link C++ function TUtil::ConvertVectorFormat;
-#pragma link C++ function TUtil::ConvertTopCandidate;
+#pragma link C++ function TUtil::ConvertThreeBodyDecayCandidate;
 //
 #pragma link C++ function TUtil::SumMatrixElementPDF;
 #pragma link C++ function TUtil::JHUGenMatEl;

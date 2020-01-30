@@ -24,19 +24,23 @@ namespace PDGHelpers{
 
   extern TVar::CandidateDecayMode HDecayMode;
 
-  bool isALepton(const int id);
-  bool isANeutrino(const int id);
-  bool isAJet(const int id);
-  bool isAnUnknownJet(const int id);
-  bool isInvalid(const int id);
-  bool isAQuark(const int id);
-  bool isUpTypeQuark(const int id);
-  bool isDownTypeQuark(const int id);
-  bool isAGluon(const int id);
-  bool isAPhoton(const int id);
-  bool isAZBoson(const int id);
-  bool isAWBoson(const int id);
-  bool isAHiggs(const int id);
+  bool isALepton(const int id); // Charged leptons to be more specific
+  bool isANeutrino(const int id); // Neutral leptons
+  bool isAnUnknownJet(const int id); // id==0 particles
+  bool isAKnownJet(const int id); // q or g
+  bool isAJet(const int id); // q, g or unknown
+  bool isInvalid(const int id); // id=-9000
+  bool isAQuark(const int id); // |id|<=6
+  bool isALightQuark(const int id); // |id|<=5, so includes b quarks
+  bool isUpTypeQuark(const int id); // |id|==2, 4, 6
+  bool isDownTypeQuark(const int id); // |id|==1, 3, 5
+  bool isATopQuark(const int id); // |id|==6
+  bool isATauLepton(const int id); // |id|==15
+  bool isAGluon(const int id); // id==21
+  bool isAPhoton(const int id); // id==22
+  bool isAZBoson(const int id); // id==23
+  bool isAWBoson(const int id); // |id|==24
+  bool isAHiggs(const int id); // id==25
 
   void orderParticles(
     const std::vector<int>& idlist,

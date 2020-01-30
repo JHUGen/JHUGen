@@ -154,6 +154,47 @@ namespace TUtil{
     TLorentzVector* injet1=0, int injet1Id=0, // Gen. partons in lab frame
     TLorentzVector* injet2=0, int injet2Id=0
     );
+  // hs: cos theta*
+  // h[x]: cos theta_X
+  void computeTTHAngles(
+    // ttH system
+    float& hs,
+    float& hincoming,
+    float& hTT,
+    float& PhiTT,
+    float& Phi1,
+
+    // tt system
+    float& hbb,
+    float& hWW,
+    float& Phibb,
+    float& Phi1bb,
+
+    // Wplus system
+    float& hWplusf,
+    float& PhiWplusf,
+
+    // Wminus system
+    float& hWminusf,
+    float& PhiWminusf,
+
+    // H->ZZ/ZA/AA vectors. For A decays, leave second vector (0,0,0,0) with id=-9000
+    // Z/A1
+    TLorentzVector p4M11, int Z1_lept1Id,
+    TLorentzVector p4M12, int Z1_lept2Id,
+    // Z/A2
+    TLorentzVector p4M21, int Z2_lept1Id,
+    TLorentzVector p4M22, int Z2_lept2Id,
+    // TT system
+    TLorentzVector b, int bId,
+    TLorentzVector Wplusf, int WplusfId,
+    TLorentzVector Wplusfb, int WplusfbId,
+    TLorentzVector bbar, int bbarId,
+    TLorentzVector Wminusf, int WminusfId,
+    TLorentzVector Wminusfb, int WminusfbId,
+    TLorentzVector* injet1=0, int injet1Id=0, // Gen. partons in lab frame
+    TLorentzVector* injet2=0, int injet2Id=0
+  );
 
   // Parameter settings
   void SetEwkCouplingParameters(double ext_Gf, double ext_aemmz, double ext_mW, double ext_mZ, double ext_xW, int ext_ewscheme);
@@ -276,14 +317,14 @@ namespace TUtil{
     std::vector<MELAParticle*>* particleList,
     std::vector<MELACandidate*>* candList
     );
-  // Convert the vector of top daughters (as simple particles) to MELAParticles and create a MELATopCandidate
+  // Convert the vector of three body decay daughters (as simple particles) to MELAParticles and create a MELAThreeBodyDecayCandidate
   // The output lists could be members of TEvtProb directly.
-  MELATopCandidate* ConvertTopCandidate(
+  MELAThreeBodyDecayCandidate* ConvertThreeBodyDecayCandidate(
     // Input
-    SimpleParticleCollection_t* TopDaughters,
+    SimpleParticleCollection_t* tbdDaughters,
     // Outputs
     std::vector<MELAParticle*>* particleList,
-    std::vector<MELATopCandidate*>* topCandList
+    std::vector<MELAThreeBodyDecayCandidate*>* tbdCandList
     );
   void PrintCandidateSummary(MELACandidate* cand);
   void PrintCandidateSummary(TVar::simple_event_record* cand);

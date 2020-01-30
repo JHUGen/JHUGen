@@ -9,7 +9,7 @@ curdir=$(pwd)
 
 cd $scriptdir
 
-pkgname="collier-1.2"
+pkgname="collier-1.2.0"
 pkgdir="COLLIER-1.2"
 tarname=$pkgname".tar.gz"
 tarweb="https://collier.hepforge.org/downloads/"$tarname

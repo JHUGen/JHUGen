@@ -37,7 +37,7 @@ void TUtil::applyJetMassCorrection(bool flag){ TUtil::forbidMassiveJets = flag; 
 void TUtil::setLeptonMassScheme(TVar::FermionMassRemoval scheme){ LeptonMassScheme=scheme; }
 void TUtil::setJetMassScheme(TVar::FermionMassRemoval scheme){ JetMassScheme=scheme; }
 void TUtil::constrainedRemovePairMass(TLorentzVector& p1, TLorentzVector& p2, double m1, double m2){
-  TLorentzVector nullFourVector(0, 0, 0, 0);
+  TLorentzVector const nullFourVector(0, 0, 0, 0);
   TLorentzVector p1hat, p2hat;
   if (p1==nullFourVector || p2==nullFourVector) return;
 
@@ -71,15 +71,19 @@ void TUtil::scaleMomentumToEnergy(const TLorentzVector& massiveJet, TLorentzVect
   ratio = (p3>0. ? (newp3/p3) : 1.);
   masslessJet.SetXYZT(massiveJet.X()*ratio, massiveJet.Y()*ratio, massiveJet.Z()*ratio, energy);
 }
-pair<TLorentzVector, TLorentzVector> TUtil::removeMassFromPair(
+std::pair<TLorentzVector, TLorentzVector> TUtil::removeMassFromPair(
   TLorentzVector const& jet1, int const& jet1Id,
   TLorentzVector const& jet2, int const& jet2Id,
   double m1, double m2
   ){
-  TLorentzVector nullFourVector(0, 0, 0, 0);
+  TLorentzVector const nullFourVector(0, 0, 0, 0);
   TLorentzVector jet1massless(0, 0, 0, 0), jet2massless(0, 0, 0, 0);
 
-  if (TUtil::forbidMassiveJets && (PDGHelpers::isAJet(jet1Id) || PDGHelpers::isAJet(jet2Id))){
+  if (
+    TUtil::forbidMassiveJets
+    &&
+    ((PDGHelpers::isAJet(jet1Id) && !PDGHelpers::isATopQuark(jet1Id)) || (PDGHelpers::isAJet(jet2Id) && !PDGHelpers::isATopQuark(jet2Id)))
+    ){
     if (JetMassScheme==TVar::NoRemoval){
       jet1massless=jet1;
       jet2massless=jet2;
@@ -138,7 +142,7 @@ void TUtil::adjustTopDaughters(SimpleParticleCollection_t& daughters){ // Daught
   pair<TLorentzVector, TLorentzVector> corrbW = TUtil::removeMassFromPair(
     daughters.at(0).second, daughters.at(0).first,
     pW, -daughters.at(0).first, // Trick the function
-    0., pW.M() // Conserve W mass, ensures Wf+Wfb=W after re-boosting Wf and Wfb to te new W frame.
+    0., pW.M() // Conserve W mass, ensures Wf+Wfb=W after re-boosting Wf and Wfb to the new W frame.
     );
   daughters.at(0).second=corrbW.first;
   pW=corrbW.second;
@@ -163,12 +167,11 @@ std::pair<TLorentzVector, TLorentzVector> TUtil::ComplexBoost(TVector3 const& be
   double bx=beta.X();
   double by=beta.Y();
   double bz=beta.Z();
-
-  double bp = bx*p4.X() + by*p4.Y() + bz*p4.Z();
   double b2 = bx*bx + by*by + bz*bz;
   double gammasqinv = 1.-b2;
-
   double gamma=0.;
+
+  double bp = bx*p4.X() + by*p4.Y() + bz*p4.Z();
   double gammap_real=0;
   double gammap_imag=0;
   TLorentzVector p4new_real(0, 0, 0, 0), p4new_imag(0, 0, 0, 0);
@@ -213,7 +216,7 @@ void TUtil::computeAngles(
   TLorentzVector p4M21, int Z2_lept1Id,
   TLorentzVector p4M22, int Z2_lept2Id
   ){
-  TLorentzVector nullFourVector(0, 0, 0, 0);
+  TLorentzVector const nullFourVector(0, 0, 0, 0);
   if (p4M12==nullFourVector || p4M22==nullFourVector){
     pair<TLorentzVector, TLorentzVector> f13Pair = TUtil::removeMassFromPair(p4M11, Z1_lept1Id, p4M21, Z2_lept1Id);
     p4M11 = f13Pair.first;
@@ -237,14 +240,14 @@ void TUtil::computeAngles(
   TLorentzVector p4Z1 = p4M11 + p4M12;
   TLorentzVector p4Z2 = p4M21 + p4M22;
 
-  // Sort Z1 leptons so that:
+  // Sort Z1 leptons so that...
   if (
     Z1_lept2Id!=-9000
     &&
     (
-    (Z1_lept1Id*Z1_lept2Id<0 && Z1_lept1Id<0) // for OS pairs: lep1 must be the negative one
+    (Z1_lept1Id*Z1_lept2Id<0 && Z1_lept1Id<0) // ...for OS pairs, lep1 is the particle.
     ||
-    ((Z1_lept1Id*Z1_lept2Id>0 || (Z1_lept1Id==0 && Z1_lept2Id==0)) && p4M11.Phi()<=p4M12.Phi()) //for SS pairs: use random deterministic convention
+    ((Z1_lept1Id*Z1_lept2Id>0 || (Z1_lept1Id==0 && Z1_lept2Id==0)) && p4M11.Phi()<=p4M12.Phi()) // ...for SS pairs, a random deterministic convention is used.
     )
     ) swap(p4M11, p4M12);
   // Same for Z2 leptons
@@ -271,8 +274,8 @@ void TUtil::computeAngles(
   TLorentzVector thep4Z2inXFrame(p4Z2);
   thep4Z1inXFrame.Boost(boostX);
   thep4Z2inXFrame.Boost(boostX);
-  TVector3 theZ1X_p3 = TVector3(thep4Z1inXFrame.X(), thep4Z1inXFrame.Y(), thep4Z1inXFrame.Z());
-  TVector3 theZ2X_p3 = TVector3(thep4Z2inXFrame.X(), thep4Z2inXFrame.Y(), thep4Z2inXFrame.Z());
+  TVector3 theZ1X_p3 = thep4Z1inXFrame.Vect();
+  TVector3 theZ2X_p3 = thep4Z2inXFrame.Vect();
   costhetastar = theZ1X_p3.CosTheta();
 
   TVector3 boostV1(0, 0, 0);
@@ -333,7 +336,7 @@ void TUtil::computeAngles(
   p4M22_BX.Boost(boostX);
   TLorentzVector p4V1_BX = p4M11_BX + p4M12_BX;
 
-  TVector3 beamAxis(0, 0, 1);
+  TVector3 const beamAxis(0, 0, 1);
   TVector3 p3V1_BX = p4V1_BX.Vect().Unit();
   TVector3 normal1_BX = (p4M11_BX.Vect().Cross(p4M12_BX.Vect())).Unit();
   TVector3 normal2_BX = (p4M21_BX.Vect().Cross(p4M22_BX.Vect())).Unit();
@@ -380,7 +383,7 @@ void TUtil::computeAnglesCS(
   TLorentzVector p4M21, int Z2_lept1Id,
   TLorentzVector p4M22, int Z2_lept2Id
   ){
-  TLorentzVector nullFourVector(0, 0, 0, 0);
+  TLorentzVector const nullFourVector(0, 0, 0, 0);
   if (p4M12==nullFourVector || p4M22==nullFourVector){
     pair<TLorentzVector, TLorentzVector> f13Pair = TUtil::removeMassFromPair(p4M11, Z1_lept1Id, p4M21, Z2_lept1Id);
     p4M11 = f13Pair.first;
@@ -491,7 +494,7 @@ void TUtil::computeAnglesCS(
 
   TLorentzVector p4Z1_BX_rotCS = p4M11_BX_rotCS + p4M12_BX_rotCS;
   TVector3 p3V1_BX_rotCS = (p4Z1_BX_rotCS.Vect()).Unit();
-  TVector3 beamAxis(0, 0, 1);
+  TVector3 const beamAxis(0, 0, 1);
   TVector3 normal1_BX_rotCS = (p4M11_BX_rotCS.Vect().Cross(p4M12_BX_rotCS.Vect())).Unit();
   TVector3 normal2_BX_rotCS = (p4M21_BX_rotCS.Vect().Cross(p4M22_BX_rotCS.Vect())).Unit();
   TVector3 normalSC_BX_rotCS = (beamAxis.Cross(p3V1_BX_rotCS)).Unit();
@@ -604,28 +607,10 @@ void TUtil::computeVBFAngles(
   TLorentzVector p4M22, int Z2_lept2Id,
   TLorentzVector jet1, int jet1Id,
   TLorentzVector jet2, int jet2Id,
-  TLorentzVector* injet1, int injet1Id, // Gen. partons in lab frame
+  TLorentzVector* injet1, int injet1Id, // Gen. partons in the lab frame
   TLorentzVector* injet2, int injet2Id
   ){
-  TLorentzVector nullFourVector(0, 0, 0, 0);
-  if (p4M12==nullFourVector || p4M22==nullFourVector){
-    pair<TLorentzVector, TLorentzVector> f13Pair = TUtil::removeMassFromPair(p4M11, Z1_lept1Id, p4M21, Z2_lept1Id);
-    p4M11 = f13Pair.first;
-    p4M21 = f13Pair.second;
-  }
-  else if (p4M11==nullFourVector || p4M21==nullFourVector){
-    pair<TLorentzVector, TLorentzVector> f24Pair = TUtil::removeMassFromPair(p4M12, Z1_lept2Id, p4M22, Z2_lept2Id);
-    p4M12 = f24Pair.first;
-    p4M22 = f24Pair.second;
-  }
-  else{
-    pair<TLorentzVector, TLorentzVector> f12Pair = TUtil::removeMassFromPair(p4M11, Z1_lept1Id, p4M12, Z1_lept2Id);
-    pair<TLorentzVector, TLorentzVector> f34Pair = TUtil::removeMassFromPair(p4M21, Z2_lept1Id, p4M22, Z2_lept2Id);
-    p4M11 = f12Pair.first;
-    p4M12 = f12Pair.second;
-    p4M21 = f34Pair.first;
-    p4M22 = f34Pair.second;
-  }
+  TLorentzVector const nullFourVector(0, 0, 0, 0);
 
   TLorentzVector jet1massless, jet2massless;
   pair<TLorentzVector, TLorentzVector> jetPair = TUtil::removeMassFromPair(jet1, jet1Id, jet2, jet2Id);
@@ -701,7 +686,7 @@ void TUtil::computeVBFAngles(
   TLorentzVector fermion1, fermion2, antifermion1, antifermion2;
   // Consider cases with gen. partons
   // By default, fermion1/2 are jet1/2 unless incoming partons are specifically anti-quarks!
-  if (injet1!=0 && injet1Id<0){
+  if (injet1 && injet1Id<0){
     fermion1=-P1;
     antifermion1 = jet1massless;
   }
@@ -709,7 +694,7 @@ void TUtil::computeVBFAngles(
     fermion1 = jet1massless;
     antifermion1=-P1;
   }
-  if (injet2!=0 && injet2Id<0){
+  if (injet2 && injet2Id<0){
     fermion2=-P2;
     antifermion2 = jet2massless;
   }
@@ -756,28 +741,10 @@ void TUtil::computeVBFAngles_ComplexBoost(
   TLorentzVector p4M22, int Z2_lept2Id,
   TLorentzVector jet1, int jet1Id,
   TLorentzVector jet2, int jet2Id,
-  TLorentzVector* injet1, int injet1Id, // Gen. partons in lab frame
+  TLorentzVector* injet1, int injet1Id, // Gen. partons in the lab frame
   TLorentzVector* injet2, int injet2Id
   ){
-  TLorentzVector nullFourVector(0, 0, 0, 0);
-  if (p4M12==nullFourVector || p4M22==nullFourVector){
-    pair<TLorentzVector, TLorentzVector> f13Pair = TUtil::removeMassFromPair(p4M11, Z1_lept1Id, p4M21, Z2_lept1Id);
-    p4M11 = f13Pair.first;
-    p4M21 = f13Pair.second;
-  }
-  else if (p4M11==nullFourVector || p4M21==nullFourVector){
-    pair<TLorentzVector, TLorentzVector> f24Pair = TUtil::removeMassFromPair(p4M12, Z1_lept2Id, p4M22, Z2_lept2Id);
-    p4M12 = f24Pair.first;
-    p4M22 = f24Pair.second;
-  }
-  else{
-    pair<TLorentzVector, TLorentzVector> f12Pair = TUtil::removeMassFromPair(p4M11, Z1_lept1Id, p4M12, Z1_lept2Id);
-    pair<TLorentzVector, TLorentzVector> f34Pair = TUtil::removeMassFromPair(p4M21, Z2_lept1Id, p4M22, Z2_lept2Id);
-    p4M11 = f12Pair.first;
-    p4M12 = f12Pair.second;
-    p4M21 = f34Pair.first;
-    p4M22 = f34Pair.second;
-  }
+  TLorentzVector const nullFourVector(0, 0, 0, 0);
 
   TLorentzVector jet1massless, jet2massless;
   pair<TLorentzVector, TLorentzVector> jetPair = TUtil::removeMassFromPair(jet1, jet1Id, jet2, jet2Id);
@@ -853,7 +820,7 @@ void TUtil::computeVBFAngles_ComplexBoost(
   TLorentzVector fermion1, fermion2, antifermion1, antifermion2;
   // Consider cases with gen. partons
   // By default, fermion1/2 are jet1/2 unless incoming partons are specifically anti-quarks!
-  if (injet1!=0 && injet1Id<0){
+  if (injet1 && injet1Id<0){
     fermion1=-P1;
     antifermion1 = jet1massless;
   }
@@ -861,7 +828,7 @@ void TUtil::computeVBFAngles_ComplexBoost(
     fermion1 = jet1massless;
     antifermion1=-P1;
   }
-  if (injet2!=0 && injet2Id<0){
+  if (injet2 && injet2Id<0){
     fermion2=-P2;
     antifermion2 = jet2massless;
   }
@@ -917,28 +884,10 @@ void TUtil::computeVHAngles(
   TLorentzVector p4M22, int Z2_lept2Id,
   TLorentzVector jet1, int jet1Id,
   TLorentzVector jet2, int jet2Id,
-  TLorentzVector* injet1, int injet1Id, // Gen. partons in lab frame
+  TLorentzVector* injet1, int injet1Id, // Gen. partons in the lab frame
   TLorentzVector* injet2, int injet2Id
   ){
-  TLorentzVector nullFourVector(0, 0, 0, 0);
-  if (p4M12==nullFourVector || p4M22==nullFourVector){
-    pair<TLorentzVector, TLorentzVector> f13Pair = TUtil::removeMassFromPair(p4M11, Z1_lept1Id, p4M21, Z2_lept1Id);
-    p4M11 = f13Pair.first;
-    p4M21 = f13Pair.second;
-  }
-  else if (p4M11==nullFourVector || p4M21==nullFourVector){
-    pair<TLorentzVector, TLorentzVector> f24Pair = TUtil::removeMassFromPair(p4M12, Z1_lept2Id, p4M22, Z2_lept2Id);
-    p4M12 = f24Pair.first;
-    p4M22 = f24Pair.second;
-  }
-  else{
-    pair<TLorentzVector, TLorentzVector> f12Pair = TUtil::removeMassFromPair(p4M11, Z1_lept1Id, p4M12, Z1_lept2Id);
-    pair<TLorentzVector, TLorentzVector> f34Pair = TUtil::removeMassFromPair(p4M21, Z2_lept1Id, p4M22, Z2_lept2Id);
-    p4M11 = f12Pair.first;
-    p4M12 = f12Pair.second;
-    p4M21 = f34Pair.first;
-    p4M22 = f34Pair.second;
-  }
+  TLorentzVector const nullFourVector(0, 0, 0, 0);
 
   TLorentzVector jet1massless, jet2massless;
   pair<TLorentzVector, TLorentzVector> jetPair = TUtil::removeMassFromPair(jet1, jet1Id, jet2, jet2Id);
@@ -954,14 +903,15 @@ void TUtil::computeVHAngles(
   if (
     (jet1Id*jet2Id<0 && jet1Id<0) // for OS pairs: jet1 must be the particle
     ||
-    (jet1Id*jet2Id>0 && jet1massless.Phi()<=jet2massless.Phi()) // for SS pairs: use random deterministic convention
+    ((jet1Id*jet2Id>0 || (jet1Id==0 && jet2Id==0)) && jet1massless.Phi()<=jet2massless.Phi()) // for SS pairs: use random deterministic convention
     ){
     swap(jet1massless, jet2massless);
     swap(jet1Id, jet2Id);
   }
 
   //Find the incoming partons - first boost so the pT(HJJ) = 0, then boost away the pz.
-  //This preserves the z direction.  Then assume that the partons come in this z direction.
+  //This preserves the z direction. 
+  //Then, assume that the partons come in this z direction.
   //This is exactly correct at LO (since pT=0 anyway).
   //Then associate the one going forwards with jet1 and the one going backwards with jet2
   TLorentzRotation movingframe;
@@ -996,7 +946,7 @@ void TUtil::computeVHAngles(
 
   // Rotate every vector such that Z1 - Z2 axis is the "beam axis" analogue of decay
   TLorentzRotation ZZframe;
-  TVector3 beamAxis(0, 0, 1);
+  TVector3 const beamAxis(0, 0, 1);
   if (p4Z1==nullFourVector || p4Z2==nullFourVector){
     TVector3 pNewAxis = (p4Z2-p4Z1).Vect().Unit(); // Let Z2 be in the z direction so that once the direction of H is reversed, Z1 is in the z direction
     if (pNewAxis != nullFourVector.Vect()){
@@ -1005,12 +955,8 @@ void TUtil::computeVHAngles(
 
       P1.Transform(ZZframe);
       P2.Transform(ZZframe);
-      jet1massless = -jet1massless;
-      jet2massless = -jet2massless;
-      jet1massless.Transform(ZZframe);
-      jet2massless.Transform(ZZframe);
-      jet1massless = -jet1massless;
-      jet2massless = -jet2massless;
+      jet1massless = -jet1massless; jet1massless.Transform(ZZframe); jet1massless = -jet1massless;
+      jet2massless = -jet2massless; jet2massless.Transform(ZZframe); jet2massless = -jet2massless;
     }
   }
   else{
@@ -1022,12 +968,8 @@ void TUtil::computeVHAngles(
     ZZframe.Rotate(acos(pNewAxis.Dot(beamAxis)), pNewAxisPerp);
     P1.Transform(ZZframe);
     P2.Transform(ZZframe);
-    jet1massless = -jet1massless;
-    jet2massless = -jet2massless;
-    jet1massless.Transform(ZZframe);
-    jet2massless.Transform(ZZframe);
-    jet1massless = -jet1massless;
-    jet2massless = -jet2massless;
+    jet1massless = -jet1massless; jet1massless.Transform(ZZframe); jet1massless = -jet1massless;
+    jet2massless = -jet2massless; jet2massless.Transform(ZZframe); jet2massless = -jet2massless;
   }
 
   TUtil::computeAngles(
@@ -1043,6 +985,397 @@ void TUtil::computeVHAngles(
   );
   m1 = (P1 + P2).M();
   m2 = (jet1massless + jet2massless).M();
+}
+void TUtil::computeTTHAngles(
+  // ttH system
+  float& hs,
+  float& hincoming,
+  float& hTT,
+  float& PhiTT,
+  float& Phi1,
+
+  // tt system
+  float& hbb,
+  float& hWW,
+  float& Phibb,
+  float& Phi1bb,
+
+  // Wplus system
+  float& hWplusf,
+  float& PhiWplusf,
+
+  // Wminus system
+  float& hWminusf,
+  float& PhiWminusf,
+
+  TLorentzVector p4M11, int Z1_lept1Id,
+  TLorentzVector p4M12, int Z1_lept2Id,
+  TLorentzVector p4M21, int Z2_lept1Id,
+  TLorentzVector p4M22, int Z2_lept2Id,
+  TLorentzVector b, int bId,
+  TLorentzVector Wplusf, int WplusfId,
+  TLorentzVector Wplusfb, int WplusfbId,
+  TLorentzVector bbar, int bbarId,
+  TLorentzVector Wminusf, int WminusfId,
+  TLorentzVector Wminusfb, int WminusfbId,
+  TLorentzVector* injet1, int injet1Id, // Gen. partons in the lab frame
+  TLorentzVector* injet2, int injet2Id
+){
+  TLorentzVector const nullFourVector(0, 0, 0, 0);
+  TVector3 const beamAxis(0, 0, 1);
+  TVector3 const xAxis(1, 0, 0);
+
+  // Initialize output values
+  hs=hincoming=hTT=PhiTT=Phi1
+    =hbb=hWW=Phibb=Phi1bb
+    =hWplusf=PhiWplusf
+    =hWminusf=PhiWminusf=0;
+  if (
+    bId!=-9000 && !(PDGHelpers::isATopQuark(bId) || PDGHelpers::isATauLepton(bId)) && WplusfId==-9000 && WplusfbId==-9000
+    &&
+    bbarId!=-9000 && !(PDGHelpers::isATopQuark(bbarId) || PDGHelpers::isATauLepton(bbarId)) && WminusfId==-9000 && WminusfbId==-9000
+    ){
+    float m1_dummy=0, m2_dummy=0;
+    return TUtil::computeVHAngles(
+      hs, hincoming, hTT, PhiTT, Phi1,
+      m1_dummy, m2_dummy,
+      p4M11, Z1_lept1Id,
+      p4M12, Z1_lept2Id,
+      p4M21, Z2_lept1Id,
+      p4M22, Z2_lept2Id,
+      b, bId,
+      bbar, bbarId,
+      injet1, injet1Id,
+      injet2, injet2Id
+    );
+  }
+
+  // Swap Wplus daughters if needed
+  if (
+    WplusfId!=-9000 && WplusfbId!=-9000
+    &&
+    (
+    (WplusfId*WplusfbId<0 && WplusfId<0) // for OS pairs: Wplusf must be the particle
+      ||
+      ((WplusfId*WplusfbId>0 || (WplusfId==0 && WplusfbId==0)) && Wplusf.Phi()<=Wplusfb.Phi()) // for SS pairs: use random deterministic convention
+      )
+    ){
+    swap(Wplusf, Wplusfb);
+    swap(WplusfId, WplusfbId);
+  }
+  // Swap Wminus daughters if needed
+  if (
+    WminusfId!=-9000 && WminusfbId!=-9000
+    &&
+    (
+    (WminusfId*WminusfbId<0 && WminusfId<0) // for OS pairs: Wminusf must be the particle
+      ||
+      ((WminusfId*WminusfbId>0 || (WminusfId==0 && WminusfbId==0)) && Wminusf.Phi()<=Wminusfb.Phi()) // for SS pairs: use random deterministic convention
+      )
+    ){
+    swap(Wminusf, Wminusfb);
+    swap(WminusfId, WminusfbId);
+  }
+
+  // Correct the T daughters
+  if (bId!=-9000 && WplusfId!=-9000 && WplusfbId!=-9000){
+    SimpleParticleCollection_t tmp_daus;
+    tmp_daus.reserve(3);
+    tmp_daus.emplace_back(bId, b);
+    tmp_daus.emplace_back(WplusfId, Wplusf);
+    tmp_daus.emplace_back(WplusfbId, Wplusfb);
+    TUtil::adjustTopDaughters(tmp_daus);
+    b = tmp_daus.at(0).second;
+    Wplusf = tmp_daus.at(1).second;
+    Wplusfb = tmp_daus.at(2).second;
+  }
+  else if (WplusfId!=-9000 && WplusfbId!=-9000){
+    pair<TLorentzVector, TLorentzVector> Wffb = TUtil::removeMassFromPair(Wplusf, WplusfId, Wplusfb, WplusfbId);
+    Wplusf = Wffb.first;
+    Wplusfb = Wffb.second;
+  }
+  // Correct the TBar daughters
+  if (bbarId!=-9000 && WminusfId!=-9000 && WminusfbId!=-9000){
+    SimpleParticleCollection_t tmp_daus;
+    tmp_daus.reserve(3);
+    tmp_daus.emplace_back(bbarId, bbar);
+    tmp_daus.emplace_back(WminusfId, Wminusf);
+    tmp_daus.emplace_back(WminusfbId, Wminusfb);
+    TUtil::adjustTopDaughters(tmp_daus);
+    bbar = tmp_daus.at(0).second;
+    Wminusf = tmp_daus.at(1).second;
+    Wminusfb = tmp_daus.at(2).second;
+  }
+  else if (WminusfId!=-9000 && WminusfbId!=-9000){
+    pair<TLorentzVector, TLorentzVector> Wffb = TUtil::removeMassFromPair(Wminusf, WminusfId, Wminusfb, WminusfbId);
+    Wminusf = Wffb.first;
+    Wminusfb = Wffb.second;
+  }
+  // If the Ws are not present but the bs are, the masses of the bs should not be removed. This is because the bs are now either tops or taus (based on the similar if-statement above).
+
+  // Build Z 4-vectors
+  TLorentzVector p4Z1 = p4M11 + p4M12;
+  TLorentzVector p4Z2 = p4M21 + p4M22;
+  // No longer need to use p4Mxy
+  TLorentzVector pH = p4Z1 + p4Z2;
+
+  TLorentzVector pWplus = Wplusf + Wplusfb;
+  TLorentzVector pTop = b + pWplus;
+
+  TLorentzVector pWminus = Wminusf + Wminusfb;
+  TLorentzVector pATop = bbar + pWminus;
+
+  TLorentzVector pTT = pTop + pATop;
+  TLorentzVector pTTH = pTT + pH;
+
+  //Find the incoming partons - first boost so the pT(TTH) = 0, then boost away the pz.
+  //This preserves the z direction. 
+  //Then, assume that the partons come in this z direction.
+  //This is exactly correct at LO (since pT=0 anyway).
+  //Then associate the one going forwards with jet1 and the one going backwards with jet2
+  TLorentzRotation movingframe;
+  TLorentzVector pTTH_perp(pTTH.X(), pTTH.Y(), 0, pTTH.T());
+  movingframe.Boost(-pTTH_perp.BoostVector());
+  pTTH.Boost(-pTTH_perp.BoostVector());
+  movingframe.Boost(-pTTH.BoostVector());
+  pTTH.Boost(-pTTH.BoostVector());   //make sure to boost TTH AFTER boosting movingframe
+
+  TLorentzVector P1(0, 0, -pTTH.T()/2, pTTH.T()/2);
+  TLorentzVector P2(0, 0, pTTH.T()/2, pTTH.T()/2);
+  // Transform incoming partons back to the original frame
+  P1.Transform(movingframe.Inverse());
+  P2.Transform(movingframe.Inverse());
+  pTTH.Transform(movingframe.Inverse());
+  // movingframe and TTH_T will not be used anymore
+  // Handle gen. partons if they are available
+  if (injet1 && injet2 && fabs((*injet1+*injet2).P()-pTTH.P())<pTTH.P()*1e-4){
+    P1=*injet1;
+    P2=*injet2;
+    // Apply convention for incoming (!) particles
+    if (
+      (injet1Id*injet2Id<0 && injet1Id>0) // for OS pairs: parton 2 must be the particle
+      ||
+      (injet1Id*injet2Id>0 && P1.Z()>=P2.Z()) //for SS pairs: parton 2 must have the greater pz
+      ){
+      swap(P1, P2);
+      swap(injet1Id, injet2Id);
+    }
+  }
+
+  // Rotate every vector such that Z1 - Z2 axis is the "beam axis" analogue of decay
+  TLorentzRotation ZZframe;
+  bool applyZZframe=false;
+  if (p4Z1==nullFourVector || p4Z2==nullFourVector){ // Higgs is undecayed
+    TVector3 pNewAxis = (p4Z2-p4Z1).Vect().Unit(); // Let Z2 be in the z direction so that once the direction of H is reversed, Z1 is in the z direction
+    if (pNewAxis != nullFourVector.Vect()){
+      TVector3 pNewAxisPerp = pNewAxis.Cross(beamAxis);
+      ZZframe.Rotate(acos(pNewAxis.Dot(beamAxis)), pNewAxisPerp);
+      applyZZframe=true;
+    }
+  }
+  else{
+    TVector3 pHboost = pH.BoostVector();
+    ZZframe.Boost(-pHboost);
+    p4Z1.Boost(-pHboost);
+    p4Z2.Boost(-pHboost);
+    TVector3 pNewAxis = (p4Z2-p4Z1).Vect().Unit(); // Let Z2 be in the z direction so that once the direction of H is reversed, Z1 is in the z direction
+    TVector3 pNewAxisPerp = pNewAxis.Cross(beamAxis);
+    ZZframe.Rotate(acos(pNewAxis.Dot(beamAxis)), pNewAxisPerp);
+    // Boost p4Z1 and p4Z2 back so that you can apply the transformation separately
+    p4Z1.Boost(pHboost);
+    p4Z2.Boost(pHboost);
+    applyZZframe=true;
+  }
+  if (applyZZframe){
+    P1.Transform(ZZframe); P2.Transform(ZZframe);
+    p4Z1 = -p4Z1; p4Z1.Transform(ZZframe); p4Z1 = -p4Z1;
+    p4Z2 = -p4Z2; p4Z2.Transform(ZZframe); p4Z2 = -p4Z2;
+    b = -b; b.Transform(ZZframe); b = -b;
+    Wplusf = -Wplusf; Wplusf.Transform(ZZframe); Wplusf = -Wplusf;
+    Wplusfb = -Wplusfb; Wplusfb.Transform(ZZframe); Wplusfb = -Wplusfb;
+    bbar = -bbar; bbar.Transform(ZZframe); bbar = -bbar;
+    Wminusf = -Wminusf; Wminusf.Transform(ZZframe); Wminusf = -Wminusf;
+    Wminusfb = -Wminusfb; Wminusfb.Transform(ZZframe); Wminusfb = -Wminusfb;
+  }
+  // Re-assign derived momenta
+  pH = p4Z1 + p4Z2;
+  pWplus = Wplusf + Wplusfb;
+  pTop = b + pWplus;
+  pWminus = Wminusf + Wminusfb;
+  pATop = bbar + pWminus;
+  pTT = pTop + pATop;
+  pTTH = pTT + pH;
+
+  TUtil::computeAngles(
+    hs,
+    hincoming,
+    hTT,
+    PhiTT,
+    Phi1,
+    -P1, 23, // Id is 23 to avoid an attempt to remove quark mass
+    -P2, 0, // Id is 0 to avoid swapping
+    pTop, 23,
+    pATop, 0
+  );
+
+  // Boost everything to Higgs frame AFTER ttH-frame angle computations
+  // This is to avoid an undetermined z axis in the above angles when Higgs is undecayed
+  {
+    TVector3 pHboost = pH.BoostVector();
+
+    P1.Boost(-pHboost);
+    P2.Boost(-pHboost);
+    // No need for Z1 and Z2
+    //p4Z1.Boost(-pHboost);
+    //p4Z2.Boost(-pHboost);
+    b.Boost(-pHboost);
+    Wplusf.Boost(-pHboost);
+    Wplusfb.Boost(-pHboost);
+    bbar.Boost(-pHboost);
+    Wminusf.Boost(-pHboost);
+    Wminusfb.Boost(-pHboost);
+
+    // Re-assign derived momenta
+    // No need for the Higgs in Higgs frame
+    //pH = p4Z1 + p4Z2;
+    pWplus = Wplusf + Wplusfb;
+    pTop = b + pWplus;
+    pWminus = Wminusf + Wminusfb;
+    pATop = bbar + pWminus;
+    pTT = pTop + pATop;
+    // No need for the TTH system in Higgs frame
+    //pTTH = pTT + pH;
+  }
+
+  {
+    TLorentzRotation TTframe;
+
+    // z rotation
+    TVector3 nNewZAxis = (-P1-P2-pTop-pATop).Vect().Unit(); // Let the z axis be formed by the (-P1-P2)--TT axis in the Higgs frame
+    if (nNewZAxis != nullFourVector.Vect()){
+      TVector3 nNewZAxisPerp = nNewZAxis.Cross(beamAxis);
+      TTframe.Rotate(acos(nNewZAxis.Dot(beamAxis)), nNewZAxisPerp);
+    }
+
+    P1.Transform(TTframe);
+    P2.Transform(TTframe);
+    b.Transform(TTframe);
+    Wplusf.Transform(TTframe);
+    Wplusfb.Transform(TTframe);
+    bbar.Transform(TTframe);
+    Wminusf.Transform(TTframe);
+    Wminusfb.Transform(TTframe);
+
+    // Re-assign derived momenta
+    pWplus = Wplusf + Wplusfb;
+    pTop = b + pWplus;
+    pWminus = Wminusf + Wminusfb;
+    pATop = bbar + pWminus;
+  }
+
+  // Compute TT angles
+  {
+    float hs_dummy;
+    int id_dummy_Wplus=24;
+    int id_dummy_Wminus=-24;
+    if (WplusfId!=-9000 && WplusfbId!=-9000) id_dummy_Wplus=-9000;
+    if (WminusfId!=-9000 && WminusfbId!=-9000) id_dummy_Wminus=-9000;
+    TUtil::computeAngles(
+      hs_dummy,
+      hbb,
+      hWW,
+      Phibb, // -\Phi_b from arxiv:1606.03107
+      Phi1bb, // This angle is the one between the bb plane and the TT-H plane instead of that between the WW plane and the TT-H plane as defined in arxiv:1606.03107.
+      b, bId,
+      bbar, bbarId,
+      pWplus, id_dummy_Wplus,
+      pWminus, id_dummy_Wminus
+    );
+  }
+
+  // Wplus frame
+  if (WplusfId!=-9000 && WplusfbId!=-9000){
+    TLorentzVector pATop_tmp = pATop;
+    TVector3 pWplus_boost = (Wplusf+Wplusfb).BoostVector();
+    b.Boost(-pWplus_boost);
+    Wplusf.Boost(-pWplus_boost);
+    Wplusfb.Boost(-pWplus_boost);
+    pATop_tmp.Boost(-pWplus_boost);
+
+    TLorentzRotation Wplusframe;
+
+    // z rotation
+    TVector3 nNewZAxis = (b+Wplusf+Wplusfb-pATop_tmp).Vect().Unit(); // Let the z axis be formed by the TBar direction
+    if (nNewZAxis != nullFourVector.Vect()){
+      TVector3 nNewZAxisPerp = nNewZAxis.Cross(beamAxis);
+      Wplusframe.Rotate(acos(nNewZAxis.Dot(beamAxis)), nNewZAxisPerp);
+    }
+
+    b.Transform(Wplusframe);
+    Wplusf.Transform(Wplusframe);
+    Wplusfb.Transform(Wplusframe);
+
+    TVector3 n3_Wb = -b.Vect().Unit();
+    TVector3 nW = ((Wplusf-Wplusfb).Vect().Cross(n3_Wb)).Unit();
+    TVector3 nS = (beamAxis.Cross(n3_Wb)).Unit();
+
+    // hWplusf
+    hWplusf = n3_Wb.Dot(Wplusf.Vect().Unit());
+    // PhiWplusf
+    float tmpSgnPhiWplusf = n3_Wb.Dot(nW.Cross(nS));
+    float sgnPhiWplusf = 0;
+    if (fabs(tmpSgnPhiWplusf)>0.) sgnPhiWplusf = tmpSgnPhiWplusf/fabs(tmpSgnPhiWplusf);
+    float dot_nWnS = nW.Dot(nS);
+    if (fabs(dot_nWnS)>=1.) dot_nWnS *= 1./fabs(dot_nWnS);
+    PhiWplusf = sgnPhiWplusf * acos(dot_nWnS);
+    /*
+    b.Transform(Wplusframe.Inverse());
+    Wplusf.Transform(Wplusframe.Inverse());
+    Wplusfb.Transform(Wplusframe.Inverse());
+    */
+  }
+
+  // Wminus frame
+  if (WminusfId!=-9000 && WminusfbId!=-9000){
+    TLorentzVector pTop_tmp = pTop;
+    TVector3 pWminus_boost = (Wminusf+Wminusfb).BoostVector();
+    bbar.Boost(-pWminus_boost);
+    Wminusf.Boost(-pWminus_boost);
+    Wminusfb.Boost(-pWminus_boost);
+    pTop_tmp.Boost(-pWminus_boost);
+
+    TLorentzRotation Wminusframe;
+
+    // z rotation
+    TVector3 nNewZAxis = (pTop_tmp-bbar-Wminusf-Wminusfb).Vect().Unit(); // Let the z axis be formed by the T direction
+    if (nNewZAxis != nullFourVector.Vect()){
+      TVector3 nNewZAxisPerp = nNewZAxis.Cross(beamAxis);
+      Wminusframe.Rotate(acos(nNewZAxis.Dot(beamAxis)), nNewZAxisPerp);
+    }
+
+    bbar.Transform(Wminusframe);
+    Wminusf.Transform(Wminusframe);
+    Wminusfb.Transform(Wminusframe);
+
+    TVector3 n3_Wb = -bbar.Vect().Unit();
+    TVector3 nW = ((Wminusf-Wminusfb).Vect().Cross(n3_Wb)).Unit();
+    TVector3 nS = (beamAxis.Cross(n3_Wb)).Unit();
+
+    // hWminusf
+    hWminusf = n3_Wb.Dot(Wminusf.Vect().Unit());
+    // PhiWminusf
+    float tmpSgnPhiWminusf = n3_Wb.Dot(nW.Cross(nS));
+    float sgnPhiWminusf = 0;
+    if (fabs(tmpSgnPhiWminusf)>0.) sgnPhiWminusf = tmpSgnPhiWminusf/fabs(tmpSgnPhiWminusf);
+    float dot_nWnS = nW.Dot(nS);
+    if (fabs(dot_nWnS)>=1.) dot_nWnS *= 1./fabs(dot_nWnS);
+    PhiWminusf = sgnPhiWminusf * acos(dot_nWnS);
+    /*
+    bbar.Transform(Wminusframe.Inverse());
+    Wminusf.Transform(Wminusframe.Inverse());
+    Wminusfb.Transform(Wminusframe.Inverse());
+    */
+  }
 }
 
 
@@ -1267,7 +1600,7 @@ void TUtil::GetMassWidth(const MELAParticle* part, double& m, double& ga){
 
 double TUtil::InterpretScaleScheme(const TVar::Production& production, const TVar::MatrixElement& matrixElement, const TVar::EventScaleScheme& scheme, TLorentzVector p[mxpart]){
   double Q=0;
-  TLorentzVector nullFourVector(0, 0, 0, 0);
+  TLorentzVector const nullFourVector(0, 0, 0, 0);
   if (scheme == TVar::Fixed_mH) Q = masses_mcfm_.hmass;
   else if (scheme == TVar::Fixed_mW) Q = masses_mcfm_.wmass;
   else if (scheme == TVar::Fixed_mZ) Q = masses_mcfm_.zmass;
@@ -1895,7 +2228,7 @@ bool TUtil::MCFM_SetupParticleCouplings(
   const TVar::Process& process, const TVar::Production& production,
   const TVar::VerbosityLevel& verbosity,
   const simple_event_record& mela_event,
-  vector<int>* partOrder, vector<int>* apartOrder
+  std::vector<int>* partOrder, std::vector<int>* apartOrder
   ){
   bool result=true;
 
@@ -6791,7 +7124,7 @@ double TUtil::TTHiggsMatEl(
   int nRequested_Tops=1;
   int nRequested_Antitops=1;
   if (topDecay>0) partIncCode=TVar::kUseAssociated_UnstableTops; // Look for unstable tops
-  else partIncCode=TVar::kUseAssociated_StableTops; // Look for unstable tops
+  else partIncCode=TVar::kUseAssociated_StableTops; // Look for stable tops
 
   simple_event_record mela_event;
   mela_event.AssociationCode=partIncCode;
@@ -7541,13 +7874,13 @@ void TUtil::GetBoostedParticleVectors(
   if (verbosity>=TVar::DEBUG) MELAout << "Begin GetBoostedParticleVectors" << endl;
   // This is the beginning of one long function.
 
-  int code = mela_event.AssociationCode;
+  int const& code = mela_event.AssociationCode;
   if (verbosity>=TVar::DEBUG) MELAout << "TUtil::GetBoostedParticleVectors: code=" << code << endl;
-  int aVhypo = mela_event.AssociationVCompatibility;
-  TLorentzVector nullFourVector(0, 0, 0, 0);
+  int const& aVhypo = mela_event.AssociationVCompatibility;
+  TLorentzVector const nullFourVector(0, 0, 0, 0);
 
   SimpleParticleCollection_t daughters;
-  vector<int> idVstar;
+  vector<int> idVstar; idVstar.reserve(2);
   if (melaCand->getNDaughters()==0){
     // Undecayed Higgs has V1=H, V2=empty, no sortedDaughters!
     daughters.push_back(SimpleParticle_t(melaCand->id, melaCand->p4));
@@ -7559,9 +7892,9 @@ void TUtil::GetBoostedParticleVectors(
     // H->GG has V1=G->G, V2=G->G
     // H->ZG has V1=Z->ffb, V2=G->G
     // Everything else is as expected.
-    for (int iv=0; iv<2; iv++){ // 2 Vs are guaranteed in MELACandidate.
+    for (unsigned char iv=0; iv<2; iv++){ // 2 Vs are guaranteed in MELACandidate.
       MELAParticle* Vdau = melaCand->getSortedV(iv);
-      if (Vdau!=0){
+      if (Vdau){
         int idtmp = Vdau->id;
         for (MELAParticle* Vdau_i:Vdau->getDaughters()){
           if (Vdau_i && Vdau_i->passSelection) daughters.push_back(SimpleParticle_t(Vdau_i->id, Vdau_i->p4));
@@ -7575,8 +7908,8 @@ void TUtil::GetBoostedParticleVectors(
     }
   }
   if (daughters.size()>=2){
-    unsigned int nffs = daughters.size()/2;
-    for (unsigned int iv=0; iv<nffs; iv++){
+    size_t nffs = daughters.size()/2;
+    for (size_t iv=0; iv<nffs; iv++){
       pair<TLorentzVector, TLorentzVector> corrPair = TUtil::removeMassFromPair(
         daughters.at(2*iv+0).second, daughters.at(2*iv+0).first,
         daughters.at(2*iv+1).second, daughters.at(2*iv+1).first
@@ -7586,11 +7919,12 @@ void TUtil::GetBoostedParticleVectors(
     }
     if (2*nffs<daughters.size()){
       TLorentzVector tmp = nullFourVector;
+      SimpleParticle_t& lastDau = daughters.back();
       pair<TLorentzVector, TLorentzVector> corrPair = TUtil::removeMassFromPair(
-        daughters.at(daughters.size()-1).second, daughters.at(daughters.size()-1).first,
+        lastDau.second, lastDau.first,
         tmp, -9000
         );
-      daughters.at(daughters.size()-1).second = corrPair.first;
+      lastDau.second = corrPair.first;
     }
   }
 
@@ -7610,13 +7944,13 @@ void TUtil::GetBoostedParticleVectors(
 
     vector<MELAParticle*> asortedVs = melaCand->getAssociatedSortedVs();
     for (MELAParticle* Vdau:asortedVs){ // Loop over associated Vs
-      if (Vdau!=0){
+      if (Vdau){
         bool doAdd=false;
         int idV = Vdau->id;
         if ((abs(idV)==aVhypo || idV==0) && Vdau->getNDaughters()>0 && Vdau->passSelection){ // If the V is unknown or compatible with the requested hypothesis
           doAdd=true;
           for (MELAParticle* Vdau_i:Vdau->getDaughters()){ // Loop over the daughters of V
-            if (Vdau_i==0){ doAdd=false; break; }
+            if (!Vdau_i){ doAdd=false; break; }
             else if (
               (mela_event.nRequested_AssociatedLeptons==0 && (PDGHelpers::isALepton(Vdau_i->id) || PDGHelpers::isANeutrino(Vdau_i->id)))
               ||
@@ -7693,7 +8027,7 @@ void TUtil::GetBoostedParticleVectors(
     if (code%TVar::kUseAssociated_Leptons==0){
       SimpleParticleCollection_t associated_tmp;
       for (MELAParticle* part:melaCand->getAssociatedLeptons()){
-        if (part!=0 && part->passSelection && nsatisfied_lnus<mela_event.nRequested_AssociatedLeptons){
+        if (part && part->passSelection && nsatisfied_lnus<mela_event.nRequested_AssociatedLeptons){
           nsatisfied_lnus++;
           associated_tmp.push_back(SimpleParticle_t(part->id, part->p4));
         }
@@ -7703,8 +8037,8 @@ void TUtil::GetBoostedParticleVectors(
 
       // Adjust the kinematics of associated non-V-originating particles
       if (associated_tmp.size()>=1){
-        unsigned int nffs = associated_tmp.size()/2;
-        for (unsigned int iv=0; iv<nffs; iv++){
+        size_t nffs = associated_tmp.size()/2;
+        for (size_t iv=0; iv<nffs; iv++){
           if (verbosity>=TVar::DEBUG) MELAout << "TUtil::GetBoostedParticleVectors: Removing mass from lepton pair " << 2*iv+0 << '\t' << 2*iv+1 << endl;
           pair<TLorentzVector, TLorentzVector> corrPair = TUtil::removeMassFromPair(
             associated_tmp.at(2*iv+0).second, associated_tmp.at(2*iv+0).first,
@@ -7716,11 +8050,12 @@ void TUtil::GetBoostedParticleVectors(
         if (2*nffs<associated_tmp.size()){
           if (verbosity>=TVar::DEBUG) MELAout << "TUtil::GetBoostedParticleVectors: Removing mass from last lepton  " << associated_tmp.size()-1 << endl;
           TLorentzVector tmp = nullFourVector;
+          SimpleParticle_t& lastAssociated = associated_tmp.at(associated_tmp.size()-1);
           pair<TLorentzVector, TLorentzVector> corrPair = TUtil::removeMassFromPair(
-            associated_tmp.at(associated_tmp.size()-1).second, associated_tmp.at(associated_tmp.size()-1).first,
+            lastAssociated.second, lastAssociated.first,
             tmp, -9000
             );
-          associated_tmp.at(associated_tmp.size()-1).second = corrPair.first;
+          lastAssociated.second = corrPair.first;
         }
       }
       for (SimpleParticle_t& sp:associated_tmp) associated.push_back(sp); // Fill associated at the last step
@@ -7729,7 +8064,7 @@ void TUtil::GetBoostedParticleVectors(
     if (code%TVar::kUseAssociated_Jets==0){
       SimpleParticleCollection_t associated_tmp;
       for (MELAParticle* part:melaCand->getAssociatedJets()){
-        if (part!=0 && part->passSelection && nsatisfied_jets<mela_event.nRequested_AssociatedJets){
+        if (part && part->passSelection && nsatisfied_jets<mela_event.nRequested_AssociatedJets){
           nsatisfied_jets++;
           associated_tmp.push_back(SimpleParticle_t(part->id, part->p4));
         }
@@ -7752,11 +8087,12 @@ void TUtil::GetBoostedParticleVectors(
         if (2*nffs<associated_tmp.size()){
           if (verbosity>=TVar::DEBUG) MELAout << "TUtil::GetBoostedParticleVectors: Removing mass from last jet  " << associated_tmp.size()-1 << endl;
           TLorentzVector tmp = nullFourVector;
+          SimpleParticle_t& lastAssociated = associated_tmp.at(associated_tmp.size()-1);
           pair<TLorentzVector, TLorentzVector> corrPair = TUtil::removeMassFromPair(
-            associated_tmp.at(associated_tmp.size()-1).second, associated_tmp.at(associated_tmp.size()-1).first,
+            lastAssociated.second, lastAssociated.first,
             tmp, -9000
             );
-          associated_tmp.at(associated_tmp.size()-1).second = corrPair.first;
+          lastAssociated.second = corrPair.first;
         }
       }
       for (SimpleParticle_t& sp:associated_tmp) associated.push_back(sp); // Fill associated at the last step
@@ -7766,7 +8102,7 @@ void TUtil::GetBoostedParticleVectors(
 
   if (code%TVar::kUseAssociated_Photons==0){
     for (MELAParticle* part:melaCand->getAssociatedPhotons()){
-      if (part!=0 && part->passSelection && nsatisfied_gammas<mela_event.nRequested_AssociatedPhotons){
+      if (part && part->passSelection && nsatisfied_gammas<mela_event.nRequested_AssociatedPhotons){
         nsatisfied_gammas++;
         associated.push_back(SimpleParticle_t(part->id, part->p4));
       }
@@ -7784,15 +8120,15 @@ void TUtil::GetBoostedParticleVectors(
   SimpleParticleCollection_t stableTops;
   SimpleParticleCollection_t stableAntitops;
 
-  vector<MELATopCandidate*> tops;
-  vector<MELATopCandidate*> topbars;
-  vector<MELATopCandidate*> unknowntops;
+  vector<MELATopCandidate_t*> tops;
+  vector<MELATopCandidate_t*> topbars;
+  vector<MELATopCandidate_t*> unknowntops;
   if (code%TVar::kUseAssociated_StableTops==0 && code%TVar::kUseAssociated_UnstableTops==0 && verbosity>=TVar::INFO) MELAerr << "TUtil::GetBoostedParticleVectors: Stable and unstable tops are not supported at the same time!"  << endl;
   else if (code%TVar::kUseAssociated_StableTops==0 || code%TVar::kUseAssociated_UnstableTops==0){
 
-    for (MELATopCandidate* theTop:melaCand->getAssociatedTops()){
-      if (theTop!=0 && theTop->passSelection){
-        vector<MELATopCandidate*>* particleArray;
+    for (MELATopCandidate_t* theTop:melaCand->getAssociatedTops()){
+      if (theTop && theTop->passSelection){
+        vector<MELATopCandidate_t*>* particleArray;
         if (theTop->id==6) particleArray = &tops;
         else if (theTop->id==-6) particleArray = &topbars;
         else particleArray = &unknowntops;
@@ -7800,13 +8136,13 @@ void TUtil::GetBoostedParticleVectors(
           (code%TVar::kUseAssociated_StableTops==0)
           ||
           (theTop->getNDaughters()==3 && code%TVar::kUseAssociated_UnstableTops==0)
-          ) particleArray->push_back((MELATopCandidate*)theTop);
+          ) particleArray->push_back(theTop);
       }
     }
     if (verbosity>=TVar::DEBUG){ MELAout << "TUtil::GetBoostedParticleVectors: tops.size=" << tops.size() << ", topbars.size=" << topbars.size() << ", unknowntops.size=" << unknowntops.size() << endl; }
 
     // Fill the stable/unstable top arrays
-    for (MELATopCandidate* theTop:tops){
+    for (MELATopCandidate_t* theTop:tops){
       if (code%TVar::kUseAssociated_StableTops==0 && nsatisfied_tops<mela_event.nRequested_Tops){ // Case with no daughters needed
         nsatisfied_tops++;
         stableTops.push_back(SimpleParticle_t(theTop->id, theTop->p4));
@@ -7815,18 +8151,18 @@ void TUtil::GetBoostedParticleVectors(
         nsatisfied_tops++;
         SimpleParticleCollection_t vdaughters;
 
-        MELAParticle* bottom = theTop->getLightQuark();
+        MELAParticle* bottom = theTop->getPartnerParticle();
         MELAParticle* Wf = theTop->getWFermion();
         MELAParticle* Wfb = theTop->getWAntifermion();
-        if (bottom!=0) vdaughters.push_back(SimpleParticle_t(bottom->id, bottom->p4));
-        if (Wf!=0) vdaughters.push_back(SimpleParticle_t(Wf->id, Wf->p4));
-        if (Wfb!=0) vdaughters.push_back(SimpleParticle_t(Wfb->id, Wfb->p4));
+        if (bottom) vdaughters.push_back(SimpleParticle_t(bottom->id, bottom->p4));
+        if (Wf) vdaughters.push_back(SimpleParticle_t(Wf->id, Wf->p4));
+        if (Wfb) vdaughters.push_back(SimpleParticle_t(Wfb->id, Wfb->p4));
 
         TUtil::adjustTopDaughters(vdaughters); // Adjust top daughter kinematics
         if (vdaughters.size()==3) topDaughters.push_back(vdaughters);
       }
     }
-    for (MELATopCandidate* theTop:topbars){
+    for (MELATopCandidate_t* theTop:topbars){
       if (code%TVar::kUseAssociated_StableTops==0 && nsatisfied_antitops<mela_event.nRequested_Antitops){ // Case with no daughters needed
         nsatisfied_antitops++;
         stableAntitops.push_back(SimpleParticle_t(theTop->id, theTop->p4));
@@ -7835,12 +8171,12 @@ void TUtil::GetBoostedParticleVectors(
         nsatisfied_antitops++;
         SimpleParticleCollection_t vdaughters;
 
-        MELAParticle* bottom = theTop->getLightQuark();
+        MELAParticle* bottom = theTop->getPartnerParticle();
         MELAParticle* Wf = theTop->getWFermion();
         MELAParticle* Wfb = theTop->getWAntifermion();
-        if (bottom!=0) vdaughters.push_back(SimpleParticle_t(bottom->id, bottom->p4));
-        if (Wf!=0) vdaughters.push_back(SimpleParticle_t(Wf->id, Wf->p4));
-        if (Wfb!=0) vdaughters.push_back(SimpleParticle_t(Wfb->id, Wfb->p4));
+        if (bottom) vdaughters.push_back(SimpleParticle_t(bottom->id, bottom->p4));
+        if (Wf) vdaughters.push_back(SimpleParticle_t(Wf->id, Wf->p4));
+        if (Wfb) vdaughters.push_back(SimpleParticle_t(Wfb->id, Wfb->p4));
 
         TUtil::adjustTopDaughters(vdaughters); // Adjust top daughter kinematics
         if (vdaughters.size()==3) antitopDaughters.push_back(vdaughters);
@@ -7849,7 +8185,7 @@ void TUtil::GetBoostedParticleVectors(
     }
     // Loop over the unknown-id tops
     // Fill tops, then antitops from the unknown tops
-    for (MELATopCandidate* theTop:unknowntops){
+    for (MELATopCandidate_t* theTop:unknowntops){
       // t, then tb cases with no daughters needed
       if (code%TVar::kUseAssociated_StableTops==0 && nsatisfied_tops<mela_event.nRequested_Tops){
         nsatisfied_tops++;
@@ -7864,12 +8200,12 @@ void TUtil::GetBoostedParticleVectors(
         nsatisfied_tops++;
         SimpleParticleCollection_t vdaughters;
 
-        MELAParticle* bottom = theTop->getLightQuark();
+        MELAParticle* bottom = theTop->getPartnerParticle();
         MELAParticle* Wf = theTop->getWFermion();
         MELAParticle* Wfb = theTop->getWAntifermion();
-        if (bottom!=0) vdaughters.push_back(SimpleParticle_t(bottom->id, bottom->p4));
-        if (Wf!=0) vdaughters.push_back(SimpleParticle_t(Wf->id, Wf->p4));
-        if (Wfb!=0) vdaughters.push_back(SimpleParticle_t(Wfb->id, Wfb->p4));
+        if (bottom) vdaughters.push_back(SimpleParticle_t(bottom->id, bottom->p4));
+        if (Wf) vdaughters.push_back(SimpleParticle_t(Wf->id, Wf->p4));
+        if (Wfb) vdaughters.push_back(SimpleParticle_t(Wfb->id, Wfb->p4));
 
         TUtil::adjustTopDaughters(vdaughters); // Adjust top daughter kinematics
         if (vdaughters.size()==3) topDaughters.push_back(vdaughters);
@@ -7878,12 +8214,12 @@ void TUtil::GetBoostedParticleVectors(
         nsatisfied_antitops++;
         SimpleParticleCollection_t vdaughters;
 
-        MELAParticle* bottom = theTop->getLightQuark();
+        MELAParticle* bottom = theTop->getPartnerParticle();
         MELAParticle* Wf = theTop->getWFermion();
         MELAParticle* Wfb = theTop->getWAntifermion();
-        if (bottom!=0) vdaughters.push_back(SimpleParticle_t(bottom->id, bottom->p4));
-        if (Wf!=0) vdaughters.push_back(SimpleParticle_t(Wf->id, Wf->p4));
-        if (Wfb!=0) vdaughters.push_back(SimpleParticle_t(Wfb->id, Wfb->p4));
+        if (bottom) vdaughters.push_back(SimpleParticle_t(bottom->id, bottom->p4));
+        if (Wf) vdaughters.push_back(SimpleParticle_t(Wf->id, Wf->p4));
+        if (Wfb) vdaughters.push_back(SimpleParticle_t(Wfb->id, Wfb->p4));
 
         TUtil::adjustTopDaughters(vdaughters); // Adjust top daughter kinematics
         if (vdaughters.size()==3) antitopDaughters.push_back(vdaughters);
@@ -8003,12 +8339,12 @@ MELACandidate* TUtil::ConvertVectorFormat(
   std::vector<MELAParticle*>* particleList,
   std::vector<MELACandidate*>* candList
   ){
-  MELACandidate* cand=0;
+  MELACandidate* cand=nullptr;
 
-  if (pDaughters==0){ MELAerr << "TUtil::ConvertVectorFormat: No daughters!" << endl; return cand; }
+  if (!pDaughters){ MELAerr << "TUtil::ConvertVectorFormat: No daughters!" << endl; return cand; }
   else if (pDaughters->size()==0){ MELAerr << "TUtil::ConvertVectorFormat: Daughter size==0!" << endl; return cand; }
   else if (pDaughters->size()>4){ MELAerr << "TUtil::ConvertVectorFormat: Daughter size " << pDaughters->size() << ">4 is not supported!" << endl; return cand; }
-  if (pMothers!=0 && pMothers->size()!=2){ MELAerr << "TUtil::ConvertVectorFormat: Mothers momentum size (" << pMothers->size() << ") has to have had been 2! Continuing by omitting mothers." << endl; /*return cand;*/ }
+  if (pMothers && pMothers->size()!=2){ MELAerr << "TUtil::ConvertVectorFormat: Mothers momentum size (" << pMothers->size() << ") has to have had been 2! Continuing by omitting mothers." << endl; /*return cand;*/ }
 
   // Create mother, daughter and associated particle MELAParticle objects
   std::vector<MELAParticle*> daughters;
@@ -8017,22 +8353,22 @@ MELACandidate* TUtil::ConvertVectorFormat(
   for (auto& spart:(*pDaughters)){
     MELAParticle* onePart = new MELAParticle(spart.first, spart.second);
     onePart->setGenStatus(1); // Final state status
-    if (particleList!=0) particleList->push_back(onePart);
+    if (particleList) particleList->push_back(onePart);
     daughters.push_back(onePart);
   }
-  if (pAssociated!=0){
+  if (pAssociated){
     for (auto& spart:(*pAssociated)){
       MELAParticle* onePart = new MELAParticle(spart.first, spart.second);
       onePart->setGenStatus(1); // Final state status
-      if (particleList!=0) particleList->push_back(onePart);
+      if (particleList) particleList->push_back(onePart);
       aparticles.push_back(onePart);
     }
   }
-  if (pMothers!=0 && pMothers->size()==2){
+  if (pMothers && pMothers->size()==2){
     for (auto& spart:(*pMothers)){
       MELAParticle* onePart = new MELAParticle(spart.first, spart.second);
       onePart->setGenStatus(-1); // Mother status
-      if (particleList!=0) particleList->push_back(onePart);
+      if (particleList) particleList->push_back(onePart);
       mothers.push_back(onePart);
     }
   }
@@ -8095,9 +8431,9 @@ MELACandidate* TUtil::ConvertVectorFormat(
   else/* if (daughters.size()==4)*/{
     TLorentzVector pH(0, 0, 0, 0);
     double charge = 0.;
-    for (int ip=0; ip<4; ip++){ pH = pH + (daughters.at(ip))->p4; charge += (daughters.at(ip))->charge(); }
+    for (unsigned char ip=0; ip<4; ip++){ pH = pH + (daughters.at(ip))->p4; charge += (daughters.at(ip))->charge(); }
     cand = new MELACandidate(25, pH);
-    for (int ip=0; ip<4; ip++) cand->addDaughter(daughters.at(ip));
+    for (unsigned char ip=0; ip<4; ip++) cand->addDaughter(daughters.at(ip));
     // FIXME/REIMPLEMENT: ZW trickier than I thought: Summing over charges over all 4f is not enough, affects SSSF pairing in ZZ
     //TVar::CandidateDecayMode defaultHDecayMode = PDGHelpers::HDecayMode;
     //if (fabs(charge)>0.01) PDGHelpers::setCandidateDecayMode(TVar::CandidateDecay_ZW);
@@ -8115,64 +8451,60 @@ MELACandidate* TUtil::ConvertVectorFormat(
   }
 
   /***** Adaptation of LHEAnalyzer::Event::addVVCandidateMother *****/
-  if (mothers.size()>0){ // ==2
+  if (!mothers.empty()){ // ==2
     for (auto& part:mothers) cand->addMother(part);
     if (isGen) cand->setGenStatus(-1); // Candidate is a gen. particle!
   }
   /***** Adaptation of LHEAnalyzer::Event::addVVCandidateAppendages *****/
-  if (aparticles.size()>0){
+  if (!aparticles.empty()){
     for (auto& part:aparticles){
       const int& partId = part->id;
-      if (PDGHelpers::isALepton(partId)) cand->addAssociatedLeptons(part);
-      else if (PDGHelpers::isANeutrino(partId)) cand->addAssociatedNeutrinos(part); // Be careful: Neutrinos are neutrinos, but also "leptons" in MELACandidate!
-      else if (PDGHelpers::isAPhoton(partId)) cand->addAssociatedPhotons(part);
-      else if (PDGHelpers::isAJet(partId)) cand->addAssociatedJets(part);
+      if (PDGHelpers::isALepton(partId)) cand->addAssociatedLepton(part);
+      else if (PDGHelpers::isANeutrino(partId)) cand->addAssociatedNeutrino(part); // Be careful: Neutrinos are neutrinos, but also "leptons" in MELACandidate!
+      else if (PDGHelpers::isAPhoton(partId)) cand->addAssociatedPhoton(part);
+      else if (PDGHelpers::isAJet(partId)) cand->addAssociatedJet(part);
     }
     cand->addAssociatedVs(); // For the VH topology
   }
 
-  if (candList!=0 && cand!=0) candList->push_back(cand);
+  if (candList && cand) candList->push_back(cand);
   return cand;
 }
 
-// Convert the vector of top daughters (as simple particles) to MELAParticles and create a MELATopCandidate
+// Convert the vector of three body decay daughters (as simple particles) to MELAParticles and create a MELAThreeBodyDecayCandidate
 // The output lists could be members of TEvtProb directly.
-MELATopCandidate* TUtil::ConvertTopCandidate(
+MELAThreeBodyDecayCandidate* TUtil::ConvertThreeBodyDecayCandidate(
   // Input
-  SimpleParticleCollection_t* TopDaughters,
+  SimpleParticleCollection_t* tbdDaughters,
   // Outputs
   std::vector<MELAParticle*>* particleList,
-  std::vector<MELATopCandidate*>* topCandList
+  std::vector<MELAThreeBodyDecayCandidate*>* tbdCandList
   ){
-  MELATopCandidate* cand=0;
+  MELAThreeBodyDecayCandidate* cand=nullptr;
 
-  if (TopDaughters==0){ MELAerr << "TUtil::ConvertTopCandidate: No daughters!" << endl; return cand; }
-  else if (TopDaughters->size()==0){ MELAerr << "TUtil::ConvertTopCandidate: Daughter size==0!" << endl; return cand; }
-  else if (!(TopDaughters->size()==1 || TopDaughters->size()==3)){ MELAerr << "TUtil::ConvertVectorFormat: Daughter size " << TopDaughters->size() << "!=1 or 3 is not supported!" << endl; return cand; }
+  if (!tbdDaughters){ MELAerr << "TUtil::ConvertThreeBodyDecayCandidate: No daughters!" << endl; return cand; }
+  else if (tbdDaughters->empty()){ MELAerr << "TUtil::ConvertThreeBodyDecayCandidate: Daughter size==0!" << endl; return cand; }
+  else if (!(tbdDaughters->size()==1 || tbdDaughters->size()==3)){ MELAerr << "TUtil::ConvertThreeBodyDecayCandidate: Daughter size " << tbdDaughters->size() << "!=1 or 3 is not supported!" << endl; return cand; }
 
-  if (TopDaughters->size()==1){
-    if (abs((TopDaughters->at(0)).first)==6 || (TopDaughters->at(0)).first==0){
-      cand = new MELATopCandidate((TopDaughters->at(0)).first, (TopDaughters->at(0)).second);
-      topCandList->push_back(cand);
+  if (tbdDaughters->size()==1){
+    if (abs((tbdDaughters->at(0)).first)==6 || (tbdDaughters->at(0)).first==0){
+      cand = new MELAThreeBodyDecayCandidate((tbdDaughters->at(0)).first, (tbdDaughters->at(0)).second);
+      tbdCandList->push_back(cand);
     }
   }
-  else if (TopDaughters->size()==3){
-    MELAParticle* bottom = new MELAParticle((TopDaughters->at(0)).first, (TopDaughters->at(0)).second);
-    MELAParticle* Wf = new MELAParticle((TopDaughters->at(1)).first, (TopDaughters->at(1)).second);
-    MELAParticle* Wfb = new MELAParticle((TopDaughters->at(2)).first, (TopDaughters->at(2)).second);
+  else if (tbdDaughters->size()==3){
+    MELAParticle* partnerPart = new MELAParticle((tbdDaughters->at(0)).first, (tbdDaughters->at(0)).second);
+    MELAParticle* Wf = new MELAParticle((tbdDaughters->at(1)).first, (tbdDaughters->at(1)).second);
+    MELAParticle* Wfb = new MELAParticle((tbdDaughters->at(2)).first, (tbdDaughters->at(2)).second);
 
-    if (Wf->id<0 || Wfb->id>0){
-      MELAParticle* parttmp = Wf;
-      Wf=Wfb;
-      Wfb=parttmp;
-    }
+    if (Wf->id<0 || Wfb->id>0) std::swap(Wf, Wfb);
 
-    particleList->push_back(bottom);
+    particleList->push_back(partnerPart);
     particleList->push_back(Wf);
     particleList->push_back(Wfb);
 
-    cand = new MELATopCandidate(bottom, Wf, Wfb);
-    topCandList->push_back(cand);
+    cand = new MELAThreeBodyDecayCandidate(partnerPart, Wf, Wfb);
+    tbdCandList->push_back(cand);
   }
   return cand;
 }
@@ -8186,7 +8518,7 @@ void TUtil::PrintCandidateSummary(MELACandidate* cand){
 void TUtil::PrintCandidateSummary(simple_event_record* cand){
   MELAout << "***** TUtil::PrintCandidateSummary (Simple Event Record) *****" << endl;
   MELAout << "Candidate: " << cand << endl;
-  if (cand!=0){
+  if (cand){
     MELAout << "\tAssociationCode: " << cand->AssociationCode << endl;
     MELAout << "\tAssociationVCompatibility: " << cand->AssociationVCompatibility << endl;
     MELAout << "\tnRequested_AssociatedJets: " << cand->nRequested_AssociatedJets << endl;

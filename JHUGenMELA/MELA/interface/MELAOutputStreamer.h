@@ -14,6 +14,7 @@
 #include <utility>
 #include "TString.h"
 #include "TLorentzVector.h"
+#include "MELAThreeBodyDecayCandidate.h"
 #include "MELACandidate.h"
 
 
@@ -82,6 +83,7 @@ template MELAOutputStreamer& MELAOutputStreamer::operator<< <std::streambuf*>(st
 template MELAOutputStreamer& MELAOutputStreamer::operator<< <void*>(void* const& val);
 
 template<> MELAOutputStreamer& MELAOutputStreamer::operator<< <MELAParticle>(MELAParticle const& val);
+template<> MELAOutputStreamer& MELAOutputStreamer::operator<< <MELAThreeBodyDecayCandidate>(MELAThreeBodyDecayCandidate const& val);
 template<> MELAOutputStreamer& MELAOutputStreamer::operator<< <MELACandidate>(MELACandidate const& val);
 
 

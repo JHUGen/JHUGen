@@ -129,7 +129,7 @@ public:
   MELACandidate* GetCurrentCandidate();
   int GetCurrentCandidateIndex(); // Return the index of current melaCand in the candList array, or -1 if it does not exist
   int GetNCandidates();
-  std::vector<MELATopCandidate*>* GetTopCandidates();
+  std::vector<MELATopCandidate_t*>* GetTopCandidates();
 
 protected:
   //--------------------
@@ -161,7 +161,7 @@ protected:
   MELACandidate* melaCand; // Only a pointer to the top-level (input) candList object
   std::vector<MELAParticle*> particleList; // Container of intermediate objects, for bookkeeping to delete later
   std::vector<MELACandidate*> candList; // Container of candidate objects, for bookkeeping to delete later
-  std::vector<MELATopCandidate*> topCandList; // Container of candidate objects, for bookkeeping to delete later
+  std::vector<MELATopCandidate_t*> topCandList; // Container of candidate objects, for bookkeeping to delete later
 
   // Initialization functions
   void InitializeMCFM();

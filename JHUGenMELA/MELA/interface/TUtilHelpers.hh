@@ -7,7 +7,7 @@
 #include <utility>
 #include "MELAParticle.h"
 #include "MELACandidate.h"
-#include "MELATopCandidate.h"
+#include "MELAThreeBodyDecayCandidate.h"
 #include "TVar.hh"
 #include "TNumericUtil.hh"
 
@@ -15,6 +15,7 @@ namespace TUtilHelpers{
 
   template<typename T> void copyVector(std::vector<T> const& input, std::vector<T>& target);
   template<typename T, typename U=T> bool checkElementExists(T const& element, std::vector<U> const& elementlist);
+  template<typename T> bool hasCommonElements(std::vector<T> const& v1, std::vector<T> const& v2);
 
 }
 
@@ -23,7 +24,7 @@ template<typename T> void TUtilHelpers::copyVector(std::vector<T> const& input, 
 }
 template void TUtilHelpers::copyVector<MELAParticle*>(std::vector<MELAParticle*> const& input, std::vector<MELAParticle*>& target);
 template void TUtilHelpers::copyVector<MELACandidate*>(std::vector<MELACandidate*> const& input, std::vector<MELACandidate*>& target);
-template void TUtilHelpers::copyVector<MELATopCandidate*>(std::vector<MELATopCandidate*> const& input, std::vector<MELATopCandidate*>& target);
+template void TUtilHelpers::copyVector<MELAThreeBodyDecayCandidate*>(std::vector<MELAThreeBodyDecayCandidate*> const& input, std::vector<MELAThreeBodyDecayCandidate*>& target);
 template void TUtilHelpers::copyVector<SimpleParticle_t>(SimpleParticleCollection_t const& input, SimpleParticleCollection_t& target);
 template void TUtilHelpers::copyVector<bool>(std::vector<bool> const& input, std::vector<bool>& target);
 template void TUtilHelpers::copyVector<short>(std::vector<short> const& input, std::vector<short>& target);
@@ -44,8 +45,8 @@ template bool TUtilHelpers::checkElementExists<MELAParticle const*>(MELAParticle
 template bool TUtilHelpers::checkElementExists<MELAParticle const*, MELAParticle*>(MELAParticle const* const& element, std::vector<MELAParticle*> const& elementlist);
 template bool TUtilHelpers::checkElementExists<MELACandidate const*>(MELACandidate const* const& element, std::vector<MELACandidate const*> const& elementlist);
 template bool TUtilHelpers::checkElementExists<MELACandidate const*, MELACandidate*>(MELACandidate const* const& element, std::vector<MELACandidate*> const& elementlist);
-template bool TUtilHelpers::checkElementExists<MELATopCandidate const*>(MELATopCandidate const* const& element, std::vector<MELATopCandidate const*> const& elementlist);
-template bool TUtilHelpers::checkElementExists<MELATopCandidate const*, MELATopCandidate*>(MELATopCandidate const* const& element, std::vector<MELATopCandidate*> const& elementlist);
+template bool TUtilHelpers::checkElementExists<MELAThreeBodyDecayCandidate const*>(MELAThreeBodyDecayCandidate const* const& element, std::vector<MELAThreeBodyDecayCandidate const*> const& elementlist);
+template bool TUtilHelpers::checkElementExists<MELAThreeBodyDecayCandidate const*, MELAThreeBodyDecayCandidate*>(MELAThreeBodyDecayCandidate const* const& element, std::vector<MELAThreeBodyDecayCandidate*> const& elementlist);
 template bool TUtilHelpers::checkElementExists<bool>(bool const& element, std::vector<bool> const& elementlist);
 template bool TUtilHelpers::checkElementExists<short>(short const& element, std::vector<short> const& elementlist);
 template bool TUtilHelpers::checkElementExists<unsigned int>(unsigned int const& element, std::vector<unsigned int> const& elementlist);
@@ -56,6 +57,15 @@ template bool TUtilHelpers::checkElementExists<long long>(long long const& eleme
 template bool TUtilHelpers::checkElementExists<float>(float const& element, std::vector<float> const& elementlist);
 template bool TUtilHelpers::checkElementExists<double>(double const& element, std::vector<double> const& elementlist);
 template bool TUtilHelpers::checkElementExists<TNumericUtil::intQuad_t>(TNumericUtil::intQuad_t const& element, std::vector<TNumericUtil::intQuad_t> const& elementlist);
+
+template<typename T> bool TUtilHelpers::hasCommonElements(std::vector<T> const& v1, std::vector<T> const& v2){
+  for (T const& el1:v1){
+    for (T const& el2:v2){
+      if (el1==el2) return true;
+    }
+  }
+  return false;
+}
 
 #endif
 

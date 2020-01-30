@@ -169,7 +169,7 @@ MELAParticle* MELACandidate::getAssociatedJet(int index)const{
   if ((int)associatedJets.size()>index) return associatedJets.at(index);
   else return 0;
 }
-MELATopCandidate* MELACandidate::getAssociatedTop(int index)const{
+MELATopCandidate_t* MELACandidate::getAssociatedTop(int index)const{
   if ((int)associatedTops.size()>index) return associatedTops.at(index);
   else return 0;
 }
@@ -180,7 +180,7 @@ std::vector<MELAParticle*>& MELACandidate::getAssociatedLeptons(){ return associ
 std::vector<MELAParticle*>& MELACandidate::getAssociatedNeutrinos(){ return associatedNeutrinos; }
 std::vector<MELAParticle*>& MELACandidate::getAssociatedPhotons(){ return associatedPhotons; }
 std::vector<MELAParticle*>& MELACandidate::getAssociatedJets(){ return associatedJets; }
-std::vector<MELATopCandidate*>& MELACandidate::getAssociatedTops(){ return associatedTops; }
+std::vector<MELATopCandidate_t*>& MELACandidate::getAssociatedTops(){ return associatedTops; }
 
 const std::vector<MELAParticle*>& MELACandidate::getSortedDaughters()const{ return sortedDaughters; }
 const std::vector<MELAParticle*>& MELACandidate::getSortedVs()const{ return sortedVs; }
@@ -188,7 +188,7 @@ const std::vector<MELAParticle*>& MELACandidate::getAssociatedLeptons()const{ re
 const std::vector<MELAParticle*>& MELACandidate::getAssociatedNeutrinos()const{ return associatedNeutrinos; }
 const std::vector<MELAParticle*>& MELACandidate::getAssociatedPhotons()const{ return associatedPhotons; }
 const std::vector<MELAParticle*>& MELACandidate::getAssociatedJets()const{ return associatedJets; }
-const std::vector<MELATopCandidate*>& MELACandidate::getAssociatedTops()const{ return associatedTops; }
+const std::vector<MELATopCandidate_t*>& MELACandidate::getAssociatedTops()const{ return associatedTops; }
 
 std::vector<MELAParticle*> MELACandidate::getAssociatedSortedVs(){
   std::vector<MELAParticle*> res;
@@ -557,16 +557,33 @@ TLorentzVector MELACandidate::getAlternativeVMomentum(int index)const{
   else if (beginWithWPair) HVVmass = PDGHelpers::Wmass;
 
   TLorentzVector nullFourVector(0, 0, 0, 0);
-  if (sortedDaughters.size()>=3){
-    TLorentzVector pZ1 = sortedDaughters.at(0)->p4;
-    if (sortedDaughters.size()>3) pZ1 = pZ1 + sortedDaughters.at(3)->p4;
-    TLorentzVector pZ2 = sortedDaughters.at(2)->p4+sortedDaughters.at(1)->p4;
-    if (std::abs(pZ1.M() - HVVmass)>std::abs(pZ2.M() - HVVmass)){
-      TLorentzVector pZtmp = pZ1;
-      pZ1 = pZ2;
-      pZ2 = pZtmp;
+  if (sortedDaughters.size()>=4){
+    if (beginWithWPair){
+      TLorentzVector pUU = sortedDaughters.at(0)->p4 + sortedDaughters.at(3)->p4;
+      TLorentzVector pDD = sortedDaughters.at(2)->p4 + sortedDaughters.at(1)->p4;
+      return (index==0 ? pDD : pUU);
     }
-    return (index==0 ? pZ1 : pZ2);
+    else{
+      TLorentzVector pWp = sortedDaughters.at(2)->p4 + sortedDaughters.at(1)->p4;
+      TLorentzVector pWm = sortedDaughters.at(0)->p4 + sortedDaughters.at(3)->p4;
+      if (
+        (
+          (isALepton(sortedDaughters.at(0)->id) && isALepton(sortedDaughters.at(2)->id))
+          ||
+          (isANeutrino(sortedDaughters.at(0)->id) && isANeutrino(sortedDaughters.at(2)->id))
+          ||
+          (isAJet(sortedDaughters.at(0)->id) && isAJet(sortedDaughters.at(2)->id))
+        )
+        &&
+        std::abs(pWp.M() - HVVmass) > std::abs(pWm.M() - HVVmass)
+        ) std::swap(pWp, pWm);
+      return (index==0 ? pWp : pWm);
+    }
+  }
+  else if (sortedDaughters.size()==3){
+    TLorentzVector pVa = sortedDaughters.at(0)->p4 + sortedDaughters.at(2)->p4;
+    TLorentzVector pVb = sortedDaughters.at(1)->p4 + sortedDaughters.at(2)->p4;
+    return (index==0 ? pVa : pVb);
   }
   else return nullFourVector;
 }
@@ -586,20 +603,20 @@ bool MELACandidate::checkDaughtership(MELAParticle const* myParticle)const{
   return hasDaughter(myParticle);
 }
 
-void MELACandidate::addAssociatedLeptons(MELAParticle* myParticle){
+void MELACandidate::addAssociatedLepton(MELAParticle* myParticle){
   addAssociatedParticleToArray(myParticle, associatedLeptons);
 }
-void MELACandidate::addAssociatedNeutrinos(MELAParticle* myParticle){
+void MELACandidate::addAssociatedNeutrino(MELAParticle* myParticle){
   addAssociatedParticleToArray(myParticle, associatedLeptons); // Neutrinos are leptons at the ZZ candidate level
   addAssociatedParticleToArray(myParticle, associatedNeutrinos);
 }
-void MELACandidate::addAssociatedPhotons(MELAParticle* myParticle){
+void MELACandidate::addAssociatedPhoton(MELAParticle* myParticle){
   addAssociatedParticleToArray(myParticle, associatedPhotons);
 }
-void MELACandidate::addAssociatedJets(MELAParticle* myParticle){
+void MELACandidate::addAssociatedJet(MELAParticle* myParticle){
   addAssociatedParticleToArray(myParticle, associatedJets);
 }
-void MELACandidate::addAssociatedTops(MELATopCandidate* myParticle){
+void MELACandidate::addAssociatedTop(MELATopCandidate_t* myParticle){
   addAssociatedParticleToArray(myParticle, associatedTops);
 }
 void MELACandidate::addAssociatedParticleToArray(MELAParticle* myParticle, std::vector<MELAParticle*>& particleArray){
@@ -607,8 +624,14 @@ void MELACandidate::addAssociatedParticleToArray(MELAParticle* myParticle, std::
   if (associatedByHighestPt) MELACandidate::addByHighestPt(myParticle, particleArray);
   else MELACandidate::addUnordered(myParticle, particleArray);
 }
-void MELACandidate::addAssociatedParticleToArray(MELATopCandidate* myParticle, std::vector<MELATopCandidate*>& particleArray){
+void MELACandidate::addAssociatedParticleToArray(MELAThreeBodyDecayCandidate* myParticle, std::vector<MELAThreeBodyDecayCandidate*>& particleArray){
   if (checkDaughtership(myParticle)) return;
+
+  // Check if any of the top daughters, if present, are also daughters of the candidate.
+  if (myParticle->getPartnerParticle() && checkDaughtership(myParticle->getPartnerParticle())) return;
+  if (myParticle->getWFermion() && checkDaughtership(myParticle->getWFermion())) return;
+  if (myParticle->getWAntifermion() && checkDaughtership(myParticle->getWAntifermion())) return;
+
   if (associatedByHighestPt) MELACandidate::addByHighestPt(myParticle, particleArray);
   else MELACandidate::addUnordered(myParticle, particleArray);
 }
@@ -673,22 +696,32 @@ void MELACandidate::testPreSelectedDaughters(){
   }
 }
 
-void MELACandidate::getRelatedParticles(std::vector<MELAParticle*>& particles){
+void MELACandidate::getRelatedParticles(std::vector<MELAParticle*>& particles) const{
   MELAParticle::getRelatedParticles(particles);
-  for (auto& part:sortedDaughters) part->getRelatedParticles(particles); // Hopefully no particle gets added from here
-  for (auto& part:associatedTops) part->getRelatedParticles(particles);
-  for (auto& part:sortedVs) part->getRelatedParticles(particles);
-  for (auto& part:associatedLeptons) part->getRelatedParticles(particles);
-  for (auto& part:associatedPhotons) part->getRelatedParticles(particles);
-  for (auto& part:associatedJets) part->getRelatedParticles(particles);
+  for (auto* part:sortedDaughters){ if (part) part->getRelatedParticles(particles); } // Hopefully no particle gets added from here
+  for (auto* part:associatedTops){ if (part) part->getRelatedParticles(particles); }
+  for (auto* part:sortedVs){ if (part) part->getRelatedParticles(particles); }
+  for (auto* part:associatedLeptons){ if (part) part->getRelatedParticles(particles); }
+  for (auto* part:associatedPhotons){ if (part) part->getRelatedParticles(particles); }
+  for (auto* part:associatedJets){ if (part) part->getRelatedParticles(particles); }
+}
+void MELACandidate::getDaughterParticles(std::vector<MELAParticle*>& particles) const{
+  MELAParticle::getDaughterParticles(particles);
+  for (auto* part:sortedDaughters){ if (part) part->getDaughterParticles(particles); } // Hopefully no particle gets added from here
+  for (auto* sortedV:sortedVs){ // Only add sorted Vs that are actually the intermediates of the sorted daughters
+    if (!sortedV) continue;
+    bool doAddV=false;
+    for (auto& dau:sortedDaughters){ if (dau && sortedV->hasDaughter(dau)){ doAddV=true; break; } }
+    if (doAddV) sortedV->getDaughterParticles(particles);
+  }
 }
 
 void MELACandidate::addUnordered(MELAParticle* myParticle, std::vector<MELAParticle*>& particleArray){
   bool inserted = MELAParticle::checkParticleExists(myParticle, particleArray); // Test if the particle is already in the vector
   if (!inserted) particleArray.push_back(myParticle);
 }
-void MELACandidate::addUnordered(MELATopCandidate* myParticle, std::vector<MELATopCandidate*>& particleArray){
-  bool inserted = MELATopCandidate::checkTopCandidateExists(myParticle, particleArray); // Test if the particle is already in the vector
+void MELACandidate::addUnordered(MELAThreeBodyDecayCandidate* myParticle, std::vector<MELAThreeBodyDecayCandidate*>& particleArray){
+  bool inserted = MELAThreeBodyDecayCandidate::checkCandidateExists(myParticle, particleArray); // Test if the particle is already in the vector
   if (!inserted) particleArray.push_back(myParticle);
 }
 void MELACandidate::addByHighestPt(MELAParticle* myParticle, std::vector<MELAParticle*>& particleArray){
@@ -704,10 +737,10 @@ void MELACandidate::addByHighestPt(MELAParticle* myParticle, std::vector<MELAPar
     if (!inserted) particleArray.push_back(myParticle);
   }
 }
-void MELACandidate::addByHighestPt(MELATopCandidate* myParticle, std::vector<MELATopCandidate*>& particleArray){
-  bool inserted = MELATopCandidate::checkTopCandidateExists(myParticle, particleArray); // Test if the particle is already in the vector
+void MELACandidate::addByHighestPt(MELAThreeBodyDecayCandidate* myParticle, std::vector<MELAThreeBodyDecayCandidate*>& particleArray){
+  bool inserted = MELAThreeBodyDecayCandidate::checkCandidateExists(myParticle, particleArray); // Test if the particle is already in the vector
   if (!inserted){
-    for (std::vector<MELATopCandidate*>::iterator it = particleArray.begin(); it<particleArray.end(); it++){
+    for (std::vector<MELAThreeBodyDecayCandidate*>::iterator it = particleArray.begin(); it<particleArray.end(); it++){
       if ((*it)->pt()<myParticle->pt()){
         inserted=true;
         particleArray.insert(it, myParticle);

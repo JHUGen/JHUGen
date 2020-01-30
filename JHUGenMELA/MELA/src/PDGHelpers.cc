@@ -11,6 +11,10 @@ namespace PDGHelpers{
   TVar::CandidateDecayMode HDecayMode = TVar::CandidateDecay_ZZ;
 }
 
+bool PDGHelpers::isAKnownJet(const int id){
+  if (PDGHelpers::isAQuark(id) || PDGHelpers::isAGluon(id)) return true;
+  else return false;
+}
 bool PDGHelpers::isAJet(const int id){
   if (PDGHelpers::isAnUnknownJet(id) || PDGHelpers::isAQuark(id) || PDGHelpers::isAGluon(id)) return true;
   else return false;
@@ -23,28 +27,46 @@ bool PDGHelpers::isInvalid(const int id){
   if (id==-9000) return true;
   else return false;
 }
+bool PDGHelpers::isALightQuark(const int id){
+  const int abs_id = std::abs(id);
+  if (abs_id<=5 && abs_id>0) return true;
+  else return false;
+}
 bool PDGHelpers::isAQuark(const int id){
-  if (std::abs(id)<=6 && std::abs(id)>0) return true;
+  const int abs_id = std::abs(id);
+  if (abs_id<=6 && abs_id>0) return true;
   else return false;
 }
 bool PDGHelpers::isUpTypeQuark(const int id){
-  if (std::abs(id)==2 || std::abs(id)==4 || std::abs(id)==6) return true;
+  const int abs_id = std::abs(id);
+  if (abs_id==2 || abs_id==4 || abs_id==6) return true;
   else return false;
 }
 bool PDGHelpers::isDownTypeQuark(const int id){
-  if (std::abs(id)==1 || std::abs(id)==3 || std::abs(id)==5) return true;
+  const int abs_id = std::abs(id);
+  if (abs_id==1 || abs_id==3 || abs_id==5) return true;
   else return false;
 }
-bool PDGHelpers::isALepton(const int id){
-  if (std::abs(id)==11 || std::abs(id)==13 || std::abs(id)==15) return true;
+bool PDGHelpers::isATopQuark(const int id){
+  if (std::abs(id)==6) return true;
   else return false;
 }
-bool PDGHelpers::isANeutrino(const int id){
-  if (std::abs(id)==12 || std::abs(id)==14 || std::abs(id)==16) return true;
+bool PDGHelpers::isATauLepton(const int id){
+  if (std::abs(id)==15) return true;
   else return false;
 }
 bool PDGHelpers::isAGluon(const int id){
   if (std::abs(id)==21) return true;
+  else return false;
+}
+bool PDGHelpers::isALepton(const int id){
+  const int abs_id = std::abs(id);
+  if (abs_id==11 || abs_id==13 || abs_id==15) return true;
+  else return false;
+}
+bool PDGHelpers::isANeutrino(const int id){
+  const int abs_id = std::abs(id);
+  if (abs_id==12 || abs_id==14 || abs_id==16) return true;
   else return false;
 }
 bool PDGHelpers::isAPhoton(const int id){
@@ -71,17 +93,17 @@ void PDGHelpers::orderParticles(
   ){
   ordering.clear();
   if (testlist.size() != idlist.size()){ MELAerr << "PDGHelpers::orderParticles: List of ids and list of their tests do not have the same size!" << std::endl; return; }
-  for (unsigned int itest=0; itest<testlist.size(); itest++){
+  for (std::vector<bool(*)(const int)>::const_iterator it_test=testlist.cbegin(); it_test!=testlist.cend(); it_test++){
     bool testFilled=false;
     for (unsigned int ipart=0; ipart<idlist.size(); ipart++){
       bool isAvailable=true;
-      for (unsigned int iord=0; iord<ordering.size(); iord++){
-        if (ordering.at(iord)==(int)ipart){ isAvailable=false; break; }
+      for (int const& ord:ordering){
+        if (ord==(int)ipart){ isAvailable=false; break; }
       }
       if (!isAvailable) continue;
       int tested = idlist.at(ipart);
       if (PDGHelpers::isAnUnknownJet(tested)) continue;
-      if (testlist.at(itest)(tested)){
+      if ((*it_test)(tested)){
         ordering.push_back(tested);
         testFilled=true;
       }
@@ -89,13 +111,13 @@ void PDGHelpers::orderParticles(
     if (!testFilled && allowUnknown){
       for (unsigned int ipart=0; ipart<idlist.size(); ipart++){
         bool isAvailable=true;
-        for (unsigned int iord=0; iord<ordering.size(); iord++){
-          if (ordering.at(iord)==(int)ipart){ isAvailable=false; break; }
+        for (int const& ord:ordering){
+          if (ord==(int) ipart){ isAvailable=false; break; }
         }
         if (!isAvailable) continue;
         int tested = idlist.at(ipart);
         if (!PDGHelpers::isAnUnknownJet(tested)) continue;
-        if (testlist.at(itest)(tested)){
+        if ((*it_test)(tested)){
           ordering.push_back(tested);
           testFilled=true;
         }
@@ -111,20 +133,20 @@ void PDGHelpers::groupIdenticalParticles(
   bool* hasUnknownParticles
   ){
   ordering.clear();
-  if (hasUnknownParticles!=0) *hasUnknownParticles=false;
+  if (hasUnknownParticles) *hasUnknownParticles=false;
 
   for (unsigned int ipart=0; ipart<ids.size(); ipart++){
-    int id_part = ids.at(ipart);
+    int const& id_part = ids.at(ipart);
     if (PDGHelpers::isAnUnknownJet(id_part)) continue; // Group them the last
     bool grouped=false;
-    for (unsigned int ig=0; ig<ordering.size(); ig++){
-      if (ordering.at(ig).at(0)==id_part){ ordering.at(ig).push_back(ipart); grouped=true; break; }
+    for (auto& ord:ordering){
+      if (ord.at(0)==id_part){ ord.push_back(ipart); grouped=true; break; }
     }
     if (!grouped){ std::vector<int> newgroup; newgroup.push_back(ipart); ordering.push_back(newgroup); }
   }
   bool firstUnknown=true;
   for (unsigned int ipart=0; ipart<ids.size(); ipart++){
-    int id_part = ids.at(ipart);
+    int const& id_part = ids.at(ipart);
     if (!PDGHelpers::isAnUnknownJet(id_part)) continue; // Unknwon parton group
     if (hasUnknownParticles!=0) *hasUnknownParticles=true;
     if (firstUnknown){
@@ -145,34 +167,33 @@ void PDGHelpers::pairIdenticalParticles(
   bool hasUnknown=false;
   PDGHelpers::groupIdenticalParticles(ids, grouping, &hasUnknown);
 
-  for (unsigned int ig=0; ig<grouping.size(); ig++){
-    unsigned int group_rep = grouping.at(ig).at(0);
-    if (group_rep>=ids.size()){ MELAerr << "PDGHelpers::pairIdenticalParticles: Group " << ig << " has a representative location >=ids.size (" << ids.size() << ")!" << std::endl; continue; }
+  for (auto const& group:grouping){
+    unsigned int group_rep = group.at(0);
+    if (group_rep>=ids.size()){ MELAerr << "PDGHelpers::pairIdenticalParticles: Group " << group << " has a representative location >=ids.size (" << ids.size() << ")!" << std::endl; continue; }
     int group_flag = ids.at(group_rep);
     if (!PDGHelpers::isAnUnknownJet(group_flag)){ // Known particles first!
-      unsigned int npairs = grouping.at(ig).size()/2;
-      bool isOdd=(grouping.at(ig).size() % 2 == 1);
+      unsigned int npairs = group.size()/2;
+      bool isOdd=(group.size() % 2 == 1);
       if (isOdd) npairs++;
       for (unsigned int ip=0; ip<npairs; ip++){
-        if (isOdd && ip==npairs-1) ordering.push_back(std::pair<int, int>(grouping.at(ig).at(2*ip), -1));
-        else ordering.push_back(std::pair<int, int>(grouping.at(ig).at(2*ip), grouping.at(ig).at(2*ip+1)));
+        if (isOdd && ip==npairs-1) ordering.push_back(std::pair<int, int>(group.at(2*ip), -1));
+        else ordering.push_back(std::pair<int, int>(group.at(2*ip), group.at(2*ip+1)));
       }
     }
   }
   if (allowUnknown){
-    for (unsigned int ig=0; ig<grouping.size(); ig++){
-      unsigned int group_rep = grouping.at(ig).at(0);
-      if (group_rep>=ids.size()){ MELAerr << "PDGHelpers::pairIdenticalParticles: Group " << ig << " has a representative location >=ids.size (" << ids.size() << ")!" << std::endl; continue; }
+    for (auto const& group:grouping){
+      unsigned int group_rep = group.at(0);
+      if (group_rep>=ids.size()){ MELAerr << "PDGHelpers::pairIdenticalParticles: Group " << group << " has a representative location >=ids.size (" << ids.size() << ")!" << std::endl; continue; }
       int group_flag = ids.at(group_rep);
       if (!PDGHelpers::isAnUnknownJet(group_flag)) continue; // Unknown particles
       // Now that we found the unknown particles group, loop over it
-      for (unsigned int iun=0; iun<grouping.at(ig).size(); iun++){
+      for (int const& pos:group){
         bool paired=false;
-        int pos = grouping.at(ig).at(iun);
         // Check if there are unpaired particles left
-        for (unsigned int iord=0; iord<ordering.size(); iord++){
-          if (ordering.at(iord).second==-1 && PDGHelpers::isAJet(ids.at(ordering.at(iord).first))){
-            ordering.at(iord).second = pos;
+        for (auto& order:ordering){
+          if (order.second==-1 && PDGHelpers::isAJet(ids.at(order.first))){
+            order.second = pos;
             paired=true;
             break;
           }
@@ -216,11 +237,11 @@ int PDGHelpers::getCoupledVertex(const int idfirst, const int idsecond, int* hel
   int ids_jhu[2]={ -9000, -9000 };
   for (unsigned int ip=0; ip<2; ip++){ if (!PDGHelpers::isInvalid(ids[ip])) ids_jhu[ip] = convertLHEreverse(&(ids[ip])); }
   int zahswitch=0;
-  if (useAHcoupl!=0) zahswitch = *useAHcoupl;
+  if (useAHcoupl) zahswitch = *useAHcoupl;
   // Left-handed couplings always exist; right handed ones may or may not exist. This is why the default below is -1 for left-handed.
   // Example: Z->nu nub does not have Z->nu_R nub_L counterpart because nu_R or nub_L do not exist!
   int heleff=-1;
-  if (hel!=0) heleff = *hel;
+  if (hel) heleff = *hel;
   int Vid_jhu = CoupledVertex(ids_jhu, &heleff, &zahswitch);
   return convertLHE(&Vid_jhu);
 }
@@ -234,5 +255,3 @@ int PDGHelpers::convertPythiaStatus(int pSt){
     return -99;
   }
 }
-
-

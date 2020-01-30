@@ -289,19 +289,19 @@ void TEvtProb::SetInputEvent(
 }
 void TEvtProb::AppendTopCandidate(SimpleParticleCollection_t* TopDaughters){
   if (!CheckInputPresent()){
-    MELAerr << "TEvtProb::AppendTopCandidate: No MELACandidates are present to append this top!" << endl;
+    if (verbosity>=TVar::INFO) MELAout << "TEvtProb::AppendTopCandidate: No MELACandidates are present to append this top!" << endl;
     return;
   }
-  MELATopCandidate* cand = ConvertTopCandidate(
+  MELATopCandidate_t* cand = ConvertThreeBodyDecayCandidate(
     TopDaughters,
     &particleList, &topCandList // push_back is done automatically
     );
-  if (cand) melaCand->addAssociatedTops(cand);
+  if (cand) melaCand->addAssociatedTop(cand);
 }
 void TEvtProb::SetRcdCandPtr(){ RcdME.melaCand = melaCand; }
 void TEvtProb::SetCurrentCandidateFromIndex(unsigned int icand){
   if (candList.size()>icand) melaCand = candList.at(icand);
-  else MELAerr << "TEvtProb::SetCurrentCandidateFromIndex: icand=" << icand << ">=candList.size()=" << candList.size() << endl;
+  else if (verbosity>=TVar::ERROR) MELAerr << "TEvtProb::SetCurrentCandidateFromIndex: icand=" << icand << ">=candList.size()=" << candList.size() << endl;
 }
 void TEvtProb::SetCurrentCandidate(MELACandidate* cand){
   melaCand = cand;
@@ -346,9 +346,9 @@ void TEvtProb::ResetInputEvent(){
   for (MELACandidate* tmpPart:candList) delete tmpPart;
   candList.clear();
   // Clean MELATopCandidates next since they contain MELAParticles
-  for (MELATopCandidate* tmpPart:topCandList) delete tmpPart;
+  for (MELATopCandidate_t* tmpPart:topCandList) delete tmpPart;
   topCandList.clear();
-  // Clean all remaining MELAPArticles
+  // Clean all remaining MELAParticles
   for (MELAParticle* tmpPart:particleList) delete tmpPart;
   particleList.clear();
 }
@@ -383,19 +383,19 @@ int TEvtProb::GetCurrentCandidateIndex(){
   return -1;
 }
 int TEvtProb::GetNCandidates(){ return (static_cast<int>(candList.size())); }
-std::vector<MELATopCandidate*>* TEvtProb::GetTopCandidates(){ return &topCandList; }
+std::vector<MELATopCandidate_t*>* TEvtProb::GetTopCandidates(){ return &topCandList; }
 
 
 // Check/test functions
 bool TEvtProb::CheckInputPresent(){
   if (!melaCand){
-    MELAerr
+    if (verbosity>=TVar::INFO) MELAout
       << "TEvtProb::CheckInputPresent: melaCand==" << melaCand << " is nullPtr!"
       << endl;
     if (candList.empty()) return false;
     else{
       SetCurrentCandidateFromIndex(candList.size()-1);
-      MELAerr << "TEvtProb::CheckInputPresent: melaCand now points to the latest candidate (cand" << (candList.size()-1) << ")" << endl;
+      if (verbosity>=TVar::INFO) MELAout << "TEvtProb::CheckInputPresent: melaCand now points to the latest candidate (cand[" << (candList.size()-1) << "])" << endl;
     }
   }
   SetRcdCandPtr(); // If input event is present, set the RcdME pointer to melaCand
@@ -697,7 +697,7 @@ double TEvtProb::XsecCalc_XVV(){
     }
 
     if (isSpinZero || isSpinOne || isSpinTwo) dXsec = JHUGenMatEl(process, production, matrixElement, &event_scales, &RcdME, EBEAM, verbosity);
-    else MELAerr
+    else if (verbosity>=TVar::ERROR) MELAerr
       << "TEvtProb::XsecCalc_XVV: JHUGen ME is not spin zero, one or two! The process is described by "
       << "Process: " << TVar::ProcessName(process) << ", Production: " << TVar::ProductionName(production) << ", and ME: " << TVar::MatrixElementName(matrixElement)
       << endl;
@@ -745,7 +745,7 @@ double TEvtProb::XsecCalc_VVXVV(){
     }
     else if (verbosity>=TVar::INFO) MELAout << "TEvtProb::XsecCalc_VVXVV: MCFM_chooser failed to determine the process configuration." << endl;
   }
-  else MELAerr << "TEvtProb::XsecCalc_VVXVV: Non-MCFM Mes are not supported." << endl;
+  else if (verbosity>=TVar::ERROR) MELAerr << "TEvtProb::XsecCalc_VVXVV: Non-MCFM Mes are not supported." << endl;
 
   if (verbosity >= TVar::DEBUG) MELAout
     << "Process " << TVar::ProcessName(process)
@@ -847,7 +847,7 @@ double TEvtProb::XsecCalcXJJ(){
     dXsec = HJJMatEl(process, production, matrixElement, &event_scales, &RcdME, EBEAM, verbosity);
     if (verbosity >= TVar::DEBUG) MELAout << "TEvtProb::XsecCalc_XJJ: Process " << TVar::ProcessName(process) << " dXsec=" << dXsec << endl;
   }
-  else MELAerr << "TEvtProb::XsecCalc_XJJ: Non-JHUGen vbfMELA MEs are not supported!" << endl;
+  else if (verbosity>=TVar::ERROR) MELAerr << "TEvtProb::XsecCalc_XJJ: Non-JHUGen vbfMELA MEs are not supported!" << endl;
 
   ResetCouplings();
   ResetRenFacScaleMode();
@@ -878,7 +878,7 @@ double TEvtProb::XsecCalcXJ(){
     dXsec = HJJMatEl(process, production, matrixElement, &event_scales, &RcdME, EBEAM, verbosity);
     if (verbosity >= TVar::DEBUG) MELAout << "TEvtProb::XsecCalc_XJ: Process " << TVar::ProcessName(process) << " dXsec=" << dXsec << endl;
   }
-  else MELAerr << "TEvtProb::XsecCalc_XJ: Non-JHUGen HJ MEs are not supported!" << endl;
+  else if (verbosity>=TVar::ERROR) MELAerr << "TEvtProb::XsecCalc_XJ: Non-JHUGen HJ MEs are not supported!" << endl;
 
   ResetCouplings();
   ResetRenFacScaleMode();
@@ -954,7 +954,7 @@ double TEvtProb::XsecCalc_VX(
     dXsec = VHiggsMatEl(process, production, matrixElement, &event_scales, &RcdME, EBEAM, includeHiggsDecay, verbosity);
     if (verbosity >= TVar::DEBUG) MELAout << "TEVtProb::XsecCalc_VX: Process " << TVar::ProcessName(process) << " dXsec=" << dXsec << endl;
   } // end of JHUGen matrix element calculations
-  else MELAerr << "TEVtProb::XsecCalc_VX: Non-JHUGen VH MEs are not supported!" << endl;
+  else if (verbosity>=TVar::ERROR) MELAerr << "TEVtProb::XsecCalc_VX: Non-JHUGen VH MEs are not supported!" << endl;
 
   ResetCouplings();
   ResetRenFacScaleMode();
@@ -991,7 +991,7 @@ double TEvtProb::XsecCalc_TTX(
     else if (verbosity >= TVar::ERROR) MELAout << "TEvtProb::XsecCalc_TTX only supports ttH and bbH productions for the moment." << endl;
     if (verbosity >= TVar::DEBUG) MELAout << "TEvtProb::XsecCalc_TTX: Process " << TVar::ProcessName(process) << " dXsec=" << dXsec << endl;
   }
-  else MELAerr << "TEvtProb::XsecCalc_TTX: Non-JHUGen ttH MEs are not supported!" << endl;
+  else if (verbosity>=TVar::ERROR) MELAerr << "TEvtProb::XsecCalc_TTX: Non-JHUGen ttH MEs are not supported!" << endl;
 
   ResetCouplings();
   ResetRenFacScaleMode();
