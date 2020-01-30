@@ -104,7 +104,7 @@ FinalStateWeight = 1d0
    call Kinematics_TTBH(MomOffShell,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return
    FluxFac = 1d0/(2d0*EHat**2)
-   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * PartChannelAvg * WdecayKfactor * FinalStateWeight
+   PreFac = hbarc2XsecUnit * FluxFac * sHatJacobi * PSWgt * PartChannelAvg * WdecayKfactor * FinalStateWeight
    call SetRunningScales( (/ MomExt(1:4,Hbos),MomExt(1:4,tbar),MomExt(1:4,t) /) , (/ Not_a_particle_,ATop_,Top_,Not_a_particle_ /) )
    call EvalAlphaS()
    call setPDFs(eta1,eta2,pdf)
@@ -146,25 +146,25 @@ FinalStateWeight = 1d0
 ! pause
 !       LO_Res_QQB_Unpol = LO_Res_QQB_Unpol/alphas**2*0.13d0**2
 !       LO_Res_GG_Unpol = LO_Res_GG_Unpol/alphas**2*0.13d0**2
-!       MG_MOM(0:3,1) = MomExt(1:4,1)*100d0
-!       MG_MOM(0:3,2) = MomExt(1:4,2)*100d0
-!       MG_MOM(0:3,3) = MomExt(1:4,5)*100d0
-!       MG_MOM(0:3,4) = MomExt(1:4,4)*100d0
-!       MG_MOM(0:3,5) = MomExt(1:4,3)*100d0
+!       MG_MOM(0:3,1) = MomExt(1:4,1)/GeV
+!       MG_MOM(0:3,2) = MomExt(1:4,2)/GeV
+!       MG_MOM(0:3,3) = MomExt(1:4,5)/GeV
+!       MG_MOM(0:3,4) = MomExt(1:4,4)/GeV
+!       MG_MOM(0:3,5) = MomExt(1:4,3)/GeV
 !       call coupsm(0)
 !       call SGG_TTBH(MG_MOM,MadGraph_tree)
 !       print *, ""
 !       print *, alphas,m_top,m_z
-!       print *, "My gg tree:         ", LO_Res_GG_Unpol/(100d0)**2
+!       print *, "My gg tree:         ", LO_Res_GG_Unpol*GeV**2
 !       print *, "MadGraph gg hel.amp:", MadGraph_tree
-!       print *, "MG/ME ratio: ", MadGraph_tree/(dble(LO_Res_GG_Unpol)/(100d0)**2)
+!       print *, "MG/ME ratio: ", MadGraph_tree/(dble(LO_Res_GG_Unpol)*GeV**2)
 !
 !       call SUUB_TTBH(MG_MOM,MadGraph_tree)
 !       print *, ""
 !       print *, alphas,m_top,m_z
-!       print *, "My qqb tree:         ", LO_Res_QQB_Unpol/(100d0)**2
+!       print *, "My qqb tree:         ", LO_Res_QQB_Unpol*GeV**2
 !       print *, "MadGraph qqb hel.amp:", MadGraph_tree
-!       print *, "MG/ME ratio: ", MadGraph_tree/(dble(LO_Res_QQB_Unpol)/(100d0)**2)
+!       print *, "MG/ME ratio: ", MadGraph_tree/(dble(LO_Res_QQB_Unpol)*GeV**2)
 !       pause
 
 
@@ -302,7 +302,7 @@ FinalStateWeight = 1d0
 !    call EvalPhasespace_HDecay(MomExt(1:4,3),yRnd(16:17),MomExt(1:4,12:13),PSWgt4)
 !    PSWgt = PSWgt * PSWgt4
    FluxFac = 1d0/(2d0*EHat**2)
-   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * WdecayKfactor * FinalStateWeight
+   PreFac = hbarc2XsecUnit * FluxFac * sHatJacobi * PSWgt * WdecayKfactor * FinalStateWeight
 
    call Kinematics_TTBH(MomOffShell,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return

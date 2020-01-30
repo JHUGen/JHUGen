@@ -8,6 +8,7 @@
 % % \usepackage{cprotect}
 \usepackage{amsmath}
 \usepackage[hidelinks]{hyperref}
+\usepackage{wasysym}
 
 % \textwidth18cm
 % \addtolength{\oddsidemargin}{-2cm}
@@ -27,7 +28,7 @@ Manual for the JHU generator and MELA package
 \begin{center}
 \small
 For simulation, reweighting, and analysis of a single-produced resonance at hadron colliders \\
-(version v7.2.7, release date January 31, 2018) \\
+(version v7.3.4, release date September 11, 2019) \\
 \normalsize
 \end{center}
 
@@ -54,6 +55,125 @@ The latter was also introduced in Ref.~\cite{Chatrchyan:2012ufa}. The matrix ele
 \vspace{0.5cm}
 
 %\newpage
+
+
+\section{Notation}
+
+The notation has been set in Refs.~\cite{Gao:2010qx,Bolognesi:2012,Anderson:2013,Gritsan:2016} ,
+the $HVV$ scattering amplitude of a spin-zero boson $H$ and two vector bosons with polarization vectors 
+$\varepsilon_{1}^\mu(q_1)$ and $\varepsilon_{2}^\mu(q_2)$
+is parameterized by
+\begin{eqnarray}
+  A({H V V}) \!=\! \frac{1}{v} &\bigg\{  &
+                          M_V^2 \bigg(g_{1}^{VV} 
++ \frac{\kappa_1^{VV}q_{1}^2 + \kappa_2^{VV} q_{2}^{2}}{\left(\Lambda_{1}^{VV} \right)^{2}} + \frac{\kappa_3^{VV} (q_1+q_2)^2}{\left(\Lambda_{Q}^{VV} \right)^{2}} 
++ \frac{2 q_1\cdot q_2}{M_V^2} g_2^{VV}\bigg) (\varepsilon_1 \cdot \varepsilon_2) 
+\nonumber \\ &&
+                        -2 g_2^{VV} \, {(\varepsilon_1 \cdot q_2)(\varepsilon_2 \cdot q_1)}
+                        -2  g_4^{VV} \, {\varepsilon^{\varepsilon_1\,\varepsilon_2\,q_1\,q_2}}
+                               \bigg\}.
+\label{eq:HVV}
+\end{eqnarray}
+This parametrization represents the most general Lorentz-invariant form. 
+The couplings used in Eq.~(\ref{eq:HVV}) are the direct input to the JHU generator, as discussed
+in the rest of this manual. 
+
+The parameterization of the amplitude in Eq.~(\ref{eq:HVV}) can be related to a fundamental Lagrange density function,
+using effective field theory coefficients of the so-called Higgs basis \cite{deFlorian:2016spz}:
+\begin{eqnarray}
+\label{eq:EFT_hvv}
+ {\cal L}_{\rm hvv} =& & {h \over v} \left [ 
+  \left (1 +  \delta c_z \right )  {(g^2+g^{\prime 2}) v^2 \over 4} Z_\mu Z_\mu
++ c_{zz} {g^2 + g'{}^2 \over  4} Z_{\mu \nu} Z_{\mu\nu}  
++c_{z \Box} g^2 Z_\mu \partial_\nu Z_{\mu \nu}
++ \tilde c_{zz}  {g^2 + g'{}^2  \over  4} Z_{\mu \nu} \tilde Z_{\mu\nu}
+\right . \nonumber \\ & & \left . 
+% 
+% 
+ +\left (1 +  \delta c_w \right )  {g^2 v^2 \over 2} W_\mu^+ W_\mu^- 
++ c_{ww}  {g^2 \over  2} W_{\mu \nu}^+  W_{\mu\nu}^- 
++ c_{w \Box} g^2 \left (W_\mu^- \partial_\nu W_{\mu \nu}^+ + {\mathrm h.c.} \right )  
+ + \tilde c_{ww}  {g^2 \over  2} W_{\mu \nu}^+   \tilde W_{\mu\nu}^- 
+ \right . \nonumber \\ & & \left . 
+% 
+% 
++ c_{z \gamma} {e \sqrt{g^2 + g'{}^2}  \over  2} Z_{\mu \nu} A_{\mu\nu} 
++ \tilde c_{z \gamma} {e \sqrt{g^2 + g'{}^2} \over  2} Z_{\mu \nu} \tilde A_{\mu\nu}
++ c_{\gamma \Box} g g' Z_\mu \partial_\nu A_{\mu \nu}
+\right . \nonumber \\ & & \left . 
+% 
+% 
++ c_{\gamma \gamma} {e^2 \over 4} A_{\mu \nu} A_{\mu \nu} 
++ \tilde c_{\gamma \gamma} {e^2 \over 4} A_{\mu \nu} \tilde A_{\mu \nu} 
++  c_{gg} {g_s^2 \over 4 } G_{\mu \nu}^a G_{\mu \nu}^a   
++  \tilde c_{gg} {g_s^2 \over 4} G_{\mu \nu}^a \tilde G_{\mu \nu}^a  
+\right ],
+\end{eqnarray} 
+in accordance with Eq.~(II.2.20) in Ref.~\cite{deFlorian:2016spz}.
+
+There is unique representation of each EFT coefficient in Eq.~(\ref{eq:EFT_hvv}) by couplings in Eq.~(\ref{eq:HVV}),
+as shown below:
+\begin{eqnarray}  &&
+\label{eq:EFT_ci}
+    \delta c_z  = \frac12 g_1^{ZZ} - 1,
+    \quad\quad
+    c_{zz} = -\frac{2 s_w^2 c_w^2}{e^2} g_2^{ZZ},
+    \quad\quad
+    c_{z \Box} = \frac{M_Z^2 s_w^2}{e^2} \, \frac{\kappa_1^{ZZ}}{(\Lambda_1^{ZZ})^2},
+    \quad\quad
+    \tilde c_{zz} = -\frac{2 s_w^2 c_w^2}{e^2} g_4^{ZZ},
+    \nonumber \\ &&
+     \delta c_w = \frac12 g_1^{WW} - 1,
+    \quad\quad
+    c_{ww} = -\frac{2 s_w^2 }{e^2} g_2^{WW},
+    \quad\quad
+    c_{w \Box} = \frac{M_W^2 s_w^2}{e^2} \, \frac{\kappa_1^{WW}}{(\Lambda_1^{WW})^2},
+    \quad\quad
+    \tilde c_{ww} = -\frac{2 s_w^2}{e^2} g_4^{WW},
+    \nonumber\\ &&
+     c_{z \gamma} = -\frac{2 s_w c_w}{e^2} g_2^{Z\gamma},
+    \quad\quad
+    \tilde c_{z \gamma} = -\frac{2 s_w c_w}{e^2} g_4^{Z\gamma},
+    \quad\quad
+    c_{\gamma \Box} = \frac{s_w c_w}{e^2} \, \frac{M_Z^2}{(\Lambda_1^{Z\gamma})^2} \kappa_2^{Z\gamma},
+   \nonumber\\ &&
+     c_{\gamma \gamma} = -\frac{2}{e^2} g_2^{\gamma\gamma},   
+    \quad\quad
+   \tilde c_{\gamma \gamma} = -\frac{2}{e^2} g_4^{\gamma\gamma},
+    \quad\quad
+     c_{gg} = -\frac{2}{g_s^2} g_2^{gg},
+   \quad\quad
+   \tilde c_{gg} = -\frac{2}{g_s^2} g_4^{gg}.
+\end{eqnarray} 
+
+Enforcing linear relations for the dependent coefficients~\cite{deFlorian:2016spz} allows a unique relationship based on a minimal set of degrees of freedom:
+\begin{eqnarray}
+  g_1^{WW} &=& g_1^{ZZ} 
+  %+ \frac{\Delta M_W}{M_W}
+  ,    
+  \label{eq:deltaMW}
+  \\
+  g_2^{WW} &=& c_w^2 g_2^{ZZ} + s_w^2 g_2^{\gamma\gamma} + 2 s_w c_w g_2^{Z\gamma},
+  \label{eq:g2WW}
+  \\
+  g_4^{WW} &=& c_w^2 g_4^{ZZ} + s_w^2 g_4^{\gamma\gamma} + 2 s_w c_w g_4^{Z\gamma},
+  \label{eq:g4WW}
+  \\
+  \frac{\kappa_1^{WW}}{(\Lambda_1^{WW})^2} (c_w^2-s_w^2) &=& \frac{\kappa_1^{ZZ}}{(\Lambda_1^{ZZ})^2},
+                                                           +2 s_w^2 \frac{g_2^{\gamma\gamma}-g_2^{ZZ}}{M_Z^2} 
+                                                          +2 \frac{s_w}{c_w} (c_w^2-s_w^2) \frac{g_2^{Z\gamma}}{M_Z^2},
+ \label{eq:kappa1WW}
+  \\
+  \frac{\kappa_2^{Z\gamma}}{(\Lambda_1^{Z\gamma})^2} (c_w^2-s_w^2) &=&  2 s_w c_w \left( \frac{\kappa_1^{ZZ}}{(\Lambda_1^{ZZ})^2} 
+                                                                              + \frac{ g_2^{\gamma\gamma} - g_2^{ZZ}}{M_Z^2}  \right)
+                                                                               +2 (c_w^2-s_w^2) \frac{g_2^{Z\gamma}}{M_Z^2}.
+ \label{eq:kappa2Zgamma}
+ \end{eqnarray}
+
+Automatic relationship of couplings in the EFT approach discussed here is not implemented directly in the generator, 
+but could be obtained with a script following the formulas above. 
+There is a one-to-one correspondence of the couplings used in the generator settings in Eq.~(\ref{eq:HVV}) 
+and the couplings used in the Higgs basis~\cite{deFlorian:2016spz}. 
 
 \section{Installation}
 
@@ -203,6 +323,7 @@ This is the list of command line configurables (also defined in the \verb|README
                        66=EW VVJJ sig., 67=EW VVJJ bkg., 68=EW VVJJ tot.,
                        69=QCD VVJJ bkg.,
                        70=EW VVLL sig., 71=EW VVLL bkg., 72=EW VVLL tot.,
+                       73=gg 4f sig., 74=gg 4f bkg., 75=gg 4f tot.,
                        80=ttH, 90=bbH,
                        110=t+H t channel, 111=tbar+H t channel,
                        112=t+H s channel, 113=tbar+H s channel
@@ -213,6 +334,11 @@ This is the list of command line configurables (also defined in the \verb|README
                          4=W->lnu, 5=W->2q, 6=W->taunu,
                          7=gamma, 8=Z->2l+2tau,
                          9=Z->anything, 10=W->lnu+taunu, 11=W->anything
+                         Exclusive difermion modes other than those with the tau flavor:
+                         The numbers p=(1; 2, 3; 5, 7, 11, 13, 17)
+                         represent f=(nu; e, mu; d, u, s, c, b). In order to have a
+                         V->f1 f2 decay, please specify the decay mode as -p1*p2
+                         for the p1 and p2 that match f1 and f2.
     Interf:            0=neglect interference for 4f final states,
                        1=include interference
     ReweightInterf:    if true, include interference as LHE event weights for
@@ -299,15 +425,20 @@ This is the list of command line configurables (also defined in the \verb|README
     RenScheme:         QCD renormalization scale scheme
     MuRenMultiplier:   Multiplier for the renormalization scale chosen by RenScheme
   Lepton and jet filter:
-    FilterNLept:       For decay mode, reject events that have less than FilterNLept leptons
-    FilterOSPairs:     For decay mode, reject events that have less than FilterOSPairs pairs of
-                       sign leptons of any flavor.
-    FilterOSSFPairs:   For decay mode, reject events that have less than FilterOSSFPairs pairs of
-                       opposite-sign-same-flavor leptons.
-    CountTauAsAny:     For FilterOSSFPairs, taus can stand in place of electrons or muons
+    NLepMin:       Reject events that have less than this many charged leptons
+    NLepMax:       Reject events that have more than this many charged leptons
+    NJetMin:       Reject events that have less than this many jets
+    NJetMax:       Reject events that have more than this many jets
+    NOSMin:       Reject events that have less than this many
+                  opposite-sign pairs of leptons of any flavor
+    NOSMax:       Reject events that have more than this many
+                  opposite-sign pairs of leptons of any flavor
+    NOSSFMin:       Reject events that have less than this many
+                    opposite-sign same-flavor pairs of leptons
+    NOSSFMax:       Reject events that have more than this many
+                    opposite-sign same-flavor pairs of leptons
+    CountTauAsAny:     For OSSF pairs, taus can stand in place of electrons or muons
                        of the same charge.
-    FilterNJets:       For decay mode, reject events that have less than FilterNJets quarks
-                       and/or gluons
     WriteFailedEvents: Write events that fail in the LHE file, but with a weight of 0
                        (off by default)
   Higgs propagator and decay width:
@@ -367,15 +498,15 @@ This is the list of command line configurables (also defined in the \verb|README
 
 Process 51 is a new implementation of VH with matrix elements expressed with the spinor-helicity formalism, including LO $q \bar q \to V \to VH$ (currently in beta), one-loop induced LO $gg \to ZH$, and $q \bar q \to V \to VH$ at NLO (currently in development). The initial state, order of calculation, and diagrams (triangle, box, both, or the interference term between the two, for gg) is set by the parameter \texttt{VH\_PC}, with its options listed above. $\gamma H$, i.e. \texttt{DecayMode1=7}, is not yet implemented for \texttt{Process=51}.
 
-\paragraph{Offshell VBF}
-\label{sec:offshellVBF}
+\paragraph{Off-shell Higgs production}
+\label{sec:offshell}
 
-Processes 66 (signal), 67 (background), and 68 (signal+background+interference) provide an interface to a modified version of MCFM~\cite{Campbell:2010ff} to produce offshell VBF production $VV\to VV$, including all anomalous couplings.  Hadronic $VH$ and the equivalent $VVV$ background topologies are also included.  For these processes, a second spin-zero resonance can be activated by setting \verb|MReso2| and \verb|GaReso2| to nonzero values.  The second resonance's couplings can be set to arbitrary values, similar to the first resonance's.
+Processes 66 (signal), 67 (background), and 68 (signal+background+interference) provide an interface to a modified version of MCFM~\cite{Campbell:2010ff} to produce off-shell EW production $VV\to VV$ in association with two quarks, including all anomalous couplings.  Hadronic $VH$ and the equivalent $VVV$ background topologies are also included. For these processes, a second spin-zero resonance can be activated by setting \verb|MReso2| and \verb|GaReso2| to nonzero values.  The second resonance's couplings can be set to arbitrary values, similar to the first resonance's. These couplings are denoted as \verb|gh2*|.
 
-When producing unweighted VBF offshell events, jobs must be submitted in two steps, with five jobs per step.  Each set of five jobs can be run in parallel, but none of the jobs in the the second set can start until all five jobs of the first set finish.
+When producing unweighted EW off-shell events, jobs must be submitted in two steps, with 164 jobs per step, each job corresponding to a particular mother-associated parton combination.  Each set of jobs can be run in parallel, but none of the jobs in the the second set can start until all jobs in the first set are completed.
 
 \begin{enumerate}
-	\item Grid generation:
+	\item Grid generation (\verb|VBFoffsh=1..164|):
 	\begin{itemize}
 		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=1}
 		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=2}
@@ -383,7 +514,7 @@ When producing unweighted VBF offshell events, jobs must be submitted in two ste
 		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=4}
 		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=5}
 	\end{itemize}
-	\item Event generation, which can only begin after all five previous jobs have ended:
+	\item Event generation, which can only begin after all previous jobs have ended:
 	\begin{itemize}
 		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=1 VegasNc2=10000 ReadCSmax}
 		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=2 VegasNc2=10000 ReadCSmax}
@@ -393,9 +524,13 @@ When producing unweighted VBF offshell events, jobs must be submitted in two ste
 	\end{itemize}
 \end{enumerate}
 
-The final result will be five \texttt{.lhe} files, each containing events from some of the partonic channels.  The number of events in each file will be proportional to the cross section of those channels.  The total number of events in the five files may be larger or smaller than the number of events requested.  If you want the exact number of events, use the same random seed five all five jobs of the second step.
+Similarly, processes 70 (signal), 71 (background), and 72 (signal+background+interference) generate off-shell EW production $VV\to VV$ in association with a $W$ or a $Z$ boson decaying leptonically. The same couplings for processes 66 or 68 can be used for 70 or 72. These processes require 84 partonic channels in the first grid generation step instead of 164. In addition, process 69 implements QCD $4f$ production in association with two partons, but this process only includes the continuum production without Higgs contribution. There are 175 partonic channels associated with this process.
+
+The final result will be as many \texttt{.lhe} files as the number of partonic channels, each containing events from that particular partonic channel.  The number of events in each file will be proportional to the cross section of those channels.  The total number of events in the five files may be larger or smaller than the number of events requested.  If you want the exact number of events, use the same random seed five all five jobs of the second step.
 
 It is also possible to reuse the output of the first step to run more jobs in the second step.  For example, to run 1 million events using 400 jobs, you can run the first step once, then run 100 sets of 4 jobs each, using 100 different random seeds.
+
+The MCFM interface also allows the production of $ZZ/WW\to4f$ (without any other associated particles) through gluon fusion with infinite- or finite-mass quarks in the $ggH$ interaction. The corresponding processes are 73 (signal), 74 (background), and 75 (signal+background+interference). Only a single partonic channel, $gg$, is relevant for this process. The second resonance parameters can be used in this process as well. In addition, the $ggH$ vertex can be modified via \verb|gh*g*| or \verb|gh*g*_4gen| for two separate couplings per resonance for point-like $ggH$ interactions, or \verb|kappa*_*_top| and \verb|kappa*_*_bot|, or \verb|kappa*_tilde*_4gen_top| and \verb|kappa*_tilde*_4gen_bot| for a third-generation top and a bottom quark, or a fourth-generation top or bottom quark in the loop, respectively, again separately implemented for each resonance. For the fourth-generation interactions, the corresponding masses \verb|m_top_4gen| and \verb|m_bot_4gen| need to be set and are common to both resonances. The masses modifying the third generation quark loops are \verb|m_top| and \verb|m_bot|.
 
 \subsubsection{Resonance parameters}
 \begin{itemize}
@@ -403,8 +538,9 @@ It is also possible to reuse the output of the first step to run more jobs in th
 \end{itemize}
 \subsubsection{Cuts}
 \begin{itemize}
-\item \verb|pTjetcut|, \verb|deltaRcut|, \verb|mJJcut| All three cuts are used in processes 60 (VBF), 61 ($H+jj$), 90 ($bbH$), and also 80 ($ttH$) if \verb|m_Top| is set to be light ($<10 \text{GeV}$).  In addition, \verb|pTjetcut| is used in process 62 ($H+j$) and also processes 110--113 ($t/\bar{t}+H$) if \verb|m_Top| is light.
-\item \verb|MPhotonCutoff| If the decay is to $ZZ$ and any of the couplings to photons (\verb|ghzgsX| or \verb|ghgsgsX|) is set, the $\gamma^*$ contribution will be included along with the $Z$'s.  Similarly, if the decay is to $Z\gamma$ and any of the \verb|ghgsgsX| couplings are set, the $\gamma\gamma^*$ contribution will be included as well.  In this case, a lower cut on the photon invariant mass has to be placed in order to avoid the collinear singularity.  This can be set using MPhotonCutoff.
+\item \verb|pTjetcut|, \verb|etajetcut|, \verb|deltaRcut|, \verb|mJJcut| All of these cuts are used in processes 60 (VBF), 61 ($H+jj$), 90 ($bbH$), 66-75 (off-shell), and also 80 ($ttH$) if \verb|m_Top| is set to be light ($<10 \text{GeV}$).  In addition, \verb|pTjetcut| is used in process 62 ($H+j$) and also processes 110--113 ($t/\bar{t}+H$) if \verb|m_Top| is light.
+\item \verb|pTlepcut|, \verb|etalepcut| similarly adjust the $p_T$ or $|\eta|$ of leptons.
+\item \verb|MPhotonCutoff| If the decay is to $ZZ$ and any of the couplings to photons (\verb|ghzgsX| or \verb|ghgsgsX|, or continuum amplitudes with virtual photons) is set, the $\gamma^*$ contribution will be included along with the $Z$'s.  Similarly, if the decay is to $Z\gamma$ and any of the \verb|ghgsgsX| couplings are set, the $\gamma\gamma^*$ contribution will be included as well.  In this case, a lower cut on the photon invariant mass has to be placed in order to avoid the collinear singularity.  This can be set using MPhotonCutoff.
 \item \verb|pTjetcut|, \verb|etajetcut|, \verb|detajetcut|, \verb|deltaRcut|, \verb|mJJcut|, \verb|m4l_min|, \verb|m4l_max|, \verb|m2l_min|, \verb|m2l_max|, \verb|mVH_min|, \verb|mVH_max|, \verb|pTlepcut|, \verb|etalepcut|, and \verb|pTHcut| are available for Process 51. The default values are set such that there is no cuts.
 \end{itemize}
 \subsubsection{Renormalization and factorization scales}
@@ -427,8 +563,8 @@ It is also possible to reuse the output of the first step to run more jobs in th
 \end{itemize}
 \subsubsection{Lepton and jet filter}
 \begin{itemize}
-\item Any combination of \verb|FilterNLept|, \verb|FilterOSPairs|, \verb|FilterOSSFPairs| can be used in ReadLHE mode to filter the events.  \verb|CountTauAsAny|, off by default, counts each tau as an electron or muon of the same sign towards an OSSF pair.
-\item \verb|FilterNJets| can be used alone or in conjunction with the lepton filter (e.g. request two leptons and a jet).  It counts each final state quark or gluon as a jet.
+\item Any combination of \verb|NLepMin/Max|, \verb|NOSMin/Max|, \verb|NOSSFMin/Max| can be used in ReadLHE mode to filter the events.  \verb|CountTauAsAny|, off by default, counts each tau as an electron or muon of the same sign towards an OSSF pair.
+\item \verb|NJetMin/Max| can be used alone or in conjunction with the lepton filter (e.g. request two leptons and a jet).  It counts each final state quark or gluon as a jet.
 \item \verb|WriteFailedEvents|: By default, events that fail the lepton filter are not written to the LHE file.  If this option is set to 1, they are written, but their weight is set to 0.  If it is set to 2, they are written with a weight of zero and with no particles in the event (this saves disk space with  and is accepted by Pythia, but some parsers may not like it).  This option is useful if the same number of events are required to be in the input and the output.
 \end{itemize}
 \subsubsection{Higgs propagator and decay width}
@@ -465,7 +601,7 @@ The general syntax is:
 \item \verb|ghgX|, \verb|ghzX|, \verb|ghzX_primeY|, \verb|cz_qXsq|, \verb|Lambda_zXY|, \verb|ghwX|, \verb|ghwX_primeY|, \verb|cw_qXsq|, \verb|Lambda_wXY|, \verb|ghzgsX|, \verb|ghzgs1_prime2|, and \verb|ghgsgsX| for spin 0 $HVV$ couplings (see the list for the ranges of X and Y)
 \item \verb|zprime_qq_left|, \verb|zprime_qq_right|, \verb|zprime_zz_1|, and \verb|zprime_zz_2| for spin 1
 \item \verb|aX|, \verb|bX|, \verb|graviton_qq_left|, \verb|and graviton_qq_right| for spin 2 (see the list for the range of X)
-\item The $Hff$ couplings \verb|kappa| and \verb|kappa_tilde|
+\item The $Hff$ couplings \verb|kappa| and \verb|kappa_tilde| and variants
 \end{itemize}
 Except for the form factors (\verb|cz_qXsq|, \verb|Lambda_zXY|, and their $WW$ equivalents), the couplings are complex, and must be set with a comma between the real and imaginary parts.  For example:
 \begin{verbatim}
@@ -473,11 +609,12 @@ ghz1=0,0 ghz4=1,0
 \end{verbatim}
 If an anomalous coupling is turned on, the default coupling in the same category must also be specified to leave it on or turn it off.  For example, if \verb|ghz4| is specified, \verb|ghz1| must either be set to \verb|0,0| to generate a pure pseudoscalar or to some other value to generate a $CP$-violating mixture.
 In the weak vector boson fusion process (VBF) we also allow for different $ZZH$ and $WWH$ couplings.  Per default, they are assumed to be equal, set by the $Z$ couplings; however, if any of the $W$ couplings are set, they will be used instead for $WWH$ fusion.  $WWH$ can be turned off entirely by explicitly setting one of them to \verb|0,0|.
+For the $Hff$ couplings, one can also specify \verb|kappa_top| or \verb|kappa_tilde_top| for the processes that involve $Htt$ coupling, and \verb|kappa_bot| or \verb|kappa_tilde_bot| for the processes that involve $Hbb$ coupling. Setting \verb|kappa| and \verb|kappa_tilde| instead of these sets of couplings sets all relevant $Hff$ couplings to the same value.
 \end{itemize}
 \paragraph{Spin-0 parameters}
 \label{spin0}
 The \verb|ghg*| parameters control the coupling of a spin-0 resonance to gluons in the production mechanism.
-In practice, the production parameters do not have a large effect since angular corrections from the production mechanism are lost for spinless particles.
+In practice, the production parameters do not have a large effect on Higgs decay since angular corrections from the production mechanism are lost for spinless particles.
 The \verb|ghz*| parameters control the decay into $Z$ and $W$ bosons.
 These spin-0 couplings are described in Eq.(9) from Ref.~\cite{Bolognesi:2012}, and can be set from the command line.
 We allow for $q^2$ dependent form factors similar to those described in Ref.~\cite{Anderson:2013}:
@@ -504,7 +641,7 @@ complex(8), public :: ghg2 = (1.0d0,0d0)
 complex(8), public :: ghg3 = (0.0d0,0d0)
 complex(8), public :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
 
-complex(8), public :: ghz1 = (2.0d0,0d0)
+complex(8), public :: ghz1 = (2.0d0,0d0)   ! =1 for off-shell processes in SM
 complex(8), public :: ghz2 = (0.0d0,0d0)
 complex(8), public :: ghz3 = (0.0d0,0d0)
 complex(8), public :: ghz4 = (0.0d0,0d0)   ! pseudoscalar
@@ -638,7 +775,7 @@ The couplings between $V^\prime$ and fermions are set by
 
 The $W^\prime$ equivalent of the CKM matrix is assumed to be diagonal.
 
-By default, $Z^\prime$ and $W^\prime$ are assumed to have infinite mass.  Under these conditions, setting \verb|ghzzp1| and  some of the $V^\prime ff$ couplings to nonzero values is equivalent to the contact terms described in \cite{Gonzalez-Alonso:2014eva}.  $Z^\prime$ ($W^\prime$) can also be given finite mass by setting its mass \verb|MZprime| (\verb|MWprime|) and width \verb|GaZprime| (\verb|GaWprime|) on the command line.
+By default, $Z^\prime$ and $W^\prime$ are assumed to have infinite mass.  Under these conditions, setting \verb|ghzzp1| and  some of the $V^\prime ff$ couplings to nonzero values is equivalent to the contact terms described in \cite{Gonzalez-Alonso:2014eva}.  $Z^\prime$ ($W^\prime$) can also be given finite mass by setting its mass \verb|MZprime| (\verb|MWprime|) and width \verb|GaZprime| (\verb|GaWprime|) on the command line. The lifetime of the $V^\prime$ is determined by the \verb|ctauVprime| option in units of milimeters. For cases where only the $V^\prime V^\prime$ couplings are set in the processes 0, 1, 2, 50 and 51, a nonzero decay length is recorded for all such $V^\prime$ difermion pairs. In all other cases, the factor \verb|VprimeDecayLengthMassCutoffFactor| controls the extent of the invariant mass of the difermion pair in units of $\Gamma_{V^\prime}$ in order to record a nonzero decay length; a value less than or equal to $0$ for this factor assigns a decay length to all $V^\prime$ difermion pairs with a default value of $10$.
 
 \paragraph{Spin-1 parameters}
 \label{spin1}
@@ -855,13 +992,17 @@ Since text processing is simple in Python, the Python MELA interface is especial
 
 \section{Release notes}
 \noindent
-In going from \verb|v7.2.4| to \verb|v7.2.7| (January 31, 2018), the updates are as follows:
+In going to \verb|v7.3.0| (April 28, 2019), the updates are as follows:
+\begin{itemize}
+\item Faster option for generating interference in \(4\ell\) final states in offshell VBF production, 164 jobs per step.
+\end{itemize}
+\noindent
+In going from \verb|v7.2.4| to \verb|v7.2.7| (January 31, 2019), the updates are as follows:
 \begin{itemize}
 \item $gg\to ZH$ with anomalous couplings using Process 51, using the same syntax as for other processes.
 \item Faster option for generating interference in \(4\ell\) final states in offshell VBF production.
 \item Additional options for the renormalization and factorization scales in JHUGen and MELA.
 \end{itemize}
-
 \noindent
 In going from \verb|v7.1.4| to \verb|v7.2.4| (November 15, 2018), the updates are as follows:
 \begin{itemize}
@@ -1114,6 +1255,10 @@ See webpage: \url{http://spin.pha.jhu.edu}
   Nucl.\ Phys.\ Proc.\ Suppl.\  {\bf 205-206}, 10 (2010)
   [arXiv:1007.3492 [hep-ph]].
   See also http://mcfm.fnal.gov
+\bibitem{deFlorian:2016spz}
+``Handbook of LHC Higgs Cross Sections: 4. Deciphering the Nature of the Higgs Sector,''
+CERN Yellow Report 10.23731/CYRM-2017-002.
+[arXiv:1610.07922 [hep-ph]].
 \bibitem{Goria:2011wa}
   S.~Goria, G.~Passarino and D.~Rosco,
   ``The Higgs-boson lineshape,''

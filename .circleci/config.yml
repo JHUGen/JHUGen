@@ -8,9 +8,9 @@ env: &env
         LD_LIBRARY_PATH: "/home/cmsbld/JHUGen/JHUGenMELA/MELA/data/slc6_amd64_gcc630"
         PYTHONPATH: "/home/cmsbld/JHUGen/JHUGenMELA/MELA/python"
 
-        REFERENCE_LHES_USERNAME: "hroskes"
-        REFERENCE_LHES_BUILD_NUMBER: "2772"  #note this has to be the build number of generator_reference
-        REFERENCE_JHUGEN_VERSION: "v7.3.0"
+        REFERENCE_LHES_USERNAME: "JHUGen"
+        REFERENCE_LHES_BUILD_NUMBER: "1677"  #note this has to be the build number of generator_reference
+        REFERENCE_JHUGEN_VERSION: "v7.3.7"
 
         REFERENCE_COUPLINGS_SPIN0: "ghg2=0.383432074687728,0.918260989345657 ghg3=6294.49296087723,2253.12941717723 ghg4=0.335495485382528,0.17285803562226 ghz1=0.154934976270359,0.453918144016304 ghz2=0.469297059144414,0.745302300947002 ghz3=3947.40921062637,3597.4885961919 ghz4=0.177791270766536,0.920170534486048 ghzgs2=0.0240331049939919,0.232175381101053 ghzgs3=0.331962910170583,0.0450183240308457 ghzgs4=0.808286540247172,0.133184346613754 ghgsgs2=0.530394804029869,0.211218112389125 ghgsgs3=0.914978695198138,0.055650585081425 ghgsgs4=0.694524307167701,0.511424456076726 ghz1_prime=0.143354267833606,0.0910761280837012 ghz1_prime2=7416.7007267243,4861.35525489789 ghz1_prime3=4431.44656075298,4436.48625894176 ghz1_prime4=2441.69123517064,6946.16318931911 ghz1_prime5=78314042.889773,69465359.939181 ghz1_prime6=51233058.8130761,29537873.5850789 ghz1_prime7=47832192.9001564,59559649.9633293 ghz2_prime=0.574657934630028,0.419921909647711 ghz2_prime2=4385.45874563721,6176.12459852571 ghz2_prime3=4592.16963616924,7549.93910627412 ghz2_prime4=8471.59059254828,7199.72377618203 ghz2_prime5=19558280.2853878,94843889.2606103 ghz2_prime6=23209661.2997162,67617823.213967 ghz2_prime7=7005990.36881107,53660190.8462267 ghz3_prime=4045.70652084481,1969.31611860658 ghz3_prime2=33402456.1975735,3761591.91683341 ghz3_prime3=44855079.5072533,12184926.2142809 ghz3_prime4=27878602.2354225,78237523.9345265 ghz3_prime5=932464343314.011,631580849953.887 ghz3_prime6=358115623918.415,410777463003.642 ghz3_prime7=622981476674.746,618278567362.628 ghz4_prime=0.416533954328515,0.331155934531404 ghz4_prime2=7588.37556838387,3923.43274304607 ghz4_prime3=8956.07552332742,9302.03148380015 ghz4_prime4=3203.44114317821,2863.76747251504 ghz4_prime5=49012574.439022,74595800.8833662 ghz4_prime6=73323809.5808115,53968832.1189929 ghz4_prime7=68563876.4508939,43025213.6236445 ghzgs1_prime2=5668.9642840505,7017.67588606661 kappa=0.689310602032707,0.649791728597345 kappa_tilde=0.202059494758542,0.398401745337368 cz_q1sq=1 cz_q2sq=1 cz_q12sq=-1 Lambda_z11=138.878490490027 Lambda_z21=154.519403407032 Lambda_z31=119.983302253928 Lambda_z41=181.363668458552 Lambda_z12=136.665079759304 Lambda_z22=166.590821204599 Lambda_z32=138.840555064043 Lambda_z42=49.0635744690497 Lambda_z10=9.69729610745373 Lambda_z20=193.257456475821 Lambda_z30=89.2044521747102 Lambda_z40=161.673304321983"
         REFERENCE_COUPLINGS_SPIN1: "zprime_qq_left=0.159847991225521,0.324512374690709 zprime_qq_right=0.514696145793129,0.150317974674483 zprime_zz_1=0.4084476008646,0.289302928999951 zprime_zz_2=0.328820833481286,0.910335641048151"
@@ -25,7 +25,7 @@ env: &env
 
         SEED: "765543533"
 
-        REFERENCE_FILENAMES: "ggH_ZZ.lhe ggH_WW.lhe ggH_Zgamma.lhe ggH_gammagamma.lhe ggH_ZZ_contact.lhe ggH_ZZ_Zprime.lhe spin1_ZZ.lhe spin1_WW.lhe gg_spin2_ZZ.lhe qq_spin2_WW.lhe gg_spin2_Zgamma.lhe qq_spin2_gammagamma.lhe ZH_bb.lhe WH_Zgamma.lhe ee_gammaH_bb.lhe VBF_ZZ.lhe HJJ_WW.lhe HJ_gammagamma.lhe ttH_tautau.lhe gg_bbH_tautau.lhe qq_bbH.lhe tqH_110.lhe tqH_111.lhe tqH_112.lhe tqH_113.lhe tqH_114.lhe gg_ZH_llbb.lhe ee_ZH_llbb.lhe qq_ZH_llbb.lhe VBFoffshell_66.lhe"
+        REFERENCE_FILENAMES: "ggH_ZZ.lhe ggH_WW.lhe ggH_Zgamma.lhe ggH_gammagamma.lhe ggH_ZZ_contact.lhe ggH_ZZ_Zprime.lhe spin1_ZZ.lhe spin1_WW.lhe gg_spin2_ZZ.lhe qq_spin2_WW.lhe gg_spin2_Zgamma.lhe qq_spin2_gammagamma.lhe ZH_bb.lhe WH_Zgamma.lhe ee_gammaH_bb.lhe VBF_ZZ.lhe HJJ_WW.lhe HJ_gammagamma.lhe ttH_tautau.lhe gg_bbH_tautau.lhe qq_bbH.lhe tqH_110.lhe tqH_111.lhe tqH_112.lhe tqH_113.lhe tqH_114.lhe gg_ZH_llbb.lhe ee_ZH_llbb.lhe qq_ZH_llbb.lhe VBFoffshell_69.lhe"
         REFERENCE_FILENAME_GGH: "ggH_ZZ.lhe"
         REFERENCE_FILENAME_VBF: "VBF_ZZ.lhe"
         REFERENCE_FILENAME_HJJ: "HJJ_WW.lhe"
@@ -97,17 +97,18 @@ jobs:
       - persist_to_workspace:
           root: ~/JHUGen
           paths:
-            - .circleci
-            - .git
-            - AnalyticMELA
-            - JHUGenerator
-            - JHUGenMELA
-            - lib
-            - MCFM-JHUGen
-            - Manual
-            - README.md
-            - VH_NLO
-            - Web
+           - .circleci
+           - .git
+           - .gitignore
+           - AnalyticMELA
+           - JHUGenerator
+           - JHUGenMELA
+           - lib
+           - MCFM-JHUGen
+           - Manual
+           - README.md
+           - VH_NLO
+           - Web
 
   build:
     <<: *env
@@ -268,13 +269,17 @@ jobs:
           name: VBF offshell grids
           command: |
             if ! $DOREFERENCE ; then exit 0; fi
-            mkdir -p VBFoffshell_66/
-            ./JHUGen.py Seed=$SEED Process=66 DecayMode1=0 DecayMode2=0 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=compare_to_reference/VBFoffshell_66.lhe CSmaxFile=VBFoffshell_66/output
+            for igrid in {69..69}; do
+              mkdir -p VBFoffshell_${igrid}/
+              ./JHUGen.py Seed=$SEED Process=${igrid} DecayMode1=0 DecayMode2=0 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=compare_to_reference/VBFoffshell_${igrid}.lhe CSmaxFile=VBFoffshell_${igrid}/output
+            done
       - run:
           name: VBF offshell
           command: |
             if ! $DOREFERENCE ; then exit 0; fi
-            ./JHUGen.py Seed=$SEED Process=66 DecayMode1=0 DecayMode2=0                PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=compare_to_reference/VBFoffshell_66.lhe CSmaxFile=VBFoffshell_66/output ReadCSmax VegasNc2=10
+            for igrid in {69..69}; do
+              ./JHUGen.py Seed=$SEED Process=${igrid} DecayMode1=0 DecayMode2=0                PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=compare_to_reference/VBFoffshell_${igrid}.lhe CSmaxFile=VBFoffshell_${igrid}/output ReadCSmax VegasNc2=10
+            done
           no_output_timeout: 1h
 
       #now compare to reference
@@ -451,28 +456,50 @@ jobs:
       - run: "! $DOSYNTAX || grep -q 'Interference: F' $LHEDIR/tbarH_t_ZZ.lhe"
 
       - restore_cache:
-          key: v9-VBF-offshell-grids-66-syntax
+          key: v10-VBF-offshell-grids-66-72-syntax
       - run:
           name: VBF offshell grids
           command: |
             if ! $DOSYNTAX ; then exit 0; fi
-            mkdir -p VBFoffshell_66/
-            for i in {001..164}; do
-              if ! [ -e VBFoffshell_66/output_${i}_step2.grid ]; then
-                ./JHUGen.py Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=66 DecayMode1=8 DecayMode2=8 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=$LHEDIR/VBFoffshell_66.lhe CSmaxFile=VBFoffshell_66/output
-                break
-              fi
+            #for igrid in {66..69}; do
+            for igrid in {69..69}; do
+              mkdir -p VBFoffshell_${igrid}/
+              for i in {001..164}; do
+                if ! [ -e VBFoffshell_${igrid}/output_${i}_step2.grid ]; then
+                  ./JHUGen.py Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=${igrid} DecayMode1=8 DecayMode2=8 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=$LHEDIR/VBFoffshell_${igrid}.lhe CSmaxFile=VBFoffshell_${igrid}/output
+                  break
+                fi
+              done
             done
+            #mkdir -p VBFoffshell_69/
+            #for i in {001..175}; do
+            #  if ! [ -e VBFoffshell_69/output_${i}_step2.grid ]; then
+            #    ./JHUGen.py Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=${igrid} DecayMode1=8 DecayMode2=8 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=$LHEDIR/VBFoffshell_69.lhe CSmaxFile=VBFoffshell_69/output
+            #    break
+            #  fi
+            #done
+            #for igrid in {70..72}; do
+            #  mkdir -p VBFoffshell_${igrid}/
+            #  for i in {001..084}; do
+            #    if ! [ -e VBFoffshell_${igrid}/output_${i}_step2.grid ]; then
+            #      ./JHUGen.py Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=${igrid} DecayMode1=8 DecayMode2=8 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=$LHEDIR/VBFoffshell_${igrid}.lhe CSmaxFile=VBFoffshell_${igrid}/output
+            #      break
+            #    fi
+            #  done
+            #done
       - save_cache:
-          key: v9-VBF-offshell-grids-66-syntax
+          key: v10-VBF-offshell-grids-66-72-syntax
           paths:
-            - ~/JHUGen/JHUGenerator/VBFoffshell_66/
+            - ~/JHUGen/JHUGenerator/VBFoffshell_69/
       - run:
           name: VBF offshell
           command: |
             if ! $DOSYNTAX ; then exit 0; fi
-            ./JHUGen.py Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=66 DecayMode1=8 DecayMode2=8 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=$LHEDIR/VBFoffshell_66.lhe CSmaxFile=VBFoffshell_66/output ReadCSmax VegasNc2=10
-          no_output_timeout: 1h
+            #for igrid in {66..72}; do
+            for igrid in {69..69}; do
+              ./JHUGen.py Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=${igrid} DecayMode1=8 DecayMode2=8 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=$LHEDIR/VBFoffshell_${igrid}.lhe CSmaxFile=VBFoffshell_${igrid}/output ReadCSmax VegasNc2=10
+            done
+          no_output_timeout: 2h
 
       - run:
           name: checklhe
@@ -481,7 +508,7 @@ jobs:
               echo "The generator is unchanged from $(cat no-need-for-generator-syntax) when the last syntax test was done."
               exit 0
             fi
-            ../.circleci/checklhe/checklhe.py $(find $LHEDIR -name *.lhe) | tee checklheoutput.txt
+            ../.circleci/checklhe/checklhe.py $(find $LHEDIR -name *.lhe) |& tee checklheoutput.txt
             ! grep -q '!' checklheoutput.txt
           when: always
       - store_artifacts:
@@ -916,10 +943,12 @@ jobs:
           when: always
           command: |
             exitstatus=0
-            for a in $(grep -i 'call *ReadCommandLineArgument' JHUGenerator/main.F90 | grep -v '!undocumented' | sed -r 's/.*"(.*)".*/\1/'); do
+            for a in $(grep -i 'call *ReadCommandLineArgument' JHUGenerator/main.F90 | grep -v '!undocumented' | grep -v 4gen | sed -r 's/.*"(.*)".*/\1/'); do
               if ! grep -q $a Manual/manJHUGenerator.tex &&
                  ! grep -q ${a/w/z} Manual/manJHUGenerator.tex &&      #ghw*, etc. are mentioned collectively
                  ! grep -q ${a/2z/z} Manual/manJHUGenerator.tex &&     #second resonance couplings are too
+                 ! grep -q ${a/gh2/gh} Manual/manJHUGenerator.tex &&   #second resonance couplings, gh2*
+                 ! grep -q ${a/kappa2/kappa} Manual/manJHUGenerator.tex &&     #second resonance couplings, kappa2*
                  ! grep -q ${a/zzp/z} Manual/manJHUGenerator.tex &&    #same for contact terms
                  ! grep -q ${a/zpzp/z} Manual/manJHUGenerator.tex &&   #same for contact terms
                  ! grep -q ${a/zpgs/zgs} Manual/manJHUGenerator.tex && #same for contact terms

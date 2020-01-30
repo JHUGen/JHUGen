@@ -80,7 +80,6 @@ complex(8)             :: MinkowskyProductRC
                       - p1(4)*p2(4)
 END FUNCTION MinkowskyProductRC
 
-
 FUNCTION MinkowskyProductCR(p1,p2)
 implicit none
 real(8),    intent(in) :: p2(1:4)
@@ -92,6 +91,19 @@ complex(8)             :: MinkowskyProductCR
                       - p1(3)*p2(3)  &
                       - p1(4)*p2(4)
 END FUNCTION MinkowskyProductCR
+
+
+function LogicalToInteger(var)
+implicit none
+logical :: var
+integer :: LogicalToInteger
+   if (var) then
+      LogicalToInteger = 1
+   else
+      LogicalToInteger = 0
+   endif
+end function
+
 
 double complex function et1(e1,e2,e3,e4)
 implicit none
@@ -1170,9 +1182,22 @@ real(8), intent(in) :: XSecArray(-5:5,-5:5)
 integer(8), intent(out) :: NumberOfSeats(-5:5,-5:5)
 
   NumberOfSeats(:,:) = 0
+  if (TotalNumberOfSeats.lt.1) return
 
-  totalxsec = sum(XSecArray(:,:))
-  CrossSecNormalized = XSecArray / totalxsec
+  do i=-5,5
+    do j=-5,5
+      totalxsec = totalxsec+abs(XSecArray(i,j))
+    enddo
+  enddo
+  if (totalxsec.eq.0d0) then
+    print *,"HouseOfRepresentatives: Total xsec is 0. Aborting..."
+    stop 1
+  endif
+  do i=-5,5
+    do j=-5,5
+      CrossSecNormalized(i,j) = abs(XSecArray(i,j)) / totalxsec
+    enddo
+  enddo
 
   do n=1,TotalNumberOfSeats
     do while(.true.)
@@ -1187,13 +1212,13 @@ integer(8), intent(out) :: NumberOfSeats(-5:5,-5:5)
         enddo
       enddo
       !in case a rounding error causes sum(CrossSecNormalized) != 1
-      print *, "Warning: rounding error, try again"
+      print *, "HouseOfRepresentatives: Warning, rounding error, try again"
     enddo
 99  continue
   enddo
 
   if (sum(NumberOfSeats(:,:)).ne.TotalNumberOfSeats) then
-    print *, "Wrong total number of events, shouldn't be able to happen"
+    print *, "HouseOfRepresentatives: Wrong total number of events, shouldn't be able to happen"
     stop 1
   endif
 end subroutine
@@ -1206,33 +1231,43 @@ subroutine HouseOfRepresentatives2(XSecArray, NumberOfSeats, TotalNumberOfSeats)
 implicit none
 real(8), intent(in) :: XSecArray(:)
 real(8) :: totalxsec, CrossSecNormalized(size(XSecArray)), yRnd
-integer :: n,i
+integer :: n,i,nchannels
 integer, intent(in) :: TotalNumberOfSeats
 integer(8), intent(out) :: NumberOfSeats(:)
 
   NumberOfSeats(:) = 0
+  if (TotalNumberOfSeats.lt.1) return
 
-  totalxsec = sum(XSecArray(:))
-  CrossSecNormalized = XSecArray / totalxsec
+  nchannels = size(XSecArray)
+
+  do i=1,nchannels
+    totalxsec = totalxsec+abs(XSecArray(i))
+  enddo
+  if (totalxsec.eq.0d0) then
+    print *,"HouseOfRepresentatives2: Total xsec is 0. Aborting..."
+    stop 1
+  endif
+  do i=1,nchannels
+    CrossSecNormalized(i) = abs(XSecArray(i)) / totalxsec
+  enddo
 
   do n=1,TotalNumberOfSeats
     do while(.true.)
       call random_number(yRnd)
-      do i=1,size(XSecArray)
+      do i=1,nchannels
           if (yRnd .lt. CrossSecNormalized(i)) then
             NumberOfSeats(i) = NumberOfSeats(i)+1
             goto 99
           endif
           yRnd = yRnd - CrossSecNormalized(i)
       enddo
-      !in case a rounding error causes sum(CrossSecNormalized) != 1
-      print *, "Warning: rounding error, try again"
+      print *, "HouseOfRepresentatives2: Warning, rounding error, try again"
     enddo
 99  continue
   enddo
 
   if (sum(NumberOfSeats(:)).ne.TotalNumberOfSeats) then
-    print *, "Wrong total number of events, shouldn't be able to happen"
+    print *, "HouseOfRepresentatives2: Wrong total number of events, shouldn't be able to happen"
     stop 1
   endif
 end subroutine
@@ -1531,6 +1566,7 @@ function CalculatesXsec(Process)
   implicit none
   integer :: Process
   logical :: CalculatesXsec
+  CalculatesXsec=.false.
   if (Process.le.2) then
     CalculatesXsec=.true.
   elseif (Process.eq.50) then
@@ -1543,14 +1579,14 @@ function CalculatesXsec(Process)
     CalculatesXsec=.true.
   elseif (Process.eq.62) then
     CalculatesXsec=.false.
-  elseif (Process.ge.66 .and. Process.le.72) then
+  elseif (Process.ge.66 .and. Process.le.75) then
     CalculatesXsec=.true.
   elseif (Process.eq.80 .or. Process.eq.90) then
     CalculatesXsec=.false.
   elseif (Process.ge.110 .and. Process.le.114) then
     CalculatesXsec=.true.
   else
-    print *, "Unknown process in CalculatesXsec", process
+    print *, "Unknown process in CalculatesXsec", process, "; setting CalculatesXsec=false."
   endif
 end function CalculatesXsec
 

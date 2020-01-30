@@ -19,7 +19,7 @@ ZZMatrixElement::ZZMatrixElement(
   processVerbosity(verbosity),
   processLeptonInterference(TVar::DefaultLeptonInterf),
   EBEAM(ebeam),
-  Xcal2(pathtoHiggsCSandWidth, ebeam, pathtoPDFSet, PDFMember, verbosity),
+  Xcal2(pathtoHiggsCSandWidth, EBEAM, pathtoPDFSet, PDFMember, verbosity),
   melaCand(0)
 {
   if (processVerbosity>=TVar::DEBUG) MELAout << "Begin ZZMatrixElement constructor" << endl;

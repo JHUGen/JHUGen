@@ -121,6 +121,7 @@ c--- read-in grid if necessary
          i=i+1
          dr=dr-rc
          xin(i)=xn-(xn-xo)*dr
+         !write(6,*) "xin(",i,")=",xin(i)
          if(i.lt.ndm)go to 5
          do 6 i=1,ndm
  6       xi(i,j)=xin(i)
@@ -208,20 +209,31 @@ c
         tsi=tsi*dv2g
         ti2=ti*ti
 88     format(1x,'tsi',g14.6)
-        wgt=ti2/tsi
+        if (tsi.ne.0d0) wgt=ti2/tsi
+        else wgt=0d0
         si=si+ti*wgt
         si2=si2+ti2
         swgt=swgt+wgt
         schi=schi+ti2*wgt
 995    FORMAT(1X,'SWGT',G14.6,'SI2',G14.6)
-        avgi=si/swgt
-        sd=swgt*dble(it)/si2
-        chi2a=sd*(schi/swgt-avgi*avgi)/(dble(it)-.999d0)
-        sd=dsqrt(one/sd)
+        if (swgt.ne.0d0) avgi=si/swgt
+        else avgi=0d0
+        if (si2.ne.0d0) sd=swgt*dble(it)/si2
+        else sd=0d0
+        if (swgt.gt.0d0) then
+          chi2a=sd*(schi/swgt-avgi*avgi)/(dble(it)-.999d0)
+        else
+          chi2a=0d0
+        endif
+        if (sd.gt.0d0) then
+          sd=dsqrt(one/sd)
+        else
+          sd=0d0
+        endif
 c
         tsi=dsqrt(tsi)
 c        write(6,201)it,ti,tsi,avgi,sd,chi2a
-        if (nprn .gt. 0) write(6,201)it,ti,avgi,tsi,sd,wtmin,wtmax,chi2a
+        if (nprn.gt.0) write(6,201)it,ti,avgi,tsi,sd,wtmin,wtmax,chi2a
         wtmin=1d14
         wtmax=-1d14
         !write(15,201)it,ti,avgi,tsi,sd,wtmax,chi2a
@@ -295,7 +307,7 @@ c
  26     if(rc.gt.dr)go to 25
         i=i+1
         dr=dr-rc
-        xin(i)=xn-(xn-xo)*dr/r(k)
+        if (r(k).ne.0d0) xin(i)=xn-(xn-xo)*dr/r(k)
         if(i.lt.ndm)go to 26
         do 27 i=1,ndm
  27     xi(i,j)=xin(i)

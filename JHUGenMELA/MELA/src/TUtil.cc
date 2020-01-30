@@ -3294,11 +3294,15 @@ bool TUtil::MCFM_smalls(double s[][mxpart], int npart){
 }
 
 
-void TUtil::InitJHUGenMELA(const char* pathtoPDFSet, int PDFMember){
+void TUtil::InitJHUGenMELA(const char* pathtoPDFSet, int PDFMember, double collider_sqrts){
+  const double GeV = 1./100.;
+  collider_sqrts *= GeV; // GeV units in JHUGen
+
   char path_pdf_c[200];
   sprintf(path_pdf_c, "%s", pathtoPDFSet);
   int pathpdfLength = strlen(path_pdf_c);
-  __modjhugen_MOD_initfirsttime(path_pdf_c, &pathpdfLength, &PDFMember);
+
+  __modjhugen_MOD_initfirsttime(path_pdf_c, &pathpdfLength, &PDFMember, &collider_sqrts);
 }
 void TUtil::SetJHUGenHiggsMassWidth(double MReso, double GaReso){
   const double GeV = 1./100.;
@@ -4987,8 +4991,7 @@ double TUtil::JHUGenMatEl(
     << aL1 << ", " << aR1 << ", " << aL2 << ", " << aR2
     << endl;
 
-  // This constant is needed to account for the different units used in
-  // JHUGen compared to the MCFM
+  // This constant is needed to account for the different units used in JHUGen compared to MCFM
   int GeVexponent_MEsq = 4-((int)mela_event.pDaughters.size())*2;
   if (production == TVar::ZZINDEPENDENT) GeVexponent_MEsq += 2; // Amplitude missing m from production and 1/m**2 from propagator == Amplitude missing 1/m == MEsq missing 1/m**2
   double constant = pow(GeV, -GeVexponent_MEsq);

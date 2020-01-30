@@ -3,7 +3,7 @@ implicit none
 save
 !
 !
-character(len=*),parameter :: JHUGen_Version="v7.3.0"
+character(len=*),parameter :: JHUGen_Version="v7.3.7"
 !
 !
 !=====================================================
@@ -20,7 +20,11 @@ real(8), public :: Collider_Energy
 integer, public :: FacScheme,RenScheme
 real(8), public :: MuFacMultiplier,MuRenMultiplier
 integer, public :: VegasIt1_default,VegasNc0_default,VegasNc1_default,VegasNc2_default
-integer, public :: NumHistograms,RequestNLeptons,RequestOS,RequestOSSF,RequestNJets
+integer, public :: NumHistograms
+integer, public :: RequestNLeptons(1:2) = -1
+integer, public :: RequestNJets(1:2) = -1
+integer, public :: RequestOS(1:2) = -1
+integer, public :: RequestOSSF(1:2) = -1
 logical, public :: Unweighted,OffShellReson,OffShellV1,OffShellV2,ReadLHEFile,ConvertLHEFile,DoPrintPMZZ
 logical, public :: ReadCSmax,GenerateEvents,CountTauAsAny,HasLeptonFilter, FoundHiggsMass, FoundHiggsWidth
 integer, public :: WriteFailedEvents
@@ -71,8 +75,42 @@ integer, public :: Collier_maxRank = -1
 #endif
 logical, public :: includeInterference, ReweightInterference, writegit
 real(8), public :: M_V,Ga_V, M_Vprime,Ga_Vprime, M_V_ps,Ga_V_ps, M_Z_ps,Ga_Z_ps, M_W_ps,Ga_W_ps
-real(8), public, parameter :: GeV=1d0/100d0 ! we are using units of 100GeV, i.e. Lambda=10 is 1TeV
+real(dp), public, parameter :: pi =3.141592653589793238462643383279502884197_dp
+real(dp), public, parameter :: sqrt2 = 1.4142135623730950488016887242096980786_dp
+real(dp), public, parameter :: gamma_0 = 0.5772156649015328606065120900824024310421_dp  !Euler–Mascheroni constant
+real(dp), public, parameter :: pisq = pi**2
+real(8), public, parameter :: one = 1.0d0, mone = -1.0d0
+real(8), public, parameter :: half  = 0.5d0,two = 2.0d0
+real(8), public, parameter :: zero  = 0d0
+complex(8), parameter, public :: czero = (0d0,0d0)
+complex(8), parameter, public :: cone = 1.0d0
+complex(8), parameter, public :: ci=(0d0,1.0d0)
+complex(8), parameter, public :: ne=(0d0,1.0d0)
 real(8), public, parameter :: percent=1d0/100d0
+real(8), public, parameter :: SymmFac=1d0/2d0, SpinAvg=1d0/4d0, QuarkColAvg=1d0/3d0, GluonColAvg=1d0/8d0
+! Units
+real(8), public, parameter :: GeV=1d0/100d0 ! we are using units of 100GeV, i.e. Lambda=10 is 1TeV
+real(8), public, parameter :: TeV=1d+3*GeV
+real(8), public, parameter :: MeV=1d-3*GeV
+real(8), public, parameter :: keV=1d-6*GeV
+real(8), public, parameter :: eV=1d-9*GeV
+real(8), public, parameter :: meter=1d6
+real(8), public, parameter :: milimeter=1d-3*meter
+real(8), public, parameter :: ctauUnit=milimeter
+real(8), public, parameter :: barn=1d-28*(meter**2)
+real(8), public, parameter :: picobarn=1e-12*barn
+real(8), public, parameter :: femtobarn=1e-15*barn
+real(8), public, parameter :: attobarn=1e-18*barn
+real(8), public, parameter :: second=1d15
+real(8), public, parameter :: milisecond=1d-3*second
+real(8), public, parameter :: SpeedOfLight=299792458*meter/second
+real(8), public, parameter :: PlanckConstant=4.13567d-15*eV*second
+real(8), public, parameter :: hbar=PlanckConstant/(2d0*pi)
+real(8), public, parameter :: hbarc=hbar*SpeedOfLight
+real(8), public, parameter :: hbarc2=hbarc**2
+real(8), public, parameter :: hbarc2_fbGeV2 = hbarc2/(femtobarn*(GeV**2))
+real(8), public, parameter :: hbarc2_pbGeV2 = hbarc2/(picobarn*(GeV**2))
+real(8), public, parameter :: hbarc2XsecUnit = hbarc2_fbGeV2*(GeV**2) ! Units of xsec are reported in fb. Mutliplication by GeV**2 is to cancel out the units of ME*PS.
 ! real(8),public :: GlobalMax=-1d99
 ! real(8),public :: GlobalMin=+1d99
 ! integer,parameter :: NPart=200
@@ -104,6 +142,7 @@ complex(8), public :: PrintPMZZ   !real part is the minimum, imaginary part is t
 integer, public :: PrintPMZZIntervals
 integer, public :: VBFoffsh_run=-1
 logical, public :: FindCrossSectionWithWeights = .false.
+real(8), public :: VprimeDecayLengthMassCutoffFactor = -1d0 ! x Ga_Vprime
 real(8), public :: CrossSectionWithWeights = 0d0, CrossSectionWithWeightsErrorSquared = 0d0
 !=====================================================
 
@@ -162,21 +201,21 @@ real(8), public :: alpha_dip = 1d0 !extra non physical degree of freedom for dip
 
 !=====================================================
 !cuts - should be set on the command line
-real(8), public :: pTjetcut = -1d0*GeV                        ! jet min pt, default is set in main (0 in VH, 15 GeV otherwise)
-real(8), public :: etajetcut = -1d0                           ! jet max |eta|, default is set in main (4 in offshell VBF, infinity elsewhere)
-real(8), public :: detajetcut = -1d0                          ! min difference in eta between jets (default 2 in VBF offshell, 0 elsewhere)
-real(8), public :: Rjet = -1d0                                ! jet deltaR, anti-kt algorithm, default is set in main (0 in VH, 0.3 otherwise)
-real(8), public :: mJJcut = 0d0*GeV                           ! minimum mJJ for VBF, HJJ, bbH, VH
-real(8), public :: m4l_minmax(1:2) = (/ -1d0,-1d0 /)*GeV      ! min and max for m_4l in off-shell VBF production;   default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
+real(8), public :: pTjetcut = -1d0*GeV                        ! jet min pt
+real(8), public :: etajetcut = -1d0                           ! jet max |eta|
+real(8), public :: detajetcut = -1d0                          ! min difference in eta between jets
+real(8), public :: Rjet = -1d0                                ! jet deltaR
+real(8), public :: mJJcut = 0d0*GeV                           ! minimum mJJ
+real(8), public :: m4l_minmax(1:2) = (/ -1d0,-1d0 /)*GeV      ! min and max for m_4l. default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
 real(8), public :: m2l_minmax(1:2) = (/ 0d0,14000d0 /)*GeV   ! min and max for m_V in VH production;
 real(8), public :: mVH_minmax(1:2) = (/ 0d0,14000d0 /)*GeV      ! min and max for m_VH in VH production;
 logical, public :: includeGammaStar = .false.                 ! include offshell photons?
 logical, public :: includeVprime = .false.
 real(8), public :: MPhotonCutoff = -1d0*GeV                          ! minimum |mass_ll| for offshell photons when includeGammaStar = .true. or in VBF bkg
-real(8), public :: pTlepcut = -1d0*GeV
-real(8), public :: etalepcut = 999d0
+real(8), public :: pTlepcut = -1d0*GeV                         ! lepton min pt
+real(8), public :: etalepcut = 999d0                           ! lepton max |eta|
 real(8), public :: pTHcut = 0d0*GeV
-logical, public :: JetsOppositeEta = .false.
+logical, public :: JetsOppositeEta = .false.                   ! Ensures associated jets are in opposite hemispheres. Useful to obtain VBF/VBS topology from inclusive production
 !=====================================================
 
 !=====================================================
@@ -187,18 +226,22 @@ real(8), public            :: M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-
 real(8), public            :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-2011)
 real(8), public            :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
 real(8), public            :: Ga_W    = 2.085d0   *GeV      ! W boson width(PDG-2011)
-real(8), public            :: M_Reso  = 125.0d0   *GeV      ! X resonance mass (spin 0, spin 1, spin 2)     (can be overwritten by command line argument)
+real(8), public            :: M_Reso  = 125.0d0   *GeV      ! X resonance mass (spin 0, spin 1, spin 2, can be overwritten by command line argument)
 real(8), public            :: Ga_Reso = 0.00407d0 *GeV      ! X resonance width
-real(8), public            :: HiggsDecayLengthMM = 0d0      ! Higgs decay length in [mm]
-real(8), public            :: M_Reso2 = -1d0      *GeV      ! second resonance mass (spin 0 in off-shell VBF)     (can be overwritten by command line argument)
+real(8), public            :: M_Reso2 = -1d0      *GeV      ! second resonance mass (spin 0 in off-shell MCFM, can be overwritten by command line argument)
 real(8), public            :: Ga_Reso2= 0d0       *GeV      ! second resonance width
+
+real(8), public            :: HiggsDecayLengthMM = 0d0      ! Higgs decay length in [mm]
+real(8), public            :: VprimeDecayLengthMM = 0d0     ! Vprime decay length in [mm]
 
 real(8), public            :: m_bot = 4.75d0       *GeV     ! bottom quark mass
 real(8), public            :: m_charm = 1.275d0    *GeV     ! charm quark mass
 real(8), public            :: m_el = 0.00051100d0  *GeV     ! electron mass
 real(8), public            :: m_mu = 0.10566d0     *GeV     ! muon mass
 real(8), public            :: m_tau = 1.7768d0     *GeV     ! tau mass
-real(8), public            :: Ga_tau =2.267d-12    *GeV     ! tau width
+real(8), public            :: Ga_tau = 2.267d-12   *GeV     ! tau width
+real(8), public            :: m_bot_4gen = 100000d0*GeV     ! b mass for fourth-generation loop in gg MCFM
+real(8), public            :: m_top_4gen = 100000d0*GeV     ! t mass for fourth-generation loop in gg MCFM
 
 real(8), public            :: Gf = 1.16639d-5/GeV**2        ! Fermi constant
 real(8), public            :: alpha_QED = 1d0/128d0         ! el.magn. coupling
@@ -209,8 +252,8 @@ real(dp), public           :: esq ! = 4.0d0 * pi * alpha_QED  ! Fundamental char
 real(8), public            :: xw = 0.23119d0                ! sin**2(Theta_Weinberg) (PDG-2008)
 real(8), public            :: sitW ! = dsqrt(xw)            ! sin(Theta_Weinberg) (PDG-2008)
 real(8), public            :: twosc ! = sqrt(4.0_dp*xw*(1.0_dp-xw))
-real(8), public, parameter :: LHC_Energy=13000d0  *GeV      ! LHC hadronic center of mass energy
-real(8), public, parameter :: TEV_Energy=1960d0  *GeV       ! Tevatron hadronic center of mass energy
+real(8), public, parameter :: LHC_Energy=13d0  *TeV      ! LHC hadronic center of mass energy
+real(8), public, parameter :: TEV_Energy=1.96d0  *TeV       ! Tevatron hadronic center of mass energy
 real(8), public, parameter :: ILC_Energy=250d0  *GeV        ! Linear collider center of mass energy
 !command line: epPolarization, emPolarization
 real(8), public            :: POL_A = 0d0                   ! e+ polarization. 0: no polarization, 100: helicity = 1, -100: helicity = -1
@@ -327,8 +370,13 @@ real(8), public, parameter :: Lambda2 = 1000d0    *GeV      ! for second resonan
    complex(8), public :: ghg3 = (0d0,0d0)
    complex(8), public :: ghg4 = (0d0,0d0)   ! pseudoscalar
 
+!-- Hgg couplings to gluons for point-like vertices (4th generation vertex for MCFM)
+   complex(8), public :: ghg2_4gen = (0d0,0d0)
+   complex(8), public :: ghg3_4gen = (0d0,0d0)
+   complex(8), public :: ghg4_4gen = (0d0,0d0)
+
 !-- HVV' couplings to ZZ/ZA/AA and WW
-   complex(8), public :: ghz1 = (2.0d0,0d0)   ! SM=2
+   complex(8), public :: ghz1 = (2.0d0,0d0) ! SM=2 (MCFM => =1)
    complex(8), public :: ghz2 = (0d0,0d0)
    complex(8), public :: ghz3 = (0d0,0d0)
    complex(8), public :: ghz4 = (0d0,0d0)   ! pseudoscalar
@@ -666,7 +714,17 @@ real(8), public, parameter :: Lambda2 = 1000d0    *GeV      ! for second resonan
 
 
 
-!-- second resonance (H2) couplings for off-shell VBF
+!-- second resonance (H2) couplings for MCFM interface
+!-- Hgg couplings to gluons for point-like vertices
+   complex(8), public :: gh2g2 = (0d0,0d0)
+   complex(8), public :: gh2g3 = (0d0,0d0)
+   complex(8), public :: gh2g4 = (0d0,0d0)   ! pseudoscalar
+
+!-- Hgg couplings to gluons for point-like vertices (4th generation vertex for MCFM)
+   complex(8), public :: gh2g2_4gen = (0d0,0d0)
+   complex(8), public :: gh2g3_4gen = (0d0,0d0)
+   complex(8), public :: gh2g4_4gen = (0d0,0d0)
+
 !-- HVV' couplings to ZZ/ZA/AA and WW
    complex(8), public :: gh2z1 = (0.0d0,0d0)
    complex(8), public :: gh2z2 = (0.0d0,0d0)
@@ -818,13 +876,32 @@ real(8), public, parameter :: Lambda2 = 1000d0    *GeV      ! for second resonan
    complex(8),    public :: dFour_Z= (0.0d0,0d0)
 
 
-
-
-
-
 !-- Hff couplings for ttbar+H and bbar+H
    complex(8), public :: kappa       = (1d0,0d0)
    complex(8), public :: kappa_tilde = (0d0,0d0)
+!-- first resonance (H) couplings
+   ! Usable in JHUGen-only processes
+   complex(8), public :: kappa_top       = (1d0,0d0)
+   complex(8), public :: kappa_tilde_top = (0d0,0d0)
+   complex(8), public :: kappa_bot       = (1d0,0d0)
+   complex(8), public :: kappa_tilde_bot = (0d0,0d0)
+   ! Extra MCFM couplings to fourth-generation quarks
+   complex(8), public :: kappa_4gen_top       = (0d0,0d0)
+   complex(8), public :: kappa_tilde_4gen_top = (0d0,0d0)
+   complex(8), public :: kappa_4gen_bot       = (0d0,0d0)
+   complex(8), public :: kappa_tilde_4gen_bot = (0d0,0d0)
+
+!-- seconds resonance (H2) couplings for MCFM interface
+   complex(8), public :: kappa2_top       = (0d0,0d0)
+   complex(8), public :: kappa2_tilde_top = (0d0,0d0)
+   complex(8), public :: kappa2_bot       = (0d0,0d0)
+   complex(8), public :: kappa2_tilde_bot = (0d0,0d0)
+
+   complex(8), public :: kappa2_4gen_top       = (0d0,0d0)
+   complex(8), public :: kappa2_tilde_4gen_top = (0d0,0d0)
+   complex(8), public :: kappa2_4gen_bot       = (0d0,0d0)
+   complex(8), public :: kappa2_tilde_4gen_bot = (0d0,0d0)
+
 
 !--------------------!
 !-----! Spin-1 !-----!
@@ -992,8 +1069,6 @@ real(dp), public           :: couplAZff
 real(dp), public           :: couplAffsq
 !----------------------------------------------------------------------------------
 
-real(8), public, parameter :: fbGeV2=0.389379d12*GeV**2
-real(8), public, parameter :: SymmFac=1d0/2d0, SpinAvg=1d0/4d0, QuarkColAvg=1d0/3d0, GluonColAvg=1d0/8d0
 integer, public, target :: Up_  = 1
 integer, public, target :: Dn_  = 2
 integer, public, target :: Chm_ = 3
@@ -1047,18 +1122,6 @@ integer, public, parameter :: pdfAStr_ = -3
 integer, public, parameter :: pdfAChm_ = -4
 integer, public, parameter :: pdfABot_ = -5
 integer, public, parameter :: pdfATop_ = -6 ! Dummy
-
-real(dp), public, parameter :: pi =3.141592653589793238462643383279502884197_dp
-real(dp), public, parameter :: sqrt2 = 1.4142135623730950488016887242096980786_dp
-real(dp), public, parameter :: gamma_0 = 0.5772156649015328606065120900824024310421_dp  !Euler–Mascheroni constant
-real(dp), public, parameter :: pisq = pi**2
-real(8), public, parameter :: one = 1.0d0, mone = -1.0d0
-real(8), public, parameter :: half  = 0.5d0,two = 2.0d0
-real(8), public, parameter :: zero  = 0d0
-complex(8), parameter, public :: czero = (0d0,0d0)
-complex(8), parameter, public :: cone = 1.0d0
-complex(8), parameter, public :: ci=(0d0,1.0d0)
-complex(8), parameter, public :: ne=(0d0,1.0d0)
 
 integer,parameter :: io_stdout=6
 integer,parameter :: io_LHEOutFile=14
@@ -2182,6 +2245,16 @@ integer :: DKMode
      IsAZDecay = .true.
   elseif( DKMode.eq.9 ) then
      IsAZDecay = .true.
+  elseif( DKMode.lt.0 ) then
+     IsAZDecay = (            &
+        DKMode.eq.-2*2   .or. & ! Z->ee
+        DKMode.eq.-3*3   .or. & ! Z->mumu
+        DKMode.eq.-5*5   .or. & ! Z->dd
+        DKMode.eq.-7*7   .or. & ! Z->uu
+        DKMode.eq.-11*11 .or. & ! Z->ss
+        DKMode.eq.-13*13 .or. & ! Z->cc
+        DKMode.eq.-17*17      & ! Z->bb
+     )
   else
      IsAZDecay=.false.
   endif
@@ -2205,6 +2278,17 @@ integer :: DKMode
      IsAWDecay = .true.
   elseif( DKMode.eq.11 ) then
      IsAWDecay = .true.
+  elseif( DKMode.lt.0 ) then
+     IsAWDecay = (            &
+        DKMode.eq.-2*1   .or. & ! W->enu
+        DKMode.eq.-3*1   .or. & ! W->munu
+        DKMode.eq.-5*7   .or. & ! W->du
+        DKMode.eq.-5*13  .or. & ! W->dc
+        DKMode.eq.-11*7  .or. & ! W->su
+        DKMode.eq.-11*13 .or. & ! W->sc
+        DKMode.eq.-17*7  .or. & ! W->bu
+        DKMode.eq.-17*13      & ! W->bc
+     )
   else
      IsAWDecay=.false.
   endif
@@ -2471,6 +2555,7 @@ end function CoupledVertexIsDiagonal
 
 
 
+! Counts *charged* leptons to be specific
 FUNCTION CountLeptons( MY_IDUP )
 implicit none
 integer :: MY_IDUP(:),CountLeptons
@@ -2479,6 +2564,21 @@ integer :: i
    CountLeptons = 0
    do i = 1,size(MY_IDUP)
       if( IsALepton( MY_IDUP(i) ) ) CountLeptons=CountLeptons+1
+   enddo
+
+
+RETURN
+END FUNCTION
+
+! Counts light jets
+FUNCTION CountJets( MY_IDUP )
+implicit none
+integer :: MY_IDUP(:),CountJets
+integer :: i
+
+   CountJets = 0
+   do i = 1,size(MY_IDUP)
+      if( IsAJet( MY_IDUP(i) ) ) CountJets=CountJets+1
    enddo
 
 
@@ -2743,9 +2843,14 @@ subroutine EvalAlphaS()
    INTEGER, PARAMETER :: NF3=3
    INTEGER, PARAMETER :: NF2=2
    INTEGER, PARAMETER :: NF1=1
+   INTEGER, PARAMETER :: NF0=0
 
       IF (Mu_Ren .LE. 0d0) THEN
          WRITE(6,*) 'ModParameters::EvalAlphaS: Mu_Ren .le. 0, Mu_Ren (GeV) = ',(Mu_Ren*GeV)
+         stop
+      ENDIF
+      IF (nQflavors_pdf .GT. NF6 .OR. nQflavors_pdf .LT. NF0) THEN
+         WRITE(6,*) 'ModParameters::EvalAlphaS: nQflavors_pdf has to be between 0 and 6. nQflavors_pdf = ',nQflavors_pdf
          stop
       ENDIF
       IF (nQflavors_pdf .NE. NF5) THEN
@@ -2759,7 +2864,7 @@ subroutine EvalAlphaS()
          stop
       ENDIF
 
-      alphas=alphas_mz/(1.0_dp+alphas_mz*B0_PDF(NF5)*2.0_dp*dlog((Mu_Ren/zmass_pdf)))
+      alphas=alphas_mz/(1.0_dp+alphas_mz*B0_PDF(nQflavors_pdf)*2.0_dp*dlog((Mu_Ren/zmass_pdf)))
 #endif
       ! Calculate the derived couplings
       call ComputeQCDVariables()

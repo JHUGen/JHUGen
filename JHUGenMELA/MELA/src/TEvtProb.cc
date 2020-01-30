@@ -145,7 +145,7 @@ void TEvtProb::InitializeMCFM(){
 void TEvtProb::InitializeJHUGen(const char* pathtoPDFSet, int PDFMember){
   if (verbosity>=TVar::DEBUG) MELAout << "Begin TEvtProb::InitializeJHUGen" << endl;
 
-  InitJHUGenMELA(pathtoPDFSet, PDFMember);
+  InitJHUGenMELA(pathtoPDFSet, PDFMember, 2.*EBEAM);
 
   if (verbosity>=TVar::DEBUG) MELAout << "End TEvtProb::InitializeJHUGen" << endl;
 }

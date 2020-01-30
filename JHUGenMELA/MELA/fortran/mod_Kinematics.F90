@@ -583,6 +583,7 @@ END FUNCTION
 ! When a CKM partner is called, since sum(VCKM**@)=1 along a row, counting should not be unaffected.
 SUBROUTINE VVBranchings(MY_IDUP,ICOLUP,CombWeight,ColorBase)
 use ModParameters
+use ModMisc
 implicit none
 integer :: MY_IDUP(4:9),ICOLUP(1:2,6:9),DKFlavor,ICOLUP_Base
 integer, optional ::ColorBase
@@ -698,6 +699,68 @@ real(8) :: DKRnd
            MY_IDUP(7) = +abs(DKFlavor)+7   ! neutrino
         endif
         CombWeight = CombWeight*9d0!*(3d0 + 2d0*3d0)
+   ! Exclusive Z1 decay modes
+   elseif( &
+      DecayMode1.eq.-2*2   .or. & ! Z->ee
+      DecayMode1.eq.-3*3   .or. & ! Z->mumu
+      DecayMode1.eq.-5*5   .or. & ! Z->dd
+      DecayMode1.eq.-7*7   .or. & ! Z->uu
+      DecayMode1.eq.-11*11 .or. & ! Z->ss
+      DecayMode1.eq.-13*13 .or. & ! Z->cc
+      DecayMode1.eq.-17*17      & ! Z->bb
+      ) then
+        MY_IDUP(4) = Z0_
+        DKFlavor = (                      &
+            ElM_*LogicalToInteger(DecayMode1.eq.-2*2)   + & ! Z->ee
+            MuM_*LogicalToInteger(DecayMode1.eq.-3*3)   + & ! Z->mumu
+            Dn_*LogicalToInteger(DecayMode1.eq.-5*5)    + & ! Z->dd
+            Up_*LogicalToInteger(DecayMode1.eq.-7*7)    + & ! Z->uu
+            Str_*LogicalToInteger(DecayMode1.eq.-11*11) + & ! Z->ss
+            Chm_*LogicalToInteger(DecayMode1.eq.-13*13) + & ! Z->cc
+            Bot_*LogicalToInteger(DecayMode1.eq.-17*17)   & ! Z->bb
+        )
+        MY_IDUP(6) =-DKFlavor
+        MY_IDUP(7) =+DKFlavor
+        if(IsAQuark(DKFlavor)) then
+           ICOLUP(1:2,6) = (/            0,ICOLUP_BASE+3/)
+           ICOLUP(1:2,7) = (/ICOLUP_BASE+3,            0/)
+        endif
+   ! Exclusive W+ decay modes
+   elseif( &
+      DecayMode1.eq.-2*1   .or. & ! W->enu
+      DecayMode1.eq.-3*1   .or. & ! W->munu
+      DecayMode1.eq.-5*7   .or. & ! W->du
+      DecayMode1.eq.-5*13  .or. & ! W->dc
+      DecayMode1.eq.-11*7  .or. & ! W->su
+      DecayMode1.eq.-11*13 .or. & ! W->sc
+      DecayMode1.eq.-17*7  .or. & ! W->bu
+      DecayMode1.eq.-17*13      & ! W->bc
+      ) then
+        MY_IDUP(4) = Wp_
+        MY_IDUP(6) = (                    &
+           ElP_*LogicalToInteger(DecayMode1.eq.-2*1)    + & ! W->enu
+           MuP_*LogicalToInteger(DecayMode1.eq.-3*1)    + & ! W->munu
+           ADn_*LogicalToInteger(DecayMode1.eq.-5*7)    + & ! W->du
+           ADn_*LogicalToInteger(DecayMode1.eq.-5*13)   + & ! W->dc
+           AStr_*LogicalToInteger(DecayMode1.eq.-11*7)  + & ! W->su
+           AStr_*LogicalToInteger(DecayMode1.eq.-11*13) + & ! W->sc
+           ABot_*LogicalToInteger(DecayMode1.eq.-17*7)  + & ! W->bu
+           ABot_*LogicalToInteger(DecayMode1.eq.-17*13)   & ! W->bc
+        )
+        MY_IDUP(7) = (                   &
+           NuE_*LogicalToInteger(DecayMode1.eq.-2*1)   + & ! W->enu
+           NuM_*LogicalToInteger(DecayMode1.eq.-3*1)   + & ! W->munu
+           Up_*LogicalToInteger(DecayMode1.eq.-5*7)    + & ! W->du
+           Chm_*LogicalToInteger(DecayMode1.eq.-5*13)  + & ! W->dc
+           Up_*LogicalToInteger(DecayMode1.eq.-11*7)   + & ! W->su
+           Chm_*LogicalToInteger(DecayMode1.eq.-11*13) + & ! W->sc
+           Up_*LogicalToInteger(DecayMode1.eq.-17*7)   + & ! W->bu
+           Chm_*LogicalToInteger(DecayMode1.eq.-17*13)   & ! W->bc
+        )
+        if(IsAQuark(DKFlavor)) then
+           ICOLUP(1:2,6) = (/            0,ICOLUP_BASE+3/)
+           ICOLUP(1:2,7) = (/ICOLUP_BASE+3,            0/)
+        endif
    endif
 
 
@@ -795,6 +858,68 @@ real(8) :: DKRnd
            MY_IDUP(9) = -abs(DKFlavor)     ! lepton(-)
         endif
         CombWeight = CombWeight*9d0!*(3d0 + 2d0*3d0)
+   ! Exclusive Z2 decay modes
+   elseif( &
+      DecayMode2.eq.-2*2   .or. & ! Z->ee
+      DecayMode2.eq.-3*3   .or. & ! Z->mumu
+      DecayMode2.eq.-5*5   .or. & ! Z->dd
+      DecayMode2.eq.-7*7   .or. & ! Z->uu
+      DecayMode2.eq.-11*11 .or. & ! Z->ss
+      DecayMode2.eq.-13*13 .or. & ! Z->cc
+      DecayMode2.eq.-17*17      & ! Z->bb
+      ) then
+        MY_IDUP(5) = Z0_
+        DKFlavor = (                      &
+            ElM_*LogicalToInteger(DecayMode2.eq.-2*2)   + & ! Z->ee
+            MuM_*LogicalToInteger(DecayMode2.eq.-3*3)   + & ! Z->mumu
+            Dn_*LogicalToInteger(DecayMode2.eq.-5*5)    + & ! Z->dd
+            Up_*LogicalToInteger(DecayMode2.eq.-7*7)    + & ! Z->uu
+            Str_*LogicalToInteger(DecayMode2.eq.-11*11) + & ! Z->ss
+            Chm_*LogicalToInteger(DecayMode2.eq.-13*13) + & ! Z->cc
+            Bot_*LogicalToInteger(DecayMode2.eq.-17*17)   & ! Z->bb
+        )
+        MY_IDUP(8) =-DKFlavor
+        MY_IDUP(9) =+DKFlavor
+        if(IsAQuark(DKFlavor)) then
+           ICOLUP(1:2,8) = (/            0,ICOLUP_BASE+4/)
+           ICOLUP(1:2,9) = (/ICOLUP_BASE+4,            0/)
+        endif
+   ! Exclusive W- decay modes
+   elseif( &
+      DecayMode2.eq.-2*1   .or. & ! W->enu
+      DecayMode2.eq.-3*1   .or. & ! W->munu
+      DecayMode2.eq.-5*7   .or. & ! W->du
+      DecayMode2.eq.-5*13  .or. & ! W->dc
+      DecayMode2.eq.-11*7  .or. & ! W->su
+      DecayMode2.eq.-11*13 .or. & ! W->sc
+      DecayMode2.eq.-17*7  .or. & ! W->bu
+      DecayMode2.eq.-17*13      & ! W->bc
+      ) then
+        MY_IDUP(5) = Wm_
+        MY_IDUP(9) = (                   &
+           ElM_*LogicalToInteger(DecayMode2.eq.-2*1)   + & ! W->enu
+           MuM_*LogicalToInteger(DecayMode2.eq.-3*1)   + & ! W->munu
+           Dn_*LogicalToInteger(DecayMode2.eq.-5*7)    + & ! W->du
+           Dn_*LogicalToInteger(DecayMode2.eq.-5*13)   + & ! W->dc
+           Str_*LogicalToInteger(DecayMode2.eq.-11*7)  + & ! W->su
+           Str_*LogicalToInteger(DecayMode2.eq.-11*13) + & ! W->sc
+           Bot_*LogicalToInteger(DecayMode2.eq.-17*7)  + & ! W->bu
+           Bot_*LogicalToInteger(DecayMode2.eq.-17*13)   & ! W->bc
+        )
+        MY_IDUP(8) = (                    &
+           ANuE_*LogicalToInteger(DecayMode2.eq.-2*1)   + & ! W->enu
+           ANuM_*LogicalToInteger(DecayMode2.eq.-3*1)   + & ! W->munu
+           AUp_*LogicalToInteger(DecayMode2.eq.-5*7)    + & ! W->du
+           AChm_*LogicalToInteger(DecayMode2.eq.-5*13)  + & ! W->dc
+           AUp_*LogicalToInteger(DecayMode2.eq.-11*7)   + & ! W->su
+           AChm_*LogicalToInteger(DecayMode2.eq.-11*13) + & ! W->sc
+           AUp_*LogicalToInteger(DecayMode2.eq.-17*7)   + & ! W->bu
+           AChm_*LogicalToInteger(DecayMode2.eq.-17*13)   & ! W->bc
+        )
+        if(IsAQuark(DKFlavor)) then
+           ICOLUP(1:2,8) = (/            0,ICOLUP_BASE+4/)
+           ICOLUP(1:2,9) = (/ICOLUP_BASE+4,            0/)
+        endif
    endif
 
 

@@ -353,6 +353,8 @@ c--- Routine to convert MCFM plabel to PDG number
         plabeltoPDG=nta_pdg
       elseif (ch .eq. 'pp') then
         plabeltoPDG=g_pdg
+      elseif (ch .eq. 'ga') then
+        plabeltoPDG=ga_pdg
       else
         write(6,*) 'Unknown plabel in plabeltoPDG: ',ch
         stop

@@ -26,6 +26,8 @@
       integer i,pflav,pbarflav
       double precision p(mxpart,4),wt
       character*72 inputfile,workdir
+      logical newreadimpl
+      parameter (newreadimpl = .true.)
       common/iterat/itmx1,ncall1,itmx2,ncall2
       common/dryrun/dryrun
        
@@ -51,13 +53,12 @@
 *   dryrun = .true. , readin = .false. : accumulate during warmup
 *   dryrun = .true. , readin = .true.  : accumulate with frozen grid
 
-      if ((dryrun .eqv. .false.) .or. 
-     .    ((dryrun) .and. (readin .eqv. .false.))) then
+      njetzero=0
+      ncutzero=0
+      ntotzero=0
+      ntotshot=0
+      if (.not.readin .or. .not.dryrun) then
 * Initialize efficiency variables      
-        njetzero=0
-        ncutzero=0
-        ntotzero=0
-        ntotshot=0
         call mcfm_vegas(0,itmx1,ncall1,dryrun,integ,integ_err)
         itmxplots=itmx1
       endif
@@ -67,8 +68,8 @@
 * the results stage (itmx2,ncall2) and binning takes place (.true.)
 * wtmax may have been set during the dry run, so re-set here :
       wtmax = 0d0
-      if ((dryrun .eqv. .false.) .or. 
-     .    ((dryrun) .and. (readin .eqv. .true.))) then
+      if ((.not.dryrun) .or.
+     .    (readin .and. .not.newreadimpl)) then
 * Initialize efficiency variables      
         njetzero=0
         ncutzero=0
@@ -77,7 +78,21 @@
         call mcfm_vegas(1,itmx2,ncall2,.true.,integ,integ_err)
         itmxplots=itmx2
       endif
-      
+
+      if (newreadimpl) then
+        if(.not. readin) then
+          open(unit=50, file="CSmax.bin", form="unformatted",
+     &      status="replace")
+          write(50) wtmax, integ, integ_err
+          close(unit=50)
+        else
+          open(unit=50, file="CSmax.bin", form="unformatted",
+     &      status="old")
+          read(50) wtmax, integ, integ_err
+          close(unit=50)
+        endif
+      endif
+
 * So far we have not used VEGAS to generate any events.
 * Make sure future calls to "getevent" are aware of this :
       numstored = 0

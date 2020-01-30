@@ -1,17 +1,15 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #Inputs are down at the bottom.  No need to change anything above that unless there's a bug
 
 import argparse
-from contextlib import closing, contextmanager
+from contextlib import contextmanager
 from getpass import getpass
 import os
 import re
 import shutil
-from subprocess import check_call
+from subprocess import CalledProcessError, check_call
 import tempfile
-import urllib2
-
-gitdir = None
+import urllib.request, urllib.error
 
 Webdir = os.getcwd()
 WebGeneratordir = os.path.join(Webdir, "Generator")
@@ -25,7 +23,7 @@ def uploadwebpage(dontupload=[], dontuploadifexists=[], dryrun=False, overwrite_
     if dryrun:
         JHED = password = ""
     else:
-        JHED = raw_input("Enter your JHED ID: ")
+        JHED = input("Enter your JHED ID: ")
         password = getpass("Enter your JHED password: ")
     if not overwrite_mcfm:
         dontuploadifexists.append("MCFM-precompiled")
@@ -41,13 +39,13 @@ def uploadwebpage(dontupload=[], dontuploadifexists=[], dryrun=False, overwrite_
               "uploadfiles": getuploadfiles(".", dontupload=dontupload, dontuploadifexists=dontuploadifexists),
              }
     if dryrun:
-        print "Would open cadaver, then run:"
-        print
-        print CadaverRC(**repmap)
+        print("Would open cadaver, then run:")
+        print()
+        print(CadaverRC(**repmap))
     else:
         with CadaverRC(**repmap) as crc:
             if edit_cadaverrc:
-                raw_input("You can now edit "+crc.filename+".  When you're done press enter.")
+                input("You can now edit "+crc.filename+".  When you're done press enter.")
             with NetRC(**repmap):
                 check_call(["cadaver"])
 
@@ -94,9 +92,9 @@ class CadaverRC(RC):
 def existsonwebsite(filename):
     #https://stackoverflow.com/a/16778473/5228524
     try:
-        with closing(urllib2.urlopen(os.path.join(websitebase, filename))) as f:
+        with urllib.request.urlopen(os.path.join(websitebase, filename)) as f:
             return True
-    except urllib2.HTTPError:
+    except urllib.error.HTTPError:
         return False
 
 class ListOfRegexes(list):
@@ -120,7 +118,7 @@ def getuploadfiles(dir, dontupload, dontuploadifexists):
     return result
 
 class Version(object):
-    def __init__(self, version, gitcommit=None, tarballname=None, manualname=None, manualcommit=None, melacommit=None, visible=True):
+    def __init__(self, version, gitcommit=None, tarballname=None, manualname=None, manualcommit=None, melacommit=None, mcfmcommit=None, visible=True):
         self.version = version
         if gitcommit is None: gitcommit = version
         if tarballname is None: tarballname = "JHUGenerator.{}.tar.gz".format(self.version)
@@ -131,21 +129,14 @@ class Version(object):
         self.manualname = manualname
         self.manualcommit = manualcommit
         self.melacommit = melacommit
+        self.mcfmcommit = mcfmcommit
         self.visible = visible
 
     def getlink(self):
         return link_template.format(tarballname=self.tarballname)
 
-    def createtarball(self, force=False):
-        global gitdir
-
+    def createtarball(self, gitdir, force=False):
         if not force and os.path.exists(os.path.join(WebGeneratordir, self.tarballname)): return
-
-        if gitdir is None:
-            tmpdir = tempfile.mkdtemp()
-            with cd(tmpdir):
-                check_call(["git", "clone", "git@github.com:JHUGen/JHUGen"])
-                gitdir = os.path.join(tmpdir, "JHUGen")
 
         with cd(gitdir):
             check_call(["git", "clean", "-f", "-x", "-d"])
@@ -166,6 +157,14 @@ class Version(object):
             check_call(["git", "checkout", self.gitcommit])
             if self.melacommit is not None:
                 check_call(["git", "checkout", self.melacommit, "--", "JHUGenMELA"])
+            if self.mcfmcommit is not None:
+                try:
+                    check_call(["git", "checkout", self.mcfmcommit, "--", "MCFM-JHUGen"])
+                except CalledProcessError as e:
+                    if e.returncode == 1: #commit is valid but file doesn't exist
+                        shutil.rmtree("MCFM-JHUGen")
+                    else:                 #other error
+                        raise
             for folder in storefolders:
                 if os.path.exists(folder):
                     store.append(folder)
@@ -175,10 +174,17 @@ class Version(object):
 def create_Download(*versions):
     mostrecentversion = [_ for _ in versions if _.visible][0]
     olderversions = [_ for _ in versions if _ is not mostrecentversion]
-    mostrecentversion.createtarball(force=True)
-    check_call(["cp", os.path.join(gitdir, mostrecentversion.manualname), os.path.join(Webdir, "Manual.pdf")])
-    for version in [mostrecentversion] + list(olderversions) + list(reallyold):
-        version.createtarball()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        with cd(tmpdir):
+            check_call(["git", "clone", "git@github.com:JHUGen/JHUGen"])
+        gitdir = os.path.join(tmpdir, "JHUGen")
+
+        mostrecentversion.createtarball(gitdir=gitdir, force=True)
+        check_call(["cp", os.path.join(gitdir, mostrecentversion.manualname), os.path.join(Webdir, "Manual.pdf")])
+        for version in [mostrecentversion] + list(olderversions) + list(reallyold):
+            version.createtarball(gitdir=gitdir)
+
     Download = Download_template.format(
                                         latest = mostrecentversion.getlink(),
                                         older = "\n    ".join(v.getlink() for v in [mostrecentversion] + list(olderversions) if v.visible),
@@ -253,9 +259,12 @@ Download_template = """
 #       could use a later version if the manual is updated after the generator is tagged
 #   - melacommit, name of the commit to checkout for the JHUGenMELA folder.  Default is the same
 #       as the generator
+#   - mcfmcommit, name of the commit to checkout for the MCFM-JHUgen folder.  Default is the same
+#       as the generator
 versions = (
-            Version("v7.2.7", visible=False, gitcommit="05c4ea749698a25ccc789519f1dff84914b34411"),
-            Version("v7.2.6", visible=False),
+            Version("v7.3.0", visible=False, gitcommit="5b00360015fb3979f671eb480fb1d652e52c7359"),
+            Version("v7.2.7", visible=False, gitcommit="05c4ea749698a25ccc789519f1dff84914b34411", mcfmcommit="v7.2.4"),
+            Version("v7.2.6", visible=False, mcfmcommit="v7.2.4"),
             Version("v7.2.4"),
             Version("v7.2.3", visible=False),
             Version("v7.2.2", visible=False),
@@ -295,7 +304,7 @@ reallyold = (
 
 #things that get stored in the tarball if present
 #graviton and graviton_mod_off are in the really old versions
-storefolders = ["JHUGenerator", "JHUGenMELA", "AnalyticMELA", "graviton", "graviton_mod_off"]
+storefolders = ["JHUGenerator", "JHUGenMELA", "AnalyticMELA", "MCFM-JHUGen", "graviton", "graviton_mod_off"]
 #plus the manual which is treated separately
 
 #files in this directory that should not be uploaded to the spin page

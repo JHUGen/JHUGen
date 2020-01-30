@@ -41,7 +41,7 @@ integer :: a,b,c,NumFSPartons
 integer :: MY_IDUP(:),ICOLUP(:,:)
 integer :: LHE_IDUP(1:7+maxpart),i,ISTUP(1:7+maxpart),MOTHUP(1:2,1:7+maxpart)
 integer :: NUP,IDPRUP
-real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,mZ1,mZ2,HiggsDKLength
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,mZ1,mZ2,HiggsDKLength,VprimeDKLength(1:2)
 character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
 
 
@@ -55,11 +55,20 @@ do i=1,9
     LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
 enddo
 
-! NUP changes for gamma gamma final state
+SCALUP=Mu_Fact/GeV
+AQEDUP=alpha_QED
+AQCDUP=alphas
+
+ISTUP(1:2) = -1 ! Mother status
+ISTUP(3:5) = 2 ! Intermediate particle status
+ISTUP(6:9) = 1 ! Final hard process particle status
 if ( LHE_IDUP(4).eq.22 .and. LHE_IDUP(5).eq.22 ) then! photon+photon FS
     NUP=5
+    ISTUP(4:5) = 1
 elseif ( LHE_IDUP(4).ne.22 .and. LHE_IDUP(5).eq.22 ) then! Z+photon FS
     NUP=7
+    ISTUP(4) = 2
+    ISTUP(5:7) = 1
 else! ZZ or WW FS
     NUP=9
 endif
@@ -71,21 +80,6 @@ if( present(EventWeight) ) then
     XWGTUP=EventWeight
 else
     XWGTUP=1.0d0
-endif
-
-SCALUP=Mu_Fact * 100d0
-AQEDUP=alpha_QED
-AQCDUP=alphas
-
-ISTUP(1:2) = -1 ! Mother status
-ISTUP(3:5) = 2 ! Intermediate particle status
-ISTUP(6:9) = 1 ! Final hard process particle status
-
-if ( LHE_IDUP(4).eq.22 .and. LHE_IDUP(5).eq.22 ) then! photon+photon FS
-    ISTUP(4:5) = 1
-elseif ( LHE_IDUP(4).ne.22 .and. LHE_IDUP(5).eq.22 ) then! Z+photon FS
-    ISTUP(4) = 2
-    ISTUP(5:7) = 1
 endif
 
 
@@ -121,10 +115,10 @@ if( present(MomFSPartons) ) then ! add additional FS partons
        else
           MOTHUP(1:2,9+a) = (/ mod(a,2)+1,mod(a,2)+1 /) !  = (1,1), (2,2), (1,1), ...
        endif
-       MomDummy(1,6+a) = 100.0d0*MomFSPartons(1,a)
-       MomDummy(2,6+a) = 100.0d0*MomFSPartons(2,a)
-       MomDummy(3,6+a) = 100.0d0*MomFSPartons(3,a)
-       MomDummy(4,6+a) = 100.0d0*MomFSPartons(4,a)
+       MomDummy(1,6+a) = MomFSPartons(1,a)/GeV
+       MomDummy(2,6+a) = MomFSPartons(2,a)/GeV
+       MomDummy(3,6+a) = MomFSPartons(3,a)/GeV
+       MomDummy(4,6+a) = MomFSPartons(4,a)/GeV
     enddo
 endif
 
@@ -132,16 +126,17 @@ endif
 LHE_IDUP(3) = 25
 if( Process.eq.1 ) LHE_IDUP(3) = 32
 if( Process.eq.2 ) LHE_IDUP(3) = 39
+VprimeDKLength(:) = 0d0
 Lifetime = 0.0d0
 Spin = 0.1d0
 call getHiggsDecayLength(HiggsDKLength)
 
 
 do a=1,6
-    MomDummy(1,a) = 100.0d0*Mom(1,a)
-    MomDummy(2,a) = 100.0d0*Mom(2,a)
-    MomDummy(3,a) = 100.0d0*Mom(3,a)
-    MomDummy(4,a) = 100.0d0*Mom(4,a)
+    MomDummy(1,a) = Mom(1,a)/GeV
+    MomDummy(2,a) = Mom(2,a)/GeV
+    MomDummy(3,a) = Mom(3,a)/GeV
+    MomDummy(4,a) = Mom(4,a)/GeV
 enddo
 
 do b=1,4! V boson momenta
@@ -167,7 +162,7 @@ endif
 
 
 
-!  associte lepton pairs to MOTHUP
+!  associate lepton pairs to MOTHUP
 if( (IsAZDecay(DecayMode1)).and.(IsAZDecay(DecayMode2)) .and. abs(LHE_IDUP(7)).eq.abs(LHE_IDUP(9)) ) then
      s34 = Get_MInv( Mom(1:4,3)+Mom(1:4,4) )
      s56 = Get_MInv( Mom(1:4,5)+Mom(1:4,6) )
@@ -262,51 +257,57 @@ endif
 
 ! parton_a
 i=1
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,1),MomDummy(1,1),Part1Mass,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,1),MomDummy(1,1),Part1Mass,Lifetime/ctauUnit,Spin
 
 ! parton_b
 i=2
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,2),MomDummy(1,2),Part2Mass,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,2),MomDummy(1,2),Part2Mass,Lifetime/ctauUnit,Spin
 
 ! X
 i=3
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),XFV(2:4),XFV(1),XMass,HiggsDKLength,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),XFV(2:4),XFV(1),XMass,HiggsDKLength/ctauUnit,Spin
 
 ! V1
 i=4
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),Z1FV(2:4),Z1FV(1),V1Mass,Lifetime,Spin
+if (includeVprime .and. M_Vprime .ge. 0d0 .and. (VprimeDecayLengthMassCutoffFactor.le.0d0 .or. abs(V1Mass*GeV-M_Vprime).lt.VprimeDecayLengthMassCutoffFactor*Ga_Vprime) .and. LHE_IDUP(6) .ne. Not_a_particle_ .and. LHE_IDUP(7) .ne. Not_a_particle_) then
+  call getVprimeDecayLength(VprimeDKLength(1))
+endif
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),Z1FV(2:4),Z1FV(1),V1Mass,VprimeDKLength(1)/ctauUnit,Spin
 
 ! V2
 i=5
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),Z2FV(2:4),Z2FV(1),V2Mass,Lifetime,Spin
+if (includeVprime .and. M_Vprime .ge. 0d0 .and. (VprimeDecayLengthMassCutoffFactor.le.0d0 .or. abs(V2Mass*GeV-M_Vprime).lt.VprimeDecayLengthMassCutoffFactor*Ga_Vprime) .and. LHE_IDUP(8) .ne. Not_a_particle_ .and. LHE_IDUP(9) .ne. Not_a_particle_) then
+   call getVprimeDecayLength(VprimeDKLength(2))
+endif
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),Z2FV(2:4),Z2FV(1),V2Mass,VprimeDKLength(2)/ctauUnit,Spin
 
 ! decay product 1 (V1): l-, nu or q
 i=7
 if (LHE_IDUP(i).gt.Not_a_particle_) then
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,4),MomDummy(1,4),L12Mass,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,4),MomDummy(1,4),L12Mass,Lifetime/ctauUnit,Spin
 endif
 
 ! decay product 2 (V1): l+, nubar or qbar
 i=6
 if (LHE_IDUP(i).gt.Not_a_particle_) then
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,3),MomDummy(1,3),L11Mass,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,3),MomDummy(1,3),L11Mass,Lifetime/ctauUnit,Spin
 endif
 
 ! decay product 1 (V2): l-, nu or q
 i=9
 if (LHE_IDUP(i).gt.Not_a_particle_) then
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,6),MomDummy(1,6),L22Mass,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,6),MomDummy(1,6),L22Mass,Lifetime/ctauUnit,Spin
 endif
 
 ! decay product 2 (V2): l+, nubar or qbar
 i=8
 if (LHE_IDUP(i).gt.Not_a_particle_) then
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,5),MomDummy(1,5),L21Mass,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,5),MomDummy(1,5),L21Mass,Lifetime/ctauUnit,Spin
 endif
 
 ! additional F.S. partons
 do a=1,NumFSPartons
-    write(io_LHEOutFile,fmt1) LHE_IDUP(9+a),ISTUP(9+a), MOTHUP(1,9+a),MOTHUP(2,9+a), ICOLUP(1,9+a),ICOLUP(2,9+a),MomDummy(2:4,6+a),MomDummy(1,6+a),PartonMass(a),Lifetime,Spin
+    write(io_LHEOutFile,fmt1) LHE_IDUP(9+a),ISTUP(9+a), MOTHUP(1,9+a),MOTHUP(2,9+a), ICOLUP(1,9+a),ICOLUP(2,9+a),MomDummy(2:4,6+a),MomDummy(1,6+a),PartonMass(a),Lifetime/ctauUnit,Spin
 enddo
 
 if( present(PDFLine) ) then
@@ -345,12 +346,12 @@ real(8),optional :: EventScaleAqedAqcd(1:3)
 character(len=*),optional :: BeginEventLine
 character(len=*),optional :: InputFmt0
 ! integer,optional :: MOTHUP_Parton(:,:)
-real(8) :: Spin, Lifetime, s34,s56,s36,s45,smallestInv
+real(8) :: Spin, s34,s56,s36,s45,smallestInv
 integer :: IDUP(:),ISTUP(:),MOTHUP(:,:),ICOLUP(:,:)
 integer :: HiggsDK_IDUP(:),HiggsDK_ICOLUP(:,:),HiggsDK_ISTUP(4:9),HiggsDK_MOTHUP(1:2,4:9)
 integer :: i,iHiggs
 integer :: NUP,NUP_NEW,IDPRUP
-real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,HiggsDKLength
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,Lifetime(3:9)
 character(len=*),parameter :: DefaultFmt0 = "I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7"
 character(len=*),parameter :: Fmt1 = "6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0"
 integer :: indent
@@ -403,7 +404,7 @@ logical :: IsEmpty
         AQEDUP=EventScaleAqedAqcd(2)
         AQCDUP=EventScaleAqedAqcd(3)
     else
-        SCALUP=Mu_Fact * 100d0
+        SCALUP=Mu_Fact/GeV
         AQEDUP=alpha_QED
         AQCDUP=alphas
     endif
@@ -430,11 +431,11 @@ logical :: IsEmpty
         HiggsDK_MOTHUP(1:2,9) = (/2,2/) + NUP
     endif
 
-    Lifetime = 0.0d0
+    Lifetime(:) = 0d0
     Spin = 0.1d0
-    call getHiggsDecayLength(HiggsDKLength)
+    call getHiggsDecayLength(Lifetime(3))
 
-    !  associte lepton pairs to MOTHUP
+    !  associate lepton pairs to MOTHUP
     if( (IsAZDecay(DecayMode1)).and.(IsAZDecay(DecayMode2)) .and. abs(HiggsDK_IDUP(7)).eq.abs(HiggsDK_IDUP(9)) ) then
         s34 = Get_MInv( HiggsDK_Mom(1:4,3)+HiggsDK_Mom(1:4,4) )
         s56 = Get_MInv( HiggsDK_Mom(1:4,5)+HiggsDK_Mom(1:4,6) )
@@ -450,6 +451,14 @@ logical :: IsEmpty
             HiggsDK_Mom(1:4,2) = HiggsDK_Mom(1:4,4)+ HiggsDK_Mom(1:4,5)
         endif
     endif
+
+    if (includeVprime .and. M_Vprime .ge. 0d0 .and. (VprimeDecayLengthMassCutoffFactor.le.0d0 .or. abs(Get_MInv(HiggsDK_Mom(1:4,1)) - M_Vprime).lt.VprimeDecayLengthMassCutoffFactor*Ga_Vprime) .and. .not.IsAPhoton(DecayMode1)) then
+      call getVprimeDecayLength(Lifetime(4))
+    endif
+    if (includeVprime .and. M_Vprime .ge. 0d0 .and. (VprimeDecayLengthMassCutoffFactor.le.0d0 .or. abs(Get_MInv(HiggsDK_Mom(1:4,2)) - M_Vprime).lt.VprimeDecayLengthMassCutoffFactor*Ga_Vprime) .and. .not.IsAPhoton(DecayMode2)) then
+      call getVprimeDecayLength(Lifetime(5))
+    endif
+
 
     if (present(BeginEventLine)) then
         write(io_LHEOutFile, "(A)") trim(BeginEventLine)
@@ -490,10 +499,10 @@ logical :: IsEmpty
         do i = 1, NUP
             if( i.eq.iHiggs ) then
                write(io_LHEOutFile,IndentedFmt1) IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),  &
-                                                 Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,HiggsDKLength, Spin
+                                                 Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,Lifetime(3)/ctauUnit, Spin
             else
                write(io_LHEOutFile,IndentedFmt1) IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),  &
-                                                 Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,Lifetime, Spin
+                                                 Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,0d0, Spin
             endif
         enddo
 
@@ -503,7 +512,7 @@ logical :: IsEmpty
         !call swap_mom(HiggsDK_Mom(1:4,5),HiggsDK_Mom(1:4,6))! swap to account for flipped asignments
         do i = 4,4 + (NUP_NEW-1)
             write(io_LHEOutFile,IndentedFmt1) HiggsDK_IDUP(i),HiggsDK_ISTUP(i), HiggsDK_MOTHUP(1,i),HiggsDK_MOTHUP(2,i), HiggsDK_ICOLUP(1,i),HiggsDK_ICOLUP(2,i),  &
-                                              HiggsDK_Mom(2:4,i-3)/GeV,HiggsDK_Mom(1,i-3)/GeV, get_MInv(HiggsDK_Mom(1:4,i-3))/GeV, Lifetime, Spin
+                                              HiggsDK_Mom(2:4,i-3)/GeV,HiggsDK_Mom(1,i-3)/GeV, get_MInv(HiggsDK_Mom(1:4,i-3))/GeV, Lifetime(i)/ctauUnit, Spin
         enddo
     endif
 
@@ -511,6 +520,116 @@ RETURN
 END SUBROUTINE
 
 
+SUBROUTINE WriteOutEvent_gg4f_fullproddec(Mom,MY_IDUP,ICOLUP,EventWeight)
+use ModParameters
+use ModMisc
+implicit none
+integer,parameter :: inTop=1, inBot=2, V1=3, V2=4, Lep1P=5, Lep1M=6, Lep2P=7, Lep2M=8, NUP=8
+real(8) :: Mom(1:4,1:NUP),xRnd,s34,s36,s45,s56
+real(8),optional :: EventWeight
+integer :: MY_IDUP(1:NUP),ICOLUP(1:2,1:NUP),LHE_IDUP(1:NUP),ISTUP(1:NUP),MOTHUP(1:2,1:NUP)
+integer :: IDPRUP,i,smallestInv,j
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,Lifetime,Spin,MomDummy(1:4,1:NUP),TheMass,mjj
+character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
+integer, parameter :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6,5/)
+! For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
+! The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
+
+
+      IDPRUP=Process
+      SCALUP=Mu_Fact/GeV
+      AQEDUP=alpha_QED
+      AQCDUP=alphas
+
+      ISTUP(inTop:inBot) = -1
+      ISTUP(V1:V2) = 2
+      ISTUP(V2+1:NUP) = +1
+
+      ICOLUP(1:2,V1:V2) = 0
+      if( IsAGluon(MY_IDUP(1)) .and. IsAGluon(MY_IDUP(2)) ) then! gg->VV
+         ICOLUP(1:2,1) = (/501,502/)
+         ICOLUP(1:2,2) = (/502,501/)
+      elseif (MY_IDUP(1).gt.0 .and. MY_IDUP(2).lt.0) then  ! qqb->VV
+         ICOLUP(1:2,1) = (/501,000/)
+         ICOLUP(1:2,2) = (/000,501/)
+      elseif (MY_IDUP(2).gt.0 .and. MY_IDUP(1).lt.0) then  ! qbq->VV
+         ICOLUP(1:2,2) = (/501,000/)
+         ICOLUP(1:2,1) = (/000,501/)
+      else
+        print *, "Colors for the gg4f process cannot be resolved."
+        print *, MY_IDUP(inTop:inBot)
+        stop 1
+      endif
+
+
+      MOTHUP(1:2,inTop:inBot) = 0
+      MOTHUP(1:2,V1)=(/inTop,inBot/)
+      MOTHUP(1:2,V2)=(/inTop,inBot/)
+      MOTHUP(1:2,Lep1P)= (/V1,V1/)
+      MOTHUP(1:2,Lep1M)= (/V1,V1/)
+      MOTHUP(1:2,Lep2P)= (/V2,V2/)
+      MOTHUP(1:2,Lep2M)= (/V2,V2/)
+
+
+      if( present(EventWeight) ) then
+          XWGTUP=EventWeight
+      else
+          XWGTUP=1d0
+      endif
+      Lifetime = 0.0d0
+      Spin     = 0.1d0
+
+
+      do i=1,NUP
+          LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
+          MomDummy(1,i) = Mom(1,i)/GeV
+          MomDummy(2,i) = Mom(2,i)/GeV
+          MomDummy(3,i) = Mom(3,i)/GeV
+          MomDummy(4,i) = Mom(4,i)/GeV
+      enddo
+
+
+!  associate lepton pairs to MOTHUP
+      if( MY_IDUP(Lep1P).eq.MY_IDUP(Lep2P) ) then
+          s34 = Get_MInv( Mom(1:4,Lep1P)+Mom(1:4,Lep1M) )
+          s56 = Get_MInv( Mom(1:4,Lep2P)+Mom(1:4,Lep2M) )
+          s36 = Get_MInv( Mom(1:4,Lep1P)+Mom(1:4,Lep2M) )
+          s45 = Get_MInv( Mom(1:4,Lep2P)+Mom(1:4,Lep1M) )
+          smallestInv = minloc((/dabs(s34-M_V),dabs(s56-M_V),dabs(s36-M_V),dabs(s45-M_V)/),1)
+          if( smallestInv.eq.3 .or. smallestInv.eq.4 ) then
+              call swap(MOTHUP(1,Lep1P),MOTHUP(1,Lep2P))
+              call swap(MOTHUP(2,Lep1P),MOTHUP(2,Lep2P))
+              call swap(ICOLUP(1,Lep1P),ICOLUP(1,Lep2P))
+              call swap(ICOLUP(2,Lep1P),ICOLUP(2,Lep2P))
+              call swap(MomDummy(1:4,Lep1P),MomDummy(1:4,Lep2P))
+          endif
+      endif
+      MomDummy(1:4,V1) = MomDummy(1:4,Lep1P)+MomDummy(1:4,Lep1M)
+      MomDummy(1:4,V2) = MomDummy(1:4,Lep2P)+MomDummy(1:4,Lep2M)
+
+
+write(io_LHEOutFile,"(A)") "<event>"
+write(io_LHEOutFile,"(I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+! in order of appearance:
+! (*) number of particles in the event
+! (*) process ID (user defined)
+! (*) weighted or unweighted events: +1=unweighted, otherwise= see manual
+! (*) pdf factorization scale in GeV
+! (*) alpha_QED coupling for this event
+! (*) alpha_s coupling for this event
+
+
+do i=1,NUP
+     TheMass = get_Minv(MomDummy(:,i))
+     if( i.le.inBot  ) TheMass = 0d0  ! setting incoming quark/gluon masses to zero
+     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),TheMass,Lifetime/ctauUnit,Spin
+enddo
+
+write(io_LHEOutFile,"(A)") "</event>"
+
+
+RETURN
+END SUBROUTINE
 
 
 SUBROUTINE WriteOutEvent_HFF(NUP,IDUP,ISTUP,MOTHUP,ICOLUP,Mom,HiggsDK_Mom,Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventProcessId,EventWeight,EventScaleAqedAqcd,BeginEventLine,InputFmt0,Empty)
@@ -572,7 +691,7 @@ logical :: IsEmpty
         AQEDUP=EventScaleAqedAqcd(2)
         AQCDUP=EventScaleAqedAqcd(3)
     else
-        SCALUP=Mu_Fact * 100d0
+        SCALUP=Mu_Fact/GeV
         AQEDUP=alpha_QED
         AQCDUP=alphas
     endif
@@ -640,17 +759,17 @@ logical :: IsEmpty
         do i = 1, NUP
             if( i.eq.iHiggs ) then
                write(io_LHEOutFile,IndentedFmt1) IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),  &
-                                                 Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,HiggsDKLength, Spin
+                                                 Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,HiggsDKLength/ctauUnit, Spin
             else
                write(io_LHEOutFile,IndentedFmt1) IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),  &
-                                                 Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,Lifetime, Spin
+                                                 Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,Lifetime/ctauUnit, Spin
             endif
         enddo
 
 !       write new intermediate particles and Higgs decay products
         do i = 4,4 + (NUP_NEW-1)
             write(io_LHEOutFile,IndentedFmt1) HiggsDK_IDUP(i),HiggsDK_ISTUP(i), HiggsDK_MOTHUP(1,i),HiggsDK_MOTHUP(2,i), HiggsDK_ICOLUP(1,i),HiggsDK_ICOLUP(2,i),  &
-                                              HiggsDK_Mom(2:4,i)/GeV,HiggsDK_Mom(1,i)/GeV, get_MInv(HiggsDK_Mom(1:4,i))/GeV, Lifetime, Spin
+                                              HiggsDK_Mom(2:4,i)/GeV,HiggsDK_Mom(1,i)/GeV, get_MInv(HiggsDK_Mom(1:4,i))/GeV, Lifetime/ctauUnit, Spin
         enddo
     endif
 
@@ -745,7 +864,7 @@ enddo
 
 
 IDPRUP=Process
-SCALUP=Mu_Fact * 100d0
+SCALUP=Mu_Fact/GeV
 AQEDUP=alpha_QED
 AQCDUP=alphas
 
@@ -778,10 +897,10 @@ Spin = 0.1d0
 call getHiggsDecayLength(HiggsDKLength)
 
 do a=1,4
-    MomDummy(1,a) = 100.0d0*Mom(1,a)
-    MomDummy(2,a) = 100.0d0*Mom(2,a)
-    MomDummy(3,a) = 100.0d0*Mom(3,a)
-    MomDummy(4,a) = 100.0d0*Mom(4,a)
+    MomDummy(1,a) = Mom(1,a)/GeV
+    MomDummy(2,a) = Mom(2,a)/GeV
+    MomDummy(3,a) = Mom(3,a)/GeV
+    MomDummy(4,a) = Mom(4,a)/GeV
 enddo
 
 ! do b=1,4
@@ -793,7 +912,7 @@ enddo
 Part1Mass = 0d0
 Part2Mass = 0d0
 Part4Mass = 0d0
-XMass = M_Reso* 100d0
+XMass = M_Reso/GeV
 
 
 
@@ -811,19 +930,19 @@ if( .not. ReadLHEFile ) write(io_LHEOutFile,"(I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1
 
 ! parton_a
 i=1
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),Part1Mass,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),Part1Mass,Lifetime/ctauUnit,Spin
 
 ! parton_b
 i=2
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),Part2Mass,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),Part2Mass,Lifetime/ctauUnit,Spin
 
 ! H
 i=3
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),XMass,HiggsDKLength,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),XMass,HiggsDKLength/ctauUnit,Spin
 
 ! j1
 i=4
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),Part4Mass,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),Part4Mass,Lifetime/ctauUnit,Spin
 
 
 write(io_LHEOutFile,"(A)") "</event>"
@@ -833,26 +952,25 @@ write(io_LHEOutFile,"(A)") "</event>"
 END SUBROUTINE
 
 
-SUBROUTINE WriteOutEvent_HJJ_fulldecay(Mom,MY_IDUP,ICOLUP,EventWeight)
+SUBROUTINE WriteOutEvent_HJJ_fulldecay(Mom,MY_IDUP,ICOLUP,do78,EventWeight)
 use ModParameters
 use ModMisc
 implicit none
-integer,parameter :: NUP=10
+integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10, NUP=10
 real(8) :: Mom(1:4,1:NUP),xRnd,s34,s36,s45,s56
 real(8),optional :: EventWeight
 integer :: MY_IDUP(1:NUP),ICOLUP(1:2,1:NUP),LHE_IDUP(1:NUP),ISTUP(1:NUP),MOTHUP(1:2,1:NUP)
 integer :: IDPRUP,i,smallestInv,j
 real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,Lifetime,Spin,MomDummy(1:4,1:NUP),TheMass,mjj
 character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
-integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
 integer, parameter :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6,5/)
-logical :: canbeVBF, canbeVH, isVHlike
+logical :: do78, canbeVBF, canbeVH, isVHlike
 ! For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
 ! The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
 
 
       IDPRUP=Process
-      SCALUP=Mu_Fact * 100d0
+      SCALUP=Mu_Fact/GeV
       AQEDUP=alpha_QED
       AQCDUP=alphas
 
@@ -864,8 +982,14 @@ logical :: canbeVBF, canbeVH, isVHlike
             ICOLUP(1:2,1) = (/501,502/)
             ICOLUP(1:2,2) = (/503,501/)
             if (IsAGluon(MY_IDUP(3))) then ! gg->gg
-               ICOLUP(1:2,3) = (/504,502/)
-               ICOLUP(1:2,4) = (/503,504/)
+               call random_number(xRnd)
+               if (xRnd.gt.0.5) then
+                  ICOLUP(1:2,3) = (/504,502/)
+                  ICOLUP(1:2,4) = (/503,504/)
+               else
+                  ICOLUP(1:2,4) = (/504,502/)
+                  ICOLUP(1:2,3) = (/503,504/)
+               endif
             elseif (MY_IDUP(3).gt.0) then  ! gg->qqb
                ICOLUP(1:2,3) = (/503,000/)
                ICOLUP(1:2,4) = (/000,502/)
@@ -883,7 +1007,7 @@ logical :: canbeVBF, canbeVH, isVHlike
                ICOLUP(1:2,2) = (/503,000/)
                ICOLUP(1:2,1) = (/000,502/)
             endif
-         elseif( (IsAQuark(MY_IDUP(1)) .and. IsAGluon(MY_IDUP(2))) .or. (IsAQuark(MY_IDUP(2)) .and. IsAGluon(MY_IDUP(1))) ) then! qg->qg
+         elseif( (IsAQuark(MY_IDUP(1)) .and. IsAGluon(MY_IDUP(2))) .or. (IsAQuark(MY_IDUP(2)) .and. IsAGluon(MY_IDUP(1))) ) then! qg/gq->qg/gq or qbg/gqb->qbg/gqb
             ICOLUP(1:2,1) = (/501,000/)
             ICOLUP(1:2,2) = (/502,501/)
             ICOLUP(1:2,3) = (/503,000/)
@@ -915,38 +1039,80 @@ logical :: canbeVBF, canbeVH, isVHlike
               endif
             endif
          ! qq->qq
-         elseif (MY_IDUP(1).eq.MY_IDUP(2)) then
+         elseif (abs(MY_IDUP(1)).eq.abs(MY_IDUP(2))) then
             ICOLUP(1:2,1) = (/501,000/)
             ICOLUP(1:2,2) = (/501,000/)
-            ICOLUP(1:2,3) = (/000,502/)
-            ICOLUP(1:2,4) = (/000,502/)
-            if (MY_IDUP(1).lt.0) then
-               do j=1,2
-                  call swap(ICOLUP(j,1),ICOLUP(j,3))
-                  call swap(ICOLUP(j,2),ICOLUP(j,4))
-               enddo
+            ICOLUP(1:2,3) = (/502,000/)
+            ICOLUP(1:2,4) = (/502,000/)
+            if (MY_IDUP(1).eq.MY_IDUP(3) .and. MY_IDUP(1).eq.MY_IDUP(4)) then
+               call random_number(xRnd)
+               if (xRnd.lt.0.5d0) then
+                  call swap(ICOLUP(1,2),ICOLUP(1,3))
+                  call swap(ICOLUP(2,2),ICOLUP(2,3))
+               else
+                  call swap(ICOLUP(1,2),ICOLUP(1,4))
+                  call swap(ICOLUP(2,2),ICOLUP(2,4))
+               endif
+            else if (MY_IDUP(1).eq.MY_IDUP(3)) then
+               call random_number(xRnd)
+               if (xRnd.lt.0.5d0) then
+                  call swap(ICOLUP(1,2),ICOLUP(1,3))
+                  call swap(ICOLUP(2,2),ICOLUP(2,3))
+               ! else leave colors alone
+               endif
+            else if (MY_IDUP(1).eq.MY_IDUP(4)) then
+               call random_number(xRnd)
+               if (xRnd.lt.0.5d0) then
+                  call swap(ICOLUP(1,2),ICOLUP(1,4))
+                  call swap(ICOLUP(2,2),ICOLUP(2,4))
+               ! else leave colors alone
+               endif
             endif
-         elseif (MY_IDUP(1).eq.MY_IDUP(3)) then
+            if (MY_IDUP(1).lt.0) then
+               call swap(ICOLUP(1,1),ICOLUP(2,1))
+            endif
+            if (MY_IDUP(2).lt.0) then
+               call swap(ICOLUP(1,2),ICOLUP(2,2))
+            endif
+            if (MY_IDUP(3).lt.0) then
+               call swap(ICOLUP(1,3),ICOLUP(2,3))
+            endif
+            if (MY_IDUP(4).lt.0) then
+               call swap(ICOLUP(1,4),ICOLUP(2,4))
+            endif
+         elseif (abs(MY_IDUP(1)).eq.abs(MY_IDUP(3))) then
             ICOLUP(1:2,1) = (/501,000/)
-            ICOLUP(1:2,2) = (/000,502/)
+            ICOLUP(1:2,2) = (/502,000/)
             ICOLUP(1:2,3) = (/501,000/)
-            ICOLUP(1:2,4) = (/000,502/)
+            ICOLUP(1:2,4) = (/502,000/)
             if (MY_IDUP(1).lt.0) then
-               do j=1,2
-                  call swap(ICOLUP(j,1),ICOLUP(j,2))
-                  call swap(ICOLUP(j,3),ICOLUP(j,4))
-               enddo
+               call swap(ICOLUP(1,1),ICOLUP(2,1))
             endif
-         elseif (MY_IDUP(1).eq.MY_IDUP(4)) then
+            if (MY_IDUP(2).lt.0) then
+               call swap(ICOLUP(1,2),ICOLUP(2,2))
+            endif
+            if (MY_IDUP(3).lt.0) then
+               call swap(ICOLUP(1,3),ICOLUP(2,3))
+            endif
+            if (MY_IDUP(4).lt.0) then
+               call swap(ICOLUP(1,4),ICOLUP(2,4))
+            endif
+         elseif (abs(MY_IDUP(1)).eq.abs(MY_IDUP(4))) then
             ICOLUP(1:2,1) = (/501,000/)
-            ICOLUP(1:2,2) = (/000,502/)
-            ICOLUP(1:2,3) = (/000,502/)
+            ICOLUP(1:2,2) = (/502,000/)
+            ICOLUP(1:2,3) = (/502,000/)
             ICOLUP(1:2,4) = (/501,000/)
             if (MY_IDUP(1).lt.0) then
-               do j=1,2
-                  call swap(ICOLUP(j,1),ICOLUP(j,2))
-                  call swap(ICOLUP(j,3),ICOLUP(j,4))
-               enddo
+               call swap(ICOLUP(1,1),ICOLUP(2,1))
+            endif
+            if (MY_IDUP(2).lt.0) then
+               call swap(ICOLUP(1,2),ICOLUP(2,2))
+            endif
+            if (MY_IDUP(3).lt.0) then
+               call swap(ICOLUP(1,3),ICOLUP(2,3))
+            endif
+            if (MY_IDUP(4).lt.0) then
+               call swap(ICOLUP(1,4),ICOLUP(2,4))
             endif
          else
            print *, "Color for this Process 69 configuration cannot be resolved"
@@ -1122,8 +1288,8 @@ write(io_LHEOutFile,"(I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7)") NUP
 
 do i=1,NUP
      TheMass = get_Minv(MomDummy(:,i))
-     if( i.le.4  ) TheMass = 0.0d0  ! setting quark masses to zero
-     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),TheMass,Lifetime,Spin
+     if( i.le.inbot .or. (.not. do78 .and. i.le.outBot)  ) TheMass = 0.0d0  ! setting quark masses to zero
+     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),TheMass,Lifetime/ctauUnit,Spin
 enddo
 
 write(io_LHEOutFile,"(A)") "</event>"
@@ -1155,7 +1321,7 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,
 
 
 IDPRUP=Process
-SCALUP=Mu_Fact * 100d0
+SCALUP=Mu_Fact/GeV
 AQEDUP=alpha_QED
 AQCDUP=alphas
 
@@ -1198,10 +1364,10 @@ Spin     = 0.1d0
 
 do i=1,5
     LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
-    MomDummy(1,i) = 100.0d0*Mom(1,i)
-    MomDummy(2,i) = 100.0d0*Mom(2,i)
-    MomDummy(3,i) = 100.0d0*Mom(3,i)
-    MomDummy(4,i) = 100.0d0*Mom(4,i)
+    MomDummy(1,i) = Mom(1,i)/GeV
+    MomDummy(2,i) = Mom(2,i)/GeV
+    MomDummy(3,i) = Mom(3,i)/GeV
+    MomDummy(4,i) = Mom(4,i)/GeV
 enddo
 
 if( TopDecays.ne.0 ) then
@@ -1219,10 +1385,10 @@ if( TopDecays.ne.0 ) then
 
       do i=6,13
           LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
-          MomDummy(1,i) = 100.0d0*MomDummy(1,i)
-          MomDummy(2,i) = 100.0d0*MomDummy(2,i)
-          MomDummy(3,i) = 100.0d0*MomDummy(3,i)
-          MomDummy(4,i) = 100.0d0*MomDummy(4,i)
+          MomDummy(1,i) = MomDummy(1,i)/GeV
+          MomDummy(2,i) = MomDummy(2,i)/GeV
+          MomDummy(3,i) = MomDummy(3,i)/GeV
+          MomDummy(4,i) = MomDummy(4,i)/GeV
       enddo
 endif
 
@@ -1238,10 +1404,9 @@ write(io_LHEOutFile,"(I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7)") NUP
 ! (*) alpha_s coupling for this event
 
 do i=1,NUP
-!      TheMass = GetMass( MY_IDUP(i) )*100d0
      TheMass = get_Minv(MomDummy(:,i))
-     if( i.le.2  ) TheMass = 0.0d0  ! setting initial parton masses to zero
-     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),TheMass,Lifetime,Spin
+     if( i.le.2  ) TheMass = 0d0  ! setting initial parton masses to zero
+     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),TheMass,Lifetime/ctauUnit,Spin
 enddo
 write(io_LHEOutFile,"(A)") "</event>"
 
@@ -1275,7 +1440,7 @@ enddo
 
 
 IDPRUP=Process
-SCALUP=Mu_Fact * 100d0
+SCALUP=Mu_Fact/GeV
 AQEDUP=alpha_QED
 AQCDUP=alphas
 
@@ -1302,10 +1467,10 @@ Lifetime = 0.0d0
 Spin     = 0.1d0
 
 do i=1,11
-    MomDummy(1,i) = 100.0d0*Mom(1,i)
-    MomDummy(2,i) = 100.0d0*Mom(2,i)
-    MomDummy(3,i) = 100.0d0*Mom(3,i)
-    MomDummy(4,i) = 100.0d0*Mom(4,i)
+    MomDummy(1,i) = Mom(1,i)/GeV
+    MomDummy(2,i) = Mom(2,i)/GeV
+    MomDummy(3,i) = Mom(3,i)/GeV
+    MomDummy(4,i) = Mom(4,i)/GeV
 enddo
 
 
@@ -1324,23 +1489,23 @@ write(io_LHEOutFile,"(I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7)") NUP
 
 ! parton_a
 i=1
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime/ctauUnit,Spin
 
 ! parton_b
 i=2
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime/ctauUnit,Spin
 
 ! H
 i=3
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),M_Reso*100d0,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),M_Reso/GeV,Lifetime/ctauUnit,Spin
 
 ! bb
 i=4
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),m_top*100d0,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),m_top/GeV,Lifetime/ctauUnit,Spin
 
 ! b
 i=5
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),m_top*100d0,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),m_top/GeV,Lifetime/ctauUnit,Spin
 
 
 
@@ -1376,7 +1541,7 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
 
 
 IDPRUP=Process
-SCALUP=Mu_Fact * 100d0
+SCALUP=Mu_Fact/GeV
 AQEDUP=alpha_QED
 AQCDUP=alphas
 
@@ -1413,10 +1578,10 @@ Spin     = 0.1d0
 
 do i=1,5
     LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
-    MomDummy(1,i) = 100.0d0*Mom(1,i)
-    MomDummy(2,i) = 100.0d0*Mom(2,i)
-    MomDummy(3,i) = 100.0d0*Mom(3,i)
-    MomDummy(4,i) = 100.0d0*Mom(4,i)
+    MomDummy(1,i) = Mom(1,i)/GeV
+    MomDummy(2,i) = Mom(2,i)/GeV
+    MomDummy(3,i) = Mom(3,i)/GeV
+    MomDummy(4,i) = Mom(4,i)/GeV
 enddo
 
 if( TopDecays.ne.0 ) then
@@ -1430,10 +1595,10 @@ if( TopDecays.ne.0 ) then
 
       do i=6,9
           LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
-          MomDummy(1,i) = 100.0d0*MomDummy(1,i)
-          MomDummy(2,i) = 100.0d0*MomDummy(2,i)
-          MomDummy(3,i) = 100.0d0*MomDummy(3,i)
-          MomDummy(4,i) = 100.0d0*MomDummy(4,i)
+          MomDummy(1,i) = MomDummy(1,i)/GeV
+          MomDummy(2,i) = MomDummy(2,i)/GeV
+          MomDummy(3,i) = MomDummy(3,i)/GeV
+          MomDummy(4,i) = MomDummy(4,i)/GeV
       enddo
 endif
 
@@ -1450,10 +1615,9 @@ write(io_LHEOutFile,"(I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7)") NUP
 ! (*) alpha_s coupling for this event
 
 do i=1,NUP
-!      TheMass = GetMass( MY_IDUP(i) )*100d0
      TheMass = get_Minv(MomDummy(:,i))
      if( i.le.2  ) TheMass = 0.0d0  ! setting initial parton masses to zero
-     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),TheMass,Lifetime,Spin
+     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),TheMass,Lifetime/ctauUnit,Spin
 enddo
 write(io_LHEOutFile,"(A)") "</event>"
 
@@ -1495,7 +1659,7 @@ enddo
 
 
 IDPRUP=Process
-SCALUP=Mu_Fact * 100d0
+SCALUP=Mu_Fact/GeV
 AQEDUP=alpha_QED
 AQCDUP=alphas
 
@@ -1543,10 +1707,10 @@ Spin = 0.1d0
 call getHiggsDecayLength(HiggsDKLength)
 
 do a=1,5
-    MomDummy(1,a) = 100.0d0*Mom(1,a)
-    MomDummy(2,a) = 100.0d0*Mom(2,a)
-    MomDummy(3,a) = 100.0d0*Mom(3,a)
-    MomDummy(4,a) = 100.0d0*Mom(4,a)
+    MomDummy(1,a) = Mom(1,a)/GeV
+    MomDummy(2,a) = Mom(2,a)/GeV
+    MomDummy(3,a) = Mom(3,a)/GeV
+    MomDummy(4,a) = Mom(4,a)/GeV
 enddo
 
 ! do b=1,4
@@ -1559,7 +1723,7 @@ Part1Mass = 0d0
 Part2Mass = 0d0
 Part3Mass = 0d0
 Part4Mass = 0d0
-XMass = M_Reso* 100d0
+XMass = M_Reso/GeV
 
 
 
@@ -1577,23 +1741,23 @@ if( .not. ReadLHEFile ) write(io_LHEOutFile,"(I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1
 
 ! parton_a
 i=1
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),Part1Mass,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),Part1Mass,Lifetime/ctauUnit,Spin
 
 ! parton_b
 i=2
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),Part2Mass,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),Part2Mass,Lifetime/ctauUnit,Spin
 
 ! j1
 i=3
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),Part3Mass,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),Part3Mass,Lifetime/ctauUnit,Spin
 
 ! j2
 i=4
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),Part4Mass,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),Part4Mass,Lifetime/ctauUnit,Spin
 
 ! H
 i=5
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),XMass,HiggsDKLength,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),XMass,HiggsDKLength/ctauUnit,Spin
 
 
 write(io_LHEOutFile,"(A)") "</event>"
@@ -1690,9 +1854,9 @@ else
 endif
 
 if(H_DK.eqv..true.)then
-  write(io_LHEOutFile,fmt1) id(5), 2,1,2,0,0,MomDummy(2:4,5), MomDummy(1,5), MassDummy(5), HiggsDKLength, Spin
+  write(io_LHEOutFile,fmt1) id(5), 2,1,2,0,0,MomDummy(2:4,5), MomDummy(1,5), MassDummy(5), HiggsDKLength/ctauUnit, Spin
 else
-  write(io_LHEOutFile,fmt1) id(5), 1,1,2,0,0,MomDummy(2:4,5), MomDummy(1,5), MassDummy(5), HiggsDKLength, Spin
+  write(io_LHEOutFile,fmt1) id(5), 1,1,2,0,0,MomDummy(2:4,5), MomDummy(1,5), MassDummy(5), HiggsDKLength/ctauUnit, Spin
 endif
 
 if(.not.IsAPhoton(DecayMode1)) then
@@ -2071,6 +2235,159 @@ END SUBROUTINE
 
 
 
+SUBROUTINE Kinematics_gg4f_fullproddec(MomExt,ids,applyPSCut,NBin)
+use ModMisc
+use ModParameters
+implicit none
+integer,parameter :: inTop=1, inBot=2, V1=3, V2=4, Lep1P=5, Lep1M=6, Lep2P=7, Lep2M=8, NUP=8
+real(8), intent(in) :: MomExt(1:4,1:NUP)
+integer, intent(in) :: ids(1:NUP-2) ! excludes V1, V2
+logical, intent(out) :: applyPSCut
+integer, intent(inout) :: NBin(:)
+integer :: ipart,jpart,lepcount,jetcount,id_ij,idpho_ij
+real(8) :: m_4l,pT_part,eta_part,eta_jpart,dphi_ij,deta_ij,dR_ij,m_ij,pT_ij
+logical, parameter :: doPrintFailReason=.false.
+
+      applyPSCut = .false.
+      lepcount=0
+      jetcount=0
+
+      if (doPrintFailReason) then
+         write(6,*) "Begin debugging of Kinematics_gg4f_fullproddec"
+         do jpart=1,6
+            write(6,*) "id(",jpart,")=",convertLHE(ids(jpart))
+         enddo
+         do jpart=1,NUP
+            write(6,*) "MomExt(",jpart,")=",MomExt(:,jpart)
+         enddo
+      endif
+
+      if ( any(RequestNLeptons.ge.0) ) then
+         lepcount = CountLeptons(ids(V2+1-2:NUP-2))
+         applyPSCut = ( (RequestNLeptons(1).ge.0 .and. lepcount .lt. RequestNLeptons(1)) .or. (RequestNLeptons(2).ge.0 .and. lepcount .gt. RequestNLeptons(2)) )
+         if (applyPSCut) then
+            if (doPrintFailReason) write(6,*) "Failed nlep cutoff (nleps=",lepcount,")"
+            return
+         endif
+      endif
+      if ( any(RequestNJets.ge.0) ) then
+         jetcount = CountJets(ids(V2+1-2:NUP-2))
+         applyPSCut = ( (RequestNJets(1).ge.0 .and. jetcount .lt. RequestNJets(1)) .or. (RequestNJets(2).ge.0 .and. jetcount .gt. RequestNJets(2)) )
+         if (applyPSCut) then
+            if (doPrintFailReason) write(6,*) "Failed njet cutoff (njets=",jetcount,")"
+            return
+         endif
+      endif
+
+      m_4l = get_MInv( MomExt(1:4,Lep1P)+MomExt(1:4,Lep1M)+MomExt(1:4,Lep2P)+MomExt(1:4,Lep2M) )
+
+      do ipart=V2+1,NUP
+         pT_part = get_PT(MomExt(1:4,ipart))
+         eta_part = get_Eta(MomExt(1:4,ipart))
+         if (IsALepton(ids(ipart-2))) then
+            if (pT_part.lt.pTlepcut) then
+               if (doPrintFailReason) write(6,*) "Failed pTlep cutoff. pT=",pT_part,"<",pTlepcut
+               applyPSCut=.true.
+               return
+            endif
+            if (abs(eta_part).gt.etalepcut) then
+               if (doPrintFailReason) write(6,*) "Failed etalep cutoff. eta=",eta_part,">",etalepcut
+               applyPSCut=.true.
+               return
+            endif
+         endif
+         if (IsAJet(ids(ipart-2))) then
+            if (pT_part.lt.pTjetcut) then
+               if (doPrintFailReason) write(6,*) "Failed pTjet cutoff. pT=",pT_part,"<",pTjetcut
+               applyPSCut=.true.
+               return
+            endif
+            if (abs(eta_part).gt.etalepcut) then
+               if (doPrintFailReason) write(6,*) "Failed etajet cutoff. eta=",eta_part,">",etajetcut
+               applyPSCut=.true.
+               return
+            endif
+         endif
+
+         do jpart=ipart+1,NUP
+            dphi_ij = abs( Get_PHI(MomExt(1:4,ipart)) - Get_PHI(MomExt(1:4,jpart)) )
+            if( dphi_ij.gt.Pi ) then
+               dphi_ij=2d0*Pi-dphi_ij
+            endif
+            eta_jpart = get_Eta(MomExt(1:4,jpart))
+            deta_ij = abs(eta_part - eta_jpart)
+            dR_ij = sqrt(deta_ij**2 + dphi_ij**2)
+            m_ij = get_MInv(MomExt(1:4,ipart)+MomExt(1:4,jpart))
+            pT_ij = get_PT(MomExt(1:4,ipart)+MomExt(1:4,jpart))
+
+            idpho_ij = CoupledVertex((/ids(ipart-2),ids(jpart-2)/),-1,useAHcoupl=1)
+            id_ij = CoupledVertex((/ids(ipart-2),ids(jpart-2)/),-1)
+            if (idpho_ij.eq.Pho_) then
+               if (m_ij.lt.MPhotonCutoff) then
+                  if (doPrintFailReason) write(6,*) "Failed mphoton cutoff. m(",ipart,jpart,")=",m_ij,"<",MPhotonCutoff
+                  applyPSCut=.true.
+                  return
+               endif
+            endif
+
+            if ( &
+               id_ij.eq.Z0_ .and. (                       &
+                  (ipart.eq.Lep1P .and. jpart.eq.Lep1M) .or. &
+                  (ipart.eq.Lep2P .and. jpart.eq.Lep2M) .or. &
+                  includeInterference .and. ( &
+                     (ipart.eq.Lep1P .and. jpart.eq.Lep2M) .or. &
+                     (ipart.eq.Lep2P .and. jpart.eq.Lep1M)      &
+                  ) &
+               ) &
+               ) then
+               if (pT_ij.lt.0.1d0*GeV) then
+                  if (doPrintFailReason) write(6,*) "MCFM does not allow p_T^Z<0.1 GeV. pT(",ipart,jpart,")=",pT_ij,"<0.1 GeV"
+                  applyPSCut=.true.
+                  return
+               endif
+            endif
+            if ( &
+               abs(id_ij).eq.abs(Wp_) .and. ( &
+                  (ipart.eq.Lep1P .and. jpart.eq.Lep1M) .or. &
+                  (ipart.eq.Lep2P .and. jpart.eq.Lep2M) .or. &
+                  includeInterference .and. ( &
+                     (ipart.eq.Lep1P .and. jpart.eq.Lep2M) .or. &
+                     (ipart.eq.Lep2P .and. jpart.eq.Lep1M)      &
+                  ) &
+               ) &
+               ) then
+               if (pT_ij.lt.0.05d0*GeV) then
+                  if (doPrintFailReason) write(6,*) "MCFM does not allow p_T^W<0.05 GeV. pT(",ipart,jpart,")=",pT_ij,"<0.05 GeV"
+                  applyPSCut=.true.
+                  return
+               endif
+            endif
+
+            if( IsAJet(ids(ipart-2)) .and. IsAJet(ids(jpart-2)) ) then
+               if (deta_ij.lt.detajetcut .or. (JetsOppositeEta .and. eta_part*eta_jpart.gt.0d0)) then
+                  if (doPrintFailReason) write(6,*) "Failed detajet cutoff. deta=|",eta_part,"-",eta_jpart,"|<",detajetcut
+                  applyPSCut=.true.
+                  return
+               endif
+               if( m_ij.lt.mJJcut .or. dR_ij.lt.Rjet )  then
+                  if (doPrintFailReason) write(6,*) "Failed mjj cutoff. mjj=",m_ij,"<",mJJcut,"or dRjj=",dR_ij,"<",Rjet
+                  applyPSCut=.true.
+                  return
+               endif
+            endif
+         enddo
+      enddo
+
+!     binning
+      NBin(:) = 1
+
+
+   if (doPrintFailReason) write(6,*) "End debugging of Kinematics_gg4f_fullproddec"
+
+RETURN
+END SUBROUTINE
+
+
 
 
 SUBROUTINE Kinematics_HVBF(NumPart,MomExt,applyPSCut,NBin)
@@ -2140,7 +2457,7 @@ real(8) :: MomExt(:,:), mZ1, mZ2, MReso, mZ1alt, mZ2alt
 real(8) :: MomLepP(1:4),MomLepM(1:4),MomBoost(1:4),BeamAxis(1:4),ScatteringAxis(1:4),dummy(1:4)
 real(8) :: MomLept(1:4,1:4),MomLeptX(1:4,1:4),MomLeptPlane1(2:4),MomLeptPlane2(2:4),MomBeamScatterPlane(2:4)
 logical :: applyPSCut
-integer :: NBin(:),ids(1:8),jpart
+integer :: NBin(:),ids(1:8),jpart,lepcount,jetcount
 real(8) :: m_jj,y_j1,y_j2,dphi_jj,dy_j1j2,pT_jl,pT_j1,pT_j2,pT_H,m_4l,dR_j1j2
 real(8) :: pT_l1,pT_l2,pT_l3,pT_l4,y_l1,y_l2,y_l3,y_l4
 real(8) :: Phi1,signPhi1,MomReso(1:4)
@@ -2149,6 +2466,25 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=8, 
 
 
        applyPSCut = .false.
+       lepcount=0
+       jetcount=0
+
+       if ( any(RequestNLeptons.ge.0) ) then
+          lepcount = CountLeptons(ids(3:8))
+          applyPSCut = ( (RequestNLeptons(1).ge.0 .and. lepcount .lt. RequestNLeptons(1)) .or. (RequestNLeptons(2).ge.0 .and. lepcount .gt. RequestNLeptons(2)) )
+          if (applyPSCut) then
+             if (doPrintFailReason) write(6,*) "Failed nlep cutoff (nleps=",lepcount,")"
+             return
+          endif
+       endif
+       if ( any(RequestNJets.ge.0) ) then
+          jetcount = CountJets(ids(3:8))
+          applyPSCut = ( (RequestNJets(1).ge.0 .and. jetcount .lt. RequestNJets(1)) .or. (RequestNJets(2).ge.0 .and. jetcount .gt. RequestNJets(2)) )
+          if (applyPSCut) then
+             if (doPrintFailReason) write(6,*) "Failed njet cutoff (njets=",jetcount,")"
+             return
+          endif
+       endif
 
        m_jj = get_MInv( MomExt(1:4,outTop)+MomExt(1:4,outBot) )
        m_4l = get_MInv( MomExt(1:4,Lep1P)+MomExt(1:4,Lep1M)+MomExt(1:4,Lep2P)+MomExt(1:4,Lep2M) )
@@ -4117,6 +4453,7 @@ END FUNCTION
 ! When a CKM partner is called, since sum(VCKM**@)=1 along a row, counting should not be unaffected.
 SUBROUTINE VVBranchings(MY_IDUP,ICOLUP,CombWeight,ColorBase)
 use ModParameters
+use ModMisc
 implicit none
 integer :: MY_IDUP(4:9),ICOLUP(1:2,6:9),DKFlavor,ICOLUP_Base
 integer, optional ::ColorBase
@@ -4232,6 +4569,68 @@ real(8) :: DKRnd
            MY_IDUP(7) = +abs(DKFlavor)+7   ! neutrino
         endif
         CombWeight = CombWeight*9d0!*(3d0 + 2d0*3d0)
+   ! Exclusive Z1 decay modes
+   elseif( &
+      DecayMode1.eq.-2*2   .or. & ! Z->ee
+      DecayMode1.eq.-3*3   .or. & ! Z->mumu
+      DecayMode1.eq.-5*5   .or. & ! Z->dd
+      DecayMode1.eq.-7*7   .or. & ! Z->uu
+      DecayMode1.eq.-11*11 .or. & ! Z->ss
+      DecayMode1.eq.-13*13 .or. & ! Z->cc
+      DecayMode1.eq.-17*17      & ! Z->bb
+      ) then
+        MY_IDUP(4) = Z0_
+        DKFlavor = (                      &
+            ElM_*LogicalToInteger(DecayMode1.eq.-2*2)   + & ! Z->ee
+            MuM_*LogicalToInteger(DecayMode1.eq.-3*3)   + & ! Z->mumu
+            Dn_*LogicalToInteger(DecayMode1.eq.-5*5)    + & ! Z->dd
+            Up_*LogicalToInteger(DecayMode1.eq.-7*7)    + & ! Z->uu
+            Str_*LogicalToInteger(DecayMode1.eq.-11*11) + & ! Z->ss
+            Chm_*LogicalToInteger(DecayMode1.eq.-13*13) + & ! Z->cc
+            Bot_*LogicalToInteger(DecayMode1.eq.-17*17)   & ! Z->bb
+        )
+        MY_IDUP(6) =-DKFlavor
+        MY_IDUP(7) =+DKFlavor
+        if(IsAQuark(DKFlavor)) then
+           ICOLUP(1:2,6) = (/            0,ICOLUP_BASE+3/)
+           ICOLUP(1:2,7) = (/ICOLUP_BASE+3,            0/)
+        endif
+   ! Exclusive W+ decay modes
+   elseif( &
+      DecayMode1.eq.-2*1   .or. & ! W->enu
+      DecayMode1.eq.-3*1   .or. & ! W->munu
+      DecayMode1.eq.-5*7   .or. & ! W->du
+      DecayMode1.eq.-5*13  .or. & ! W->dc
+      DecayMode1.eq.-11*7  .or. & ! W->su
+      DecayMode1.eq.-11*13 .or. & ! W->sc
+      DecayMode1.eq.-17*7  .or. & ! W->bu
+      DecayMode1.eq.-17*13      & ! W->bc
+      ) then
+        MY_IDUP(4) = Wp_
+        MY_IDUP(6) = (                    &
+           ElP_*LogicalToInteger(DecayMode1.eq.-2*1)    + & ! W->enu
+           MuP_*LogicalToInteger(DecayMode1.eq.-3*1)    + & ! W->munu
+           ADn_*LogicalToInteger(DecayMode1.eq.-5*7)    + & ! W->du
+           ADn_*LogicalToInteger(DecayMode1.eq.-5*13)   + & ! W->dc
+           AStr_*LogicalToInteger(DecayMode1.eq.-11*7)  + & ! W->su
+           AStr_*LogicalToInteger(DecayMode1.eq.-11*13) + & ! W->sc
+           ABot_*LogicalToInteger(DecayMode1.eq.-17*7)  + & ! W->bu
+           ABot_*LogicalToInteger(DecayMode1.eq.-17*13)   & ! W->bc
+        )
+        MY_IDUP(7) = (                   &
+           NuE_*LogicalToInteger(DecayMode1.eq.-2*1)   + & ! W->enu
+           NuM_*LogicalToInteger(DecayMode1.eq.-3*1)   + & ! W->munu
+           Up_*LogicalToInteger(DecayMode1.eq.-5*7)    + & ! W->du
+           Chm_*LogicalToInteger(DecayMode1.eq.-5*13)  + & ! W->dc
+           Up_*LogicalToInteger(DecayMode1.eq.-11*7)   + & ! W->su
+           Chm_*LogicalToInteger(DecayMode1.eq.-11*13) + & ! W->sc
+           Up_*LogicalToInteger(DecayMode1.eq.-17*7)   + & ! W->bu
+           Chm_*LogicalToInteger(DecayMode1.eq.-17*13)   & ! W->bc
+        )
+        if(IsAQuark(DKFlavor)) then
+           ICOLUP(1:2,6) = (/            0,ICOLUP_BASE+3/)
+           ICOLUP(1:2,7) = (/ICOLUP_BASE+3,            0/)
+        endif
    endif
 
 
@@ -4329,6 +4728,68 @@ real(8) :: DKRnd
            MY_IDUP(9) = -abs(DKFlavor)     ! lepton(-)
         endif
         CombWeight = CombWeight*9d0!*(3d0 + 2d0*3d0)
+   ! Exclusive Z2 decay modes
+   elseif( &
+      DecayMode2.eq.-2*2   .or. & ! Z->ee
+      DecayMode2.eq.-3*3   .or. & ! Z->mumu
+      DecayMode2.eq.-5*5   .or. & ! Z->dd
+      DecayMode2.eq.-7*7   .or. & ! Z->uu
+      DecayMode2.eq.-11*11 .or. & ! Z->ss
+      DecayMode2.eq.-13*13 .or. & ! Z->cc
+      DecayMode2.eq.-17*17      & ! Z->bb
+      ) then
+        MY_IDUP(5) = Z0_
+        DKFlavor = (                      &
+            ElM_*LogicalToInteger(DecayMode2.eq.-2*2)   + & ! Z->ee
+            MuM_*LogicalToInteger(DecayMode2.eq.-3*3)   + & ! Z->mumu
+            Dn_*LogicalToInteger(DecayMode2.eq.-5*5)    + & ! Z->dd
+            Up_*LogicalToInteger(DecayMode2.eq.-7*7)    + & ! Z->uu
+            Str_*LogicalToInteger(DecayMode2.eq.-11*11) + & ! Z->ss
+            Chm_*LogicalToInteger(DecayMode2.eq.-13*13) + & ! Z->cc
+            Bot_*LogicalToInteger(DecayMode2.eq.-17*17)   & ! Z->bb
+        )
+        MY_IDUP(8) =-DKFlavor
+        MY_IDUP(9) =+DKFlavor
+        if(IsAQuark(DKFlavor)) then
+           ICOLUP(1:2,8) = (/            0,ICOLUP_BASE+4/)
+           ICOLUP(1:2,9) = (/ICOLUP_BASE+4,            0/)
+        endif
+   ! Exclusive W- decay modes
+   elseif( &
+      DecayMode2.eq.-2*1   .or. & ! W->enu
+      DecayMode2.eq.-3*1   .or. & ! W->munu
+      DecayMode2.eq.-5*7   .or. & ! W->du
+      DecayMode2.eq.-5*13  .or. & ! W->dc
+      DecayMode2.eq.-11*7  .or. & ! W->su
+      DecayMode2.eq.-11*13 .or. & ! W->sc
+      DecayMode2.eq.-17*7  .or. & ! W->bu
+      DecayMode2.eq.-17*13      & ! W->bc
+      ) then
+        MY_IDUP(5) = Wm_
+        MY_IDUP(9) = (                   &
+           ElM_*LogicalToInteger(DecayMode2.eq.-2*1)   + & ! W->enu
+           MuM_*LogicalToInteger(DecayMode2.eq.-3*1)   + & ! W->munu
+           Dn_*LogicalToInteger(DecayMode2.eq.-5*7)    + & ! W->du
+           Dn_*LogicalToInteger(DecayMode2.eq.-5*13)   + & ! W->dc
+           Str_*LogicalToInteger(DecayMode2.eq.-11*7)  + & ! W->su
+           Str_*LogicalToInteger(DecayMode2.eq.-11*13) + & ! W->sc
+           Bot_*LogicalToInteger(DecayMode2.eq.-17*7)  + & ! W->bu
+           Bot_*LogicalToInteger(DecayMode2.eq.-17*13)   & ! W->bc
+        )
+        MY_IDUP(8) = (                    &
+           ANuE_*LogicalToInteger(DecayMode2.eq.-2*1)   + & ! W->enu
+           ANuM_*LogicalToInteger(DecayMode2.eq.-3*1)   + & ! W->munu
+           AUp_*LogicalToInteger(DecayMode2.eq.-5*7)    + & ! W->du
+           AChm_*LogicalToInteger(DecayMode2.eq.-5*13)  + & ! W->dc
+           AUp_*LogicalToInteger(DecayMode2.eq.-11*7)   + & ! W->su
+           AChm_*LogicalToInteger(DecayMode2.eq.-11*13) + & ! W->sc
+           AUp_*LogicalToInteger(DecayMode2.eq.-17*7)   + & ! W->bu
+           AChm_*LogicalToInteger(DecayMode2.eq.-17*13)   & ! W->bc
+        )
+        if(IsAQuark(DKFlavor)) then
+           ICOLUP(1:2,8) = (/            0,ICOLUP_BASE+4/)
+           ICOLUP(1:2,9) = (/ICOLUP_BASE+4,            0/)
+        endif
    endif
 
 
@@ -4640,11 +5101,25 @@ END SUBROUTINE
 SUBROUTINE getHiggsDecayLength(ctau)
 use ModParameters
 implicit none
-real(8) :: x,xp,xpp,Len0,propa,ctau,ctau0
+real(8),intent(out) :: ctau
+   call getSimpleDecayLength(HiggsDecayLengthMM,ctau)
+END SUBROUTINE
+
+SUBROUTINE getVprimeDecayLength(ctau)
+use ModParameters
+implicit none
+real(8),intent(out) :: ctau
+   call getSimpleDecayLength(VprimeDecayLengthMM,ctau)
+END SUBROUTINE
+
+subroutine getSimpleDecayLength(ctau0,ctau)
+implicit none
+real(8), intent(in) :: ctau0
+real(8), intent(out) :: ctau
+real(8) :: x,xp,xpp,Len0,propa
 integer :: loop
 
      ctau  = 0d0
-     ctau0 = HiggsDecayLengthMM
      if( ctau0.lt.1d-16 ) RETURN
 
      do loop=1,4000000!  4Mio. tries otherwise return zero
@@ -4660,9 +5135,7 @@ integer :: loop
      enddo
 
 RETURN
-END SUBROUTINE
-
-
+end subroutine
 
 
 SUBROUTINE SmearExternal(xRnd,Mass,Width,MinEnergy,MaxEnergy,invMass,Jacobi)
@@ -4745,7 +5218,7 @@ real(8), optional :: EhatMin
 
   elseif (MapType.eq.11) then ! delta-function map
 
-     etamin = M_Reso**2/Collider_Energy**2
+     etamin = (M_Reso/Collider_Energy)**2
      eta2 = etamin + (1d0-etamin)*yRnd(2)
      eta1 = etamin/eta2
      fmax = 0.5d0*pi/M_Reso**3/Ga_Reso
@@ -5046,8 +5519,8 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,
     call SmearExternal(xRndWidth(5),m_W,Ga_W,m_W-6d0*Ga_W,m_W+6d0*Ga_W,BW_Mass(5),BW_Jacobi(5))
     Jacobian = BW_Jacobi(2) * BW_Jacobi(3) * BW_Jacobi(4) * BW_Jacobi(5)
 
-! print *, "smeared mt",(BW_Mass(2:3)-m_top)*100d0
-! print *, "smeared mw",(BW_Mass(4:5)-m_w)*100d0
+! print *, "smeared mt",(BW_Mass(2:3)-m_top)/GeV
+! print *, "smeared mw",(BW_Mass(4:5)-m_w)/GeV
 
     call ShiftMass(MomIn(1:4,tbar),MomIn(1:4,t),BW_Mass(2),BW_Mass(3),MomOut(1:4,tbar),MomOut(1:4,t))
 
@@ -5716,11 +6189,11 @@ endif
 
 
 !  print *, ""
-!  print *, "Ehat",Ehat*100d0
-!  print *, "E1",e1*100d0
-!  print *, "E2",e2*100d0
-!  print *, "-sqrt(s1)",-dsqrt(dabs(s1*100d0**2))
-!  print *, "-sqrt(s2)",-dsqrt(dabs(s2*100d0**2))
+!  print *, "Ehat",Ehat/GeV
+!  print *, "E1",e1/GeV
+!  print *, "E2",e2/GeV
+!  print *, "-sqrt(s1)",-dsqrt(dabs(s1/GeV**2))
+!  print *, "-sqrt(s2)",-dsqrt(dabs(s2/GeV**2))
 !  print *, "y1",y1
 !  print *, "y2",y2
 !
@@ -6032,7 +6505,7 @@ real(8) :: Jac,Jac1,Jac2,Jac3,Mom_ij_Dummy(1:4),s35,s45
 RETURN
 END SUBROUTINE
 
-SUBROUTINE EvalPhasespace_VBF_H4f(xchannel,xRnd,Energy,Mom,Jac,ids,swap34_56,id12_78)
+SUBROUTINE EvalPhasespace_VBF_H4f(xchannel,xRnd,Energy,Mom,Jac,ids,swap34_56,do78,id12_78)
 use ModParameters
 use ModPhasespace
 use ModMisc
@@ -6042,19 +6515,22 @@ integer :: EqualLeptons,ids(1:8)
 integer :: iChannel
 real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7,Jac8,Jac9
 real(8) :: s3H,s4H,s56,s78,s910,s34,s35,s46,Mom_Dummy(1:4),Mom_Dummy2(1:4),xRndLeptInterf,Emin,Emax
-real(8), parameter :: RescaleWidth=1d0
+real(8) :: BWmass_ps, BWwidth_ps
 real(8) :: s1min, s2min
 integer :: NumChannels, it_chan, ch_ctr
 integer :: id12, id78, id17, id28, id18, id27, id12_78
-logical :: swap34_56, isZH, isWH, isVBF
+logical :: swap34_56, do78, isZH, isWH, isVBF
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
+logical,parameter :: includeNewBWPSinEW = .true.
 
    isZH = .false.
    isWH = .false.
    isVBF = .false.
    swap34_56 = .false.
+   do78 = .false.
    id12_78 = Not_a_particle_
-
+   BWmass_ps=-1d0
+   BWwidth_ps=-1d0
 
    Mom(1:4,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
    Mom(1:4,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
@@ -6068,7 +6544,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
    if( EMin.lt.0d0 .or. EMin.gt.EMax ) call Error("m4l_minmax is not set correctly")
 
 
-   if ( Process.ne. 69) then
+   if ( Process .ne. 69) then
       id12=CoupledVertex((/-ids(1),-ids(2)/),-1)
       id78=CoupledVertex(ids(7:8),-1)
       id17=CoupledVertex((/-ids(1),ids(7)/),-1)
@@ -6102,10 +6578,59 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
       !write(6,*) "iChannel = ",iChannel,"/",NumChannels,"(xchannel: ",xchannel,")"
       !pause
 
-      if( Emin.gt.M_Reso+2*Ga_Reso .or. Emax.lt.M_Reso-2*Ga_Reso .or. Process.eq.67 ) then ! Create a 4f tail
+      if (includeNewBWPSinEW) then
+         if (Process.eq.67 .or. Process.eq.71) then
+            ! This is almost flat but not quite
+            BWmass_ps = M_Z
+            BWwidth_ps = 4d0*M_V_ps-BWmass_ps ! Since 2*M_V needs to be covered
+            if (Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.gt.(BWmass_ps+10d0*BWwidth_ps)) then
+               BWmass_ps = -1d0
+               BWwidth_ps = -1d0
+            endif
+         else if (Process.eq.66 .or. Process.eq.70) then
+            if( M_Reso.ge.0d0 .and. M_Reso2.ge.0d0 ) then ! Both resonances are present
+               BWmass_ps = max(M_Reso,M_Reso2)
+               BWwidth_ps = max(max(abs(M_Reso-M_Reso2),Ga_Reso), Ga_Reso2) ! Cover the full mass difference
+            else if( M_Reso.ge.0d0 ) then
+               BWmass_ps = M_Reso
+               BWwidth_ps = Ga_Reso
+            else if( M_Reso2.ge.0d0 ) then
+               BWmass_ps = M_Reso2
+               BWwidth_ps = Ga_Reso2
+            endif
+            if (Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.gt.(BWmass_ps+10d0*BWwidth_ps)) then
+               BWmass_ps = -1d0
+               BWwidth_ps = -1d0
+            endif
+         else if (Process.eq.68 .or. Process.eq.72) then
+            if( M_Reso.ge.0d0 .and. M_Reso2.ge.0d0 ) then ! Both resonances are present
+               BWmass_ps = max(M_Reso,M_Reso2)
+               BWwidth_ps = max(max(abs(M_Reso-M_Reso2),Ga_Reso), Ga_Reso2) ! Cover the full mass difference
+            else if( M_Reso.ge.0d0 ) then
+               BWmass_ps = M_Reso
+               BWwidth_ps = Ga_Reso
+            else if( M_Reso2.ge.0d0 ) then
+               BWmass_ps = M_Reso2
+               BWwidth_ps = Ga_Reso2
+            endif
+            if ( &
+               Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.gt.(BWmass_ps+10d0*BWwidth_ps) &
+               .or. (Emin.lt.M_Z .and. abs(BWmass_ps-M_Z).gt.10d0*BWwidth_ps) & ! Check distance from M_Z as well for BSI
+               ) then
+               BWmass_ps = -1d0
+               BWwidth_ps = -1d0
+            endif
+         endif
+      else
+         if( .not.(Emin.gt.M_Reso+2d0*Ga_Reso .or. Emax.lt.M_Reso-2d0*Ga_Reso .or. Process.eq.67 .or. Process.eq.71) ) then
+            BWmass_ps = M_Reso
+            BWwidth_ps = Ga_Reso
+         endif
+      endif
+      if( BWmass_ps.lt.0d0 .or. BWwidth_ps.lt.0d0 ) then ! Create flat 4f mass
          Jac1 = k_l(xRnd(1),Emin**2,Emax**2,s56)
-      else ! Create an H boson around the BW
-         Jac1 = k_BreitWigner(xRnd(1),M_Reso**2,Ga_Reso*RescaleWidth,Emin**2,Emax**2,s56)
+      else ! Create a BW 4f mass
+         Jac1 = k_BreitWigner(xRnd(1),BWmass_ps**2,BWwidth_ps,Emin**2,Emax**2,s56)
       endif
       Jac3 = s_channel_propagator(M_V_ps**2,Ga_V_ps,s1min,s56,xRnd(3),s78) ! m1
       Jac4 = s_channel_propagator(M_V_ps**2,Ga_V_ps,s2min,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910) ! m2
@@ -6122,6 +6647,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
                cycle
             endif
 
+            do78 = .true.
             Jac2 = s_channel_propagator(M_Z**2,Ga_Z*5,mJJcut**2,(Energy-dsqrt(s56))**2,xRnd(2),s34) ! Associated mZ for Z->ff
             Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:))
             Jac6 = s_channel_decay(Mom_Dummy(:),0d0,0d0,xRnd(7:8),Mom(:,3),Mom(:,4))
@@ -6137,6 +6663,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
                cycle
             endif
 
+            do78 = .true.
             Jac2 = s_channel_propagator(M_W**2,Ga_W*5,mJJcut**2,(Energy-dsqrt(s56))**2,xRnd(2),s34) ! Associated mW for W->ff
             Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:))
             Jac6 = s_channel_decay(Mom_Dummy(:),0d0,0d0,xRnd(7:8),Mom(:,3),Mom(:,4))
@@ -6152,6 +6679,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
                cycle
             endif
 
+            do78 = .true.
             Jac2 = k_l(xRnd(2),mJJcut**2,(Energy-dsqrt(s56))**2,s34)
             Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:))
             Jac6 = s_channel_decay(Mom_Dummy(:),0d0,0d0,xRnd(7:8),Mom(:,3),Mom(:,4))
@@ -6166,21 +6694,32 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
    else
       NumChannels=1
 
-      if( Emin.gt.M_Z+2*Ga_Z .or. Emax.lt.M_Z-2*Ga_Z ) then ! Create a VV->4f tail
-         Jac1 = k_l(xRnd(1),Emin**2,Emax**2,s56)
-      else ! Create an H boson around the BW
-         Jac1 = k_BreitWigner(xRnd(1),M_Z**2,Ga_Z*RescaleWidth,Emin**2,Emax**2,s56)
+      BWmass_ps = M_Z
+      BWwidth_ps = 4d0*M_V_ps-BWmass_ps ! Since 2*M_V needs to be covered
+      if (Emin.lt.(BWmass_ps-10d0*BWwidth_ps) .or. Emax.gt.(BWmass_ps+10d0*BWwidth_ps)) then
+         BWmass_ps = -1d0
+         BWwidth_ps = -1d0
       endif
+      if( &
+         BWmass_ps.lt.0d0 .or. BWwidth_ps.lt.0d0 .or. &
+         Emin.gt.BWmass_ps+10d0*BWwidth_ps .or. Emax.lt.BWmass_ps-10d0*BWwidth_ps &
+         ) then ! Create flat 4f mass
+         Jac1 = k_l(xRnd(1),Emin**2,Emax**2,s56)
+      else ! Create a BW 4f mass
+         Jac1 = k_BreitWigner(xRnd(1),BWmass_ps**2,BWwidth_ps,Emin**2,Emax**2,s56)
+      endif
+
       Jac3 = s_channel_propagator(M_V_ps**2,Ga_V_ps,0d0,s56,xRnd(3),s78) ! m1
       Jac4 = s_channel_propagator(M_V_ps**2,Ga_V_ps,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910) ! m2
 
+      do78 = .true.
       Jac2 = k_l(xRnd(2),mJJcut**2,(Energy-dsqrt(s56))**2,s34)
       Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:))
       Jac6 = s_channel_decay(Mom_Dummy(:),0d0,0d0,xRnd(7:8),Mom(:,3),Mom(:,4))
       Jac7 = s_channel_decay(Mom_Dummy2(:),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))
    endif
 
-   if( includeInterference .and. ids(3).eq.ids(5) .and. ids(4).eq.ids(6) ) then!   EqualLeptons=0 means equal leptons
+   if( includeInterference .and. ids(3).eq.ids(5) .and. ids(4).eq.ids(6) ) then
       call random_number(xRndLeptInterf)
       if( xRndLeptInterf.gt.0.5d0 ) then ! Swapped config.
          Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,9),Mom(:,8))       !   Z --> ffbar
@@ -6480,9 +7019,9 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
 !    print *, "Mom.cons. ",Mom(1:4,5)-Mom(1:4,7)-Mom(1:4,8)
 !    print *, "Mom.cons. ",Mom(1:4,6)-Mom(1:4,9)-Mom(1:4,10)
 !    print *, "----------"
-!    print *, "Inv.mass  ",get_MInv(Mom_Dummy(1:4))*100d0
-!    print *, "Inv.mass  ",get_MInv(Mom(1:4,5))*100d0
-!    print *, "Inv.mass  ",get_MInv(Mom(1:4,6))*100d0
+!    print *, "Inv.mass  ",get_MInv(Mom_Dummy(1:4))/GeV
+!    print *, "Inv.mass  ",get_MInv(Mom(1:4,5))/GeV
+!    print *, "Inv.mass  ",get_MInv(Mom(1:4,6))/GeV
 !    pause
 
 
@@ -6490,6 +7029,175 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
 RETURN
 END SUBROUTINE
 
+SUBROUTINE EvalPhasespace_gg4f(xRnd,eta1,eta2,Energy,Mom,Jac,ids,swap34_56)
+use ModParameters
+use ModPhasespace
+use ModMisc
+implicit none
+integer,parameter :: inTop=1, inBot=2, V1=3, V2=4, Lep1P=5, Lep1M=6, Lep2P=7, Lep2M=8, NUP=8
+real(8) :: xRnd(:), eta1, eta2, Energy, Mom(:,:)
+integer :: ids(1:6)
+real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7,Jac8,Jac9
+real(8) :: sysY,s34,s56,s78,xRndLeptInterf,Emin,Emax
+real(8) :: BWmass_ps, BWwidth_ps
+real(8) :: s1min, s2min
+logical :: swap34_56
+
+   swap34_56 = .false.
+
+   EMin = 0d0
+   EMax = Collider_Energy
+   Jac = 0d0
+   if (m4l_minmax(1).ge.0d0) then
+      EMin = m4l_minmax(1)
+   endif
+   if (m4l_minmax(2).ge.0d0) then
+      EMax = min(m4l_minmax(2),Emax)
+   endif
+   if( EMin.gt.EMax ) call Error("m4l_minmax is not set correctly")
+
+   if( &
+      includeInterference .and. &
+      (CoupledVertex((/ids(3),ids(6)/),-1).ne.Not_a_particle_ .and. CoupledVertex((/ids(5),ids(4)/),-1).ne.Not_a_particle_) &
+      ) then
+      call random_number(xRndLeptInterf)
+      if( xRndLeptInterf.gt.0.5d0 ) then ! Swap 46
+         swap34_56 = .true.
+      endif
+   endif
+   if (.not. swap34_56) then
+      if (CoupledVertex(ids(3:4),-1,useAHcoupl=1).eq.Pho_) then
+         s1min = (max(MPhotonCutoff,getMass(ids(3))+getMass(ids(4))))**2
+      else
+         s1min = getMass(ids(3))+getMass(ids(4))
+      endif
+      if (CoupledVertex(ids(5:6),-1,useAHcoupl=1).eq.Pho_) then
+         s2min = (max(MPhotonCutoff,getMass(ids(5))+getMass(ids(6))))**2
+      else
+         s2min = getMass(ids(5))+getMass(ids(6))
+      endif
+   else
+      if (CoupledVertex((/ids(3),ids(6)/),-1,useAHcoupl=1).eq.Pho_) then
+         s1min = (max(MPhotonCutoff,getMass(ids(3))+getMass(ids(6))))**2
+      else
+         s1min = getMass(ids(3))+getMass(ids(6))
+      endif
+      if (CoupledVertex((/ids(5),ids(4)/),-1,useAHcoupl=1).eq.Pho_) then
+         s2min = (max(MPhotonCutoff,getMass(ids(5))+getMass(ids(4))))**2
+      else
+         s2min = getMass(ids(5))+getMass(ids(4))
+      endif
+   endif
+   Emin = max(Emin,sqrt(max(s1min,s2min)))
+   ! s1,2max=s34
+
+   ! Find s34 = Energy**2
+   BWmass_ps=-1d0
+   BWwidth_ps=-1d0
+   if (Process.eq.73) then
+      if( M_Reso.ge.0d0 .and. M_Reso2.ge.0d0 ) then ! Both resonances are present
+         BWmass_ps = max(M_Reso,M_Reso2)
+         BWwidth_ps = max(max(abs(M_Reso-M_Reso2),Ga_Reso), Ga_Reso2) ! Cover the full mass difference
+         if (Emin.gt.max(M_Reso+10d0*Ga_Reso,M_Reso2+10d0*Ga_Reso2) .or. Emax.lt.min(M_Reso-10d0*Ga_Reso,M_Reso2-10d0*Ga_Reso2)) then
+            BWmass_ps = -1d0
+            BWwidth_ps = -1d0
+         endif
+      else if( M_Reso.ge.0d0 ) then
+         BWmass_ps = M_Reso
+         BWwidth_ps = Ga_Reso
+         if (Emin.gt.(BWmass_ps+10d0*BWwidth_ps) .or. Emax.lt.(BWmass_ps-10d0*BWwidth_ps)) then
+            BWmass_ps = -1d0
+            BWwidth_ps = -1d0
+         endif
+      else if( M_Reso2.ge.0d0 ) then
+         BWmass_ps = M_Reso2
+         BWwidth_ps = Ga_Reso2
+         if (Emin.gt.(BWmass_ps+10d0*BWwidth_ps) .or. Emax.lt.(BWmass_ps-10d0*BWwidth_ps)) then
+            BWmass_ps = -1d0
+            BWwidth_ps = -1d0
+         endif
+      endif
+   else if (Process.eq.75) then
+      if( M_Reso.ge.0d0 .and. M_Reso2.ge.0d0 ) then ! Both resonances are present
+         BWmass_ps = max(M_Reso,M_Reso2)
+         BWwidth_ps = max(abs(M_Reso-M_Reso2), abs(M_Reso-2d0*M_V_ps), abs(M_Reso2-2d0*M_V_ps), Ga_Reso, Ga_Reso2) ! Cover the full mass difference
+         if (Emin.gt.max(M_Reso+10d0*Ga_Reso,M_Reso2+10d0*Ga_Reso2) .or. Emax.lt.min(M_Reso-10d0*Ga_Reso,M_Reso2-10d0*Ga_Reso2)) then
+            BWmass_ps = -1d0
+            BWwidth_ps = -1d0
+         endif
+      else if( M_Reso.ge.0d0 ) then
+         BWmass_ps = M_Reso
+         BWwidth_ps = max(abs(M_Reso-2d0*M_V_ps), Ga_Reso)
+         if (Emin.gt.(BWmass_ps+10d0*BWwidth_ps) .or. Emax.lt.(BWmass_ps-10d0*BWwidth_ps)) then
+            BWmass_ps = -1d0
+            BWwidth_ps = -1d0
+         endif
+      else if( M_Reso2.ge.0d0 ) then
+         BWmass_ps = M_Reso2
+         BWwidth_ps = max(abs(M_Reso2-2d0*M_V_ps), Ga_Reso2)
+         if (Emin.gt.(BWmass_ps+10d0*BWwidth_ps) .or. Emax.lt.(BWmass_ps-10d0*BWwidth_ps)) then
+            BWmass_ps = -1d0
+            BWwidth_ps = -1d0
+         endif
+      endif
+   else if (Process.eq.74) then
+      BWmass_ps = 2d0*M_V_ps
+      BWwidth_ps = max(2d0*M_V_ps, Ga_V_ps)
+      if (Emin.gt.max(M_Reso+10d0*Ga_Reso,M_Reso2+10d0*Ga_Reso2) .or. Emax.lt.min(M_Reso-10d0*Ga_Reso,M_Reso2-10d0*Ga_Reso2)) then
+         BWmass_ps = -1d0
+         BWwidth_ps = -1d0
+      endif
+   endif
+   if( BWmass_ps.lt.0d0 .or. BWwidth_ps.lt.0d0 ) then ! Create flat 4f mass
+      Jac1 = k_l(xRnd(1),Emin**2,Emax**2,s34)
+   else ! Create a BW 4f mass
+      Jac1 = k_BreitWigner(xRnd(1),BWmass_ps**2,BWwidth_ps,Emin**2,Emax**2,s34)
+   endif
+   if (s34.le.0d0) then
+      return
+   endif
+   Energy = sqrt(s34)
+
+   ! Find y and set eta1, eta2
+   Jac2 = rapidity_tan_map(xRnd(2),sysY,ywidthset=sqrt(2d0))
+   eta1 = Energy/Collider_Energy*exp(sysY) ! x1
+   eta2 = Energy/Collider_Energy*exp(-sysY) ! x2
+   if (eta1.ge.1d0 .or. eta2.ge.1d0) then
+      return
+   endif
+
+   ! Begin four-momenta
+   Mom(1:4,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
+   Mom(1:4,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
+
+   Jac3 = s_channel_propagator(M_V_ps**2,Ga_V_ps,s1min,s34,xRnd(3),s56) ! Find s56=m1**2
+   Jac4 = s_channel_propagator(M_V_ps**2,Ga_V_ps,s2min,(dsqrt(s34)-dsqrt(s56))**2,xRnd(4),s78) ! Find s78=m2**2
+   Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s56,s78,xRnd(5:6),Mom(:,V1),Mom(:,V2)) ! Decay pVV to pV1, pV2 in CoM
+   if( swap34_56 ) then ! Swapped config.
+      Jac6 = s_channel_decay(Mom(:,V1),0d0,0d0,xRnd(7:8),Mom(:,Lep1P),Mom(:,Lep2M)) ! Decay pV1
+      Jac7 = s_channel_decay(Mom(:,V2),0d0,0d0,xRnd(9:10),Mom(:,Lep2P),Mom(:,Lep1M)) ! Decay pV2
+   else ! Normal config
+      Jac6 = s_channel_decay(Mom(:,V1),0d0,0d0,xRnd(7:8),Mom(:,Lep1P),Mom(:,Lep1M)) ! Decay pV1
+      Jac7 = s_channel_decay(Mom(:,V2),0d0,0d0,xRnd(9:10),Mom(:,Lep2P),Mom(:,Lep2M)) ! Decay pV2
+   endif
+
+   Jac = Jac1*Jac2*Jac3*Jac4*Jac5*Jac6*Jac7 * PSNorm4
+
+   if( isNan(jac) ) then
+      print *, "EvalPhasespace_gg4f NaN"
+      print *, Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7
+      if( isNan(jac) ) Jac = 0d0
+
+      write(6,*) "ids=",ids
+      write(6,*) "m34:",sqrt(s34)/GeV
+      write(6,*) "m56:",sqrt(s56)/GeV
+      write(6,*) "m78:",sqrt(s78)/GeV
+
+      pause
+   endif
+
+RETURN
+END SUBROUTINE
 
 
 
@@ -6647,10 +7355,10 @@ ENDIF
 !    print *, "Mom.cons. ",Mom(1:4,3)-Mom(1:4,5)-Mom(1:4,6)
 !    print *, "Mom.cons. ",Mom(1:4,4)-Mom(1:4,7)-Mom(1:4,8)
 !    print *, "----------"
-!    print *, "Inv.mass  ",get_MInv(Mom_Dummy(1:4))*100d0
-!    print *, "Inv.mass  ",get_MInv(Mom(1:4,3)+Mom(1:4,4))*100d0
-!    print *, "Inv.mass  ",get_MInv(Mom(1:4,3))*100d0
-!    print *, "Inv.mass  ",get_MInv(Mom(1:4,4))*100d0
+!    print *, "Inv.mass  ",get_MInv(Mom_Dummy(1:4))/GeV
+!    print *, "Inv.mass  ",get_MInv(Mom(1:4,3)+Mom(1:4,4))/GeV
+!    print *, "Inv.mass  ",get_MInv(Mom(1:4,3))/GeV
+!    print *, "Inv.mass  ",get_MInv(Mom(1:4,4))/GeV
 !    pause
 
 
@@ -6783,10 +7491,10 @@ ENDIF
 !    print *, "Mom.cons. ",Mom(1:4,3)-Mom(1:4,5)-Mom(1:4,6)
 !    print *, "Mom.cons. ",Mom(1:4,4)-Mom(1:4,7)-Mom(1:4,8)
 !    print *, "----------"
-!    print *, "Inv.mass  ",get_MInv(Mom_Dummy(1:4))*100d0
-!    print *, "Inv.mass  ",get_MInv(Mom(1:4,3)+Mom(1:4,4))*100d0
-!    print *, "Inv.mass  ",get_MInv(Mom(1:4,3))*100d0
-!    print *, "Inv.mass  ",get_MInv(Mom(1:4,4))*100d0
+!    print *, "Inv.mass  ",get_MInv(Mom_Dummy(1:4))/GeV
+!    print *, "Inv.mass  ",get_MInv(Mom(1:4,3)+Mom(1:4,4))/GeV
+!    print *, "Inv.mass  ",get_MInv(Mom(1:4,3))/GeV
+!    print *, "Inv.mass  ",get_MInv(Mom(1:4,4))/GeV
 !    pause
 
 

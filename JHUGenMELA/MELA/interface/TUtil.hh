@@ -227,7 +227,7 @@ namespace TUtil{
   TString GetMCFMParticleLabel(const int& pid, bool useQJ, bool useExtendedConventions);
 
   // JHUGen-specific wrappers
-  void InitJHUGenMELA(const char* pathtoPDFSet, int PDFMember);
+  void InitJHUGenMELA(const char* pathtoPDFSet, int PDFMember, double collider_sqrts);
   void SetJHUGenHiggsMassWidth(double MReso, double GaReso);
   void SetJHUGenDistinguishWWCouplings(bool doAllow);
   void ResetAmplitudeIncludes();

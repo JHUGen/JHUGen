@@ -11,35 +11,31 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
 
 ! since the me2(:,:) array is defined from -5..+5, the iPart_sel,jPart_sel have to follow the LHE numbering convention
 FUNCTION EvalWeighted_HJJ_fulldecay(yRnd,VgsWgt)
+#if linkMELA==1
 use ModKinematics
 use ModParameters
-#if linkMELA==1
 use ModMCFMWrapper
-#endif
-use ModHiggsjj
-use ModHiggs
 use ModMisc
 #if compiler==1
 use ifport
 #endif
 implicit none
-integer,parameter :: mxpart=14 ! this has to match the MCFM parameter
 real(8) :: yRnd(1:17),VgsWgt, EvalWeighted_HJJ_fulldecay
 real(8) :: pdf(-6:6,1:2),me2(-5:5,-5:5)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
-real(8) :: MomExt(1:4,1:10),MomShifted(1:4,1:10),PSWgt,FinalStateWeight,m1ffwgt,m2ffwgt
+real(8) :: MomExt(1:4,1:10),MomShifted(1:4,1:10),PSWgt,FinalStateWeight,m1ffwgt,m2ffwgt,m3ffwgt
 real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5),msq_VgsWgt(-5:5,-5:5),Wgt_Ratio_Interf,originalprobability
 integer :: id_MCFM(mxpart),MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),NHisto,ipart,jpart
 integer, pointer :: ijSel(:,:)
 integer :: iPartChannel,PartChannelAvg,NumPartonicChannels,iflip,i,j,k
 real(8) :: PreFac,VegasWeighted_HJJ_fulldecay,xRnd,LeptonAndVegasWeighted_HJJ_fulldecay
-logical :: applyPSCut,swap34_56
+logical :: applyPSCut,swap34_56,do78
 integer :: id12_78
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
 include 'vegas_common.f'
 include 'maxwt.f'
 EvalWeighted_HJJ_fulldecay = 0d0
-m1ffwgt=1d0;m2ffwgt=1d0
+m1ffwgt=1d0;m2ffwgt=1d0;m3ffwgt=1d0
 
    if (Process.eq.69) then
       call getRef_MCFM_qqVVqqStrong_Hash(ijSel) ! ijSel is in JHU convention
@@ -127,7 +123,7 @@ m1ffwgt=1d0;m2ffwgt=1d0
    endif
 
    call PDFMapping(2,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi,EhatMin=dmax1(m4l_minmax(1),0d0)+mJJcut)
-   call EvalPhasespace_VBF_H4f(yRnd(3),yRnd(4:17),EHat,MomExt(1:4,1:10),PSWgt,id_MCFM(1:8),swap34_56,id12_78)
+   call EvalPhasespace_VBF_H4f(yRnd(3),yRnd(4:17),EHat,MomExt(1:4,1:10),PSWgt,id_MCFM(1:8),swap34_56,do78,id12_78)
    call boost2Lab(eta1,eta2,10,MomExt(1:4,1:10))
    !write(6,*) "After EvalPS, MomExt:",MomExt,", Pwwgt:",PSWgt
 
@@ -155,7 +151,7 @@ m1ffwgt=1d0;m2ffwgt=1d0
 !       EvalWeighted_HJJ_fulldecay=PSWgt *sHatJacobi  * ( MomExt(1:4,3).dot.MomExt(1:4,7) ) * ( MomExt(1:4,4).dot.MomExt(1:4,10) ) * ( MomExt(1:4,8).dot.MomExt(1:4,9) ) * ( MomExt(1:4,7).dot.MomExt(1:4,10) ) / EHat**8
 !       return
    !write(6,*) "SetRunningScales args:",(MomExt(1:4,5)+MomExt(1:4,6)),",",MomExt(1:4,3),",",MomExt(1:4,4),",",(/ id12_78,Not_a_particle_,Not_a_particle_,id12_78 /)
-   call SetRunningScales( (/MomExt(1:4,5)+MomExt(1:4,6),MomExt(1:4,3),MomExt(1:4,4) /) , (/ id12_78,Not_a_particle_,Not_a_particle_,id12_78 /) )
+   call SetRunningScales( (/MomExt(1:4,V1)+MomExt(1:4,V2),MomExt(1:4,outTop),MomExt(1:4,outBot) /) , (/ id12_78,Not_a_particle_,Not_a_particle_,id12_78 /) )
    !write(6,*) "setPDFs args:",eta1,eta2,alphas,alphas_mz
    call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
@@ -188,24 +184,24 @@ m1ffwgt=1d0;m2ffwgt=1d0
          call ShiftMass(MomExt(1:4,Lep2P),MomExt(1:4,Lep2M), GetMass(MY_IDUP(Lep2P)),GetMass(MY_IDUP(Lep2M)),MomShifted(1:4,Lep2P),MomShifted(1:4,Lep2M),MassWeight=m2ffwgt)
       endif
    endif
+   if (do78) then
+      call ShiftMass(MomExt(1:4,outTop),MomExt(1:4,outBot), GetMass(MY_IDUP(outTop)),GetMass(MY_IDUP(outBot)),MomShifted(1:4,outTop),MomShifted(1:4,outBot),MassWeight=m3ffwgt)
+   else
+      call ShiftMass(MomExt(1:4,outTop),MomExt(1:4,outBot), GetMass(MY_IDUP(outTop)),GetMass(MY_IDUP(outBot)),MomShifted(1:4,outTop),MomShifted(1:4,outBot),MassWeight=m3ffwgt)
+      if (m3ffwgt.gt.0d0) then ! This means no reweighting should be applied. The case with wgt=0 occurs when q78<=(m7+m8).
+         m3ffwgt = 1d0
+      endif
+   endif
 
-
-#if linkMELA==1
 
    call EvalAmp_qqVVqq(id_MCFM, p_MCFM, msq_MCFM)
-
-#else
-   print *, "To use this process, please set linkMELA=Yes in the makefile and recompile."
-   print *, "You will also need to have a compiled JHUGenMELA in the directory specified by JHUGenMELADir in the makefile."
-   stop 1
-#endif
 
    !write(6,*) "msq_MCFM:",msq_MCFM
    !pause
 
    originalprobability = msq_MCFM(iPart_sel,jPart_sel)
 
-   PreFac = fbGeV2 * FluxFac * PSWgt * sHatJacobi * m1ffwgt * m2ffwgt
+   PreFac = hbarc2XsecUnit * FluxFac * PSWgt * sHatJacobi * m1ffwgt * m2ffwgt * m3ffwgt
    msq_MCFM = msq_MCFM * PreFac / (GeV**8)  ! adjust msq_MCFM for GeV units of MCFM mat.el.
 !    do ipart=-5,5; do jpart=-5,5
 !       msq_MCFM(ipart,jpart)=msq_MCFM(ipart,jpart) * pdf(LHA2M_pdf(ipart),1)*pdf(LHA2M_pdf(jpart),2)
@@ -225,12 +221,18 @@ m1ffwgt=1d0;m2ffwgt=1d0
       write(6,*) "alphas =",alphas
       write(6,*) "alphas_mz =",alphas_mz
       write(6,*) "msq_MCFM(",iPart_sel,",",jPart_sel,") =",msq_MCFM(iPart_sel,jPart_sel)
-      write(6,*) "pdf1 =",pdf(LHA2M_pdf(iPart_sel),1)
-      write(6,*) "pdf2 =",pdf(LHA2M_pdf(jPart_sel),2)
+      write(6,*) "pdf1 =",pdf(LHA2M_pdf(iPart_sel),1)," (x1=",eta1,")"
+      write(6,*) "pdf2 =",pdf(LHA2M_pdf(jPart_sel),2)," (x2=",eta2,")"
       do jpart=1,8
          write(6,*) "P_MCFM(",convertLHE(id_MCFM(jpart)),")=",p_MCFM(jpart,:)
       enddo
-      pause
+      if ( &
+            IsNaN(msq_MCFM(iPart_sel,jPart_sel)) .or. &
+            IsNaN(pdf(LHA2M_pdf(iPart_sel),1)) .or. &
+            IsNaN(pdf(LHA2M_pdf(jPart_sel),2)) &
+         ) then
+         pause
+      endif
       return
     endif
 
@@ -259,7 +261,7 @@ m1ffwgt=1d0;m2ffwgt=1d0
        enddo
 
        if (FindCrossSectionWithWeights) then
-         LeptonAndVegasWeighted_HJJ_fulldecay = VegasWeighted_HJJ_fulldecay * ReweightLeptonInterference(id_MCFM, p_MCFM, originalprobability)
+         LeptonAndVegasWeighted_HJJ_fulldecay = VegasWeighted_HJJ_fulldecay * ReweightLeptonInterference_qqVVqq(id_MCFM, p_MCFM, originalprobability)
          CrossSectionWithWeights = CrossSectionWithWeights + LeptonAndVegasWeighted_HJJ_fulldecay
          CrossSectionWithWeightsErrorSquared = CrossSectionWithWeightsErrorSquared + LeptonAndVegasWeighted_HJJ_fulldecay**2
        endif
@@ -282,9 +284,9 @@ m1ffwgt=1d0;m2ffwgt=1d0
           AccepCounter = AccepCounter + 1
           AccepCounter_part2(iPartChannel) = AccepCounter_part2(iPartChannel) + 1
 
-          Wgt_Ratio_Interf = ReweightLeptonInterference(id_MCFM, p_MCFM, originalprobability)
+          Wgt_Ratio_Interf = ReweightLeptonInterference_qqVVqq(id_MCFM, p_MCFM, originalprobability)
 
-          call WriteOutEvent_HJJ_fulldecay(MomShifted,MY_IDUP,ICOLUP,EventWeight=Wgt_Ratio_Interf)
+          call WriteOutEvent_HJJ_fulldecay(MomShifted,MY_IDUP,ICOLUP,do78,EventWeight=Wgt_Ratio_Interf)
 
           do NHisto=1,NumHistograms
             call intoHisto(NHisto,NBin(NHisto),1d0)
@@ -300,7 +302,7 @@ m1ffwgt=1d0;m2ffwgt=1d0
       if( VegasWeighted_HJJ_fulldecay.ne.0d0 ) then
         AccepCounter=AccepCounter+1
         if( writeWeightedLHE .and. (.not. warmup) ) then
-            call WriteOutEvent_HJJ_fulldecay(MomShifted,MY_IDUP,ICOLUP,EventWeight=VegasWeighted_HJJ_fulldecay)
+            call WriteOutEvent_HJJ_fulldecay(MomShifted,MY_IDUP,ICOLUP,do78,EventWeight=VegasWeighted_HJJ_fulldecay)
         endif
         do NHisto=1,NumHistograms
           call intoHisto(NHisto,NBin(NHisto),VegasWeighted_HJJ_fulldecay)
@@ -310,6 +312,16 @@ m1ffwgt=1d0;m2ffwgt=1d0
 
    endif! unweighted
 
+#else
+
+implicit none
+real(8) :: yRnd(1:17),VgsWgt, EvalWeighted_HJJ_fulldecay
+   EvalWeighted_HJJ_fulldecay = 0d0
+   print *, "To use this process, please set linkMELA=Yes in the makefile and recompile."
+   print *, "You will also need to have a compiled JHUGenMELA in the directory specified by JHUGenMELADir in the makefile."
+   stop 1
+
+#endif
 
 RETURN
 END FUNCTION
@@ -466,7 +478,7 @@ use ifport
       call Kinematics_HVBF(5,MomExt,applyPSCut,NBin)
       if( applyPSCut .or. PSWgt.eq.zero ) return
       EvalCounter = EvalCounter+1
-      PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt  * PartChannelAvg
+      PreFac = hbarc2XsecUnit * FluxFac * sHatJacobi * PSWgt  * PartChannelAvg
       if( iStore.ne.jStore ) PreFac = PreFac*2d0
 
       call EvalAmp_WBFH_UnSymm_SA_Select_exact( MomExt,iPart_sel,jPart_sel,rPart_Sel,sPart_Sel,me2(iPart_sel,jPart_sel))
@@ -497,8 +509,14 @@ use ifport
                MY_IDUP(3:4) = (/Bot_,ABot_/)
             endif
          else! gg->gg
-            ICOLUP(1:2,3) = (/504,502/)
-            ICOLUP(1:2,4) = (/503,504/)
+            call random_number(xRnd)
+            if (xRnd.gt.0.5) then
+               ICOLUP(1:2,3) = (/504,502/)
+               ICOLUP(1:2,4) = (/503,504/)
+            else
+               ICOLUP(1:2,4) = (/504,502/)
+               ICOLUP(1:2,3) = (/503,504/)
+            endif
          endif
       elseif( MY_IDUP(1).ne.Glu_ .and. MY_IDUP(1).gt.0 .and. MY_IDUP(2).eq.Glu_ ) then! qg->qg
          ICOLUP(1:2,1) = (/501,000/)
@@ -605,7 +623,7 @@ use ifport
       call Kinematics_HJJ(5,MomExt,applyPSCut,NBin)
       if( applyPSCut .or. PSWgt.eq.zero ) return
       EvalCounter = EvalCounter+1
-      PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt  * PartChannelAvg
+      PreFac = hbarc2XsecUnit * FluxFac * sHatJacobi * PSWgt  * PartChannelAvg
       if( iStore.ne.jStore ) PreFac = PreFac*2d0
 
       call EvalAmp_SBFH_UnSymm_SA_Select_exact(MomExt,iPart_sel,jPart_sel,rPart_sel,sPart_sel,me2(iPart_sel,jPart_sel))
@@ -728,7 +746,7 @@ END FUNCTION
    EvalCounter = EvalCounter+1
 
    FluxFac = 1d0/(2d0*EHat**2)
-   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt  * PartChannelAvg
+   PreFac = hbarc2XsecUnit * FluxFac * sHatJacobi * PSWgt  * PartChannelAvg
    call random_number(partonic_flip)
    if( partonic_flip.gt.0.5d0 ) call swapi(iPart_sel,jPart_sel)
    if( iPart_sel.ne.jPart_sel ) PreFac = PreFac*2d0
@@ -815,8 +833,14 @@ END FUNCTION
                 MY_IDUP(3:4) = (/Bot_,ABot_/)
              endif
           else! gg->gg
-             ICOLUP(1:2,3) = (/504,502/)
-             ICOLUP(1:2,4) = (/503,504/)
+             call random_number(xRnd)
+             if (xRnd.gt.0.5) then
+               ICOLUP(1:2,3) = (/504,502/)
+               ICOLUP(1:2,4) = (/503,504/)
+             else
+               ICOLUP(1:2,4) = (/504,502/)
+               ICOLUP(1:2,3) = (/503,504/)
+             endif
           endif
       elseif( MY_IDUP(1).ne.Glu_ .and. MY_IDUP(1).gt.0 .and. MY_IDUP(2).eq.Glu_ ) then! qg->qg
           ICOLUP(1:2,1) = (/501,000/)
@@ -988,7 +1012,7 @@ END FUNCTION
 implicit none
 real(8) :: yRnd(:),VgsWgt, EvalUnWeighted_HJJ,RES(-5:5,-5:5)
 real(8) :: pdf(-6:6,1:2)
-real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
+real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi, xRnd
 real(8) :: MomExt(1:4,1:5), PSWgt
 real(8) :: me2(-5:5,-5:5)
 integer :: i,j,k,iPartons(1:2)
@@ -1020,7 +1044,7 @@ include 'csmaxvalue.f'
    FluxFac = 1d0/(2d0*EHat**2)
    EvalCounter = EvalCounter+1
 
-   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt
+   PreFac = hbarc2XsecUnit * FluxFac * sHatJacobi * PSWgt
 
 
 
@@ -1103,8 +1127,14 @@ IF( GENEVT ) THEN
       if( MY_IDUP(1).eq.Glu_ .and. MY_IDUP(2).eq.Glu_ ) then! gg->gg
           ICOLUP(1:2,1) = (/501,502/)
           ICOLUP(1:2,2) = (/503,501/)
-          ICOLUP(1:2,3) = (/504,502/)
-          ICOLUP(1:2,4) = (/503,504/)
+          call random_number(xRnd)
+          if (xRnd.gt.0.5) then
+            ICOLUP(1:2,3) = (/504,502/)
+            ICOLUP(1:2,4) = (/503,504/)
+          else
+            ICOLUP(1:2,4) = (/504,502/)
+            ICOLUP(1:2,3) = (/503,504/)
+          endif
       elseif( MY_IDUP(1).ne.Glu_ .and. MY_IDUP(1).gt.0 .and. MY_IDUP(2).eq.Glu_ ) then! qg->qg
           ICOLUP(1:2,1) = (/501,000/)
           ICOLUP(1:2,2) = (/502,501/)
@@ -1223,20 +1253,18 @@ END FUNCTION EvalUnWeighted_HJJ
 
 
 
-function ReweightLeptonInterference(id_MCFM, p_MCFM, originalprobability)
+#if linkMELA==1
+function ReweightLeptonInterference_qqVVqq(id_MCFM, p_MCFM, originalprobability)
 use ModMisc
 use ModParameters
-#if linkMELA==1
 use ModMCFMWrapper
-#endif
 implicit none
-integer,parameter :: mxpart=14 ! this has to match the MCFM parameter
 integer, intent(in) :: id_MCFM(mxpart)
 real(8), intent(in) :: p_MCFM(mxpart,1:4), originalprobability
 real(8) :: msq_MCFM_interf(-5:5,-5:5), msq_MCFM_swapped(-5:5,-5:5), p_MCFM_swapped(mxpart,1:4), numerator, denominator
-real(8) :: ReweightLeptonInterference
+real(8) :: ReweightLeptonInterference_qqVVqq
 
-   ReweightLeptonInterference = 1d0
+   ReweightLeptonInterference_qqVVqq = 1d0
 
    if( (id_MCFM(3).eq.id_MCFM(5)) .and. (ReweightInterference) ) then
       if (includeInterference) then
@@ -1259,12 +1287,7 @@ real(8) :: ReweightLeptonInterference
       !We calculate it now.
 
       includeInterference=.true.
-#if linkMELA==1
       call EvalAmp_qqVVqq(id_MCFM, p_MCFM, msq_MCFM_interf)
-#else
-      print *, "this shouldn't be able to happen"
-      stop 1
-#endif
       includeInterference=.false.
       numerator = msq_MCFM_interf(iPart_sel,jPart_sel)
 
@@ -1307,11 +1330,11 @@ real(8) :: ReweightLeptonInterference
 
       denominator = (originalprobability + msq_MCFM_swapped(iPart_sel,jPart_sel)) / 2
 
-      if (denominator .gt. 0d0) ReweightLeptonInterference = numerator / denominator
+      if (denominator .gt. 0d0) ReweightLeptonInterference_qqVVqq = numerator / denominator
 
    endif
-
-end function ReweightLeptonInterference
+end function ReweightLeptonInterference_qqVVqq
+#endif
 
 
 
