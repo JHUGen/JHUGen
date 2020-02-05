@@ -1277,8 +1277,8 @@ type(SaveValues) :: tosave, oldsavevalues
     if( .not. (Process.ge.66 .and. Process.le.72) .and. SetVBFoffsh_run ) then
       call Error("VBFoffsh_run is only for VBF/QCD off-shell")
     endif
-    if( (Process.ge.66 .and. Process.le.72) .and. VBFoffsh_run.le.0 ) then
-      call Error("VBFoffsh_run must be greater than 0.")
+    if( (Process.ge.66 .and. Process.le.72) .and. VBFoffsh_run.lt.0 ) then
+      call Error("VBFoffsh_run must be greater than equal 0.")
     endif
 
     if( Process.ge.66 .and. Process.le.75) then

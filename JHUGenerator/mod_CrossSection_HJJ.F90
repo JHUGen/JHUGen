@@ -20,7 +20,7 @@ use ModMisc
 use ifport
 #endif
 implicit none
-real(8) :: yRnd(1:17),VgsWgt, EvalWeighted_HJJ_fulldecay
+real(8) :: yRnd(1:18),VgsWgt, EvalWeighted_HJJ_fulldecay
 real(8) :: pdf(-6:6,1:2),me2(-5:5,-5:5)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
 real(8) :: MomExt(1:4,1:10),MomShifted(1:4,1:10),PSWgt,FinalStateWeight,m1ffwgt,m2ffwgt,m3ffwgt
@@ -45,8 +45,8 @@ m1ffwgt=1d0;m2ffwgt=1d0;m3ffwgt=1d0
          iPartChannel = VBFoffsh_run
       else
          NumPartonicChannels=Hash_MCFM_qqVVqqStrong_Size
-         !iPartChannel = int(yRnd(18) * NumPartonicChannels) +1 ! Must use last yRnd
-         call Error("You may not use VBFoffsh_run<=0 anymore.")
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1 ! Must use last yRnd
+!          call Error("You may not use VBFoffsh_run<=0 anymore.")
          iPartChannel= iPartChannel
       endif
    elseif (Process.ge.66 .and. Process.le.68) then
@@ -57,8 +57,8 @@ m1ffwgt=1d0;m2ffwgt=1d0;m3ffwgt=1d0
          iPartChannel = VBFoffsh_run
       else
          NumPartonicChannels=Hash_MCFM_qqVVqq_Size
-         !iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-         call Error("You may not use VBFoffsh_run<=0 anymore.")
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+!          call Error("You may not use VBFoffsh_run<=0 anymore.")
          iPartChannel= iPartChannel  ! runs from 1..164
       endif
    elseif (Process.ge.70 .and. Process.le.72) then
@@ -69,8 +69,8 @@ m1ffwgt=1d0;m2ffwgt=1d0;m3ffwgt=1d0
          iPartChannel = VBFoffsh_run
       else
          NumPartonicChannels=Hash_MCFM_qqVVll_Size
-         !iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
-         call Error("You may not use VBFoffsh_run<=0 anymore.")
+         iPartChannel = int(yRnd(18) * NumPartonicChannels) +1
+!          call Error("You may not use VBFoffsh_run<=0 anymore.")
          iPartChannel= iPartChannel  ! runs from 1..164
       endif
    endif
@@ -153,7 +153,10 @@ m1ffwgt=1d0;m2ffwgt=1d0;m3ffwgt=1d0
    !write(6,*) "SetRunningScales args:",(MomExt(1:4,5)+MomExt(1:4,6)),",",MomExt(1:4,3),",",MomExt(1:4,4),",",(/ id12_78,Not_a_particle_,Not_a_particle_,id12_78 /)
    call SetRunningScales( (/MomExt(1:4,V1)+MomExt(1:4,V2),MomExt(1:4,outTop),MomExt(1:4,outBot) /) , (/ id12_78,Not_a_particle_,Not_a_particle_,id12_78 /) )
    !write(6,*) "setPDFs args:",eta1,eta2,alphas,alphas_mz
+!    call EvalAlphaS()
    call setPDFs(eta1,eta2,pdf)
+   
+ 
    FluxFac = 1d0/(2d0*EHat**2)
    !pause
 
@@ -193,11 +196,8 @@ m1ffwgt=1d0;m2ffwgt=1d0;m3ffwgt=1d0
       endif
    endif
 
-
    call EvalAmp_qqVVqq(id_MCFM, p_MCFM, msq_MCFM)
 
-   !write(6,*) "msq_MCFM:",msq_MCFM
-   !pause
 
    originalprobability = msq_MCFM(iPart_sel,jPart_sel)
 
