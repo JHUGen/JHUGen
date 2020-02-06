@@ -6,7 +6,7 @@ set -euo pipefail
 cd $(dirname $0)
 
 MELADIR="."
-MCFMVERSION=mcfm_706
+MCFMVERSION=mcfm_707
 if [[ -z "${SCRAM_ARCH+x}" ]];then
   export SCRAM_ARCH="slc6_amd64_gcc530"
 fi
