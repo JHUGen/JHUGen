@@ -152,11 +152,10 @@ m1ffwgt=1d0;m2ffwgt=1d0;m3ffwgt=1d0
 !       return
    !write(6,*) "SetRunningScales args:",(MomExt(1:4,5)+MomExt(1:4,6)),",",MomExt(1:4,3),",",MomExt(1:4,4),",",(/ id12_78,Not_a_particle_,Not_a_particle_,id12_78 /)
    call SetRunningScales( (/MomExt(1:4,V1)+MomExt(1:4,V2),MomExt(1:4,outTop),MomExt(1:4,outBot) /) , (/ id12_78,Not_a_particle_,Not_a_particle_,id12_78 /) )
-   call EvalAlphaS()
-   !write(6,*) "setPDFs args:",eta1,eta2,alphas,alphas_mz
-   if (Process.eq.69) then
+   if (Process .eq. 69) then
       call EvalAlphaS()
    endif
+   !write(6,*) "setPDFs args:",eta1,eta2,alphas,alphas_mz
    call setPDFs(eta1,eta2,pdf)
 
 
