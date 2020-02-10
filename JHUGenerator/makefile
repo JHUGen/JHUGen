@@ -11,16 +11,31 @@ PDFDir = $(Here)/pdfs
 VegasDir = $(Here)/vegas
 CollierDir = $(Here)/../lib/COLLIER-1.2/
 
-# compiler options, Comp='ifort' or 'gfort'
+## compiler options, Comp='ifort' or 'gfort'
 Opt  = Yes
 Comp = gfort
 
-# link pdfs via LHA library ('Yes' or 'No')
+################
+## USER FLAGS ##
+################
+## link pdfs via LHA library ('Yes' or 'No')
 UseLHAPDF=No
 # remember to export
 #          LD_LIBRARY_PATH=/.../LHAPDF-x.y.z/lib/:${LD_LIBRARY_PATH}
 #          LHAPDF_DATA_PATH=/.../LHAPDF-x.y.z/share/LHAPDF/:${LHAPDF_DATA_PATH}
 
+## link MCFM libraries from MELA
+linkMELA = No
+# remember to export
+#          LD_LIBRARY_PATH=/.../MELA/data/$SCRAM_ARCH/:${LD_LIBRARY_PATH}
+
+## include Collier Loop Integral Library
+linkCollierLib = No
+
+###############################################
+## COMPILER SETTINGS BASED ON THE USER FLAGS ##
+###############################################
+## LHAPDF options
 # directory which contains libLHAPDF.a, libLHAPDF.la, libLHAPDF.so
 # this one in terms of the environment variable should work in most cases
 MyLHADir=${LHAPDF_DATA_PATH}/../../lib/
@@ -31,13 +46,8 @@ else
    LHAPDFflags = -DuseLHAPDF=0
 endif
 
-#link MCFM libraries from MELA
-# remember to export
-#          LD_LIBRARY_PATH=/.../MELA/data/$SCRAM_ARCH/:${LD_LIBRARY_PATH}
-linkMELA = Yes
-
+## MELA options
 MELAflags = -DlinkMELA=0
-
 ifeq ($(linkMELA),Yes)
   ifndef SCRAM_ARCH
     $(error $$SCRAM_ARCH is not set. Please set the MELA environment properly)
@@ -58,9 +68,7 @@ ifeq ($(linkMELA),Yes)
   endif
 endif
 
-#include Collier Loop Integral Library
-linkCollierLib = No
-
+## Collier options
 ifeq ($(linkMELA),Yes)
    linkCollierLib = Yes
    CollierLibflags = -DuseCollier=1 -I$(MELADir)/COLLIER -lcollier

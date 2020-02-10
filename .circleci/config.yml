@@ -127,7 +127,13 @@ jobs:
           command: |
             cd JHUGenMELA/MELA/
             ./setup.sh -j
-      - run: cd JHUGenerator && make
+      - run:
+          name: compile generator with linkMELA=Yes
+          command: |
+            cd JHUGenerator
+            sed -i -r -e "s/^(linkMELA *= *)No/\1Yes/" makefile
+            make
+            git checkout -- makefile
       - run: cd JHUGenerator/pdfs && ./downloadNNPDF.sh
       - persist_to_workspace:
           root: ~/JHUGen
@@ -167,7 +173,13 @@ jobs:
           command: |
             cd JHUGenMELA/MELA/
             ./setup.sh -j
-      - run: cd JHUGenerator && make
+      - run:
+          name: compile generator with linkMELA=Yes
+          command: |
+            cd JHUGenerator
+            sed -i -r -e "s/^(linkMELA *= *)No/\1Yes/" makefile
+            make
+            git checkout -- makefile
       - run: cd JHUGenerator/pdfs && ./downloadNNPDF.sh
       - run:
           name: "test the MELA reference with the compiled MCFM"
@@ -1027,8 +1039,8 @@ jobs:
             ! ./JHUGen Process=61 PDFSet=231 DataFile=HJJ_readcsmax.lhe MReso=250 $REFERENCE_COUPLINGS_CONTACT VegasNc2=500 pTjetcut=20.0d0 Interf=0 $REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0 ReadCSmax
             ! ./JHUGen Process=61 PDFSet=231 DataFile=HJJ_readcsmax.lhe MReso=250 $REFERENCE_COUPLINGS_CONTACT VegasNc2=500 pTjetcut=30.0d0 Interf $REFERENCE_COUPLINGS_SPIN0_ZP GaReso=10 $REFERENCE_COUPLINGS_SPIN0 ReadCSmax
       - run:
-          name: "check that linkMELA is turned on"
-          command: "grep 'linkMELA *= *Yes' JHUGenerator/makefile"
+          name: "check that linkMELA is turned off by default"
+          command: "grep 'linkMELA *= *No' JHUGenerator/makefile"
           when: always
       - run:
           name: "check compiling and running with linkMELA off"
@@ -1045,6 +1057,7 @@ jobs:
             exit $exitcode
           when: always
       - run:
+          name: "check that lonkCollierLib is turned off by default"
           command: grep 'linkCollierLib *= *No' JHUGenerator/makefile
           when: always
 
