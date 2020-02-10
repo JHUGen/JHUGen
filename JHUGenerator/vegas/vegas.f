@@ -104,6 +104,9 @@ c--- read-in grid if necessary
            close(11)
            ndo=nd
            readin=.false.
+         else if(stopadapt) then
+           ndo=nd
+           !stopadapt=.false.
          endif
 
          if(nd.eq.ndo)go to 8
@@ -273,7 +276,8 @@ c 20     write(6,202) j,(xi(i,j),di(i,j),d(i,j),i=1,nd)
 c
 c      refine grid
 c
- 21     do 23 j=1,ndim
+ 21     if (.not.stopadapt) then
+        do 23 j=1,ndim
         xo=d(1,j)
         xn=d(2,j)
         d(1,j)=(xo+xn)/2d0
@@ -309,9 +313,11 @@ c
         dr=dr-rc
         if (r(k).ne.0d0) xin(i)=xn-(xn-xo)*dr/r(k)
         if(i.lt.ndm)go to 26
+        !print *, "Adapting the grid..."
         do 27 i=1,ndm
  27     xi(i,j)=xin(i)
  28     xi(nd,j)=one
+        endif
 c
         if(it.lt.itmx.and.acc*dabs(avgi).lt.sd)go to 9
 

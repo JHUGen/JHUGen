@@ -2017,6 +2017,7 @@ include 'maxwt.f'
   acc = -1d0
   nprn = 1
   readin=.false.
+  stopadapt=.false.
   writeout=.false.
   stopvegas=.false.
   evtgen=.false.
@@ -2593,6 +2594,8 @@ if( VegasNc2.eq.-1 .and.  .not. (unweighted) ) VegasNc2 = VegasNc2_default
 
    PChannel_aux = PChannel
 
+   !print *, "StartVegas: unweighted=",unweighted,"GenerateEvents=",GenerateEvents
+
 if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !----------------------- weighted events
 
 
@@ -2642,6 +2645,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     !DATA RUN
     call ClearHisto()
     warmup = .false.
+    stopadapt=.true.
     EvalCounter=0
     RejeCounter=0
     AccepCounter=0
@@ -2977,6 +2981,7 @@ character(len=len(CSmaxFile)+20) :: FileToRead
    if( VegasNc2.eq.-1 .and.  .not. (unweighted) ) VegasNc2 = VegasNc2_default
 
 
+   !print *, "StartVegas_NEW: unweighted=",unweighted,"GenerateEvents=",GenerateEvents
 
    if(Process.lt.10) then
       write(ProcessStr,"(I1)") Process
@@ -3049,6 +3054,7 @@ character(len=len(CSmaxFile)+20) :: FileToRead
 
        call ClearHisto()
        warmup = .false.
+       stopadapt=.true.
        Br_counter(:,:) = 0
        EvalCounter=0
        RejeCounter=0
@@ -3078,6 +3084,7 @@ character(len=len(CSmaxFile)+20) :: FileToRead
    elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 
    UseBetaVersion = CalculatesXsec(Process)
+   !print *, "StartVegas_NEW: UseBetaVersion=",UseBetaVersion
 
 
       if( UseBetaVersion ) then
@@ -3108,7 +3115,7 @@ character(len=len(CSmaxFile)+20) :: FileToRead
                  if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
                  if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
                  if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-                 if( Process.ge.72 .and. Process.le.75 ) call vegas(EvalWeighted_gg4f_fullproddec,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.ge.73 .and. Process.le.75 ) call vegas(EvalWeighted_gg4f_fullproddec,VG_Result,VG_Error,VG_Chi2)
                  if( Process.eq.110) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
                  if( Process.eq.111) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
                  if( Process.eq.112) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
@@ -3140,7 +3147,7 @@ character(len=len(CSmaxFile)+20) :: FileToRead
          !         if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
                  if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
                  if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-                 if( Process.ge.72 .and. Process.le.75 ) call vegas1(EvalWeighted_gg4f_fullproddec,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.ge.73 .and. Process.le.75 ) call vegas1(EvalWeighted_gg4f_fullproddec,VG_Result,VG_Error,VG_Chi2)
                  if( Process.eq.110) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
                  if( Process.eq.111) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
                  if( Process.eq.112) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
@@ -3227,10 +3234,10 @@ character(len=len(CSmaxFile)+20) :: FileToRead
 
              PreviousSum = 0
              if( sum(RequEvents(:,:)).eq.0 ) StatusPercent = 100d0
+             stopadapt=.true.  ! this prevents adapting the grid during this while-loop
              do while( StatusPercent.lt.100d0  )
          !     do while( AccepCounter_part(iPart_sel,jPart_sel).lt.RequEvents(iPart_sel,jPart_sel) )
                  call cpu_time(time_start)
-                 readin=.true.  ! this prevents adapting the grid during this while-loop
 
                  if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
          !         if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)! adjust to LHE format
@@ -3259,7 +3266,7 @@ character(len=len(CSmaxFile)+20) :: FileToRead
                      endif
                  enddo
                  enddo
-                 write(*,"(A,I10,I10,F16.6)") "PS gen eff. ",DebugCounter(10),DebugCounter(9),dble(DebugCounter(10))/dble(DebugCounter(9))*100d0
+                 !write(*,"(A,I10,I10,F16.6)") "PS gen eff. ",DebugCounter(10),DebugCounter(9),dble(DebugCounter(10))/dble(DebugCounter(9))*100d0
                  DebugCounter(9:10)=0
                  StatusPercent = int(100d0*dble(sum(AccepCounter_part(:,:)))/dble(sum(RequEvents(:,:)))  )
                  print *, "StatusPercent=",StatusPercent, "  Events=",sum(AccepCounter_part(:,:))
@@ -3491,9 +3498,10 @@ character(len=len(CSmaxFile)+20) :: FileToRead
 
              PreviousSum = 0
              if( sum(RequEvents2(:)).eq.0 ) StatusPercent = 100d0
+             readin=.true.  ! read the grid for the first time
+             stopadapt=.true.  ! this prevents adapting the grid during this while-loop
              do while( StatusPercent.lt.100d0  )
                  call cpu_time(time_start)
-                 readin=.true.  ! this prevents adapting the grid during this while-loop
 
                  if( Process.ge.66 .and. Process.le.72 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
                  write(io_stdout,*) ""

@@ -603,9 +603,8 @@ MODULE ModPhasespace
     endif
 
     y = tan(pi*(min(max(r-0.5d0,-rthr),rthr))) ! Unitless at the moment
-    rapidity_tan_map = (1d0 + y**2)
-    ! Multiply by the actual y width
-    rapidity_tan_map = ywidth*rapidity_tan_map
+    rapidity_tan_map = ywidth*pi*(1d0 + y**2)
+    ! Multiply by the actual y width now
     y = ywidth*y
 
   RETURN
