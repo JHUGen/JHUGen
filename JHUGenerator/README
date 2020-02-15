@@ -90,6 +90,10 @@ Command line parameters for quick reference:
     ctauReso:          resonance decay length in mm (default=0)
     OffshellX:         Whether to allow resonance (X) to go offshell
                        in processes 0, 1 or 2
+    MZ:                Z mass in GeV (default=91.1876)
+    GaZ:               Z width in GeV (default=2.4952)
+    MW:                W mass in GeV (default=80.399)
+    GaW:               W width in GeV (default=2.085)
     MReso2:            2nd resonance mass in GeV in offshell VBF
     GaReso2:           2nd resonance width in GeV in offshell VBF
   EW coupling parameters:

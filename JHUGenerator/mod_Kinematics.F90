@@ -169,6 +169,16 @@ if( (IsAZDecay(DecayMode1)).and.(IsAZDecay(DecayMode2)) .and. abs(LHE_IDUP(7)).e
      s36 = Get_MInv( Mom(1:4,3)+Mom(1:4,6) )
      s45 = Get_MInv( Mom(1:4,4)+Mom(1:4,5) )
      smallestInv = minloc((/dabs(s34-M_V),dabs(s56-M_V),dabs(s36-M_V),dabs(s45-M_V)/),1)
+     if (includeVprime .and. M_Vprime .ge. 0d0 .and. ( &
+         VprimeDecayLengthMassCutoffFactor.le.0d0 .or. (&
+            abs(s36-M_Vprime).lt.VprimeDecayLengthMassCutoffFactor*Ga_Vprime .and. abs(s45-M_Vprime).lt.VprimeDecayLengthMassCutoffFactor*Ga_Vprime &
+            ) .or. (&
+            abs(s34-M_Vprime).lt.VprimeDecayLengthMassCutoffFactor*Ga_Vprime .and. abs(s56-M_Vprime).lt.VprimeDecayLengthMassCutoffFactor*Ga_Vprime &
+            ) &
+         ) &
+      ) then
+        smallestInv = minloc((/dabs(s34-M_Vprime),dabs(s56-M_Vprime),dabs(s36-M_Vprime),dabs(s45-M_Vprime)/),1)
+     endif
      if( smallestInv.eq.3 .or. smallestInv.eq.4 ) then
         call swapi(MOTHUP(1,7),MOTHUP(1,9))
         call swapi(MOTHUP(2,7),MOTHUP(2,9))
@@ -442,6 +452,16 @@ logical :: IsEmpty
         s36 = Get_MInv( HiggsDK_Mom(1:4,3)+HiggsDK_Mom(1:4,6) )
         s45 = Get_MInv( HiggsDK_Mom(1:4,4)+HiggsDK_Mom(1:4,5) )
         smallestInv = minloc((/dabs(s34-M_V),dabs(s56-M_V),dabs(s36-M_V),dabs(s45-M_V)/),1)
+        if (includeVprime .and. M_Vprime .ge. 0d0 .and. ( &
+            VprimeDecayLengthMassCutoffFactor.le.0d0 .or. (&
+               abs(s36-M_Vprime).lt.VprimeDecayLengthMassCutoffFactor*Ga_Vprime .and. abs(s45-M_Vprime).lt.VprimeDecayLengthMassCutoffFactor*Ga_Vprime &
+               ) .or. (&
+               abs(s34-M_Vprime).lt.VprimeDecayLengthMassCutoffFactor*Ga_Vprime .and. abs(s56-M_Vprime).lt.VprimeDecayLengthMassCutoffFactor*Ga_Vprime &
+               ) &
+            ) &
+         ) then
+           smallestInv = minloc((/dabs(s34-M_Vprime),dabs(s56-M_Vprime),dabs(s36-M_Vprime),dabs(s45-M_Vprime)/),1)
+        endif
         if( smallestInv.eq.3 .or. smallestInv.eq.4 ) then
             call swapi(HiggsDK_MOTHUP(1,7),HiggsDK_MOTHUP(1,9))
             call swapi(HiggsDK_MOTHUP(2,7),HiggsDK_MOTHUP(2,9))
