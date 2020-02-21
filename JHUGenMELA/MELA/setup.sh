@@ -7,23 +7,47 @@ cd $(dirname $0)
 
 MELADIR="."
 MCFMVERSION=mcfm_707
+
+declare -i needSCRAM
+needSCRAM=0
 if [[ -z "${SCRAM_ARCH+x}" ]];then
-  export SCRAM_ARCH="slc6_amd64_gcc530"
+  needSCRAM=1
+  GCCVERSION=$(gcc -dumpversion)
+  if [[ "$GCCVERSION" == "4.3"* ]] || [[ "$GCCVERSION" == "4.4"* ]] || [[ "$GCCVERSION" == "4.5"* ]]; then # v1 of MCFM library
+    export SCRAM_ARCH="slc5_amd64_gcc434"
+  elif [[ "$GCCVERSION" == "4"* ]] || [[ "$GCCVERSION" == "5"* ]] || [[ "$GCCVERSION" == "6"* ]]; then # v2 of MCFM library
+    export SCRAM_ARCH="slc6_amd64_gcc630"
+  elif [[ "$GCCVERSION" == "7"* ]]; then # v3 of MCFM library
+    export SCRAM_ARCH="slc7_amd64_gcc700"
+  #elif [[ "$GCCVERSION" == "8"* ]]; then # v4 of MCFM library
+  else
+    export SCRAM_ARCH="slc7_amd64_gcc820"
+  fi
 fi
 
+
 printenv () {
-    if [ -z "${LD_LIBRARY_PATH+x}" ]; then
-      end=''
-    else
-      end=':$LD_LIBRARY_PATH'
-    fi
-    echo "export LD_LIBRARY_PATH=$(readlink -f $MELADIR)/data/$SCRAM_ARCH$end"
-    if [ -z "${PYTHONPATH+x}" ]; then
-      end=''
-    else
-      end=':$PYTHONPATH'
-    fi
-    echo "export PYTHONPATH=$(readlink -f $MELADIR)/python$end"
+  ldlibappend="$(readlink -f $MELADIR)/data/${SCRAM_ARCH}"
+  end=""
+  if [[ ! -z "${LD_LIBRARY_PATH+x}" ]]; then
+    end=":${LD_LIBRARY_PATH}"
+  fi
+  if [[ "${end}" != *"$ldlibappend"* ]];then
+    echo "export LD_LIBRARY_PATH=${ldlibappend}${end}"
+  fi
+
+  pythonappend="$(readlink -f $MELADIR)/python"
+  end=""
+  if [[ ! -z "${PYTHONPATH+x}" ]]; then
+    end=":${PYTHONPATH}"
+  fi
+  if [[ "${end}" != *"$pythonappend"* ]];then
+    echo "export PYTHONPATH=${pythonappend}${end}"
+  fi
+
+  if [[ $needSCRAM -eq 1 ]];then
+    echo "export SCRAM_ARCH=${SCRAM_ARCH}"
+  fi
 }
 doenv () {
   ldlibappend="$(readlink -f $MELADIR)/data/${SCRAM_ARCH}"
@@ -31,7 +55,7 @@ doenv () {
   if [[ ! -z "${LD_LIBRARY_PATH+x}" ]]; then
     end=":${LD_LIBRARY_PATH}"
   fi
-  if [[ "${LD_LIBRARY_PATH+x}" != *"$ldlibappend"* ]];then
+  if [[ "${end}" != *"$ldlibappend"* ]];then
     export LD_LIBRARY_PATH="${ldlibappend}${end}"
     echo "Temporarily using LD_LIBRARY_PATH as ${LD_LIBRARY_PATH}"
   fi
@@ -41,7 +65,7 @@ doenv () {
   if [[ ! -z "${PYTHONPATH+x}" ]]; then
     end=":${PYTHONPATH}"
   fi
-  if [[ "${PYTHONPATH+x}" != *"$pythonappend"* ]];then
+  if [[ "${end}" != *"$pythonappend"* ]];then
     export PYTHONPATH="${pythonappend}${end}"
     echo "Temporarily using PYTHONPATH as ${PYTHONPATH}"
   fi
@@ -92,7 +116,7 @@ if mv libjhugenmela.so "../data/"$SCRAM_ARCH"/"; then
     echo
     echo "remember to:"
     echo
-    printenv
+    echo 'eval $(./setup.sh env)'
     echo
 else
     echo
