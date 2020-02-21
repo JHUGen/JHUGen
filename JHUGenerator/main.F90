@@ -555,6 +555,10 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "GaReso", success, Ga_Reso, success2=SetGaReso, multiply=GeV, tosave=tosave)
     call ReadCommandLineArgument(arg, "MReso2", success, M_Reso2, success2=SetMReso2, multiply=GeV, tosave=tosave)
     call ReadCommandLineArgument(arg, "GaReso2", success, Ga_Reso2, success2=SetGaReso2, multiply=GeV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "MZ", success, M_Z, multiply=GeV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "GaZ", success, Ga_Z, multiply=GeV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "MW", success, M_W, multiply=GeV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "GaW", success, Ga_W, multiply=GeV, tosave=tosave)
 
     call ReadCommandLineArgument(arg, "ctauReso", success, HiggsDecayLengthMM, multiply=ctauUnit, tosave=tosave)
     call ReadCommandLineArgument(arg, "ctauVprime", success, VprimeDecayLengthMM, multiply=ctauUnit, tosave=tosave)
@@ -6890,6 +6894,10 @@ implicit none
         print *, "   ctauReso:          resonance decay length in mm (default=0)"
         print *, "   OffshellX:         Whether to allow resonance (X) to go off-shell"
         print *, "                      in processes 0, 1 or 2"
+        print *, "   MZ:                Z mass in GeV (default=91.1876)"
+        print *, "   GaZ:               Z width in GeV (default=2.4952)"
+        print *, "   MW:                W mass in GeV (default=80.399)"
+        print *, "   GaW:               W width in GeV (default=2.085)"
         print *, "   MReso2:            2nd resonance mass in GeV in off-shell EW"
         print *, "   GaReso2:           2nd resonance width in GeV in off-shell EW"
         print *, " EW coupling parameters:"
