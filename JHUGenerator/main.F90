@@ -817,7 +817,7 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "bgsgs4", success, bgsgs4, success2=SetSpin2VV, success3=Setgammagammacoupling, checkdestchange=.true., tosave=tosave)
     call ReadCommandLineArgument(arg, "bgsgs8", success, bgsgs8, success2=SetSpin2VV, success3=Setgammagammacoupling, checkdestchange=.true., tosave=tosave)
 
-!   similar as above for the 2nd resonance in offshell VBF
+!   similar as above for the 2nd resonance in off-shell EW
     !spin 0 Hff couplings
     call ReadCommandLineArgument(arg, "kappa2_top", success, kappa2_top, success2=SetAnomalousHffMCFM, success3=Setkappa2top, checkdestchange=.true., tosave=tosave)
     call ReadCommandLineArgument(arg, "kappa2_tilde_top", success, kappa2_tilde_top, success2=SetAnomalousHffMCFM, success3=Setkappa2top, checkdestchange=.true., tosave=tosave)
@@ -2645,7 +2645,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     !DATA RUN
     call ClearHisto()
     warmup = .false.
-    stopadapt=.true.
+    stopadapt=.false. ! Why false? Stopping adaptation does not matter for weighted events (?)/
     EvalCounter=0
     RejeCounter=0
     AccepCounter=0
@@ -3054,7 +3054,7 @@ character(len=len(CSmaxFile)+20) :: FileToRead
 
        call ClearHisto()
        warmup = .false.
-       stopadapt=.true.
+       stopadapt=.false. ! Why false? Stopping adaptation does not matter for weighted events (?)/
        Br_counter(:,:) = 0
        EvalCounter=0
        RejeCounter=0
@@ -3090,7 +3090,7 @@ character(len=len(CSmaxFile)+20) :: FileToRead
       if( UseBetaVersion ) then
       ! !-------------------new stuff -------------------
 
-         IF( .NOT. (Process.ge.66 .and. Process.le.72) ) THEN! special treatment for offshell VBF
+         IF( .NOT. (Process.ge.66 .and. Process.le.72) ) THEN! special treatment for off-shell EW
 
              write(io_stdout,"(2X,A)")  "Scanning the integrand"
              warmup = .true.
@@ -3291,7 +3291,7 @@ character(len=len(CSmaxFile)+20) :: FileToRead
 
 
 
-         ELSEIF( Process.ge.66 .and. Process.le.72 ) THEN! special treatment for offshell VBF
+         ELSEIF( Process.ge.66 .and. Process.le.72 ) THEN! special treatment for off-shell EW
              if (Process.ge.66 .and. Process.le.68) then
                 VBFoffsh_Hash_Size = Hash_MCFM_qqVVqq_Size
                 VBFoffsh_run_size = Hash_MCFM_qqVVqq_Size
@@ -6841,7 +6841,7 @@ implicit none
         print *, "   Interf:            0=neglect interference for 4f final states,"
         print *, "                      1=include interference"
         print *, "   ReweightInterf:    if true, include interference as LHE event weights for"
-        print *, "                      offshell VBF events"
+        print *, "                      off-shell EW events"
         print *, "   RandomizeVVdecays: Randomizes the order of DecayMode1 and DecayMode2,"
         print *, "                      per event (default true)"
         print *, "                      For a WW decay, turning this off will mean"
@@ -6882,16 +6882,16 @@ implicit none
         print *, "                      VH_PC overrides Pchannel."
         print *, "   alpha_dip          extra non-physical degree of freedom for Process=51 & VH_PC=nl, defaulted at 1."
         print *, "                      Vary to check indepedence (of alpha_dip)."
-        print *, "   VBFoffsh_run:      For VBF offshell production, set this to an index"
+        print *, "   VBFoffsh_run:      For EW off-shell or QCD continuum productions, set this to an index"
         print *, "                      for each of the jobs.  See manual for more details."
         print *, " Resonance parameters:"
         print *, "   MReso:             resonance mass in GeV (default=125.00)"
         print *, "   GaReso:            resonance width in GeV (default=0.00407)"
         print *, "   ctauReso:          resonance decay length in mm (default=0)"
-        print *, "   OffshellX:         Whether to allow resonance (X) to go offshell"
+        print *, "   OffshellX:         Whether to allow resonance (X) to go off-shell"
         print *, "                      in processes 0, 1 or 2"
-        print *, "   MReso2:            2nd resonance mass in GeV in offshell VBF"
-        print *, "   GaReso2:           2nd resonance width in GeV in offshell VBF"
+        print *, "   MReso2:            2nd resonance mass in GeV in off-shell EW"
+        print *, "   GaReso2:           2nd resonance width in GeV in off-shell EW"
         print *, " EW coupling parameters:"
         print *, "   Vud:               CKM element for W-ud couplings"
         print *, "   Vus:               CKM element for W-us couplings"
@@ -6906,16 +6906,16 @@ implicit none
         print *, "   pTjetcut:          Minimum pT for jets in GeV (default: 15)"
         print *, "   deltaRcut:         Minimum deltaR for jets (default: 0.3)"
         print *, "   mJJcut:            Minimum dijet mass in GeV (default: 0)"
-        print *, "   MPhotonCutoff:     Minimum mass for offshell photons in GeV, when included (default: 4)"
-        print *, "   etajetcut:         Maximum |eta| for jets in offshell VBF (default: 4)"
-        print *, "   detajetcut:        Minimum deltaeta between jets in offshell VBF (default: 2)"
-        print *, "   JetsOppositeEta:   Require sgn(eta) to be opposite for the two jets in offshell VBF"
+        print *, "   MPhotonCutoff:     Minimum mass for off-shell photons in GeV, when included (default: 4)"
+        print *, "   etajetcut:         Maximum |eta| for jets in off-shell EW (default: 4)"
+        print *, "   detajetcut:        Minimum deltaeta between jets in off-shell EW (default: 2)"
+        print *, "   JetsOppositeEta:   Require sgn(eta) to be opposite for the two jets in off-shell EW"
         print *, "                      (default: true)"
-        print *, "   pTlepcut:          Minimum pT for leptons in offshell VBF, in GeV (default: 3)"
-        print *, "   etalepcut:         Maximum |eta| for leptons in offshell VBF (default: 2.7)"
-        print *, "   m4l_min, m4l_max:  Minimum and maximum four-lepton mass in offshell VBF"
-        print *, "   m2l_min:   Minimum invariant mass of V (onshell) in new VH (\texttt{Process=51}) (default: 0)"
-        print *, "   m2l_max:   Maximum invariant mass of V (onshell) in new VH (\texttt{Process=51}) (default: infinity)"
+        print *, "   pTlepcut:          Minimum pT for leptons in off-shell EW, in GeV (default: 3)"
+        print *, "   etalepcut:         Maximum |eta| for leptons in off-shell EW (default: 2.7)"
+        print *, "   m4l_min, m4l_max:  Minimum and maximum four-lepton mass in off-shell EW"
+        print *, "   m2l_min:   Minimum invariant mass of V (on-shell) in new VH (\texttt{Process=51}) (default: 0)"
+        print *, "   m2l_max:   Maximum invariant mass of V (on-shell) in new VH (\texttt{Process=51}) (default: infinity)"
         print *, "   mVH_min:   Minimum invariant mass of VH in new VH (\texttt{Process=51}) (default: 0)"
         print *, "   mVH_max:   Maximum invariant mass of VH in new VH (\texttt{Process=51}) (default: infinity)"
         print *, " Renormalization and factorization scales:"
