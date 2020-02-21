@@ -183,6 +183,8 @@ Download the package from \url{spin.pha.jhu.edu} and untar the file.  Go to the 
 $ make
 \end{verbatim}
 
+By default, the makefile options \verb|linkMELA| and \verb|linkCollierLib| are set to \verb|No|. If you need to use the NLO features, you need to set \verb|linkCollierLib = Yes|. Likewise, if you need to use off-shell processes, which use modified MCFM matrix elements, you need to set \verb|linkMELA = Yes| and compile JHUGenMELA before compiling JHUGenerator (see compilation instructions for JHUGenMELA). In the case \verb|linkMELA = Yes|, the compiler has to be set to \verb|Comp = gfort|, and the gcc version should be at least 4.6.
+
 \section{Quick start}
 
 Examples of running the generator.  The number of events is determined using \texttt{VegasNc2}.
@@ -919,9 +921,9 @@ It is possible to interface to an LHAPDF setup instead of compiling with local P
 These instructions are meant as an introduction to MELA and do not illustrate the full flexibility provided by the package.  For further instructions, please contact the authors.
 \subsection{Compiling}
 After extracting the code, you can go to the directory \texttt{JHUGenMELA/MELA} to find code for computing matrix elements directly.
-To compile the code, simply run \texttt{./setup.sh}.  At the end, it will print two environment variables that have to be exported in order to use \texttt{MELA}.  \texttt{LD\_LIBRARY\_PATH} is needed for any use of MELA, while \texttt{PYTHONPATH} is needed to use the Python MELA interface.
+To compile the code, simply run \texttt{./setup.sh}. You can specify the option \verb|-j N| for multi-core compilation, or option \verb|clean| for cleanup.. At the end, if necessary, it will print a command to run in order to set three environment variables that are needed to run \texttt{MELA}: \texttt{LD\_LIBRARY\_PATH} needs to include the library path for MELA, \texttt{PYTHONPATH} needs to contain the path for thte Python MELA interface, and \texttt{SCRAM_ARCH} needs to be set to refer to one of the folders inside MELA/data for the correct version of the MCFM library.
 
-\textbf{Please take note: The setup relies on MCFM libraries, which are downloaded from the main webpage during the \texttt{setup.sh} script.  They are provided for \texttt{gfort + gcc version 5.3.0} or later, on SLC, and probably work with other compiler versions that are not too far away.  Better portability coming soon.}
+\textbf{Please take note: The setup relies on MCFM libraries, which are downloaded from the main webpage during the \texttt{setup.sh} script.  They are provided for \texttt{gfort + gcc version 4.6} or later, and only for SLC. They work out-of-the-box with other compiler versions that are not too far away, and we regularly monitor new versions. If you are using SLC but a very new gfort/gcc version that requires a new precompiled library, let us know and we will provide it promptly. If you are not using SLC, or the precompiled libraries do not work, you can always compile the MCFM library yourself by going into the MCFM-JHUGen directory and running \verb|./compile.sh (-j N)|.}
 
 MELA requires the ROOT package~\cite{root}, and the simplest way to use MELA is to compile in ROOT.  Run the \texttt|loadMELA.C| script in the test directory before compiling or loading any other scripts that rely on MELA.  It is also possible to link against the MELA code directly.
 \subsection{Starting out}
