@@ -28,7 +28,7 @@ Manual for the JHU generator and MELA package
 \begin{center}
 \small
 For simulation, reweighting, and analysis of a single-produced resonance at hadron colliders \\
-(version v7.3.8, release date February 11, 2019) \\
+(version v7.3.8, release date February 21, 2019) \\
 \normalsize
 \end{center}
 
@@ -41,7 +41,7 @@ Only relative values of cross sections are supposed to produce meaningful result
 
 Additionally, the package includes code for computing the matrix elements standalone which can be used in a numerical matrix element analysis.
 Please reference the above papers and refer to ``MELA'' when using the matrix element likelihood approach.
-The latter was also introduced in Ref.~\cite{Chatrchyan:2012ufa}. The matrix element package (MELA) and offshell VBF generation also depend on MCFM libraries for background parameterization which should be referenced~\cite{Campbell:2010ff} when used.
+The latter was also introduced in Ref.~\cite{Chatrchyan:2012ufa}. The matrix element package (MELA) and off-shell EW generation also depend on MCFM libraries for background parameterization which should be referenced~\cite{Campbell:2010ff} when used.
 
 \vspace{0.5cm}
 \begin{center}
@@ -251,7 +251,7 @@ Examples of running the generator.  The number of events is determined using \te
 		pTjetcut=15 deltaRcut=0
 		\end{verbatim}
 	\end{itemize}
-	\item Offshell VBF, \texttt{Process=66}, \texttt{67}, \texttt{68}
+	\item off-shell EW, \texttt{Process=66}, \texttt{67}, \texttt{68}
 	\begin{itemize}
 		\item including VBF and hadronic $VH$ with up to two scalar resonances and interference with the SM background
 		\item see below, page \pageref{sec:offshellVBF}, for the configuration
@@ -342,7 +342,7 @@ This is the list of command line configurables (also defined in the \verb|README
     Interf:            0=neglect interference for 4f final states,
                        1=include interference
     ReweightInterf:    if true, include interference as LHE event weights for
-                       offshell VBF events
+                       off-shell EW events
     RandomizeVVdecays: Randomizes the order of DecayMode1 and DecayMode2,
                        per event (default true)
                        For a WW decay, turning this off will mean
@@ -383,16 +383,16 @@ This is the list of command line configurables (also defined in the \verb|README
                        VH_PC overrides Pchannel.
     alpha_dip          extra non-physical degree of freedom for Process=51 & VH_PC=nl, defaulted at 1.
                        Vary to check indepedence (of alpha_dip).
-    VBFoffsh_run:      For VBF offshell production, set this to an index
-                       for each of the jobs.  See below for more details.
+    VBFoffsh_run:      For EW off-shell or QCD continuum productions, set this to an index
+                       for each of the jobs.  See manual for more details.
   Resonance parameters:
     MReso:             resonance mass in GeV (default=125.00)
     GaReso:            resonance width in GeV (default=0.00407)
     ctauReso:          resonance decay length in mm (default=0)
-    OffshellX:         Whether to allow resonance (X) to go offshell
+    OffshellX:         Whether to allow resonance (X) to go off-shell
                        in processes 0, 1 or 2
-    MReso2:            2nd resonance mass in GeV in offshell VBF
-    GaReso2:           2nd resonance width in GeV in offshell VBF
+    MReso2:            2nd resonance mass in GeV in off-shell EW
+    GaReso2:           2nd resonance width in GeV in off-shell EW
   EW coupling parameters:
     Vud:               CKM element for W-ud couplings
     Vus:               CKM element for W-us couplings
@@ -407,16 +407,16 @@ This is the list of command line configurables (also defined in the \verb|README
     pTjetcut:          Minimum pT for jets in GeV (default: 15)
     deltaRcut:         Minimum deltaR for jets (default: 0.3)
     mJJcut:            Minimum dijet mass in GeV (default: 0)
-    MPhotonCutoff:     Minimum mass for offshell photons in GeV, when included (default: 4)
-    etajetcut:         Maximum |eta| for jets in offshell VBF (default: 4)
-    detajetcut:        Minimum deltaeta between jets in offshell VBF (default: 2)
-    JetsOppositeEta:   Require sgn(eta) to be opposite for the two jets in offshell VBF
+    MPhotonCutoff:     Minimum mass for off-shell photons in GeV, when included (default: 4)
+    etajetcut:         Maximum |eta| for jets in off-shell EW (default: 4)
+    detajetcut:        Minimum deltaeta between jets in off-shell EW (default: 2)
+    JetsOppositeEta:   Require sgn(eta) to be opposite for the two jets in off-shell EW
                        (default: true)
-    pTlepcut:          Minimum pT for leptons in offshell VBF, in GeV (default: 3)
-    etalepcut:         Maximum |eta| for leptons in offshell VBF (default: 2.7)
-    m4l_min, m4l_max:  Minimum and maximum four-lepton mass in offshell VBF
-    m2l_min:   Minimum invariant mass of V (onshell) in new VH (\texttt{Process=51}) (default: 0)
-    m2l_max:   Maximum invariant mass of V (onshell) in new VH (\texttt{Process=51}) (default: infinity)
+    pTlepcut:          Minimum pT for leptons in off-shell EW, in GeV (default: 3)
+    etalepcut:         Maximum |eta| for leptons in off-shell EW (default: 2.7)
+    m4l_min, m4l_max:  Minimum and maximum four-lepton mass in off-shell EW
+    m2l_min:   Minimum invariant mass of V (on-shell) in new VH (\texttt{Process=51}) (default: 0)
+    m2l_max:   Maximum invariant mass of V (on-shell) in new VH (\texttt{Process=51}) (default: infinity)
     mVH_min:   Minimum invariant mass of VH in new VH (\texttt{Process=51}) (default: 0)
     mVH_max:   Maximum invariant mass of VH in new VH (\texttt{Process=51}) (default: infinity)
   Renormalization and factorization scales:
@@ -425,18 +425,18 @@ This is the list of command line configurables (also defined in the \verb|README
     RenScheme:         QCD renormalization scale scheme
     MuRenMultiplier:   Multiplier for the renormalization scale chosen by RenScheme
   Lepton and jet filter:
-    NLepMin:       Reject events that have less than this many charged leptons
-    NLepMax:       Reject events that have more than this many charged leptons
-    NJetMin:       Reject events that have less than this many jets
-    NJetMax:       Reject events that have more than this many jets
-    NOSMin:       Reject events that have less than this many
-                  opposite-sign pairs of leptons of any flavor
-    NOSMax:       Reject events that have more than this many
-                  opposite-sign pairs of leptons of any flavor
-    NOSSFMin:       Reject events that have less than this many
-                    opposite-sign same-flavor pairs of leptons
-    NOSSFMax:       Reject events that have more than this many
-                    opposite-sign same-flavor pairs of leptons
+    NLepMin:           Reject events that have less than this many charged leptons
+    NLepMax:           Reject events that have more than this many charged leptons
+    NJetMin:           Reject events that have less than this many jets
+    NJetMax:           Reject events that have more than this many jets
+    NOSMin:            Reject events that have less than this many
+                       opposite-sign pairs of leptons of any flavor
+    NOSMax:            Reject events that have more than this many
+                       opposite-sign pairs of leptons of any flavor
+    NOSSFMin:          Reject events that have less than this many
+                       opposite-sign same-flavor pairs of leptons
+    NOSSFMax:          Reject events that have more than this many
+                       opposite-sign same-flavor pairs of leptons
     CountTauAsAny:     For OSSF pairs, taus can stand in place of electrons or muons
                        of the same charge.
     WriteFailedEvents: Write events that fail in the LHE file, but with a weight of 0
@@ -469,9 +469,9 @@ This is the list of command line configurables (also defined in the \verb|README
                        Use DecayMode1 to specify the decay.
                        (should be a Z or W mode, depending on the input file)
     UnformattedRead:   Turn this on if the normal, faster reading fails
-    VegasVerbosity:   Turn on or off verbose vegas printout (1: on, 0: off; default: 1)
+    VegasVerbosity:    Turn on or off verbose vegas printout (1: on, 0: off; default: 1)
   Couplings:
-    See below for the full list
+    See manual for the full list
 \end{verbatim}
 
 \subsubsection{Process configuration}
@@ -485,7 +485,7 @@ This is the list of command line configurables (also defined in the \verb|README
 \item In $H\to \tau\tau$ decay, if \verb|TauDK| is true, \verb|DecayMode1,2| are used to decay the $W$ bosons from the $\tau$ decays.
 \end{itemize}
 \item \verb|Interf|: For final states with 4 same flavor fermions, this parameter controls whether or not to include interference effects.
-\item \verb|ReweightInterf|: For offshell VBF production, this includes the 4 lepton interference in the event weights.  We recommend setting this option instead of \texttt{Interf} because the phase space integration is much more efficient without interference.  This option is not an approximation: it is mathematically correct as far as the \texttt{.lhe} files go.  However, the \texttt{.dat} files produced will not be filled correctly with this option.
+\item \verb|ReweightInterf|: For off-shell EW production, this includes the 4 lepton interference in the event weights.  We recommend setting this option instead of \texttt{Interf} because the phase space integration is much more efficient without interference.  This option is not an approximation: it is mathematically correct as far as the \texttt{.lhe} files go.  However, the \texttt{.dat} files produced will not be filled correctly with this option.
 \item \verb|RandomizeVVdecays|: For $VV$ decay (and similarly in $ttH$ production), by default the $V$'s are randomized so that, for example, \verb|DecayMode1=5 DecayMode2=11| will produce all combinations that include at least one hadronic $W$ decay (rather of specifically hadronic decay of the $W^+$).  This can be switched off by setting \verb|RandomizeVVdecays=0|.  In this case, \verb|DecayMode1| will refer specifically to the $W^+$ and \verb|DecayMode2| to the $W^-$.  For $ZZ$ decay, this parameter only determines whether the decays of first and second $Z$ written to the LHE file are randomized or not; in this case the only effect is the appearance of the output.
 \item \verb|PChannel|: This parameter is only meaningful in the spin-2 case and for the $ttH$ and $bbH$ production mechanisms.  For spin-0, production is possible only via the $gg$ process; for spin-1 and for the VBF, $VH$, and $tH$ processes, production is only possible via the $qq^\prime$ process.  For $H+jj$ and $H+j$, all parton channels $gg$, $qq^\prime$, and $qg$ are included.
 \item \verb|ChannelRatio|: In the case when \verb|PChannel=2| for a spin-2 resonance, this parameter determines an approximate fraction of the events that should come from $q\bar{q}$.  This is equivalent to appropriately scaling the $Xq\bar{q}$ couplings with respect to the $Xgg$ ones, but can be done without advance knowledge of the relative cross sections.
@@ -725,7 +725,7 @@ complex(8), public :: ghzgs1_prime2= (0.0d0,0d0)
 real(8),    public, parameter :: Lambda_zgs1 = 10000d0*GeV.
 \end{verbatim}
 
-Each \verb|ghzX|, \verb|ghzX_primeY|, \verb|Lambda_zXY|, and \verb|cz_qXsq| parameter has a \verb|ghwX|, \verb|ghzwX_primeY|, \verb|Lambda_wXY|, and \verb|cw_qXsq| counterpart, which are used for the $WWH$ coupling in VBF if at least one of them is set on the command line.  Similarly, \verb|gh2zX|, \verb|gh2zX_primeY|, \verb|Lambda2_zXY|, \verb|c2z_qXsq|, \verb|gh2wX|, \verb|gh2wX_primeY|, \verb|Lambda2_wXY|, and \verb|c2w_qXsq| can be used to set the couplings of the second resonance in offshell VBF production.
+Each \verb|ghzX|, \verb|ghzX_primeY|, \verb|Lambda_zXY|, and \verb|cz_qXsq| parameter has a \verb|ghwX|, \verb|ghzwX_primeY|, \verb|Lambda_wXY|, and \verb|cw_qXsq| counterpart, which are used for the $WWH$ coupling in VBF if at least one of them is set on the command line.  Similarly, \verb|gh2zX|, \verb|gh2zX_primeY|, \verb|Lambda2_zXY|, \verb|c2z_qXsq|, \verb|gh2wX|, \verb|gh2wX_primeY|, \verb|Lambda2_wXY|, and \verb|c2w_qXsq| can be used to set the couplings of the second resonance in off-shell EW production.
 
 \subparagraph{Contact terms}
 \label{contactterms}
@@ -992,21 +992,28 @@ Since text processing is simple in Python, the Python MELA interface is especial
 
 \section{Release notes}
 \noindent
-In going to \verb|v7.3.0| (April 28, 2019), the updates are as follows:
+In going to \verb|v7.3.8| (February 21, 2020), the updates are as follows:
 \begin{itemize}
-\item Faster option for generating interference in \(4\ell\) final states in offshell VBF production, 164 jobs per step.
+\item Completion of the implementation of couplings with $V^\prime$ in all signal-only JHUGen processes at leading-order in QCD, where relevant, and decay lifetime for $V^\prime V^\prime$ final states in ReadLHE mode.
+\item Implementation of Process 69, QCD $VV+2j$ continuum production without the Higgs contribution.
+\item Improvements on the phase space optimization for off-shell processes.
+\end{itemize}
+\noindent
+In going to \verb|v7.3.0| (April 28, 2019), the update is as follows:
+\begin{itemize}
+\item Faster option for generating interference in \(4\ell\) final states in off-shell EW production, 164 jobs per step.
 \end{itemize}
 \noindent
 In going from \verb|v7.2.4| to \verb|v7.2.7| (January 31, 2019), the updates are as follows:
 \begin{itemize}
 \item $gg\to ZH$ with anomalous couplings using Process 51, using the same syntax as for other processes.
-\item Faster option for generating interference in \(4\ell\) final states in offshell VBF production.
+\item Faster option for generating interference in \(4\ell\) final states in off-shell EW production.
 \item Additional options for the renormalization and factorization scales in JHUGen and MELA.
 \end{itemize}
 \noindent
 In going from \verb|v7.1.4| to \verb|v7.2.4| (November 15, 2018), the updates are as follows:
 \begin{itemize}
-\item Processes 66 (signal), 67 (background), and 68 (signal+background+interference) are added to generate offshell VBF events, including hadronic $VH$, the continuum background, and up to two scalar resonances.  The matrix elements are provided through an interface to MCFM, modified to include $HVV$ and $XVV$ anomalous couplings.
+\item Processes 66 (signal), 67 (background), and 68 (signal+background+interference) are added to generate off-shell EW events, including hadronic $VH$, the continuum background, and up to two scalar resonances.  The matrix elements are provided through an interface to MCFM, modified to include $HVV$ and $XVV$ anomalous couplings.
 \item Process 51 is added with a new procedure to generate $gg \to ZH$ events.  ($qq\to VH$ and $ee\to ZH$ are also supported but currently in beta.  We recommend using Process 50 instead for them.)
 \end{itemize}
 \noindent

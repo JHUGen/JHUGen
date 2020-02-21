@@ -41,7 +41,7 @@ Command line parameters for quick reference:
     Interf:            0=neglect interference for 4f final states,
                        1=include interference
     ReweightInterf:    if true, include interference as LHE event weights for
-                       offshell VBF events
+                       off-shell EW events
     RandomizeVVdecays: Randomizes the order of DecayMode1 and DecayMode2,
                        per event (default true)
                        For a WW decay, turning this off will mean
@@ -82,16 +82,16 @@ Command line parameters for quick reference:
                        VH_PC overrides Pchannel.
     alpha_dip          extra non-physical degree of freedom for Process=51 & VH_PC=nl, defaulted at 1.
                        Vary to check indepedence (of alpha_dip).
-    VBFoffsh_run:      For VBF offshell production, set this to an index
+    VBFoffsh_run:      For EW off-shell or QCD continuum productions, set this to an index
                        for each of the jobs.  See manual for more details.
   Resonance parameters:
     MReso:             resonance mass in GeV (default=125.00)
     GaReso:            resonance width in GeV (default=0.00407)
     ctauReso:          resonance decay length in mm (default=0)
-    OffshellX:         Whether to allow resonance (X) to go offshell
+    OffshellX:         Whether to allow resonance (X) to go off-shell
                        in processes 0, 1 or 2
-    MReso2:            2nd resonance mass in GeV in offshell VBF
-    GaReso2:           2nd resonance width in GeV in offshell VBF
+    MReso2:            2nd resonance mass in GeV in off-shell EW
+    GaReso2:           2nd resonance width in GeV in off-shell EW
   EW coupling parameters:
     Vud:               CKM element for W-ud couplings
     Vus:               CKM element for W-us couplings
@@ -106,16 +106,16 @@ Command line parameters for quick reference:
     pTjetcut:          Minimum pT for jets in GeV (default: 15)
     deltaRcut:         Minimum deltaR for jets (default: 0.3)
     mJJcut:            Minimum dijet mass in GeV (default: 0)
-    MPhotonCutoff:     Minimum mass for offshell photons in GeV, when included (default: 4)
-    etajetcut:         Maximum |eta| for jets in offshell VBF (default: 4)
-    detajetcut:        Minimum deltaeta between jets in offshell VBF (default: 2)
-    JetsOppositeEta:   Require sgn(eta) to be opposite for the two jets in offshell VBF
+    MPhotonCutoff:     Minimum mass for off-shell photons in GeV, when included (default: 4)
+    etajetcut:         Maximum |eta| for jets in off-shell EW (default: 4)
+    detajetcut:        Minimum deltaeta between jets in off-shell EW (default: 2)
+    JetsOppositeEta:   Require sgn(eta) to be opposite for the two jets in off-shell EW
                        (default: true)
-    pTlepcut:          Minimum pT for leptons in offshell VBF, in GeV (default: 3)
-    etalepcut:         Maximum |eta| for leptons in offshell VBF (default: 2.7)
-    m4l_min, m4l_max:  Minimum and maximum four-lepton mass in offshell VBF
-    m2l_min:   Minimum invariant mass of V (onshell) in new VH (\texttt{Process=51}) (default: 0)
-    m2l_max:   Maximum invariant mass of V (onshell) in new VH (\texttt{Process=51}) (default: infinity)
+    pTlepcut:          Minimum pT for leptons in off-shell EW, in GeV (default: 3)
+    etalepcut:         Maximum |eta| for leptons in off-shell EW (default: 2.7)
+    m4l_min, m4l_max:  Minimum and maximum four-lepton mass in off-shell EW
+    m2l_min:   Minimum invariant mass of V (on-shell) in new VH (\texttt{Process=51}) (default: 0)
+    m2l_max:   Maximum invariant mass of V (on-shell) in new VH (\texttt{Process=51}) (default: infinity)
     mVH_min:   Minimum invariant mass of VH in new VH (\texttt{Process=51}) (default: 0)
     mVH_max:   Maximum invariant mass of VH in new VH (\texttt{Process=51}) (default: infinity)
   Renormalization and factorization scales:
