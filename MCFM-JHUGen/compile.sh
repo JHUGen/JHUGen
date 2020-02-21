@@ -7,7 +7,17 @@ cd $(dirname $0)
 
 JHUGenbasedir=../
 if [[ -z "${SCRAM_ARCH+x}" ]];then
-  export SCRAM_ARCH="slc6_amd64_gcc530"
+  GCCVERSION=$(gcc -dumpversion)
+  if [[ "$GCCVERSION" == "4.3"* ]] || [[ "$GCCVERSION" == "4.4"* ]] || [[ "$GCCVERSION" == "4.5"* ]]; then # v1 of MCFM library
+    export SCRAM_ARCH="slc5_amd64_gcc434"
+  elif [[ "$GCCVERSION" == "4"* ]] || [[ "$GCCVERSION" == "5"* ]] || [[ "$GCCVERSION" == "6"* ]]; then # v2 of MCFM library
+    export SCRAM_ARCH="slc6_amd64_gcc630"
+  elif [[ "$GCCVERSION" == "7"* ]]; then # v3 of MCFM library
+    export SCRAM_ARCH="slc7_amd64_gcc700"
+  #elif [[ "$GCCVERSION" == "8"* ]]; then # v4 of MCFM library
+  else
+    export SCRAM_ARCH="slc7_amd64_gcc820"
+  fi
 fi
 LIB=libmcfm_707.so
 
