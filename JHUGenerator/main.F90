@@ -3173,7 +3173,7 @@ character(len=len(CSmaxFile)+20) :: FileToRead
              endif
 
              write(io_stdout,"(A)")  ""
-             write(io_stdout,*) "Total xsec: ",VG_Result, " +/-",VG_Error, " pb    vs.",sum(CrossSec(:,:))
+             write(io_stdout,*) "Total xsec: ",VG_Result, " +/-",VG_Error, " fb    vs.",sum(CrossSec(:,:))
              call InitOutput(VG_Result, VG_Error)
 
 
@@ -3414,7 +3414,7 @@ character(len=len(CSmaxFile)+20) :: FileToRead
              endif
 
              write(io_stdout,"(A)")  ""
-             write(io_stdout,*) "Total unweighted xsec (used by Vegas): ", VG_Result, " +/-", VG_Error, " pb    vs.",sum(CrossSec2(:))
+             write(io_stdout,*) "Total unweighted xsec (used by Vegas): ", VG_Result, " +/-", VG_Error, " fb    vs.",sum(CrossSec2(:))
              write(io_stdout,*) "Total xsec with weights (use for physics): ", CrossSectionWithWeights, " +/-", sqrt(CrossSectionWithWeightsErrorSquared)
              call InitOutput(CrossSectionWithWeights, sqrt(CrossSectionWithWeightsErrorSquared))
 
@@ -5847,8 +5847,8 @@ integer :: stat
 ! (*) number of process types to be accepted (default=1, otherwise=see manual)
             write(io_LHEOutFile ,'(1PE14.7,1X,1PE14.7,1X,1PE14.7,1X,I3)') CrossSection, CrossSectionError, 1.00000000000E-00, Process
 ! in order of appearance:
-! (*) total cross section in pb
-! (*) stat. error in the total cross section in pb
+! (*) total cross section
+! (*) stat. error in the total cross section
 ! (*) maximum weight
 ! (*) list of all user process ID's
             write(io_LHEOutFile ,'(A)') '</init>'
