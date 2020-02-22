@@ -2695,8 +2695,8 @@ module modHiggsJJ
     endif
 
     ! SM contribution
-    iprop12 = sprod(j1,j2) - M_W**2 + ci * M_W * Ga_W
-    iprop34 = sprod(j3,j4) - M_W**2 + ci * M_W * Ga_W
+    iprop12 = q2Wplus - M_W**2 + ci * M_W * Ga_W
+    iprop34 = q2Wminus - M_W**2 + ci * M_W * Ga_W
 
     a1_ww = vvcoupl_prime_ww(1) * M_W**2/mhsq + vvcoupl_prime_ww(2) * two * q1q2/mhsq + vvcoupl_prime_ww(3) * kcoupl * q1q2/mhsq
     a2_ww = -two * vvcoupl_prime_ww(2) - kcoupl * vvcoupl_prime_ww(3)
@@ -2767,19 +2767,18 @@ module modHiggsJJ
 
        helcoup(1:3,-1,+1) = helcoup(1:3,-1,+1) + &
                             struc_wpwp(1:3) * LCT(line1) * RCT(line2)/wpprop12/wpprop34 + &
-                            struc_wpw(1:3)  * LCT(line1)             /wpprop12/iprop34  + &
+                            struc_wpw(1:3)  * LCT(line1) * czero     /wpprop12/iprop34  + &
                             struc_wwp(1:3)               * RCT(line2)/iprop12/wpprop34
 
        helcoup(1:3,+1,-1) = helcoup(1:3,+1,-1) + &
                             struc_wpwp(1:3) * RCT(line1) * LCT(line2)/wpprop12/wpprop34 + &
                             struc_wpw(1:3)  * RCT(line1)             /wpprop12/iprop34  + &
-                            struc_wwp(1:3)               * LCT(line2)/iprop12/wpprop34
+                            struc_wwp(1:3)  * czero      * LCT(line2)/iprop12/wpprop34
 
        helcoup(1:3,+1,+1) = helcoup(1:3,+1,+1) + &
                             struc_wpwp(1:3) * RCT(line1) * RCT(line2)/wpprop12/wpprop34 + &
-                            struc_wpw(1:3)  * RCT(line1)             /wpprop12/iprop34  + &
-                            struc_wwp(1:3)               * RCT(line2)/iprop12/wpprop34
-
+                            struc_wpw(1:3)  * RCT(line1) * czero     /wpprop12/iprop34  + &
+                            struc_wwp(1:3)  * czero      * RCT(line2)/iprop12/wpprop34
     endif
 
 
@@ -2800,6 +2799,7 @@ module modHiggsJJ
             zab2(j2,j3,j4,j1)*zab2(j4,j1,j2,j3) * helcoup(2,+1,+1) + &
             za(j2,j1)*za(j4,j3)*zb(j3,j1)**2 * helcoup(3,+1,+1)
     endif
+
 
     A0_WW_4f = A0_WW_4f/vev
 

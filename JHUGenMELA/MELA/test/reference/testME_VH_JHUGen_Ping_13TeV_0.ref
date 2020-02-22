@@ -57,6 +57,16 @@ p0mplus_selfD: 2.84461e-06
 
 p0mplus_selfD_CT: 2.84461e-06
 
+p0mplus_selfD_VpVp: 2.84461e-06
+
+p0hplus_selfD_CT: 9.30717e-05
+
+p0hplus_selfD_VpVp: 9.30717e-05
+
+p0minus_selfD_CT: 8.30212e-05
+
+p0minus_selfD_VpVp: 8.30212e-05
+
 p0g1prime2_selfD: 1.72637e-12
 
 p0hplus_selfD: 9.30717e-05
@@ -91,6 +101,16 @@ p0mplus_selfD: 4.05069e-06
 
 p0mplus_selfD_CT: 4.05069e-06
 
+p0mplus_selfD_VpVp: 4.05069e-06
+
+p0hplus_selfD_CT: 0.000269095
+
+p0hplus_selfD_VpVp: 0.000269095
+
+p0minus_selfD_CT: 0.000262514
+
+p0minus_selfD_VpVp: 0.000262514
+
 p0g1prime2_selfD: 2.45833e-12
 
 p0hplus_selfD: 0.000269095
@@ -123,7 +143,17 @@ p0hpluszgs: 0.00392878
 
 p0mplus_selfD: 4.07334e-05
 
-p0mplus_selfD_CT: 3.92589e-05
+p0mplus_selfD_CT: 3.99928e-05
+
+p0mplus_selfD_VpVp: 3.92589e-05
+
+p0hplus_selfD_CT: 0.00128236
+
+p0hplus_selfD_VpVp: 0.00125883
+
+p0minus_selfD_CT: 0.00113207
+
+p0minus_selfD_VpVp: 0.0011113
 
 p0g1prime2_selfD: 2.47208e-11
 
@@ -157,7 +187,17 @@ p0hpluszgs: 0
 
 p0mplus_selfD: 0.000113529
 
-p0mplus_selfD_CT: 0.000109352
+p0mplus_selfD_CT: 0.000111431
+
+p0mplus_selfD_VpVp: 0.000109352
+
+p0hplus_selfD_CT: 0.00591254
+
+p0hplus_selfD_VpVp: 0.00580223
+
+p0minus_selfD_CT: 0.00521962
+
+p0minus_selfD_VpVp: 0.00512224
 
 p0g1prime2_selfD: 6.88999e-11
 

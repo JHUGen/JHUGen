@@ -163,13 +163,16 @@ for j, ref in enumerate(referencefiles, start=1):
 
   if "_selfD:" in content:
     pendingselfD = {}
+    iline=0
     for line in content.split("\n"):
+      iline=iline+1
       if "hadronic Z-BF" in line: break
       match = re.match("(p.*)_selfD: ([0-9.e+-]*)", line)
       if match:
         if float(match.group(2)) != pendingselfD.get(match.group(1)):
-          print float(match.group(2)), pendingselfD.get(match.group(1))
+          print match.group(1), float(match.group(2)), pendingselfD.get(match.group(1))
         if float(match.group(2)) != pendingselfD.pop(match.group(1), None):
+          print "Bad selfD file due to line",line," [line=",iline,"]"
           badselfD.add(newfile)
       else:
         match = re.match("(p.*): ([0-9.e+-]*)", line)
