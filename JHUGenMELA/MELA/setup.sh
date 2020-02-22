@@ -117,6 +117,12 @@ if mv libjhugenmela.so "../data/"$SCRAM_ARCH"/"; then
     echo "remember to:"
     echo
     echo 'eval $(./setup.sh env)'
+    echo "or"
+    echo 'eval `./setup.sh env`'
+    echo
+    echo "or do"
+    echo './setup.sh env'
+    echo "and change the commands according to your shell in order to do something equivalent to set up the environment variables."
     echo
 else
     echo
