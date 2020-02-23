@@ -70,9 +70,36 @@ doenv () {
     echo "Temporarily using PYTHONPATH as ${PYTHONPATH}"
   fi
 }
+dodeps () {
+  COLLIER/setup.sh "$@"
+  tcsh data/retrieve.csh $SCRAM_ARCH $MCFMVERSION
+  ./downloadNNPDF.sh
+}
+printenvinstr () {
+  echo
+  echo "remember to do"
+  echo
+  echo 'eval $(./setup.sh env)'
+  echo "or"
+  echo 'eval `./setup.sh env`'
+  echo
+  echo "if you are using a bash-related shell, or you can do"
+  echo
+  echo './setup.sh env'
+  echo
+  echo "and change the commands according to your shell in order to do something equivalent to set up the environment variables."
+  echo
+}
 
 if [[ "$#" -eq 1 ]] && [[ "$1" == "env" ]]; then
     printenv
+    exit
+elif [[ "$#" -eq 1 ]] && [[ "$1" == "envinstr" ]]; then
+    printenvinstr
+    exit
+elif [[ "$#" -eq 1 ]] && [[ "$1" == "deps" ]]; then
+    doenv
+    dodeps
     exit
 elif [[ "$#" -eq 1 ]] && [[ "$1" == *"clean"* ]]; then
     #echo "Cleaning COLLIER"
@@ -102,9 +129,7 @@ else
 fi
 
 doenv
-COLLIER/setup.sh "$@"
-tcsh data/retrieve.csh $SCRAM_ARCH $MCFMVERSION
-./downloadNNPDF.sh
+dodeps
 pushd $MELADIR"/fortran/"
 make all
 if mv libjhugenmela.so "../data/"$SCRAM_ARCH"/"; then
@@ -113,17 +138,7 @@ if mv libjhugenmela.so "../data/"$SCRAM_ARCH"/"; then
     echo
     popd
     make "$@"
-    echo
-    echo "remember to:"
-    echo
-    echo 'eval $(./setup.sh env)'
-    echo "or"
-    echo 'eval `./setup.sh env`'
-    echo
-    echo "or do"
-    echo './setup.sh env'
-    echo "and change the commands according to your shell in order to do something equivalent to set up the environment variables."
-    echo
+    printenvinstr
 else
     echo
     echo "ERROR: something went wrong in mv, see ^ error message"

@@ -28,7 +28,7 @@ Manual for the JHU generator and MELA package
 \begin{center}
 \small
 For simulation, reweighting, and analysis of a single-produced resonance at hadron colliders \\
-(version v7.3.8, release date February 21, 2019) \\
+(version v7.4.0, release date February 24, 2019) \\
 \normalsize
 \end{center}
 
@@ -183,7 +183,7 @@ Download the package from \url{spin.pha.jhu.edu} and untar the file.  Go to the 
 $ make
 \end{verbatim}
 
-By default, the makefile options \verb|linkMELA| and \verb|linkCollierLib| are set to \verb|No|. If you need to use the NLO features, you need to set \verb|linkCollierLib = Yes|. Likewise, if you need to use off-shell processes, which use modified MCFM matrix elements, you need to set \verb|linkMELA = Yes| and compile JHUGenMELA before compiling JHUGenerator (see compilation instructions for JHUGenMELA). In the case \verb|linkMELA = Yes|, the compiler has to be set to \verb|Comp = gfort|, and the gcc version should be at least 4.6.
+By default, the makefile options \verb|linkMELA| and \verb|linkCollierLib| are set to \verb|No|. If you need to use the NLO features, you need to set \verb|linkCollierLib = Yes|. Likewise, if you need to use off-shell processes, which use modified MCFM matrix elements, you need to set \verb|linkMELA = Yes| and compile JHUGenMELA with at least the option \verb|deps| before compiling JHUGenerator (see compilation instructions for JHUGenMELA for more details). In the case \verb|linkMELA = Yes|, the compiler has to be set to \verb|Comp = gfort|, and the gcc version should be at least 4.6.
 
 \section{Quick start}
 
@@ -921,7 +921,7 @@ It is possible to interface to an LHAPDF setup instead of compiling with local P
 These instructions are meant as an introduction to MELA and do not illustrate the full flexibility provided by the package.  For further instructions, please contact the authors.
 \subsection{Compiling}
 After extracting the code, you can go to the directory \texttt{JHUGenMELA/MELA} to find code for computing matrix elements directly.
-To compile the code, simply run \texttt{./setup.sh}. You can specify the option \verb|-j N| for multi-core compilation, or option \verb|clean| for cleanup.. At the end, if necessary, it will print a command to run in order to set three environment variables that are needed to run \texttt{MELA}: \texttt{LD\_LIBRARY\_PATH} needs to include the library path for MELA, \texttt{PYTHONPATH} needs to contain the path for thte Python MELA interface, and \texttt{SCRAM\_ARCH} needs to be set to refer to one of the folders inside MELA/data for the correct version of the MCFM library.
+To compile the code, simply run \texttt{./setup.sh}. You can specify the option \verb|-j N| for multi-core compilation, or option \verb|clean| for cleanup. There is also the option \verb|deps| to only set up dependencies without compiling MELA itself, which is useful if you only intend to use the dependencies for linking to JHUGenerator. The script will print a set of instructions to run at theend of its execution in order to set up to three environment variables that are needed to run \texttt{MELA}: \texttt{LD\_LIBRARY\_PATH} needs to include the library path for MELA, \texttt{PYTHONPATH} needs to contain the path for thte Python MELA interface, and \texttt{SCRAM\_ARCH} needs to be set to refer to one of the folders inside MELA/data for the correct version of the MCFM library.
 
 \textbf{Please take note: The setup relies on MCFM libraries, which are downloaded from the main webpage during the \texttt{setup.sh} script.  They are provided for \texttt{gfort + gcc version 4.6} or later, and only for SLC. They work out-of-the-box with other compiler versions that are not too far away, and we regularly monitor new versions. If you are using SLC but a very new gfort/gcc version that requires a new precompiled library, let us know and we will provide it promptly.}
 If you are not using SLC, or the precompiled libraries do not work, you can always compile the MCFM library yourself by going into the MCFM-JHUGen directory and running \verb|./compile.sh (-j N)| (\verb|./compile.sh clean| for cleanup).
@@ -999,7 +999,7 @@ Since text processing is simple in Python, the Python MELA interface is especial
 
 \section{Release notes}
 \noindent
-In going to \verb|v7.3.8| (major revision; February 21, 2020), the updates are as follows:
+In going to \verb|v7.4.0| (major revision; February 24, 2020), the updates are as follows:
 \begin{itemize}
 \item Completion of the implementation of couplings with $V^\prime$ in all signal-only JHUGen processes at leading-order in QCD, where relevant, and decay lifetime for $V^\prime V^\prime$ final states in ReadLHE mode.
 \item Implementations of Process 69, QCD $VV+2j$ continuum production without the Higgs contribution, and Process 70-72, EW $VV+2\ell/2\nu/\ell\nu$.
