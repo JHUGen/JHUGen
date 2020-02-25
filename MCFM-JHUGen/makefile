@@ -40,6 +40,15 @@ OLODIR          = /Users/johnmc/Research/OneLOop-3.3.1
 # allow alternative calculation of scalar integrals
 LINKONELOOP     = NO
 
+# FASTJET
+FASTJETLIBS = 
+FASTJETCXXFLAGS = 
+LINKFASTJET = NO
+ifeq ($(LINKFASTJET),YES)
+  FASTJETLIBS = `fastjet-config` --libs
+  FASTJETCXXFLAGS = `fastjet-config --cxxflags`
+endif
+
 # Set this to NATIVE/PDFLIB/LHAPDF
 #   NATIVE -- internal routines
 #   PDFLIB -- PDFLIB v8.04
@@ -88,6 +97,7 @@ ROOTINCLUDE     := -I `root-config --prefix=$(ROOTDIR) --incdir`
 
 DIRS	=	$(MCFMHOME):\
 		$(OBJDIR):\
+                $(SOURCEDIR)/External: \
 		$(SOURCEDIR)/User:$(SOURCEDIR)/Procdep:$(SOURCEDIR)/Vol:\
 		$(SOURCEDIR)/Need:$(SOURCEDIR)/Lib:$(SOURCEDIR)/Phase:\
 		$(SOURCEDIR)/Parton:$(SOURCEDIR)/Integrate:\
@@ -2010,11 +2020,13 @@ ifeq ($(PDFROUTINES),PDFLIB)
 else
 ifeq ($(PDFROUTINES),LHAPDF)
    PARTONFILES += \
+   LHAPDFversion.o \
    alfamz_lhapdf.o \
    fdist_lhapdf.o \
    pdfwrap_lhapdf.o
-   LIBDIR += -L$(LHAPDFLIB)
-   LIBFLAGS += -lLHAPDF
+   LIBDIR += -L$(LHAPDFLIB) -I$(LHAPDFLIB)/../include
+   CXXFLAGS += -L$(LHAPDFLIB) -I$(LHAPDFLIB)/../include -lLHAPDF -lstdc++ -fPIC
+   LIBFLAGS += -lLHAPDF -lstdc++
    PDFMSG='   ----> MCFM compiled with LHAPDF routines <----'
 else
 ifeq ($(PDFROUTINES),NATIVE)
@@ -2133,7 +2145,7 @@ mcfmalt: mcfmlib $(NONLIB)
 mcfmcc: mcfmlib $(MAIN) cxxusercode.o
 	$(FC) $(FFLAGS) -L$(LIBDIR) -L$(QLDIR) -L$(FFDIR) -L$(PVDIR) -L$(RECURDIR) -L$(OVDIR) -o $@ \
 	$(patsubst %,$(OBJNAME)/%,$(MAIN)) $(OBJNAME)/cxxusercode.o -lmcfm $(LIBFLAGS) \
-	`fastjet-config` --libs -lstdc++
+	$(FASTJETLIBS) -lstdc++
 	mv mcfmcc Bin/
 	@echo $(PDFMSG)
 	@echo $(NTUPMSG)
@@ -2150,7 +2162,7 @@ mcfmlib: $(MCFMLIB)
 	$(F90) $(F90FLAGS) -c -o $(OBJDIR)/$@ $<
 
 %.o: %.cc
-	$(CXX) -c $(CXXFLAGS) `fastjet-config --cxxflags` -o $(OBJNAME)/$@ $<
+	$(CXX) -c $(CXXFLAGS) $(FASTJETCXXFLAGS) -o $(OBJNAME)/$@ $<
 
 # for c++ targets
 #%.o: %.cxx
