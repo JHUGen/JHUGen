@@ -11,6 +11,7 @@ See the manual for more details
 
 Command line parameters for quick reference:
   help:                Print all command line options
+  version:             Print the version tag
   DryRun:              Check that the command line is valid, then exit
   Process configuration:
     Collider:          1=LHC (default), 2=Tevatron, 0=e+e-

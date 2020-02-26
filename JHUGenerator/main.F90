@@ -388,7 +388,7 @@ use ModCommandLine
 implicit none
 character :: arg*(500)
 integer :: NumArgs,NArg
-logical :: help, DryRun, success, SetLastArgument, interfSet
+logical :: help, PrintVersion, DryRun, success, SetLastArgument, interfSet
 logical :: SetRenScheme, SetMuRenMultiplier, SetFacScheme, SetMuFacMultiplier
 logical :: SetMReso, SetGaReso, SetMReso2, SetGaReso2
 logical :: SetAnomalousSpin0gg, Setghg2, SetAnomalousSpin0VV, Setghz1
@@ -416,6 +416,7 @@ integer :: i
 type(SaveValues) :: tosave, oldsavevalues
 
    help = .false.
+   PrintVersion = .false.
    DryRun = .false.
 
 #if useLHAPDF==1
@@ -535,7 +536,12 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "help", success, help)
     if( help ) then
         call PrintCommandLineArgs()
-        stop 1
+        call exit(0)
+    endif
+    call ReadCommandLineArgument(arg, "version", success, PrintVersion)
+    if( PrintVersion ) then
+        write(6,*) trim(JHUGen_Version)
+        call exit(0)
     endif
     !ReadCommandLineArgument is overloaded, it puts the value into the last argument
     ! by detecting the type.  It also sets success to .true. if the argument name (before =)
@@ -6815,6 +6821,7 @@ implicit none
 
         print *, ""
         print *, " help:                Print all command line options"
+        print *, " version:             Print the version tag"
         print *, " DryRun:              Check that the command line is valid, then exit"
         print *, " Process configuration:"
         print *, "   Collider:          1=LHC (default), 2=Tevatron, 0=e+e-"
