@@ -1548,6 +1548,7 @@ character(len=*) :: title
     write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D86 (2012) 095031;  arXiv:1208.4018  [hep-ph],", linelength)
     write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D89 (2014) 035007;  arXiv:1309.4819  [hep-ph],", linelength)
     write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D94 (2016) 055023;  arXiv:1606.03107 [hep-ph].", linelength)
+    write(TheUnit, *) " ", CenterWithStars("                              arXiv:2002.09888 [hep-ph].", linelength)
     write(TheUnit, *) " ", CenterWithStars("", linelength)
     write(TheUnit, *) " ", repeat("*", linelength)
     write(TheUnit, *) " "
