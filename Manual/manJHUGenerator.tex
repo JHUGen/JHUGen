@@ -508,7 +508,7 @@ Process 51 is a new implementation of VH with matrix elements expressed with the
 \paragraph{Off-shell Higgs production}
 \label{sec:offshell}
 
-Processes 66 (signal), 67 (background), and 68 (signal+background+interference) provide an interface to a modified version of MCFM~\cite{Campbell:2010ff} to produce off-shell EW production $VV\to VV$ in association with two quarks, including all anomalous couplings.  Hadronic $VH$ and the equivalent $VVV$ background topologies are also included. For these processes, a second spin-zero resonance can be activated by setting \verb|MReso2| and \verb|GaReso2| to nonzero values.  The second resonance's couplings can be set to arbitrary values, similar to the first resonance's. These couplings are denoted as \verb|gh2*|.
+Processes 66 (signal), 67 (background), and 68 (signal+background+interference) provide an interface to a modified version of MCFM~\cite{Campbell:2010ff} to produce off-shell EW production $VV\to VV$ in association with two quarks, including all anomalous couplings.  Hadronic $VH$ and the equivalent $VVV$ background topologies are also included. For these processes, a second spin-zero resonance can be activated by setting \verb|MReso2| and \verb|GaReso2| to nonzero values.  The second resonance's couplings can be set to arbitrary values, similar to the first resonance's. These couplings are denoted as \verb|gh2*|. The convention of the \verb|ghz*/ghw*| couplings differs such that the SM value of \verb|ghz1| and \verb|ghw1| are defined as 1, rather than 2 as defined in other processes. Other couplings that affect the continuum amplitude are defined such that their values are either 1 or 0, depending on the amplitude they scale.
 
 When producing unweighted EW off-shell events, jobs must be submitted in two steps, with 164 jobs per step, each job corresponding to a particular mother-associated parton combination.  Each set of jobs can be run in parallel, but none of the jobs in the the second set can start until all jobs in the first set are completed.
 
@@ -618,6 +618,7 @@ If an anomalous coupling is turned on, the default coupling in the same category
 In the weak vector boson fusion process (VBF) we also allow for different $ZZH$ and $WWH$ couplings.  Per default, they are assumed to be equal, set by the $Z$ couplings; however, if any of the $W$ couplings are set, they will be used instead for $WWH$ fusion.  $WWH$ can be turned off entirely by explicitly setting one of them to \verb|0,0|.
 For the $Hff$ couplings, one can also specify \verb|kappa_top| or \verb|kappa_tilde_top| for the processes that involve $Htt$ coupling, and \verb|kappa_bot| or \verb|kappa_tilde_bot| for the processes that involve $Hbb$ coupling. Setting \verb|kappa| and \verb|kappa_tilde| instead of these sets of couplings sets all relevant $Hff$ couplings to the same value.
 \end{itemize}
+
 \paragraph{Spin-0 parameters}
 \label{spin0}
 The \verb|ghg*| parameters control the coupling of a spin-0 resonance to gluons in the production mechanism.
@@ -732,9 +733,9 @@ complex(8), public :: ghzgs1_prime2= (0.0d0,0d0)
 real(8),    public, parameter :: Lambda_zgs1 = 10000d0*GeV.
 \end{verbatim}
 
-Each \verb|ghzX|, \verb|ghzX_primeY|, \verb|Lambda_zXY|, and \verb|cz_qXsq| parameter has a \verb|ghwX|, \verb|ghzwX_primeY|, \verb|Lambda_wXY|, and \verb|cw_qXsq| counterpart, which are used for the $WWH$ coupling in VBF if at least one of them is set on the command line.  Similarly, \verb|gh2zX|, \verb|gh2zX_primeY|, \verb|Lambda2_zXY|, \verb|c2z_qXsq|, \verb|gh2wX|, \verb|gh2wX_primeY|, \verb|Lambda2_wXY|, and \verb|c2w_qXsq| can be used to set the couplings of the second resonance in off-shell EW production.
+Each \verb|ghzX|, \verb|ghzX_primeY|, \verb|Lambda_zXY|, and \verb|cz_qXsq| parameter has a \verb|ghwX|, \verb|ghzwX_primeY|, \verb|Lambda_wXY|, and \verb|cw_qXsq| counterpart, which are used for the $WWH$ coupling in VBF if at least one of them is set on the command line.  Similarly, \verb|gh2zX|, \verb|gh2zX_primeY|, \verb|Lambda2_zXY|, \verb|c2z_qXsq|, \verb|gh2wX|, \verb|gh2wX_primeY|, \verb|Lambda2_wXY|, and \verb|c2w_qXsq| can be used to set the couplings of the second resonance in off-shell EW production.\\
 
-\subparagraph{Contact terms}
+\paragraph{Contact terms and $V^\prime$ couplings}
 \label{contactterms}
 
 JHUGen also supports a spin zero resonance coupling to a new spin-1 boson, $Z^\prime$ or $W^\prime$, in VBF and VH production and in decay.
@@ -747,6 +748,8 @@ complex(8), public :: ghzpgs2 = (0d0,0d0)
 give couplings for $HZZ^\prime$, $HZ^\prime Z^\prime$, and $HZ^\prime\gamma$ that are equivalent to \verb|ghz1| or \verb|ghzgs2|.  All supported couplings for $HZZ$ have equivalent couplings for $HZZ^\prime$ and $HZ^\prime Z^\prime$, and all supported couplings for $HZ\gamma$ have equivalent couplings for $HZ^\prime\gamma$.
 
 As in the $WW$ case, by default the $HWW^\prime$ and $HW^\prime W^\prime$ couplings are assumed to be the same as $HZZ^\prime$ and $HZ^\prime Z^\prime$.  In the VBF production, the equivalent couplings \verb|ghwwp*| and \verb|ghwpwp*| can be set.  If any of the $HWW$, $HWW^\prime$, or $HW^\prime W^\prime$ couplings are set explicitly, $HW({}^\prime)W(^{\prime})$ is completely separated from $HZ({}^\prime)Z(^{\prime})$, and the specified couplings are used instead.
+
+In both $Z^\prime$ and $W^\prime$ cases, the $M_V$ parameter in Eq.~\ref{eq:HVV} is set to $M_Z$ and $M_W$, respectively, in order to avoid assumptions for a particular mass matrix. The user needs to set the couplings accordingly in order to their particular model.
 
 The couplings between $V^\prime$ and fermions are set by
 \begin{verbatim}
@@ -785,7 +788,7 @@ The values of \verb|ezp*left| (\verb|ezp*right|) couplings that give SM coupling
 With the similar conventions, the values of \verb|ewp*left| (\verb|ewp*right|) couplings that give SM couplings can be set by $\sqrt{2 \left(1-\sin^2 \theta_{W}\right)}$ ($0$).
 The CKM mechanism is assumed to affect the $W^\prime ff$ couplings the same way as it affects the $Wff$ couplings.
 
-By default, $Z^\prime$ and $W^\prime$ are assumed to have infinite mass. Under these conditions, setting \verb|ghzzp1| and  some of the $V^\prime ff$ couplings to nonzero values is equivalent to the contact terms described in \cite{Gonzalez-Alonso:2014eva}.  $Z^\prime$ ($W^\prime$) can also be given finite mass by setting its mass \verb|MZprime| (\verb|MWprime|) and width \verb|GaZprime| (\verb|GaWprime|) on the command line. The lifetime of the $V^\prime$ is determined by the \verb|ctauVprime| option in units of milimeters. For cases where only the $V^\prime V^\prime$ couplings are set in the processes 0, 1, 2, 50 and 51, a nonzero decay length is recorded for all such $V^\prime$ difermion pairs. In all other cases, the factor \verb|VprimeDecayLengthMassCutoffFactor| controls the extent of the invariant mass of the difermion pair in units of $\Gamma_{V^\prime}$ in order to record a nonzero decay length; a value less than or equal to $0$ for this factor assigns a decay length to all $V^\prime$ difermion pairs with a default value of $10$.
+By default, $Z^\prime$ and $W^\prime$ are assumed to have infinite mass. Under these conditions, setting \verb|ghzzp1| and  some of the $V^\prime ff$ couplings to nonzero values is equivalent to the contact terms described in \cite{Gonzalez-Alonso:2014eva}.  $Z^\prime$ ($W^\prime$) can also be given finite mass by setting its mass \verb|MZprime| (\verb|MWprime|) and width \verb|GaZprime| (\verb|GaWprime|) on the command line. The lifetime of the $V^\prime$ is determined by the \verb|ctauVprime| option in units of milimeters. For cases where only the $V^\prime V^\prime$ couplings are set in the processes 0, 1, 2, 50 and 51, a nonzero decay length is recorded for all such $V^\prime$ difermion pairs. In all other cases, the factor \verb|VprimeDecayLengthMassCutoffFactor| controls the extent of the invariant mass of the difermion pair in units of $\Gamma_{V^\prime}$ in order to record a nonzero decay length; a value less than or equal to $0$ for this factor assigns a decay length to all $V^\prime$ difermion pairs with a default value of $10$.\\
 
 \paragraph{Spin-1 parameters}
 \label{spin1}
