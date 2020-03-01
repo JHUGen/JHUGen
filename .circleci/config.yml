@@ -1057,8 +1057,25 @@ jobs:
             exit $exitcode
           when: always
       - run:
-          name: "check that lonkCollierLib is turned off by default"
+          name: "check that linkCollierLib is turned off by default"
           command: grep 'linkCollierLib *= *No' JHUGenerator/makefile
+          when: always
+      - run:
+          name: "check compiling with linkCollierLib on"
+          command: |
+            exitcode=0
+            cd lib
+            ./downloadcollier.sh || exit $?
+            cd ..
+            cd JHUGenerator
+            (
+              sed -i -r -e "s/^(linkCollierLib *= *)No/\1Yes/" makefile
+              make
+            ) || exitcode=$?
+            git checkout -- makefile
+            cd ../lib
+            ./downloadcollier.sh clean || exit $?
+            exit $exitcode
           when: always
 
       - restore_cache:
