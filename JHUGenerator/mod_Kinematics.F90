@@ -5271,31 +5271,30 @@ real(8), optional :: EhatMin
       sHatJacobi = fmax/Collider_Energy**2 * (1d0-z)/eta1  * ( (sbar - (M_Reso+M_Z)**2)**2 + (M_Reso+M_Z)**2*Ga_Z**2 )
 
   elseif( MapType.eq.14 .or. MapType.eq.15 .or. MapType.eq.16 .or. MapType.eq.17 ) then! V-Higgs associated production, or H+j (16), or HH (17)
-      if (MapType.eq.16) then
-         etamin = (M_Reso-10d0*Ga_Reso)/Collider_Energy
-      elseif (MapType.eq.17) then
+      if (MapType.eq.17) then
          etamin = (M_Reso+M_Reso-10d0*Ga_Reso)/Collider_Energy
       else
-         etamin = (M_Reso+M_V-10d0*(Ga_V+Ga_Reso))/Collider_Energy
-         if (includeVprime) then
-            etamin = min(etamin, (M_Reso+M_VPrime-10d0*(Ga_VPrime+Ga_Reso))/Collider_Energy )
-         endif
-         if (includeGammaStar .or. IsAPhoton(DecayMode1)) then
-            etamin = min(etamin, (M_Reso-10d0*Ga_Reso)/Collider_Energy )
+         etamin = min(etamin, (M_Reso-10d0*Ga_Reso)/Collider_Energy )
+         if (includeGammaStar .and. MPhotonCutoff.gt.0d0) then
+            etamin = max(etamin, MPhotonCutoff/Collider_Energy)
          endif
       endif
-      if (etamin.le.0d0) then
-         etamin = 0.1d0/Collider_Energy
+      etamin = max(0d0, etamin)
+      if (z.le.yRnd(1)) then
+         sHatJacobi=0d0
+         eta1=0d0
+         eta2=0d0
+      else
+         z = 1d0/(1d0-etamin)
+         Ymin = ((z-1d0)/(z-yRnd(1)))**2
+         Ymax = 1d0 / Ymin
+         Ymin = 0.5d0*dlog(Ymin)
+         Ymax = 0.5d0*dlog(Ymax)
+         Y = Ymin + yrnd(2)*(Ymax-Ymin)
+         eta1 = (z-1d0)/(z-yRnd(1))*dexp(Y)
+         eta2 = (z-1d0)/(z-yRnd(1))*dexp(-Y)
+         sHatJacobi = 2d0*(z-1d0)**2/(z-yRnd(1))**3*(Ymax-Ymin)
       endif
-      z = 1d0/(1d0-etamin)
-      Ymin = ((z-1d0)/(z-yRnd(1)))**2
-      Ymax = 1d0 / Ymin
-      Ymin = 0.5d0*dlog(Ymin)
-      Ymax = 0.5d0*dlog(Ymax)
-      Y = Ymin + yrnd(2)*(Ymax-Ymin)
-      eta1 = (z-1d0)/(z-yRnd(1))*dexp(Y)
-      eta2 = (z-1d0)/(z-yRnd(1))*dexp(-Y)
-      sHatJacobi = 2d0*(z-1d0)**2/(z-yRnd(1))**3*(Ymax-Ymin)
 
   else
       call Error("PDF mapping not available")

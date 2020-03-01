@@ -2197,16 +2197,23 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
     id(:)=0
     helicity(:)=0
     mass(1:2,1:2)=0d0
+    mass(3,1)=M_V
+    mass(3,2)=Ga_V
+    mass(4,1)=M_V
+    mass(4,2)=Ga_V
     if(IsAPhoton(DecayMode1))then
-       mass(3,1)=M_Z
-       mass(3,2)=Ga_Z
+       if (includeVprime .and. Ga_Vprime.gt.0d0) then
+          mass(3,1)=(M_V+M_Vprime)/2d0
+          mass(3,2)=sqrt(abs((M_V-M_Vprime)/2d0)**2+Ga_V**2+Ga_Vprime**2)
+       endif
        mass(4,1)=getMass(Pho_)
        mass(4,2)=getDecayWidth(Pho_)
     else
-       mass(3,1)=M_V
-       mass(3,2)=Ga_V
-       mass(4,1)=M_V
-       mass(4,2)=Ga_V
+       if (includeVprime .and. Ga_Vprime.gt.0d0) then
+          mass(3,1)=(M_V+M_Vprime)/2d0
+          mass(3,2)=sqrt(abs((M_V-M_Vprime)/2d0)**2+Ga_V**2+Ga_Vprime**2)
+          mass(4,:)=mass(3,:)
+       endif
     endif
     mass(5,1)=M_Reso
     mass(5,2)=Ga_Reso
@@ -2741,16 +2748,23 @@ id(:)=0
 helicity(:)=0
 
 mass(1:2,1:2)=0d0
+mass(3,1)=M_V
+mass(3,2)=Ga_V
+mass(4,1)=M_V
+mass(4,2)=Ga_V
 if(IsAPhoton(DecayMode1))then
-   mass(3,1)=M_Z
-   mass(3,2)=Ga_Z
-   mass(4,1)=getMass(Pho_)
-   mass(4,2)=getDecayWidth(Pho_)
+  if (includeVprime .and. Ga_Vprime.gt.0d0) then
+    mass(3,1)=(M_V+M_Vprime)/2d0
+    mass(3,2)=sqrt(abs((M_V-M_Vprime)/2d0)**2+Ga_V**2+Ga_Vprime**2)
+  endif
+  mass(4,1)=getMass(Pho_)
+  mass(4,2)=getDecayWidth(Pho_)
 else
-   mass(3,1)=M_V
-   mass(3,2)=Ga_V
-   mass(4,1)=M_V
-   mass(4,2)=Ga_V
+  if (includeVprime .and. Ga_Vprime.gt.0d0) then
+    mass(3,1)=(M_V+M_Vprime)/2d0
+    mass(3,2)=sqrt(abs((M_V-M_Vprime)/2d0)**2+Ga_V**2+Ga_Vprime**2)
+    mass(4,:)=mass(3,:)
+  endif
 endif
 mass(5,1)=M_Reso
 mass(5,2)=Ga_Reso
