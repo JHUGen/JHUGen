@@ -183,7 +183,7 @@ Download the package from \url{spin.pha.jhu.edu} and untar the file.  Go to the 
 $ make
 \end{verbatim}
 
-By default, the makefile options \verb|linkMELA| and \verb|linkCollierLib| are set to \verb|No|. If you need to use the NLO features, you need to set \verb|linkCollierLib = Yes|. Likewise, if you need to use off-shell processes, which use modified MCFM matrix elements, you need to set \verb|linkMELA = Yes| and compile JHUGenMELA with at least the option \verb|deps| before compiling JHUGenerator (see compilation instructions for JHUGenMELA for more details). In the case \verb|linkMELA = Yes|, the compiler has to be set to \verb|Comp = gfort|, and the gcc version should be at least 4.6.
+By default, the makefile options \verb|linkMELA| and \verb|linkCollierLib| are set to \verb|No|. If you need to use the NLO features, you need to set \verb|linkCollierLib = Yes|, and download and compile the COLLIER package using \verb|./downloadcollier.sh| with optional arguments \verb|compiler| and \verb|-j| to specify the Fortran compiler and the number of cores to use for compilation, respectively. Likewise, if you need to use off-shell processes, which use modified MCFM matrix elements, you need to set \verb|linkMELA = Yes| and compile JHUGenMELA with at least the option \verb|deps| before compiling JHUGenerator (see compilation instructions for JHUGenMELA for more details). In the case \verb|linkMELA = Yes|, the compiler has to be set to \verb|Comp = gfort|, and the gcc version should be at least 4.6.
 
 \section{Quick start}
 
