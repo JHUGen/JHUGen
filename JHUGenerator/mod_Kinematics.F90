@@ -5280,12 +5280,12 @@ real(8), optional :: EhatMin
          endif
       endif
       etamin = max(0d0, etamin)
-      if (z.le.yRnd(1)) then
+      z = 1d0/(1d0-etamin)
+      if (isnan(z) .or. z.le.yRnd(1)) then
          sHatJacobi=0d0
          eta1=0d0
          eta2=0d0
       else
-         z = 1d0/(1d0-etamin)
          Ymin = ((z-1d0)/(z-yRnd(1)))**2
          Ymax = 1d0 / Ymin
          Ymin = 0.5d0*dlog(Ymin)
