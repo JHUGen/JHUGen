@@ -7003,7 +7003,7 @@ logical,parameter :: includeNewBWPSinEW = .true.
       write(6,*) "m34:",sqrt(s34)/GeV
       write(6,*) "Last case:",ch_ctr
 
-      pause
+      call Exit(1)
    endif
 
 !    print *, "OS checker", dsqrt( dabs(Mom(1:4,3).dot.Mom(1:4,3) ))
@@ -7193,7 +7193,7 @@ logical :: swap34_56
       write(6,*) "m56:",sqrt(s56)/GeV
       write(6,*) "m78:",sqrt(s78)/GeV
 
-      pause
+      call Exit(1)
    endif
 
 RETURN
