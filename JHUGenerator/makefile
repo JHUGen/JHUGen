@@ -9,7 +9,7 @@ MELALibDir = ""
 MCFMLib = mcfm_707
 PDFDir = $(Here)/pdfs
 VegasDir = $(Here)/vegas
-CollierDir = $(Here)/../lib/COLLIER-1.2/
+CollierDir = $(Here)/../lib/COLLIER/
 
 ## compiler options, Comp='ifort' or 'gfort'
 Opt  = Yes

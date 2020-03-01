@@ -8,6 +8,7 @@ ncores=0
 
 if [[ "$#" -eq 1 ]] && [[ "$1" == *"clean"* ]]; then
   rm -rf COLLIER*
+  rm -f *.tar.gz
   exit 0
 elif [[ "$#" -eq 1 ]] && [[ "$1" == *"-j"* ]]; then
   ncores=-1
@@ -31,11 +32,15 @@ elif [[ "$#" -eq 4 ]] && [[ "$3" == *"-j"* ]] && [[ "$1" == *"compiler"* ]]; the
   compiler=$2
 fi
 
+
 cd $(dirname $0)
+
 wget http://www.hepforge.org/archive/collier/collier-1.2.0.tar.gz
 tar -xvzf collier-1.2.0.tar.gz
 rm collier-1.2.0.tar.gz
-cd COLLIER-1.2/build
+mv COLLIER-1.2 COLLIER
+
+cd COLLIER/build
 cmake -DCMAKE_Fortran_COMPILER=$compiler ..
 if [[ $ncores -eq 0 ]];then
   make
