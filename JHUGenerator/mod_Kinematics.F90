@@ -5274,7 +5274,7 @@ real(8), optional :: EhatMin
       if (MapType.eq.17) then
          etamin = (M_Reso+M_Reso-10d0*Ga_Reso)/Collider_Energy
       else
-         etamin = min(etamin, (M_Reso-10d0*Ga_Reso)/Collider_Energy )
+         etamin = (M_Reso-10d0*Ga_Reso)/Collider_Energy
          if (includeGammaStar .and. MPhotonCutoff.gt.0d0) then
             etamin = max(etamin, MPhotonCutoff/Collider_Energy)
          endif
