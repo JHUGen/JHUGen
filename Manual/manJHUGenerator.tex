@@ -174,6 +174,115 @@ Automatic relationship of couplings in the EFT approach discussed here is not im
 but could be obtained with a script following the formulas above. 
 There is a one-to-one correspondence of the couplings used in the generator settings in Eq.~(\ref{eq:HVV}) 
 and the couplings used in the Higgs basis~\cite{deFlorian:2016spz}. 
+\\
+
+
+We also allow modifications of gauge boson self couplings. 
+Their parameterization reads
+\begin{eqnarray}
+ & A({VW^+W^-}) = (-e) \,  d^{VWW} \, \bigg\{  
+                          (\varepsilon_V \cdot \varepsilon_+)(q_{12}^V \cdot \varepsilon_-)
+                         +(\varepsilon_+ \cdot \varepsilon_-)(q_{23}^V \cdot \varepsilon_V)
+                         +(\varepsilon_V \cdot \varepsilon_-)(q_{31}^V \cdot \varepsilon_+)
+                         + d^V_4 \varepsilon^{\varepsilon_V\,\varepsilon_+\,\varepsilon_-\,p_1}
+                               \bigg\} \,, \;\;
+\label{eq:VVV}                               
+\\
+ & A({V_1 V_2 W^+W^-}) = (+e^2) \,  d^{VVWW} \, \bigg\{  
+                               (\varepsilon_{1} \cdot \varepsilon_{+})  (\varepsilon_{2} \cdot \varepsilon_{-})
+                              +(\varepsilon_{1} \cdot \varepsilon_{-})  (\varepsilon_{2} \cdot \varepsilon_{+})
+                             -2(\varepsilon_{1} \cdot \varepsilon_{2})  (\varepsilon_{+} \cdot \varepsilon_{-})
+                               \bigg\} \,,
+\label{eq:VVVV}
+\end{eqnarray}
+where $q_{ij}^V = d_i^V p_i - d_j^V p_j$ is the relative momentum transfer. 
+We fix $d^{\gamma WW}  = 1$ and $d^{Z WW} = {c_w}/{s_w}$ per convention and allow all other couplings to vary. 
+In the SM, their values are
+% ---
+\begin{eqnarray}
+\label{eq:VVVVSM}
+&& d_1^V =d_2^V =d_3^V =1\,,
+\quad
+d_4^V=0\,, 
+\\
+&& d^{\gamma\gamma WW} = 1\,,
+\quad
+d^{Z\gamma WW} = \frac{c_w}{s_w}\,,
+\quad
+d^{ZZWW} = \frac{c_w^2}{s_w^2}\,,
+\quad
+d^{WWWW} = \frac{1}{2 s_w^2} \,. 
+\nonumber
+\end{eqnarray}
+% ---
+The relevant contributions of the dimension-six Lagrangian for the triple and quartic gauge boson self-interactions are 
+(see Eqs.~(3.12, 3.14, 3.15)  in Ref.~\cite{Falkowski:2001958})
+\begin{eqnarray} 
+\label{eq:EFT_tgc}
+ {\cal L}_{\rm tgc}  = &  &
+ \mathrm{i}  e    \left ( W_{\mu \nu}^+ W_\mu^-  -  W_{\mu \nu}^- W_\mu^+ \right ) A_\nu   
+ + \mathrm{i}  e  \left [  (1 + \delta \kappa_\gamma )  A_{\mu\nu}\,W_\mu^+W_\nu^-   
++ \tilde \kappa_\gamma  \tilde A_{\mu\nu}\,W_\mu^+W_\nu^-  \right ]
+\nonumber \\  &  + & \mathrm{i} e \frac{c_w}{s_w}  \left [  (1 + \delta g_{1,z})   \left ( W_{\mu \nu}^+ W_\mu^-  -  W_{\mu \nu}^- W_\mu^+ \right ) Z_\nu 
+ + (1 +  \delta \kappa_z) \, Z_{\mu\nu}\,W_\mu^+W_\nu^-   
+ +  \tilde  \kappa_z \,  \tilde Z_{\mu\nu}\,W_\mu^+W_\nu^-   \right ] \,,
+\\
+\label{eq:EFT_qgc}
+ {\cal L}_{\rm qgc}  = &  &
+ e^2 ( W^+_\mu A_\mu W^-_\nu A_\nu - W^+_\mu W^-_\mu A_\nu A_\nu  ) 
+ + \frac{e^2}{2 s_w^2} (1+2 c_w^2 \delta g_{1,z}) ( W^+_\mu W^+_\mu W^-_\nu W^-_\nu -  W^+_\mu W^-_\mu W^+_\nu W^-_\nu )
+ \nonumber \\ &+ & 
+ e^2 \frac{c_w^2}{s_w^2}  (1+2\delta g_{1,z} ) ( W^+_\mu Z_\mu W^-_\nu Z_\nu -  W^+_\mu W^-_\mu Z_\nu Z_\nu )
+ \nonumber \\ &+ &  
+ e^2 \frac{c_w}{s_w} (1+\delta g_{1,z} ) ( W^+_\mu Z_\mu W^-_\nu A_\nu + W^+_\mu A_\mu W^-_\nu Z_\nu  - 2  W^+_\mu W^-_\mu Z_\nu A_\nu  )
+ \,.
+\end{eqnarray} 
+The anomalous coefficients in Eqs.~(\ref{eq:EFT_tgc},\ref{eq:EFT_qgc}) are related to couplings in Eqs.~(\ref{eq:VVV},\ref{eq:VVVV}) by 
+\begin{eqnarray}  
+  \delta \kappa_\gamma = \frac12 \left( d_1^\gamma - 1 \right) \,,
+  \quad\quad 
+  \tilde \kappa_\gamma =  \frac12 d_4^\gamma \,,
+  \quad\quad 
+  \delta \kappa_z = \frac12 \left( d_1^Z - 1 \right) \,,
+  \quad\quad 
+  \tilde  \kappa_z =  \frac12 d_4^Z \,,
+  \nonumber \\ 
+  \delta g_{1,z} = d_2^Z - 1= d_3^Z - 1= \frac12 \left( \frac{s_w^2}{c_w^2} d^{ZZWW}-1 \right) = \frac{s_w}{c_w} d^{Z \gamma WW} -1
+  \,.
+\end{eqnarray}
+Similar to the case of $\mathcal{L}_\mathrm{hvv}$, not all coefficients in Eqs.~(\ref{eq:EFT_tgc},\ref{eq:EFT_qgc}) 
+are independent in the effective field theory framework, and we discuss their dependence in the next subsection. 
+Moreover, additional anomalous triple and quartic contributions, the $\lambda_{\gamma,Z}, \tilde \lambda_{\gamma,Z}$ 
+terms in Ref.~\cite{Falkowski:2001958,deFlorian:2016spz}, can arise. 
+These additional terms are unrelated to any of the $H$ boson contributions, and therefore, we do not consider them here. 
+\\
+
+Enforcing linear relations for the dependent coefficients [8] allows a unique relationship based on a minimal set of
+degrees of freedom:
+
+\begin{eqnarray}
+  d_1^\gamma &=& 1 + (g_2^{\gamma\gamma}-g_2^{ZZ}) c_w^2  + g_2^{Z\gamma} \left(\frac{c_w}{s_w}-2s_w c_w \right)\,,
+   \label{eq:d1}
+  \\
+  d_4^{\gamma} &=& (g_4^{\gamma\gamma}-g_4^{ZZ}) c_w^2 + g_4^{Z\gamma} \left( \frac{c_w}{s_w}-2 s_w c_w \right)\,,
+   \label{eq:d2}
+  \\
+  d_1^Z &=& 1 -2 \frac{s_w^2 c_w^2}{c_w^2-s_w^2} \left(g_2^{\gamma\gamma}  -g_2^{ZZ} \right) -2 s_w c_w g_2^{Z\gamma} - \frac{M_Z^2}{2 (c_w^2-s_w^2) }  \frac{\kappa_1^{ZZ}}{(\Lambda_1^{ZZ})^2}\,,
+   \label{eq:d3}
+  \\
+  d_2^Z &=& d_3^Z = 1 - \frac{s_w^2}{c_w^2-s_w^2} \left(g_2^{\gamma\gamma}-g_2^{ZZ} \right) - \frac{s_w}{c_w} g_2^{Z\gamma} - \frac{M_Z^2}{2(c_w^2-s_w^2)} \frac{\kappa_1^{ZZ}}{(\Lambda_1^{ZZ})^2}\,,
+   \label{eq:d4}
+  \\
+  d_4^Z &=& -\frac{s_w^2}{c_w^2} d_4^{\gamma}\,,
+   \label{eq:d5}
+  \\
+  d^{ZZWW} &=& \frac{c_w^2}{s_w^2} \left( 2 d_2^Z -1 \right)\,,
+  \quad\quad
+  d^{Z\gamma WW} = \frac{c_w}{s_w} d_2^Z\,.
+   \label{eq:d6}
+\end{eqnarray}
+
+
 
 \section{Installation}
 
@@ -790,6 +899,27 @@ The CKM mechanism is assumed to affect the $W^\prime ff$ couplings the same way 
 
 By default, $Z^\prime$ and $W^\prime$ are assumed to have infinite mass. Under these conditions, setting \verb|ghzzp1| and  some of the $V^\prime ff$ couplings to nonzero values is equivalent to the contact terms described in \cite{Gonzalez-Alonso:2014eva}.  $Z^\prime$ ($W^\prime$) can also be given finite mass by setting its mass \verb|MZprime| (\verb|MWprime|) and width \verb|GaZprime| (\verb|GaWprime|) on the command line. The lifetime of the $V^\prime$ is determined by the \verb|ctauVprime| option in units of milimeters. For cases where only the $V^\prime V^\prime$ couplings are set in the processes 0, 1, 2, 50 and 51, a nonzero decay length is recorded for all such $V^\prime$ difermion pairs. In all other cases, the factor \verb|VprimeDecayLengthMassCutoffFactor| controls the extent of the invariant mass of the difermion pair in units of $\Gamma_{V^\prime}$ in order to record a nonzero decay length; a value less than or equal to $0$ for this factor assigns a decay length to all $V^\prime$ difermion pairs with a default value of $10$.\\
 
+
+\paragraph{Gauge boson self couplings}
+\label{TGCQGC}
+Off-shell VBF processes 66 (signal), 67 (background), and 68 (signal+background+interference) involve triple and quartic gauge couplings in Eqs.~\ref{eq:VVV}-\ref{eq:VVVV}.
+To set the couplings in Eqs.~\ref{eq:VVVVSM} on the command line use e.g. 
+\begin{eqnarray*}
+d_1^\gamma \quad \leftrightarrow& \quad  &{\verb dVA  = 1.0,0.0 }\\
+d_2^\gamma \quad \leftrightarrow& \quad  &{\verb dPA  = 1.0,0.0 }\\
+d_3^\gamma \quad \leftrightarrow& \quad  &{\verb dMA  = 1.0,0.0 }\\
+d_1^Z      \quad \leftrightarrow& \quad  &{\verb dVZ  = 1.0,0.0 }\\
+d_2^Z      \quad \leftrightarrow& \quad  &{\verb dPZ  = 1.0,0.0 }\\
+d_3^Z      \quad \leftrightarrow& \quad  &{\verb dMZ  = 1.0,0.0 }\\
+d_4^\gamma \times d^{\gamma WW} \quad \leftrightarrow& \quad  &{\verb dFourA  = 1.0,0.0 }\\
+d_4^Z      \times d^{Z      WW} \quad \leftrightarrow& \quad  &{\verb dFourZ  = 1.0,0.0 }\\
+d^{\gamma\gamma WW}      \quad \leftrightarrow& \quad  &{\verb dAAWpWm  = 1.0,0.0 }\\
+\frac{s_w}{c_w} \times d^{Z\gamma WW}      \quad \leftrightarrow& \quad  &{\verb dZAWpWm  = 1.0,0.0 }\\
+\frac{s_w^2}{c_w^2} \times d^{ZZ WW}      \quad \leftrightarrow& \quad  &{\verb dZZWpWm  = 1.0,0.0 }\\
+d^{WW WW}      \quad \leftrightarrow& \quad  &{\text{currently not needed/available}}\\
+\end{eqnarray*}
+\\
+
 \paragraph{Spin-1 parameters}
 \label{spin1}
 
@@ -845,6 +975,9 @@ complex(8), public :: bgsgs8 = (0.0d0,0d0)
 \end{verbatim}
 
 As in the spin 0 case, decay to $Z^\prime$ is fully supported.  Each of the parameters listed above for $VV$ has an equivalent parameter that describes the spin 2 resonance's coupling to $VV^\prime$ and $V^\prime V^\prime$; examples include \verb|bzzp1| and \verb|bzpzp2|.  Similarly, the parameters describing the decay to $Z\gamma$ have equivalent parameters, such as \verb|bzpgs3|, that describe the decay to $Z^\prime\gamma$.  The parameters controlling the mass, width, and fermion couplings of $Z^\prime$ and $W^\prime$ are described above in Section \ref{contactterms}.
+
+
+
 
 \subsection{Configuration in parameter file}
 
@@ -1012,6 +1145,8 @@ In going to \verb|v7.4.0| (major revision; February 24, 2020), the updates are a
 \item Implementations of Process 69, QCD $VV+2j$ continuum production without the Higgs contribution, and Process 70-72, EW $VV+2\ell/2\nu/\ell\nu$.
 \item Extension of DecayMode options, final state filters, and implementation of the final state filters in the off-shell processes. Filter options are also renamed as a result of the extension of functionality.
 \item Improvements on the phase space optimization for off-shell processes.
+\item Added command line setting of triple and quartic gauge boson couplings in off-shell VBF processes 66-68.
+\item Enlarge allowed invariant mass range in the $q\bar{q} \to H \gamma$ process
 \end{itemize}
 \noindent
 In going to \verb|v7.3.0| (April 28, 2019), the update is as follows:
@@ -1281,6 +1416,10 @@ See webpage: \url{http://spin.pha.jhu.edu}
 ``Handbook of LHC Higgs Cross Sections: 4. Deciphering the Nature of the Higgs Sector,''
 CERN Yellow Report 10.23731/CYRM-2017-002.
 [arXiv:1610.07922 [hep-ph]].
+\bibitem{Falkowski:2001958}
+{A.~Falkowski, ``{Higgs Basis: Proposal for an EFT basis choice
+  for LHC HXSWG}'',} Technical Report LHCHXSWG-INT-2015-001, 2015.
+\newblock \url{https://cds.cern.ch/record/2001958}.
 \bibitem{Goria:2011wa}
   S.~Goria, G.~Passarino and D.~Rosco,
   ``The Higgs-boson lineshape,''
