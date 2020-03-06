@@ -905,20 +905,33 @@ By default, $Z^\prime$ and $W^\prime$ are assumed to have infinite mass. Under t
 Off-shell VBF processes 66 (signal), 67 (background), and 68 (signal+background+interference) involve triple and quartic gauge couplings in Eqs.~\ref{eq:VVV}-\ref{eq:VVVV}.
 To set the couplings in Eqs.~\ref{eq:VVVVSM} on the command line use e.g. 
 \begin{eqnarray*}
-d_1^\gamma \quad \leftrightarrow& \quad  &{\verb dVA  = 1.0,0.0 }\\
-d_2^\gamma \quad \leftrightarrow& \quad  &{\verb dPA  = 1.0,0.0 }\\
-d_3^\gamma \quad \leftrightarrow& \quad  &{\verb dMA  = 1.0,0.0 }\\
-d_1^Z      \quad \leftrightarrow& \quad  &{\verb dVZ  = 1.0,0.0 }\\
-d_2^Z      \quad \leftrightarrow& \quad  &{\verb dPZ  = 1.0,0.0 }\\
-d_3^Z      \quad \leftrightarrow& \quad  &{\verb dMZ  = 1.0,0.0 }\\
-d_4^\gamma \times d^{\gamma WW} \quad \leftrightarrow& \quad  &{\verb dFourA  = 1.0,0.0 }\\
-d_4^Z      \times d^{Z      WW} \quad \leftrightarrow& \quad  &{\verb dFourZ  = 1.0,0.0 }\\
-d^{\gamma\gamma WW}      \quad \leftrightarrow& \quad  &{\verb dAAWpWm  = 1.0,0.0 }\\
-\frac{s_w}{c_w} \times d^{Z\gamma WW}      \quad \leftrightarrow& \quad  &{\verb dZAWpWm  = 1.0,0.0 }\\
-\frac{s_w^2}{c_w^2} \times d^{ZZ WW}      \quad \leftrightarrow& \quad  &{\verb dZZWpWm  = 1.0,0.0 }\\
-d^{WW WW}      \quad \leftrightarrow& \quad  &{\text{currently not needed/available}}\\
+d_1^\gamma \quad \leftrightarrow \quad  {\verb dVA   },\quad\quad
+d_2^\gamma \quad \leftrightarrow \quad  {\verb dPA   },\quad\quad
+d_3^\gamma \quad \leftrightarrow& \quad  &{\verb dMA   },\\
+d_1^Z      \quad \leftrightarrow \quad  {\verb dVZ   },\quad\quad
+d_2^Z      \quad \leftrightarrow \quad  {\verb dPZ   },\quad\quad
+d_3^Z      \quad \leftrightarrow& \quad  &{\verb dMZ   },\\
+d_4^\gamma \times d^{\gamma WW} \quad \leftrightarrow& \quad  &{\verb dFourA   },\\
+d_4^Z      \times d^{Z      WW} \quad \leftrightarrow& \quad  &{\verb dFourZ   },\\
+d^{\gamma\gamma WW}      \quad \leftrightarrow& \quad  &{\verb dAAWpWm   },\\
+\frac{s_w}{c_w} \times d^{Z\gamma WW}      \quad \leftrightarrow& \quad  &{\verb dZAWpWm   },\\
+\frac{s_w^2}{c_w^2} \times d^{ZZ WW}      \quad \leftrightarrow& \quad  &{\verb dZZWpWm   }.\\
+% d^{WW WW}      \quad \leftrightarrow& \quad  &{\text{currently not needed/available}}\\
 \end{eqnarray*}
+For example, in order to simulate the hypothesis with 
+\begin{eqnarray*}
+  &g_1^{ZZ}= 2.0, \quad  g_1^{WW}= 2.0, \quad  \kappa_1^{ZZ}=\kappa_2^{ZZ}=-10.0, \quad \kappa_1^{WW}=\kappa_2^{WW}=-18.6 \quad \kappa_2^{Z\gamma}=-15.68,
 \\
+  &d_1^Z=d_2^Z=d_3^Z = 1.08, \quad d^{Z\gamma WW} = 1.96, \quad d^{ZZ WW} =3.84.
+\end{eqnarray*}
+the command line should be
+\begin{verbatim}
+./JHUGen Process=68 ghz1=1.0,0.0 ghw1=1.0,0.0 ghz2=0.0,0.0 ghw2=0.0,0.0 ghz1_prime2=-5.0,0.0 
+        ghw1_prime2=-9.3,0.0 ghzgs1_prime2=-7.84,0.0 dV_A=1.0,0.0 dV_Z=1.08,0.0 dP_A=1.0,0.0 
+        dP_Z=1.08,0.0 dM_A=1.0,0.0 dM_Z=1.08,0.0 dZZWpWm=1.15,0.0 dZAWpWm=1.08,0.0 ...
+\end{verbatim}
+{Remember that $HVV$ couplings need to be divided by two in processes 66-68.}
+
 
 \paragraph{Spin-1 parameters}
 \label{spin1}
@@ -1142,10 +1155,10 @@ Since text processing is simple in Python, the Python MELA interface is especial
 In going to \verb|v7.4.0| (major revision; February 24, 2020), the updates are as follows:
 \begin{itemize}
 \item Completion of the implementation of couplings with $V^\prime$ in all signal-only JHUGen processes at leading-order in QCD, where relevant, and decay lifetime for $V^\prime V^\prime$ final states in ReadLHE mode.
+\item Added command line setting of triple and quartic gauge boson couplings in off-shell VBF processes 66-68.
 \item Implementations of Process 69, QCD $VV+2j$ continuum production without the Higgs contribution, and Process 70-72, EW $VV+2\ell/2\nu/\ell\nu$.
 \item Extension of DecayMode options, final state filters, and implementation of the final state filters in the off-shell processes. Filter options are also renamed as a result of the extension of functionality.
 \item Improvements on the phase space optimization for off-shell processes.
-\item Added command line setting of triple and quartic gauge boson couplings in off-shell VBF processes 66-68.
 \item Enlarge allowed invariant mass range in the $q\bar{q} \to H \gamma$ process
 \end{itemize}
 \noindent
