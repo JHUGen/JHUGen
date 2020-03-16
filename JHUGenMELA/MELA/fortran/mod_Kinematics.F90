@@ -766,6 +766,7 @@ END SUBROUTINE
 
 SUBROUTINE VVBranchings(MY_IDUP,ICOLUP,CombWeight,ColorBase)
 use ModParameters
+use ModMisc
 implicit none
 integer :: MY_IDUP(4:9),ICOLUP(1:2,6:9),ICOLUP_Base
 integer, optional ::ColorBase
