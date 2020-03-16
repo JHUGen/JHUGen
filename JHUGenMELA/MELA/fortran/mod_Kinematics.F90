@@ -644,8 +644,6 @@ real(8) :: DKRnd
         call random_number(DKRnd)
         MY_IDUP(1) = Wp_
         DKFlavor = WQuaUpBranching_flat( DKRnd )!= Up,Chm
-!         MY_IDUP(2) = -abs(DKFlavor)-1  ! anti-dn flavor
-!         MY_IDUP(3) = +abs(DKFlavor)    ! up flavor
         MY_IDUP(3) = +abs(DKFlavor)           ! up flavor
         MY_IDUP(2) = GetCKMPartner(MY_IDUP(3))! anti-dn flavor
         ICOLUP(1:2,1) = (/            0,ICOLUP_BASE+3/)
@@ -689,8 +687,6 @@ real(8) :: DKRnd
         MY_IDUP(1) = Wp_
         DKFlavor = WAnyBranching_flat( DKRnd )
         if(IsAQuark(DKFlavor)) then
-!            MY_IDUP(2) = -abs(DKFlavor)-1  ! anti-dn flavor
-!            MY_IDUP(3) = +abs(DKFlavor)    ! up flavor
            MY_IDUP(3) = +abs(DKFlavor)           ! up flavor
            MY_IDUP(2) = GetCKMPartner(MY_IDUP(3))! anti-dn flavor
            ICOLUP(1:2,1) = (/            0,ICOLUP_BASE+3/)
@@ -810,6 +806,12 @@ real(8) :: DKRnd
    MY_IDUP(9) = tmp_idup(3)
    ICOLUP(1:2,8) = tmp_icolup(1:2,1)
    ICOLUP(1:2,9) = tmp_icolup(1:2,2)
+   if (isAWDecay(DecayMode2)) then
+      MY_IDUP(5) = -MY_IDUP(5)
+      call swap(MY_IDUP(8),MY_IDUP(9))
+      MY_IDUP(8) = -MY_IDUP(8)
+      MY_IDUP(9) = -MY_IDUP(9)
+   endif
    CombWeight = CombWeight * tmp_CombWeight
 
 RETURN
