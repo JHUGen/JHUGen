@@ -577,15 +577,16 @@ integer :: WAnyBranching
 RETURN
 END FUNCTION
 
-! VVBranchings also takes into account color multiplicity, so it should be used only when color is not taken into account inside the ME!
+! VBranching and VVBranchings also take into account color multiplicity, so it should be used only when color is not taken into account inside the ME!
 ! This is why some final states count 3 times instead of just once.
 ! Rule of thumb for counting final states in this function is e,mu,ta,nus=1, d,u,s,c,b=3
 ! When a CKM partner is called, since sum(VCKM**@)=1 along a row, counting should not be unaffected.
-SUBROUTINE VVBranchings(MY_IDUP,ICOLUP,CombWeight,ColorBase)
+SUBROUTINE VBranching(DecayMode,MY_IDUP,ICOLUP,CombWeight,ColorBase)
 use ModParameters
 use ModMisc
 implicit none
-integer :: MY_IDUP(4:9),ICOLUP(1:2,6:9),DKFlavor,ICOLUP_Base
+integer, intent(in) :: DecayMode
+integer :: MY_IDUP(1:3),ICOLUP(1:2,1:2),DKFlavor,ICOLUP_Base
 integer, optional ::ColorBase
 real(8), intent(out) :: CombWeight
 real(8) :: DKRnd
@@ -605,323 +606,211 @@ real(8) :: DKRnd
 
    ICOLUP(:,:) = 0
    CombWeight = 1d0
-   if( DecayMode1.eq.0 ) then! Z1->2l
+   if( DecayMode.eq.0 ) then! Z1->2l
         call random_number(DKRnd)
-        MY_IDUP(4) = Z0_
+        MY_IDUP(1) = Z0_
         DKFlavor = ZLepBranching_flat( DKRnd )!= ElM or MuM
-        MY_IDUP(6) =-DKFlavor
-        MY_IDUP(7) =+DKFlavor
+        MY_IDUP(2) =-DKFlavor
+        MY_IDUP(3) =+DKFlavor
         CombWeight = CombWeight*2d0
-   elseif( DecayMode1.eq.1 ) then! Z1->2q
+   elseif( DecayMode.eq.1 ) then! Z1->2q
         call random_number(DKRnd)
-        MY_IDUP(4) = Z0_
+        MY_IDUP(1) = Z0_
         DKFlavor = ZQuaBranching_flat( DKRnd )!= Up,Dn,Chm,Str,Bot
-        MY_IDUP(6) =-DKFlavor
-        MY_IDUP(7) =+DKFlavor
-        ICOLUP(1:2,6) = (/            0,ICOLUP_BASE+3/)
-        ICOLUP(1:2,7) = (/ICOLUP_BASE+3,            0/)
+        MY_IDUP(2) =-DKFlavor
+        MY_IDUP(3) =+DKFlavor
+        ICOLUP(1:2,1) = (/            0,ICOLUP_BASE+3/)
+        ICOLUP(1:2,2) = (/ICOLUP_BASE+3,            0/)
         CombWeight = CombWeight*5d0*3d0
-   elseif( DecayMode1.eq.2 ) then! Z1->2tau
-        MY_IDUP(4) = Z0_
-        MY_IDUP(6) = TaP_
-        MY_IDUP(7) = TaM_
-   elseif( DecayMode1.eq.3 ) then! Z1->2nu
+   elseif( DecayMode.eq.2 ) then! Z1->2tau
+        MY_IDUP(1) = Z0_
+        MY_IDUP(2) = TaP_
+        MY_IDUP(3) = TaM_
+   elseif( DecayMode.eq.3 ) then! Z1->2nu
         call random_number(DKRnd)
-        MY_IDUP(4) = Z0_
+        MY_IDUP(1) = Z0_
         DKFlavor = ZNuBranching_flat( DKRnd )!= NuE,NuM,NuT
-        MY_IDUP(6) =-DKFlavor
-        MY_IDUP(7) =+DKFlavor
+        MY_IDUP(2) =-DKFlavor
+        MY_IDUP(3) =+DKFlavor
         CombWeight = CombWeight*3d0
-   elseif( DecayMode1.eq.4 ) then! W1(+)->lnu
+   elseif( DecayMode.eq.4 ) then! W1(+)->lnu
         call random_number(DKRnd)
-        MY_IDUP(4) = Wp_
+        MY_IDUP(1) = Wp_
         DKFlavor = WLepBranching_flat( DKRnd )!= ElM or MuM
-        MY_IDUP(6) = +abs(DKFlavor)     ! lepton(+)
-        MY_IDUP(7) = +abs(DKFlavor)+7   ! neutrino
+        MY_IDUP(2) = +abs(DKFlavor)     ! lepton(+)
+        MY_IDUP(3) = +abs(DKFlavor)+7   ! neutrino
         CombWeight = CombWeight*2d0
-   elseif( DecayMode1.eq.5 ) then! W1(+)->2q
+   elseif( DecayMode.eq.5 ) then! W1(+)->2q
         call random_number(DKRnd)
-        MY_IDUP(4) = Wp_
+        MY_IDUP(1) = Wp_
         DKFlavor = WQuaUpBranching_flat( DKRnd )!= Up,Chm
-!         MY_IDUP(6) = -abs(DKFlavor)-1  ! anti-dn flavor
-!         MY_IDUP(7) = +abs(DKFlavor)    ! up flavor
-        MY_IDUP(7) = +abs(DKFlavor)           ! up flavor
-        MY_IDUP(6) = GetCKMPartner(MY_IDUP(7))! anti-dn flavor
-        ICOLUP(1:2,6) = (/            0,ICOLUP_BASE+3/)
-        ICOLUP(1:2,7) = (/ICOLUP_BASE+3,            0/)
+!         MY_IDUP(2) = -abs(DKFlavor)-1  ! anti-dn flavor
+!         MY_IDUP(3) = +abs(DKFlavor)    ! up flavor
+        MY_IDUP(3) = +abs(DKFlavor)           ! up flavor
+        MY_IDUP(2) = GetCKMPartner(MY_IDUP(3))! anti-dn flavor
+        ICOLUP(1:2,1) = (/            0,ICOLUP_BASE+3/)
+        ICOLUP(1:2,2) = (/ICOLUP_BASE+3,            0/)
         CombWeight = CombWeight*2d0*3d0
-   elseif( DecayMode1.eq.6 ) then! W1(+)->taunu
-        MY_IDUP(4) = Wp_
-        MY_IDUP(6) = TaP_
-        MY_IDUP(7) = NuT_
-   elseif( DecayMode1.eq.7 ) then! photon
-        MY_IDUP(4) = Pho_
-        MY_IDUP(6) = Not_a_particle_
-        MY_IDUP(7) = Not_a_particle_
-   elseif( DecayMode1.eq.8 ) then! Z1->2l+2tau
+   elseif( DecayMode.eq.6 ) then! W1(+)->taunu
+        MY_IDUP(1) = Wp_
+        MY_IDUP(2) = TaP_
+        MY_IDUP(3) = NuT_
+   elseif( DecayMode.eq.7 ) then! photon
+        MY_IDUP(1) = Pho_
+        MY_IDUP(2) = Not_a_particle_
+        MY_IDUP(3) = Not_a_particle_
+   elseif( DecayMode.eq.8 ) then! Z1->2l+2tau
         call random_number(DKRnd)
-        MY_IDUP(4) = Z0_
+        MY_IDUP(1) = Z0_
         DKFlavor = ZLepPlusTauBranching_flat( DKRnd )!= ElM or MuM or TaM
-        MY_IDUP(6) =-DKFlavor
-        MY_IDUP(7) =+DKFlavor
+        MY_IDUP(2) =-DKFlavor
+        MY_IDUP(3) =+DKFlavor
         CombWeight = CombWeight*3d0
-   elseif( DecayMode1.eq.9 ) then! Z1-> anything
+   elseif( DecayMode.eq.9 ) then! Z1-> anything
         call random_number(DKRnd)
-        MY_IDUP(4) = Z0_
+        MY_IDUP(1) = Z0_
         DKFlavor = ZAnyBranching_flat( DKRnd )
-        MY_IDUP(6) =-DKFlavor
-        MY_IDUP(7) =+DKFlavor
+        MY_IDUP(2) =-DKFlavor
+        MY_IDUP(3) =+DKFlavor
         if(IsAQuark(DKFlavor)) then
-           ICOLUP(1:2,6) = (/            0,ICOLUP_BASE+3/)
-           ICOLUP(1:2,7) = (/ICOLUP_BASE+3,            0/)
+           ICOLUP(1:2,1) = (/            0,ICOLUP_BASE+3/)
+           ICOLUP(1:2,2) = (/ICOLUP_BASE+3,            0/)
         endif
         CombWeight = CombWeight*21d0!*(6d0 + 5d0*3d0)
-   elseif( DecayMode1.eq.10 ) then! W1(+)->l+tau  +nu
+   elseif( DecayMode.eq.10 ) then! W1(+)->l+tau  +nu
         call random_number(DKRnd)
-        MY_IDUP(4) = Wp_
+        MY_IDUP(1) = Wp_
         DKFlavor = WLepPlusTauBranching_flat( DKRnd )!= ElM or MuM or TaM
-        MY_IDUP(6) = +abs(DKFlavor)     ! lepton(+)
-        MY_IDUP(7) = +abs(DKFlavor)+7   ! neutrino
+        MY_IDUP(2) = +abs(DKFlavor)     ! lepton(+)
+        MY_IDUP(3) = +abs(DKFlavor)+7   ! neutrino
         CombWeight = CombWeight*3d0
-   elseif( DecayMode1.eq.11 ) then! W1(+)-> anything
+   elseif( DecayMode.eq.11 ) then! W1(+)-> anything
         call random_number(DKRnd)
-        MY_IDUP(4) = Wp_
+        MY_IDUP(1) = Wp_
         DKFlavor = WAnyBranching_flat( DKRnd )
         if(IsAQuark(DKFlavor)) then
-!            MY_IDUP(6) = -abs(DKFlavor)-1  ! anti-dn flavor
-!            MY_IDUP(7) = +abs(DKFlavor)    ! up flavor
-           MY_IDUP(7) = +abs(DKFlavor)           ! up flavor
-           MY_IDUP(6) = GetCKMPartner(MY_IDUP(7))! anti-dn flavor
-           ICOLUP(1:2,6) = (/            0,ICOLUP_BASE+3/)
-           ICOLUP(1:2,7) = (/ICOLUP_BASE+3,            0/)
+!            MY_IDUP(2) = -abs(DKFlavor)-1  ! anti-dn flavor
+!            MY_IDUP(3) = +abs(DKFlavor)    ! up flavor
+           MY_IDUP(3) = +abs(DKFlavor)           ! up flavor
+           MY_IDUP(2) = GetCKMPartner(MY_IDUP(3))! anti-dn flavor
+           ICOLUP(1:2,1) = (/            0,ICOLUP_BASE+3/)
+           ICOLUP(1:2,2) = (/ICOLUP_BASE+3,            0/)
         else
-           MY_IDUP(6) = +abs(DKFlavor)     ! lepton(+)
-           MY_IDUP(7) = +abs(DKFlavor)+7   ! neutrino
+           MY_IDUP(2) = +abs(DKFlavor)     ! lepton(+)
+           MY_IDUP(3) = +abs(DKFlavor)+7   ! neutrino
         endif
         CombWeight = CombWeight*9d0!*(3d0 + 2d0*3d0)
    ! Exclusive Z1 decay modes
    elseif( &
-      DecayMode1.eq.-2*2   .or. & ! Z->ee
-      DecayMode1.eq.-3*3   .or. & ! Z->mumu
-      DecayMode1.eq.-5*5   .or. & ! Z->dd
-      DecayMode1.eq.-7*7   .or. & ! Z->uu
-      DecayMode1.eq.-11*11 .or. & ! Z->ss
-      DecayMode1.eq.-13*13 .or. & ! Z->cc
-      DecayMode1.eq.-17*17      & ! Z->bb
+      DecayMode.eq.-2*2   .or. & ! Z->ee
+      DecayMode.eq.-3*3   .or. & ! Z->mumu
+      DecayMode.eq.-5*5   .or. & ! Z->dd
+      DecayMode.eq.-7*7   .or. & ! Z->uu
+      DecayMode.eq.-11*11 .or. & ! Z->ss
+      DecayMode.eq.-13*13 .or. & ! Z->cc
+      DecayMode.eq.-17*17      & ! Z->bb
       ) then
-        MY_IDUP(4) = Z0_
+        MY_IDUP(1) = Z0_
         DKFlavor = (                      &
-            ElM_*LogicalToInteger(DecayMode1.eq.-2*2)   + & ! Z->ee
-            MuM_*LogicalToInteger(DecayMode1.eq.-3*3)   + & ! Z->mumu
-            Dn_*LogicalToInteger(DecayMode1.eq.-5*5)    + & ! Z->dd
-            Up_*LogicalToInteger(DecayMode1.eq.-7*7)    + & ! Z->uu
-            Str_*LogicalToInteger(DecayMode1.eq.-11*11) + & ! Z->ss
-            Chm_*LogicalToInteger(DecayMode1.eq.-13*13) + & ! Z->cc
-            Bot_*LogicalToInteger(DecayMode1.eq.-17*17)   & ! Z->bb
+            ElM_*LogicalToInteger(DecayMode.eq.-2*2)   + & ! Z->ee
+            MuM_*LogicalToInteger(DecayMode.eq.-3*3)   + & ! Z->mumu
+            Dn_*LogicalToInteger(DecayMode.eq.-5*5)    + & ! Z->dd
+            Up_*LogicalToInteger(DecayMode.eq.-7*7)    + & ! Z->uu
+            Str_*LogicalToInteger(DecayMode.eq.-11*11) + & ! Z->ss
+            Chm_*LogicalToInteger(DecayMode.eq.-13*13) + & ! Z->cc
+            Bot_*LogicalToInteger(DecayMode.eq.-17*17)   & ! Z->bb
         )
-        MY_IDUP(6) =-DKFlavor
-        MY_IDUP(7) =+DKFlavor
+        MY_IDUP(2) =-DKFlavor
+        MY_IDUP(3) =+DKFlavor
         if(IsAQuark(DKFlavor)) then
-           ICOLUP(1:2,6) = (/            0,ICOLUP_BASE+3/)
-           ICOLUP(1:2,7) = (/ICOLUP_BASE+3,            0/)
+           ICOLUP(1:2,1) = (/            0,ICOLUP_BASE+3/)
+           ICOLUP(1:2,2) = (/ICOLUP_BASE+3,            0/)
         endif
    ! Exclusive W+ decay modes
    elseif( &
-      DecayMode1.eq.-2*1   .or. & ! W->enu
-      DecayMode1.eq.-3*1   .or. & ! W->munu
-      DecayMode1.eq.-5*7   .or. & ! W->du
-      DecayMode1.eq.-5*13  .or. & ! W->dc
-      DecayMode1.eq.-11*7  .or. & ! W->su
-      DecayMode1.eq.-11*13 .or. & ! W->sc
-      DecayMode1.eq.-17*7  .or. & ! W->bu
-      DecayMode1.eq.-17*13      & ! W->bc
+      DecayMode.eq.-2*1   .or. & ! W->enu
+      DecayMode.eq.-3*1   .or. & ! W->munu
+      DecayMode.eq.-5*7   .or. & ! W->du
+      DecayMode.eq.-5*13  .or. & ! W->dc
+      DecayMode.eq.-11*7  .or. & ! W->su
+      DecayMode.eq.-11*13 .or. & ! W->sc
+      DecayMode.eq.-17*7  .or. & ! W->bu
+      DecayMode.eq.-17*13      & ! W->bc
       ) then
-        MY_IDUP(4) = Wp_
-        MY_IDUP(6) = (                    &
-           ElP_*LogicalToInteger(DecayMode1.eq.-2*1)    + & ! W->enu
-           MuP_*LogicalToInteger(DecayMode1.eq.-3*1)    + & ! W->munu
-           ADn_*LogicalToInteger(DecayMode1.eq.-5*7)    + & ! W->du
-           ADn_*LogicalToInteger(DecayMode1.eq.-5*13)   + & ! W->dc
-           AStr_*LogicalToInteger(DecayMode1.eq.-11*7)  + & ! W->su
-           AStr_*LogicalToInteger(DecayMode1.eq.-11*13) + & ! W->sc
-           ABot_*LogicalToInteger(DecayMode1.eq.-17*7)  + & ! W->bu
-           ABot_*LogicalToInteger(DecayMode1.eq.-17*13)   & ! W->bc
+        MY_IDUP(1) = Wp_
+        MY_IDUP(2) = (                    &
+           ElP_*LogicalToInteger(DecayMode.eq.-2*1)    + & ! W->enu
+           MuP_*LogicalToInteger(DecayMode.eq.-3*1)    + & ! W->munu
+           ADn_*LogicalToInteger(DecayMode.eq.-5*7)    + & ! W->du
+           ADn_*LogicalToInteger(DecayMode.eq.-5*13)   + & ! W->dc
+           AStr_*LogicalToInteger(DecayMode.eq.-11*7)  + & ! W->su
+           AStr_*LogicalToInteger(DecayMode.eq.-11*13) + & ! W->sc
+           ABot_*LogicalToInteger(DecayMode.eq.-17*7)  + & ! W->bu
+           ABot_*LogicalToInteger(DecayMode.eq.-17*13)   & ! W->bc
         )
-        MY_IDUP(7) = (                   &
-           NuE_*LogicalToInteger(DecayMode1.eq.-2*1)   + & ! W->enu
-           NuM_*LogicalToInteger(DecayMode1.eq.-3*1)   + & ! W->munu
-           Up_*LogicalToInteger(DecayMode1.eq.-5*7)    + & ! W->du
-           Chm_*LogicalToInteger(DecayMode1.eq.-5*13)  + & ! W->dc
-           Up_*LogicalToInteger(DecayMode1.eq.-11*7)   + & ! W->su
-           Chm_*LogicalToInteger(DecayMode1.eq.-11*13) + & ! W->sc
-           Up_*LogicalToInteger(DecayMode1.eq.-17*7)   + & ! W->bu
-           Chm_*LogicalToInteger(DecayMode1.eq.-17*13)   & ! W->bc
+        MY_IDUP(3) = (                   &
+           NuE_*LogicalToInteger(DecayMode.eq.-2*1)   + & ! W->enu
+           NuM_*LogicalToInteger(DecayMode.eq.-3*1)   + & ! W->munu
+           Up_*LogicalToInteger(DecayMode.eq.-5*7)    + & ! W->du
+           Chm_*LogicalToInteger(DecayMode.eq.-5*13)  + & ! W->dc
+           Up_*LogicalToInteger(DecayMode.eq.-11*7)   + & ! W->su
+           Chm_*LogicalToInteger(DecayMode.eq.-11*13) + & ! W->sc
+           Up_*LogicalToInteger(DecayMode.eq.-17*7)   + & ! W->bu
+           Chm_*LogicalToInteger(DecayMode.eq.-17*13)   & ! W->bc
         )
         if(IsAQuark(DKFlavor)) then
-           ICOLUP(1:2,6) = (/            0,ICOLUP_BASE+3/)
-           ICOLUP(1:2,7) = (/ICOLUP_BASE+3,            0/)
+           ICOLUP(1:2,1) = (/            0,ICOLUP_BASE+3/)
+           ICOLUP(1:2,2) = (/ICOLUP_BASE+3,            0/)
         endif
    endif
 
 
-   if( DecayMode2.eq.0 ) then! Z2->2l (sample over el,mu)
-        call random_number(DKRnd)
-        MY_IDUP(5) = Z0_
-        DKFlavor = ZLepBranching_flat( DKRnd )!= ElM or MuM
-        MY_IDUP(8) =-DKFlavor
-        MY_IDUP(9) =+DKFlavor
-        CombWeight = CombWeight*2d0
-   elseif( DecayMode2.eq.1 ) then! Z2->2q
-        call random_number(DKRnd)
-        MY_IDUP(5) = Z0_
-        DKFlavor = ZQuaBranching_flat( DKRnd )!= Up,Dn,Chm,Str,Bot
-        MY_IDUP(8) =-DKFlavor
-        MY_IDUP(9) =+DKFlavor
-        ICOLUP(1:2,8) = (/            0,ICOLUP_BASE+4/)
-        ICOLUP(1:2,9) = (/ICOLUP_BASE+4,            0/)
-        CombWeight = CombWeight*5d0*3d0
-   elseif( DecayMode2.eq.2 ) then! Z2->2tau
-        MY_IDUP(5) = Z0_
-        MY_IDUP(8) = TaP_
-        MY_IDUP(9) = TaM_
-   elseif( DecayMode2.eq.3 ) then! Z2->2nu
-        call random_number(DKRnd)
-        MY_IDUP(5) = Z0_
-        DKFlavor = ZNuBranching_flat( DKRnd )!= NuE,NuM,NuT
-        MY_IDUP(8) =-DKFlavor
-        MY_IDUP(9) =+DKFlavor
-        CombWeight = CombWeight*3d0
-   elseif( DecayMode2.eq.4 ) then! W2(-)->lnu
-        call random_number(DKRnd)
-        MY_IDUP(5) = Wm_
-        DKFlavor = WLepBranching_flat( DKRnd )!= ElM or MuM
-        MY_IDUP(8) = -abs(DKFlavor)-7   ! anti-neutrino
-        MY_IDUP(9) = -abs(DKFlavor)     ! lepton(-)
-        CombWeight = CombWeight*2d0
-   elseif( DecayMode2.eq.5 ) then! W2(-)->2q (sample over u,d,s,c)
-        call random_number(DKRnd)
-        MY_IDUP(5) = Wm_
-        DKFlavor = WQuaUpBranching_flat( DKRnd )!= Up,Chm
-!         MY_IDUP(8) = -abs(DKFlavor)    ! anti-up flavor
-!         MY_IDUP(9) = +abs(DKFlavor)+1  ! dn flavor
-        MY_IDUP(8) = -abs(DKFlavor)           ! up flavor
-        MY_IDUP(9) = GetCKMPartner(MY_IDUP(8))! dn flavor
-        ICOLUP(1:2,8) = (/            0,ICOLUP_BASE+4/)
-        ICOLUP(1:2,9) = (/ICOLUP_BASE+4,            0/)
-        CombWeight = CombWeight*2d0*3d0
-   elseif( DecayMode2.eq.6 ) then! W2(-)->taunu
-        MY_IDUP(5) = Wm_
-        MY_IDUP(8) = ANuT_
-        MY_IDUP(9) = TaM_
-   elseif( DecayMode2.eq.7 ) then! photon
-        MY_IDUP(5) = Pho_
-        MY_IDUP(8) = Not_a_particle_
-        MY_IDUP(9) = Not_a_particle_
-   elseif( DecayMode2.eq.8 ) then! Z2->2l+2tau
-        call random_number(DKRnd)
-        MY_IDUP(5) = Z0_
-        DKFlavor = ZLepPlusTauBranching_flat( DKRnd )!= ElM or MuM or TaM
-        MY_IDUP(8) =-DKFlavor
-        MY_IDUP(9) =+DKFlavor
-        CombWeight = CombWeight*3d0
-   elseif( DecayMode2.eq.9 ) then! Z2-> anything
-        call random_number(DKRnd)
-        MY_IDUP(5) = Z0_
-        DKFlavor = ZAnyBranching_flat( DKRnd )
-        MY_IDUP(8) =-DKFlavor
-        MY_IDUP(9) =+DKFlavor
-        if(IsAQuark(DKFlavor)) then
-           ICOLUP(1:2,8) = (/            0,ICOLUP_BASE+4/)
-           ICOLUP(1:2,9) = (/ICOLUP_BASE+4,            0/)
-        endif
-        CombWeight = CombWeight*21d0!*(6d0 + 5d0*3d0)
-   elseif( DecayMode2.eq.10 ) then! W2(-)->l+tau + nu
-        call random_number(DKRnd)
-        MY_IDUP(5) = Wm_
-        DKFlavor = WLepPlusTauBranching_flat( DKRnd )!= ElM or MuM or TaM
-        MY_IDUP(8) = -abs(DKFlavor)-7   ! anti-neutrino
-        MY_IDUP(9) = -abs(DKFlavor)     ! lepton(-)
-        CombWeight = CombWeight*3d0
-   elseif( DecayMode2.eq.11 ) then! W2(-)-> anything
-        call random_number(DKRnd)
-        MY_IDUP(5) = Wm_
-        DKFlavor = WAnyBranching_flat( DKRnd )
-        if(IsAQuark(DKFlavor)) then
-!            MY_IDUP(8) = -abs(DKFlavor)    ! anti-up flavor
-!            MY_IDUP(9) = +abs(DKFlavor)+1  ! dn flavor
-           MY_IDUP(8) = -abs(DKFlavor)           ! up flavor
-           MY_IDUP(9) = GetCKMPartner(MY_IDUP(8))! dn flavor
-           ICOLUP(1:2,8) = (/            0,ICOLUP_BASE+4/)
-           ICOLUP(1:2,9) = (/ICOLUP_BASE+4,            0/)
-        else
-           MY_IDUP(8) = -abs(DKFlavor)-7   ! anti-neutrino
-           MY_IDUP(9) = -abs(DKFlavor)     ! lepton(-)
-        endif
-        CombWeight = CombWeight*9d0!*(3d0 + 2d0*3d0)
-   ! Exclusive Z2 decay modes
-   elseif( &
-      DecayMode2.eq.-2*2   .or. & ! Z->ee
-      DecayMode2.eq.-3*3   .or. & ! Z->mumu
-      DecayMode2.eq.-5*5   .or. & ! Z->dd
-      DecayMode2.eq.-7*7   .or. & ! Z->uu
-      DecayMode2.eq.-11*11 .or. & ! Z->ss
-      DecayMode2.eq.-13*13 .or. & ! Z->cc
-      DecayMode2.eq.-17*17      & ! Z->bb
-      ) then
-        MY_IDUP(5) = Z0_
-        DKFlavor = (                      &
-            ElM_*LogicalToInteger(DecayMode2.eq.-2*2)   + & ! Z->ee
-            MuM_*LogicalToInteger(DecayMode2.eq.-3*3)   + & ! Z->mumu
-            Dn_*LogicalToInteger(DecayMode2.eq.-5*5)    + & ! Z->dd
-            Up_*LogicalToInteger(DecayMode2.eq.-7*7)    + & ! Z->uu
-            Str_*LogicalToInteger(DecayMode2.eq.-11*11) + & ! Z->ss
-            Chm_*LogicalToInteger(DecayMode2.eq.-13*13) + & ! Z->cc
-            Bot_*LogicalToInteger(DecayMode2.eq.-17*17)   & ! Z->bb
-        )
-        MY_IDUP(8) =-DKFlavor
-        MY_IDUP(9) =+DKFlavor
-        if(IsAQuark(DKFlavor)) then
-           ICOLUP(1:2,8) = (/            0,ICOLUP_BASE+4/)
-           ICOLUP(1:2,9) = (/ICOLUP_BASE+4,            0/)
-        endif
-   ! Exclusive W- decay modes
-   elseif( &
-      DecayMode2.eq.-2*1   .or. & ! W->enu
-      DecayMode2.eq.-3*1   .or. & ! W->munu
-      DecayMode2.eq.-5*7   .or. & ! W->du
-      DecayMode2.eq.-5*13  .or. & ! W->dc
-      DecayMode2.eq.-11*7  .or. & ! W->su
-      DecayMode2.eq.-11*13 .or. & ! W->sc
-      DecayMode2.eq.-17*7  .or. & ! W->bu
-      DecayMode2.eq.-17*13      & ! W->bc
-      ) then
-        MY_IDUP(5) = Wm_
-        MY_IDUP(9) = (                   &
-           ElM_*LogicalToInteger(DecayMode2.eq.-2*1)   + & ! W->enu
-           MuM_*LogicalToInteger(DecayMode2.eq.-3*1)   + & ! W->munu
-           Dn_*LogicalToInteger(DecayMode2.eq.-5*7)    + & ! W->du
-           Dn_*LogicalToInteger(DecayMode2.eq.-5*13)   + & ! W->dc
-           Str_*LogicalToInteger(DecayMode2.eq.-11*7)  + & ! W->su
-           Str_*LogicalToInteger(DecayMode2.eq.-11*13) + & ! W->sc
-           Bot_*LogicalToInteger(DecayMode2.eq.-17*7)  + & ! W->bu
-           Bot_*LogicalToInteger(DecayMode2.eq.-17*13)   & ! W->bc
-        )
-        MY_IDUP(8) = (                    &
-           ANuE_*LogicalToInteger(DecayMode2.eq.-2*1)   + & ! W->enu
-           ANuM_*LogicalToInteger(DecayMode2.eq.-3*1)   + & ! W->munu
-           AUp_*LogicalToInteger(DecayMode2.eq.-5*7)    + & ! W->du
-           AChm_*LogicalToInteger(DecayMode2.eq.-5*13)  + & ! W->dc
-           AUp_*LogicalToInteger(DecayMode2.eq.-11*7)   + & ! W->su
-           AChm_*LogicalToInteger(DecayMode2.eq.-11*13) + & ! W->sc
-           AUp_*LogicalToInteger(DecayMode2.eq.-17*7)   + & ! W->bu
-           AChm_*LogicalToInteger(DecayMode2.eq.-17*13)   & ! W->bc
-        )
-        if(IsAQuark(DKFlavor)) then
-           ICOLUP(1:2,8) = (/            0,ICOLUP_BASE+4/)
-           ICOLUP(1:2,9) = (/ICOLUP_BASE+4,            0/)
-        endif
+RETURN
+END SUBROUTINE
+
+SUBROUTINE VVBranchings(MY_IDUP,ICOLUP,CombWeight,ColorBase)
+use ModParameters
+implicit none
+integer :: MY_IDUP(4:9),ICOLUP(1:2,6:9),ICOLUP_Base
+integer, optional ::ColorBase
+real(8), intent(out) :: CombWeight
+integer :: tmp_idup(1:3),tmp_icolup(1:2,1:2)
+real(8) :: tmp_CombWeight
+real(8) :: DKRnd
+
+!    particle associations:
+!
+!    IDUP(6)  -->  MomDK(:,2)  -->     v-spinor
+!    IDUP(7)  -->  MomDK(:,1)  -->  ubar-spinor
+!    IDUP(8)  -->  MomDK(:,4)  -->     v-spinor
+!    IDUP(9)  -->  MomDK(:,3)  -->  ubar-spinor
+
+   if (present(ColorBase)) then
+       ICOLUP_BASE = ColorBase
+   else
+       ICOLUP_BASE = 800
    endif
 
+   ICOLUP(:,:) = 0
+   CombWeight = 1d0
+
+   call VBranching(DecayMode1, tmp_idup, tmp_icolup, tmp_CombWeight, ICOLUP_BASE)
+   MY_IDUP(4) = tmp_idup(1)
+   MY_IDUP(6) = tmp_idup(2)
+   MY_IDUP(7) = tmp_idup(3)
+   ICOLUP(1:2,6) = tmp_icolup(1:2,1)
+   ICOLUP(1:2,7) = tmp_icolup(1:2,2)
+   CombWeight = CombWeight * tmp_CombWeight
+
+
+   ICOLUP_BASE = ICOLUP_BASE+1
+   call VBranching(DecayMode2, tmp_idup, tmp_icolup, tmp_CombWeight, ICOLUP_BASE)
+   MY_IDUP(5) = tmp_idup(1)
+   MY_IDUP(8) = tmp_idup(2)
+   MY_IDUP(9) = tmp_idup(3)
+   ICOLUP(1:2,8) = tmp_icolup(1:2,1)
+   ICOLUP(1:2,9) = tmp_icolup(1:2,2)
+   CombWeight = CombWeight * tmp_CombWeight
 
 RETURN
 END SUBROUTINE
