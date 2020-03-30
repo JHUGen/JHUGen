@@ -2273,7 +2273,7 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
       helicity(7)=-helicity(6)
     endif
     if(H_DK) then
-      DkWgt = DKWgt*3d0 ! H->bb decay
+      DkWgt = DKWgt*6d0 ! H->bb decay
     endif
 
 
@@ -2644,7 +2644,7 @@ if(IsAWDecay(DecayMode1)) then
    helicity(7)=-helicity(6)
 endif
 if(H_DK) then
-   DkWgt = DKWgt*3d0 ! H->bb decay
+   DkWgt = DKWgt*6d0 ! H->bb decay
 endif
 
 
