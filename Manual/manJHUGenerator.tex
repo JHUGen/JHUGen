@@ -349,8 +349,9 @@ Examples of running the generator.  The number of events is determined using \te
     \item $ZH$ production at NLO with SM couplings ($g_1=2$), with $Z\to 2l$ decay and ``stable" Higgs (for further processing):
     \begin{verbatim}
 ./JHUGen Collider=1 Process=51 VH_PC=nl HbbDK=0 DecayMode1=0 VegasNc2=100000 \\
-    DataFile=qqtoZH_nlo_to_llbb ghz1=2,0
+    DataFile=qqtoZH_nlo_to_llbb ghz1=2,0 Unweighted=0
     \end{verbatim}
+    \item Note: for $ZH$ production at NLO, \texttt{Process=51} can produce weighted event only. One must specify Unweighted=0.
 		\item \texttt{Process=51} also includes all the features of \texttt{Process=50}, but is currently in beta; we recommend using it only for $gg\to ZH$.
 	\end{itemize}
 	\item VBF, \texttt{Process=60}:
