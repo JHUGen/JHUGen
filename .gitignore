@@ -1,0 +1,7 @@
+**/*.o
+**/*.so
+**/*.d
+**/*.pcm
+**/*.pyc
+LexiConHC/lib
+LexiConHC/LexiConHC
