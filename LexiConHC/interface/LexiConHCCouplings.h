@@ -2,6 +2,8 @@
 #define LEXICONHC_COUPLINGS_H
 
 
+#include <string>
+
 // Default values of parameters as in mod_Parameters.F90
 #define DEFVAL_MZ 91.1876
 #define DEFVAL_MW 80.399
@@ -79,6 +81,12 @@ namespace LexiConHCCouplings{
 
 #undef COUPLING_COMMAND
 
+  // Functions to get the coupling names from the indices
+  std::string getCouplingName(LexiConHCCouplings::Amplitude_JHUGen_CouplingType type);
+  std::string getCouplingName(LexiConHCCouplings::EFT_JHUGen_CouplingType type);
+  std::string getCouplingName(LexiConHCCouplings::EFT_HiggsBasis_CouplingType type);
+
 }
+
 
 #endif

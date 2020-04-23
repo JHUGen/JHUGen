@@ -40,6 +40,17 @@ void LexiConHCOptionParser::analyze(){
 
   if (basis_input == nIOBases || basis_output == nIOBases){ cerr << "LexiConHCOptionParser::analyze: You have to specify the input and output basis types." << endl; if (!hasInvalidOption) hasInvalidOption=true; }
 
+  bool distinguish_HWWcouplings; getValueWithDefault<std::string, bool>(flags, "distinguish_HWWcouplings", distinguish_HWWcouplings, false);
+  if (!distinguish_HWWcouplings && basis_input == bAmplitude_JHUGen){
+    using namespace LexiConHCCouplings;
+    static_assert((unsigned int) coupl_ampjhu_ghzgs1_prime2 - (unsigned int) coupl_ampjhu_ghw1 == (unsigned int) coupl_ampjhu_ghw1 - (unsigned int) coupl_ampjhu_ghz1);
+    for (unsigned int i=(unsigned int) coupl_ampjhu_ghz1; i<(unsigned int) coupl_ampjhu_ghw1; i++){
+      couplings[getCouplingName((Amplitude_JHUGen_CouplingType) (i+(unsigned int) coupl_ampjhu_ghw1 - (unsigned int) coupl_ampjhu_ghz1))] =
+        couplings[getCouplingName((Amplitude_JHUGen_CouplingType) i)];
+    }
+  }
+
+
   // Print help if needed and abort at this point, nowhere later
   if (hasInvalidOption) printOptionsHelp(hasInvalidOption);
 }

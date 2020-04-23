@@ -153,9 +153,9 @@ std::vector< std::pair<double, double> > LexiConHCTranslator::getOrderedInputCou
   std::vector< std::pair<double, double> > res;
 #define COUPLING_COMMAND(NAME, PREFIX, DEFVAL) \
   getValueWithDefault<std::string, std::pair<double, double>>(input_couplings, #NAME, res.at(coupl_##PREFIX##_##NAME), std::pair<double, double>(DEFVAL, 0)); \
-  if (useMCFMAtInput && std::string(#NAME).find("ghz")!=std::string::npos){ res.at(coupl_##PREFIX##_##NAME).first *= 2.; res.at(coupl_##PREFIX##_##NAME).second *= 2.; } \
-  if (std::string(#NAME).find("ghz")!=std::string::npos && std::string(#NAME).find("ghzgs")==std::string::npos && std::string(#NAME).find("prime2")!=std::string::npos){ res.at(coupl_##PREFIX##_##NAME).first *= std::pow(MZ/Lambda_z1, 2); res.at(coupl_##PREFIX##_##NAME).second *= std::pow(MZ/Lambda_z1, 2); } \
-  else if (std::string(#NAME).find("ghzgs")!=std::string::npos && std::string(#NAME).find("prime2")!=std::string::npos){ res.at(coupl_##PREFIX##_##NAME).first *= std::pow(MZ/Lambda_zgs1, 2); res.at(coupl_##PREFIX##_##NAME).second *= std::pow(MZ/Lambda_zgs1, 2); } \
+  if (useMCFMAtInput && (std::string(#NAME).find("ghz")!=std::string::npos || std::string(#NAME).find("ghw")!=std::string::npos)){ res.at(coupl_##PREFIX##_##NAME).first *= 2.; res.at(coupl_##PREFIX##_##NAME).second *= 2.; } \
+  if (std::string(#NAME).find("ghzgs")!=std::string::npos && std::string(#NAME).find("prime2")!=std::string::npos){ res.at(coupl_##PREFIX##_##NAME).first *= std::pow(MZ/Lambda_zgs1, 2); res.at(coupl_##PREFIX##_##NAME).second *= std::pow(MZ/Lambda_zgs1, 2); } \
+  else if (std::string(#NAME).find("ghz")!=std::string::npos && std::string(#NAME).find("prime2")!=std::string::npos){ res.at(coupl_##PREFIX##_##NAME).first *= std::pow(MZ/Lambda_z1, 2); res.at(coupl_##PREFIX##_##NAME).second *= std::pow(MZ/Lambda_z1, 2); } \
   else if (std::string(#NAME).find("ghw")!=std::string::npos && std::string(#NAME).find("prime2")!=std::string::npos){ res.at(coupl_##PREFIX##_##NAME).first *= std::pow(MW/Lambda_w1, 2); res.at(coupl_##PREFIX##_##NAME).second *= std::pow(MW/Lambda_w1, 2); }
 
   switch (basis_input){
@@ -163,14 +163,6 @@ std::vector< std::pair<double, double> > LexiConHCTranslator::getOrderedInputCou
   {
     res.assign(nAmplitude_JHUGen_CouplingTypes, std::pair<double, double>(0, 0));
     AMPLITUDE_JHUGEN_COUPLING_COMMANDS;
-
-    if (!distinguish_HWWcouplings){
-      static_assert((unsigned int) coupl_ampjhu_ghzgs1_prime2 - (unsigned int) coupl_ampjhu_ghw1 == (unsigned int) coupl_ampjhu_ghw1 - (unsigned int) coupl_ampjhu_ghz1);
-      for (unsigned int i=(unsigned int) coupl_ampjhu_ghz1; i<(unsigned int) coupl_ampjhu_ghw1; i++){
-        res.at(i+(unsigned int) coupl_ampjhu_ghw1 - (unsigned int) coupl_ampjhu_ghz1).first = res.at(i).first;
-        res.at(i+(unsigned int) coupl_ampjhu_ghw1 - (unsigned int) coupl_ampjhu_ghz1).second = res.at(i).second;
-      }
-    }
     break;
   }
   case bEFT_JHUGen:
@@ -210,9 +202,9 @@ void LexiConHCTranslator::interpretOutputCouplings(
   double Lambda_zgs1; getValueWithDefault<std::string, double>(input_parameters, "Lambda_zgs1", Lambda_zgs1, DEFVAL_LAMBDA_VI);
 
 #define COUPLING_COMMAND(NAME, PREFIX, DEFVAL) \
-  if (useMCFMAtOutput && std::string(#NAME).find("ghz")!=std::string::npos){ output_vector.at(coupl_##PREFIX##_##NAME).first /= 2.; output_vector.at(coupl_##PREFIX##_##NAME).second /= 2.; } \
-  if (std::string(#NAME).find("ghz")!=std::string::npos && std::string(#NAME).find("ghzgs")==std::string::npos && std::string(#NAME).find("prime2")!=std::string::npos){ output_vector.at(coupl_##PREFIX##_##NAME).first /= std::pow(MZ/Lambda_z1, 2); output_vector.at(coupl_##PREFIX##_##NAME).second /= std::pow(MZ/Lambda_z1, 2); } \
-  else if (std::string(#NAME).find("ghzgs")!=std::string::npos && std::string(#NAME).find("prime2")!=std::string::npos){ output_vector.at(coupl_##PREFIX##_##NAME).first /= std::pow(MZ/Lambda_zgs1, 2); output_vector.at(coupl_##PREFIX##_##NAME).second /= std::pow(MZ/Lambda_zgs1, 2); } \
+  if (useMCFMAtOutput && (std::string(#NAME).find("ghz")!=std::string::npos || std::string(#NAME).find("ghw")!=std::string::npos)){ output_vector.at(coupl_##PREFIX##_##NAME).first /= 2.; output_vector.at(coupl_##PREFIX##_##NAME).second /= 2.; } \
+  if (std::string(#NAME).find("ghzgs")!=std::string::npos && std::string(#NAME).find("prime2")!=std::string::npos){ output_vector.at(coupl_##PREFIX##_##NAME).first /= std::pow(MZ/Lambda_zgs1, 2); output_vector.at(coupl_##PREFIX##_##NAME).second /= std::pow(MZ/Lambda_zgs1, 2); } \
+  else if (std::string(#NAME).find("ghz")!=std::string::npos && std::string(#NAME).find("prime2")!=std::string::npos){ output_vector.at(coupl_##PREFIX##_##NAME).first /= std::pow(MZ/Lambda_z1, 2); output_vector.at(coupl_##PREFIX##_##NAME).second /= std::pow(MZ/Lambda_z1, 2); } \
   else if (std::string(#NAME).find("ghw")!=std::string::npos && std::string(#NAME).find("prime2")!=std::string::npos){ output_vector.at(coupl_##PREFIX##_##NAME).first /= std::pow(MW/Lambda_w1, 2); output_vector.at(coupl_##PREFIX##_##NAME).second /= std::pow(MW/Lambda_w1, 2); } \
   result_couplings[#NAME] = output_vector.at(coupl_##PREFIX##_##NAME);
 
