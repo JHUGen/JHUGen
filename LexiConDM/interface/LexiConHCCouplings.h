@@ -1,5 +1,5 @@
-#ifndef LEXICONDM_COUPLINGS_H
-#define LEXICONDM_COUPLINGS_H
+#ifndef LEXICONHC_COUPLINGS_H
+#define LEXICONHC_COUPLINGS_H
 
 
 // Default values of parameters as in mod_Parameters.F90
@@ -61,7 +61,7 @@
   COUPLING_COMMAND(cgsgs_tilde, efthbasis, 0.)
 
 
-namespace LexiConDMCouplings{
+namespace LexiConHCCouplings{
 #define COUPLING_COMMAND(NAME, PREFIX, DEFVAL) coupl_##PREFIX##_##NAME,
 
   enum Amplitude_JHUGen_CouplingType{

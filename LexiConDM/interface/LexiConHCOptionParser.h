@@ -1,5 +1,5 @@
-#ifndef LEXICONDM_OPTIONPARSER_H
-#define LEXICONDM_OPTIONPARSER_H
+#ifndef LEXICONHC_OPTIONPARSER_H
+#define LEXICONHC_OPTIONPARSER_H
 
 #include <iostream>
 #include <cstdio>
@@ -8,33 +8,33 @@
 #include <vector>
 #include <utility>
 #include <unordered_map>
-#include "LexiConDMIOHelpers.h"
+#include "LexiConHCIOHelpers.h"
 
 
-class LexiConDMOptionParser{
+class LexiConHCOptionParser{
 public:
   static bool globalHelpFlag;
 
 protected:
   std::vector<std::string> rawOptions;
 
-  LexiConDMIOHelpers::IOBasisType basis_input;
-  LexiConDMIOHelpers::IOBasisType basis_output;
+  LexiConHCIOHelpers::IOBasisType basis_input;
+  LexiConHCIOHelpers::IOBasisType basis_output;
 
   std::unordered_map<std::string, bool> flags;
   std::unordered_map<std::string, double> parameters;
   std::unordered_map<std::string, std::pair<double, double> > couplings;
 
 public:
-  LexiConDMOptionParser(int argc, char** argv);
-  ~LexiConDMOptionParser(){}
+  LexiConHCOptionParser(int argc, char** argv);
+  ~LexiConHCOptionParser(){}
 
   void analyze();
   void interpretOption(std::string const& wish, std::string const& value, bool& invalidOption);
   void printOptionsHelp(bool command_fail) const;
 
-  LexiConDMIOHelpers::IOBasisType const& getInputBasis() const{ return basis_input; }
-  LexiConDMIOHelpers::IOBasisType const& getOutputBasis() const{ return basis_output; }
+  LexiConHCIOHelpers::IOBasisType const& getInputBasis() const{ return basis_input; }
+  LexiConHCIOHelpers::IOBasisType const& getOutputBasis() const{ return basis_output; }
 
   std::unordered_map<std::string, bool>& getInputFlags(){ return flags; }
   std::unordered_map<std::string, bool> const& getInputFlags() const{ return flags; }

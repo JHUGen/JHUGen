@@ -1,16 +1,16 @@
 #include <exception>
 #include <iostream>
-#include "LexiConDMOptionParser.h"
-#include "LexiConDMTranslator.h"
+#include "LexiConHCOptionParser.h"
+#include "LexiConHCTranslator.h"
 
 
 int main(int argc, char** argv){
   using namespace std;
 
   try{
-    LexiConDMOptionParser options(argc, argv);
-    if (!LexiConDMOptionParser::globalHelpFlag){
-      LexiConDMTranslator translator(options);
+    LexiConHCOptionParser options(argc, argv);
+    if (!LexiConHCOptionParser::globalHelpFlag){
+      LexiConHCTranslator translator(options);
       bool firstEntry = true;
       for (auto const& it:translator.getParameters()){
         if (!firstEntry) cout << " ";

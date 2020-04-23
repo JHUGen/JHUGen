@@ -3,23 +3,23 @@
 #include <cstdlib>
 #include <cmath>
 #include <iostream>
-#include "LexiConDMCouplings.h"
-#include "LexiConDMTranslator.h"
-#include "LexiConDMHelperFunctions.h"
+#include "LexiConHCCouplings.h"
+#include "LexiConHCTranslator.h"
+#include "LexiConHCHelperFunctions.h"
 
 
 using namespace std;
-using namespace LexiConDMHelperFunctions;
-using namespace LexiConDMIOHelpers;
-using namespace LexiConDMCouplings;
+using namespace LexiConHCHelperFunctions;
+using namespace LexiConHCIOHelpers;
+using namespace LexiConHCCouplings;
 
 
-LexiConDMTranslator::LexiConDMTranslator(LexiConDMOptionParser const& opts_) :
+LexiConHCTranslator::LexiConHCTranslator(LexiConHCOptionParser const& opts_) :
   opts(opts_)
 {
   translate();
 }
-void LexiConDMTranslator::translate(){
+void LexiConHCTranslator::translate(){
   auto const& input_flags = opts.getInputFlags();
   auto const& input_parameters = opts.getInputParameters();
   auto const& input_couplings = opts.getInputCouplings();
@@ -46,8 +46,8 @@ void LexiConDMTranslator::translate(){
   interpretOutputCouplings(basis_output, input_flags, input_parameters, voutput);
 }
 
-std::vector<std::vector<double>> LexiConDMTranslator::getTranslationMatrix(
-  LexiConDMIOHelpers::IOBasisType const& basis_input, LexiConDMIOHelpers::IOBasisType const& basis_output,
+std::vector<std::vector<double>> LexiConHCTranslator::getTranslationMatrix(
+  LexiConHCIOHelpers::IOBasisType const& basis_input, LexiConHCIOHelpers::IOBasisType const& basis_output,
   std::unordered_map<std::string, double> const& input_parameters
 ) const{
   double sw; getValueWithDefault<std::string, double>(input_parameters, "sin2ThetaW", sw, DEFVAL_SW);
@@ -129,15 +129,15 @@ std::vector<std::vector<double>> LexiConDMTranslator::getTranslationMatrix(
   }
 
   if (res.empty()){
-    cerr << "LexiConDMTranslator::getTranslationMatrix: Translation from input basis " << basis_input << " to output basis " << basis_output << " is not implemented." << endl;
+    cerr << "LexiConHCTranslator::getTranslationMatrix: Translation from input basis " << basis_input << " to output basis " << basis_output << " is not implemented." << endl;
     assert(0);
   }
 
   return res;
 }
 
-std::vector< std::pair<double, double> > LexiConDMTranslator::getOrderedInputCouplings(
-  LexiConDMIOHelpers::IOBasisType const& basis_input,
+std::vector< std::pair<double, double> > LexiConHCTranslator::getOrderedInputCouplings(
+  LexiConHCIOHelpers::IOBasisType const& basis_input,
   std::unordered_map<std::string, bool> const& input_flags,
   std::unordered_map<std::string, double> const& input_parameters,
   std::unordered_map<std::string, std::pair<double, double> > const& input_couplings
@@ -186,7 +186,7 @@ std::vector< std::pair<double, double> > LexiConDMTranslator::getOrderedInputCou
     break;
   }
   default:
-    cerr << "LexiConDMTranslator::getOrderedInputCouplings: Input basis " << basis_input << " is not implemented." << endl;
+    cerr << "LexiConHCTranslator::getOrderedInputCouplings: Input basis " << basis_input << " is not implemented." << endl;
     assert(0);
   }
 
@@ -195,8 +195,8 @@ std::vector< std::pair<double, double> > LexiConDMTranslator::getOrderedInputCou
   return res;
 }
 
-void LexiConDMTranslator::interpretOutputCouplings(
-  LexiConDMIOHelpers::IOBasisType const& basis_output,
+void LexiConHCTranslator::interpretOutputCouplings(
+  LexiConHCIOHelpers::IOBasisType const& basis_output,
   std::unordered_map<std::string, bool> const& input_flags,
   std::unordered_map<std::string, double> const& input_parameters,
   std::vector< std::pair<double, double> >& output_vector
@@ -233,7 +233,7 @@ void LexiConDMTranslator::interpretOutputCouplings(
     break;
   }
   default:
-    cerr << "LexiConDMTranslator::interpretOutputCouplings: Output basis " << basis_output << " is not implemented." << endl;
+    cerr << "LexiConHCTranslator::interpretOutputCouplings: Output basis " << basis_output << " is not implemented." << endl;
     assert(0);
   }
 

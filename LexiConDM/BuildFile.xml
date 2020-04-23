@@ -5,7 +5,7 @@
 
 <Flags CPPDEFINES="CMSSW_VERSION=$(shell echo ${CMSSW_VERSION}|sed -e s/CMSSW_// -e s/_//g -e s/patch\.//)"/>
 
-<flags CPPFLAGS="-Wall -Wextra -Wpedantic -I$(CMSSW_BASE)/src/LexiConDM/LexiConDM/interface/" />
+<flags CPPFLAGS="-Wall -Wextra -Wpedantic -I$(CMSSW_BASE)/src/LexiConHC/LexiConHC/interface/" />
 
 <export>
   <lib name="1"/>

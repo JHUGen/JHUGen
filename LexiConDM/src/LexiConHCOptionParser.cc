@@ -1,19 +1,19 @@
 #include <exception>
 #include <cstdlib>
 #include <iostream>
-#include "LexiConDMCouplings.h"
-#include "LexiConDMOptionParser.h"
-#include "LexiConDMHelperFunctions.h"
+#include "LexiConHCCouplings.h"
+#include "LexiConHCOptionParser.h"
+#include "LexiConHCHelperFunctions.h"
 
 
 using namespace std;
-using namespace LexiConDMHelperFunctions;
-using namespace LexiConDMIOHelpers;
+using namespace LexiConHCHelperFunctions;
+using namespace LexiConHCIOHelpers;
 
 
-bool LexiConDMOptionParser::globalHelpFlag = false;
+bool LexiConHCOptionParser::globalHelpFlag = false;
 
-LexiConDMOptionParser::LexiConDMOptionParser(int argc, char** argv) :
+LexiConHCOptionParser::LexiConHCOptionParser(int argc, char** argv) :
   basis_input(nIOBases),
   basis_output(nIOBases)
 {
@@ -24,7 +24,7 @@ LexiConDMOptionParser::LexiConDMOptionParser(int argc, char** argv) :
 
   analyze();
 }
-void LexiConDMOptionParser::analyze(){
+void LexiConHCOptionParser::analyze(){
   bool hasInvalidOption=false;
   char rawdelimiter = '=';
   for (unsigned int opt=1; opt<rawOptions.size(); opt++){
@@ -36,20 +36,20 @@ void LexiConDMOptionParser::analyze(){
     hasInvalidOption |= isInvalidOption;
   }
 
-  if (LexiConDMOptionParser::globalHelpFlag){ printOptionsHelp(false); return; }
+  if (LexiConHCOptionParser::globalHelpFlag){ printOptionsHelp(false); return; }
 
-  if (basis_input == nIOBases || basis_output == nIOBases){ cerr << "LexiConDMOptionParser::analyze: You have to specify the input and output basis types." << endl; if (!hasInvalidOption) hasInvalidOption=true; }
+  if (basis_input == nIOBases || basis_output == nIOBases){ cerr << "LexiConHCOptionParser::analyze: You have to specify the input and output basis types." << endl; if (!hasInvalidOption) hasInvalidOption=true; }
 
   // Print help if needed and abort at this point, nowhere later
   if (hasInvalidOption) printOptionsHelp(hasInvalidOption);
 }
 
-void LexiConDMOptionParser::interpretOption(std::string const& wish, std::string const& value, bool& invalidOption){
+void LexiConHCOptionParser::interpretOption(std::string const& wish, std::string const& value, bool& invalidOption){
   invalidOption=false;
   if (wish.empty()){
-    if (value=="help") LexiConDMOptionParser::globalHelpFlag = true;
+    if (value=="help") LexiConHCOptionParser::globalHelpFlag = true;
     else{
-      cerr << "LexiConDMOptionParser::interpretOption: Unknown unspecified argument: " << value << endl;
+      cerr << "LexiConHCOptionParser::interpretOption: Unknown unspecified argument: " << value << endl;
       invalidOption=true;
     }
   }
@@ -77,9 +77,9 @@ void LexiConDMOptionParser::interpretOption(std::string const& wish, std::string
   else cerr << "Unknown specified argument: " << value << " with specifier " << wish << endl;
 }
 
-void LexiConDMOptionParser::printOptionsHelp(bool command_fail)const{
+void LexiConHCOptionParser::printOptionsHelp(bool command_fail)const{
   cout << endl;
-  cout << "The options implemented in LexiConDM (format: specifier=value):\n\n";
+  cout << "The options implemented in LexiConHC (format: specifier=value):\n\n";
 
   cout << "- input_basis: Input coupling conventions\n\n";
   cout << "- output_basis: Output coupling conventions\n\n";
