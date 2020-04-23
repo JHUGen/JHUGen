@@ -5647,7 +5647,7 @@ SUBROUTINE EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell)
 use ModParameters
 implicit none
 
-logical, optional :: useAonshell
+logical, intent(in) :: useAonshell
       !logical, intent(in) :: HDecays
       !logical, intent(in), optional :: PhoOnshell
       !logical, optional :: ZAinterference
@@ -5669,9 +5669,6 @@ logical, optional :: useAonshell
 !      logical, parameter :: breit_wigner = .true.
       real(8) :: jacobian4, jacobian5
       logical :: hasAonshell, hasInterference
-
-
-      hasAonshell = useAonshell
       !if(present(PhoOnshell)) then
       !   hasAonshell=PhoOnshell
       !endif
@@ -5712,6 +5709,12 @@ logical, optional :: useAonshell
 !444444444444
 !energy of 4 in the CM frame of 3
       MomExt(1,4)=(inv_mass(3)**2+(inv_mass(4)+inv_mass(5))*(inv_mass(4)-inv_mass(5)))/2d0/inv_mass(3)
+
+      if(MomExt(1,4).lt.0d0)then
+        MomExt=0d0
+        PSWgt=0d0
+      endif
+
 !|3-momentum| of 4 in the CM frame of 3
       cm_abs3p(4) = dsqrt((MomExt(1,4)+inv_mass(4)) * (MomExt(1,4)-inv_mass(4)))
 !generating cos(theta_4) and phi_4 in the CM frame of 3
@@ -5740,7 +5743,7 @@ logical, optional :: useAonshell
       MomExt(1:4,5) = MomExt(1:4,3) - MomExt(1:4,4)
 
 !666666666666666666
-      if(.not.hasAonshell) then
+      if(.not.useAonshell) then
 !invariant mass of 6
          inv_mass(6)=0d0
 !energy of 6 in the CM frame of 4
@@ -5816,7 +5819,6 @@ logical, optional :: useAonshell
 !pause
 
       if(isnan(PSWgt).or.PSWgt.eq.0d0)then
-        !print *,  "()",inv_mass, jacobian4, jacobian5, cm_abs3p(4), PSWgt, "()"
         MomExt=0d0
         PSWgt=0d0
       endif

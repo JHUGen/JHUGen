@@ -2180,7 +2180,7 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
     real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
     real(8) :: MomExt(1:4,1:9), PSWgt, PSWgt2,NewME2(1:6)
     real(8) :: me2!, lheweight(-6:6,-6:6)
-    integer :: i,j,k,NBin(1:NumHistograms),NHisto
+    integer :: i,j,k,h,NBin(1:NumHistograms),NHisto
     real(8) :: DKWgt, LO_Res_Unpol, PreFac
     logical :: applyPSCut !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!phase space cuts?
     real(8) :: cyRnd(4)
@@ -2268,7 +2268,8 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
     if (id(6).eq.-id(7) .and. id(6).lt.0) then
       call swap(id(6),id(7))
     endif
-    if(IsAWDecay(DecayMode1)) then
+
+    if(IsAWDecay(DecayMode1) .or. ( IsALHENeutrino(id(6)) .or. IsALHENeutrino(id(7)) )) then
       helicity(6)=sign(1d0,-dble(id(6)))
       helicity(7)=-helicity(6)
     endif
@@ -2276,6 +2277,16 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
       DkWgt = DKWgt*6d0 ! H->bb decay
     endif
 
+    if( ( ( IsALHENeutrino(id(6)) .or. IsALHENeutrino(id(7)) ) .and. (.not.includeVprime) ) &
+     .or. (IsAWDecay(DecayMode1)) )then
+      DkWgt = DkWgt ! left helicity only
+!print*, DkWgt      
+    else
+      DkWgt = DkWgt * 2d0 ! 2 possible helicities
+!print*, DkWgt 
+    endif
+
+!print*, id(6:7),helicity(6:7)
 
 if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
 !if pp collider
@@ -2296,7 +2307,7 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 !print*,includeGammaStar
-      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell=IsAPhoton(DecayMode1))
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,IsAPhoton(DecayMode1))
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell=IsAPhoton(DecayMode1))
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -2316,6 +2327,7 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
         if (abs(LHA2M_PDF(i)).ne.6   .and.   abs(LHA2M_PDF(j)).ne.6.  .and.  i.ne.0)then
           call EvalAmp_VHiggs(id,helicity,MomExt,me2)
           if(IsNaN(me2).or.(me2.eq.0d0))return
+          !if(IsNaN(me2))return
           if(H_DK.eqv..false.)me2=me2*(M_Reso*Ga_Reso)**2!remove erroneous H propagator with stable H in mod_VHiggs.F90 
 
 
@@ -2335,6 +2347,7 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
           LO_Res_Unpol = me2/3d0*pdf(i,1)*pdf(j,2)* PreFac
           EvalWeighted_VHiggs = EvalWeighted_VHiggs + LO_Res_Unpol
           !lheweight(i,j)=LO_Res_Unpol
+
       enddo
 
 !if e+ e- collider
@@ -2353,7 +2366,7 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell=IsAPhoton(DecayMode1))
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,IsAPhoton(DecayMode1))
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell=IsAPhoton(DecayMode1))
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -2388,7 +2401,8 @@ elseif( IsAWDecay(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,IsAPhoton(DecayMode1))
+
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -2423,6 +2437,7 @@ elseif( IsAWDecay(DecayMode1) ) then
              helicity(7)=-helicity(6)
              call EvalAmp_VHiggs(id2,helicity,MomExt,me2)
              if(IsNaN(me2).or.(me2.eq.0d0))return
+             if(H_DK.eqv..false.)me2=me2*(M_Reso*Ga_Reso)**2!remove erroneous H propagator with stable H in mod_VHiggs.F90
          else
              me2=0d0
          endif
@@ -2605,7 +2620,7 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1)) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell=IsAPhoton(DecayMode1))
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,IsAPhoton(DecayMode1))
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell=IsAPhoton(DecayMode1))
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -2634,7 +2649,7 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1)) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell=IsAPhoton(DecayMode1))
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,IsAPhoton(DecayMode1))
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell=IsAPhoton(DecayMode1))
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -2659,7 +2674,7 @@ elseif( IsAWDecay(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,IsAPhoton(DecayMode1))
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
