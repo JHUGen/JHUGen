@@ -5665,7 +5665,7 @@ implicit none
 !use Cauchy distribution for Breit-Wigner distribution for the invariant mass of 2 and 3?
 !      logical, parameter :: breit_wigner = .true.
       real(8) :: jacobian4, jacobian5
-      logical :: hasAonshell, hasInterference
+      logical :: hasInterference
       !if(present(PhoOnshell)) then
       !   hasAonshell=PhoOnshell
       !endif
@@ -5690,7 +5690,7 @@ implicit none
       endif
 
 !4444444444
-      if(hasAonshell) then
+      if(useAonshell) then
         inv_mass(4) = mass(4,1)
 !print*,inv_mass(4),mass(4,1)
         jacobian4=1d0
