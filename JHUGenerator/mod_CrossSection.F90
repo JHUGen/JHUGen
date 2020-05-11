@@ -2183,14 +2183,14 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
     integer :: i,j,k,h,NBin(1:NumHistograms),NHisto
     real(8) :: DKWgt, LO_Res_Unpol, PreFac
     logical :: applyPSCut !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!phase space cuts?
-    real(8) :: cyRnd(4)
+    real(8) :: cyRnd(4),Wdecrnd
 
     real(8) :: inv_mass(9),mass(9,2)
     !double precision beam_momentum(2,4), four_momentum(7,4),inv_mass(7),mass(7,2)
     real(8) :: helicity(9)!, beam_h(2) !helicities
-    integer :: id(9), id2(9)!, beam_id(2)
+    integer :: id(9), id2(9), idjhuvv(1:4)!, beam_id(2)
     integer :: tmp_idup(1:3), tmp_icolup(1:2,1:2)
-    integer :: nVhels
+    integer :: nVhels, nISs
 
 
     EvalWeighted_VHiggs=0d0
@@ -2205,6 +2205,7 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
     mass(4,1)=M_V
     mass(4,2)=Ga_V
     nVhels=2
+    nISs=0
     if(IsAPhoton(DecayMode1))then
        if (includeVprime .and. Ga_Vprime.gt.0d0) then
           mass(3,1)=(M_V+M_Vprime)/2d0
@@ -2267,6 +2268,18 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
     if (tmp_idup(3).ne.Not_a_particle_)then
       id(7)=convertLHE(tmp_idup(3))
     endif
+
+    if(IsAWDecay(DecayMode1)) then
+       call random_number(Wdecrnd)
+       if(Wdecrnd.gt.0.5d0) then
+          call swap(id(6),id(7))
+          id(3) = -id(3)
+          id(4) = -id(4)
+          id(6) = -id(6)
+          id(7) = -id(7)
+      endif
+    endif
+
     if (id(6).eq.-id(7) .and. id(6).lt.0) then
       call swap(id(6),id(7))
     endif
@@ -2322,7 +2335,7 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
         id(1:2) = (/LHA2M_PDF(i),LHA2M_PDF(j)/)
         if (abs(LHA2M_PDF(i)).ne.6   .and.   abs(LHA2M_PDF(j)).ne.6.  .and.  i.ne.0)then
           call EvalAmp_VHiggs(id,helicity,MomExt,me2)
-          if(IsNaN(me2).or.(me2.eq.0d0))return
+          if(IsNaN(me2))return
           !if(IsNaN(me2))return
           if(H_DK.eqv..false.)me2=me2*(M_Reso*Ga_Reso)**2!remove erroneous H propagator with stable H in mod_VHiggs.F90
 
@@ -2340,7 +2353,8 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
         else
           me2=0d0
         endif
-          LO_Res_Unpol = me2/3d0*pdf(i,1)*pdf(j,2)* PreFac
+          LO_Res_Unpol = me2*pdf(i,1)*pdf(j,2)* PreFac
+          if (LO_Res_Unpol.ne.0d0) nISs = nISs+1
           EvalWeighted_VHiggs = EvalWeighted_VHiggs + LO_Res_Unpol
           !lheweight(i,j)=LO_Res_Unpol
 
@@ -2373,9 +2387,10 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
       id(2)=convertLHE(ElM_)
       id(1)=-id(2)
       call EvalAmp_VHiggs(id,helicity,MomExt,me2)
-      if(IsNaN(me2).or.(me2.eq.0d0))return
+      if(IsNaN(me2))return
       if(H_DK.eqv..false.)me2=me2*(M_Reso*Ga_Reso)**2!remove erroneous H propagator with stable H in mod_VHiggs.F90
       LO_Res_Unpol =me2 * PreFac
+      if (LO_Res_Unpol.ne.0d0) nISs = nISs+1
       EvalWeighted_VHiggs = LO_Res_Unpol
 
     endif
@@ -2411,22 +2426,31 @@ elseif( IsAWDecay(DecayMode1) ) then
       do i = -5,5
       do j = -5,5
          if (i.eq.0 .or. j.eq.0) cycle
+         if (modulo(abs(i),2).eq.modulo(abs(j),2) .or. i*j.gt.0) cycle
 
          id2=id
          id2(1:2) = (/i,j/)
 
-         if (CoupledVertex(id2(1:2),-1) .ne. CoupledVertex(id2(6:7),-1)) cycle
+         idjhuvv(1)=ConvertLHEReverse(id2(1))
+         idjhuvv(2)=ConvertLHEReverse(id2(2))
+         idjhuvv(3)=ConvertLHEReverse(id2(6))
+         idjhuvv(4)=ConvertLHEReverse(id2(7))
+
+         if (CoupledVertex(idjhuvv(1:2),-1) .ne. CoupledVertex(idjhuvv(3:4),-1)) cycle
 
          call EvalAmp_VHiggs(id2,helicity,MomExt,me2)
-         if(IsNaN(me2).or.(me2.eq.0d0))return
+         if(IsNaN(me2))return
          if(H_DK.eqv..false.)me2=me2*(M_Reso*Ga_Reso)**2!remove erroneous H propagator with stable H in mod_VHiggs.F90
 
          LO_Res_Unpol = me2 *pdf(LHA2M_PDF(i),1)*pdf(LHA2M_PDF(j),2) * PreFac
+         if (LO_Res_Unpol.ne.0d0) nISs = nISs+1
          EvalWeighted_VHiggs = EvalWeighted_VHiggs+LO_Res_Unpol
       enddo
       enddo
 
 endif
+
+   if (nISs.gt.0) EvalWeighted_VHiggs = EvalWeighted_VHiggs / dble(nISs)
 
    cyRnd(1)=yRnd(9)
    cyRnd(2)=yRnd(8)
@@ -2488,12 +2512,13 @@ integer :: i,j,k,ifound,jfound
 integer :: NBin(1:NumHistograms),NHisto
 real(8) :: DKWgt, LO_Res_Unpol, PreFac, CS_max, sumtot
 logical :: applyPSCut,genEVT
-real(8) :: cyRnd(4)
+real(8) :: cyRnd(4),Wdecrnd
 real(8) :: inv_mass(9),mass(9,2)
 !real(8) :: beam_momentum(2,4), four_momentum(7,4),inv_mass(7),mass(7,2)
 real(8) :: helicity(9) !helicities
-integer :: id(9), id2(9)
+integer :: id(9), id2(9),idjhuvv(1:4)
 integer :: tmp_idup(1:3), tmp_icolup(1:2,1:2)
+integer :: nVhels, nISs
 include 'csmaxvalue.f'
 
 EvalUnWeighted_VHiggs = 0d0
@@ -2501,6 +2526,10 @@ EvalUnWeighted_VHiggs = 0d0
 DKWgt=1d0
 id(:)=0
 helicity(:)=0
+ifound=0
+jfound=0
+nVhels=2
+nISs=0
 
 mass(1:2,1:2)=0d0
 mass(3,1)=M_V
@@ -2568,16 +2597,31 @@ endif
 if (tmp_idup(3).ne.Not_a_particle_)then
    id(7)=convertLHE(tmp_idup(3))
 endif
+
+if(IsAWDecay(DecayMode1)) then
+   call random_number(Wdecrnd)
+   if(Wdecrnd.gt.0.5d0) then
+      call swap(id(6),id(7))
+      id(3) = -id(3)
+      id(4) = -id(4)
+      id(6) = -id(6)
+      id(7) = -id(7)
+   endif
+endif
 if (id(6).eq.-id(7) .and. id(6).lt.0) then
    call swap(id(6),id(7))
 endif
-if(IsAWDecay(DecayMode1)) then
+
+if((IsAWDecay(DecayMode1) .or. IsALHENeutrino(id(6)) .or. IsALHENeutrino(id(7))) .and. .not. includeVprime) then
    helicity(6)=sign(1d0,-dble(id(6)))
    helicity(7)=-helicity(6)
+   nVhels=1
 endif
 if(H_DK) then
    DkWgt = DKWgt*6d0 ! H->bb decay
 endif
+
+DkWgt = DkWgt * dble(nVhels) ! 2 possible helicities
 
 
 
@@ -2672,8 +2716,12 @@ IF( GENEVT ) THEN
    do i = -5,5
       do j = -5,5
          sumtot = sumtot + csmax(i,j)
+         !print *,"csmax",i,j,csmax(i,j)
       enddo
    enddo
+   if (sumtot.eq.0d0) then
+      call Error("sumtot==0")
+   endif
 
    k=0; bound(0)=0d0
    do i = -5,5
@@ -2687,6 +2735,9 @@ IF( GENEVT ) THEN
       enddo
    enddo
 1313 continue
+   if (ifound.eq.0 .or. jfound.eq.0) then
+     return
+   endif
 
 
 if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
@@ -2714,18 +2765,26 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
 elseif( IsAWDecay(DecayMode1) ) then
 !pp>WH
     id(1:2) = (/ifound,jfound/)
-    if( ((id(1).eq.convertLHE(AUp_).or.id(1).eq.convertLHE(AChm_)) .and. &
-     (id(2).eq.convertLHE(Dn_) .or. id(2).eq.convertLHE(Str_) .or. id(2).eq.convertLHE(Bot_))) .or. &
-    ((id(2).eq.convertLHE(AUp_).or. id(2).eq.convertLHE(AChm_)) .and. &
-     (id(1).eq.convertLHE(Dn_) .or. id(1).eq.convertLHE(Str_) .or. id(1).eq.convertLHE(Bot_)))   )then
+
+    idjhuvv(1)=ConvertLHEReverse(id(1))
+    idjhuvv(2)=ConvertLHEReverse(id(2))
+    idjhuvv(3)=ConvertLHEReverse(id(6))
+    idjhuvv(4)=ConvertLHEReverse(id(7))
+
+    if (CoupledVertex(idjhuvv(1:2),-1) .eq. -CoupledVertex(idjhuvv(3:4),-1)) then
+      call swap(id(6), id(7))
       id(3)=-id(3)
       id(4)=-id(4)
       id(6)=-id(6)
       id(7)=-id(7)
-      helicity(6)=sign(1d0,-dble(id(6)))
-      helicity(7)=-helicity(6)
     endif
+
     call EvalAmp_VHiggs(id,helicity,MomExt,me2)
+    !if(me2.eq.0d0) then
+    !  print *,"ME2=0 for id1,2,6,7=",id(1:2),id(6:7),helicity(1:2),helicity(6:7)
+    !else
+    !  print *,"ME2 non-zero for id1,2,6,7=",id(1:2),id(6:7),helicity(1:2),helicity(6:7)
+    !endif
     if(IsNaN(me2).or.(me2.eq.0d0))return
     if(H_DK.eqv..false.)me2=me2*(M_Reso*Ga_Reso)**2!remove erroneous H propagator with stable H in mod_VHiggs.F90
     LO_Res_Unpol = me2 *pdf(LHA2M_PDF(ifound),1)*pdf(LHA2M_PDF(jfound),2) * PreFac
@@ -2769,16 +2828,17 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
 !if pp collider
   if(Collider.eq.1)then
   do i = -5,5
+    if (i.eq.0) cycle
+
     j = -i
     id(1:2) = (/i,j/)
-    if (abs(i).ne.0)then
-      call EvalAmp_VHiggs(id,helicity,MomExt,me2)
-      if(IsNaN(me2).or.(me2.eq.0d0))return
-      if(H_DK.eqv..false.)me2=me2*(M_Reso*Ga_Reso)**2!remove erroneous H propagator with stable H in mod_VHiggs.F90
-    else
-      me2=0d0
-    endif
+
+    call EvalAmp_VHiggs(id,helicity,MomExt,me2)
+    if(IsNaN(me2))return
+    if(H_DK.eqv..false.)me2=me2*(M_Reso*Ga_Reso)**2!remove erroneous H propagator with stable H in mod_VHiggs.F90
+
     LO_Res_Unpol = me2 *pdf(LHA2M_PDF(i),1)*pdf(LHA2M_PDF(j),2) * PreFac
+    if (LO_Res_Unpol .ne. 0d0) nISs=nISs+1
     EvalUnWeighted_VHiggs = EvalUnWeighted_VHiggs+LO_Res_Unpol
     RES(i,j) = LO_Res_Unpol
     if (LO_Res_Unpol.gt.csmax(i,j)) then
@@ -2790,9 +2850,10 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
     id(2)=convertLHE(ElM_)
     id(1)=-id(2)
     call EvalAmp_VHiggs(id,helicity,MomExt,me2)
-    if(IsNaN(me2).or.(me2.eq.0d0))return
+    if(IsNaN(me2))return
     if(H_DK.eqv..false.)me2=me2*(M_Reso*Ga_Reso)**2!remove erroneous H propagator with stable H in mod_VHiggs.F90
     LO_Res_Unpol = me2 * PreFac
+    if (LO_Res_Unpol .ne. 0d0) nISs=nISs+1
     EvalUnWeighted_VHiggs = EvalUnWeighted_VHiggs + LO_Res_Unpol
     RES(0,0) = LO_Res_Unpol
     if (LO_Res_Unpol.gt.csmax(0,0)) then
@@ -2803,35 +2864,29 @@ elseif( IsAWDecay(DecayMode1) ) then
 !pp>WH
   do i = -5,5
   do j = -5,5
-     id2=id
-     id2(1:2) = (/i,j/)
-     if    ( ((id2(1).eq.convertLHE(Up_).or.id2(1).eq.convertLHE(Chm_)) .and. &
-      (id2(2).eq.convertLHE(ADn_) .or. id2(2).eq.convertLHE(AStr_) .or. id2(2).eq.convertLHE(ABot_))) .or. &
-     ((id2(2).eq.convertLHE(Up_).or.id2(2).eq.convertLHE(Chm_)) .and. &
-      (id2(1).eq.convertLHE(ADn_) .or. id2(1).eq.convertLHE(AStr_) .or. id2(1).eq.convertLHE(ABot_)))   )then
-           helicity(6)=sign(1d0,-dble(id2(6)))
-           helicity(7)=-helicity(6)
-           call EvalAmp_VHiggs(id2,helicity,MomExt,me2)
-           if(IsNaN(me2).or.(me2.eq.0d0))return
-           if(H_DK.eqv..false.)me2=me2*(M_Reso*Ga_Reso)**2!remove erroneous H propagator with stable H in mod_VHiggs.F90
-     elseif( ((id2(1).eq.convertLHE(AUp_).or.id2(1).eq.convertLHE(AChm_)) .and. &
-      (id2(2).eq.convertLHE(Dn_) .or. id2(2).eq.convertLHE(Str_) .or. id2(2).eq.convertLHE(Bot_))) .or. &
-     ((id2(2).eq.convertLHE(AUp_).or. id2(2).eq.convertLHE(AChm_)) .and. &
-      (id2(1).eq.convertLHE(Dn_) .or. id2(1).eq.convertLHE(Str_) .or. id2(1).eq.convertLHE(Bot_)))   )then
-           id2(3)=-id2(3)
-           id2(4)=-id2(4)
-           id2(6)=-id2(6)
-           id2(7)=-id2(7)
-           helicity(6)=sign(1d0,-dble(id2(6)))
-           helicity(7)=-helicity(6)
-           call EvalAmp_VHiggs(id2,helicity,MomExt,me2)
-           if(IsNaN(me2).or.(me2.eq.0d0))return
-           if(H_DK.eqv..false.)me2=me2*(M_Reso*Ga_Reso)**2!remove erroneous H propagator with stable H in mod_VHiggs.F90
-     else
-           me2=0d0
-     endif
+    if (i.eq.0 .or. j.eq.0) cycle
+    if (modulo(abs(i),2).eq.modulo(abs(j),2) .or. i*j.gt.0) cycle
+
+    id2=id
+    id2(1:2) = (/i,j/)
+
+    idjhuvv(1)=ConvertLHEReverse(id2(1))
+    idjhuvv(2)=ConvertLHEReverse(id2(2))
+    idjhuvv(3)=ConvertLHEReverse(id2(6))
+    idjhuvv(4)=ConvertLHEReverse(id2(7))
+
+    if (CoupledVertex(idjhuvv(1:2),-1) .ne. CoupledVertex(idjhuvv(3:4),-1)) cycle
+
+    call EvalAmp_VHiggs(id2,helicity,MomExt,me2)
+    !if (CoupledVertex(idjhuvv(3:4),-1).eq.Wm_) then
+    !   print *,"Wminus found:",me2,id2(1:2),id2(6:7),helicity(1:2),helicity(6:7)
+    !endif
+    if(IsNaN(me2))return
+    if(H_DK.eqv..false.)me2=me2*(M_Reso*Ga_Reso)**2!remove erroneous H propagator with stable H in mod_VHiggs.F90
+
     LO_Res_Unpol = me2 *pdf(LHA2M_PDF(i),1)*pdf(LHA2M_PDF(j),2) * PreFac
     EvalUnWeighted_VHiggs = EvalUnWeighted_VHiggs+LO_Res_Unpol
+    if (LO_Res_Unpol .ne. 0d0) nISs=nISs+1
     RES(i,j) = LO_Res_Unpol
     if (LO_Res_Unpol.gt.csmax(i,j)) then
       csmax(i,j) = LO_Res_Unpol
@@ -2840,6 +2895,9 @@ elseif( IsAWDecay(DecayMode1) ) then
   enddo
 endif
 
+if (nISs.gt.0) then
+  EvalUnWeighted_VHiggs = EvalUnWeighted_VHiggs / dble(nISs)
+endif
 
 ENDIF! GENEVT
 
