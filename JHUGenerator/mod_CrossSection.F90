@@ -2353,7 +2353,7 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
         else
           me2=0d0
         endif
-          LO_Res_Unpol = me2*pdf(i,1)*pdf(j,2)* PreFac
+          LO_Res_Unpol = me2*pdf(i,1)*pdf(j,2)* PreFac/3d0
           if (LO_Res_Unpol.ne.0d0) nISs = nISs+1
           EvalWeighted_VHiggs = EvalWeighted_VHiggs + LO_Res_Unpol
           !lheweight(i,j)=LO_Res_Unpol
@@ -2450,7 +2450,8 @@ elseif( IsAWDecay(DecayMode1) ) then
 
 endif
 
-   if (nISs.gt.0) EvalWeighted_VHiggs = EvalWeighted_VHiggs / dble(nISs)
+   !print *,"nISs",nISs
+   !if (nISs.gt.0) EvalWeighted_VHiggs = EvalWeighted_VHiggs / dble(nISs)
 
    cyRnd(1)=yRnd(9)
    cyRnd(2)=yRnd(8)
@@ -2747,7 +2748,7 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
     call EvalAmp_VHiggs(id,helicity,MomExt,me2)
     if(IsNaN(me2).or.(me2.eq.0d0))return
     if(H_DK.eqv..false.)me2=me2*(M_Reso*Ga_Reso)**2!remove erroneous H propagator with stable H in mod_VHiggs.F90
-    LO_Res_Unpol = me2 *pdf(LHA2M_PDF(ifound),1)*pdf(LHA2M_PDF(jfound),2) * PreFac
+    LO_Res_Unpol = me2 *pdf(LHA2M_PDF(ifound),1)*pdf(LHA2M_PDF(jfound),2) * PreFac / 3d0
     EvalUnWeighted_VHiggs = LO_Res_Unpol
 !if e+ e- collider
   else if(Collider.eq.0)then
@@ -2837,7 +2838,7 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
     if(IsNaN(me2))return
     if(H_DK.eqv..false.)me2=me2*(M_Reso*Ga_Reso)**2!remove erroneous H propagator with stable H in mod_VHiggs.F90
 
-    LO_Res_Unpol = me2 *pdf(LHA2M_PDF(i),1)*pdf(LHA2M_PDF(j),2) * PreFac
+    LO_Res_Unpol = me2 *pdf(LHA2M_PDF(i),1)*pdf(LHA2M_PDF(j),2) * PreFac / 3d0
     if (LO_Res_Unpol .ne. 0d0) nISs=nISs+1
     EvalUnWeighted_VHiggs = EvalUnWeighted_VHiggs+LO_Res_Unpol
     RES(i,j) = LO_Res_Unpol
