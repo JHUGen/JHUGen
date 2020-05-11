@@ -2736,7 +2736,7 @@ IF( GENEVT ) THEN
       enddo
    enddo
 1313 continue
-   if (ifound.eq.0 .or. jfound.eq.0) then
+   if (Collider.eq.1 .and. (ifound.eq.0 .or. jfound.eq.0)) then
      return
    endif
 
