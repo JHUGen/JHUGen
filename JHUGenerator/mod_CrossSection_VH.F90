@@ -65,7 +65,7 @@ Function EvalWeighted_VH(yRnd,VgsWgt)
   real(8) :: mu_Ren_save,mu_Fact_save,alphas_save
   integer :: qin,gin,itemp
 ! for tests!!!!!!!!!!!!!!
-!real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:10),MomExt1t(1:4,1:9),MomExt2t(1:4,1:9),MomExt3t(1:4,1:9),dummy
+real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:10),MomExt1t(1:4,1:9),MomExt2t(1:4,1:9),MomExt3t(1:4,1:9),dummy
 ! for tests!!!!!!!!!!!!!!
 
   EvalWeighted_VH=0d0
@@ -570,7 +570,7 @@ Function EvalWeighted_VH(yRnd,VgsWgt)
 !MomExt2t(:,7) = (/  0.67971422900874456d0,       -4.2592428426426909d-002  , -0.38805281221061005d0,      -0.55642819221632600d0     /)
 !MomExt2t(:,8) = (/   0.0000000000000000d0,        0.0000000000000000d0     ,   0.0000000000000000d0,        0.0000000000000000d0     /)
 !MomExt2t(:,9) = (/   0.0000000000000000d0,        0.0000000000000000d0     ,   0.0000000000000000d0,        0.0000000000000000d0     /)
-!! ======================
+! ======================
 !
 !
 !
@@ -657,6 +657,43 @@ stop 1
 
 
 
+!id(1:2) = (/2,-1/)
+!id(3)=convertLHE(Wp_)
+!id(7)=convertLHE(ElP_)
+!id(6)=convertLHE(NuE_)
+!print*,"========================="
+!do l=0,1
+!do p=0,1
+!!do q=0,1
+!print*,"helicities",(l*2-1),(p*2-1)!,(q*2-1)
+!call SetRunningScales( (/ MomExt1t(1:4,5),MomExt1t(1:4,6),MomExt1t(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
+!call EvalAlphaS()
+!print *, "alphas = ",alphas
+!call amp_VH_LO(MomExt1t(:,1:9),mass(3:5,:),(/dble(l*2-1),dble(1-l*2),helicity(3:5),dble(p*2-1),-dble(p*2-1),helicity(8:9)/),id(1:9),amp_dummy)
+!me2lo = dble(amp_dummy*dconjg(amp_dummy)) *QuarkColAvg**2 * 3d0
+!print*,"MomExt1t amptd = ",amp_dummy
+!print*,"MomExt1t me2lo = ",me2lo
+!!enddo
+!enddo
+!enddo
+!do l=0,1
+!do p=0,1
+!!do q=0,1
+!print*,"helicities",(l*2-1),(p*2-1)!,(q*2-1)
+!call SetRunningScales( (/ MomExt2t(1:4,5),MomExt2t(1:4,6),MomExt2t(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
+!call EvalAlphaS()
+!print *, "alphas = ",alphas
+!call amp_VH_LO(MomExt2t(:,1:9),mass(3:5,:),(/dble(l*2-1),dble(1-l*2),helicity(3:5),dble(p*2-1),-dble(p*2-1),helicity(8:9)/),id(1:9),amp_dummy)
+!me2lo = dble(amp_dummy*dconjg(amp_dummy)) *QuarkColAvg**2 * 3d0
+!print*,"MomExt2t amptd = ",amp_dummy
+!print*,"MomExt2t me2lo = ",me2lo
+!!enddo
+!enddo
+!enddo
+!pause
+
+
+
 
 
     !lo/qq
@@ -684,6 +721,7 @@ stop 1
         enddo
       !W
       elseif( IsAWDecay(DecayMode1) )then
+print *,"=================="
         do i = -5,5 !gluon = 0, otherwise PDG codes
         do j = -5,5
 
@@ -706,7 +744,10 @@ stop 1
           endif
           call amp_VH_LO(Mom(:,1:9),mass(3:5,:),helicity(1:9),id2(1:9),amp_dummy)
           me2lo = me2lo + dble(amp_dummy*dconjg(amp_dummy))*pdf(LHA2M_PDF(i),1)*pdf(LHA2M_PDF(j),2)
-         
+me2gg=dble(amp_dummy*dconjg(amp_dummy))
+if(me2gg.ne.0d0)then
+  print *,id2(1),int(helicity(1)),id2(2),int(helicity(2)),id2(6),int(helicity(6)),id2(7),int(helicity(7))
+endif
         enddo! parton
         enddo! parton
         me2lo = me2lo *PreFac *PostFac *QuarkColAvg**2 *3d0
@@ -1926,6 +1967,7 @@ stop 1
           me2gg = me2gg *PreFac *PostFac *GluonColAvg**2 *8d0
           RES(0,0) = me2gg
           EvalUnWeighted_VH=EvalUnWeighted_VH+me2gg
+!print*, EvalUnweighted_VH
           !update max weight
           if (me2gg.gt.csmax(0,0)) then
             csmax(0,0) = me2gg

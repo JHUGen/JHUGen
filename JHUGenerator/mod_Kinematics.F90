@@ -5644,8 +5644,10 @@ END SUBROUTINE
 SUBROUTINE EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell)
 use ModParameters
 implicit none
-
-      logical, optional :: useAonshell
+      logical, intent(in) :: useAonshell
+      !logical, intent(in) :: HDecays
+      !logical, intent(in), optional :: PhoOnshell
+      !logical, optional :: ZAinterference
       real(8), intent(in) :: yRnd(1:20),mass(9,2)
       real(8) :: phi, beta, gamma
       real(8) :: temp_vector(4), temp_boost(4)
@@ -5663,47 +5665,60 @@ implicit none
 !use Cauchy distribution for Breit-Wigner distribution for the invariant mass of 2 and 3?
 !      logical, parameter :: breit_wigner = .true.
       real(8) :: jacobian4, jacobian5
-      logical :: hasAonshell
+      logical :: hasInterference
+      !if(present(PhoOnshell)) then
+      !   hasAonshell=PhoOnshell
+      !endif
+      !hasInterference = .false.
+      !if(present(ZAinterference)) then
+      !   hasInterference=ZAinterference
+      !endif
 
-      hasAonshell = .false.
-      if(present(useAonshell)) then
-         hasAonshell=useAonshell
+      MomExt(:,4:9)=0d0
+      inv_mass(4:9)=0d0
+
+!333333333
+      inv_mass(3) = dsqrt((MomExt(1,3)+MomExt(4,3))*(MomExt(1,3)-MomExt(4,3)))
+
+!555555555
+      if(H_DK)then
+        inv_mass(5) = dsqrt(dabs(bw_sq(yRnd(13),mass(5,1), mass(5,2), inv_mass(3)**2, jacobian5)))
+        jacobian5 = jacobian5 /16d0 /Pi**2 != (ds5/2pi)*(1/8pi)
+      else
+        inv_mass(5) = mass(5,1)
+        jacobian5=1d0
       endif
 
-!3333333333
-!invariant mass of 3
-      if(mass(3,2).gt.0d0 .and. mass(3,1).gt.0d0) then
-         inv_mass(3) = dsqrt((MomExt(1,3)+MomExt(4,3))*(MomExt(1,3)-MomExt(4,3)))
+!4444444444
+      if(useAonshell) then
+        inv_mass(4) = mass(4,1)
+!print*,inv_mass(4),mass(4,1)
+        jacobian4=1d0
+      elseif(.not.hasInterference)then
+        inv_mass(4) = dsqrt(dabs(bw_sq(yRnd(12),mass(4,1), mass(4,2), (inv_mass(3)-inv_mass(5))**2, jacobian4)))
+        jacobian4 = jacobian4 /16d0 /Pi**2 != (ds4/2pi)*(1/8pi)
       else
-         inv_mass(3) = mass(3,1)
-      endif
-      if(mass(4,2).gt.0d0 .and. mass(4,1).gt.0d0) then
-         inv_mass(4) = dsqrt(dabs(bw_sq(yRnd(12),mass(4,1), mass(4,2), inv_mass(3)**2, jacobian4)))
-      else
-         inv_mass(4) = mass(4,1)
-         jacobian4=1d0
-      endif
-      if(mass(5,2).gt.0d0 .and. mass(5,1).gt.0d0) then
-         inv_mass(5) = dsqrt(dabs(bw_sq(yRnd(13),mass(5,1), mass(5,2), (inv_mass(3)-inv_mass(4))**2, jacobian5)))
-      else
-         inv_mass(5) = mass(5,1)
-         jacobian5=1d0
+        inv_mass(4) = dsqrt(dabs(bw_sq(yRnd(12),mass(4,1), mass(4,2), (inv_mass(3)-inv_mass(5))**2, jacobian4)))
+        !inv_mass(4) = dsqrt(one_over_s_sq(yRnd(12), MPhotonCutoff**2, (inv_mass(3)-inv_mass(5))**2, jacobian4))
+        jacobian4 = jacobian4 /16d0 /Pi**2
       endif
 
 !444444444444
 !energy of 4 in the CM frame of 3
-      if(dabs(inv_mass(3)).gt.0d0) then
-         MomExt(1,4)=(inv_mass(3)**2+(inv_mass(4)+inv_mass(5))*(inv_mass(4)-inv_mass(5)))/2d0/inv_mass(3)
-      else
-         MomExt(1,4)=0d0
+      MomExt(1,4)=(inv_mass(3)**2+(inv_mass(4)+inv_mass(5))*(inv_mass(4)-inv_mass(5)))/2d0/inv_mass(3)
+
+      if(MomExt(1,4).lt.0d0)then
+        MomExt=0d0
+        PSWgt=0d0
       endif
+
 !|3-momentum| of 4 in the CM frame of 3
       cm_abs3p(4) = dsqrt((MomExt(1,4)+inv_mass(4)) * (MomExt(1,4)-inv_mass(4)))
 !generating cos(theta_4) and phi_4 in the CM frame of 3
-      cm_cos_theta(4) = yRnd(6)
+      cm_cos_theta(4) = yRnd(7)
       cm_cos_theta(4) = cm_cos_theta(4)*2d0-1d0
       cm_sin_theta(4) = dsqrt((1d0+cm_cos_theta(4))  *(1d0-cm_cos_theta(4)))
-      phi = yRnd(7)
+      phi = yRnd(6)
       phi=Twopi*phi
       cm_cos_phi(4) = dcos(phi)
       cm_sin_phi(4) = dsin(phi)
@@ -5725,7 +5740,7 @@ implicit none
       MomExt(1:4,5) = MomExt(1:4,3) - MomExt(1:4,4)
 
 !666666666666666666
-      if(.not.hasAonshell) then
+      if(.not.useAonshell) then
 !invariant mass of 6
          inv_mass(6)=0d0
 !energy of 6 in the CM frame of 4
@@ -5734,10 +5749,10 @@ implicit none
          cm_abs3p(6)=MomExt(1,6)
 !generating cos(theta_6) and phi_6 in the CM frame of 4
 !z-axis is along the boost of 2
-         cm_cos_theta(6) = yRnd(8)
+         cm_cos_theta(6) = yRnd(9)
          cm_cos_theta(6) = cm_cos_theta(6)*2d0-1d0
          cm_sin_theta(6) = dsqrt((1d0+cm_cos_theta(6)) *(1d0-cm_cos_theta(6)))
-         cm_cos_phi(6) = yRnd(9)
+         cm_cos_phi(6) = yRnd(8)
          phi=Twopi*cm_cos_phi(6)
          cm_cos_phi(6) = dcos(phi)
          cm_sin_phi(6) = dsin(phi)
@@ -5761,58 +5776,54 @@ implicit none
       MomExt(1:4,7)=MomExt(1:4,4)-MomExt(1:4,6)
 
 !8888888888888888888888
+      if(H_DK)then
 !invariant mass of 8
-      inv_mass(8)=0d0
+        inv_mass(8)=0d0
 !energy of 8 in the CM frame of 5
-      MomExt(1,8)=inv_mass(5)/2d0
+        MomExt(1,8)=inv_mass(5)/2d0
 !|3-momentum| of 8 in the CM frame of 5
-      cm_abs3p(8)=MomExt(1,8)
+        cm_abs3p(8)=MomExt(1,8)
 !generating cos(theta_8) and phi_8 in the CM frame of 5
 !z-axis is along the boost of 5
-      cm_cos_theta(8) = yRnd(10)
-      cm_cos_theta(8) = cm_cos_theta(8)*2d0-1d0
-      cm_sin_theta(8) = dsqrt((1d0+cm_cos_theta(8)) *(1d0-cm_cos_theta(8)))
-      cm_cos_phi(8) = yRnd(11)
-      phi=Twopi*cm_cos_phi(8)
-      cm_cos_phi(8) = dcos(phi)
-      cm_sin_phi(8) = dsin(phi)
+        cm_cos_theta(8) = yRnd(11)
+        cm_cos_theta(8) = cm_cos_theta(8)*2d0-1d0
+        cm_sin_theta(8) = dsqrt((1d0+cm_cos_theta(8)) *(1d0-cm_cos_theta(8)))
+        cm_cos_phi(8) = yRnd(10)
+        phi=Twopi*cm_cos_phi(8)
+        cm_cos_phi(8) = dcos(phi)
+        cm_sin_phi(8) = dsin(phi)
 !3-momentum of 8 in the CM frame of 5
 !x and y components are not necessary, yet
-      MomExt(2,8)=cm_abs3p(8)*cm_sin_theta(8)*cm_cos_phi(8)
-      MomExt(3,8)=cm_abs3p(8)*cm_sin_theta(8)*cm_sin_phi(8)
-      MomExt(4,8)=cm_abs3p(8)*cm_cos_theta(8)
+        MomExt(2,8)=cm_abs3p(8)*cm_sin_theta(8)*cm_cos_phi(8)
+        MomExt(3,8)=cm_abs3p(8)*cm_sin_theta(8)*cm_sin_phi(8)
+        MomExt(4,8)=cm_abs3p(8)*cm_cos_theta(8)
 !boost the 4-momentum of 6 to the lab frame
-      temp_vector = MomExt(1:4,8)
-      temp_boost = MomExt(1:4,5)
-      call LORENTZ(temp_vector, temp_boost)
-      MomExt(1:4,8) = temp_vector
-
+        temp_vector = MomExt(1:4,8)
+        temp_boost = MomExt(1:4,5)
+        call LORENTZ(temp_vector, temp_boost)
+        MomExt(1:4,8) = temp_vector
 !9999999999999999999999
-!invariant mass of 9
-      inv_mass(9)=0d0
 !4-momentum of 9 (lab frame) by energy-momentum conservation
-      MomExt(1:4,9)=MomExt(1:4,5)-MomExt(1:4,8)
+        MomExt(1:4,9)=MomExt(1:4,5)-MomExt(1:4,8)
+      endif
 
-      if(inv_mass(3).gt.0d0) then
-         PSWgt = jacobian4*jacobian5*cm_abs3p(4)/(4d0*pi)/inv_mass(3)
-      else
-         PSWgt = jacobian4*jacobian5/(4d0*pi)
-      endif
-      if(.not.hasAonshell) then
-         PSWgt = PSWgt/(16d0*pi**2)
-      endif
-      if(H_DK) then
-         PSWgt = PSWgt/(16d0*pi**2)
-      endif
-      !print *,  "()",inv_mass, jacobian4, jacobian5, cm_abs3p(4), PSWgt, "()"
+      PSWgt = jacobian4*jacobian5 * cm_abs3p(4)/(4d0*pi)/inv_mass(3)
+      !if(isnan(PSWgt).or.(PSWgt.eq.0d0)) print *,  "()",inv_mass, jacobian4, jacobian5, PSWgt, "()"
 
 !do i=4,7
 !print *, dsqrt(dabs(four_momentum(i,:).dot.four_momentum(i,:)))
 !enddo
 !pause
 
+      if(isnan(PSWgt).or.PSWgt.eq.0d0)then
+        MomExt=0d0
+        PSWgt=0d0
+      endif
+
+
 RETURN
 END SUBROUTINE
+
 
 
 
