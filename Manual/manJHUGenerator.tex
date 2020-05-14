@@ -27,15 +27,16 @@ Manual for the JHU generator and MELA package
 \maketitle
 \begin{center}
 \small
-For simulation, reweighting, and analysis of a single-produced resonance at hadron colliders \\
-(version v7.4.0, release date February 24, 2019) \\
+For simulation, reweighting, and analysis of single-produced resonances at hadron colliders \\
+(version v7.4.0, release date March 30, 2020) \\
 \normalsize
 \end{center}
 
 \noindent
-The generator from \cite{Gao:2010qx,Bolognesi:2012,Anderson:2013,Gritsan:2016} is a model-independent generator for studying spin and parity properties of new resonances.
-Please cite \cite{Gao:2010qx,Bolognesi:2012,Anderson:2013,Gritsan:2016} if using the ``JHU generator''.
-The code can be downloaded from \cite{thesite}.
+The generator from \cite{Gao:2010qx,Bolognesi:2012,Anderson:2013,Gritsan:2016,Gritsan:2020pib} 
+is a model-independent generator for studying spin-parity properties of new resonances, including the Higgs boson(s). 
+Please cite \cite{Gao:2010qx,Bolognesi:2012,Anderson:2013,Gritsan:2016,Gritsan:2020pib} 
+if using the ``JHU generator'' (or JHUGen). The code can be downloaded from \cite{thesite}.
 The generator outputs LHE files which can be passed to parton shower programs for hadronization.
 Only relative values of cross sections are supposed to produce meaningful results, while absolute values are often subject to an arbitrary normalization.
 
@@ -335,25 +336,26 @@ Examples of running the generator.  The number of events is determined using \te
 		\end{verbatim}
 	\end{itemize}
 	\item $gg\to ZH$ and $qq\to VH$ at NLO, \texttt{Process=51}:
-	\begin{itemize}
-    \item $ZH$ production with SM couplings ($g_1=2$), with $Z\to 2l$ decay and ``stable" Higgs (for further processing):
-    \begin{verbatim}
-./JHUGen Collider=1 Process=51 VH_PC=gg HbbDK=0 DecayMode1=0 VegasNc2=100000 \\
-    DataFile=ggtoZHtollH ghz1=2,0
-    \end{verbatim}
+		\begin{itemize}
 		\item $ZH$ production with $g_2$ anomalous coupling, decay to $Z\to 2l,~H\to b\bar{b}$:	
-    \begin{verbatim}
-./JHUGen Collider=1 Process=51 VH_PC=gg HbbDK=1 DecayMode1=0 VegasNc2=100000 \\
+    		\begin{verbatim}
+		./JHUGen Collider=1 Process=51 VH_PC=gg HbbDK=1 DecayMode1=0 VegasNc2=100000 \\
 		DataFile=ggZH2lbb ghz1=0,0 ghz2=1,0
 		\end{verbatim}
-    \item $ZH$ production at NLO with SM couplings ($g_1=2$), with $Z\to 2l$ decay and ``stable" Higgs (for further processing):
-    \begin{verbatim}
-./JHUGen Collider=1 Process=51 VH_PC=nl HbbDK=0 DecayMode1=0 VegasNc2=100000 \\
-    DataFile=qqtoZH_nlo_to_llbb ghz1=2,0 Unweighted=0
-    \end{verbatim}
-    \item Note: for $ZH$ production at NLO, \texttt{Process=51} can produce weighted event only. One must specify Unweighted=0.
-		\item \texttt{Process=51} also includes all the features of \texttt{Process=50}, but is currently in beta; we recommend using it only for $gg\to ZH$.
-	\end{itemize}
+    		\item $ZH$ production with SM couplings ($g_1=2$), with $Z\to 2l$ decay and ``stable" Higgs (for further processing):
+    		\begin{verbatim}
+		./JHUGen Collider=1 Process=51 VH_PC=gg HbbDK=0 DecayMode1=0 VegasNc2=100000 \\
+		DataFile=ggtoZHtollH ghz1=2,0
+    		\end{verbatim}
+		\item $ZH$ production at NLO with SM couplings ($g_1=2$), with $Z\to 2l$ decay and ``stable" Higgs (for further processing).
+		Note: for $ZH$ production at NLO, \texttt{Process=51} can produce weighted events only. One must specify \texttt{Unweighted=0}:
+    		\begin{verbatim}
+		./JHUGen Collider=1 Process=51 VH_PC=nl HbbDK=0 DecayMode1=0 VegasNc2=100000 \\
+		DataFile=qqtoZH_nlo_to_llbb ghz1=2,0 Unweighted=0
+    		\end{verbatim}
+		\item \texttt{Process=51} also includes all the features of \texttt{Process=50}, but is currently in beta; we recommend 
+		using \texttt{Process=51} only for $gg\to ZH$.
+	\end{itemize}		
 	\item VBF, \texttt{Process=60}:
 	\begin{itemize}
 		\item $Z^*Z^*/W^*W^*\to H$:
@@ -376,7 +378,7 @@ Examples of running the generator.  The number of events is determined using \te
 	\item off-shell EW, \texttt{Process=66}, \texttt{67}, \texttt{68}
 	\begin{itemize}
 		\item including VBF and hadronic $VH$ with up to two scalar resonances and interference with the SM background
-		\item see below, page \pageref{sec:offshellVBF}, for the configuration
+		\item see below, page \pageref{sec:offshell}, for the configuration
 	\end{itemize}
 	\item $H+jj$, \texttt{Process=61}:
 	\begin{verbatim}
@@ -623,14 +625,39 @@ This is the list of command line configurables (also defined in the \verb|README
 
 \paragraph{\texorpdfstring{$gg\to ZH$}{gg to ZH}}
 
-Process 51 is a new implementation of VH with matrix elements expressed with the spinor-helicity formalism, including LO $q \bar q \to V \to VH$ (currently in beta), one-loop induced LO $gg \to ZH$, and $q \bar q \to V \to VH$ at NLO (currently in development). The initial state, order of calculation, and diagrams (triangle, box, both, or the interference term between the two, for gg) is set by the parameter \texttt{VH\_PC}, with its options listed above. $\gamma H$, i.e. \texttt{DecayMode1=7}, is not yet implemented for \texttt{Process=51}.
+Process 51 is a new implementation of VH with matrix elements expressed with the spinor-helicity formalism, 
+including LO $q \bar q \to V \to VH$ (currently in beta, Process 50 should be used instead), 
+one-loop induced LO $gg \to ZH$, and $q \bar q \to V \to VH$ at NLO. 
+The initial state, order of calculation, and diagrams (triangle, box, both, or the interference term between the two, for gg) 
+is set by the parameter \texttt{VH\_PC}, with its options listed above. 
+The $\gamma H$ process, i.e. \texttt{DecayMode1=7}, is not yet implemented for \texttt{Process=51}.
 
 \paragraph{Off-shell Higgs production}
 \label{sec:offshell}
 
-Processes 66 (signal), 67 (background), and 68 (signal+background+interference) provide an interface to a modified version of MCFM~\cite{Campbell:2010ff} to produce off-shell EW production $VV\to VV$ in association with two quarks, including all anomalous couplings.  Hadronic $VH$ and the equivalent $VVV$ background topologies are also included. For these processes, a second spin-zero resonance can be activated by setting \verb|MReso2| and \verb|GaReso2| to nonzero values.  The second resonance's couplings can be set to arbitrary values, similar to the first resonance's. These couplings are denoted as \verb|gh2*|. The convention of the \verb|ghz*/ghw*| couplings differs such that the SM value of \verb|ghz1| and \verb|ghw1| are defined as 1, rather than 2 as defined in other processes. Other couplings that affect the continuum amplitude are defined such that their values are either 1 or 0, depending on the amplitude they scale.
+Processes 66 (signal), 67 (background), and 68 (signal+background+interference) provide an interface to a modified 
+version of MCFM~\cite{Campbell:2010ff} to produce off-shell EW production $VV\to VV$ in association with two quarks, 
+including all anomalous couplings.  Hadronic $VH$ and the equivalent $VVV$ background topologies are also included. 
+For these processes, a second spin-zero resonance can be activated by setting \verb|MReso2| and \verb|GaReso2| to 
+nonzero values.  The second resonance's couplings can be set to arbitrary values, similar to the first resonance's. 
+These couplings are denoted as \verb|gh2*|. 
 
-When producing unweighted EW off-shell events, jobs must be submitted in two steps, with 164 jobs per step, each job corresponding to a particular mother-associated parton combination.  Each set of jobs can be run in parallel, but none of the jobs in the the second set can start until all jobs in the first set are completed.
+Note that the convention of the \verb|ghz*/ghw*| couplings differs such that the SM value of \verb|ghz1| and \verb|ghw1| 
+are defined as~1, rather than 2 as defined in other processes (they becomes essentially scaling factors with respect to SM). 
+This also means that all the couplings (not only  \verb|ghz1| and \verb|ghw1| ) which affect HVV interactions have to be 
+scaled down by a factor of 2 coherently, with respect to what is expected in Eqs.~(\ref{eq:HVV}) or~(\ref{eq:EFT_hvv}).
+This affects only the direct HVV couplings in Eqs.~(\ref{eq:HVV}) or~(\ref{eq:EFT_hvv}) and the origin of
+this convention is in the MCFM convention for \verb|ghz1| and \verb|ghw1| ($g_1^{ZZ}$ and $g_1^{WW}$)
+couplings in the off-shell matrix elements. The relative size of all HVV couplings in our framework is preserved this way. 
+It is important to note that the continuum background matrix elements are not affected by the above convention 
+and all the SM and anomalous couplings discussed on page~\pageref{TGCQGC} section~\ref{TGCQGC} in application 
+to the background parameterization do not need to be rescaled, even if they are expressed though the HVV couplings. 
+% Other couplings that affect the continuum amplitude are defined such that their values are either 1 or 0, 
+% depending on the amplitude they scale.
+
+When producing unweighted EW off-shell events, jobs must be submitted in two steps, with 164 jobs per step, 
+each job corresponding to a particular mother-associated parton combination.  Each set of jobs can be run in parallel, 
+but none of the jobs in the the second set can start until all jobs in the first set are completed.
 
 \begin{enumerate}
 	\item Grid generation (\verb|VBFoffsh=1..164|):
@@ -913,8 +940,9 @@ By default, $Z^\prime$ and $W^\prime$ are assumed to have infinite mass. Under t
 
 \paragraph{Gauge boson self couplings}
 \label{TGCQGC}
-Off-shell VBF processes 66 (signal), 67 (background), and 68 (signal+background+interference) involve triple and quartic gauge couplings in Eqs.~\ref{eq:VVV}-\ref{eq:VVVV}.
-To set the couplings in Eqs.~\ref{eq:VVVVSM} on the command line use e.g. 
+Off-shell VBF processes 66 (signal), 67 (background), and 68 (signal+background+interference) involve triple and 
+quartic gauge couplings in Eqs.~(\ref{eq:VVV}-\ref{eq:VVVV}).
+To set the couplings in Eq.~(\ref{eq:VVVVSM}) on the command line use e.g. 
 \begin{eqnarray*}
 d_1^\gamma \quad \leftrightarrow \quad  {\verb dVA   },\quad\quad
 d_2^\gamma \quad \leftrightarrow \quad  {\verb dPA   },\quad\quad
@@ -941,8 +969,15 @@ the command line should be
         ghw1_prime2=-9.3,0.0 ghzgs1_prime2=-7.84,0.0 dV_A=1.0,0.0 dV_Z=1.08,0.0 dP_A=1.0,0.0 
         dP_Z=1.08,0.0 dM_A=1.0,0.0 dM_Z=1.08,0.0 dZZWpWm=1.15,0.0 dZAWpWm=1.08,0.0 ...
 \end{verbatim}
-{Remember that $HVV$ couplings need to be divided by two in processes 66-68.}
 
+Note that as discussed on page~\pageref{sec:offshell}, the direct $HVV$ couplings need to be divided by 2 in processes 66-68.
+However, when using these couplings to express the  triple and quartic gauge couplings following Eqs.~(\ref{eq:d1} - \ref{eq:d6}),
+no such division is necessary. In other words, the scaling convention applies only to direct HVV couplings configured in the
+generator, while it does not apply to TGC and QGC in any way. This convention may appear confusing at first, but should become
+transparent with careful consideration, and please check the example above as well. It is the unfortunate consequence of the
+SM convention $g_1^{ZZ}=g_1^{WW}=1$ in the MCFM matrix element (as opposed to $g_1^{ZZ}=g_1^{WW}=2$ elsewhere), 
+which we would like to preserve for compatibility purpose. 
+\vspace{0.3cm}
 
 \paragraph{Spin-1 parameters}
 \label{spin1}
@@ -1423,6 +1458,8 @@ S. Bolognesi, Y.Y. Gao, A. V. Gritsan, K. Melnikov, M. Schulze, N. V. Tran and A
 I. Anderson, S. Bolognesi, F. Caola, Y.Y. Gao, A. V. Gritsan, C. B. Martin, K. Melnikov, M. Schulze, N. V. Tran, A. Whitbeck, Y. Zhou, ``Constraining anomalous HVV interactions at proton and lepton colliders''. Phys. Rev. D \textbf{89}, 035007 (2014). arXiv:1309.4819 [hep-ph].
 \bibitem{Gritsan:2016}
 A. V. Gritsan, R. R\"ontsch, M. Schulze, M. Xiao, ``Constraining anomalous Higgs boson couplings to the heavy flavor fermions using matrix element techniques''. Phys. Rev. D \textbf{94} (2016) 055023. arXiv:1606.03107 [hep-ph].
+\bibitem{Gritsan:2020pib} 
+ A.~V.~Gritsan, J.~Roskes, U.~Sarica, M.~Schulze, M.~Xiao and Y.~Zhou, ``New features in the JHU generator framework,'' arXiv:2002.09888 [hep-ph].
 \bibitem{thesite}
 See webpage: \url{http://spin.pha.jhu.edu}
 \bibitem{Chatrchyan:2012ufa}
