@@ -30,7 +30,7 @@ linkMELA = No
 #          LD_LIBRARY_PATH=/.../MELA/data/$SCRAM_ARCH/:${LD_LIBRARY_PATH}
 
 ## include Collier Loop Integral Library
-linkCollierLib = No
+linkCollierLib = NO
 
 ###############################################
 ## COMPILER SETTINGS BASED ON THE USER FLAGS ##

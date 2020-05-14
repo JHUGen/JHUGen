@@ -2192,6 +2192,11 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
     integer :: tmp_idup(1:3), tmp_icolup(1:2,1:2)
     integer :: nVhels, nISs
 
+    real(8) :: MomExt1t(1:4,1:9),MomExt2t(1:4,1:9)
+    integer :: l,p,q
+    complex(8) :: amp_dummy
+    real(8) :: me2lo
+
 
     EvalWeighted_VHiggs=0d0
     EvalCounter = EvalCounter+1
@@ -2295,7 +2300,69 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
 
     DkWgt = DkWgt * dble(nVhels) ! 2 possible helicities
 
-!print*, id(6:7),helicity(6:7)
+
+
+
+
+!MomExt1t(:,1) = (/  1.4612636158434757d0  ,        0.0000000000000000d0,        0.0000000000000000d0     ,   1.4612636158434757d0     /)
+!MomExt1t(:,2) = (/  1.4612636158434757d0  ,        0.0000000000000000d0,        0.0000000000000000d0     ,  -1.4612636158434757d0     /)
+!MomExt1t(:,3) = (/  2.9225272316869515d0  ,        0.0000000000000000d0,        0.0000000000000000d0     ,   0.0000000000000000d0     /)
+!MomExt1t(:,4) = (/  1.3351579764951791d0  ,       0.23912248810916401d0,      -0.49887803363686017d0     , -0.80695867029432466d0     /)
+!MomExt1t(:,5) = (/  1.5873692551917724d0  ,      -0.23912248810916401d0,       0.49887803363686017d0     ,  0.80695867029432466d0     /)
+!MomExt1t(:,6) = (/ 0.32428361334240258d0  ,      -0.30847990233180261d0,       -4.0824295707895482d-002  ,  -9.1287395733039817d-002  /)
+!MomExt1t(:,7) = (/  1.0108743631527766d0  ,       0.54760239044096659d0,      -0.45805373792896470d0     , -0.71567127456128488d0     /)
+!MomExt1t(:,8) = (/  0.0000000000000000d0  ,        0.0000000000000000d0,        0.0000000000000000d0     ,   0.0000000000000000d0     /)
+!MomExt1t(:,9) = (/  0.0000000000000000d0  ,        0.0000000000000000d0,        0.0000000000000000d0     ,   0.0000000000000000d0     /)
+!! ======================
+!MomExt2t(:,1) = (/   1.4993889013229147d0,        0.0000000000000000d0     ,   0.0000000000000000d0,        1.4993889013229147d0     /)
+!MomExt2t(:,2) = (/   1.4993889013229147d0,        0.0000000000000000d0     ,   0.0000000000000000d0,       -1.4993889013229147d0     /)
+!MomExt2t(:,3) = (/   2.9987778026458294d0,        0.0000000000000000d0     ,   0.0000000000000000d0,        0.0000000000000000d0     /)
+!MomExt2t(:,4) = (/   1.3795905093925491d0,       0.37240043559138541d0     , -0.90237656049098836d0,      -0.32603979708109893d0     /)
+!MomExt2t(:,5) = (/   1.6191872932532803d0,      -0.37240043559138541d0     ,  0.90237656049098836d0,       0.32603979708109893d0     /)
+!MomExt2t(:,6) = (/  0.69987628038380456d0,       0.41499286401781232d0     , -0.51432374828037830d0,       0.23038839513522705d0     /)
+!MomExt2t(:,7) = (/  0.67971422900874456d0,       -4.2592428426426909d-002  , -0.38805281221061005d0,      -0.55642819221632600d0     /)
+!MomExt2t(:,8) = (/   0.0000000000000000d0,        0.0000000000000000d0     ,   0.0000000000000000d0,        0.0000000000000000d0     /)
+!MomExt2t(:,9) = (/   0.0000000000000000d0,        0.0000000000000000d0     ,   0.0000000000000000d0,        0.0000000000000000d0     /)
+!! ======================
+!
+!
+!
+!id(1:2) = (/2,-1/)
+!id(3)=convertLHE(Wp_)
+!id(7)=convertLHE(ElP_)
+!id(6)=convertLHE(NuE_)
+!print*,"========================="
+!do l=0,1
+!do p=0,1
+!!do q=0,1
+!print*,"helicities",(l*2-1),(p*2-1)!,(q*2-1)
+!call SetRunningScales( (/ MomExt1t(1:4,5),MomExt1t(1:4,6),MomExt1t(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
+!call EvalAlphaS()
+!print *, "alphas = ",alphas
+!!call amp_VH_LO(MomExt1t(:,1:9),mass(3:5,:),(/dble(l*2-1),dble(1-l*2),helicity(3:5),dble(p*2-1),-dble(p*2-1),helicity(8:9)/),id(1:9),amp_dummy)
+!call EvalAmp_VHiggs(id,(/dble(l*2-1),dble(1-l*2),helicity(3:5),dble(p*2-1),-dble(p*2-1),helicity(8:9)/),MomExt1t(:,1:9),me2lo)
+!me2lo = me2lo *QuarkColAvg**2 * 3d0 *(M_Reso*Ga_Reso)**2
+!print*,"MomExt1t me2lo = ",me2lo
+!!enddo
+!enddo
+!enddo
+!do l=0,1
+!do p=0,1
+!!do q=0,1
+!print*,"helicities",(l*2-1),(p*2-1)!,(q*2-1)
+!call SetRunningScales( (/ MomExt2t(1:4,5),MomExt2t(1:4,6),MomExt2t(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
+!call EvalAlphaS()
+!print *, "alphas = ",alphas
+!call EvalAmp_VHiggs(id,(/dble(l*2-1),dble(1-l*2),helicity(3:5),dble(p*2-1),-dble(p*2-1),helicity(8:9)/),MomExt2t(:,1:9),me2lo)
+!me2lo = me2lo *QuarkColAvg**2 * 3d0 *(M_Reso*Ga_Reso)**2
+!print*,"MomExt2t me2lo = ",me2lo
+!!enddo
+!enddo
+!enddo
+!pause
+
+
+
 
 if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
 !if pp collider
@@ -2355,7 +2422,7 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
         endif
           LO_Res_Unpol = me2*pdf(i,1)*pdf(j,2)* PreFac/3d0
           if (LO_Res_Unpol.ne.0d0) nISs = nISs+1
-          EvalWeighted_VHiggs = EvalWeighted_VHiggs + LO_Res_Unpol
+          EvalWeighted_VHiggs = EvalWeighted_VHiggs + LO_Res_Unpol * 2d0!WH is missing a factor of 2 whose origin is left to be iedntified
           !lheweight(i,j)=LO_Res_Unpol
 
       enddo
@@ -2423,6 +2490,7 @@ elseif( IsAWDecay(DecayMode1) ) then
       PreFac = hbarc2XsecUnit * FluxFac * sHatJacobi * PSWgt * DKWgt
       LO_Res_Unpol=0d0
       EvalWeighted_VHiggs=0d0
+!print *,"=================="
       do i = -5,5
       do j = -5,5
          if (i.eq.0 .or. j.eq.0) cycle
@@ -2440,9 +2508,16 @@ elseif( IsAWDecay(DecayMode1) ) then
 
          call EvalAmp_VHiggs(id2,helicity,MomExt,me2)
          if(IsNaN(me2))return
+!if(me2.ne.0d0)then
+!  print *,id2(1),int(helicity(1)),id2(2),int(helicity(2)),id2(6),int(helicity(6)),id2(7),int(helicity(7))
+!endif
+         !if(IsNaN(me2))then
+         !   me2=0d0
+         !   return
+         !endif
          if(H_DK.eqv..false.)me2=me2*(M_Reso*Ga_Reso)**2!remove erroneous H propagator with stable H in mod_VHiggs.F90
 
-         LO_Res_Unpol = me2 *pdf(LHA2M_PDF(i),1)*pdf(LHA2M_PDF(j),2) * PreFac
+         LO_Res_Unpol = me2 *pdf(LHA2M_PDF(i),1)*pdf(LHA2M_PDF(j),2) * PreFac / 3d0
          if (LO_Res_Unpol.ne.0d0) nISs = nISs+1
          EvalWeighted_VHiggs = EvalWeighted_VHiggs+LO_Res_Unpol
       enddo
