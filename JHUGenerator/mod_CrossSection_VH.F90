@@ -721,7 +721,7 @@ stop 1
         enddo
       !W
       elseif( IsAWDecay(DecayMode1) )then
-print *,"=================="
+!print *,"=================="
         do i = -5,5 !gluon = 0, otherwise PDG codes
         do j = -5,5
 
@@ -744,10 +744,10 @@ print *,"=================="
           endif
           call amp_VH_LO(Mom(:,1:9),mass(3:5,:),helicity(1:9),id2(1:9),amp_dummy)
           me2lo = me2lo + dble(amp_dummy*dconjg(amp_dummy))*pdf(LHA2M_PDF(i),1)*pdf(LHA2M_PDF(j),2)
-me2gg=dble(amp_dummy*dconjg(amp_dummy))
-if(me2gg.ne.0d0)then
-  print *,id2(1),int(helicity(1)),id2(2),int(helicity(2)),id2(6),int(helicity(6)),id2(7),int(helicity(7))
-endif
+!me2gg=dble(amp_dummy*dconjg(amp_dummy))
+!if(me2gg.ne.0d0)then
+!  print *,id2(1),int(helicity(1)),id2(2),int(helicity(2)),id2(6),int(helicity(6)),id2(7),int(helicity(7))
+!endif
         enddo! parton
         enddo! parton
         me2lo = me2lo *PreFac *PostFac *QuarkColAvg**2 *3d0
