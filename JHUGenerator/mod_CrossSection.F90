@@ -2422,7 +2422,7 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
         endif
           LO_Res_Unpol = me2*pdf(i,1)*pdf(j,2)* PreFac/3d0
           if (LO_Res_Unpol.ne.0d0) nISs = nISs+1
-          EvalWeighted_VHiggs = EvalWeighted_VHiggs + LO_Res_Unpol * 2d0!WH is missing a factor of 2 whose origin is left to be iedntified
+          EvalWeighted_VHiggs = EvalWeighted_VHiggs + LO_Res_Unpol
           !lheweight(i,j)=LO_Res_Unpol
 
       enddo
@@ -2519,7 +2519,7 @@ elseif( IsAWDecay(DecayMode1) ) then
 
          LO_Res_Unpol = me2 *pdf(LHA2M_PDF(i),1)*pdf(LHA2M_PDF(j),2) * PreFac / 3d0
          if (LO_Res_Unpol.ne.0d0) nISs = nISs+1
-         EvalWeighted_VHiggs = EvalWeighted_VHiggs+LO_Res_Unpol
+         EvalWeighted_VHiggs = EvalWeighted_VHiggs+LO_Res_Unpol * 2d0!WH is missing a factor of 2 whose origin is left to be iedntified
       enddo
       enddo
 
