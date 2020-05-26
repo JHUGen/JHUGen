@@ -2192,10 +2192,10 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
     integer :: tmp_idup(1:3), tmp_icolup(1:2,1:2)
     integer :: nVhels, nISs
 
-    real(8) :: MomExt1t(1:4,1:9),MomExt2t(1:4,1:9)
-    integer :: l,p,q
-    complex(8) :: amp_dummy
-    real(8) :: me2lo
+!    real(8) :: MomExt1t(1:4,1:9),MomExt2t(1:4,1:9)
+!    integer :: l,p,q
+!    complex(8) :: amp_dummy
+!    real(8) :: me2lo
 
 
     EvalWeighted_VHiggs=0d0
@@ -2275,8 +2275,9 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
     endif
 
     if(IsAWDecay(DecayMode1)) then
-       call random_number(Wdecrnd)
-       if(Wdecrnd.gt.0.5d0) then
+       !call random_number(Wdecrnd)
+       !if(Wdecrnd.gt.0.5d0) then
+       if(yrnd(5).gt.0.5d0) then
           call swap(id(6),id(7))
           id(3) = -id(3)
           id(4) = -id(4)
@@ -2509,7 +2510,7 @@ elseif( IsAWDecay(DecayMode1) ) then
          call EvalAmp_VHiggs(id2,helicity,MomExt,me2)
          if(IsNaN(me2))return
 !if(me2.ne.0d0)then
-!  print *,id2(1),int(helicity(1)),id2(2),int(helicity(2)),id2(6),int(helicity(6)),id2(7),int(helicity(7))
+!  print *,id2(1),id2(2),id2(6),id2(7)
 !endif
          !if(IsNaN(me2))then
          !   me2=0d0
@@ -2675,8 +2676,9 @@ if (tmp_idup(3).ne.Not_a_particle_)then
 endif
 
 if(IsAWDecay(DecayMode1)) then
-   call random_number(Wdecrnd)
-   if(Wdecrnd.gt.0.5d0) then
+   !call random_number(Wdecrnd)
+   !if(Wdecrnd.gt.0.5d0) then
+   if(yrnd(5).gt.0.5d0) then
       call swap(id(6),id(7))
       id(3) = -id(3)
       id(4) = -id(4)
