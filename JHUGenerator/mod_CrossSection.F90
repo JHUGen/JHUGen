@@ -2155,6 +2155,7 @@ ENDIF! GENEVT
 
 Function EvalWeighted_VHiggs(yRnd,VgsWgt)
  use ModKinematics
+ use ModKinematics_VH
  use ModParameters
  use ModVHiggs
  use ModMisc
@@ -2384,7 +2385,8 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 !print*,includeGammaStar
-      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,IsAPhoton(DecayMode1))
+      !call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,IsAPhoton(DecayMode1))
+      call EvalPhasespace_VH(yRnd(6:13),Ehat,MomExt(:,1:9),id(6:9),PSWgt,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell=IsAPhoton(DecayMode1))
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -2444,7 +2446,8 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,IsAPhoton(DecayMode1))
+      !call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,IsAPhoton(DecayMode1))
+      call EvalPhasespace_VH(yRnd(6:13),ILC_Energy,MomExt(:,1:9),id(6:9),PSWgt,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell=IsAPhoton(DecayMode1))
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -2480,7 +2483,8 @@ elseif( IsAWDecay(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,IsAPhoton(DecayMode1))
+      !call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,IsAPhoton(DecayMode1))
+      call EvalPhasespace_VH(yRnd(6:13),Ehat,MomExt(:,1:9),id(6:9),PSWgt,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
 
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
@@ -2573,6 +2577,7 @@ endif
 
 Function EvalUnWeighted_VHiggs(yRnd,genEvt,RES)
 use ModKinematics
+use ModKinematics_VH
  use ModParameters
  use ModVHiggs
  use ModMisc
@@ -2722,7 +2727,8 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1)) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,IsAPhoton(DecayMode1))
+      !call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,IsAPhoton(DecayMode1))
+      call EvalPhasespace_VH(yRnd(6:13),EHat,MomExt(:,1:9),id(6:9),PSWgt,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell=IsAPhoton(DecayMode1))
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -2751,7 +2757,8 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1)) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,IsAPhoton(DecayMode1))
+      !call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,IsAPhoton(DecayMode1))
+      call EvalPhasespace_VH(yRnd(6:13),ILC_Energy,MomExt(:,1:9),id(6:9),PSWgt,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell=IsAPhoton(DecayMode1))
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -2776,7 +2783,8 @@ elseif( IsAWDecay(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,IsAPhoton(DecayMode1))
+      !call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,IsAPhoton(DecayMode1))
+      call EvalPhasespace_VH(yRnd(6:13),EHat,MomExt(:,1:9),id(6:9),PSWgt,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
