@@ -1220,6 +1220,26 @@ under the SU(2)$\times$U(1) and custodial symmetry
 $\delta c_z, c_{zz}, c_{z \Box}, \tilde c_{zz}, c_{z \gamma}, \tilde c_{z \gamma}, c_{\gamma \gamma}, \tilde c_{\gamma \gamma}, c_{gg},$ and~$\tilde c_{gg}$.
 For further details, see~\cite{Falkowski:2015wza}. 
 
+\begin{verbatim}
+./JHUGenLexicon input_basis=hbasis output_basis=amp_jhu dCz=1,0 Czz=.5,0 Czbx=0,1E-7 tCzz=1.05,0 
+dCw=2,0 Cww=1,0 Cwbx=0,2E-7 tCww=1,1 Cza=1,.5 tCza=.5,1 Cabx=0,0 Caa=0,.5 tCaa=.5,1 Cgg=2.1,0
+tCgg=.5,.5
+  
+\end{verbatim}
+\begin{verbatim}
+./JHUGenLexicon input_basis=eft_hbasis output_basis=amp_jhu dCz=1,0 Czz=.5,0 Czbx=0,1E-7 
+tCzz=1.05,0 Cza=1,.5 tCza=.5,1 Cabx=0,0 Caa=0,.5 tCaa=.5,1 Cgg=2.1,0 
+\end{verbatim}
+The following example demonstrates how to modify constants used in the coupling translation, as well as the couplings that are output by JHUGeneratorLexicon. In this case we include translation from 10 independent $HVV$ and $Hgg$ couplings in the Higgs Basis to the native coefficients used in JHUGen. We return only charged current couplings including triple and quartic gauge couplings with Lambda\_w1, Lambda\_z1 and Lambda\_zgs1 set to 100GeV.
+\begin{verbatim}
+./JHUGenLexicon input_basis=eft_hbasis output_basis=amp_jhu dCz=1,0 Czz=.5,0 Czbx=0,1E-7 
+tCzz=1.05,0 Cza=1,.5 tCza=.5,1 Cabx=0,0 Caa=0,.5 tCaa=.5,1 Cgg=2.1,0 neutral_current=false 
+Lambda_z1=100 Lambda_w1=100 Lambda_zgs1=100
+\end{verbatim}
+To view all of the options available, including modifiable constants, output format, and basis type, type:
+\begin{verbatim}
+./JHUGeneratorLexicon help
+\end{verbatim}
 
 \section{Release notes}
 \noindent
