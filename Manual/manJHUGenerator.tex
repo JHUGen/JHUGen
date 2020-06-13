@@ -1219,7 +1219,37 @@ coefficients used in the generator command line. The other example includes tran
 under the SU(2)$\times$U(1) and custodial symmetry 
 $\delta c_z, c_{zz}, c_{z \Box}, \tilde c_{zz}, c_{z \gamma}, \tilde c_{z \gamma}, c_{\gamma \gamma}, \tilde c_{\gamma \gamma}, c_{gg},$ and~$\tilde c_{gg}$.
 For further details, see~\cite{Falkowski:2015wza}. 
+\begin{verbatim}
+./JHUGenLexicon input_basis=hbasis output_basis=amp_jhu dCz=1,0 Czz=.5,0 Czbx=0,1E-7 tCzz=1.05,0 
+dCw=2,0 Cww=1,0 Cwbx=0,2E-7 tCww=1,1 Cza=1,.5 tCza=.5,1 Cabx=0,0 Caa=0,.5 tCaa=.5,1 Cgg=2.1,0
+tCgg=.5,.5
+  
+\end{verbatim}
+\begin{verbatim}
+./JHUGenLexicon input_basis=eft_hbasis output_basis=amp_jhu dCz=1,0 Czz=.5,0 Czbx=0,1E-7 
+tCzz=1.05,0 Cza=1,.5 tCza=.5,1 Cabx=0,0 Caa=0,.5 tCaa=.5,1 Cgg=2.1,0 
+\end{verbatim}
+It is possible to set the value of constants used in the translations in eq. (8) of \cite{Gritsan:2020pib}. Parameters that manually set are given below. To modify these parameters, simply add param=num to the command line when calling JHUGenLexicon. Available parameters to set include the following:
+\begin{verbatim}
+    Lambda_z1 (default = 10000 GeV)
+    Lambda_w1 (default = 10000 GeV)
+    Lambda_zgs1 (default = 10000 GeV)
+    MZ (default = 91.1876 GeV)
+    MW (default = 80.399 GeV)
+    sin2ThetaW (default = 0.23119)
+    alpha (default = 0.302862)
+\end{verbatim}
+where Lambda\_z1,Lambda\_w1,Lambda\_zgs1 correspond to $\Lambda_1^{ZZ}$,$\Lambda_1^{WW}$,$\Lambda_1^{Z\gamma}$ seen in eq (1) respectively, MZ is the mass of the Z Boson, MW is the of the W Boson, sin2ThetaW is $sin^2(\theta_W)$, and alpha corresponds to the fine structure constant $\alpha$. 
+In some JHUGen Processes, only couplings to W bosons or only couplings to Z bosons are expected. In this case, the command line options charged\_current and neutral\_current can be used to set which couplings are output on the command line. For example, with output\_basis=amp\_jhu and setting neutral\_current=false, only the couplings $g_1^{WW}$,$g_2^{WW}$,$g_4^{WW}$ and $\kappa_1^{WW}$ will be returned.
 
+Off-shell JHUGen processes, such as Process 68 can utilize triple and quartic gauge couplings. In order to return these couplings using JHUGenLexicon, use the command line argument include\_triple\_quartic\_gauge=true. This option in its current implementation, is able to calculate tripe and quartic gauge couplings in the both the higgs basis and JHUGen basis, using the relations in eq(14-20). When using JHUGenLexicon alongside JHUGen-MCFM Processes, be sure to set either useMCFMAtInput=true or useMCFMAtOutput=true. useMCFMAtInput=True assumes that the $g^VV$ couplings are divided by 2. useMCFMAtOutput=True divides all of the $g^{VV}$ couplings by 2 as per MCFM conventions.
+
+The following example demonstrates how to modify constants used in the coupling translation, as well as the couplings that are output by JHUGenLexicon. In this case we include translation from 10 independent $HVV$ and $Hgg$ couplings in the Higgs Basis to the native coefficients used in JHUGen. We return only charged current couplings including triple and quartic gauge couplings with Lambda\_w1, Lambda\_z1 and Lambda\_zgs1 set to 100GeV.
+\begin{verbatim}
+./JHUGenLexicon input_basis=eft_hbasis output_basis=amp_jhu dCz=1,0 Czz=.5,0 Czbx=0,1E-7 
+tCzz=1.05,0 Cza=1,.5 tCza=.5,1 Cabx=0,0 Caa=0,.5 tCaa=.5,1 Cgg=2.1,0 neutral_current=false 
+Lambda_z1=100 Lambda_w1=100 Lambda_zgs1=100
+\end{verbatim}
 
 \section{Release notes}
 \noindent
