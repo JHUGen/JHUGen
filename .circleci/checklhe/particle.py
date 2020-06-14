@@ -53,7 +53,7 @@ class Particle(particletype.ParticleType):
             self.__lhemass = float(data[10])
             if not usefulstuff.isfinite(self.__lhemass): raise ValueError
         except ValueError:
-            self.miscellaneouschecks.append("Mass for " + str(self) + " is " + data[11] + " instead of a number!")
+            self.miscellaneouschecks.append("Mass for " + str(self) + " is " + data[10] + " instead of a number!")
             self.__lhemass = 0
         try:
             self.__lifetime = float(data[11])
