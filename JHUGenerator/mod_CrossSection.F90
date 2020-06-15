@@ -2539,14 +2539,15 @@ endif
    if(HbbDecays)then
      PSWgt3 = s_channel_decay(MomExt(:,5),getMass(convertLHEreverse(id(8)))**2,getMass(convertLHEreverse(id(9)))**2,yRnd(10:11),MomExt(:,8),MomExt(:,9)) !  H --> 89
    endif
-   
-   do i=6,7
-      inv_mass(i)=dsqrt(dabs(MomExt(1:4,i).dot.MomExt(1:4,i)))
-   enddo
 
    AccepCounter=AccepCounter+1
 
    if( writeWeightedLHE ) then
+
+      inv_mass(1:2)=0d0
+      do i=3,9
+        inv_mass(i)=dsqrt(dabs(MomExt(1:4,i).dot.MomExt(1:4,i)))
+      enddo
       
       if(Collider.eq.1)then
         call boost2Lab(eta1,eta2,9,MomExt(1:4,1:9))
@@ -2943,9 +2944,12 @@ endif
     if(Collider.eq.1)then
       call boost2Lab(eta1,eta2,9,MomExt(1:4,1:9))
     endif
-    do i=6,7
+
+    inv_mass(1:2)=0d0
+    do i=3,9
       inv_mass(i)=dsqrt(dabs(MomExt(1:4,i).dot.MomExt(1:4,i)))
     enddo
+    
     call WriteOutEvent_VHiggs(id,helicity,MomExt,inv_mass,EventWeight=1d0)
   else
     RejeCounter = RejeCounter + 1
