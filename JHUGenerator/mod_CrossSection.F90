@@ -2187,7 +2187,7 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
     logical :: applyPSCut !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!phase space cuts?
     real(8) :: cyRnd(4),Wdecrnd
 
-    real(8) :: inv_mass(9),mass(9,2)
+    real(8) :: inv_mass(9)!,mass(9,2)
     !double precision beam_momentum(2,4), four_momentum(7,4),inv_mass(7),mass(7,2)
     real(8) :: helicity(9)!, beam_h(2) !helicities
     integer :: id(9), id2(9), idjhuvv(1:4)!, beam_id(2)
@@ -2206,30 +2206,30 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
     DKWgt=1
     id(:)=0
     helicity(:)=0
-    mass(1:2,1:2)=0d0
-    mass(3,1)=M_V
-    mass(3,2)=Ga_V
-    mass(4,1)=M_V
-    mass(4,2)=Ga_V
+!    mass(1:2,1:2)=0d0
+!    mass(3,1)=M_V
+!    mass(3,2)=Ga_V
+!    mass(4,1)=M_V
+!    mass(4,2)=Ga_V
     nVhels=2
 
     if(IsAPhoton(DecayMode1))then
        if (includeVprime .and. Ga_Vprime.gt.0d0) then
-          mass(3,1)=(M_V+M_Vprime)/2d0
-          mass(3,2)=sqrt(abs((M_V-M_Vprime)/2d0)**2+Ga_V**2+Ga_Vprime**2)
+!          mass(3,1)=(M_V+M_Vprime)/2d0
+!          mass(3,2)=sqrt(abs((M_V-M_Vprime)/2d0)**2+Ga_V**2+Ga_Vprime**2)
        endif
-       mass(4,1)=getMass(Pho_)
-       mass(4,2)=getDecayWidth(Pho_)
+!       mass(4,1)=getMass(Pho_)
+!       mass(4,2)=getDecayWidth(Pho_)
     else
        if (includeVprime .and. Ga_Vprime.gt.0d0) then
-          mass(3,1)=(M_V+M_Vprime)/2d0
-          mass(3,2)=sqrt(abs((M_V-M_Vprime)/2d0)**2+Ga_V**2+Ga_Vprime**2)
-          mass(4,:)=mass(3,:)
+!          mass(3,1)=(M_V+M_Vprime)/2d0
+!          mass(3,2)=sqrt(abs((M_V-M_Vprime)/2d0)**2+Ga_V**2+Ga_Vprime**2)
+!          mass(4,:)=mass(3,:)
        endif
     endif
-    mass(5,1)=M_Reso
-    mass(5,2)=Ga_Reso
-    mass(6:9,1:2)=0d0
+!    mass(5,1)=M_Reso
+!    mass(5,2)=Ga_Reso
+!    mass(6:9,1:2)=0d0
 
 
     id(5)=convertLHE(Hig_)
@@ -2603,7 +2603,7 @@ integer :: NBin(1:NumHistograms),NHisto
 real(8) :: DKWgt, LO_Res_Unpol, PreFac, CS_max, sumtot
 logical :: applyPSCut,genEVT
 real(8) :: cyRnd(4),Wdecrnd
-real(8) :: inv_mass(9),mass(9,2)
+real(8) :: inv_mass(9)!,mass(9,2)
 !real(8) :: beam_momentum(2,4), four_momentum(7,4),inv_mass(7),mass(7,2)
 real(8) :: helicity(9) !helicities
 integer :: id(9), id2(9)!,idjhuvv(1:4)
@@ -2621,28 +2621,28 @@ jfound=0
 nVhels=2
 nISs=0
 
-mass(1:2,1:2)=0d0
-mass(3,1)=M_V
-mass(3,2)=Ga_V
-mass(4,1)=M_V
-mass(4,2)=Ga_V
+!mass(1:2,1:2)=0d0
+!mass(3,1)=M_V
+!mass(3,2)=Ga_V
+!mass(4,1)=M_V
+!mass(4,2)=Ga_V
 if(IsAPhoton(DecayMode1))then
   if (includeVprime .and. Ga_Vprime.gt.0d0) then
-    mass(3,1)=(M_V+M_Vprime)/2d0
-    mass(3,2)=sqrt(abs((M_V-M_Vprime)/2d0)**2+Ga_V**2+Ga_Vprime**2)
+!    mass(3,1)=(M_V+M_Vprime)/2d0
+!    mass(3,2)=sqrt(abs((M_V-M_Vprime)/2d0)**2+Ga_V**2+Ga_Vprime**2)
   endif
-  mass(4,1)=getMass(Pho_)
-  mass(4,2)=getDecayWidth(Pho_)
+!  mass(4,1)=getMass(Pho_)
+!  mass(4,2)=getDecayWidth(Pho_)
 else
   if (includeVprime .and. Ga_Vprime.gt.0d0) then
-    mass(3,1)=(M_V+M_Vprime)/2d0
-    mass(3,2)=sqrt(abs((M_V-M_Vprime)/2d0)**2+Ga_V**2+Ga_Vprime**2)
-    mass(4,:)=mass(3,:)
+!    mass(3,1)=(M_V+M_Vprime)/2d0
+!    mass(3,2)=sqrt(abs((M_V-M_Vprime)/2d0)**2+Ga_V**2+Ga_Vprime**2)
+!    mass(4,:)=mass(3,:)
   endif
 endif
-mass(5,1)=M_Reso
-mass(5,2)=Ga_Reso
-mass(6:9,1:2)=0d0
+!mass(5,1)=M_Reso
+!mass(5,2)=Ga_Reso
+!mass(6:9,1:2)=0d0
 
 id(5)=convertLHE(Hig_)
 id(8)=convertLHE(Bot_)
