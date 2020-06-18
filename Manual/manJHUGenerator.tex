@@ -1117,6 +1117,8 @@ It is possible to interface to an LHAPDF setup instead of compiling with local P
 \item Run with the extra command line parameter \verb|LHAPDF| specifying your PDF set's \verb|.info| file.  For example: \verb|LHAPDF=NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info|
 \end{itemize}
 %%%%%%%%%%%
+
+
 \section{JHU Generator Matrix Elements (JHUGenMELA)}
 These instructions are meant as an introduction to MELA and do not illustrate the full flexibility provided by the package.  For further instructions, please contact the authors.
 \subsection{Compiling}
@@ -1197,16 +1199,72 @@ We also provide a python interface for MELA, which works essentially the same wa
 \end{verbatim}
 Since text processing is simple in Python, the Python MELA interface is especially useful for running quick jobs on LHE files.
 
+
+\section{JHU Generator Coupling Converter (JHUGenLexicon)}
+
+In order to simplify translation between different coupling conventions, 
+within the JHU generator framework, we provide the JHUGenLexicon program,
+which includes an interface to the generator and matrix element library
+and can also be used for standalone or other applications. 
+In the present version, the program can take as input either the native coefficients used in JHUGen, 
+or the Higgs basis coefficients for the $HVV$ and $Hgg$ couplings. 
+The input can also be used either with or without the SU(2)$\times$U(1) and custodial symmetry.
+The output, which can be used in the command line of the JHU generator or as input to MELA, 
+provides all coefficients appearing without expectation of the above symmetry, as expected by the
+generator and MELA. The output can also include the triple and quartic gauge boson couplings
+used in off-shell EW processes. 
+Various options can be checked within the JHUGenLexicon program. Below we list explicit examples
+how the program can be used for translating 15 $HVV$ and $Hgg$ couplings in the Higgs basis into the
+coefficients used in the generator command line. The other example includes translation of 
+10 $HVV$ and $Hgg$ couplings in the Higgs basis, which are the ten independent couplings in the Higgs basis 
+under the SU(2)$\times$U(1) and custodial symmetry 
+$\delta c_z, c_{zz}, c_{z \Box}, \tilde c_{zz}, c_{z \gamma}, \tilde c_{z \gamma}, c_{\gamma \gamma}, \tilde c_{\gamma \gamma}, c_{gg},$ and~$\tilde c_{gg}$.
+For further details, see~\cite{Falkowski:2015wza}. 
+\begin{verbatim}
+./JHUGenLexicon input_basis=hbasis output_basis=amp_jhu dCz=1,0 Czz=.5,0 Czbx=0,1E-7 tCzz=1.05,0 
+dCw=2,0 Cww=1,0 Cwbx=0,2E-7 tCww=1,1 Cza=1,.5 tCza=.5,1 Cabx=0,0 Caa=0,.5 tCaa=.5,1 Cgg=2.1,0
+tCgg=.5,.5
+  
+\end{verbatim}
+\begin{verbatim}
+./JHUGenLexicon input_basis=eft_hbasis output_basis=amp_jhu dCz=1,0 Czz=.5,0 Czbx=0,1E-7 
+tCzz=1.05,0 Cza=1,.5 tCza=.5,1 Cabx=0,0 Caa=0,.5 tCaa=.5,1 Cgg=2.1,0 
+\end{verbatim}
+It is possible to set the value of constants used in the translations in eq. (8) of \cite{Gritsan:2020pib}. Parameters that manually set are given below. To modify these parameters, simply add param=num to the command line when calling JHUGenLexicon. Available parameters to set include the following:
+\begin{verbatim}
+    Lambda_z1 (default = 10000 GeV)
+    Lambda_w1 (default = 10000 GeV)
+    Lambda_zgs1 (default = 10000 GeV)
+    MZ (default = 91.1876 GeV)
+    MW (default = 80.399 GeV)
+    sin2ThetaW (default = 0.23119)
+    alpha (default = 0.302862)
+\end{verbatim}
+where Lambda\_z1,Lambda\_w1,Lambda\_zgs1 correspond to $\Lambda_1^{ZZ}$,$\Lambda_1^{WW}$,$\Lambda_1^{Z\gamma}$ seen in eq (1) respectively, MZ is the mass of the Z Boson, MW is the of the W Boson, sin2ThetaW is $sin^2(\theta_W)$, and alpha corresponds to the fine structure constant $\alpha$. 
+In some JHUGen Processes, only couplings to W bosons or only couplings to Z bosons are expected. In this case, the command line options charged\_current and neutral\_current can be used to set which couplings are output on the command line. For example, with output\_basis=amp\_jhu and setting neutral\_current=false, only the couplings $g_1^{WW}$,$g_2^{WW}$,$g_4^{WW}$ and $\kappa_1^{WW}$ will be returned.
+
+Off-shell JHUGen processes, such as Process 68 can utilize triple and quartic gauge couplings. In order to return these couplings using JHUGenLexicon, use the command line argument include\_triple\_quartic\_gauge=true. This option in its current implementation, is able to calculate tripe and quartic gauge couplings in the both the higgs basis and JHUGen basis, using the relations in eq(14-20). When using JHUGenLexicon alongside JHUGen-MCFM Processes, be sure to set either useMCFMAtInput=true or useMCFMAtOutput=true. useMCFMAtInput=True assumes that the $g^VV$ couplings are divided by 2. useMCFMAtOutput=True divides all of the $g^{VV}$ couplings by 2 as per MCFM conventions.
+
+The following example demonstrates how to modify constants used in the coupling translation, as well as the couplings that are output by JHUGenLexicon. In this case we include translation from 10 independent $HVV$ and $Hgg$ couplings in the Higgs Basis to the native coefficients used in JHUGen. We return only charged current couplings including triple and quartic gauge couplings with Lambda\_w1, Lambda\_z1 and Lambda\_zgs1 set to 100GeV.
+\begin{verbatim}
+./JHUGenLexicon input_basis=eft_hbasis output_basis=amp_jhu dCz=1,0 Czz=.5,0 Czbx=0,1E-7 
+tCzz=1.05,0 Cza=1,.5 tCza=.5,1 Cabx=0,0 Caa=0,.5 tCaa=.5,1 Cgg=2.1,0 neutral_current=false 
+Lambda_z1=100 Lambda_w1=100 Lambda_zgs1=100
+\end{verbatim}
+
 \section{Release notes}
 \noindent
-In going to \verb|v7.4.0| (major revision; February 24, 2020), the updates are as follows:
+In going to \verb|v7.4.0| (major revision; June 1, 2020), the updates are as follows:
 \begin{itemize}
-\item Completion of the implementation of couplings with $V^\prime$ in all signal-only JHUGen processes at leading-order in QCD, where relevant, and decay lifetime for $V^\prime V^\prime$ final states in ReadLHE mode.
-\item Added command line setting of triple and quartic gauge boson couplings in off-shell VBF processes 66-68.
-\item Implementations of Process 69, QCD $VV+2j$ continuum production without the Higgs contribution, and Process 70-72, EW $VV+2\ell/2\nu/\ell\nu$.
-\item Extension of DecayMode options, final state filters, and implementation of the final state filters in the off-shell processes. Filter options are also renamed as a result of the extension of functionality.
+\item Added command line setting of triple and quartic gauge boson couplings in off-shell EW processes 66-68.
 \item Improvements on the phase space optimization for off-shell processes.
-\item Enlarge allowed invariant mass range in the $q\bar{q} \to H \gamma$ process
+\item Extension of DecayMode options, final state filters, and implementation of the final state filters in the off-shell processes. Filter options are also renamed as a result of the extension of functionality.
+\item Enlarge allowed invariant mass ranges in the $q\bar{q} \to \gamma H$ and $q\bar{q} \to Z/\gamma^* H$ processes.
+\item Completion of the implementation of couplings with $V^\prime$ in all signal-only JHUGen processes at leading-order in QCD, where relevant, and decay lifetime for $V^\prime V^\prime$ final states in ReadLHE mode.
+\item Beta version of implementation of Process 70-72, EW $VV+2\ell/2\nu/\ell\nu$ and
+test version of Process 69, QCD $VV+2j$ continuum production without the Higgs contribution.
+\item Introduced JHUGenLexicon program for converting coupling convention, with the Higgs basis translation 
+available in this version. 
 \end{itemize}
 \noindent
 In going to \verb|v7.3.0| (April 28, 2019), the update is as follows:
@@ -1498,5 +1556,9 @@ CERN Yellow Report 10.23731/CYRM-2017-002.
   doi:10.1140/epjc/s10052-015-3345-5, arXiv:1412.6038 [hep-ph].
 \bibitem{root}
 See webpage: \url{https://root.cern.ch}
+\bibitem{Falkowski:2015wza}
+A.~Falkowski {et~al.}, ``{Rosetta: an operator basis translator for Standard Model effective field theory}'',
+ { Eur. Phys. J.}  {\bf C75} (2015) 583,
+ doi{10.1140/epjc/s10052-015-3806-x}, arXiv:1508.05895 [hep-ph].
 \end{thebibliography}
 \end{document}
