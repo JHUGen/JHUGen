@@ -25,8 +25,8 @@ env: &env
 
         SEED: "765543533"
 
-        REFERENCE_FILENAMES: "ggH_ZZ.lhe ggH_WW.lhe ggH_Zgamma.lhe ggH_gammagamma.lhe ggH_ZZ_contact.lhe ggH_ZZ_Zprime.lhe spin1_ZZ.lhe spin1_WW.lhe gg_spin2_ZZ.lhe qq_spin2_WW.lhe gg_spin2_Zgamma.lhe qq_spin2_gammagamma.lhe ZH_bb.lhe WH_Zgamma.lhe ee_gammaH_bb.lhe VBF_ZZ.lhe HJJ_WW.lhe HJ_gammagamma.lhe ttH_tautau.lhe gg_bbH_tautau.lhe qq_bbH.lhe tqH_110.lhe tqH_111.lhe tqH_112.lhe tqH_113.lhe tqH_114.lhe gg_ZH_llbb.lhe ee_ZH_llbb.lhe qq_ZH_llbb.lhe VBFoffshell_69.lhe"
-        #REFERENCE_FILENAMES: "ggH_ZZ.lhe ggH_WW.lhe ggH_Zgamma.lhe ggH_gammagamma.lhe ggH_ZZ_contact.lhe ggH_ZZ_Zprime.lhe spin1_ZZ.lhe spin1_WW.lhe gg_spin2_ZZ.lhe qq_spin2_WW.lhe gg_spin2_Zgamma.lhe qq_spin2_gammagamma.lhe ZH_bb.lhe WH_Zgamma.lhe ee_gammaH_bb.lhe VBF_ZZ.lhe HJJ_WW.lhe HJ_gammagamma.lhe ttH_tautau.lhe gg_bbH_tautau.lhe qq_bbH.lhe tqH_110.lhe tqH_111.lhe tqH_112.lhe tqH_113.lhe tqH_114.lhe VBFoffshell_69.lhe"
+        #REFERENCE_FILENAMES: "ggH_ZZ.lhe ggH_WW.lhe ggH_Zgamma.lhe ggH_gammagamma.lhe ggH_ZZ_contact.lhe ggH_ZZ_Zprime.lhe spin1_ZZ.lhe spin1_WW.lhe gg_spin2_ZZ.lhe qq_spin2_WW.lhe gg_spin2_Zgamma.lhe qq_spin2_gammagamma.lhe ZH_bb.lhe WH_Zgamma.lhe ee_gammaH_bb.lhe VBF_ZZ.lhe HJJ_WW.lhe HJ_gammagamma.lhe ttH_tautau.lhe gg_bbH_tautau.lhe qq_bbH.lhe tqH_110.lhe tqH_111.lhe tqH_112.lhe tqH_113.lhe tqH_114.lhe gg_ZH_llbb.lhe ee_ZH_llbb.lhe qq_ZH_llbb.lhe VBFoffshell_69.lhe"
+        REFERENCE_FILENAMES: "ggH_ZZ.lhe ggH_WW.lhe ggH_Zgamma.lhe ggH_gammagamma.lhe ggH_ZZ_contact.lhe ggH_ZZ_Zprime.lhe spin1_ZZ.lhe spin1_WW.lhe gg_spin2_ZZ.lhe qq_spin2_WW.lhe gg_spin2_Zgamma.lhe qq_spin2_gammagamma.lhe ZH_bb.lhe WH_Zgamma.lhe ee_gammaH_bb.lhe VBF_ZZ.lhe HJJ_WW.lhe HJ_gammagamma.lhe ttH_tautau.lhe gg_bbH_tautau.lhe qq_bbH.lhe tqH_110.lhe tqH_111.lhe tqH_112.lhe tqH_113.lhe tqH_114.lhe VBFoffshell_69.lhe"
         REFERENCE_FILENAME_GGH: "ggH_ZZ.lhe"
         REFERENCE_FILENAME_VBF: "VBF_ZZ.lhe"
         REFERENCE_FILENAME_HJJ: "HJJ_WW.lhe"
