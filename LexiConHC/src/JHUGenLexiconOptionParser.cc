@@ -1,19 +1,19 @@
 #include <exception>
 #include <cstdlib>
 #include <iostream>
-#include "LexiConHCCouplings.h"
-#include "LexiConHCOptionParser.h"
-#include "LexiConHCHelperFunctions.h"
+#include "JHUGenLexiconCouplings.h"
+#include "JHUGenLexiconOptionParser.h"
+#include "JHUGenLexiconHelperFunctions.h"
 
 
 using namespace std;
-using namespace LexiConHCHelperFunctions;
-using namespace LexiConHCIOHelpers;
+using namespace JHUGenLexiconHelperFunctions;
+using namespace JHUGenLexiconIOHelpers;
 
 
-bool LexiConHCOptionParser::globalHelpFlag = false;
+bool JHUGenLexiconOptionParser::globalHelpFlag = false;
 
-LexiConHCOptionParser::LexiConHCOptionParser(int argc, char** argv) :
+JHUGenLexiconOptionParser::JHUGenLexiconOptionParser(int argc, char** argv) :
   basis_input(nIOBases),
   basis_output(nIOBases)
 {
@@ -24,7 +24,7 @@ LexiConHCOptionParser::LexiConHCOptionParser(int argc, char** argv) :
 
   analyze();
 }
-void LexiConHCOptionParser::analyze(){
+void JHUGenLexiconOptionParser::analyze(){
   bool hasInvalidOption=false;
   char rawdelimiter = '=';
   for (unsigned int opt=1; opt<rawOptions.size(); opt++){
@@ -36,13 +36,13 @@ void LexiConHCOptionParser::analyze(){
     hasInvalidOption |= isInvalidOption;
   }
 
-  if (LexiConHCOptionParser::globalHelpFlag){ printOptionsHelp(false); return; }
+  if (JHUGenLexiconOptionParser::globalHelpFlag){ printOptionsHelp(false); return; }
 
-  if (basis_input == nIOBases || basis_output == nIOBases){ cerr << "LexiConHCOptionParser::analyze: You have to specify the input and output basis types." << endl; if (!hasInvalidOption) hasInvalidOption=true; }
+  if (basis_input == nIOBases || basis_output == nIOBases){ cerr << "JHUGenLexiconOptionParser::analyze: You have to specify the input and output basis types." << endl; if (!hasInvalidOption) hasInvalidOption=true; }
 
   bool distinguish_HWWcouplings; getValueWithDefault<std::string, bool>(flags, "distinguish_HWWcouplings", distinguish_HWWcouplings, false);
   if (!distinguish_HWWcouplings && basis_input == bAmplitude_JHUGen){
-    using namespace LexiConHCCouplings;
+    using namespace JHUGenLexiconCouplings;
     static_assert((unsigned int) coupl_ampjhu_ghzgs1_prime2 - (unsigned int) coupl_ampjhu_ghw1 == (unsigned int) coupl_ampjhu_ghw1 - (unsigned int) coupl_ampjhu_ghz1);
     for (unsigned int i=(unsigned int) coupl_ampjhu_ghz1; i<(unsigned int) coupl_ampjhu_ghw1; i++){
       couplings[getCouplingName((Amplitude_JHUGen_CouplingType) (i+(unsigned int) coupl_ampjhu_ghw1 - (unsigned int) coupl_ampjhu_ghz1))] =
@@ -55,12 +55,12 @@ void LexiConHCOptionParser::analyze(){
   if (hasInvalidOption) printOptionsHelp(hasInvalidOption);
 }
 
-void LexiConHCOptionParser::interpretOption(std::string const& wish, std::string const& value, bool& invalidOption){
+void JHUGenLexiconOptionParser::interpretOption(std::string const& wish, std::string const& value, bool& invalidOption){
   invalidOption=false;
   if (wish.empty()){
-    if (value=="help") LexiConHCOptionParser::globalHelpFlag = true;
+    if (value=="help") JHUGenLexiconOptionParser::globalHelpFlag = true;
     else{
-      cerr << "LexiConHCOptionParser::interpretOption: Unknown unspecified argument: " << value << endl;
+      cerr << "JHUGenLexiconOptionParser::interpretOption: Unknown unspecified argument: " << value << endl;
       invalidOption=true;
     }
   }
@@ -73,7 +73,7 @@ void LexiConHCOptionParser::interpretOption(std::string const& wish, std::string
   else if (wish=="useMCFMAtInput"){ flags[wish] = false; castStringToValue(value, flags[wish]); }
   else if (wish=="useMCFMAtOutput"){ flags[wish] = false; castStringToValue(value, flags[wish]); }
   else if (wish=="distinguish_HWWcouplings"){ flags[wish] = false; castStringToValue(value, flags[wish]); }
-
+  else if (wish=="include_triple_quartic_gauge"){ flags[wish] = false; castStringToValue(value, flags[wish]); }
   // Parameters come next, check if a comma is not found to assign them
   else if (value.find(",")==std::string::npos) parameters[wish] = stod(value);
 
@@ -88,9 +88,9 @@ void LexiConHCOptionParser::interpretOption(std::string const& wish, std::string
   else cerr << "Unknown specified argument: " << value << " with specifier " << wish << endl;
 }
 
-void LexiConHCOptionParser::printOptionsHelp(bool command_fail)const{
+void JHUGenLexiconOptionParser::printOptionsHelp(bool command_fail)const{
   cout << endl;
-  cout << "The options implemented in LexiConHC (format: specifier=value):\n\n";
+  cout << "The options implemented in JHUGenLexicon (format: specifier=value):\n\n";
 
   cout << "- input_basis: Input coupling conventions\n\n";
   cout << "- output_basis: Output coupling conventions\n\n";
@@ -98,6 +98,7 @@ void LexiConHCOptionParser::printOptionsHelp(bool command_fail)const{
   cout << "- useMCFMAtInput: Use MCFM conventions in the input JHUGen couplings. Assumes the ghv* couplings (ghv1=2 in SM) are divided by 2.\n\n";
   cout << "- useMCFMAtOutput: Use MCFM conventions in the output JHUGen couplings. Divides the ghv* couplings by 2.\n\n";
   cout << "- distinguish_HWWcouplings: Distinguish HZZ and HWW couplings in the JHUGen amplitude basis if it is the input. Default is false.\n\n";
+  cout << "- include_triple_quartic_gauge: Return triple gauge couplings. Default is false.\n\n";
 
   cout << "- The format to set any parameter is [specifier]=[value].\n\n";
   cout << "- The format to set any coupling [specifier] to the complex number ([vRe], [vIm]) is [specifier]=[vRe],[vIm].\n\n";
@@ -106,8 +107,12 @@ void LexiConHCOptionParser::printOptionsHelp(bool command_fail)const{
   AMPLITUDE_JHUGEN_COUPLING_COMMANDS;
   cout << "- Allowed couplings for the JHUGen EFT formalism:\n";
   EFT_JHUGEN_COUPLING_COMMANDS;
+  cout << "- Allowed couplings for the Higgs basis formalism without EFT constraints:\n";
+  HIGGSBASIS_COUPLING_COMMANDS;
   cout << "- Allowed couplings for the Higgs basis EFT formalism:\n";
   EFT_HIGGSBASIS_COUPLING_COMMANDS;
+  cout << "- Allowed couplings for the Warsaw basis EFT formalism:\n";
+  WARSAWBASIS_COUPLING_COMMANDS;
 #undef COUPLING_COMMAND
   cout << "- Allowed parameters:\n";
   cout << "\t Lambda_z1 (default = " << DEFVAL_LAMBDA_VI << ")\n";
@@ -116,7 +121,9 @@ void LexiConHCOptionParser::printOptionsHelp(bool command_fail)const{
   cout << "\t MZ (default = " << DEFVAL_MZ << ")\n";
   cout << "\t MW (default = " << DEFVAL_MW << ")\n";
   cout << "\t sin2ThetaW (default = " << DEFVAL_SW << ")\n";
-
+  cout << "\t alpha (default = " << DEFVAL_ALPHA << ")\n";
+  cout << "\t alpha_s (default - "<< DEFVAL_ALPHA_S << ")\n";
+  cout << "\t vev_lam (defaul - "<< DEFVAL_VEV_LAM << ")\n";
   cout << endl;
   if (command_fail) throw std::exception();
 }

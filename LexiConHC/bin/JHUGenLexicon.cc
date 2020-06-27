@@ -1,16 +1,16 @@
 #include <exception>
 #include <iostream>
-#include "LexiConHCOptionParser.h"
-#include "LexiConHCTranslator.h"
+#include "JHUGenLexiconOptionParser.h"
+#include "JHUGenLexiconTranslator.h"
 
 
 int main(int argc, char** argv){
   using namespace std;
 
   try{
-    LexiConHCOptionParser options(argc, argv);
-    if (!LexiConHCOptionParser::globalHelpFlag){
-      LexiConHCTranslator translator(options);
+    JHUGenLexiconOptionParser options(argc, argv);
+    if (!JHUGenLexiconOptionParser::globalHelpFlag){
+      JHUGenLexiconTranslator translator(options);
       bool firstEntry = true;
       for (auto const& it:translator.getParameters()){
         if (!firstEntry) cout << " ";

@@ -15,7 +15,7 @@ OBJECTS = $(SOURCES:.cc=.o)
 
 .PHONY: all help compile clean
 
-all: LexiConHC
+all: JHUGenLexicon
 
 
 # General rule for making object files
@@ -29,8 +29,8 @@ all: LexiConHC
 	$(CXX) $(CXXFLAGS) $< -c -o $@
 
 
-LexiConHC: $(OBJECTS) $(BINDIR)LexiConHC.cc
-	$(CXX) $(CXXFLAGS) -o $(RUNDIR)LexiConHC $(OBJECTS) $(BINDIR)LexiConHC.cc $(GLIBS)
+JHUGenLexicon: $(OBJECTS) $(BINDIR)JHUGenLexicon.cc
+	$(CXX) $(CXXFLAGS) -o $(RUNDIR)JHUGenLexicon $(OBJECTS) $(BINDIR)JHUGenLexicon.cc $(GLIBS)
 
 clean:
 	rm -rf $(OUTLIB)
@@ -41,7 +41,7 @@ clean:
 	rm -f $(BINDIR)*.so
 	rm -f $(BINDIR)*.d
 	rm -f $(RUNDIR)*.cc
-	rm -f $(RUNDIR)LexiCon*
+	rm -f $(RUNDIR)JHUGenLexicon*
 	rm -f $(RUNDIR)*.o
 	rm -f $(RUNDIR)*.so
 	rm -f $(RUNDIR)*.d

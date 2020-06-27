@@ -1,5 +1,5 @@
-#ifndef LEXICONHC_OPTIONPARSER_H
-#define LEXICONHC_OPTIONPARSER_H
+#ifndef JHUGENLEXICON_OPTIONPARSER_H
+#define JHUGENLEXICON_OPTIONPARSER_H
 
 #include <iostream>
 #include <cstdio>
@@ -8,33 +8,33 @@
 #include <vector>
 #include <utility>
 #include <unordered_map>
-#include "LexiConHCIOHelpers.h"
+#include "JHUGenLexiconIOHelpers.h"
 
 
-class LexiConHCOptionParser{
+class JHUGenLexiconOptionParser{
 public:
   static bool globalHelpFlag;
 
 protected:
   std::vector<std::string> rawOptions;
 
-  LexiConHCIOHelpers::IOBasisType basis_input;
-  LexiConHCIOHelpers::IOBasisType basis_output;
+  JHUGenLexiconIOHelpers::IOBasisType basis_input;
+  JHUGenLexiconIOHelpers::IOBasisType basis_output;
 
   std::unordered_map<std::string, bool> flags;
   std::unordered_map<std::string, double> parameters;
   std::unordered_map<std::string, std::pair<double, double> > couplings;
 
 public:
-  LexiConHCOptionParser(int argc, char** argv);
-  ~LexiConHCOptionParser(){}
+  JHUGenLexiconOptionParser(int argc, char** argv);
+  ~JHUGenLexiconOptionParser(){}
 
   void analyze();
   void interpretOption(std::string const& wish, std::string const& value, bool& invalidOption);
   void printOptionsHelp(bool command_fail) const;
 
-  LexiConHCIOHelpers::IOBasisType const& getInputBasis() const{ return basis_input; }
-  LexiConHCIOHelpers::IOBasisType const& getOutputBasis() const{ return basis_output; }
+  JHUGenLexiconIOHelpers::IOBasisType const& getInputBasis() const{ return basis_input; }
+  JHUGenLexiconIOHelpers::IOBasisType const& getOutputBasis() const{ return basis_output; }
 
   std::unordered_map<std::string, bool>& getInputFlags(){ return flags; }
   std::unordered_map<std::string, bool> const& getInputFlags() const{ return flags; }

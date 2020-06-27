@@ -1,5 +1,5 @@
-#ifndef LEXICONHC_TRANSLATOR_H
-#define LEXICONHC_TRANSLATOR_H
+#ifndef JHUGENLEXICON_TRANSLATOR_H
+#define JHUGENLEXICON_TRANSLATOR_H
 
 #include <iostream>
 #include <cstdio>
@@ -8,30 +8,31 @@
 #include <vector>
 #include <utility>
 #include <unordered_map>
-#include "LexiConHCOptionParser.h"
+#include "JHUGenLexiconOptionParser.h"
 
 
-class LexiConHCTranslator{
+class JHUGenLexiconTranslator{
 protected:
-  LexiConHCOptionParser const& opts;
+  JHUGenLexiconOptionParser const& opts;
 
   std::unordered_map<std::string, double> result_parameters;
   std::unordered_map<std::string, std::pair<double, double> > result_couplings;
 
   std::vector<std::vector<double>> getTranslationMatrix(
-    LexiConHCIOHelpers::IOBasisType const& basis_input, LexiConHCIOHelpers::IOBasisType const& basis_output,
+    JHUGenLexiconIOHelpers::IOBasisType const& basis_input, JHUGenLexiconIOHelpers::IOBasisType const& basis_output,
+    std::unordered_map<std::string, bool> const& input_flags,
     std::unordered_map<std::string, double> const& input_parameters
   ) const;
 
   std::vector< std::pair<double, double> > getOrderedInputCouplings(
-    LexiConHCIOHelpers::IOBasisType const& basis_input,
+    JHUGenLexiconIOHelpers::IOBasisType const& basis_input,
     std::unordered_map<std::string, bool> const& input_flags,
     std::unordered_map<std::string, double> const& input_parameters,
     std::unordered_map<std::string, std::pair<double, double> > const& input_couplings
   ) const;
 
   void interpretOutputCouplings(
-    LexiConHCIOHelpers::IOBasisType const& basis_output,
+    JHUGenLexiconIOHelpers::IOBasisType const& basis_output,
     std::unordered_map<std::string, bool> const& input_flags,
     std::unordered_map<std::string, double> const& input_parameters,
     std::vector< std::pair<double, double> >& output_vector
@@ -40,8 +41,8 @@ protected:
   void translate();
 
 public:
-  LexiConHCTranslator(LexiConHCOptionParser const& opts_);
-  ~LexiConHCTranslator(){}
+  JHUGenLexiconTranslator(JHUGenLexiconOptionParser const& opts_);
+  ~JHUGenLexiconTranslator(){}
 
   std::unordered_map<std::string, double>& getParameters(){ return result_parameters; }
   std::unordered_map<std::string, double> const& getParameters() const{ return result_parameters; }

@@ -1,24 +1,24 @@
 #include <cassert>
 #include <cctype>
 #include <algorithm>
-#include "LexiConHCHelperFunctions.h"
+#include "JHUGenLexiconHelperFunctions.h"
 
 
 using namespace std;
 
 
-template<> void LexiConHCHelperFunctions::lowercase(std::string const& name, std::string& val){
+template<> void JHUGenLexiconHelperFunctions::lowercase(std::string const& name, std::string& val){
   val = name;
   std::transform(val.begin(), val.end(), val.begin(), [] (unsigned char c){ return std::tolower(c); });
 }
-template<> void LexiConHCHelperFunctions::lowercase(const char* const& name, const char*& val){
+template<> void JHUGenLexiconHelperFunctions::lowercase(const char* const& name, const char*& val){
   std::string strname = name;
   std::string strval;
   lowercase(strname, strval);
   val = strval.data();
 }
 
-template<> void LexiConHCHelperFunctions::castStringToValue(std::string const& name, bool& val){
+template<> void JHUGenLexiconHelperFunctions::castStringToValue(std::string const& name, bool& val){
   std::string namelower=name;
   std::transform(namelower.begin(), namelower.end(), namelower.begin(), ::tolower);
   if (namelower=="true" || namelower=="t") val=true;
@@ -26,7 +26,7 @@ template<> void LexiConHCHelperFunctions::castStringToValue(std::string const& n
   else{ std::stringstream ss(name); ss >> val; }
 }
 
-void LexiConHCHelperFunctions::splitOption(const std::string& rawoption, std::string& wish, std::string& value, char delimiter){
+void JHUGenLexiconHelperFunctions::splitOption(const std::string& rawoption, std::string& wish, std::string& value, char delimiter){
   size_t posEq = rawoption.find(delimiter);
   if (posEq!=string::npos){
     wish=rawoption;
@@ -38,7 +38,7 @@ void LexiConHCHelperFunctions::splitOption(const std::string& rawoption, std::st
     value=rawoption;
   }
 }
-void LexiConHCHelperFunctions::splitOptionRecursive(const std::string& rawoption, std::vector<std::string>& splitoptions, char delimiter, bool uniqueResults){
+void JHUGenLexiconHelperFunctions::splitOptionRecursive(const std::string& rawoption, std::vector<std::string>& splitoptions, char delimiter, bool uniqueResults){
   string suboption=rawoption, result=rawoption;
   string remnant;
   while (result!=""){
