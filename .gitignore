@@ -2,3 +2,7 @@
 **/*.d
 **/*.a
 **/*.pcm
+**/*.o
+**/*.pyc
+JHUGenLexicon/lib
+JHUGenLexicon/JHUGenLexicon
