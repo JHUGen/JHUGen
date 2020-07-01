@@ -25,12 +25,12 @@ namespace JHUGenLexiconIOHelpers{
         break;
       case bHiggsBasis:
         strtype = "hbasis";
-	break;
+        break;
       case bEFT_HiggsBasis:
         strtype = "eft_hbasis";
         break;
       case bWarsawBasis:
-	strtype = "warsaw";
+        strtype = "warsaw";
         break;
       default:
         cerr << "JHUGenLexiconIOHelpers::getIOBasisFromString: Basis type " << btype << " is not implemented! Please revise the implementation." << endl;

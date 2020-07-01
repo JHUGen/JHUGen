@@ -192,7 +192,7 @@
 
 namespace JHUGenLexiconCouplings{
 #define COUPLING_COMMAND(NAME, PREFIX, DEFVAL) coupl_##PREFIX##_##NAME,
-  
+
   enum Amplitude_JHUGen_CouplingType{
     AMPLITUDE_JHUGEN_COUPLING_COMMANDS
     nAmplitude_JHUGen_CouplingTypes
@@ -229,15 +229,15 @@ namespace JHUGenLexiconCouplings{
     WARSAWBASIS_COUPLING_COMMANDS
     nWarsawBasis_CouplingTypes
   };
- 
+
 #undef COUPLING_COMMAND
-  
+
   // Functions to get the coupling names from the indices
   std::string getCouplingName(JHUGenLexiconCouplings::Amplitude_JHUGen_CouplingType type);
   std::string getCouplingName(JHUGenLexiconCouplings::Amplitude_JHUGen_Include_Triple_CouplingType type);
   std::string getCouplingName(JHUGenLexiconCouplings::EFT_JHUGen_CouplingType type);
   std::string getCouplingName(JHUGenLexiconCouplings::EFT_JHUGen_Include_Triple_CouplingType type);
-  std::string getCouplingName(JHUGenLexiconCouplings::HiggsBasis_CouplingType type); 
+  std::string getCouplingName(JHUGenLexiconCouplings::HiggsBasis_CouplingType type);
   std::string getCouplingName(JHUGenLexiconCouplings::HiggsBasis_Include_Triple_CouplingType type);
   std::string getCouplingName(JHUGenLexiconCouplings::EFT_HiggsBasis_CouplingType type);
   std::string getCouplingName(JHUGenLexiconCouplings::EFT_HiggsBasis_Include_Triple_CouplingType type);

@@ -11,7 +11,7 @@ namespace JHUGenLexiconIOHelpers{
     bEFT_HiggsBasis,
     bHiggsBasis,
     bWarsawBasis,
-   
+
     nIOBases
   };
 
