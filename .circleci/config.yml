@@ -103,6 +103,7 @@ jobs:
            - .gitignore
            - AnalyticMELA
            - JHUGenerator
+           - JHUGenLexicon
            - JHUGenMELA
            - lib
            - MCFM-JHUGen
@@ -141,6 +142,28 @@ jobs:
           paths:
             - JHUGenerator
             - JHUGenMELA
+
+  buildLexicon:
+    <<: *env
+    working_directory: ~/JHUGen
+    steps:
+      - attach_workspace:
+          at: ~/JHUGen
+      - run:
+          <<: *cmsrelcmsenv
+      - run:
+          <<: *jhugenversion
+      - restore_cache:
+          key: v2_boost_1_61_0
+      - run:
+          name: compile lexicon
+          command: |
+            cd JHUGenLexicon/
+            make -j
+      - persist_to_workspace:
+          root: ~/JHUGen
+          paths:
+            - JHUGenLexicon
 
   build-MCFM:
     <<: *env
@@ -1108,7 +1131,7 @@ jobs:
           name: "check that permissions are not annoying"
           command: |
             for filename in $(git ls-files); do
-              if sed -n 1p $filename | grep '^#!'; then
+              if [[ $(sed -n 1p $filename | grep '^#!') != "" ]] || [[ ( -d "${filename%/*}" ) && ( "${filename%/*}" == *"bin" ) ]]; then
                 chmod u+x $filename
               else
                 chmod u-x $filename
