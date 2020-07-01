@@ -143,7 +143,7 @@ jobs:
             - JHUGenerator
             - JHUGenMELA
 
-  buildLexicon:
+  build-lexicon:
     <<: *env
     working_directory: ~/JHUGen
     steps:
@@ -1160,6 +1160,9 @@ workflows:
     jobs:
       - checkout
       - build:
+          requires:
+            - checkout
+      - build-lexicon:
           requires:
             - checkout
       - build-MCFM:
