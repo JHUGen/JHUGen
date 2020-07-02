@@ -796,10 +796,12 @@ The names and default values of these parameters are found in \verb|mod_Paramete
 complex(8), public :: ghg2 = (1.0d0,0d0)
 complex(8), public :: ghg3 = (0.0d0,0d0)
 complex(8), public :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
+
 complex(8), public :: ghz1 = (2.0d0,0d0)   ! =1 for off-shell processes in SM
 complex(8), public :: ghz2 = (0.0d0,0d0)
 complex(8), public :: ghz3 = (0.0d0,0d0)
 complex(8), public :: ghz4 = (0.0d0,0d0)   ! pseudoscalar
+
 !-- parameters that define q^2 dependent form factors
 complex(8), public :: ghz1_prime = (0.0d0,0d0)
 complex(8), public :: ghz1_prime2= (0.0d0,0d0)
@@ -808,6 +810,7 @@ complex(8), public :: ghz1_prime4= (0.0d0,0d0)
 complex(8), public :: ghz1_prime5= (0.0d0,0d0)
 complex(8), public :: ghz1_prime6= (0.0d0,0d0)
 complex(8), public :: ghz1_prime7= (0.0d0,0d0)
+
 complex(8), public :: ghz2_prime = (0.0d0,0d0)
 complex(8), public :: ghz2_prime2= (0.0d0,0d0)
 complex(8), public :: ghz2_prime3= (0.0d0,0d0)
@@ -815,6 +818,7 @@ complex(8), public :: ghz2_prime4= (0.0d0,0d0)
 complex(8), public :: ghz2_prime5= (0.0d0,0d0)
 complex(8), public :: ghz2_prime6= (0.0d0,0d0)
 complex(8), public :: ghz2_prime7= (0.0d0,0d0)
+
 complex(8), public :: ghz3_prime = (0.0d0,0d0)
 complex(8), public :: ghz3_prime2= (0.0d0,0d0)
 complex(8), public :: ghz3_prime3= (0.0d0,0d0)
@@ -822,6 +826,7 @@ complex(8), public :: ghz3_prime4= (0.0d0,0d0)
 complex(8), public :: ghz3_prime5= (0.0d0,0d0)
 complex(8), public :: ghz3_prime6= (0.0d0,0d0)
 complex(8), public :: ghz3_prime7= (0.0d0,0d0)
+
 complex(8), public :: ghz4_prime = (0.0d0,0d0)
 complex(8), public :: ghz4_prime2= (0.0d0,0d0)
 complex(8), public :: ghz4_prime3= (0.0d0,0d0)
@@ -829,14 +834,17 @@ complex(8), public :: ghz4_prime4= (0.0d0,0d0)
 complex(8), public :: ghz4_prime5= (0.0d0,0d0)
 complex(8), public :: ghz4_prime6= (0.0d0,0d0)
 complex(8), public :: ghz4_prime7= (0.0d0,0d0)
+
 real(8),    public, parameter :: Lambda_z1 = 10000d0*GeV
 real(8),    public, parameter :: Lambda_z2 = 10000d0*GeV
 real(8),    public, parameter :: Lambda_z3 = 10000d0*GeV
 real(8),    public, parameter :: Lambda_z4 = 10000d0*GeV
 real(8),    public, parameter :: Lambda_Q  = 10000d0*GeV
+
 integer,    public :: cz_q1sq = 0d0 ! Sign of q1,2,12**2 for the following Lambda's
 integer,    public :: cz_q2sq = 0d0
 integer,    public :: cz_q12sq = 0d0
+
 real(8),    public :: Lambda_z11 = 100d0*GeV ! For Z1
 real(8),    public :: Lambda_z21 = 100d0*GeV
 real(8),    public :: Lambda_z31 = 100d0*GeV
@@ -911,6 +919,7 @@ The couplings between $V^\prime$ and fermions are set by
    complex(8), public :: ezp_Str_right  = (0d0,0d0)
    complex(8), public :: ezp_Bot_left  = (0d0,0d0)
    complex(8), public :: ezp_Bot_right  = (0d0,0d0)
+
    complex(8), public :: ewp_El_left  = (0d0,0d0)
    complex(8), public :: ewp_El_right  = (0d0,0d0)
    complex(8), public :: ewp_Mu_left  = (0d0,0d0)
@@ -961,6 +970,7 @@ the command line should be
         ghw1_prime2=-9.3,0.0 ghzgs1_prime2=-7.84,0.0 dV_A=1.0,0.0 dV_Z=1.08,0.0 dP_A=1.0,0.0 
         dP_Z=1.08,0.0 dM_A=1.0,0.0 dM_Z=1.08,0.0 dZZWpWm=1.15,0.0 dZAWpWm=1.08,0.0 ...
 \end{verbatim}
+
 Note that as discussed on page~\pageref{sec:offshell}, the direct $HVV$ couplings need to be divided by 2 in processes 66-68.
 However, when using these couplings to express the  triple and quartic gauge couplings following Eqs.~(\ref{eq:d1} - \ref{eq:d6}),
 no such division is necessary. In other words, the scaling convention applies only to direct HVV couplings configured in the
@@ -969,9 +979,12 @@ transparent with careful consideration, and please check the example above as we
 SM convention $g_1^{ZZ}=g_1^{WW}=1$ in the MCFM matrix element (as opposed to $g_1^{ZZ}=g_1^{WW}=2$ elsewhere), 
 which we would like to preserve for compatibility purpose. 
 \vspace{0.3cm}
+
 \paragraph{Spin-1 parameters}
 \label{spin1}
+
 The parameters below represent the couplings given in Eq.~(16) from Ref.~\cite{Bolognesi:2012}. The \verb|zprime_qq_*| parameters control the production of the spin-1 resonance while the \verb|zprime_zz_*| parameters control the decay.
+
 \begin{verbatim}
 !---parameters that define spin 1 coupling to SM fields, see note
 complex(8), public :: zprime_qq_left  = (1.0d0,0d0)   !  see note Eq. (4)
@@ -979,19 +992,24 @@ complex(8), public :: zprime_qq_right = (1.0d0,0d0)
 complex(8), public :: zprime_zz_1 =  (0.0d0,0d0)!  =1 for JP=1-
 complex(8), public :: zprime_zz_2 =  (0.0d0,0d0)!  =1 for JP=1+
 \end{verbatim}
+
 \paragraph{Spin-2 parameters}
 \label{spin2}
+
 \noindent
 The \verb|a*| parameters control the coupling of a spin-2 resonance to gluons in the production mechanism.  The \verb|b*| parameters control the decay to either $ZZ$ or $WW$ (\verb|b|), $Z\gamma$ (\verb|zgs|), or $\gamma\gamma$ (\verb|gsgs|).
 The spin-2 couplings are described by Eq.(18) from Ref.~\cite{Bolognesi:2012}, and can be set on the command line.
+
 \begin{verbatim}
 complex(8), public :: a1 = (1.0d0,0d0)    ! g1  -- c.f. note
 complex(8), public :: a2 = (0.0d0,0d0)    ! g2
 complex(8), public :: a3 = (0.0d0,0d0)    ! g3
 complex(8), public :: a4 = (0.0d0,0d0)    ! g4
 complex(8), public :: a5 = (0.0d0,0d0)    ! pseudoscalar, g8
+
 complex(8), public :: graviton_qq_left  = (1.0d0,0d0)! graviton coupling to quarks
 complex(8), public :: graviton_qq_right = (1.0d0,0d0)
+
 complex(8), public :: b1 = (0.0d0,0d0)
 complex(8), public :: b2 = (0.0d0,0d0)
 complex(8), public :: b3 = (0.0d0,0d0)
@@ -1002,27 +1020,38 @@ complex(8), public :: b7 = (0.0d0,0d0)
 complex(8), public :: b8 = (0.0d0,0d0)
 complex(8), public :: b9 = (0.0d0,0d0)
 complex(8), public :: b10 =(0.0d0,0d0)
+
 complex(8), public :: bzgs1 = (0.0d0,0d0)
 complex(8), public :: bzgs2 = (0.0d0,0d0)
 complex(8), public :: bzgs3 = (0.0d0,0d0)
 complex(8), public :: bzgs4 = (0.0d0,0d0)
 complex(8), public :: bzgs8 = (0.0d0,0d0)
+
 complex(8), public :: bgsgs1 = (0.0d0,0d0)
 complex(8), public :: bgsgs2 = (0.0d0,0d0)
 complex(8), public :: bgsgs3 = (0.0d0,0d0)
 complex(8), public :: bgsgs4 = (0.0d0,0d0)
 complex(8), public :: bgsgs8 = (0.0d0,0d0)
 \end{verbatim}
+
 As in the spin 0 case, decay to $Z^\prime$ is fully supported.  Each of the parameters listed above for $VV$ has an equivalent parameter that describes the spin 2 resonance's coupling to $VV^\prime$ and $V^\prime V^\prime$; examples include \verb|bzzp1| and \verb|bzpzp2|.  Similarly, the parameters describing the decay to $Z\gamma$ have equivalent parameters, such as \verb|bzpgs3|, that describe the decay to $Z^\prime\gamma$.  The parameters controlling the mass, width, and fermion couplings of $Z^\prime$ and $W^\prime$ are described above in Section \ref{contactterms}.
+
+
+
 \subsection{Configuration in parameter file}
 Some more advanced parameters can be found in \verb|mod_Parameters.F90|.  These include SM parameters such as the masses of particles and electroweak couplings, which can be changed for precise syncing with other generators used, for example.  Look for the \verb|!constants| section.
+
 \verb|mod_Parameters.F90| also contains alternate schemes for setting the spin 0 and spin 2 couplings, specified by Eq.~(11) and Eq.~(20) of \cite{Bolognesi:2012} instead of Eq.~(9) and Eq.~(18).  To enable these couplings, set \verb|generate_as| to \verb|.true.| and set the \verb|ahg*| and \verb|ahz*| couplings for spin 0, or set \verb|generate_bis| to \verb|.false.| and set the \verb|c*| couplings for spin 2.
+
 Note that these alternate couplings only work for processes 0 and 2, not for other production modes that use spin 0 couplings.
+
 Any modification to \verb|mod_Parameters.F90| requires recompiling JHUGen.  We recommend contacting the authors before modifying \verb|mod_Parameters.F90|.  If the functionality you want is useful and really cannot be achieved any other way, we can consider making it available as a command line option.
+
 \section{Examples}
 \noindent
 The below examples are not meant to be a complete set, but rather some interesting and relevant cases.
 In many cases, the example is not the only way to produce such a scenario.
+
 \subsection{\texorpdfstring{$J^P = 0^+_m$ resonance, $X \to ZZ\text{ or }WW$}{JP=0+m resonance, X -> ZZ or WW}}
 \label{sec:exA}
 \begin{verbatim}
@@ -1086,19 +1115,25 @@ It is possible to interface to an LHAPDF setup instead of compiling with local P
 \item Run with the extra command line parameter \verb|LHAPDF| specifying your PDF set's \verb|.info| file.  For example: \verb|LHAPDF=NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info|
 \end{itemize}
 %%%%%%%%%%%
+
+
 \section{JHU Generator Matrix Elements (JHUGenMELA)}
 These instructions are meant as an introduction to MELA and do not illustrate the full flexibility provided by the package.  For further instructions, please contact the authors.
 \subsection{Compiling}
 After extracting the code, you can go to the directory \texttt{JHUGenMELA/MELA} to find code for computing matrix elements directly.
 To compile the code, simply run \texttt{./setup.sh}. You can specify the option \verb|-j N| for multi-core compilation, or option \verb|clean| for cleanup. There is also the option \verb|deps| to only set up dependencies without compiling MELA itself, which is useful if you only intend to use the dependencies for linking to JHUGenerator. The script will print a set of instructions to run at theend of its execution in order to set up to three environment variables that are needed to run \texttt{MELA}: \texttt{LD\_LIBRARY\_PATH} needs to include the library path for MELA, \texttt{PYTHONPATH} needs to contain the path for thte Python MELA interface, and \texttt{SCRAM\_ARCH} needs to be set to refer to one of the folders inside MELA/data for the correct version of the MCFM library.
+
 \textbf{Please take note: The setup relies on MCFM libraries, which are downloaded from the main webpage during the \texttt{setup.sh} script.  They are provided for \texttt{gfort + gcc version 4.6} or later, and only for SLC. They work out-of-the-box with other compiler versions that are not too far away, and we regularly monitor new versions. If you are using SLC but a very new gfort/gcc version that requires a new precompiled library, let us know and we will provide it promptly.}
 If you are not using SLC, or the precompiled libraries do not work, you can always compile the MCFM library yourself by going into the MCFM-JHUGen directory and running \verb|./compile.sh (-j N)| (\verb|./compile.sh clean| for cleanup).
+
 MELA requires the ROOT package~\cite{root}, and the simplest way to use MELA is to compile in ROOT.  Run the \texttt|loadMELA.C| script in the test directory before compiling or loading any other scripts that rely on MELA.  It is also possible to link against the MELA code directly.
 \subsection{Starting out}
 To begin, create a Mela object.  For example, \verb|std::unique_ptr<Mela> mela(new Mela(13, 125))| indicates a 13 TeV LHC energy and a 125 GeV Higgs boson.  It is not recommended to create multiple Mela objects simultaneously, as some parameters in Fortran will be shared between the objects.
 \subsection{Event input}
 The next step is to provide \texttt{mela} with the particles in the event.  An event in MELA contains three sets of particles: the Higgs boson decay products (``daughters''), particles produced in association with the Higgs boson, such as VBF jets or particles from the $V$ decay in $VH$ (``associated''), and the incoming partons (``mothers'').  Each particle has a PDG id and a 4-momentum.  The mothers can and should be left out when dealing with reconstructed events, since they are not known.  In that case either an empty vector or a null pointer can be used.  Similarly, the associated collection can be empty when there are no associated particles.
+
 If you need to calculate matrix elements for the Higgs boson decay, of course it is necessary to supply the decay products' PDG ids and momenta.  If you only need to calculate production matrix elements (VBF or $VH$, for instance), the ``daughters'' can just contain the Higgs boson itself, with id 25 and the Higgs boson's 4-momentum.
+
 To construct an event, use this syntax:
 \begin{verbatim}
 SimpleParticleCollection_t daughters, associated, mothers;
@@ -1108,11 +1143,13 @@ associated.emplace_back(1, TLorentzVector(px, py, pz, E));   //for a down quark
 associated.emplace_back(0, TLorentzVector(px, py, pz, E));   //for an unknown particle,
                                                              //which may be a quark or a gluon
 \end{verbatim}
+
 As the final step, pass the particle collections to \texttt{mela}:
 \begin{verbatim}
 mela->setInputEvent(&daughters, &associated, &mothers, false);
 \end{verbatim}
 The last argument tells MELA whether the event is a generator-level event (true) or a reconstructed event (false).  This affects how the output probabilities are normalized.
+
 \subsection{Process selection}
 Once MELA has the event, you can calculate as many matrix elements as you want.  Each matrix element is calculated for a particular process and Higgs boson hypothesis and uses the matrix elements from a particular generator (either \texttt{JHUGen} or \texttt{MCFM}).  These are set using the \texttt{setProcess} function, with the help of the enums in \texttt{TVar.hh}.  For example
 \begin{verbatim}
@@ -1123,6 +1160,7 @@ mela->setProcess(TVar::bkgZZ, TVar::MCFM, TVar::ZZQQB);
 //For VBF production of a pseudoscalar Higgs boson
 mela->setProcess(TVar::H0minus, TVar::JHUGen, TVar::JJVBF);
 \end{verbatim}
+
 For full flexibility in the couplings, the texttt{SelfDefine} processes can be used instead of the pre-cooked ones.  In that case the couplings are set manually:
 \begin{verbatim}
 mela->setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, TVar::Had_ZH)
@@ -1131,6 +1169,7 @@ mela->selfDHzzcoupl[0][gHIGGS_VV_4][0] = 1;
 mela->selfDHzzcoupl[0][gHIGGS_VV_4][1] = 1;
 \end{verbatim}
 In the notation of the generator, this is equivalent to \texttt{ghz1=1,0 ghz4=1,1}, which sets the Standard Model coupling to $1$ and the pseudoscalar coupling to $1+i$.
+
 \subsection{Calculate}
 Once the event, process, and (if necessary) couplings are set, the probability can be computed using one of these functions:
 \begin{verbatim}
@@ -1140,13 +1179,16 @@ mela->computeProdP(result, useConstant);    //for production
 mela->computeProdDecP(result, useConstant); //for the combined matrix element, using MCFM
 \end{verbatim}
 The second argument affects the normalization, and should generally be set to true for reconstructed events, false for generator level events.
+
 Any of these functions reset the process and couplings to their default values.  If you want to compute another probability for the same event, there is no need to call \texttt{setInputEvent} again, but you do have to call \texttt{setProcess}, as well as set the couplings if the process is \texttt{SelfDefine}.
+
 \subsection{Clean up}
 The last step is to call
 \begin{verbatim}
 mela->resetInputEvent()
 \end{verbatim}
 to avoid memory leaks.  This is particularly important when processing many events in one job.
+
 \subsection{Python interface}
 We also provide a python interface for MELA, which works essentially the same way as the C++ interface.  For more information, use the Python help function:
 \begin{verbatim}
@@ -1154,6 +1196,8 @@ We also provide a python interface for MELA, which works essentially the same wa
 >>> help(mela)
 \end{verbatim}
 Since text processing is simple in Python, the Python MELA interface is especially useful for running quick jobs on LHE files.
+
+
 \section{JHU Generator Coupling Converter (JHUGenLexicon)}
 
 In order to simplify translation between different coupling conventions, 
@@ -1180,7 +1224,7 @@ For further details, see~\cite{Falkowski:2015wza}.
 ./JHUGenLexicon input_basis=hbasis output_basis=amp_jhu dCz=1,0 Czz=.5,0 Czbx=0,1E-7 tCzz=1.05,0 
 dCw=2,0 Cww=1,0 Cwbx=0,2E-7 tCww=1,1 Cza=1,.5 tCza=.5,1 Cabx=0,0 Caa=0,.5 tCaa=.5,1 Cgg=2.1,0
 tCgg=.5,.5
-%
+
 \end{verbatim}
 \begin{verbatim}
 ./JHUGenLexicon input_basis=eft_hbasis output_basis=amp_jhu dCz=1,0 Czz=.5,0 Czbx=0,1E-7 
@@ -1218,6 +1262,7 @@ The following example demonstrates how to modify constants used in the coupling 
 output by JHUGenLexicon. In this case we include translation from 10 independent $HVV$ and $Hgg$ couplings in the Higgs basis 
 to the native coefficients used in JHUGen. We return all couplings, including triple and quartic gauge couplings, 
 with Lambda\_w1, Lambda\_z1 and Lambda\_zgs1 set to 100GeV.
+
 \begin{verbatim}
 ./JHUGenLexicon input_basis=eft_hbasis output_basis=amp_jhu dCz=1,0 Czz=.5,0 Czbx=0,1E-7 
 tCzz=1.05,0 Cza=1,.5 tCza=.5,1 Cabx=0,0 Caa=0,.5 tCaa=.5,1 Cgg=2.1,0 neutral_current=false 
