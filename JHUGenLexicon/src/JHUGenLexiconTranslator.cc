@@ -428,7 +428,7 @@ std::vector<std::vector<double>> JHUGenLexiconTranslator::getTranslationMatrix(
         res[coupl_hbasis_Cwbx][coupl_eftjhu_ghz2] = -((2*pow(MW,2)*pow(sw,2))/(pow(e,2)*pow(MZ,2)*(cw - sw)));
         res[coupl_hbasis_Cwbx][coupl_eftjhu_ghzgs2] = ((2*pow(MW,2)*pow(sw,3.0/2.0))/(sqrt(cw)*pow(e,2)*pow(MZ,2)));
         res[coupl_hbasis_Cwbx][coupl_eftjhu_ghgsgs2] = (2*pow(MW,2)*pow(sw,2))/(pow(e,2)*pow(MZ,2)*(cw - sw));
-        es[coupl_hbasis_tCww][coupl_eftjhu_ghz4] = -((2*cw*sw)/pow(e,2));
+        res[coupl_hbasis_tCww][coupl_eftjhu_ghz4] = -((2*cw*sw)/pow(e,2));
         res[coupl_hbasis_tCww][coupl_eftjhu_ghzgs4] = -((4*sqrt(cw)*pow(sw,3.0/2))/pow(e,2));
         res[coupl_hbasis_tCww][coupl_eftjhu_ghgsgs4] =  -((2*pow(sw,2))/pow(e,2));
         res[coupl_hbasis_Cza][coupl_eftjhu_ghzgs2] = -((2*sqrt(cw)*sqrt(sw))/pow(e,2));
