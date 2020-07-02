@@ -9,7 +9,6 @@
 #define DEFVAL_SW 0.23119 //Actually is SW^2
 #define DEFVAL_LAMBDA_VI 10000.
 #define DEFVAL_ALPHA .0072973525693 //Used to set e^2
-#define DEFVAL_ALPHA_S .11834 //Used to set gs^2
 #define DEFVAL_VEV_LAM .0024622 //Vacuum Expectation Value GeV / Lambda Warsaw Basis
 
 

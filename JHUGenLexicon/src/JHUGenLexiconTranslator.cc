@@ -185,11 +185,9 @@ std::vector<std::vector<double>> JHUGenLexiconTranslator::getTranslationMatrix(
   bool include_triple_quartic_gauge; getValueWithDefault<std::string, bool>(input_flags, "include_triple_quartic_gauge", include_triple_quartic_gauge, false);
   double alpha; getValueWithDefault<std::string, double>(input_parameters, "alpha", alpha, DEFVAL_ALPHA);
   double sw; getValueWithDefault<std::string, double>(input_parameters, "sin2ThetaW", sw, DEFVAL_SW);
-  double alpha_s; getValueWithDefault<std::string, double>(input_parameters, "alpha_s", alpha_s, DEFVAL_ALPHA_S);
   double vev_lam; getValueWithDefault<std::string, double>(input_parameters, "vev_lam", vev_lam, DEFVAL_VEV_LAM);
   const double pi = 3.14159265358979323846;
   double e = sqrt(4*pi*alpha);
-  double gs = sqrt(4*pi*alpha_s);
   double cw = 1.0-sw;  
   double MZ; getValueWithDefault<std::string, double>(input_parameters, "MZ", MZ, DEFVAL_MZ);
   double MW; getValueWithDefault<std::string, double>(input_parameters, "MW", MW, DEFVAL_MW);
@@ -826,7 +824,7 @@ std::vector<std::vector<double>> JHUGenLexiconTranslator::getTranslationMatrix(
       res[coupl_warsaw_cHbx][coupl_efthbasis_Czbx]=(1.0/vev_lam)*(pow(e,2)*(-3.0*cw+sw))/(2.0*sw*(sw-cw));
       res[coupl_warsaw_cHbx][coupl_efthbasis_Cza]=(1.0/vev_lam)*-pow(e,4)/(sqrt(cw)*sqrt(sw));
       res[coupl_warsaw_cHbx][coupl_efthbasis_Caa]=(1.0/vev_lam)*-(sqrt(cw)*pow(e,4)*sqrt(sw))/(cw-sw);
-      res[coupl_warsaw_cHG][coupl_efthbasis_Cgg]=(1.0/vev_lam)*pow(gs,2.0)/(4.0);
+      res[coupl_warsaw_cHG][coupl_efthbasis_Cgg]=(1.0/vev_lam)/(4.0);
       res[coupl_warsaw_cHW][coupl_efthbasis_Czz]=(1.0/vev_lam)*pow(e,2)/(4.0*sw);
       res[coupl_warsaw_cHW][coupl_efthbasis_Cza]=(1.0/vev_lam)*pow(e,2.0)/2.0;
       res[coupl_warsaw_cHW][coupl_efthbasis_Caa]=(1.0/vev_lam)*(sw*pow(e,2.0))/4.0;
@@ -849,7 +847,7 @@ std::vector<std::vector<double>> JHUGenLexiconTranslator::getTranslationMatrix(
       res[coupl_warsaw_tcHWB][coupl_efthbasis_tCzz]=(1.0/vev_lam)*pow(e,2)/(2.0*sqrt(sw)*sqrt(cw));
       res[coupl_warsaw_tcHWB][coupl_efthbasis_tCza]=(1.0/vev_lam)*(-pow(e,2)*(cw-sw))/(2.0*sqrt(sw)*sqrt(cw));
       res[coupl_warsaw_tcHWB][coupl_efthbasis_tCaa]=(1.0/vev_lam)*-(pow(e,2)*sqrt(sw)*sqrt(cw))/2.0;
-      res[coupl_warsaw_tcHG][coupl_efthbasis_tCgg]=(1.0/vev_lam)*pow(gs,2)/4.0;
+      res[coupl_warsaw_tcHG][coupl_efthbasis_tCgg]=(1.0/vev_lam)/4.0;
     }
   }
 else if (basis_input == bWarsawBasis){
@@ -888,8 +886,8 @@ else if (basis_input == bWarsawBasis){
                 res[coupl_hbasistrip_tCaa][coupl_warsaw_tcHW]=(vev_lam)*(4.0*sw)/pow(e,2);
                 res[coupl_hbasistrip_tCaa][coupl_warsaw_tcHWB]=(vev_lam)*-(4.0*sqrt(cw)*sqrt(sw))/pow(e,2);
                 res[coupl_hbasistrip_tCaa][coupl_warsaw_tcHB]=(vev_lam)*(4.0*cw)/pow(e,2);
-                res[coupl_hbasistrip_Cgg][coupl_warsaw_cHG]=(vev_lam)*4.0/pow(gs,2);
-                res[coupl_hbasistrip_tCgg][coupl_warsaw_tcHG]=(vev_lam)*4.0/pow(gs,2);
+                res[coupl_hbasistrip_Cgg][coupl_warsaw_cHG]=(vev_lam)*4.0;
+                res[coupl_hbasistrip_tCgg][coupl_warsaw_tcHG]=(vev_lam)*4.0;
                 res[coupl_hbasistrip_dKa][coupl_warsaw_cHWB]=(vev_lam)*(sqrt(cw))/(2.0*sqrt(sw));
                 res[coupl_hbasistrip_tKa][coupl_warsaw_tcHWB]=(vev_lam)*(sqrt(cw))/(2.0*sqrt(sw));
                 res[coupl_hbasistrip_dKz][coupl_warsaw_cHWB]=(vev_lam)*-(sqrt(cw)*pow(e,2)-2*pow(sw,3.0/2.0)+2*pow(sw,5.0/2.0))/(2.0*sw*sqrt(cw)*(sw-cw));
@@ -932,8 +930,8 @@ else if (basis_input == bWarsawBasis){
                 res[coupl_hbasis_tCaa][coupl_warsaw_tcHW]=(vev_lam)*(4.0*sw)/pow(e,2);
                 res[coupl_hbasis_tCaa][coupl_warsaw_tcHWB]=(vev_lam)*-(4.0*sqrt(cw)*sqrt(sw))/pow(e,2);
                 res[coupl_hbasis_tCaa][coupl_warsaw_tcHB]=(vev_lam)*(4.0*cw)/pow(e,2);
-                res[coupl_hbasis_Cgg][coupl_warsaw_cHG]=(vev_lam)*4.0/pow(gs,2);
-                res[coupl_hbasis_tCgg][coupl_warsaw_tcHG]=(vev_lam)*4.0/pow(gs,2);
+                res[coupl_hbasis_Cgg][coupl_warsaw_cHG]=(vev_lam)*4.0;
+                res[coupl_hbasis_tCgg][coupl_warsaw_tcHG]=(vev_lam)*4.0;
  
 	   }
   	}
@@ -963,8 +961,8 @@ else if (basis_input == bWarsawBasis){
                   res[coupl_efthbasistrip_tCaa][coupl_warsaw_tcHW]=(vev_lam)*(4.0*sw)/pow(e,2);
                   res[coupl_efthbasistrip_tCaa][coupl_warsaw_tcHWB]=(vev_lam)*-(4.0*sqrt(cw)*sqrt(sw))/pow(e,2);
                   res[coupl_efthbasistrip_tCaa][coupl_warsaw_tcHB]=(vev_lam)*(4.0*cw)/pow(e,2);
-                  res[coupl_efthbasistrip_Cgg][coupl_warsaw_cHG]=(vev_lam)*4.0/pow(gs,2);
-                  res[coupl_efthbasistrip_tCgg][coupl_warsaw_tcHG]=(vev_lam)*4.0/pow(gs,2);
+                  res[coupl_efthbasistrip_Cgg][coupl_warsaw_cHG]=(vev_lam)*4.0;
+                  res[coupl_efthbasistrip_tCgg][coupl_warsaw_tcHG]=(vev_lam)*4.0;
                   res[coupl_efthbasistrip_dKa][coupl_warsaw_cHWB]=(vev_lam)*(sqrt(cw))/(2.0*sqrt(sw));
                   res[coupl_efthbasistrip_tKa][coupl_warsaw_tcHWB]=(vev_lam)*(sqrt(cw))/(2.0*sqrt(sw));
                   res[coupl_efthbasistrip_dKz][coupl_warsaw_cHWB]=(vev_lam)*-(sqrt(cw)*pow(e,2)-2*pow(sw,3.0/2.0)+2*pow(sw,5.0/2.0))/(2.0*sw*sqrt(cw)*(sw-cw));
@@ -998,8 +996,8 @@ else if (basis_input == bWarsawBasis){
                   res[coupl_efthbasis_tCaa][coupl_warsaw_tcHW]=(vev_lam)*(4.0*sw)/pow(e,2);
                   res[coupl_efthbasis_tCaa][coupl_warsaw_tcHWB]=(vev_lam)*-(4.0*sqrt(cw)*sqrt(sw))/pow(e,2);
                   res[coupl_efthbasis_tCaa][coupl_warsaw_tcHB]=(vev_lam)*(4.0*cw)/pow(e,2);
-                  res[coupl_efthbasis_Cgg][coupl_warsaw_cHG]=(vev_lam)*4.0/pow(gs,2);
-                  res[coupl_efthbasis_tCgg][coupl_warsaw_tcHG]=(vev_lam)*4.0/pow(gs,2);
+                  res[coupl_efthbasis_Cgg][coupl_warsaw_cHG]=(vev_lam)*4.0;
+                  res[coupl_efthbasis_tCgg][coupl_warsaw_tcHG]=(vev_lam)*4.0;
 		}
 	}
 	else if (basis_output == bAmplitude_JHUGen){
