@@ -28,7 +28,7 @@ Manual for the JHU generator and MELA package
 \begin{center}
 \small
 For simulation, reweighting, and analysis of single-produced resonances at hadron colliders \\
-(version v7.4.0, release date March 30, 2020) \\
+(version v7.4.0, release date July 4, 2020) \\
 \normalsize
 \end{center}
 
@@ -38,11 +38,16 @@ is a model-independent generator for studying spin-parity properties of new reso
 Please cite \cite{Gao:2010qx,Bolognesi:2012,Anderson:2013,Gritsan:2016,Gritsan:2020pib} 
 if using the ``JHU generator'' (or JHUGen). The code can be downloaded from \cite{thesite}.
 The generator outputs LHE files which can be passed to parton shower programs for hadronization.
-Only relative values of cross sections are supposed to produce meaningful results, while absolute values are often subject to an arbitrary normalization.
+Only relative values of cross sections are supposed to produce meaningful results, 
+while absolute values are often subject to an arbitrary normalization.
 
 Additionally, the package includes code for computing the matrix elements standalone which can be used in a numerical matrix element analysis.
 Please reference the above papers and refer to ``MELA'' when using the matrix element likelihood approach.
-The latter was also introduced in Ref.~\cite{Chatrchyan:2012ufa}. The matrix element package (MELA) and off-shell EW generation also depend on MCFM libraries for background parameterization which should be referenced~\cite{Campbell:2010ff} when used.
+The latter was also introduced in Ref.~\cite{Chatrchyan:2012ufa}. The matrix element package (MELA) and off-shell EW generation 
+also depend on MCFM libraries for background parameterization which should be referenced~\cite{Campbell:2010ff} when used.
+In order to simplify translation between different coupling conventions, within the JHU generator framework, we provide the JHUGenLexicon program,
+which includes an interface to the generator and matrix element library and can also be used for standalone or other applications. 
+
 
 \vspace{0.5cm}
 \begin{center}
@@ -249,6 +254,7 @@ The anomalous coefficients in Eqs.~(\ref{eq:EFT_tgc},\ref{eq:EFT_qgc}) are relat
   \tilde  \kappa_z =  \frac12 d_4^Z \,,
   \nonumber \\ 
   \delta g_{1,z} = d_2^Z - 1= d_3^Z - 1= \frac12 \left( \frac{s_w^2}{c_w^2} d^{ZZWW}-1 \right) = \frac{s_w}{c_w} d^{Z \gamma WW} -1
+  \label{eq:dg1z}
   \,.
 \end{eqnarray}
 Similar to the case of $\mathcal{L}_\mathrm{hvv}$, not all coefficients in Eqs.~(\ref{eq:EFT_tgc},\ref{eq:EFT_qgc}) 
@@ -375,7 +381,7 @@ Examples of running the generator.  The number of events is determined using \te
 		pTjetcut=15 deltaRcut=0
 		\end{verbatim}
 	\end{itemize}
-	\item off-shell EW, \texttt{Process=66}, \texttt{67}, \texttt{68}
+	\item off-shell EW $q \bar{q} \to q \bar{q} + ZZ(\to 4f)$, \texttt{Process=66}, \texttt{67}, \texttt{68} 
 	\begin{itemize}
 		\item including VBF and hadronic $VH$ with up to two scalar resonances and interference with the SM background
 		\item see below, page \pageref{sec:offshell}, for the configuration
@@ -633,12 +639,14 @@ The initial state, order of calculation, and diagrams (triangle, box, both, or t
 is set by the parameter \texttt{VH\_PC}, with its options listed above. 
 The $\gamma H$ process, i.e. \texttt{DecayMode1=7}, is not yet implemented for \texttt{Process=51}.
 
-\paragraph{Off-shell Higgs production}
+\paragraph{Off-shell Higgs production in VBF/VH.}
 \label{sec:offshell}
 
 Processes 66 (signal), 67 (background), and 68 (signal+background+interference) provide an interface to a modified 
-version of MCFM~\cite{Campbell:2010ff} to produce off-shell EW production $VV\to VV$ in association with two quarks, 
-including all anomalous couplings.  Hadronic $VH$ and the equivalent $VVV$ background topologies are also included. 
+version of MCFM~\cite{Campbell:2010ff} to off-shell EW production $q\bar{q} \to q\bar{q} + VV(\to 4\ell)$, 
+including all anomalous couplings.  $V(\to q\bar{q})+H$ and the equivalent $VVV$ background topologies are part of the background.
+We note that only $VV=ZZ(\to 4f)$ is available. Final states with $VV=WW(\to 2\ell 2\nu)$ 
+can be generated but are in a beta version that is not fully tested. 
 For these processes, a second spin-zero resonance can be activated by setting \verb|MReso2| and \verb|GaReso2| to 
 nonzero values.  The second resonance's couplings can be set to arbitrary values, similar to the first resonance's. 
 These couplings are denoted as \verb|gh2*|. 
@@ -679,13 +687,33 @@ but none of the jobs in the the second set can start until all jobs in the first
 	\end{itemize}
 \end{enumerate}
 
-Similarly, processes 70 (signal), 71 (background), and 72 (signal+background+interference) generate off-shell EW production $VV\to VV$ in association with a $W$ or a $Z$ boson decaying leptonically. The same couplings for processes 66 or 68 can be used for 70 or 72. These processes require 84 partonic channels in the first grid generation step instead of 164. In addition, process 69 implements QCD $4f$ production in association with two partons, but this process only includes the continuum production without Higgs contribution. There are 175 partonic channels associated with this process.
+Similarly, processes 70 (signal), 71 (background), and 72 (signal+background+interference) generate off-shell EW production $VV\to VV$ 
+in association with a $W$ or a $Z$ boson decaying leptonically.  However, these processes are still in a state of an untested beta version.
+The same couplings for processes 66 or 68 can be used for 70 or 72. These processes require 84 partonic channels in the first grid generation 
+step instead of 164. In addition, process 69 implements an untested beta version of QCD production of $VV(\to 4f)$ in association with two partons, 
+but this process only includes the continuum production without Higgs contribution. There are 175 partonic channels associated with this process.
 
-The final result will be as many \texttt{.lhe} files as the number of partonic channels, each containing events from that particular partonic channel.  The number of events in each file will be proportional to the cross section of those channels.  The total number of events in the five files may be larger or smaller than the number of events requested.  If you want the exact number of events, use the same random seed five all five jobs of the second step.
+The final result will be as many \texttt{.lhe} files as the number of partonic channels, each containing events from that particular partonic channel.  
+The number of events in each file will be proportional to the cross section of those channels.  The total number of events in the five files may be 
+larger or smaller than the number of events requested.  If you want the exact number of events, use the same random seed five all five jobs of the second step.
 
-It is also possible to reuse the output of the first step to run more jobs in the second step.  For example, to run 1 million events using 400 jobs, you can run the first step once, then run 100 sets of 4 jobs each, using 100 different random seeds.
+It is also possible to reuse the output of the first step to run more jobs in the second step.  For example, to run 1 million events using 400 jobs, 
+you can run the first step once, then run 100 sets of 4 jobs each, using 100 different random seeds.
 
-The MCFM interface also allows the production of $ZZ/WW\to4f$ (without any other associated particles) through gluon fusion with infinite- or finite-mass quarks in the $ggH$ interaction. The corresponding processes are 73 (signal), 74 (background), and 75 (signal+background+interference). Only a single partonic channel, $gg$, is relevant for this process. The second resonance parameters can be used in this process as well. In addition, the $ggH$ vertex can be modified via \verb|gh*g*| or \verb|gh*g*_4gen| for two separate couplings per resonance for point-like $ggH$ interactions, or \verb|kappa*_*_top| and \verb|kappa*_*_bot|, or \verb|kappa*_tilde*_4gen_top| and \verb|kappa*_tilde*_4gen_bot| for a third-generation top and a bottom quark, or a fourth-generation top or bottom quark in the loop, respectively, again separately implemented for each resonance. For the fourth-generation interactions, the corresponding masses \verb|m_top_4gen| and \verb|m_bot_4gen| need to be set and are common to both resonances. The masses modifying the third generation quark loops are \verb|m_top| and \verb|m_bot|.
+\paragraph{Off-shell Higgs production in gluon fusion.}
+\label{sec:offshellggH}
+
+The MCFM interface also allows the production of $ZZ/WW\to4f$ (without any other associated particles) through gluon fusion with infinite- or 
+finite-mass quarks in the $ggH$ interaction. The corresponding processes are 73 (signal), 74 (background), and 75 (signal+background+interference). 
+These three processes are still in a state of an untested beta version. (In the meantime, these processes are supported with the matrix elements
+extended for anomalous couplings within the JHUGen framework and integrated into the MCFM framework for simulation of events.)
+Only a single partonic channel, $gg$, is relevant for this process. The second resonance parameters can be used in this process as well. 
+In addition, the $ggH$ vertex can be modified via \verb|gh*g*| or \verb|gh*g*_4gen| for two separate couplings per resonance for point-like 
+$ggH$ interactions, or \verb|kappa*_*_top| and \verb|kappa*_*_bot|, or \verb|kappa*_tilde*_4gen_top| and \verb|kappa*_tilde*_4gen_bot| 
+for a third-generation top and a bottom quark, or a fourth-generation top or bottom quark in the loop, respectively, again separately 
+implemented for each resonance. For the fourth-generation interactions, the corresponding masses \verb|m_top_4gen| and \verb|m_bot_4gen| 
+need to be set and are common to both resonances. The masses modifying the third generation quark loops are \verb|m_top| and \verb|m_bot|.
+
 
 \subsubsection{Resonance parameters}
 \begin{itemize}
@@ -1038,9 +1066,7 @@ As in the spin 0 case, decay to $Z^\prime$ is fully supported.  Each of the para
 
 
 
-
 \subsection{Configuration in parameter file}
-
 Some more advanced parameters can be found in \verb|mod_Parameters.F90|.  These include SM parameters such as the masses of particles and electroweak couplings, which can be changed for precise syncing with other generators used, for example.  Look for the \verb|!constants| section.
 
 \verb|mod_Parameters.F90| also contains alternate schemes for setting the spin 0 and spin 2 couplings, specified by Eq.~(11) and Eq.~(20) of \cite{Bolognesi:2012} instead of Eq.~(9) and Eq.~(18).  To enable these couplings, set \verb|generate_as| to \verb|.true.| and set the \verb|ahg*| and \verb|ahz*| couplings for spin 0, or set \verb|generate_bis| to \verb|.false.| and set the \verb|c*| couplings for spin 2.
@@ -1209,6 +1235,8 @@ and can also be used for standalone or other applications.
 In the present version, the program can take as input either the native coefficients used in JHUGen, 
 or the Higgs basis coefficients for the $HVV$ and $Hgg$ couplings. 
 The input can also be used either with or without the SU(2)$\times$U(1) and custodial symmetry.
+There is also translation between the Warsaw basis coefficients and either of the above two sets of couplings,
+with the custodial symmetry introduced. 
 The output, which can be used in the command line of the JHU generator or as input to MELA, 
 provides all coefficients appearing without expectation of the above symmetry, as expected by the
 generator and MELA. The output can also include the triple and quartic gauge boson couplings
@@ -1224,13 +1252,15 @@ For further details, see~\cite{Falkowski:2015wza}.
 ./JHUGenLexicon input_basis=hbasis output_basis=amp_jhu dCz=1,0 Czz=.5,0 Czbx=0,1E-7 tCzz=1.05,0 
 dCw=2,0 Cww=1,0 Cwbx=0,2E-7 tCww=1,1 Cza=1,.5 tCza=.5,1 Cabx=0,0 Caa=0,.5 tCaa=.5,1 Cgg=2.1,0
 tCgg=.5,.5
-  
+
 \end{verbatim}
 \begin{verbatim}
 ./JHUGenLexicon input_basis=eft_hbasis output_basis=amp_jhu dCz=1,0 Czz=.5,0 Czbx=0,1E-7 
 tCzz=1.05,0 Cza=1,.5 tCza=.5,1 Cabx=0,0 Caa=0,.5 tCaa=.5,1 Cgg=2.1,0 
 \end{verbatim}
-It is possible to set the value of constants used in the translations in eq. (8) of \cite{Gritsan:2020pib}. Parameters that manually set are given below. To modify these parameters, simply add param=num to the command line when calling JHUGenLexicon. Available parameters to set include the following:
+It is possible to set the value of constants used in the translations in Eq.~(8) of Ref.~\cite{Gritsan:2020pib}. 
+Parameters that manually set are given below. To modify these parameters, simply add param=num to the 
+command line when calling JHUGenLexicon. Available parameters to set include the following:
 \begin{verbatim}
     Lambda_z1 (default = 10000 GeV)
     Lambda_w1 (default = 10000 GeV)
@@ -1239,13 +1269,28 @@ It is possible to set the value of constants used in the translations in eq. (8)
     MW (default = 80.399 GeV)
     sin2ThetaW (default = 0.23119)
     alpha (default = 0.302862)
+    vev_lam (default =.0024622)
 \end{verbatim}
-where Lambda\_z1,Lambda\_w1,Lambda\_zgs1 correspond to $\Lambda_1^{ZZ}$,$\Lambda_1^{WW}$,$\Lambda_1^{Z\gamma}$ seen in eq (1) respectively, MZ is the mass of the Z Boson, MW is the of the W Boson, sin2ThetaW is $sin^2(\theta_W)$, and alpha corresponds to the fine structure constant $\alpha$. 
-In some JHUGen Processes, only couplings to W bosons or only couplings to Z bosons are expected. In this case, the command line options charged\_current and neutral\_current can be used to set which couplings are output on the command line. For example, with output\_basis=amp\_jhu and setting neutral\_current=false, only the couplings $g_1^{WW}$,$g_2^{WW}$,$g_4^{WW}$ and $\kappa_1^{WW}$ will be returned.
+where Lambda\_z1,Lambda\_w1,Lambda\_zgs1 correspond to $\Lambda_1^{ZZ}$,$\Lambda_1^{WW}$,$\Lambda_1^{Z\gamma}$ 
+seen in Eq.~(1) respectively, MZ is the mass of the Z Boson, MW is the of the W Boson, sin2ThetaW is $sin^2(\theta_W)$, alpha corresponds to the fine structure constant $\alpha$ and vev\_lam is $\frac{v^2}{\Lambda^2}$ as in Eq.(A1) of \cite{Gritsan:2020pib}. Notice that there is no option to set the strong coupling, $\alpha_s$. Since this is a running parameter, and JHUGen internally handles $\alpha_s$, we make sure to remove all factors of $g_s$ from translations of gluon couplings. Relations between gluon couplings are given by $c_{gg}=-\frac{2}{g_s^2}g_2^{gg}$ between the JHUGen amplitude basis and higgs basis and $c_{gg}=\frac{v^2}{\Lambda^2}\frac{4}{g_s^2} \omega_{\phi G}$ between the higgs and warsaw basis. Users should be careful to scale gluon coupling inputs and outputs accordingly. 
 
-Off-shell JHUGen processes, such as Process 68 can utilize triple and quartic gauge couplings. In order to return these couplings using JHUGenLexicon, use the command line argument include\_triple\_quartic\_gauge=true. This option in its current implementation, is able to calculate tripe and quartic gauge couplings in the both the higgs basis and JHUGen basis, using the relations in eq(14-20). When using JHUGenLexicon alongside JHUGen-MCFM Processes, be sure to set either useMCFMAtInput=true or useMCFMAtOutput=true. useMCFMAtInput=True assumes that the $g^VV$ couplings are divided by 2. useMCFMAtOutput=True divides all of the $g^{VV}$ couplings by 2 as per MCFM conventions.
+% In some JHUGen Processes, only couplings to W bosons or only couplings to Z bosons are expected. In this case, the command 
+% line options charged\_current and neutral\_current can be used to set which couplings are output on the command line. 
+% For example, with output\_basis=amp\_jhu and setting neutral\_current=false, only the couplings $g_1^{WW}$,$g_2^{WW}$,$g_4^{WW}$ 
+% and $\kappa_1^{WW}$ will be returned.
 
-The following example demonstrates how to modify constants used in the coupling translation, as well as the couplings that are output by JHUGenLexicon. In this case we include translation from 10 independent $HVV$ and $Hgg$ couplings in the Higgs Basis to the native coefficients used in JHUGen. We return only charged current couplings including triple and quartic gauge couplings with Lambda\_w1, Lambda\_z1 and Lambda\_zgs1 set to 100GeV.
+Off-shell JHUGen processes, such as Process 68 can utilize triple and quartic gauge couplings. In order to return these couplings 
+using JHUGenLexicon, use the command line argument include\_triple\_quartic\_gauge=true. This option in its current implementation, 
+is able to calculate tripe and quartic gauge couplings in the both the Higgs basis and JHUGen convention, using the relations in 
+Eq.~(\ref{eq:dg1z}--\ref{eq:d6}). When using JHUGenLexicon alongside JHUGen-MCFM processes, be sure to set either 
+useMCFMAtInput=true or useMCFMAtOutput=true. useMCFMAtInput=True assumes that the $g^VV$ couplings are divided by 2. 
+useMCFMAtOutput=True divides all of the $g^{VV}$ couplings by 2 as per MCFM conventions.
+
+The following example demonstrates how to modify constants used in the coupling translation, as well as the couplings that are 
+output by JHUGenLexicon. In this case we include translation from 10 independent $HVV$ and $Hgg$ couplings in the Higgs basis 
+to the native coefficients used in JHUGen. We return all couplings, including triple and quartic gauge couplings, 
+with Lambda\_w1, Lambda\_z1 and Lambda\_zgs1 set to 100GeV.
+
 \begin{verbatim}
 ./JHUGenLexicon input_basis=eft_hbasis output_basis=amp_jhu dCz=1,0 Czz=.5,0 Czbx=0,1E-7 
 tCzz=1.05,0 Cza=1,.5 tCza=.5,1 Cabx=0,0 Caa=0,.5 tCaa=.5,1 Cgg=2.1,0 neutral_current=false 
@@ -1254,24 +1299,26 @@ Lambda_z1=100 Lambda_w1=100 Lambda_zgs1=100
 
 \section{Release notes}
 \noindent
-In going to \verb|v7.4.0| (major revision; June 1, 2020), the updates are as follows:
+In going from \verb|v7.3.0| to \verb|v7.4.0| (July 4, 2020), the updates are as follows:
 \begin{itemize}
 \item Added command line setting of triple and quartic gauge boson couplings in off-shell EW processes 66-68.
 \item Improvements on the phase space optimization for off-shell processes.
 \item Extension of DecayMode options, final state filters, and implementation of the final state filters in the off-shell processes. Filter options are also renamed as a result of the extension of functionality.
 \item Enlarge allowed invariant mass ranges in the $q\bar{q} \to \gamma H$ and $q\bar{q} \to Z/\gamma^* H$ processes.
 \item Completion of the implementation of couplings with $V^\prime$ in all signal-only JHUGen processes at leading-order in QCD, where relevant, and decay lifetime for $V^\prime V^\prime$ final states in ReadLHE mode.
-\item Beta version of implementation of Process 70-72, EW $VV+2\ell/2\nu/\ell\nu$ and
-test version of Process 69, QCD $VV+2j$ continuum production without the Higgs contribution.
-\item Introduced JHUGenLexicon program for converting coupling convention, with the Higgs basis translation 
-available in this version. 
+\item Introduced JHUGenLexicon program for converting coupling convention, 
+with the translation available between the JHU generator / MELA convention, Higgs basis, and Warsaw basis. 
+% \item Beta version of implementation of Process 70-72, EW $VV+2\ell/2\nu/\ell\nu$ and
+% test version of Process 69, QCD $VV+2j$ continuum production without the Higgs contribution.
 \end{itemize}
 \noindent
-In going to \verb|v7.3.0| (April 28, 2019), the update is as follows:
+%
+In going from \verb|v7.2.7| to \verb|v7.3.0| (April 28, 2019), the update is as follows:
 \begin{itemize}
 \item Faster option for generating interference in \(4\ell\) final states in off-shell EW production, 164 jobs per step.
 \end{itemize}
 \noindent
+%
 In going from \verb|v7.2.4| to \verb|v7.2.7| (January 31, 2019), the updates are as follows:
 \begin{itemize}
 \item $gg\to ZH$ with anomalous couplings using Process 51, using the same syntax as for other processes.
@@ -1518,7 +1565,8 @@ I. Anderson, S. Bolognesi, F. Caola, Y.Y. Gao, A. V. Gritsan, C. B. Martin, K. M
 \bibitem{Gritsan:2016}
 A. V. Gritsan, R. R\"ontsch, M. Schulze, M. Xiao, ``Constraining anomalous Higgs boson couplings to the heavy flavor fermions using matrix element techniques''. Phys. Rev. D \textbf{94} (2016) 055023. arXiv:1606.03107 [hep-ph].
 \bibitem{Gritsan:2020pib} 
- A.~V.~Gritsan, J.~Roskes, U.~Sarica, M.~Schulze, M.~Xiao and Y.~Zhou, ``New features in the JHU generator framework,'' arXiv:2002.09888 [hep-ph].
+ A.~V.~Gritsan, J.~Roskes, U.~Sarica, M.~Schulze, M.~Xiao and Y.~Zhou, ``New features in the JHU generator framework: 
+ constraining Higgs boson properties from on-shell and off-shell production,'' arXiv:2002.09888 [hep-ph].
 \bibitem{thesite}
 See webpage: \url{http://spin.pha.jhu.edu}
 \bibitem{Chatrchyan:2012ufa}
