@@ -79,6 +79,7 @@ jobs:
       - run:
           name: "undo git checkout -B hack"
           command: rm -r $HOME/githack
+      - run: git submodule update --init
       - restore_cache:
           key: v2_boost_1_61_0
       - run:

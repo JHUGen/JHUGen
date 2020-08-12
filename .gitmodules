@@ -1,0 +1,3 @@
+[submodule "JHUGenMELA"]
+	path = JHUGenMELA
+	url = git@github.com:JHUGen/JHUGenMELA
