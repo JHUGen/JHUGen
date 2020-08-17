@@ -107,8 +107,10 @@ jobs:
            - JHUGenLexicon
            - JHUGenMELA
            - lib
+           - LICENSE
            - MCFM-JHUGen
            - Manual
+           - NOTICE
            - README.md
            - VH_NLO
            - Web
