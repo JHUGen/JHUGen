@@ -351,6 +351,7 @@ SUBROUTINE SetJHUGenDefaults()
    H_DK = .false.
    VH_PC="gg"
    alpha_dip=1d0
+   sign_of_W="n"
    Unweighted =.true.
    MuFacMultiplier = 1d0
    MuRenMultiplier = 1d0
@@ -580,6 +581,7 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "PChannel", success, PChannel, tosave=tosave)
     call ReadCommandLineArgument(arg, "VH_PC", success, VH_PC, tosave=tosave)
     call ReadCommandLineArgument(arg, "alpha_dip", success, alpha_dip, tosave=tosave)
+    call ReadCommandLineArgument(arg, "sign_of_W", success, sign_of_W, tosave=tosave)
     call ReadCommandLineArgument(arg, "DataFile", success, DataFile)
     call ReadCommandLineArgument(arg, "CSmaxFile", success, CSmaxFile, success2=SetCSmaxFile)
     call ReadCommandLineArgument(arg, "Process", success, Process, tosave=tosave)
@@ -6899,6 +6901,7 @@ implicit none
         print *, "                      VH_PC overrides Pchannel."
         print *, "   alpha_dip          extra non-physical degree of freedom for Process=51 & VH_PC=nl, defaulted at 1."
         print *, "                      Vary to check indepedence (of alpha_dip)."
+        print *, "   sign_of_W          p = W+, m = W-, else = W+/- both. For VH processes (50 & 51) only."
         print *, "   VBFoffsh_run:      For EW off-shell or QCD continuum productions, set this to an index"
         print *, "                      for each of the jobs.  See manual for more details."
         print *, " Resonance parameters:"

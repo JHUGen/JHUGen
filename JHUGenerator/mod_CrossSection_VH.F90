@@ -58,14 +58,16 @@ Function EvalWeighted_VH(yRnd,VgsWgt)
   logical :: applyPSCut, applyPSCut_x(1:2),applyPSCut_dip(1:2)
   real(8) :: mass(1:10,1:2)
   real(8) :: helicity(10)
-  integer id(10), id2(10)
+  integer id(10), id2(10), idjhuvv(1:4)!, beam_id(2)
+  integer :: tmp_idup(1:3), tmp_icolup(1:2,1:2)
+  integer :: nVhels
   real(8) :: finite_factor
   real(8) :: Mu_Fact_real, Mu_ren_real, alphas_real, PSWgt_real, PreFac_real
   real(8) :: Mom_save(1:4,1:9)
   real(8) :: mu_Ren_save,mu_Fact_save,alphas_save
   integer :: qin,gin,itemp
 ! for tests!!!!!!!!!!!!!!
-real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:10),MomExt1t(1:4,1:9),MomExt2t(1:4,1:9),MomExt3t(1:4,1:9),dummy
+!real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:10),MomExt1t(1:4,1:9),MomExt2t(1:4,1:9),MomExt3t(1:4,1:9),dummy
 ! for tests!!!!!!!!!!!!!!
 
   EvalWeighted_VH=0d0
@@ -84,22 +86,49 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
 ! initialization and decaying mode related
   id(:)=0
   helicity(:)=0
-  mass(1:2,1:2)=0d0
+!  mass(1:2,1:2)=0d0
   Mom=0d0
+!  if(IsAPhoton(DecayMode1))then
+!    mass(3,1)=M_Z
+!    mass(3,2)=Ga_Z
+!    mass(4,1)=getMass(Pho_)
+!    mass(4,2)=getDecayWidth(Pho_)
+!  else
+!    mass(3,1)=M_V
+!    mass(3,2)=Ga_V
+!    mass(4,1)=M_V
+!    mass(4,2)=Ga_V
+!  endif
+!  mass(5,1)=M_Reso
+!  mass(5,2)=Ga_Reso
+!  mass(6:10,1:2)=0d0
+
+!adapted from process=50
+  mass(1:2,1:2)=0d0
+  mass(3,1)=M_V
+  mass(3,2)=Ga_V
+  mass(4,1)=M_V
+  mass(4,2)=Ga_V
+  nVhels=2
   if(IsAPhoton(DecayMode1))then
-    mass(3,1)=M_Z
-    mass(3,2)=Ga_Z
-    mass(4,1)=getMass(Pho_)
-    mass(4,2)=getDecayWidth(Pho_)
+    if (includeVprime .and. Ga_Vprime.gt.0d0) then
+      mass(3,1)=(M_V+M_Vprime)/2d0
+      mass(3,2)=sqrt(abs((M_V-M_Vprime)/2d0)**2+Ga_V**2+Ga_Vprime**2)
+    endif
+      mass(4,1)=getMass(Pho_)
+      mass(4,2)=getDecayWidth(Pho_)
   else
-    mass(3,1)=M_V
-    mass(3,2)=Ga_V
-    mass(4,1)=M_V
-    mass(4,2)=Ga_V
+    if (includeVprime .and. Ga_Vprime.gt.0d0) then
+      mass(3,1)=(M_V+M_Vprime)/2d0
+      mass(3,2)=sqrt(abs((M_V-M_Vprime)/2d0)**2+Ga_V**2+Ga_Vprime**2)
+      mass(4,:)=mass(3,:)
+    endif
   endif
   mass(5,1)=M_Reso
   mass(5,2)=Ga_Reso
-  mass(6:10,1:2)=0d0
+  mass(6:10,1:2)=0d0 !not to forget 10th particle is for real emission.
+!adapted from process=50
+
 
   id(5)=convertLHE(Hig_)
   if(HbbDecays.eqv..true.)then
@@ -137,224 +166,286 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
   endif
   helicity(7)=-helicity(6)
 
-  if(DecayMode1.eq.0)then
-    id(3)=convertLHE(Z0_)
-    id(4)=convertLHE(Z0_)
-    if(yRnd(5).lt.0.5d0)then
-      id(6)=convertLHE(MuM_)
-    else
-      id(6)=convertLHE(ElM_)
-    endif
-    id(7)=-id(6)
-    PostFac=4d0 ! of which 2 is for summing Z > ff~ helicities
-!elseif(DecayMode1.eq.1)then
-!  id(3)=convertLHE(Z0_)
-!  id(4)=convertLHE(Z0_)
-!  id(6)=convertLHE(ZQuaBranching_flat(yRnd(5)))
-!  id(7)=-id(6)
-  
-  elseif(DecayMode1.eq.1)then
-    id(3)=convertLHE(Z0_)
-    id(4)=convertLHE(Z0_)
-    if(yRnd(5).lt.0.2d0)then
-      id(6)=convertLHE(Up_)
-    elseif(yRnd(5).lt.0.4d0)then
-      id(6)=convertLHE(Chm_)
-    elseif(yRnd(5).lt.0.6d0)then
-      id(6)=convertLHE(Dn_)
-    elseif(yRnd(5).lt.0.8d0)then
-      id(6)=convertLHE(Str_)
-    else
-      id(6)=convertLHE(Bot_)
-    endif
-    id(7)=-id(6)
-    PostFac=30d0 ! of which 2 is for summing Z > ff~ helicities and 3 for summing colors
+!  if(DecayMode1.eq.0)then
+!    id(3)=convertLHE(Z0_)
+!    id(4)=convertLHE(Z0_)
+!    if(yRnd(5).lt.0.5d0)then
+!      id(6)=convertLHE(MuM_)
+!    else
+!      id(6)=convertLHE(ElM_)
+!    endif
+!    id(7)=-id(6)
+!    PostFac=4d0 ! of which 2 is for summing Z > ff~ helicities
+!!elseif(DecayMode1.eq.1)then
+!!  id(3)=convertLHE(Z0_)
+!!  id(4)=convertLHE(Z0_)
+!!  id(6)=convertLHE(ZQuaBranching_flat(yRnd(5)))
+!!  id(7)=-id(6)
+  !
+!  elseif(DecayMode1.eq.1)then
+!    id(3)=convertLHE(Z0_)
+!    id(4)=convertLHE(Z0_)
+!    if(yRnd(5).lt.0.2d0)then
+!      id(6)=convertLHE(Up_)
+!    elseif(yRnd(5).lt.0.4d0)then
+!      id(6)=convertLHE(Chm_)
+!    elseif(yRnd(5).lt.0.6d0)then
+!      id(6)=convertLHE(Dn_)
+!    elseif(yRnd(5).lt.0.8d0)then
+!      id(6)=convertLHE(Str_)
+!    else
+!      id(6)=convertLHE(Bot_)
+!    endif
+!    id(7)=-id(6)
+!    PostFac=30d0 ! of which 2 is for summing Z > ff~ helicities and 3 for summing colors
+!
+!  elseif(DecayMode1.eq.2)then
+!    id(3)=convertLHE(Z0_)
+!    id(4)=convertLHE(Z0_)
+!    id(6)=convertLHE(TaM_)
+!    id(7)=-id(6)
+!    PostFac=2d0  ! of which 2 is for summing Z > ff~ helicities
+      !
+!  elseif(DecayMode1.eq.3)then
+!    id(3)=convertLHE(Z0_)
+!    id(4)=convertLHE(Z0_)
+!    if(yRnd(5).lt.1d0/3d0)then
+!      id(6)=convertLHE(NuE_)
+!    elseif(yRnd(5).lt.2d0/3d0)then
+!      id(6)=convertLHE(NuM_)
+!    else
+!      id(6)=convertLHE(NuT_)
+!    endif
+!    id(7)=-id(6)
+!    helicity(6)=sign(1d0,-dble(id(6)))
+!    helicity(7)=-helicity(6)
+!    PostFac=3d0
+      !
+!  elseif (DecayMode1.eq.4) then
+!    id(3)=convertLHE(Wp_)
+!    id(4)=convertLHE(Wp_)
+!    if(yRnd(5).lt.0.5d0)then
+!      id(7)=convertLHE(ElP_)
+!      id(6)=convertLHE(NuE_)
+!    else
+!      id(7)=convertLHE(MuP_)
+!      id(6)=convertLHE(NuM_)
+!    endif
+!    helicity(6)=sign(1d0,-dble(id(6)))
+!    helicity(7)=-helicity(6)
+!    PostFac=2d0 
+      !
+!  elseif(DecayMode1.eq.5)then
+!    id(3)=convertLHE(Wp_)
+!    id(4)=convertLHE(Wp_)
+!    if(yRnd(5).lt.1d0/6d0)then
+!      id(6)=convertLHE(Up_)
+!      id(7)=convertLHE(Adn_)
+!    elseif(yRnd(5).lt.1d0/3d0)then
+!      id(6)=convertLHE(Chm_)
+!      id(7)=convertLHE(AStr_)
+!    elseif(yRnd(5).lt.0.5d0)then
+!      id(6)=convertLHE(Up_)
+!      id(7)=convertLHE(AStr_)
+!    elseif(yRnd(5).lt.2d0/3d0)then
+!      id(6)=convertLHE(Chm_)
+!      id(7)=convertLHE(Adn_)
+!    elseif(yRnd(5).lt.5d0/6d0)then
+!      id(6)=convertLHE(Up_)
+!      id(7)=convertLHE(Abot_)
+!    else
+!      id(6)=convertLHE(Chm_)
+!      id(7)=convertLHE(Abot_)
+!    endif
+!    helicity(6)=sign(1d0,-dble(id(6)))
+!    helicity(7)=-helicity(6)
+!    PostFac=18d0 ! of which 3 is for summing Z > ff~ colors
+      !
+!  elseif(DecayMode1.eq.6)then
+!    id(3)=convertLHE(Wp_)
+!    id(4)=convertLHE(Wp_)
+!    id(7)=convertLHE(TaP_)
+!    id(6)=convertLHE(NuT_)
+!    helicity(6)=sign(1d0,-dble(id(6)))
+!    helicity(7)=-helicity(6)
+!    PostFac=1d0
+    !
+!  elseif(DecayMode1.eq.7)then
+!    id(3)=convertLHE(Z0_)
+!    id(4)=convertLHE(Pho_)
+!    id(6)=convertLHE(Pho_)
+!    id(7)=Not_a_particle_
+!    PostFac=2d0  ! of which 2 is for summing photon polarizations
+      !
+!  elseif(DecayMode1.eq.8)then
+!    id(3)=convertLHE(Z0_)
+!    id(4)=convertLHE(Z0_)
+!    if(yRnd(5).lt.1d0/3d0)then
+!      id(6)=convertLHE(ElM_)
+!    elseif(yRnd(5).lt.2d0/3d0)then
+!      id(6)=convertLHE(MuM_)
+!    else
+!      id(6)=convertLHE(TaM_)
+!    endif
+!    id(7)=-id(6)
+!    PostFac=6d0 ! of which 2 is for summing Z > ff~ helicities
+      !
+!  elseif(DecayMode1.eq.9)then
+!    id(3)=convertLHE(Z0_)
+!    id(4)=convertLHE(Z0_)
+!    if(yRnd(5).lt.6d0/39d0)then
+!      id(6)=convertLHE(Up_)
+!    elseif(yRnd(5).lt.(12d0/39d0))then
+!      id(6)=convertLHE(Chm_)
+!    elseif(yRnd(5).lt.(18d0/39d0))then
+!      id(6)=convertLHE(Dn_)
+!    elseif(yRnd(5).lt.(24d0/39d0))then
+!      id(6)=convertLHE(Str_)
+!    elseif(yRnd(5).lt.(30d0/39d0))then
+!      id(6)=convertLHE(Bot_)
+!    elseif(yRnd(5).lt.(32d0/39d0))then
+!      id(6)=convertLHE(ElM_)
+!    elseif(yRnd(5).lt.(34d0/39d0))then
+!      id(6)=convertLHE(MuM_)
+!    elseif(yRnd(5).lt.(36d0/39d0))then
+!      id(6)=convertLHE(TaM_)
+!    elseif(yRnd(5).lt.(37d0/39d0))then
+!      id(6)=convertLHE(NuE_)
+!      helicity(6)=sign(1d0,-dble(id(6)))
+!      helicity(7)=-helicity(6)
+!    elseif(yRnd(5).lt.(38d0/39d0))then
+!      id(6)=convertLHE(NuM_)
+!      helicity(6)=sign(1d0,-dble(id(6)))
+!      helicity(7)=-helicity(6)
+!    else
+!      id(6)=convertLHE(NuT_)
+!      helicity(6)=sign(1d0,-dble(id(6)))
+!      helicity(7)=-helicity(6)
+!    endif
+!    id(7)=-id(6)
+!    PostFac=39d0
+      !
+!  elseif(DecayMode1.eq.10)then
+!    id(3)=convertLHE(Wp_)
+!    id(4)=convertLHE(Wp_)
+!    if(yRnd(5).lt.1d0/3d0)then
+!      id(7)=convertLHE(ElP_)
+!      id(6)=convertLHE(NuE_)
+!    elseif(yRnd(5).lt.2d0/3d0)then
+!      id(7)=convertLHE(MuP_)
+!      id(6)=convertLHE(NuM_)
+!    else
+!      id(7)=convertLHE(TaP_)
+!      id(6)=convertLHE(NuT_)
+!    endif
+!    helicity(6)=sign(1d0,-dble(id(6)))
+!    helicity(7)=-helicity(6)
+!    PostFac=3d0
+      !
+!  elseif(DecayMode1.eq.11)then
+!    id(3)=convertLHE(Wp_)
+!    id(4)=convertLHE(Wp_)
+!    if(yRnd(5).lt.1d0/21d0)then
+!      id(7)=convertLHE(ElP_)
+!      id(6)=convertLHE(NuE_)
+!    elseif(yRnd(5).lt.(2d0/21d0))then
+!      id(7)=convertLHE(MuP_)
+!      id(6)=convertLHE(NuM_)
+!    elseif(yRnd(5).lt.(3d0/21d0))then
+!      id(7)=convertLHE(TaP_)
+!      id(6)=convertLHE(NuT_)
+!    elseif(yRnd(5).lt.(6d0/21d0))then
+!      id(6)=convertLHE(Up_)
+!      id(7)=convertLHE(Adn_)
+!    elseif(yRnd(5).lt.(9d0/21d0))then
+!      id(6)=convertLHE(Chm_)
+!      id(7)=convertLHE(AStr_)
+!    elseif(yRnd(5).lt.(12d0/21d0))then
+!      id(6)=convertLHE(Up_)
+!      id(7)=convertLHE(AStr_)
+!    elseif(yRnd(5).lt.(15d0/21d0))then
+!      id(6)=convertLHE(Chm_)
+!      id(7)=convertLHE(Adn_)
+!    elseif(yRnd(5).lt.(18d0/21d0))then
+!      id(6)=convertLHE(Up_)
+!      id(7)=convertLHE(Abot_)
+!    else
+!      id(6)=convertLHE(Chm_)
+!      id(7)=convertLHE(Abot_)
+!    endif
+!    helicity(6)=sign(1d0,-dble(id(6)))
+!    helicity(7)=-helicity(6)
+!    PostFac=21d0
+    !
+!  else
+!    print *, "invalid final states"
+!    stop
+    !
+!  endif
+!
+!  if(HbbDecays) PostFac=PostFac*6d0 !of which 2 is for summing H > bb~ helicities and 3 for summing bb~ colors
 
-  elseif(DecayMode1.eq.2)then
-    id(3)=convertLHE(Z0_)
-    id(4)=convertLHE(Z0_)
-    id(6)=convertLHE(TaM_)
-    id(7)=-id(6)
-    PostFac=2d0  ! of which 2 is for summing Z > ff~ helicities
-      
-  elseif(DecayMode1.eq.3)then
-    id(3)=convertLHE(Z0_)
-    id(4)=convertLHE(Z0_)
-    if(yRnd(5).lt.1d0/3d0)then
-      id(6)=convertLHE(NuE_)
-    elseif(yRnd(5).lt.2d0/3d0)then
-      id(6)=convertLHE(NuM_)
-    else
-      id(6)=convertLHE(NuT_)
-    endif
-    id(7)=-id(6)
-    helicity(6)=sign(1d0,-dble(id(6)))
-    helicity(7)=-helicity(6)
-    PostFac=3d0
-      
-  elseif (DecayMode1.eq.4) then
-    id(3)=convertLHE(Wp_)
-    id(4)=convertLHE(Wp_)
-    if(yRnd(5).lt.0.5d0)then
-      id(7)=convertLHE(ElP_)
-      id(6)=convertLHE(NuE_)
-    else
-      id(7)=convertLHE(MuP_)
-      id(6)=convertLHE(NuM_)
-    endif
-    helicity(6)=sign(1d0,-dble(id(6)))
-    helicity(7)=-helicity(6)
-    PostFac=2d0 
-      
-  elseif(DecayMode1.eq.5)then
-    id(3)=convertLHE(Wp_)
-    id(4)=convertLHE(Wp_)
-    if(yRnd(5).lt.1d0/6d0)then
-      id(6)=convertLHE(Up_)
-      id(7)=convertLHE(Adn_)
-    elseif(yRnd(5).lt.1d0/3d0)then
-      id(6)=convertLHE(Chm_)
-      id(7)=convertLHE(AStr_)
-    elseif(yRnd(5).lt.0.5d0)then
-      id(6)=convertLHE(Up_)
-      id(7)=convertLHE(AStr_)
-    elseif(yRnd(5).lt.2d0/3d0)then
-      id(6)=convertLHE(Chm_)
-      id(7)=convertLHE(Adn_)
-    elseif(yRnd(5).lt.5d0/6d0)then
-      id(6)=convertLHE(Up_)
-      id(7)=convertLHE(Abot_)
-    else
-      id(6)=convertLHE(Chm_)
-      id(7)=convertLHE(Abot_)
-    endif
-    helicity(6)=sign(1d0,-dble(id(6)))
-    helicity(7)=-helicity(6)
-    PostFac=18d0 ! of which 3 is for summing Z > ff~ colors
-      
-  elseif(DecayMode1.eq.6)then
-    id(3)=convertLHE(Wp_)
-    id(4)=convertLHE(Wp_)
-    id(7)=convertLHE(TaP_)
-    id(6)=convertLHE(NuT_)
-    helicity(6)=sign(1d0,-dble(id(6)))
-    helicity(7)=-helicity(6)
-    PostFac=1d0
-    
-  elseif(DecayMode1.eq.7)then
-    id(3)=convertLHE(Z0_)
-    id(4)=convertLHE(Pho_)
-    id(6)=convertLHE(Pho_)
-    id(7)=Not_a_particle_
-    PostFac=2d0  ! of which 2 is for summing photon polarizations
-      
-  elseif(DecayMode1.eq.8)then
-    id(3)=convertLHE(Z0_)
-    id(4)=convertLHE(Z0_)
-    if(yRnd(5).lt.1d0/3d0)then
-      id(6)=convertLHE(ElM_)
-    elseif(yRnd(5).lt.2d0/3d0)then
-      id(6)=convertLHE(MuM_)
-    else
-      id(6)=convertLHE(TaM_)
-    endif
-    id(7)=-id(6)
-    PostFac=6d0 ! of which 2 is for summing Z > ff~ helicities
-      
-  elseif(DecayMode1.eq.9)then
-    id(3)=convertLHE(Z0_)
-    id(4)=convertLHE(Z0_)
-    if(yRnd(5).lt.6d0/39d0)then
-      id(6)=convertLHE(Up_)
-    elseif(yRnd(5).lt.(12d0/39d0))then
-      id(6)=convertLHE(Chm_)
-    elseif(yRnd(5).lt.(18d0/39d0))then
-      id(6)=convertLHE(Dn_)
-    elseif(yRnd(5).lt.(24d0/39d0))then
-      id(6)=convertLHE(Str_)
-    elseif(yRnd(5).lt.(30d0/39d0))then
-      id(6)=convertLHE(Bot_)
-    elseif(yRnd(5).lt.(32d0/39d0))then
-      id(6)=convertLHE(ElM_)
-    elseif(yRnd(5).lt.(34d0/39d0))then
-      id(6)=convertLHE(MuM_)
-    elseif(yRnd(5).lt.(36d0/39d0))then
-      id(6)=convertLHE(TaM_)
-    elseif(yRnd(5).lt.(37d0/39d0))then
-      id(6)=convertLHE(NuE_)
-      helicity(6)=sign(1d0,-dble(id(6)))
-      helicity(7)=-helicity(6)
-    elseif(yRnd(5).lt.(38d0/39d0))then
-      id(6)=convertLHE(NuM_)
-      helicity(6)=sign(1d0,-dble(id(6)))
-      helicity(7)=-helicity(6)
-    else
-      id(6)=convertLHE(NuT_)
-      helicity(6)=sign(1d0,-dble(id(6)))
-      helicity(7)=-helicity(6)
-    endif
-    id(7)=-id(6)
-    PostFac=39d0
-      
-  elseif(DecayMode1.eq.10)then
-    id(3)=convertLHE(Wp_)
-    id(4)=convertLHE(Wp_)
-    if(yRnd(5).lt.1d0/3d0)then
-      id(7)=convertLHE(ElP_)
-      id(6)=convertLHE(NuE_)
-    elseif(yRnd(5).lt.2d0/3d0)then
-      id(7)=convertLHE(MuP_)
-      id(6)=convertLHE(NuM_)
-    else
-      id(7)=convertLHE(TaP_)
-      id(6)=convertLHE(NuT_)
-    endif
-    helicity(6)=sign(1d0,-dble(id(6)))
-    helicity(7)=-helicity(6)
-    PostFac=3d0
-      
-  elseif(DecayMode1.eq.11)then
-    id(3)=convertLHE(Wp_)
-    id(4)=convertLHE(Wp_)
-    if(yRnd(5).lt.1d0/21d0)then
-      id(7)=convertLHE(ElP_)
-      id(6)=convertLHE(NuE_)
-    elseif(yRnd(5).lt.(2d0/21d0))then
-      id(7)=convertLHE(MuP_)
-      id(6)=convertLHE(NuM_)
-    elseif(yRnd(5).lt.(3d0/21d0))then
-      id(7)=convertLHE(TaP_)
-      id(6)=convertLHE(NuT_)
-    elseif(yRnd(5).lt.(6d0/21d0))then
-      id(6)=convertLHE(Up_)
-      id(7)=convertLHE(Adn_)
-    elseif(yRnd(5).lt.(9d0/21d0))then
-      id(6)=convertLHE(Chm_)
-      id(7)=convertLHE(AStr_)
-    elseif(yRnd(5).lt.(12d0/21d0))then
-      id(6)=convertLHE(Up_)
-      id(7)=convertLHE(AStr_)
-    elseif(yRnd(5).lt.(15d0/21d0))then
-      id(6)=convertLHE(Chm_)
-      id(7)=convertLHE(Adn_)
-    elseif(yRnd(5).lt.(18d0/21d0))then
-      id(6)=convertLHE(Up_)
-      id(7)=convertLHE(Abot_)
-    else
-      id(6)=convertLHE(Chm_)
-      id(7)=convertLHE(Abot_)
-    endif
-    helicity(6)=sign(1d0,-dble(id(6)))
-    helicity(7)=-helicity(6)
-    PostFac=21d0
-    
-  else
-    print *, "invalid final states"
-    stop
-    
-  endif
 
-  if(HbbDecays) PostFac=PostFac*6d0 !of which 2 is for summing H > bb~ helicities and 3 for summing bb~ colors
+
+
+
+
+call VBranching(DecayMode1, tmp_idup, tmp_icolup, PostFac)
+    id(3)=convertLHE(tmp_idup(1))
+    id(4)=convertLHE(tmp_idup(1))
+    id(6:7)=Not_a_particle_
+    if (tmp_idup(2).ne.Not_a_particle_)then
+      id(6)=convertLHE(tmp_idup(2))
+    elseif(DecayMode1.eq.7) then
+      id(3)=convertLHE(Z0_)
+      id(6)=convertLHE(Pho_)
+    endif
+    if (tmp_idup(3).ne.Not_a_particle_)then
+      id(7)=convertLHE(tmp_idup(3))
+    endif
+
+    if(IsAWDecay(DecayMode1)) then
+      if(sign_of_W.eq."p")then!W+
+        !do nothing
+      elseif(sign_of_W.eq."m")then!W-
+        call swap(id(6),id(7))
+        id(3) = -id(3)
+        id(4) = -id(4)
+        id(6) = -id(6)
+        id(7) = -id(7)
+      else
+        !call random_number(Wdecrnd)
+        !if(Wdecrnd.gt.0.5d0) then
+        if(yrnd(5).gt.0.5d0) then
+          call swap(id(6),id(7))
+          id(3) = -id(3)
+          id(4) = -id(4)
+          id(6) = -id(6)
+          id(7) = -id(7)
+        endif
+      endif
+    endif
+
+    if (id(6).eq.-id(7) .and. id(6).lt.0) then
+      call swap(id(6),id(7))
+    endif
+
+    if((IsAWDecay(DecayMode1) .or. IsALHENeutrino(id(6)) .or. IsALHENeutrino(id(7))) .and. .not. includeVprime) then
+      helicity(6)=sign(1d0,-dble(id(6)))
+      helicity(7)=-helicity(6)
+      nVhels=1
+    endif
+    if(H_DK) then
+      PostFac = PostFac*6d0 ! H->bb decay
+    endif
+
+    PostFac = PostFac * dble(nVhels) ! 2 possible helicities
+
+
+
+
+
+
 
 ! end initialization and decaying mode related
 
@@ -403,16 +494,19 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
 !if pp/ppbar collider
   elseif(Collider.eq.1.or.Collider.eq.2)then
     !PDFMapping
-    if( (.not.HbbDecays) .and. IsAPhoton(DecayMode1) )then! H, V=gamma (not implemented)
-      call PDFMapping(2,yrnd(18:19),eta1,eta2,Ehat,sHatJacobi,EhatMin=(M_reso+M_V))
-    elseif( HbbDecays .and. (IsAZDecay(DecayMode1) .or. IsAWDecay(DecayMode1)) )then ! if H > bb, V > ff
-      call PDFMapping(1,yrnd(18:19),eta1,eta2,Ehat,sHatJacobi,EhatMin=(M_reso+M_V-5d0*Ga_Reso-5d0*Ga_V))!Z/W
-    elseif( (.not.HbbDecays) .and. (IsAZDecay(DecayMode1) .or. IsAWDecay(DecayMode1)))then ! if H, V > ff
-      call PDFMapping(2,yrnd(18:19),eta1,eta2,Ehat,sHatJacobi,EhatMin=M_reso)!Z/W
-    elseif( HbbDecays .and. IsAPhoton(DecayMode1) )then ! if H > bb, V=gamma (not implemented)
-      call PDFMapping(2,yrnd(18:19),eta1,eta2,Ehat,sHatJacobi,EhatMin=M_V)
-    endif
-
+! Thesis Implementation
+!    if( (.not.HbbDecays) .and. IsAPhoton(DecayMode1) )then! H, V=gamma (not implemented)
+!      call PDFMapping(2,yrnd(18:19),eta1,eta2,Ehat,sHatJacobi,EhatMin=(M_reso+M_V))
+!    elseif( HbbDecays .and. (IsAZDecay(DecayMode1) .or. IsAWDecay(DecayMode1)) )then ! if H > bb, V > ff
+!      call PDFMapping(1,yrnd(18:19),eta1,eta2,Ehat,sHatJacobi,EhatMin=(M_reso+M_V-5d0*Ga_Reso-5d0*Ga_V))!Z/W
+!    elseif( (.not.HbbDecays) .and. (IsAZDecay(DecayMode1) .or. IsAWDecay(DecayMode1)))then ! if H, V > ff
+!      call PDFMapping(2,yrnd(18:19),eta1,eta2,Ehat,sHatJacobi,EhatMin=M_reso)!Z/W
+!    elseif( HbbDecays .and. IsAPhoton(DecayMode1) )then ! if H > bb, V=gamma (not implemented)
+!      call PDFMapping(2,yrnd(18:19),eta1,eta2,Ehat,sHatJacobi,EhatMin=M_V)
+!    endif
+    !PDFMapping
+!New Implementation
+    call PDFMapping(14,yrnd(18:19),eta1,eta2,Ehat,sHatJacobi)
 
 !----------- this removes all cuts ---
 !   applyPSCut=.false.                !  for debugging only 
@@ -721,35 +815,25 @@ stop 1
         enddo
       !W
       elseif( IsAWDecay(DecayMode1) )then
-!print *,"=================="
+
         do i = -5,5 !gluon = 0, otherwise PDG codes
         do j = -5,5
 
+          if (i.eq.0 .or. j.eq.0) cycle
+          if (modulo(abs(i),2).eq.modulo(abs(j),2) .or. i*j.gt.0) cycle
+
           id2=id
           id2(1:2) = (/i,j/)
-          !W+
-          if( CouplToLHEWp(id2(1:2)) )then
-            helicity(6)=sign(1d0,-dble(id2(6)))
-            helicity(7)=-helicity(6)
-          !W-
-          elseif( CouplToLHEWm(id2(1:2)) )then
-            id2(3)=-id2(3)
-            id2(4)=-id2(4)
-            id2(6)=-id2(6)
-            id2(7)=-id2(7)
-            helicity(6)=sign(1d0,-dble(id2(6)))
-            helicity(7)=-helicity(6)
-          else
-            cycle !skip this i,j combination
-          endif
+
+          if(sign_of_W.eq."p" .and. .not.CouplToLHEWp(id2(1:2)) )cycle
+          if(sign_of_W.eq."m" .and. .not.CouplToLHEWm(id2(1:2)) )cycle
+
           call amp_VH_LO(Mom(:,1:9),mass(3:5,:),helicity(1:9),id2(1:9),amp_dummy)
           me2lo = me2lo + dble(amp_dummy*dconjg(amp_dummy))*pdf(LHA2M_PDF(i),1)*pdf(LHA2M_PDF(j),2)
-!me2gg=dble(amp_dummy*dconjg(amp_dummy))
-!if(me2gg.ne.0d0)then
-!  print *,id2(1),int(helicity(1)),id2(2),int(helicity(2)),id2(6),int(helicity(6)),id2(7),int(helicity(7))
-!endif
+
         enddo! parton
         enddo! parton
+
         me2lo = me2lo *PreFac *PostFac *QuarkColAvg**2 *3d0
         !summing 3 colors in intial qq, no factor from spins because they are casted randomly, not summed.
 
@@ -1376,6 +1460,20 @@ stop 1
     Mom(:,8:9)=Mom_save(:,8:9)
   endif
 
+  if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
+     if(Collider.eq.1)then
+        id(1:2) = (/convertLHE(Up_),convertLHE(AUp_)/)
+     else if(Collider.eq.0)then!e+ e- collider
+        id(1:2) = (/convertLHE(ElP_),convertLHE(ElM_)/)
+     endif
+  elseif( IsAWDecay(DecayMode1) ) then
+    if(id(3).eq.convertLHE(Wp_))then
+      id(1:2) = (/convertLHE(Up_),convertLHE(ADn_)/)
+    elseif(id(3).eq.convertLHE(Wm_))then
+      id(1:2) = (/convertLHE(Dn_),convertLHE(AUp_)/)
+    endif
+  endif
+
 !  !boost from center of mass frame to lab frame
 !  if(Collider.eq.1.or.Collider.eq.2)then
 !    call boost2Lab(eta1,eta2,10,Mom)
@@ -1453,6 +1551,8 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
   real(8) :: mass(10,2)
   real(8) :: helicity(10)
   integer id(10), id2(10), idj
+  integer :: tmp_idup(1:3), tmp_icolup(1:2,1:2)
+  integer :: nVhels, nISs
 
   include 'csmaxvalue.f'
   EvalUnWeighted_VH = 0d0
@@ -1513,224 +1613,272 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
   endif
   helicity(7)=-helicity(6)
 
-  if(DecayMode1.eq.0)then
-    id(3)=convertLHE(Z0_)
-    id(4)=convertLHE(Z0_)
-    if(yRnd(5).lt.0.5d0)then
-      id(6)=convertLHE(MuM_)
-    else
-      id(6)=convertLHE(ElM_)
-    endif
-    id(7)=-id(6)
-    PostFac=4d0 ! of which 2 is for summing Z > ff~ helicities
-!elseif(DecayMode1.eq.1)then
-!  id(3)=convertLHE(Z0_)
-!  id(4)=convertLHE(Z0_)
-!  id(6)=convertLHE(ZQuaBranching_flat(yRnd(5)))
-!  id(7)=-id(6)
-  
-  elseif(DecayMode1.eq.1)then
-    id(3)=convertLHE(Z0_)
-    id(4)=convertLHE(Z0_)
-    if(yRnd(5).lt.0.2d0)then
-      id(6)=convertLHE(Up_)
-    elseif(yRnd(5).lt.0.4d0)then
-      id(6)=convertLHE(Chm_)
-    elseif(yRnd(5).lt.0.6d0)then
-      id(6)=convertLHE(Dn_)
-    elseif(yRnd(5).lt.0.8d0)then
-      id(6)=convertLHE(Str_)
-    else
-      id(6)=convertLHE(Bot_)
-    endif
-    id(7)=-id(6)
-    PostFac=30d0 ! of which 2 is for summing Z > ff~ helicities and 3 for summing colors
+!  if(DecayMode1.eq.0)then
+!    id(3)=convertLHE(Z0_)
+!    id(4)=convertLHE(Z0_)
+!    if(yRnd(5).lt.0.5d0)then
+!      id(6)=convertLHE(MuM_)
+!    else
+!      id(6)=convertLHE(ElM_)
+!    endif
+!    id(7)=-id(6)
+!    PostFac=4d0 ! of which 2 is for summing Z > ff~ helicities
+!!elseif(DecayMode1.eq.1)then
+!!  id(3)=convertLHE(Z0_)
+!!  id(4)=convertLHE(Z0_)
+!!  id(6)=convertLHE(ZQuaBranching_flat(yRnd(5)))
+!!  id(7)=-id(6)
+!
+!  elseif(DecayMode1.eq.1)then
+!    id(3)=convertLHE(Z0_)
+!    id(4)=convertLHE(Z0_)
+!    if(yRnd(5).lt.0.2d0)then
+!      id(6)=convertLHE(Up_)
+!    elseif(yRnd(5).lt.0.4d0)then
+!      id(6)=convertLHE(Chm_)
+!    elseif(yRnd(5).lt.0.6d0)then
+!      id(6)=convertLHE(Dn_)
+!    elseif(yRnd(5).lt.0.8d0)then
+!      id(6)=convertLHE(Str_)
+!    else
+!      id(6)=convertLHE(Bot_)
+!    endif
+!    id(7)=-id(6)
+!    PostFac=30d0 ! of which 2 is for summing Z > ff~ helicities and 3 for summing colors
+!
+!  elseif(DecayMode1.eq.2)then
+!    id(3)=convertLHE(Z0_)
+!    id(4)=convertLHE(Z0_)
+!    id(6)=convertLHE(TaM_)
+!    id(7)=-id(6)
+!    PostFac=2d0  ! of which 2 is for summing Z > ff~ helicities
+!
+!  elseif(DecayMode1.eq.3)then
+!    id(3)=convertLHE(Z0_)
+!    id(4)=convertLHE(Z0_)
+!    if(yRnd(5).lt.1d0/3d0)then
+!      id(6)=convertLHE(NuE_)
+!    elseif(yRnd(5).lt.2d0/3d0)then
+!      id(6)=convertLHE(NuM_)
+!    else
+!      id(6)=convertLHE(NuT_)
+!    endif
+!    id(7)=-id(6)
+!    helicity(6)=sign(1d0,-dble(id(6)))
+!    helicity(7)=-helicity(6)
+!    PostFac=3d0
+!
+!  elseif (DecayMode1.eq.4) then
+!    id(3)=convertLHE(Wp_)
+!    id(4)=convertLHE(Wp_)
+!    if(yRnd(5).lt.0.5d0)then
+!      id(7)=convertLHE(ElP_)
+!      id(6)=convertLHE(NuE_)
+!    else
+!      id(7)=convertLHE(MuP_)
+!      id(6)=convertLHE(NuM_)
+!    endif
+!    helicity(6)=sign(1d0,-dble(id(6)))
+!    helicity(7)=-helicity(6)
+!    PostFac=2d0 
+!
+!  elseif(DecayMode1.eq.5)then
+!    id(3)=convertLHE(Wp_)
+!    id(4)=convertLHE(Wp_)
+!    if(yRnd(5).lt.1d0/6d0)then
+!      id(6)=convertLHE(Up_)
+!      id(7)=convertLHE(Adn_)
+!    elseif(yRnd(5).lt.1d0/3d0)then
+!      id(6)=convertLHE(Chm_)
+!      id(7)=convertLHE(AStr_)
+!    elseif(yRnd(5).lt.0.5d0)then
+!      id(6)=convertLHE(Up_)
+!      id(7)=convertLHE(AStr_)
+!    elseif(yRnd(5).lt.2d0/3d0)then
+!      id(6)=convertLHE(Chm_)
+!      id(7)=convertLHE(Adn_)
+!    elseif(yRnd(5).lt.5d0/6d0)then
+!      id(6)=convertLHE(Up_)
+!      id(7)=convertLHE(Abot_)
+!    else
+!      id(6)=convertLHE(Chm_)
+!      id(7)=convertLHE(Abot_)
+!    endif
+!    helicity(6)=sign(1d0,-dble(id(6)))
+!    helicity(7)=-helicity(6)
+!    PostFac=18d0 ! of which 3 is for summing Z > ff~ colors
+!
+!  elseif(DecayMode1.eq.6)then
+!    id(3)=convertLHE(Wp_)
+!    id(4)=convertLHE(Wp_)
+!    id(7)=convertLHE(TaP_)
+!    id(6)=convertLHE(NuT_)
+!    helicity(6)=sign(1d0,-dble(id(6)))
+!    helicity(7)=-helicity(6)
+!    PostFac=1d0
+!
+!  elseif(DecayMode1.eq.7)then
+!    id(3)=convertLHE(Z0_)
+!    id(4)=convertLHE(Pho_)
+!    id(6)=convertLHE(Pho_)
+!    id(7)=Not_a_particle_
+!    PostFac=2d0  ! of which 2 is for summing photon helicities
+      !
+!  elseif(DecayMode1.eq.8)then
+!    id(3)=convertLHE(Z0_)
+!    id(4)=convertLHE(Z0_)
+!    if(yRnd(5).lt.1d0/3d0)then
+!      id(6)=convertLHE(ElM_)
+!    elseif(yRnd(5).lt.2d0/3d0)then
+!      id(6)=convertLHE(MuM_)
+!    else
+!      id(6)=convertLHE(TaM_)
+!    endif
+!    id(7)=-id(6)
+!    PostFac=6d0 ! of which 2 is for summing Z > ff~ helicities
+!
+!  elseif(DecayMode1.eq.9)then
+!    id(3)=convertLHE(Z0_)
+!    id(4)=convertLHE(Z0_)
+!    if(yRnd(5).lt.6d0/39d0)then
+!      id(6)=convertLHE(Up_)
+!    elseif(yRnd(5).lt.(12d0/39d0))then
+!      id(6)=convertLHE(Chm_)
+!    elseif(yRnd(5).lt.(18d0/39d0))then
+!      id(6)=convertLHE(Dn_)
+!    elseif(yRnd(5).lt.(24d0/39d0))then
+!      id(6)=convertLHE(Str_)
+!    elseif(yRnd(5).lt.(30d0/39d0))then
+!      id(6)=convertLHE(Bot_)
+!    elseif(yRnd(5).lt.(32d0/39d0))then
+!      id(6)=convertLHE(ElM_)
+!    elseif(yRnd(5).lt.(34d0/39d0))then
+!      id(6)=convertLHE(MuM_)
+!    elseif(yRnd(5).lt.(36d0/39d0))then
+!      id(6)=convertLHE(TaM_)
+!    elseif(yRnd(5).lt.(37d0/39d0))then
+!      id(6)=convertLHE(NuE_)
+!      helicity(6)=sign(1d0,-dble(id(6)))
+!      helicity(7)=-helicity(6)
+!    elseif(yRnd(5).lt.(38d0/39d0))then
+!      id(6)=convertLHE(NuM_)
+!      helicity(6)=sign(1d0,-dble(id(6)))
+!      helicity(7)=-helicity(6)
+!    else
+!      id(6)=convertLHE(NuT_)
+!      helicity(6)=sign(1d0,-dble(id(6)))
+!      helicity(7)=-helicity(6)
+!    endif
+!    id(7)=-id(6)
+!    PostFac=39d0
+!
+!  elseif(DecayMode1.eq.10)then
+!    id(3)=convertLHE(Wp_)
+!    id(4)=convertLHE(Wp_)
+!    if(yRnd(5).lt.1d0/3d0)then
+!      id(7)=convertLHE(ElP_)
+!      id(6)=convertLHE(NuE_)
+!    elseif(yRnd(5).lt.2d0/3d0)then
+!      id(7)=convertLHE(MuP_)
+!      id(6)=convertLHE(NuM_)
+!    else
+!      id(7)=convertLHE(TaP_)
+!      id(6)=convertLHE(NuT_)
+!    endif
+!    helicity(6)=sign(1d0,-dble(id(6)))
+!    helicity(7)=-helicity(6)
+!    PostFac=3d0
+!
+!  elseif(DecayMode1.eq.11)then
+!    id(3)=convertLHE(Wp_)
+!    id(4)=convertLHE(Wp_)
+!    if(yRnd(5).lt.1d0/21d0)then
+!      id(7)=convertLHE(ElP_)
+!      id(6)=convertLHE(NuE_)
+!    elseif(yRnd(5).lt.(2d0/21d0))then
+!      id(7)=convertLHE(MuP_)
+!      id(6)=convertLHE(NuM_)
+!    elseif(yRnd(5).lt.(3d0/21d0))then
+!      id(7)=convertLHE(TaP_)
+!      id(6)=convertLHE(NuT_)
+!    elseif(yRnd(5).lt.(6d0/21d0))then
+!      id(6)=convertLHE(Up_)
+!      id(7)=convertLHE(Adn_)
+!    elseif(yRnd(5).lt.(9d0/21d0))then
+!      id(6)=convertLHE(Chm_)
+!      id(7)=convertLHE(AStr_)
+!    elseif(yRnd(5).lt.(12d0/21d0))then
+!      id(6)=convertLHE(Up_)
+!      id(7)=convertLHE(AStr_)
+!    elseif(yRnd(5).lt.(15d0/21d0))then
+!      id(6)=convertLHE(Chm_)
+!      id(7)=convertLHE(Adn_)
+!    elseif(yRnd(5).lt.(18d0/21d0))then
+!      id(6)=convertLHE(Up_)
+!      id(7)=convertLHE(Abot_)
+!    else
+!      id(6)=convertLHE(Chm_)
+!      id(7)=convertLHE(Abot_)
+!    endif
+!    helicity(6)=sign(1d0,-dble(id(6)))
+!    helicity(7)=-helicity(6)
+!    PostFac=21d0
+!
+!  else
+!    print *, "invalid final states"
+!    stop
+!
+!  endif
 
-  elseif(DecayMode1.eq.2)then
-    id(3)=convertLHE(Z0_)
-    id(4)=convertLHE(Z0_)
-    id(6)=convertLHE(TaM_)
-    id(7)=-id(6)
-    PostFac=2d0  ! of which 2 is for summing Z > ff~ helicities
-      
-  elseif(DecayMode1.eq.3)then
-    id(3)=convertLHE(Z0_)
-    id(4)=convertLHE(Z0_)
-    if(yRnd(5).lt.1d0/3d0)then
-      id(6)=convertLHE(NuE_)
-    elseif(yRnd(5).lt.2d0/3d0)then
-      id(6)=convertLHE(NuM_)
-    else
-      id(6)=convertLHE(NuT_)
+call VBranching(DecayMode1, tmp_idup, tmp_icolup, PostFac)
+id(3)=convertLHE(tmp_idup(1))
+id(4)=convertLHE(tmp_idup(1))
+id(6:7)=Not_a_particle_
+if (tmp_idup(2).ne.Not_a_particle_)then
+   id(6)=convertLHE(tmp_idup(2))
+elseif(DecayMode1.eq.7) then
+   id(3)=convertLHE(Z0_)
+   id(6)=convertLHE(Pho_)
+endif
+if (tmp_idup(3).ne.Not_a_particle_)then
+   id(7)=convertLHE(tmp_idup(3))
+endif
+
+if(IsAWDecay(DecayMode1)) then
+  if(sign_of_W.eq."p")then!W+
+    !do nothing
+  elseif(sign_of_W.eq."m")then!W-
+    call swap(id(6),id(7))
+    id(3) = -id(3)
+    id(4) = -id(4)
+    id(6) = -id(6)
+    id(7) = -id(7)
+  else                 !W+/-
+    if(yrnd(5).gt.0.5d0) then!default is W+; if true, W-.
+      call swap(id(6),id(7))
+      id(3) = -id(3)
+      id(4) = -id(4)
+      id(6) = -id(6)
+      id(7) = -id(7)
     endif
-    id(7)=-id(6)
-    helicity(6)=sign(1d0,-dble(id(6)))
-    helicity(7)=-helicity(6)
-    PostFac=3d0
-      
-  elseif (DecayMode1.eq.4) then
-    id(3)=convertLHE(Wp_)
-    id(4)=convertLHE(Wp_)
-    if(yRnd(5).lt.0.5d0)then
-      id(7)=convertLHE(ElP_)
-      id(6)=convertLHE(NuE_)
-    else
-      id(7)=convertLHE(MuP_)
-      id(6)=convertLHE(NuM_)
-    endif
-    helicity(6)=sign(1d0,-dble(id(6)))
-    helicity(7)=-helicity(6)
-    PostFac=2d0 
-      
-  elseif(DecayMode1.eq.5)then
-    id(3)=convertLHE(Wp_)
-    id(4)=convertLHE(Wp_)
-    if(yRnd(5).lt.1d0/6d0)then
-      id(6)=convertLHE(Up_)
-      id(7)=convertLHE(Adn_)
-    elseif(yRnd(5).lt.1d0/3d0)then
-      id(6)=convertLHE(Chm_)
-      id(7)=convertLHE(AStr_)
-    elseif(yRnd(5).lt.0.5d0)then
-      id(6)=convertLHE(Up_)
-      id(7)=convertLHE(AStr_)
-    elseif(yRnd(5).lt.2d0/3d0)then
-      id(6)=convertLHE(Chm_)
-      id(7)=convertLHE(Adn_)
-    elseif(yRnd(5).lt.5d0/6d0)then
-      id(6)=convertLHE(Up_)
-      id(7)=convertLHE(Abot_)
-    else
-      id(6)=convertLHE(Chm_)
-      id(7)=convertLHE(Abot_)
-    endif
-    helicity(6)=sign(1d0,-dble(id(6)))
-    helicity(7)=-helicity(6)
-    PostFac=18d0 ! of which 3 is for summing Z > ff~ colors
-      
-  elseif(DecayMode1.eq.6)then
-    id(3)=convertLHE(Wp_)
-    id(4)=convertLHE(Wp_)
-    id(7)=convertLHE(TaP_)
-    id(6)=convertLHE(NuT_)
-    helicity(6)=sign(1d0,-dble(id(6)))
-    helicity(7)=-helicity(6)
-    PostFac=1d0
-    
-  elseif(DecayMode1.eq.7)then
-    id(3)=convertLHE(Z0_)
-    id(4)=convertLHE(Pho_)
-    id(6)=convertLHE(Pho_)
-    id(7)=Not_a_particle_
-    PostFac=2d0  ! of which 2 is for summing photon helicities
-      
-  elseif(DecayMode1.eq.8)then
-    id(3)=convertLHE(Z0_)
-    id(4)=convertLHE(Z0_)
-    if(yRnd(5).lt.1d0/3d0)then
-      id(6)=convertLHE(ElM_)
-    elseif(yRnd(5).lt.2d0/3d0)then
-      id(6)=convertLHE(MuM_)
-    else
-      id(6)=convertLHE(TaM_)
-    endif
-    id(7)=-id(6)
-    PostFac=6d0 ! of which 2 is for summing Z > ff~ helicities
-      
-  elseif(DecayMode1.eq.9)then
-    id(3)=convertLHE(Z0_)
-    id(4)=convertLHE(Z0_)
-    if(yRnd(5).lt.6d0/39d0)then
-      id(6)=convertLHE(Up_)
-    elseif(yRnd(5).lt.(12d0/39d0))then
-      id(6)=convertLHE(Chm_)
-    elseif(yRnd(5).lt.(18d0/39d0))then
-      id(6)=convertLHE(Dn_)
-    elseif(yRnd(5).lt.(24d0/39d0))then
-      id(6)=convertLHE(Str_)
-    elseif(yRnd(5).lt.(30d0/39d0))then
-      id(6)=convertLHE(Bot_)
-    elseif(yRnd(5).lt.(32d0/39d0))then
-      id(6)=convertLHE(ElM_)
-    elseif(yRnd(5).lt.(34d0/39d0))then
-      id(6)=convertLHE(MuM_)
-    elseif(yRnd(5).lt.(36d0/39d0))then
-      id(6)=convertLHE(TaM_)
-    elseif(yRnd(5).lt.(37d0/39d0))then
-      id(6)=convertLHE(NuE_)
-      helicity(6)=sign(1d0,-dble(id(6)))
-      helicity(7)=-helicity(6)
-    elseif(yRnd(5).lt.(38d0/39d0))then
-      id(6)=convertLHE(NuM_)
-      helicity(6)=sign(1d0,-dble(id(6)))
-      helicity(7)=-helicity(6)
-    else
-      id(6)=convertLHE(NuT_)
-      helicity(6)=sign(1d0,-dble(id(6)))
-      helicity(7)=-helicity(6)
-    endif
-    id(7)=-id(6)
-    PostFac=39d0
-      
-  elseif(DecayMode1.eq.10)then
-    id(3)=convertLHE(Wp_)
-    id(4)=convertLHE(Wp_)
-    if(yRnd(5).lt.1d0/3d0)then
-      id(7)=convertLHE(ElP_)
-      id(6)=convertLHE(NuE_)
-    elseif(yRnd(5).lt.2d0/3d0)then
-      id(7)=convertLHE(MuP_)
-      id(6)=convertLHE(NuM_)
-    else
-      id(7)=convertLHE(TaP_)
-      id(6)=convertLHE(NuT_)
-    endif
-    helicity(6)=sign(1d0,-dble(id(6)))
-    helicity(7)=-helicity(6)
-    PostFac=3d0
-      
-  elseif(DecayMode1.eq.11)then
-    id(3)=convertLHE(Wp_)
-    id(4)=convertLHE(Wp_)
-    if(yRnd(5).lt.1d0/21d0)then
-      id(7)=convertLHE(ElP_)
-      id(6)=convertLHE(NuE_)
-    elseif(yRnd(5).lt.(2d0/21d0))then
-      id(7)=convertLHE(MuP_)
-      id(6)=convertLHE(NuM_)
-    elseif(yRnd(5).lt.(3d0/21d0))then
-      id(7)=convertLHE(TaP_)
-      id(6)=convertLHE(NuT_)
-    elseif(yRnd(5).lt.(6d0/21d0))then
-      id(6)=convertLHE(Up_)
-      id(7)=convertLHE(Adn_)
-    elseif(yRnd(5).lt.(9d0/21d0))then
-      id(6)=convertLHE(Chm_)
-      id(7)=convertLHE(AStr_)
-    elseif(yRnd(5).lt.(12d0/21d0))then
-      id(6)=convertLHE(Up_)
-      id(7)=convertLHE(AStr_)
-    elseif(yRnd(5).lt.(15d0/21d0))then
-      id(6)=convertLHE(Chm_)
-      id(7)=convertLHE(Adn_)
-    elseif(yRnd(5).lt.(18d0/21d0))then
-      id(6)=convertLHE(Up_)
-      id(7)=convertLHE(Abot_)
-    else
-      id(6)=convertLHE(Chm_)
-      id(7)=convertLHE(Abot_)
-    endif
-    helicity(6)=sign(1d0,-dble(id(6)))
-    helicity(7)=-helicity(6)
-    PostFac=21d0
-    
-  else
-    print *, "invalid final states"
-    stop
-    
   endif
+endif
 
-  if(HbbDecays) PostFac=PostFac*6 !of which 2 is for summing H > bb~ helicities and 3 for summing bb~ colors
+if (id(6).eq.-id(7) .and. id(6).lt.0) then
+   call swap(id(6),id(7))
+endif
+
+if((IsAWDecay(DecayMode1) .or. IsALHENeutrino(id(6)) .or. IsALHENeutrino(id(7))) .and. .not. includeVprime) then
+   helicity(6)=sign(1d0,-dble(id(6)))
+   helicity(7)=-helicity(6)
+   nVhels=1
+endif
+if(HbbDecays) then
+   PostFac = PostFac*6d0 ! H->bb decay. 2 is for summing H > bb~ helicities and 3 for summing bb~ colors
+endif
+
+PostFac = PostFac * dble(nVhels) ! 2 possible helicities
+
 
 ! end initialization and decaying mode related
 ! begin event
