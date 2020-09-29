@@ -1,7 +1,7 @@
 MODULE ModTopDecay
 implicit none
 
-public :: TopDecay
+public :: TopDecay, WDecay
 private
 
  CONTAINS
@@ -96,6 +96,52 @@ WProp = (0d0,-1d0)*NWAFactor_W
 RETURN
 END SUBROUTINE
 
+
+
+
+
+
+SUBROUTINE WDecay(Charge,Mom,WCurr)
+use ModMisc
+use ModParameters
+implicit none
+real(8) :: Mom(1:4,1:2)
+integer :: Charge
+real(8) :: WMom(1:4)
+complex(8) :: Spi(1:4),BarSpi(1:4),BotSpi(1:4),WCurr(1:4)
+real(8) :: NWAFactor_W
+complex(8) :: WProp
+real(8),parameter :: Nc=xn,NFlav=2
+
+NWAFactor_W   = 1d0/dsqrt(2d0*Ga_W*m_W)
+WProp = (0d0,-1d0)*dsqrt(gwsq)*NWAFactor_W
+
+
+
+    WMom(1:4) = Mom(1:4,1)+Mom(1:4,2)
+    if( TOPDECAYS.eq.0 ) then
+        WCurr(1:4) = 0d0
+        RETURN
+    endif
+
+
+    if( Charge.eq.Wp_ ) then ! W+ decay
+!       assemble lepton current
+        call    vSpi_Weyl(dcmplx(Mom(1:4,1)),+1,Spi(1:4))     ! l+ or dn_bar
+        call ubarSpi_Weyl(dcmplx(Mom(1:4,2)),-1,BarSpi(1:4))  ! nu or up
+        WCurr(1:4)  = vbqq_Weyl(BarSpi(1:4),Spi(1:4)) * WProp ! vbqq introduces -i/Sqrt(2)
+        
+    elseif( Charge.eq.Wm_ ) then ! W- decay
+!       assemble lepton current
+        call ubarSpi_Weyl(dcmplx(Mom(1:4,1)),-1,BarSpi(1:4))  ! l- or dn
+        call    vSpi_Weyl(dcmplx(Mom(1:4,2)),+1,Spi(1:4))     ! nubar or up_bar
+        WCurr(1:4)  = vbqq_Weyl(BarSpi(1:4),Spi(1:4)) * WProp ! vbqq introduces -i/Sqrt(2)
+        
+    endif
+
+
+RETURN
+END SUBROUTINE
 
 
 

@@ -1586,6 +1586,8 @@ function CalculatesXsec(Process)
     CalculatesXsec=.false.
   elseif (Process.ge.110 .and. Process.le.114) then
     CalculatesXsec=.true.
+  elseif (Process.ge.115 .and. Process.le.117) then
+    CalculatesXsec=.true.
   else
     print *, "Unknown process in CalculatesXsec", process, "; setting CalculatesXsec=false."
   endif

@@ -221,11 +221,11 @@ logical, public :: JetsOppositeEta = .false.                   ! Ensures associa
 !=====================================================
 !constants
 real(8), public            :: M_Top   = 173.2d0   *GeV      ! top quark mass
-real(8), public            :: Ga_Top  = 2.0d0     *GeV      ! top quark width
+real(8), public            :: Ga_Top  != 2.0d0     *GeV      ! top quark width
 real(8), public            :: M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-2011)
 real(8), public            :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-2011)
 real(8), public            :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
-real(8), public            :: Ga_W    = 2.085d0   *GeV      ! W boson width(PDG-2011)
+real(8), public            :: Ga_W    != 2.085d0   *GeV      ! W boson width(PDG-2011)
 real(8), public            :: M_Reso  = 125.0d0   *GeV      ! X resonance mass (spin 0, spin 1, spin 2, can be overwritten by command line argument)
 real(8), public            :: Ga_Reso = 0.00407d0 *GeV      ! X resonance width
 real(8), public            :: M_Reso2 = -1d0      *GeV      ! second resonance mass (spin 0 in off-shell MCFM, can be overwritten by command line argument)
@@ -2763,9 +2763,9 @@ implicit none
    VCKM_ud = 0.974285d0
    VCKM_us = 0.225290d0
    VCKM_cs = 0.9734244d0
-   VCKM_cd =-0.225182d0
+   VCKM_cd = -0.225182d0
    VCKM_tb = 0.99912367d0
-   VCKM_ts =-0.040920069d0
+   VCKM_ts = -0.040920069d0
    call ComputeCKMElements(VCKM_ud, VCKM_us, VCKM_cd, VCKM_cs, VCKM_ts, VCKM_tb)
 end subroutine SetDefaultCKM
 
@@ -2777,6 +2777,9 @@ implicit none
    gwsq = 4.0d0 * M_W**2/vev**2
    sitW = sqrt(xw)
    twosc = sqrt(4d0*xw*(1d0-xw))
+   
+   Ga_W=3d0*gwsq*M_W/16d0/Pi
+   Ga_Top=Gf*M_Top**3/8d0/Pi/sqrt2*(1d0-(M_W/M_Top)**2)**2*(1D0+2d0*(M_W/M_Top)**2)
 
    esq = 4.0_dp*pi*alpha_QED
    overallCouplVffsq = esq/(twosc**2) ! ~= gwsq/4.0_dp/(1.0_dp-xw)

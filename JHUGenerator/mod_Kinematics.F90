@@ -4689,7 +4689,7 @@ real(8) :: DKRnd
    ICOLUP(1:2,7) = tmp_icolup(1:2,2)
    CombWeight = CombWeight * tmp_CombWeight
 
-
+   if( Process.lt.110 .or. Process.gt.114) then
    ICOLUP_BASE = ICOLUP_BASE+1
    call VBranching(DecayMode2, tmp_idup, tmp_icolup, tmp_CombWeight, ICOLUP_BASE)
    MY_IDUP(5) = tmp_idup(1)
@@ -4704,6 +4704,7 @@ real(8) :: DKRnd
       MY_IDUP(9) = -MY_IDUP(9)
    endif
    CombWeight = CombWeight * tmp_CombWeight
+   endif
 
 RETURN
 END SUBROUTINE
@@ -7503,6 +7504,7 @@ integer idx,ip
       call swapr(polemass(5),polemass(6)) ! will use polemass(5) as the greater mass below
    endif
    pJHstar(1:4) = pJ(1:4,1) + pHstar(1:4)
+   
 
    ! Determine the appropriate factorization scale for the chosen scheme from pole and invariant masses
    if(FacScheme .eq. kRenFacScheme_mhstar) then

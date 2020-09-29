@@ -6,6 +6,7 @@ implicit none
 public :: EvalXSec_PP_TTBH, EvalXSec_PP_BBBH, EvalAmp_GG_TTBH, EvalAmp_QQB_TTBH
 public :: InitProcess_TTBH
 public :: ExitProcess_TTBH
+public :: ubarSpi_Dirac, vSpi_Dirac
 private
 
 integer,parameter :: ColorlessTag = 1

@@ -46,8 +46,8 @@ integer, parameter :: Hash_GENchannel_Size = 121 ! Maximum size
 integer, target :: Hash_GENchannel(1:Hash_GENchannel_Size,1:3)
 
 ! JHUGen onshell TH hash - PDF conventions
-integer, parameter :: Hash_THchannel_Size = 121 ! Maximum size
-integer, target :: Hash_THchannel(1:Hash_THchannel_Size,1:3)
+integer, parameter :: Hash_THchannel_Size = 121, Hash_TWHchannel_Size = 121 ! Maximum size
+integer, target :: Hash_THchannel(1:Hash_THchannel_Size,1:3),Hash_TWHchannel(1:Hash_TWHchannel_Size,1:3)
 
 ! Variable to control initialization
 logical, private :: hashcoll_hashes_initialized = .false.
@@ -1006,6 +1006,20 @@ implicit none
 
    Hash_THchannel( 25:,:) = 0
    Hash_THchannel( 25:,3) = -1
+   
+return
+end subroutine
+
+subroutine Init_Hash_TWHchannel()
+implicit none
+   
+   Hash_TWHchannel( 1,1:3) = (/ 0, 5,115/)
+   Hash_TWHchannel( 2,1:3) = (/ 5, 0,115/)
+   Hash_TWHchannel( 3,1:3) = (/ 0, -5,116/)
+   Hash_TWHchannel( 4,1:3) = (/ -5, 0,116/)
+
+   Hash_TWHchannel( 5:,:) = 0
+   Hash_TWHchannel( 5:,3) = -1
 return
 end subroutine
 
@@ -1037,6 +1051,7 @@ implicit none
       call Init_Hash_OnshellHJJ_nosplit()
       call Init_Hash_GENchannel()
       call Init_Hash_THchannel()
+      call Init_Hash_TWHchannel()
       call Init_Hash_PPXchannel()
 
       hashcoll_hashes_initialized = .true.
@@ -1145,6 +1160,16 @@ integer, intent(out) :: ijSel(1:121,1:3)
       call SetupHashes()
    endif
    ijSel=Hash_THchannel
+return
+end subroutine
+
+subroutine get_TWHchannelHash(ijSel)
+implicit none
+integer, intent(out) :: ijSel(1:121,1:3)
+   if (.not. hashcoll_hashes_initialized) then
+      call SetupHashes()
+   endif
+   ijSel=Hash_TWHchannel
 return
 end subroutine
 
@@ -1261,6 +1286,16 @@ integer, pointer, intent(out) :: ijSel(:,:)
       call SetupHashes()
    endif
    ijSel => Hash_THchannel
+return
+end subroutine
+
+subroutine getRef_TWHchannelHash(ijSel)
+implicit none
+integer, pointer, intent(out) :: ijSel(:,:)
+   if (.not. hashcoll_hashes_initialized) then
+      call SetupHashes()
+   endif
+   ijSel => Hash_TWHchannel
 return
 end subroutine
 
