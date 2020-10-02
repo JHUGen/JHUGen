@@ -176,7 +176,11 @@ FinalStateWeight = 1d0
       MomExt(1:4,W)  = MomExt(1:4,lep) + MomExt(1:4,nu)
       PSWgt = PSWgt * PSWgt2
       
-      call Top_OffShellProjection(MomExt,MomOffShell,PSWgt3)
+   if( PROCESS.ge.110 .and. PROCESS.le.114 ) then   
+     call Kinematics_TH(MomOffShell,applyPSCut,NBin)
+   elseif( PROCESS.ge.115 .and. PROCESS.le.117 ) then    
+     call Kinematics_TWH(MomOffShell,applyPSCut,NBin)
+   endif   
       MomOffShell(1:4,1:3) = MomExt(1:4,1:3)
 !       PSWgt = PSWgt * PSWgt3        ! not using the Jacobian because the mat.el. don't have BW-propagators
 
@@ -250,7 +254,11 @@ FinalStateWeight = 1d0
    PreFac = hbarc2XsecUnit * FluxFac * sHatJacobi * PSWgt * WdecayKfactor * PartChannelAvg * FinalStateWeight
    
 
-   call Kinematics_TH(MomOffShell,applyPSCut,NBin)
+   if( PROCESS.ge.110 .and. PROCESS.le.114 ) then   
+     call Kinematics_TH(MomOffShell,applyPSCut,NBin)
+   elseif( PROCESS.ge.115 .and. PROCESS.le.117 ) then    
+     call Kinematics_TWH(MomOffShell,applyPSCut,NBin)
+   endif   
    if( applyPSCut .or. PSWgt.eq.zero ) return
 
 

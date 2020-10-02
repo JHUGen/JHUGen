@@ -3881,6 +3881,74 @@ D_0minus = 0d0
 RETURN
 END SUBROUTINE
 
+SUBROUTINE Kinematics_TWH(Mom,applyPSCut,NBin)
+use ModParameters
+use ModMisc
+! use modTTBH
+implicit none
+real(8) :: Mom(1:4,1:11),MomMELA(1:4,1:11)
+logical :: applyPSCut
+integer :: NBin(:)
+real(8) :: pT_t,pT_H,pT_Wm,MatElSq_H0,MatElSq_H1,D_0minus
+real(8) :: mt,mWm,mtWm,mWp,pT_b,pT_l,pT_lm,pT_miss
+integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4,Wm=5,  b=6,Wp=7,lepP=8,nu=9,  lepM=10,nubar=11
+logical,save :: FirstTime=.true.
+
+
+    applyPSCut = .false.
+
+    pT_t = get_PT(Mom(1:4,t))
+    pT_Wm = get_PT(Mom(1:4,Wm))
+    pT_H = get_PT(Mom(1:4,Hbos))
+    pT_b = get_PT(Mom(1:4,b))
+    pT_l = get_PT(Mom(1:4,LepP))
+    pT_lm = get_PT(Mom(1:4,LepM))
+    pT_miss = get_PT(Mom(1:4,nu)+Mom(1:4,nubar))
+    mt = get_MInv(Mom(1:4,t))
+    mWm = get_MInv(Mom(1:4,Wm))
+    mtWm = get_MInv(Mom(1:4,t)+Mom(1:4,Wm))
+    mWp = get_MInv(Mom(1:4,Wp))
+    mWm = get_MInv(Mom(1:4,Wm))
+
+    if( m_Top.lt.10d0*GeV  .and. (pT_t.lt.pTjetcut) ) applyPSCut=.true.
+
+
+!     if( FirstTime ) then
+! !       call NNPDFDriver("./pdfs/NNPDF30_lo_as_0130.LHgrid",33)
+! !       call NNinitPDF(0)
+!       call InitProcess_TTBH(m_Reso,m_top)
+!       FirstTime = .false.
+!     endif
+!     MomMELA(1:4,1) = -(/         65d0,           0.0000000000000000d0, 0.0000000000000000d0,      65d0           /)
+!     MomMELA(1:4,2) = -(/         65d0,           0.0000000000000000d0, 0.0000000000000000d0,     -65d0           /)
+!     MomMELA(1:4,3:11) = Mom(1:4,3:11)  remap here because of new W bosons
+!     MomMELA(1:4,12:13) = 0d0
+!
+!     call EvalXSec_PP_TTBH(MomMELA(1:4,1:13),(/(1d0,0d0),(0d0,0d0)/),TopDecays,2,MatElSq_H0)
+!     call EvalXSec_PP_TTBH(MomMELA(1:4,1:13),(/(0d0,0d0),(1d0,0d0)/),TopDecays,2,MatElSq_H1)
+!
+!     D_0minus = MatElSq_H0/(MatElSq_H0 + 2d0*MatElSq_H1 )
+
+    D_0minus=0d0
+
+!   binning
+    NBin(1)  = WhichBin(1,pT_t)
+    NBin(2)  = WhichBin(2,pT_H)
+    NBin(3)  = WhichBin(3,mt)
+    NBin(4)  = WhichBin(4,mWm)
+    NBin(5)  = WhichBin(5,mWp)
+    NBin(6)  = WhichBin(6,pT_b)
+    NBin(7)  = WhichBin(7,pT_l)    
+    NBin(8)  = WhichBin(8,pT_lm)
+    NBin(9)  = WhichBin(9,pT_miss)
+    NBin(10) = WhichBin(10,D_0minus)
+
+
+
+RETURN
+END SUBROUTINE
+
+
 
 
 
@@ -5464,6 +5532,42 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
 return
 END SUBROUTINE
 
+
+SUBROUTINE TW_OffShellProjection(MomIn,MomOut,Jacobian)
+use modParameters
+use modMisc
+implicit none
+real(8) :: MomIn(:,:),MomOut(:,:),MomTmp(1:4),Jacobian
+real(8) :: xRndWidth(2:5),BW_Mass(2:5),BW_Jacobi(2:5)
+integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4,Wm=5,  b=6,Wp=7,lepP=8,nu=9, lepM=10,nubar=11
+
+
+    call random_number(xRndWidth)
+
+    call SmearExternal(xRndWidth(3),m_top,Ga_Top,m_top-6d0*Ga_Top,m_top+6d0*Ga_Top,BW_Mass(3),BW_Jacobi(3)) !top
+    call SmearExternal(xRndWidth(4),m_W,Ga_W,m_W-6d0*Ga_W,m_W+6d0*Ga_W,BW_Mass(4),BW_Jacobi(4)) !wp from top-decay
+    call SmearExternal(xRndWidth(5),m_W,Ga_W,m_W-6d0*Ga_W,m_W+6d0*Ga_W,BW_Mass(5),BW_Jacobi(5)) !wm
+    Jacobian = BW_Jacobi(3) * BW_Jacobi(4) * BW_Jacobi(5)
+
+! print *, "smeared mt",(BW_Mass(3)-m_top)/GeV
+! print *, "smeared mw",(BW_Mass(4:5)-m_w)/GeV
+
+    call ShiftMass(MomIn(1:4,t),MomIn(1:4,Wm),BW_Mass(3),BW_Mass(5),MomOut(1:4,t),MomOut(1:4,Wm))
+
+    MomTmp(1:4) = MomOut(1:4,t) - MomIn(1:4,Wp)
+    call ShiftMass(MomTmp,MomIn(1:4,Wp),m_Bot,BW_Mass(4),MomOut(1:4,b),MomOut(1:4,Wp))! project b and W+ on-shell
+
+
+    MomTmp(1:4) = MomOut(1:4,Wp) - MomIn(1:4,lepP)                                ! project W+ decay products on-shell
+    MomOut(1:4,nu)   = MomTmp(1:4) - (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lepP)) * MomIn(1:4,lepP)
+    MomOut(1:4,lepP) = (1d0 + (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lepP))) * MomIn(1:4,lepP)
+
+    MomTmp(1:4) = MomOut(1:4,Wm) - MomIn(1:4,lepM)                                ! project W- decay products on-shell
+    MomOut(1:4,nubar) = MomTmp(1:4) - (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lepM)) * MomIn(1:4,lepM)
+    MomOut(1:4,lepM)  = (1d0 + (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lepM))) * MomIn(1:4,lepM)
+
+return
+END SUBROUTINE
 
 
 

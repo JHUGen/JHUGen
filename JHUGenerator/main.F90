@@ -4873,8 +4873,10 @@ implicit none
      call InitHisto_TTBH()
   elseif (Process.eq.90) then
      call InitHisto_BBBH()
-  elseif (Process.eq.110 .or. Process .eq. 111 .or. Process.eq.112 .or. Process .eq. 113 .or. Process .eq. 114 .or. Process .eq. 115 .or. Process .eq. 116 .or. Process .eq. 117) then
+  elseif (Process.eq.110 .or. Process .eq. 111 .or. Process.eq.112 .or. Process .eq. 113 .or. Process .eq. 114) then
      call InitHisto_TH()
+  elseif (Process .eq. 115 .or. Process .eq. 116 .or. Process .eq. 117) then
+     call InitHisto_TWH()
   else
 
      if( TauDecays.eq.0 .or. TauDecays.eq.1 ) then
@@ -5339,6 +5341,90 @@ integer :: AllocStatus,NHisto
           Histo(7)%LowVal = 0d0
           Histo(7)%SetScale= 1d0
 
+
+
+  do NHisto=1,NumHistograms
+      Histo(NHisto)%Value(:) = 0d0
+      Histo(NHisto)%Value2(:)= 0d0
+      Histo(NHisto)%Hits(:)  = 0
+  enddo
+
+RETURN
+END SUBROUTINE
+
+SUBROUTINE InitHisto_TWH()
+use ModMisc
+use ModKinematics
+use ModParameters
+implicit none
+integer :: AllocStatus,NHisto
+
+          it_sav = 1
+          NumHistograms = 10
+          if( .not.allocated(Histo) ) then
+                allocate( Histo(1:NumHistograms), stat=AllocStatus  )
+                if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
+          endif
+
+          Histo(1)%Info   = "pT_top"
+          Histo(1)%NBins  = 50
+          Histo(1)%BinSize= 10d0*GeV
+          Histo(1)%LowVal = 0d0
+          Histo(1)%SetScale= 1d0/GeV
+
+          Histo(2)%Info   = "pT_H"
+          Histo(2)%NBins  = 50
+          Histo(2)%BinSize= 10d0*GeV
+          Histo(2)%LowVal = 0d0
+          Histo(2)%SetScale= 1d0/GeV
+
+          Histo(3)%Info   = "mt"
+          Histo(3)%NBins  = 50
+          Histo(3)%BinSize= 0.4d0*GeV
+          Histo(3)%LowVal = 160d0*GeV
+          Histo(3)%SetScale= 1d0/GeV
+
+          Histo(4)%Info   = "mWm"
+          Histo(4)%NBins  = 50
+          Histo(4)%BinSize= 0.4d0*GeV
+          Histo(4)%LowVal = 70d0*GeV
+          Histo(4)%SetScale= 1d0/GeV
+
+          Histo(5)%Info   = "mWp"
+          Histo(5)%NBins  = 50
+          Histo(5)%BinSize= 0.4d0*GeV
+          Histo(5)%LowVal = 70d0*GeV
+          Histo(5)%SetScale= 1d0/GeV
+
+          Histo(6)%Info   = "pT_b"
+          Histo(6)%NBins  = 50
+          Histo(6)%BinSize= 10d0*GeV
+          Histo(6)%LowVal = 0d0
+          Histo(6)%SetScale= 1d0/GeV
+
+          Histo(7)%Info   = "pT_l"
+          Histo(7)%NBins  = 50
+          Histo(7)%BinSize= 10d0*GeV
+          Histo(7)%LowVal = 0d0
+          Histo(7)%SetScale= 1d0/GeV
+          
+          Histo(8)%Info   = "pT_lm"
+          Histo(8)%NBins  = 50
+          Histo(8)%BinSize= 10d0*GeV
+          Histo(8)%LowVal = 0d0
+          Histo(8)%SetScale= 1d0/GeV
+
+          Histo(9)%Info   = "pT_miss"
+          Histo(9)%NBins  = 50
+          Histo(9)%BinSize= 10d0*GeV
+          Histo(9)%LowVal = 0d0
+          Histo(9)%SetScale= 1d0/GeV
+
+          Histo(10)%Info   = "D_0minus"
+          Histo(10)%NBins  = 50
+          Histo(10)%BinSize= 0.02
+          Histo(10)%LowVal = 0d0
+          Histo(10)%SetScale= 1d0
 
 
   do NHisto=1,NumHistograms
