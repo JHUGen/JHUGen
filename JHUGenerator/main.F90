@@ -5360,7 +5360,7 @@ implicit none
 integer :: AllocStatus,NHisto
 
           it_sav = 1
-          NumHistograms = 10
+          NumHistograms = 13
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -5419,12 +5419,31 @@ integer :: AllocStatus,NHisto
           Histo(9)%BinSize= 10d0*GeV
           Histo(9)%LowVal = 0d0
           Histo(9)%SetScale= 1d0/GeV
-
-          Histo(10)%Info   = "D_0minus"
-          Histo(10)%NBins  = 50
-          Histo(10)%BinSize= 0.02
-          Histo(10)%LowVal = 0d0
+          
+          Histo(10)%Info   = "y(top)"
+          Histo(10)%NBins  = 60
+          Histo(10)%BinSize= 0.1d0
+          Histo(10)%LowVal = -3d0
           Histo(10)%SetScale= 1d0
+
+          Histo(11)%Info   = "y(W)"
+          Histo(11)%NBins  = 100
+          Histo(11)%BinSize= 0.1d0
+          Histo(11)%LowVal = -5d0
+          Histo(11)%SetScale= 1d0
+
+          Histo(12)%Info   = "y(Higgs)"
+          Histo(12)%NBins  = 100
+          Histo(12)%BinSize= 0.1d0
+          Histo(12)%LowVal = -5d0
+          Histo(12)%SetScale= 1d0
+                    
+
+          Histo(13)%Info   = "D_0minus"
+          Histo(13)%NBins  = 50
+          Histo(13)%BinSize= 0.02
+          Histo(13)%LowVal = 0d0
+          Histo(13)%SetScale= 1d0
 
 
   do NHisto=1,NumHistograms

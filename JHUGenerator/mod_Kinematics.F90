@@ -3890,7 +3890,7 @@ real(8) :: Mom(1:4,1:11),MomMELA(1:4,1:11)
 logical :: applyPSCut
 integer :: NBin(:)
 real(8) :: pT_t,pT_H,pT_Wm,MatElSq_H0,MatElSq_H1,D_0minus
-real(8) :: mt,mWm,mtWm,mWp,pT_b,pT_l,pT_lm,pT_miss
+real(8) :: mt,mWm,mtWm,mWp,pT_b,pT_l,pT_lm,pT_miss,y_top,y_Higgs,y_Wm
 integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4,Wm=5,  b=6,Wp=7,lepP=8,nu=9,  lepM=10,nubar=11
 logical,save :: FirstTime=.true.
 
@@ -3909,6 +3909,10 @@ logical,save :: FirstTime=.true.
     mtWm = get_MInv(Mom(1:4,t)+Mom(1:4,Wm))
     mWp = get_MInv(Mom(1:4,Wp))
     mWm = get_MInv(Mom(1:4,Wm))
+    
+    y_top=get_eta(Mom(1:4,t))
+    y_Higgs=get_eta(Mom(1:4,Hbos))
+    y_Wm=get_eta(Mom(1:4,Wm))
 
     if( m_Top.lt.10d0*GeV  .and. (pT_t.lt.pTjetcut) ) applyPSCut=.true.
 
@@ -3941,7 +3945,10 @@ logical,save :: FirstTime=.true.
     NBin(7)  = WhichBin(7,pT_l)    
     NBin(8)  = WhichBin(8,pT_lm)
     NBin(9)  = WhichBin(9,pT_miss)
-    NBin(10) = WhichBin(10,D_0minus)
+    NBin(10) = WhichBin(10,y_top)
+    NBin(11)  = WhichBin(11,y_Wm)
+    NBin(12)  = WhichBin(12,y_higgs)
+    NBin(13) = WhichBin(13,D_0minus)
 
 
 
