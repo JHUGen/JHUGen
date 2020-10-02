@@ -14,13 +14,13 @@ private
 
 subroutine EvalXsec_pp_TH(Mom,Channel,Res)
 implicit none
-real(8), intent(in) :: Mom(1:4,1:9)
-integer, intent(in) :: Channel! 0=s+t channel, 1=t channel, 2=s channel
+real(8), intent(in) :: Mom(1:4,1:11) !additional Mom(1:4,10:11) are lep and nu from W-decay in tw channel
+integer, intent(in) :: Channel! 0=s+t channel, 1=t channel, 2=s channel, 3=tw channel
 real(8), intent(out) :: Res(-5:5,-5:5)
 real(8) :: MatElSq_GG,MatElSq_QQB,MatElSq_QBQ
 real(8) :: LO_Res_Unpol(-6:6,-6:6)
 integer :: i,j
-integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
+integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9, lepW=10, nuW=11
 
 
    Res(:,:) = 0d0
@@ -58,6 +58,25 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
          endif
       enddo; enddo
    endif
+   
+   if( Channel.eq.3) then
+      LO_Res_Unpol(:,:)=0d0
+      call EvalAmp_GB_TWMH(Mom,LO_Res_Unpol) ! Computes g-b, b-g initial states
+      do i=-6,6; do j=-6,6
+         if(abs(i).ne.abs(Top_) .and. abs(j).ne.abs(Top_)) then
+            Res(i,j) = Res(i,j) + LO_Res_Unpol(convertToPartIndex(i),convertToPartIndex(j))
+         endif
+      enddo; enddo
+
+      LO_Res_Unpol(:,:)=0d0
+      call EvalAmp_GBB_TBWPH(Mom,LO_Res_Unpol) ! Computes g-bb, bb-g initial states
+      do i=-6,6; do j=-6,6
+         if(abs(i).ne.abs(Top_) .and. abs(j).ne.abs(Top_)) then
+            Res(i,j) = Res(i,j) + LO_Res_Unpol(convertToPartIndex(i),convertToPartIndex(j))
+         endif
+      enddo; enddo
+   endif
+      
    return
 end subroutine
 
