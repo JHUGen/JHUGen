@@ -1646,6 +1646,114 @@ RETURN
 END SUBROUTINE
 
 
+SUBROUTINE WriteOutEvent_TWH(Mom,MY_IDUP,ICOLUP,EventWeight)
+use ModParameters
+use ModMisc
+implicit none
+real(8) :: Mom(1:4,1:11)
+real(8),optional :: EventWeight
+integer :: MY_IDUP(1:11),ICOLUP(1:2,1:11),LHE_IDUP(1:11),ISTUP(1:11),MOTHUP(1:2,1:11)
+integer :: NUP,IDPRUP,i
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,Lifetime,Spin,MomDummy(1:4,1:11),TheMass
+character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
+integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4,Wm=5,  b=6,Wp=7,lepP=8,nu=9,  lepM=10,nubar=11
+
+
+! For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
+! The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
+
+
+
+IDPRUP=Process
+SCALUP=Mu_Fact/GeV
+AQEDUP=alpha_QED
+AQCDUP=alphas
+
+
+
+MOTHUP(1:2,inLeft) = (/0,0/);             ISTUP(inLeft) = -1
+MOTHUP(1:2,inRight)= (/0,0/);             ISTUP(inRight)= -1
+
+MOTHUP(1:2,Hbos)   = (/inLeft,inRight/);  ISTUP(Hbos)   = +1
+MOTHUP(1:2,Wm)   = (/inLeft,inRight/);    ISTUP(Wm)   = +2
+MOTHUP(1:2,t)      = (/inLeft,inRight/);  ISTUP(t)      = +2
+
+MOTHUP(1:2,lepM)   = (/Wm,Wm/);           ISTUP(lepM)   = +1
+MOTHUP(1:2,nubar)  = (/Wm,Wm/);           ISTUP(nubar)  = +1
+
+MOTHUP(1:2,b)      = (/t,t/);             ISTUP(b)      = +1
+MOTHUP(1:2,Wp)     = (/t,t/);             ISTUP(Wp)     = +2
+MOTHUP(1:2,lepP)   = (/Wp,Wp/);           ISTUP(lepP)   = +1
+MOTHUP(1:2,nu)     = (/Wp,Wp/);           ISTUP(nu)     = +1
+
+
+if( TopDecays.eq.0 ) then
+   NUP = 5
+   ISTUP(t)   = +1
+   ISTUP(Wm)      = +1
+else
+   NUP=11
+endif
+
+if( present(EventWeight) ) then
+    XWGTUP=EventWeight
+else
+    XWGTUP=1.0d0
+endif
+Lifetime = 0.0d0
+Spin     = 0.1d0
+
+
+do i=1,5
+    LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
+    MomDummy(1,i) = Mom(1,i)/GeV
+    MomDummy(2,i) = Mom(2,i)/GeV
+    MomDummy(3,i) = Mom(3,i)/GeV
+    MomDummy(4,i) = Mom(4,i)/GeV
+enddo
+
+if( TopDecays.ne.0 ) then
+      ! introduce b-quark mass for LHE output
+!       call ShiftMass(Mom(1:4,b),   Mom(1:4,Wp),m_bot,M_W,  MomDummy(1:4,b),   MomDummy(1:4,Wp) )
+      MomDummy(1:4,b)   = Mom(1:4,b)
+      MomDummy(1:4,Wp)  = Mom(1:4,Wp)
+
+      ! introduce lepton/quark masses for LHE output
+      call ShiftMass(Mom(1:4,LepP),Mom(1:4,Wp)-Mom(1:4,LepP), GetMass(MY_IDUP(LepP)),0d0,  MomDummy(1:4,LepP),MomDummy(1:4,Nu) )
+      call ShiftMass(Mom(1:4,LepM),Mom(1:4,Wm)-Mom(1:4,LepM), GetMass(MY_IDUP(LepM)),0d0,  MomDummy(1:4,LepM),MomDummy(1:4,Nubar) )
+
+      do i=6,11
+          LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
+          MomDummy(1,i) = MomDummy(1,i)/GeV
+          MomDummy(2,i) = MomDummy(2,i)/GeV
+          MomDummy(3,i) = MomDummy(3,i)/GeV
+          MomDummy(4,i) = MomDummy(4,i)/GeV
+      enddo
+endif
+
+
+write(io_LHEOutFile,"(A)") "<event>"
+write(io_LHEOutFile,"(I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+! in order of appearance:
+! (*) number of particles in the event
+! (*) process ID (user defined)
+! (*) weighted or unweighted events: +1=unweighted, otherwise= see manual
+! (*) pdf factorization scale in GeV
+! (*) alpha_QED coupling for this event
+! (*) alpha_s coupling for this event
+
+do i=1,NUP
+     TheMass = get_Minv(MomDummy(:,i))
+     if( i.le.2  ) TheMass = 0d0  ! setting initial parton masses to zero
+     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),TheMass,Lifetime/ctauUnit,Spin
+enddo
+write(io_LHEOutFile,"(A)") "</event>"
+
+
+RETURN
+END SUBROUTINE
+
+
 
 
 

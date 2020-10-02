@@ -175,12 +175,11 @@ FinalStateWeight = 1d0
       MomExt(1:4,lep)= MomExt(1:4,7)
       MomExt(1:4,W)  = MomExt(1:4,lep) + MomExt(1:4,nu)
       PSWgt = PSWgt * PSWgt2
-      
    if( PROCESS.ge.110 .and. PROCESS.le.114 ) then   
-     call Kinematics_TH(MomOffShell,applyPSCut,NBin)
-   elseif( PROCESS.ge.115 .and. PROCESS.le.117 ) then    
-     call Kinematics_TWH(MomOffShell,applyPSCut,NBin)
-   endif   
+      call Top_OffShellProjection(MomExt,MomOffShell,PSWgt3)
+   elseif( PROCESS.ge.115 .and. PROCESS.le.117 ) then   
+      call TW_OffShellProjection(MomExt,MomOffShell,PSWgt3)
+   endif
       MomOffShell(1:4,1:3) = MomExt(1:4,1:3)
 !       PSWgt = PSWgt * PSWgt3        ! not using the Jacobian because the mat.el. don't have BW-propagators
 
@@ -336,7 +335,11 @@ FinalStateWeight = 1d0
        elseif( VegasWeighted_TH .gt. xRnd*CrossSecMax(iPart_sel,jPart_sel) ) then
          AccepCounter = AccepCounter + 1
          AccepCounter_part(iPart_sel,jPart_sel) = AccepCounter_part(iPart_sel,jPart_sel) + 1
-         call WriteOutEvent_TH(MomOffShell,MY_IDUP(1:9),ICOLUP(1:2,1:9))
+         if( PROCESS.ge.110 .and. PROCESS.le.114 ) then   
+           call WriteOutEvent_TH(MomOffShell,MY_IDUP(1:9),ICOLUP(1:2,1:9))
+          elseif( PROCESS.ge.115 .and. PROCESS.le.117 ) then     
+            call WriteOutEvent_TWH(MomOffShell,MY_IDUP(1:11),ICOLUP(1:2,1:11))
+          endif   
          do NHisto=1,NumHistograms
            call intoHisto(NHisto,NBin(NHisto),1d0)
          enddo
@@ -349,7 +352,11 @@ FinalStateWeight = 1d0
       if( VegasWeighted_TH.ne.0d0 ) then
         AccepCounter=AccepCounter+1
         if( writeWeightedLHE ) then
-          call WriteOutEvent_TH(MomOffShell,MY_IDUP(1:9),ICOLUP(1:2,1:9))
+          if( PROCESS.ge.110 .and. PROCESS.le.114 ) then   
+            call WriteOutEvent_TH(MomOffShell,MY_IDUP(1:9),ICOLUP(1:2,1:9))
+          elseif( PROCESS.ge.115 .and. PROCESS.le.117 ) then     
+            call WriteOutEvent_TWH(MomOffShell,MY_IDUP(1:11),ICOLUP(1:2,1:11))
+          endif   
         endif
         do NHisto=1,NumHistograms
           call intoHisto(NHisto,NBin(NHisto),VegasWeighted_TH)
