@@ -1013,10 +1013,10 @@ end subroutine
 subroutine Init_Hash_TWHchannel()
 implicit none
    
-   Hash_TWHchannel( 1,1:3) = (/ 0, 5,115/)
-   Hash_TWHchannel( 2,1:3) = (/ 5, 0,115/)
-   Hash_TWHchannel( 3,1:3) = (/ 0, -5,116/)
-   Hash_TWHchannel( 4,1:3) = (/ -5, 0,116/)
+   Hash_TWHchannel( 1,1:3) = (/ pdfGlu_, pdfBot_,115/)
+   Hash_TWHchannel( 2,1:3) = (/ pdfBot_, pdfGlu_,115/)
+   Hash_TWHchannel( 3,1:3) = (/ pdfGlu_, pdfABot_,116/)
+   Hash_TWHchannel( 4,1:3) = (/ pdfABot_, pdfGlu_,116/)
 
    Hash_TWHchannel( 5:,:) = 0
    Hash_TWHchannel( 5:,3) = -1

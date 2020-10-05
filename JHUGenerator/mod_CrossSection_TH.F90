@@ -303,10 +303,10 @@ FinalStateWeight = 1d0
               MY_IDUP(1:5) = (/ LHA2M_pdf(iPart_sel),LHA2M_pdf(jPart_sel),Hig_,ATop_,Bot_ /)
               call EvalAmp_QQB_TBARHB(MomExt,LO_Res_Unpol)
    ELSEIF( iPROCESS .EQ. 115 ) THEN
-              MY_IDUP(1:5) = (/ LHA2M_pdf(iPart_sel),LHA2M_pdf(jPart_sel),Hig_,Top_,Wm_ /)
+              MY_IDUP(1:5) = (/ convertFromPartIndex(iPart_sel),convertFromPartIndex(jPart_sel),Hig_,Top_,Wm_ /)
               call EvalAmp_GB_TWMH(MomExt,LO_Res_Unpol)
    ELSEIF( iPROCESS .EQ. 116 ) THEN
-              MY_IDUP(1:5) = (/ LHA2M_pdf(iPart_sel),LHA2M_pdf(jPart_sel),Hig_,ATop_,Wp_ /)
+              MY_IDUP(1:5) = (/ convertFromPartIndex(iPart_sel),convertFromPartIndex(jPart_sel),Hig_,ATop_,Wp_ /)
               call EvalAmp_GBB_TBWPH(MomExt,LO_Res_Unpol)
    ENDIF
    
