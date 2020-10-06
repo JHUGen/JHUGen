@@ -887,7 +887,7 @@ END SUBROUTINE EvalAmp_GBB_TBWPH
         complex(8) :: UBb(4),Eg(4),UBt(4),ECw(4)
         complex(8) :: amp,ampts,ampws,amptt1,amptt2,ampwt
         real(8)    :: mt,mw,v
-        real(8)    :: kap,kapt,a1WW,a2WW,a4WW   
+        complex(8)    :: kap,kapt,a1WW,a2WW,a4WW   
 
 
         mw=M_W
@@ -4264,7 +4264,7 @@ END SUBROUTINE EvalAmp_GBB_TBWPH
         complex(8) :: Vb(4),Eg(4),Vt(4),ECw(4)
         complex(8) :: amp,ampts,ampws,amptt1,amptt2,ampwt
         real(8)    :: mt,mw,v
-        real(8)    :: kap,kapt,a1WW,a2WW,a4WW   
+        complex(8)    :: kap,kapt,a1WW,a2WW,a4WW   
 
 
         mw=M_W
