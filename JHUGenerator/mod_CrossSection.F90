@@ -2277,9 +2277,9 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
     endif
 
     if(IsAWDecay(DecayMode1)) then
-      if(sign_of_W.eq."p")then!W+
+      if(sign_of_W.eq."W+".or.sign_of_W.eq."w+")then!W+
         !do nothing
-      elseif(sign_of_W.eq."m")then!W-
+      elseif(sign_of_W.eq."W-".or.sign_of_W.eq."w-")then!W-
         call swap(id(6),id(7))
         id(3) = -id(3)
         id(4) = -id(4)
@@ -2501,8 +2501,8 @@ elseif( IsAWDecay(DecayMode1) ) then
          id2=id
          id2(1:2) = (/i,j/)
 
-         if(sign_of_W.eq."p" .and. .not.CouplToLHEWp(id2(1:2)) )cycle
-         if(sign_of_W.eq."m" .and. .not.CouplToLHEWm(id2(1:2)) )cycle
+         if((sign_of_W.eq."W+".or.sign_of_W.eq."w+") .and. .not.CouplToLHEWp(id2(1:2)) )cycle
+         if((sign_of_W.eq."W-".or.sign_of_W.eq."w-") .and. .not.CouplToLHEWm(id2(1:2)) )cycle
 
          !idjhuvv(1)=ConvertLHEReverse(id2(1))
          !idjhuvv(2)=ConvertLHEReverse(id2(2))
@@ -2690,9 +2690,9 @@ if (tmp_idup(3).ne.Not_a_particle_)then
 endif
 
 if(IsAWDecay(DecayMode1)) then
-  if(sign_of_W.eq."p")then!W+
+  if(sign_of_W.eq."W+".or.sign_of_W.eq."w+")then!W+
     !do nothing
-  elseif(sign_of_W.eq."m")then!W-
+  elseif(sign_of_W.eq."W-".or.sign_of_W.eq."w-")then!W-
     call swap(id(6),id(7))
     id(3) = -id(3)
     id(4) = -id(4)
@@ -2870,9 +2870,9 @@ elseif( IsAWDecay(DecayMode1) ) then
 !pp>WH
     id(1:2) = (/ifound,jfound/)
 
-    if(sign_of_W.eq."m")then     !W-
+    if(sign_of_W.eq."W-".or.sign_of_W.eq."w-")then     !W-
       !do nothing
-    elseif(sign_of_W.eq."p")then !W+
+    elseif(sign_of_W.eq."W+".or.sign_of_W.eq."w+")then !W+
       !do nothing
     else                         !W+/-
       if( ( CouplToLHEWp(id(1:2)) .and. (id(4).eq.convertLHE(Wm_)) ) & !W+
@@ -2888,28 +2888,7 @@ elseif( IsAWDecay(DecayMode1) ) then
       endif
     endif
 
-!    idjhuvv(1)=ConvertLHEReverse(id(1))
-!    idjhuvv(2)=ConvertLHEReverse(id(2))
-!    idjhuvv(3)=ConvertLHEReverse(id(6))
-!    idjhuvv(4)=ConvertLHEReverse(id(7))
-!
-!    if (CoupledVertex(idjhuvv(1:2),-1) .eq. -CoupledVertex(idjhuvv(3:4),-1)) then
-!      call swap(id(6), id(7))
-!      id(3)=-id(3)
-!      id(4)=-id(4)
-!      id(6)=-id(6)
-!      id(7)=-id(7)
-!    endif
-
-    !if(sign_of_W.eq."p" .and. .not.CouplToLHEWp(id(1:2)) )cycle
-    !if(sign_of_W.eq."m" .and. .not.CouplToLHEWm(id(1:2)) )cycle
-
     call EvalAmp_VHiggs(id,helicity,MomExt,me2)
-    !if(me2.eq.0d0) then
-    !  print *,"ME2=0 for id1,2,6,7=",id(1:2),id(6:7),helicity(1:2),helicity(6:7)
-    !else
-    !  print *,"ME2 non-zero for id1,2,6,7=",id(1:2),id(6:7),helicity(1:2),helicity(6:7)
-    !endif
     if(IsNaN(me2).or.(me2.eq.0d0))return
     if(H_DK.eqv..false.)me2=me2*(M_Reso*Ga_Reso)**2!remove erroneous H propagator with stable H in mod_VHiggs.F90
     LO_Res_Unpol = me2 *pdf(LHA2M_PDF(ifound),1)*pdf(LHA2M_PDF(jfound),2) * PreFac
@@ -3005,40 +2984,17 @@ elseif( IsAWDecay(DecayMode1) ) then
 
     id2=id
     id2(1:2) = (/i,j/)
-
-!    idjhuvv(1)=ConvertLHEReverse(id2(1))
-!    idjhuvv(2)=ConvertLHEReverse(id2(2))
-!    idjhuvv(3)=ConvertLHEReverse(id2(6))
-!    idjhuvv(4)=ConvertLHEReverse(id2(7))
-!
-!    if (CoupledVertex(idjhuvv(1:2),-1) .ne. CoupledVertex(idjhuvv(3:4),-1)) cycle
-
-    if(sign_of_W.eq."m")then     !W-
+    
+    if(sign_of_W.eq."W-".or.sign_of_W.eq."w-")then     !W-
       if( CouplToLHEWp(id2(1:2)) )cycle
-    elseif(sign_of_W.eq."p")then !W+
+    elseif(sign_of_W.eq."W+".or.sign_of_W.eq."w+")then !W+
       if( CouplToLHEWm(id2(1:2)) )cycle
     else                         !W+/-
       if(id2(4).eq.convertLHE(Wp_) .and. .not.CouplToLHEWp(id2(1:2))) cycle
       if(id2(4).eq.convertLHE(Wm_) .and. .not.CouplToLHEWm(id2(1:2))) cycle
     endif
 
-!    if( CouplToLHEWp(id2(1:2)) )then    !W+
-!      if(sign_of_W.eq."m")cycle
-!      if(id2(4).ne.convertLHE(Wp_))cycle
-!    elseif( CouplToLHEWm(id2(1:2)) )then!W-
-!      if(sign_of_W.eq."p")cycle
-!      if(id2(4).ne.convertLHE(Wm_))cycle
-!    else
-!      cycle
-!    endif
-
-    !if(sign_of_W.eq."p" .and. .not.CouplToLHEWp(id2(1:2)) )cycle
-    !if(sign_of_W.eq."m" .and. .not.CouplToLHEWm(id2(1:2)) )cycle
-
     call EvalAmp_VHiggs(id2,helicity,MomExt,me2)
-    !if (CoupledVertex(idjhuvv(3:4),-1).eq.Wm_) then
-    !   print *,"Wminus found:",me2,id2(1:2),id2(6:7),helicity(1:2),helicity(6:7)
-    !endif
     if(IsNaN(me2))return
     if(H_DK.eqv..false.)me2=me2*(M_Reso*Ga_Reso)**2!remove erroneous H propagator with stable H in mod_VHiggs.F90
 

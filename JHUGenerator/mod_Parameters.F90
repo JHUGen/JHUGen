@@ -199,7 +199,7 @@ real(8), public :: alpha_dip = 1d0 !extra non physical degree of freedom for dip
 ! new VH
 !=====================================================
 
-character(len=1), public :: sign_of_W = "n"     ! "p" = W+, "m" = W-, else = W+/- both. For VH processes (50 & 51) only.
+character(len=2), public :: sign_of_W = "W0"     ! "W+" or "w+" = W+, "W-" or "w-" = W-, else = W+/- both. For VH processes (50 & 51) only.
 
 !=====================================================
 !cuts - should be set on the command line
