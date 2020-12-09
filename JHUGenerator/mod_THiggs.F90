@@ -502,7 +502,7 @@ integer :: i,j,bhel,thel,gpol,wpol,theld=-1,wpold=-1
               ECw=pol_mass(dcmplx(MomExt(:,w)),wpol,.true.)                
             elseif( TOPDECAYS .NE. 0 ) then
               call WDecay(Wm_,(/MomExt(1:4,lepW),MomExt(1:4,nuW)/),ECw)
-              ECw=ECw/sqrt2      
+              ECw=ECw*(0d0,-1d0)/sqrt2      
             endif          
             do thel=-1,theld,2   
                
@@ -510,7 +510,7 @@ integer :: i,j,bhel,thel,gpol,wpol,theld=-1,wpold=-1
                 call ubarSpi_Dirac(dcmplx(MomExt(:,t)),M_Top,thel,UBtD) 
               elseif( TOPDECAYS .NE. 0 ) then
                 call TopDecay(Top_,(/MomExt(1:4,bt),MomExt(1:4,lept),MomExt(1:4,nut)/),UBtD)
-                UBtD=UBtD/sqrt2
+                UBtD=UBtD*(0d0,-1d0)/sqrt2
               endif  
                   
 
@@ -576,7 +576,7 @@ integer :: i,j,bhel,thel,gpol,wpol,theld=-1,wpold=-1
               ECw=pol_mass(dcmplx(MomExt(:,w)),wpol,.true.) 
             elseif( TOPDECAYS .NE. 0 ) then
               call WDecay(Wp_,(/MomExt(1:4,lepW),MomExt(1:4,nuW)/),ECw)               
-              ECw=ECw/sqrt2       
+              ECw=ECw*(0d0,-1d0)/sqrt2       
             endif  
                       
             do thel=-1,theld,2   
@@ -585,7 +585,7 @@ integer :: i,j,bhel,thel,gpol,wpol,theld=-1,wpold=-1
                 call vSpi_Dirac(dcmplx(MomExt(:,t)),M_Top,thel,VtD) 
               elseif( TOPDECAYS .NE. 0 ) then
                 call TopDecay(ATop_,(/MomExt(1:4,bt),MomExt(1:4,lept),MomExt(1:4,nut)/),VtD)
-                VtD=VtD/sqrt2  
+                VtD=VtD*(0d0,-1d0)/sqrt2  
               endif  
 
               call gbb_tbwpHamp(MomExt(1:4,iL),Eg,MomExt(1:4,iR),VbD,MomExt(1:4,t),VtD,MomExt(1:4,w),ECw,MomExt(1:4,H),LOampab)

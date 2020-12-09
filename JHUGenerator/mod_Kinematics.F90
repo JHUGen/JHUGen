@@ -7714,7 +7714,7 @@ integer idx,ip
    polemass(7) = getMass(id(7)) ! Pole mass of the JJ system
 
    pJJHstar = pJJ + pHstar
-   if(polemass(5).lt.polemass(6)) then
+   if(polemass(5).gt.polemass(6)) then
       pJ(:,1)=p(:,5)
       pJ(:,2)=p(:,6)
    else

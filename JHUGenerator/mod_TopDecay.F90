@@ -269,6 +269,7 @@ END SUBROUTINE
 
 
         FUNCTION vbqg_Weyl(sp,e1)
+        use ModMisc                
         implicit none
         complex(8), intent(in) :: e1(:)
         complex(8), intent(in) :: sp(:)
@@ -281,41 +282,8 @@ END SUBROUTINE
 
 
 
-
-        FUNCTION vbqq_Weyl(sp1,sp2)
-        implicit none
-        complex(8), intent(in) :: sp1(:), sp2(:)
-        integer, parameter ::  Dv=4
-        integer :: i
-        complex(8) :: vbqq_Weyl(Dv)
-        complex(8) :: rr, va(Dv),sp1a(size(sp1))
-        real(8), parameter :: sqrt2 = 1.4142135623730950488016887242096980786d0
-
-            va=(0d0,0d0)
-            vbqq_Weyl=(0d0,0d0)
-
-            do i=1,Dv
-              if (i.eq.1) then
-                va(1)=(1d0,0d0)
-              else
-                va(i)=(-1d0,0d0)
-              endif
-              sp1a=spb2_Weyl(sp1,va)
-
-              rr=(0d0,-1d0)/sqrt2*psp1_(sp1a,sp2)
-              if (i.eq.1) then
-                    vbqq_Weyl = vbqq_Weyl + rr*va
-                else
-                    vbqq_Weyl = vbqq_Weyl - rr*va
-              endif
-              va(i)=(0d0,0d0)
-            enddo
-
-        END FUNCTION
-
-
-
         function vgq_Weyl(e1,sp)
+        use ModMisc                
         implicit none
         complex(8), intent(in) :: e1(:)
         complex(8), intent(in) :: sp(:)
@@ -325,135 +293,6 @@ END SUBROUTINE
             vgq_Weyl = (0d0,-1d0)/sqrt2*spb2_Weyl(sp,e1)
 
         end function
-
-
-
-
-
-      function spb2_Weyl(sp,v)
-      implicit none
-      complex(8), intent(in) :: sp(:),v(:)
-      integer, parameter ::  Dv=4, Ds=4
-      complex (8) :: spb2_Weyl(size(sp))
-      complex(8) :: x0(4,4),xx(4,4),xy(4,4)
-      complex(8) :: xz(4,4),x5(4,4)
-      complex(8) :: y1,y2,y3,y4,bp,bm,cp,cm
-      integer :: i,i1,i2,i3,imax
-
-
-
-      imax = Ds/4
-
-           do i=1,imax
-           i1= 1+4*(i-1)
-           i2=i1+3
-
-           y1=sp(i1)
-           y2=sp(i1+1)
-           y3=sp(i1+2)
-           y4=sp(i1+3)
-
-           x0(1,i)=y3
-           x0(2,i)=y4
-           x0(3,i)=y1
-           x0(4,i)=y2
-
-           xx(1,i) = y4
-           xx(2,i) = y3
-           xx(3,i) = -y2
-           xx(4,i) = -y1
-
-           xy(1,i)=(0d0,1d0)*y4
-           xy(2,i)=-(0d0,1d0)*y3
-           xy(3,i)=-(0d0,1d0)*y2
-           xy(4,i)=(0d0,1d0)*y1
-
-           xz(1,i)=y3
-           xz(2,i)=-y4
-           xz(3,i)=-y1
-           xz(4,i)=y2
-
-           x5(1,i)=y1
-           x5(2,i)=y2
-           x5(3,i)=-y3
-           x5(4,i)=-y4
-
-           enddo
-
-
-
-           do i=1,4
-
-           spb2_Weyl(i)=v(1)*x0(i,1)-v(2)*xx(i,1)-v(3)*xy(i,1)-v(4)*xz(i,1)
-
-           enddo
-
-
-           end function
-
-
-
-
-
-         function spi2_Weyl(v,sp)
-         implicit none
-         complex(8), intent(in) :: sp(:),v(:)
-         complex(8) :: spi2_Weyl(size(sp))
-         integer, parameter ::  Dv=4,Ds=4
-         complex(8) :: x0(4,4),xx(4,4),xy(4,4)
-         complex(8) :: xz(4,4),x5(4,4)
-         complex(8) ::  y1,y2,y3,y4,bp,bm,cp,cm
-         integer :: i,i1,i2,i3,imax
-
-
-         imax = Ds/4
-
-           do i=1,imax
-           i1= 1+4*(i-1)
-           i2=i1+3
-
-           y1=sp(i1)
-           y2=sp(i1+1)
-           y3=sp(i1+2)
-           y4=sp(i1+3)
-
-           x0(1,i)=y3
-           x0(2,i)=y4
-           x0(3,i)=y1
-           x0(4,i)=y2
-
-
-           xx(1,i) = -y4
-           xx(2,i) = -y3
-           xx(3,i) = y2
-           xx(4,i) = y1
-
-
-           xy(1,i)=(0d0,1d0)*y4
-           xy(2,i)=-(0d0,1d0)*y3
-           xy(3,i)=-(0d0,1d0)*y2
-           xy(4,i)=(0d0,1d0)*y1
-
-           xz(1,i)=-y3
-           xz(2,i)=y4
-           xz(3,i)=y1
-           xz(4,i)=-y2
-
-           x5(1,i)=y1
-           x5(2,i)=y2
-           x5(3,i)=-y3
-           x5(4,i)=-y4
-
-           enddo
-
-
-           do i=1,4
-
-           spi2_Weyl(i)=v(1)*x0(i,1)-v(2)*xx(i,1) -v(3)*xy(i,1)-v(4)*xz(i,1)
-           enddo
-
-
-           end function
 
 
 
