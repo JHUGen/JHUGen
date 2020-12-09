@@ -7172,9 +7172,6 @@ integer :: NumChannels
       endif
    endif
 
-   !print *, "x",xrnd(1:2)
-   !print *, "s",s56,s78,s910
-   !pause
 
    Jac = Jac1*Jac2*Jac3
    if(Jac.eq.0d0) return ! Checkpoint for on/off-shellness
@@ -7221,7 +7218,15 @@ ELSEIF( iChannel.EQ.4 ) THEN
    Jac6 = s_channel_decay(Mom(:,4),0d0,0d0,xRnd(7:8),Mom(:,5),Mom(:,8))                                                          !  6 --> 7+10
 ENDIF
 
-   Jac = Jac*Jac4*Jac5*Jac6 * PSNorm4  !*NumChannels                                                                                 !  combine
+   Jac = Jac*Jac4*Jac5*Jac6   !*NumChannels                                                                                      !  combine
+
+    if( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
+      Jac = Jac* PSNorm2
+    elseif( .not. IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
+      Jac = Jac* PSNorm3
+    else
+      Jac = Jac* PSNorm4
+    endif  
 
    !print *, energy,dsqrt(s56)
    !print *,"Generated momenta: "
