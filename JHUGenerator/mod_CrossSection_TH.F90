@@ -178,7 +178,8 @@ FinalStateWeight = 1d0
    if( PROCESS.ge.110 .and. PROCESS.le.114 ) then   
       call Top_OffShellProjection(MomExt,MomOffShell,PSWgt3)
    elseif( PROCESS.ge.115 .and. PROCESS.le.117 ) then   
-      call TW_OffShellProjection(MomExt,MomOffShell,PSWgt3)
+!      call TW_OffShellProjection(MomExt,MomOffShell,PSWgt3)
+      MomOffShell(1:4,4:11) = MomExt(1:4,4:11)
    endif
       MomOffShell(1:4,1:3) = MomExt(1:4,1:3)
 !       PSWgt = PSWgt * PSWgt3        ! not using the Jacobian because the mat.el. don't have BW-propagators
