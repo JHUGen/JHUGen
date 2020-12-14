@@ -175,21 +175,22 @@ FinalStateWeight = 1d0
       MomExt(1:4,lep)= MomExt(1:4,7)
       MomExt(1:4,W)  = MomExt(1:4,lep) + MomExt(1:4,nu)
       PSWgt = PSWgt * PSWgt2
-   if( PROCESS.ge.110 .and. PROCESS.le.114 ) then   
-      call Top_OffShellProjection(MomExt,MomOffShell,PSWgt3)
-   elseif( PROCESS.ge.115 .and. PROCESS.le.117 ) then   
-!      call TW_OffShellProjection(MomExt,MomOffShell,PSWgt3)
-      MomOffShell(1:4,4:11) = MomExt(1:4,4:11)
-   endif
-      MomOffShell(1:4,1:3) = MomExt(1:4,1:3)
-!       PSWgt = PSWgt * PSWgt3        ! not using the Jacobian because the mat.el. don't have BW-propagators
-
       if(Process.ge.115 .and. Process.le.117) then
         call EvalPhasespace_VDecay(MomExt(1:4,5),M_W,0d0,0d0,yRnd(13:14),MomExt(1:4,10:11),PSWgt4)
         MomExt(1:4,nuW) = MomExt(1:4,11)
         MomExt(1:4,lepW)= MomExt(1:4,10)
         PSWgt = PSWgt * PSWgt4
-      endif        
+      endif 
+   if( PROCESS.ge.110 .and. PROCESS.le.114 ) then   
+      call Top_OffShellProjection(MomExt,MomOffShell,PSWgt3)
+   elseif( PROCESS.ge.115 .and. PROCESS.le.117 ) then   
+      call TW_OffShellProjection(MomExt,MomOffShell,PSWgt3) !toggle off-shell projection on
+!      MomOffShell(1:4,4:11) = MomExt(1:4,4:11)              !toggle off-shell projection off
+   endif
+      MomOffShell(1:4,1:3) = MomExt(1:4,1:3)
+!       PSWgt = PSWgt * PSWgt3        ! not using the Jacobian because the mat.el. don't have BW-propagators
+
+       
 
       call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6),FinalStateWeight,700)
       if( iPROCESS.EQ.110 ) then
