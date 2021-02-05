@@ -8,7 +8,7 @@ env: &env
         LD_LIBRARY_PATH: "/home/cmsbld/JHUGen/JHUGenMELA/MELA/data/slc6_amd64_gcc630"
         PYTHONPATH: "/home/cmsbld/JHUGen/JHUGenMELA/MELA/python"
 
-        REFERENCE_LHES_USERNAME: "JHUGen"
+        REFERENCE_LHES_USERNAME: "TOPAZdevelop"
         REFERENCE_LHES_BUILD_NUMBER: "2515"  #note this has to be the build number of generator_reference
         REFERENCE_JHUGEN_VERSION: "v7.4.0"
 
