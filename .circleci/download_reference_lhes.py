@@ -2,7 +2,7 @@
 
 from __future__ import print_function
 
-import argparse, os, re, shutil, six
+import argparse, contextlib, os, re, shutil, six
 from six.moves import urllib
 
 try:
@@ -22,7 +22,7 @@ with open(os.path.join(here, "config.yml")) as f:
 filenames = y["env"]["docker"][0]["environment"]["REFERENCE_FILENAMES"].split()
 
 url = "https://circleci.com/api/v1.1/project/github/{}/JHUGen/{}/artifacts".format(args.username, args.build_number)
-with urllib.request.urlopen(url) as u:
+with contextlib.closing(urllib.request.urlopen(url)) as u:
   artifacts = re.findall('https://[^"]*', six.ensure_str(u.read()))
 
 for filename in filenames:
@@ -34,7 +34,7 @@ for filename in filenames:
   relevantartifact, = relevantartifact
 
   print("downloading", filename)
-  with urllib.request.urlopen(relevantartifact) as copyfrom, open(os.path.join(here, "reference", filename), "wb") as copyto:
+  with contextlib.closing(urllib.request.urlopen(relevantartifact)) as copyfrom, open(os.path.join(here, "reference", filename), "wb") as copyto:
     shutil.copyfileobj(copyfrom, copyto)
 
 with open(os.path.join(here, "reference", "reference_info.txt"), "w") as f:
