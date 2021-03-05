@@ -13,6 +13,7 @@ except ImportError:
 p = argparse.ArgumentParser()
 p.add_argument("username", default="JHUGen")
 p.add_argument("build_number", type=int)
+p.add_argument("circleci_access_token", nargs="?")
 args = p.parse_args()
 
 here = os.path.dirname(__file__)
@@ -22,7 +23,10 @@ with open(os.path.join(here, "config.yml")) as f:
 filenames = y["env"]["docker"][0]["environment"]["REFERENCE_FILENAMES"].split()
 
 url = "https://circleci.com/api/v1.1/project/github/{}/JHUGen/{}/artifacts".format(args.username, args.build_number)
-with contextlib.closing(urllib.request.urlopen(url)) as u:
+request = urllib.request.Request(url)
+if args.circleci_access_token is not None:
+  request.add_header("Circle-Token", args.circleci_access_token)
+with contextlib.closing(urllib.request.urlopen(request)) as u:
   artifacts = re.findall('https://[^"]*', six.ensure_str(u.read()))
 
 for filename in filenames:
@@ -33,8 +37,12 @@ for filename in filenames:
     raise ValueError("Found multiple versions of {} in the artifacts".format(filename))
   relevantartifact, = relevantartifact
 
+  request = urllib.request.Request(relevantartifact)
+  if args.circleci_access_token is not None:
+    request.add_header("Circle-Token", args.circleci_access_token)
+
   print("downloading", filename)
-  with contextlib.closing(urllib.request.urlopen(relevantartifact)) as copyfrom, open(os.path.join(here, "reference", filename), "wb") as copyto:
+  with contextlib.closing(urllib.request.urlopen(request)) as copyfrom, open(os.path.join(here, "reference", filename), "wb") as copyto:
     shutil.copyfileobj(copyfrom, copyto)
 
 with open(os.path.join(here, "reference", "reference_info.txt"), "w") as f:
