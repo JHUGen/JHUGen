@@ -29,6 +29,8 @@ if args.circleci_access_token is not None:
 with contextlib.closing(urllib.request.urlopen(request)) as u:
   artifacts = re.findall('https://[^"]*', six.ensure_str(u.read()))
 
+JHUGenversion = set()
+
 for filename in filenames:
   relevantartifact = [artifact for artifact in artifacts if os.path.basename(artifact) == filename]
   if not relevantartifact:
@@ -45,5 +47,13 @@ for filename in filenames:
   with contextlib.closing(urllib.request.urlopen(request)) as copyfrom, open(os.path.join(here, "reference", filename), "wb") as copyto:
     shutil.copyfileobj(copyfrom, copyto)
 
+  with open(os.path.join(here, "reference", filename)) as f:
+    JHUGenversion |= set(re.findall(r"Output from the JHUGenerator (\S*)", f.read()))
+
+if len(JHUGenversion) > 1:
+  raise ValueError("Found inconsistent JHUGen versions in the reference lhes {}".format(JHUGenversion))
+JHUGenversion, = JHUGenversion
+
 with open(os.path.join(here, "reference", "reference_info.txt"), "w") as f:
   f.write("Downloaded from circleci {}/JHUGen build number {}\n".format(args.username, args.build_number))
+  f.write("JHUGen version: "+JHUGenversion+"\n")

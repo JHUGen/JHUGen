@@ -1,1 +1,2 @@
 Downloaded from circleci JHUGen/JHUGen build number 2557
+JHUGen version: v7.4.0
