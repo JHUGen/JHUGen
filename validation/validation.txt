@@ -1,2 +1,0 @@
-validation of tHW (anomalous couplings) implementation
-crosscheck with Madgraph implementation for differerential distributions done by Ren-Qi Pan
