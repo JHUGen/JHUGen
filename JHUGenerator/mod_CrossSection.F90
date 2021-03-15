@@ -2881,8 +2881,8 @@ endif
       call intoHisto(NHisto,NBin(NHisto),1d0)  ! CS_Max is the integration volume
     enddo
     AccepCounter = AccepCounter + 1
-    cyRnd(1)=yRnd(9)
-    cyRnd(2)=yRnd(8)
+    cyRnd(1)=yRnd(8)
+    cyRnd(2)=yRnd(9)
     if(.not.IsAPhoton(DecayMode1)) then
       call EvalPhasespace_VDecay(MomExt(1:4,4),inv_mass(4),getMass(convertLHEreverse(id(6))),getMass(convertLHEreverse(id(7))),cyRnd(1:2),MomExt(1:4,6:7),PSWgt2)
     endif
