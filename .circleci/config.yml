@@ -493,7 +493,7 @@ jobs:
       - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 VegasNc0=100000 TauDK=1    DecayMode1=5 DecayMode2=5 ReadLHE=$LHEDIR/tH_s.lhe DataFile=$LHEDIR/tH_s_tautau"
       - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 VegasNc0=100000 ghzgs2=1,0 DecayMode1=0 DecayMode2=7 ReadLHE=$LHEDIR/tH_all.lhe DataFile=$LHEDIR/tH_all_Zgamma.lhe"
       - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 VegasNc0=100000            DecayMode1=1 DecayMode2=1 ReadLHE=$LHEDIR/tWmH.lhe DataFile=$LHEDIR/tWmH_ZZ"
-      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 VegasNc0=100000 TauDK=1    DecayMode1=5 DecayMode2=5 ReadLHE=$LHEDIR/tWpH.lhe DataFile=$LHEDIR/tWmH_tautau"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 VegasNc0=100000 TauDK=1    DecayMode1=5 DecayMode2=5 ReadLHE=$LHEDIR/tbWpH.lhe DataFile=$LHEDIR/tbWpH_tautau"
       - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 VegasNc0=100000 ghzgs2=1,0 DecayMode1=0 DecayMode2=7 ReadLHE=$LHEDIR/tWH_all.lhe DataFile=$LHEDIR/tWH_all_Zgamma"
       #make sure that the mass was read correctly and the interference determined
       - run: "! $DOSYNTAX || grep -q 'Interference: T' $LHEDIR/ttH_ZZ.lhe"
