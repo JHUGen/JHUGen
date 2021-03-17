@@ -4872,7 +4872,6 @@ real(8) :: DKRnd
    ICOLUP(1:2,7) = tmp_icolup(1:2,2)
    CombWeight = CombWeight * tmp_CombWeight
 
-   if( Process.lt.110 .or. Process.gt.114) then
    ICOLUP_BASE = ICOLUP_BASE+1
    call VBranching(DecayMode2, tmp_idup, tmp_icolup, tmp_CombWeight, ICOLUP_BASE)
    MY_IDUP(5) = tmp_idup(1)
@@ -4886,7 +4885,8 @@ real(8) :: DKRnd
       MY_IDUP(8) = -MY_IDUP(8)
       MY_IDUP(9) = -MY_IDUP(9)
    endif
-   CombWeight = CombWeight * tmp_CombWeight
+   if( Process.lt.110 .or. Process.gt.114) then ! for tHq processes only one V branching!
+     CombWeight = CombWeight * tmp_CombWeight
    endif
 
 RETURN
