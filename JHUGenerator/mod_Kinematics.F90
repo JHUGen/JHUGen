@@ -2235,19 +2235,28 @@ real(8),parameter :: Rsep_ll=0.2d0
 
 ! construct cos(theta1): angle between direction of fermion from Z1 and negative direction of opposite Z in Z1 rest frame
 
-! this is not fully correct: first, all momenta should be boosted into the resonance rest frame
+      MomReso(1:4)= MomExt(1:4,3) + MomExt(1:4,4)       ! first, boost all momenta to the resonance rest frame
+      MomBoost(1)   = +MomReso(1)
+      MomBoost(2:4) = -MomReso(2:4)
+      MReso = get_MInv(MomExt(1:4,3) + MomExt(1:4,4))
 
-      MomBoost(1)   = +MomExt(1,3)
-      MomBoost(2:4) = -MomExt(2:4,3)
+      MomFerm(1:4)        = MomLept(1:4,1) ! MomLept 11
+      ScatteringAxis(1:4) = MomExt(1:4,3)  ! Z1
+      MomZ2(1:4)          = MomExt(1:4,4)  ! Z2
 
-      MomFerm(1:4)  = MomLept(1:4,1)
+      call boost(ScatteringAxis(1:4),MomBoost(1:4),MReso)
+      call boost(MomZ2(1:4),MomBoost(1:4),MReso)
+      call boost(MomFerm(1:4),MomBoost(1:4),MReso)
+
+
+      MomBoost(1)   = +ScatteringAxis(1)
+      MomBoost(2:4) = -ScatteringAxis(2:4)
+      mz1 = get_MInv(ScatteringAxis(1:4))
+
       call boost(MomFerm(1:4),MomBoost(1:4),mZ1)! boost fermion from Z1 into Z1 rest frame
+      call boost(MomZ2(1:4),MomBoost(1:4),mZ1)! boost Z2 into Z1 rest frame
 
-      MomZ2(1) = MomExt(1,4)
-      MomZ2(2:4) = -MomExt(2:4,4)
-      call boost(MomZ2(1:4),MomBoost(1:4),mZ1)! boost -Z2 into Z1 rest frame
-
-      CosTheta1 = Get_CosAlpha( MomFerm(1:4),MomZ2(1:4) )
+      CosTheta1 = Get_CosAlpha( MomFerm(1:4),-MomZ2(1:4) ) 
 
 
 
@@ -2282,12 +2291,6 @@ real(8),parameter :: Rsep_ll=0.2d0
 
       Phi = signPhi * acos(-1d0*(MomLeptPlane1(2)*MomLeptPlane2(2) + MomLeptPlane1(3)*MomLeptPlane2(3) + MomLeptPlane1(4)*MomLeptPlane2(4)))
 
-!print *, "phi",phi
-!pause
-
-! phi(ll)
-! Phi = acos((MomLept(2,2)*MomLept(2,3) + MomLept(3,2)*MomLept(3,3))/dsqrt(MomLept(2,2)**2+MomLept(3,2)**2)/dsqrt(MomLept(2,3)**2+MomLept(3,3)**2) )
-
 
 
 
@@ -2304,12 +2307,6 @@ real(8),parameter :: Rsep_ll=0.2d0
 !       endif
       call boost(MomZ2(1:4),MomBoost(1:4),MReso)
       CosThetaStar = Get_CosTheta( MomZ2(1:4) )
-
-! print *, MomReso(1:4)
-!       MomZ2(1:4) = MomReso(1:4)
-!       call boost(MomZ2(1:4),MomBoost(1:4),MReso)
-! print *, MomZ2(1:4)
-! pause
 
 
 
@@ -7392,9 +7389,6 @@ integer :: NumChannels
       endif
    endif
 
-   !print *, "x",xrnd(1:2)
-   !print *, "s",s56,s78,s910
-   !pause
 
    Jac = Jac1*Jac2*Jac3
    if(Jac.eq.0d0) return ! Checkpoint for on/off-shellness
@@ -7441,7 +7435,15 @@ ELSEIF( iChannel.EQ.4 ) THEN
    Jac6 = s_channel_decay(Mom(:,4),0d0,0d0,xRnd(7:8),Mom(:,5),Mom(:,8))                                                          !  6 --> 7+10
 ENDIF
 
-   Jac = Jac*Jac4*Jac5*Jac6 * PSNorm4  !*NumChannels                                                                                 !  combine
+   Jac = Jac*Jac4*Jac5*Jac6   !*NumChannels                                                                                      !  combine
+
+    if( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
+      Jac = Jac* PSNorm2
+    elseif( .not. IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
+      Jac = Jac* PSNorm3
+    else
+      Jac = Jac* PSNorm4
+    endif  
 
    !print *, energy,dsqrt(s56)
    !print *,"Generated momenta: "
