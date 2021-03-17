@@ -302,9 +302,9 @@ jobs:
       - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=112 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_112 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS_SPIN0"
       - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=113 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_113 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS_SPIN0"
       - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=114 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_114 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS_SPIN0"
-      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=115 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tWH_115 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS_SPIN0"
-      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=116 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tWH_116 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS_SPIN0"
-      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=117 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tWH_117 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS_SPIN0"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=115 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tWH_115 TopDK=1 DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS_SPIN0"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=116 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tWH_116 TopDK=1 DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS_SPIN0"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=117 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tWH_117 TopDK=1 DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS_SPIN0"
 
       - run:
           name: VBF offshell grids
@@ -482,9 +482,9 @@ jobs:
       - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=112 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tH_s    DecayMode1=11 TopDK=1"
       - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=113 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tbarH_s DecayMode1=11 TopDK=1"
       - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=114 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tH_all  DecayMode1=11 TopDK=1"
-      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=115 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tWmH  DecayMode1=11 TopDK=1"
-      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=116 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tbWpH  DecayMode1=11 TopDK=1"
-      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=117 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tWH_all  DecayMode1=11 TopDK=1"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=115 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tWmH  DecayMode1=11 DecayMode2=11 TopDK=1"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=116 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tbWpH  DecayMode1=11 DecayMode2=11 TopDK=1"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=117 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tWH_all  DecayMode1=11 DecayMode2=11 TopDK=1"
       #Decays for t(t,W)H which have complicated quarks, to check colors
       - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 VegasNc0=100000            DecayMode1=1 DecayMode2=1 ReadLHE=$LHEDIR/ttH.lhe DataFile=$LHEDIR/ttH_ZZ"
       - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 VegasNc0=100000 TauDK=1    DecayMode1=5 DecayMode2=5 ReadLHE=$LHEDIR/ttH.lhe DataFile=$LHEDIR/ttH_tautau"
