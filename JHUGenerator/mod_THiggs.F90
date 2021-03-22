@@ -464,10 +464,17 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, bout=5, bdk=6,W=7,lep=8,nu=
 RETURN
 END SUBROUTINE
 
-
+!amplitude squared for partonic reaction 
+!
+! g(iL) + b(iR) -> t(t) + H(H) + Wm(w) 
+!              (-> b(bt) + Wp(wt) + Wm(w)
+!               -> b(bt) + f1~(lept) + f'1(nut) + f'2(lepW) + f2~(nuW))
+!
+!with the fermion-antifermion pairs f'1/f1~ and f'2/f2~ 
+!from leptonic or hadronic decays of the Wp/Wm   
+!
 SUBROUTINE EvalAmp_GB_TWMH(MomExt,LO_Res_Unpol)
 use ModMisc
-use ModTTBHiggs
 use ModParameters
 use ModTopDecay
 
@@ -539,9 +546,18 @@ integer :: i,j,bhel,thel,gpol,wpol,theld=-1,wpold=-1
 RETURN
 END SUBROUTINE EvalAmp_GB_TWMH
 
+
+!amplitude squared for partonic reaction 
+!
+! g(iL) + b~(iR) -> t~(t) + H(H) + Wp(w) 
+!               (-> b~(bt) + Wm(wt) + Wp(w)
+!                -> b~(bt) + f'1(lept) + f1~(nut) + f2~(lepW) + f2(nuW))
+!
+!with the fermion-antifermion pairs f'1/f1~ and f'2/f2~ 
+!from leptonic or hadronic decays of the Wm/Wp   
+!
 SUBROUTINE EvalAmp_GBB_TBWPH(MomExt,LO_Res_Unpol)
 use ModMisc
-use ModTTBHiggs
 use ModParameters
 use ModTopDecay
 
