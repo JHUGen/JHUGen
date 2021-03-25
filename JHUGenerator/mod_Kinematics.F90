@@ -1646,6 +1646,114 @@ RETURN
 END SUBROUTINE
 
 
+SUBROUTINE WriteOutEvent_TWH(Mom,MY_IDUP,ICOLUP,EventWeight)
+use ModParameters
+use ModMisc
+implicit none
+real(8) :: Mom(1:4,1:11)
+real(8),optional :: EventWeight
+integer :: MY_IDUP(1:11),ICOLUP(1:2,1:11),LHE_IDUP(1:11),ISTUP(1:11),MOTHUP(1:2,1:11)
+integer :: NUP,IDPRUP,i
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,Lifetime,Spin,MomDummy(1:4,1:11),TheMass
+character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
+integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4,Wm=5,  b=6,Wp=7,lepP=8,nu=9,  lepM=10,nubar=11
+
+
+! For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
+! The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
+
+
+
+IDPRUP=Process
+SCALUP=Mu_Fact/GeV
+AQEDUP=alpha_QED
+AQCDUP=alphas
+
+
+
+MOTHUP(1:2,inLeft) = (/0,0/);             ISTUP(inLeft) = -1
+MOTHUP(1:2,inRight)= (/0,0/);             ISTUP(inRight)= -1
+
+MOTHUP(1:2,Hbos)   = (/inLeft,inRight/);  ISTUP(Hbos)   = +1
+MOTHUP(1:2,Wm)   = (/inLeft,inRight/);    ISTUP(Wm)   = +2
+MOTHUP(1:2,t)      = (/inLeft,inRight/);  ISTUP(t)      = +2
+
+MOTHUP(1:2,lepM)   = (/Wm,Wm/);           ISTUP(lepM)   = +1
+MOTHUP(1:2,nubar)  = (/Wm,Wm/);           ISTUP(nubar)  = +1
+
+MOTHUP(1:2,b)      = (/t,t/);             ISTUP(b)      = +1
+MOTHUP(1:2,Wp)     = (/t,t/);             ISTUP(Wp)     = +2
+MOTHUP(1:2,lepP)   = (/Wp,Wp/);           ISTUP(lepP)   = +1
+MOTHUP(1:2,nu)     = (/Wp,Wp/);           ISTUP(nu)     = +1
+
+
+if( TopDecays.eq.0 ) then
+   NUP = 5
+   ISTUP(t)   = +1
+   ISTUP(Wm)      = +1
+else
+   NUP=11
+endif
+
+if( present(EventWeight) ) then
+    XWGTUP=EventWeight
+else
+    XWGTUP=1.0d0
+endif
+Lifetime = 0.0d0
+Spin     = 0.1d0
+
+
+do i=1,5
+    LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
+    MomDummy(1,i) = Mom(1,i)/GeV
+    MomDummy(2,i) = Mom(2,i)/GeV
+    MomDummy(3,i) = Mom(3,i)/GeV
+    MomDummy(4,i) = Mom(4,i)/GeV
+enddo
+
+if( TopDecays.ne.0 ) then
+      ! introduce b-quark mass for LHE output
+!       call ShiftMass(Mom(1:4,b),   Mom(1:4,Wp),m_bot,M_W,  MomDummy(1:4,b),   MomDummy(1:4,Wp) )
+      MomDummy(1:4,b)   = Mom(1:4,b)
+      MomDummy(1:4,Wp)  = Mom(1:4,Wp)
+
+      ! introduce lepton/quark masses for LHE output
+      call ShiftMass(Mom(1:4,LepP),Mom(1:4,Wp)-Mom(1:4,LepP), GetMass(MY_IDUP(LepP)),0d0,  MomDummy(1:4,LepP),MomDummy(1:4,Nu) )
+      call ShiftMass(Mom(1:4,LepM),Mom(1:4,Wm)-Mom(1:4,LepM), GetMass(MY_IDUP(LepM)),0d0,  MomDummy(1:4,LepM),MomDummy(1:4,Nubar) )
+
+      do i=6,11
+          LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
+          MomDummy(1,i) = MomDummy(1,i)/GeV
+          MomDummy(2,i) = MomDummy(2,i)/GeV
+          MomDummy(3,i) = MomDummy(3,i)/GeV
+          MomDummy(4,i) = MomDummy(4,i)/GeV
+      enddo
+endif
+
+
+write(io_LHEOutFile,"(A)") "<event>"
+write(io_LHEOutFile,"(I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+! in order of appearance:
+! (*) number of particles in the event
+! (*) process ID (user defined)
+! (*) weighted or unweighted events: +1=unweighted, otherwise= see manual
+! (*) pdf factorization scale in GeV
+! (*) alpha_QED coupling for this event
+! (*) alpha_s coupling for this event
+
+do i=1,NUP
+     TheMass = get_Minv(MomDummy(:,i))
+     if( i.le.2  ) TheMass = 0d0  ! setting initial parton masses to zero
+     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),TheMass,Lifetime/ctauUnit,Spin
+enddo
+write(io_LHEOutFile,"(A)") "</event>"
+
+
+RETURN
+END SUBROUTINE
+
+
 
 
 
@@ -3878,6 +3986,81 @@ D_0minus = 0d0
 RETURN
 END SUBROUTINE
 
+SUBROUTINE Kinematics_TWH(Mom,applyPSCut,NBin)
+use ModParameters
+use ModMisc
+! use modTTBH
+implicit none
+real(8) :: Mom(1:4,1:11),MomMELA(1:4,1:11)
+logical :: applyPSCut
+integer :: NBin(:)
+real(8) :: pT_t,pT_H,pT_Wm,MatElSq_H0,MatElSq_H1,D_0minus
+real(8) :: mt,mWm,mtWm,mWp,pT_b,pT_l,pT_lm,pT_miss,y_top,y_Higgs,y_Wm
+integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4,Wm=5,  b=6,Wp=7,lepP=8,nu=9,  lepM=10,nubar=11
+logical,save :: FirstTime=.true.
+
+
+    applyPSCut = .false.
+
+    pT_t = get_PT(Mom(1:4,t))
+    pT_Wm = get_PT(Mom(1:4,Wm))
+    pT_H = get_PT(Mom(1:4,Hbos))
+    pT_b = get_PT(Mom(1:4,b))
+    pT_l = get_PT(Mom(1:4,LepP))
+    pT_lm = get_PT(Mom(1:4,LepM))
+    pT_miss = get_PT(Mom(1:4,nu)+Mom(1:4,nubar))
+    mt = get_MInv(Mom(1:4,t))
+    mWm = get_MInv(Mom(1:4,Wm))
+    mtWm = get_MInv(Mom(1:4,t)+Mom(1:4,Wm))
+    mWp = get_MInv(Mom(1:4,Wp))
+    mWm = get_MInv(Mom(1:4,Wm))
+    
+    y_top=get_eta(Mom(1:4,t))
+    y_Higgs=get_eta(Mom(1:4,Hbos))
+    y_Wm=get_eta(Mom(1:4,Wm))
+
+    if( m_Top.lt.10d0*GeV  .and. (pT_t.lt.pTjetcut) ) applyPSCut=.true.
+
+
+!     if( FirstTime ) then
+! !       call NNPDFDriver("./pdfs/NNPDF30_lo_as_0130.LHgrid",33)
+! !       call NNinitPDF(0)
+!       call InitProcess_TTBH(m_Reso,m_top)
+!       FirstTime = .false.
+!     endif
+!     MomMELA(1:4,1) = -(/         65d0,           0.0000000000000000d0, 0.0000000000000000d0,      65d0           /)
+!     MomMELA(1:4,2) = -(/         65d0,           0.0000000000000000d0, 0.0000000000000000d0,     -65d0           /)
+!     MomMELA(1:4,3:11) = Mom(1:4,3:11)  remap here because of new W bosons
+!     MomMELA(1:4,12:13) = 0d0
+!
+!     call EvalXSec_PP_TTBH(MomMELA(1:4,1:13),(/(1d0,0d0),(0d0,0d0)/),TopDecays,2,MatElSq_H0)
+!     call EvalXSec_PP_TTBH(MomMELA(1:4,1:13),(/(0d0,0d0),(1d0,0d0)/),TopDecays,2,MatElSq_H1)
+!
+!     D_0minus = MatElSq_H0/(MatElSq_H0 + 2d0*MatElSq_H1 )
+
+    D_0minus=0d0
+
+!   binning
+    NBin(1)  = WhichBin(1,pT_t)
+    NBin(2)  = WhichBin(2,pT_H)
+    NBin(3)  = WhichBin(3,mt)
+    NBin(4)  = WhichBin(4,mWm)
+    NBin(5)  = WhichBin(5,mWp)
+    NBin(6)  = WhichBin(6,pT_b)
+    NBin(7)  = WhichBin(7,pT_l)    
+    NBin(8)  = WhichBin(8,pT_lm)
+    NBin(9)  = WhichBin(9,pT_miss)
+    NBin(10) = WhichBin(10,y_top)
+    NBin(11)  = WhichBin(11,y_Wm)
+    NBin(12)  = WhichBin(12,y_higgs)
+    NBin(13) = WhichBin(13,D_0minus)
+
+
+
+RETURN
+END SUBROUTINE
+
+
 
 
 
@@ -4700,13 +4883,12 @@ real(8) :: DKRnd
       MY_IDUP(8) = -MY_IDUP(8)
       MY_IDUP(9) = -MY_IDUP(9)
    endif
-   CombWeight = CombWeight * tmp_CombWeight
+   if( Process.lt.110 .or. Process.gt.114) then ! for tHq processes only one V branching!
+     CombWeight = CombWeight * tmp_CombWeight
+   endif
 
 RETURN
 END SUBROUTINE
-
-
-
 
 FUNCTION GetCKMPartner( Flavor )
 use modMisc
@@ -5460,6 +5642,42 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
 return
 END SUBROUTINE
 
+
+SUBROUTINE TW_OffShellProjection(MomIn,MomOut,Jacobian)
+use modParameters
+use modMisc
+implicit none
+real(8) :: MomIn(:,:),MomOut(:,:),MomTmp(1:4),Jacobian
+real(8) :: xRndWidth(2:5),BW_Mass(2:5),BW_Jacobi(2:5)
+integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4,Wm=5,  b=6,Wp=7,lepP=8,nu=9, lepM=10,nubar=11
+
+
+    call random_number(xRndWidth)
+
+    call SmearExternal(xRndWidth(3),m_top,Ga_Top,m_top-6d0*Ga_Top,m_top+6d0*Ga_Top,BW_Mass(3),BW_Jacobi(3)) !top
+    call SmearExternal(xRndWidth(4),m_W,Ga_W,m_W-6d0*Ga_W,m_W+6d0*Ga_W,BW_Mass(4),BW_Jacobi(4)) !wp from top-decay
+    call SmearExternal(xRndWidth(5),m_W,Ga_W,m_W-6d0*Ga_W,m_W+6d0*Ga_W,BW_Mass(5),BW_Jacobi(5)) !wm
+    Jacobian = BW_Jacobi(3) * BW_Jacobi(4) * BW_Jacobi(5)
+
+! print *, "smeared mt",(BW_Mass(3)-m_top)/GeV
+! print *, "smeared mw",(BW_Mass(4:5)-m_w)/GeV
+
+    call ShiftMass(MomIn(1:4,t),MomIn(1:4,Wm),BW_Mass(3),BW_Mass(5),MomOut(1:4,t),MomOut(1:4,Wm))
+
+    MomTmp(1:4) = MomOut(1:4,t) - MomIn(1:4,Wp)
+    call ShiftMass(MomTmp,MomIn(1:4,Wp),m_Bot,BW_Mass(4),MomOut(1:4,b),MomOut(1:4,Wp))! project b and W+ on-shell
+
+
+    MomTmp(1:4) = MomOut(1:4,Wp) - MomIn(1:4,lepP)                                ! project W+ decay products on-shell
+    MomOut(1:4,nu)   = MomTmp(1:4) - (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lepP)) * MomIn(1:4,lepP)
+    MomOut(1:4,lepP) = (1d0 + (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lepP))) * MomIn(1:4,lepP)
+
+    MomTmp(1:4) = MomOut(1:4,Wm) - MomIn(1:4,lepM)                                ! project W- decay products on-shell
+    MomOut(1:4,nubar) = MomTmp(1:4) - (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lepM)) * MomIn(1:4,lepM)
+    MomOut(1:4,lepM)  = (1d0 + (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lepM))) * MomIn(1:4,lepM)
+
+return
+END SUBROUTINE
 
 
 
@@ -7496,7 +7714,7 @@ integer idx,ip
    polemass(7) = getMass(id(7)) ! Pole mass of the JJ system
 
    pJJHstar = pJJ + pHstar
-   if(polemass(5).lt.polemass(6)) then
+   if(polemass(5).gt.polemass(6)) then
       pJ(:,1)=p(:,5)
       pJ(:,2)=p(:,6)
    else
@@ -7608,9 +7826,6 @@ integer idx,ip
 
 return
 end subroutine SetRunningScales
-
-
-
 
 SUBROUTINE setPDFs(x1,x2,pdf)
 use ModParameters

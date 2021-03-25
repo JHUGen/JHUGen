@@ -18,35 +18,56 @@ use ModParameters
 use ModTHiggs
 use ModMisc
 implicit none
-real(8) :: yRnd(1:12),VgsWgt, EvalWeighted2_TH,VegasWeighted_TH
+real(8) :: yRnd(1:14),VgsWgt, EvalWeighted2_TH,VegasWeighted_TH
 real(8) :: pdf(-6:6,1:2)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi,MH_Inv
-real(8) :: MomExt(1:4,1:9),MomOffShell(1:4,1:9),PSWgt,PSWgt2,PSWgt3,FinalStateWeight
+real(8) :: MomExt(1:4,1:11),MomOffShell(1:4,1:11),PSWgt,PSWgt2,PSWgt3,PSWgt4,FinalStateWeight
 real(8) :: LO_Res_Unpol(-6:6,-6:6),PreFac,PDFFac1,DKRnd
 real(8) :: WdecayKfactor,xRnd
 integer :: NBin(1:NumHistograms),NHisto,DKFlavor,iPartChannel,NumPartonicChannels,PartChannelAvg
 integer, pointer :: ijSel(:,:)
-integer :: MY_IDUP(1:9),ICOLUP(1:2,1:9),DK_IDUP(1:6),DK_ICOLUP(1:2,3:6),iProcess
+integer :: MY_IDUP(1:11),ICOLUP(1:2,1:11),DK_IDUP(1:6),DK_ICOLUP(1:2,3:6),iProcess
 logical :: applyPSCut
-integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
+integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9, lepW=10,nuW=11
+real(8) :: m_opt=0d0 ! opt W instead of massless quark
+
 include 'vegas_common.f'
 EvalWeighted2_TH = 0d0
 WdecayKfactor = 1d0
 FinalStateWeight = 1d0
-
+ 
+   if (Process.eq.115 .or. Process.eq.116 .or. Process.eq.117) then
+    m_opt=M_W
+   endif
 
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
    MH_Inv = M_Reso
-   if( EHat.le.m_Top+MH_Inv ) return
-
-   NumPartonicChannels = 24
-   PartChannelAvg = NumPartonicChannels
-   iPartChannel = int(yRnd(12) * (NumPartonicChannels)) +1 ! this runs from 1..24
-   call getRef_THchannelHash(ijSel)
-   iPart_sel = ijSel(iPartChannel,1)
-   jPart_sel = ijSel(iPartChannel,2)
-   iProcess  = ijSel(iPartChannel,3)! = 110...113
-   if( Process.ne.114 .and. iProcess.ne.Process ) return
+   if( EHat.le.m_Top+MH_Inv+m_opt ) return
+   
+   
+   if (Process.eq.115 .or. Process.eq.116 .or. Process.eq.117) then 
+     NumPartonicChannels = 4
+     PartChannelAvg = NumPartonicChannels
+     iPartChannel = int(yRnd(12) * (NumPartonicChannels)) +1 ! this runs from 1..4
+     call getRef_TWHchannelHash(ijSel)
+     iPart_sel = ijSel(iPartChannel,1)
+     jPart_sel = ijSel(iPartChannel,2)
+     iProcess  = ijSel(iPartChannel,3)! = 115...116
+     if( Process.ne.117 .and. iProcess.ne.Process ) return  
+   endif
+   
+   if (Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113 .or. Process.eq.114) then 
+     NumPartonicChannels = 24
+     PartChannelAvg = NumPartonicChannels
+     iPartChannel = int(yRnd(12) * (NumPartonicChannels)) +1 ! this runs from 1..24
+     call getRef_THchannelHash(ijSel)
+     iPart_sel = ijSel(iPartChannel,1)
+     jPart_sel = ijSel(iPartChannel,2)
+     iProcess  = ijSel(iPartChannel,3)! = 110...113
+     if( Process.ne.114 .and. iProcess.ne.Process ) return
+   endif
+   
+ 
 
    if( unweighted .and. .not.warmup .and.  sum(AccepCounter_part(:,:)) .eq. sum(RequEvents(:,:)) ) then
       stopvegas=.true.
@@ -54,7 +75,7 @@ FinalStateWeight = 1d0
    if( (unweighted) .and. (.not. warmup) .and. (AccepCounter_part(iPart_sel,jPart_sel) .ge. RequEvents(iPart_sel,jPart_Sel))  ) return
 
 
-   call EvalPhaseSpace_2to3ArbMass(EHat,(/MH_Inv,M_Top,0d0/),yRnd(3:7),MomExt(1:4,1:5),PSWgt)!  inLeft, inRight, Higgs, Top, Quark
+   call EvalPhaseSpace_2to3ArbMass(EHat,(/MH_Inv,M_Top,m_opt/),yRnd(3:7),MomExt(1:4,1:5),PSWgt)!  inLeft, inRight, Higgs, Top, Quark/W
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
 
    if( iPROCESS.EQ.110 ) then
@@ -121,6 +142,30 @@ FinalStateWeight = 1d0
       else
           ICOLUP(1:2,inRight)= (/000,501/)
       endif
+   elseif( iPROCESS.EQ.115 ) then
+      ICOLUP(1:2,Hbos) = (/000,000/)
+      ICOLUP(1:2,t)    = (/501,000/)
+      ICOLUP(1:2,qout) = (/000,000/)
+      if (jPart_sel.eq.0 ) then
+       ICOLUP(1:2,inRight)= (/501,502/)
+       ICOLUP(1:2,inLeft) = (/502,000/)
+      endif 
+      if (iPart_sel.eq.0 ) then
+        ICOLUP(1:2,inLeft)= (/501,502/)
+        ICOLUP(1:2,inRight)= (/502,000/)
+      endif
+   elseif( iPROCESS.EQ.116 ) then
+      ICOLUP(1:2,Hbos) = (/000,000/)
+      ICOLUP(1:2,t)    = (/000,501/)
+      ICOLUP(1:2,qout) = (/000,000/)
+      if (jPart_sel.eq.0 ) then
+       ICOLUP(1:2,inRight)= (/502,501/)
+       ICOLUP(1:2,inLeft) = (/000,502/)
+      endif 
+      if (iPart_sel.eq.0 ) then
+        ICOLUP(1:2,inLeft)= (/502,501/)
+        ICOLUP(1:2,inRight)= (/000,502/)
+      endif    
    endif
 
    IF( TOPDECAYS.NE.0 ) THEN
@@ -130,10 +175,22 @@ FinalStateWeight = 1d0
       MomExt(1:4,lep)= MomExt(1:4,7)
       MomExt(1:4,W)  = MomExt(1:4,lep) + MomExt(1:4,nu)
       PSWgt = PSWgt * PSWgt2
-
+      if(Process.ge.115 .and. Process.le.117) then
+        call EvalPhasespace_VDecay(MomExt(1:4,5),M_W,0d0,0d0,yRnd(13:14),MomExt(1:4,10:11),PSWgt4)
+        MomExt(1:4,nuW) = MomExt(1:4,11)
+        MomExt(1:4,lepW)= MomExt(1:4,10)
+        PSWgt = PSWgt * PSWgt4
+      endif 
+   if( PROCESS.ge.110 .and. PROCESS.le.114 ) then   
       call Top_OffShellProjection(MomExt,MomOffShell,PSWgt3)
+   elseif( PROCESS.ge.115 .and. PROCESS.le.117 ) then   
+      call TW_OffShellProjection(MomExt,MomOffShell,PSWgt3) !toggle off-shell projection on
+!      MomOffShell(1:4,4:11) = MomExt(1:4,4:11)              !toggle off-shell projection off
+   endif
       MomOffShell(1:4,1:3) = MomExt(1:4,1:3)
 !       PSWgt = PSWgt * PSWgt3        ! not using the Jacobian because the mat.el. don't have BW-propagators
+
+       
 
       call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6),FinalStateWeight,700)
       if( iPROCESS.EQ.110 ) then
@@ -164,6 +221,26 @@ FinalStateWeight = 1d0
           MY_IDUP(nu)  = DK_IDUP(5); ICOLUP(1:2,nu) = DK_ICOLUP(1:2,5)
 
           WdecayKfactor = ScaleFactor( convertLHE(DK_IDUP(5)),convertLHE(DK_IDUP(6)) )
+      elseif( iPROCESS.EQ.115 ) then
+          MY_IDUP(b)   = Bot_;       ICOLUP(1:2,b)   = (/501,000/)
+          MY_IDUP(W)   = DK_IDUP(1); ICOLUP(1:2,W)   = (/000,000/)
+          MY_IDUP(lep) = DK_IDUP(3); ICOLUP(1:2,lep) = DK_ICOLUP(1:2,3)
+          MY_IDUP(nu)  = DK_IDUP(4); ICOLUP(1:2,nu)  = DK_ICOLUP(1:2,4)
+          MY_IDUP(qout)= DK_IDUP(2); ICOLUP(1:2,qout)= (/000,000/)
+          MY_IDUP(lepW)= DK_IDUP(6); ICOLUP(1:2,lepW)= DK_ICOLUP(1:2,6)
+          MY_IDUP(nuW) = DK_IDUP(5); ICOLUP(1:2,nuW) = DK_ICOLUP(1:2,5)
+
+          WdecayKfactor = ScaleFactor( convertLHE(DK_IDUP(3)),convertLHE(DK_IDUP(4)) )*ScaleFactor( convertLHE(DK_IDUP(5)),convertLHE(DK_IDUP(6)) )
+      elseif( iPROCESS.EQ.116 ) then
+          MY_IDUP(b)   = ABot_;      ICOLUP(1:2,b)   = (/000,501/)
+          MY_IDUP(W)   = DK_IDUP(2); ICOLUP(1:2,W)   = (/000,000/)
+          MY_IDUP(lep) = DK_IDUP(6); ICOLUP(1:2,lep) = DK_ICOLUP(1:2,6)
+          MY_IDUP(nu)  = DK_IDUP(5); ICOLUP(1:2,nu)  = DK_ICOLUP(1:2,5)
+          MY_IDUP(qout)= DK_IDUP(1); ICOLUP(1:2,qout)= (/000,000/)
+          MY_IDUP(lepW)= DK_IDUP(3); ICOLUP(1:2,lepW)= DK_ICOLUP(1:2,3)
+          MY_IDUP(nuW) = DK_IDUP(4); ICOLUP(1:2,nuW)  = DK_ICOLUP(1:2,4)
+
+          WdecayKfactor = ScaleFactor( convertLHE(DK_IDUP(5)),convertLHE(DK_IDUP(6)) )*ScaleFactor( convertLHE(DK_IDUP(3)),convertLHE(DK_IDUP(4)) )
       endif
 
    ELSE
@@ -172,17 +249,28 @@ FinalStateWeight = 1d0
 
    ENDIF
 
+
+
    FluxFac = 1d0/(2d0*EHat**2)
    PreFac = hbarc2XsecUnit * FluxFac * sHatJacobi * PSWgt * WdecayKfactor * PartChannelAvg * FinalStateWeight
+   
 
-   call Kinematics_TH(MomOffShell,applyPSCut,NBin)
+   if( PROCESS.ge.110 .and. PROCESS.le.114 ) then   
+     call Kinematics_TH(MomOffShell,applyPSCut,NBin)
+   elseif( PROCESS.ge.115 .and. PROCESS.le.117 ) then    
+     call Kinematics_TWH(MomOffShell,applyPSCut,NBin)
+   endif   
    if( applyPSCut .or. PSWgt.eq.zero ) return
 
+
    call SetRunningScales( (/ MomExt(1:4,Hbos),MomExt(1:4,t),MomExt(1:4,qout) /) , (/ Not_a_particle_,Top_,Glu_,Not_a_particle_ /) ) ! Glu_? Why not!
+   
+
+   
    call EvalAlphaS()
    call setPDFs(eta1,eta2,pdf)
    LO_Res_Unpol = 0d0
-
+   
 
    IF( iPROCESS.EQ.110 ) THEN
               call EvalAmp_QB_TH(MomExt,LO_Res_Unpol)
@@ -216,12 +304,22 @@ FinalStateWeight = 1d0
    ELSEIF( iPROCESS .EQ. 113 ) THEN
               MY_IDUP(1:5) = (/ LHA2M_pdf(iPart_sel),LHA2M_pdf(jPart_sel),Hig_,ATop_,Bot_ /)
               call EvalAmp_QQB_TBARHB(MomExt,LO_Res_Unpol)
+   ELSEIF( iPROCESS .EQ. 115 ) THEN
+              MY_IDUP(1:5) = (/ convertFromPartIndex(iPart_sel),convertFromPartIndex(jPart_sel),Hig_,Top_,Wm_ /)
+              call EvalAmp_GB_TWMH(MomExt,LO_Res_Unpol)
+   ELSEIF( iPROCESS .EQ. 116 ) THEN
+              MY_IDUP(1:5) = (/ convertFromPartIndex(iPart_sel),convertFromPartIndex(jPart_sel),Hig_,ATop_,Wp_ /)
+              call EvalAmp_GBB_TBWPH(MomExt,LO_Res_Unpol)
    ENDIF
+   
 
    PDFFac1 = pdf( LHA2M_pdf(iPart_sel),1) * pdf( LHA2M_pdf(jPart_sel),2)
+
    EvalWeighted2_TH = LO_Res_Unpol(LHA2M_pdf(iPart_sel),LHA2M_pdf(jPart_sel)) * PDFFac1 * PreFac
+
    VegasWeighted_TH = EvalWeighted2_TH*VgsWgt
 
+#if 1
    if( unweighted ) then
 
      if( warmup ) then
@@ -239,7 +337,11 @@ FinalStateWeight = 1d0
        elseif( VegasWeighted_TH .gt. xRnd*CrossSecMax(iPart_sel,jPart_sel) ) then
          AccepCounter = AccepCounter + 1
          AccepCounter_part(iPart_sel,jPart_sel) = AccepCounter_part(iPart_sel,jPart_sel) + 1
-         call WriteOutEvent_TH(MomOffShell,MY_IDUP(1:9),ICOLUP(1:2,1:9))
+         if( PROCESS.ge.110 .and. PROCESS.le.114 ) then   
+           call WriteOutEvent_TH(MomOffShell,MY_IDUP(1:9),ICOLUP(1:2,1:9))
+          elseif( PROCESS.ge.115 .and. PROCESS.le.117 ) then     
+            call WriteOutEvent_TWH(MomOffShell,MY_IDUP(1:11),ICOLUP(1:2,1:11))
+          endif   
          do NHisto=1,NumHistograms
            call intoHisto(NHisto,NBin(NHisto),1d0)
          enddo
@@ -252,7 +354,11 @@ FinalStateWeight = 1d0
       if( VegasWeighted_TH.ne.0d0 ) then
         AccepCounter=AccepCounter+1
         if( writeWeightedLHE ) then
-          call WriteOutEvent_TH(MomOffShell,MY_IDUP(1:9),ICOLUP(1:2,1:9))
+          if( PROCESS.ge.110 .and. PROCESS.le.114 ) then   
+            call WriteOutEvent_TH(MomOffShell,MY_IDUP(1:9),ICOLUP(1:2,1:9))
+          elseif( PROCESS.ge.115 .and. PROCESS.le.117 ) then     
+            call WriteOutEvent_TWH(MomOffShell,MY_IDUP(1:11),ICOLUP(1:2,1:11))
+          endif   
         endif
         do NHisto=1,NumHistograms
           call intoHisto(NHisto,NBin(NHisto),VegasWeighted_TH)
@@ -260,7 +366,7 @@ FinalStateWeight = 1d0
       endif
 
    endif! unweighted
-
+#endif
 
 RETURN
 END FUNCTION

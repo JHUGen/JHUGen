@@ -22,7 +22,7 @@ env: &env
         SEED: "765543533"
 
         #REFERENCE_FILENAMES: "ggH_ZZ.lhe ggH_WW.lhe ggH_Zgamma.lhe ggH_gammagamma.lhe ggH_ZZ_contact.lhe ggH_ZZ_Zprime.lhe spin1_ZZ.lhe spin1_WW.lhe gg_spin2_ZZ.lhe qq_spin2_WW.lhe gg_spin2_Zgamma.lhe qq_spin2_gammagamma.lhe ZH_bb.lhe WH_Zgamma.lhe ee_gammaH_bb.lhe VBF_ZZ.lhe HJJ_WW.lhe HJ_gammagamma.lhe ttH_tautau.lhe gg_bbH_tautau.lhe qq_bbH.lhe tqH_110.lhe tqH_111.lhe tqH_112.lhe tqH_113.lhe tqH_114.lhe gg_ZH_llbb.lhe ee_ZH_llbb.lhe qq_ZH_llbb.lhe VBFoffshell_69.lhe"
-        REFERENCE_FILENAMES: "ggH_ZZ.lhe ggH_WW.lhe ggH_Zgamma.lhe ggH_gammagamma.lhe ggH_ZZ_contact.lhe ggH_ZZ_Zprime.lhe spin1_ZZ.lhe spin1_WW.lhe gg_spin2_ZZ.lhe qq_spin2_WW.lhe gg_spin2_Zgamma.lhe qq_spin2_gammagamma.lhe ZH_bb.lhe WH_Zgamma.lhe ee_gammaH_bb.lhe VBF_ZZ.lhe HJJ_WW.lhe HJ_gammagamma.lhe ttH_tautau.lhe gg_bbH_tautau.lhe qq_bbH.lhe tqH_110.lhe tqH_111.lhe tqH_112.lhe tqH_113.lhe tqH_114.lhe VBFoffshell_69.lhe"
+        REFERENCE_FILENAMES: "ggH_ZZ.lhe ggH_WW.lhe ggH_Zgamma.lhe ggH_gammagamma.lhe ggH_ZZ_contact.lhe ggH_ZZ_Zprime.lhe spin1_ZZ.lhe spin1_WW.lhe gg_spin2_ZZ.lhe qq_spin2_WW.lhe gg_spin2_Zgamma.lhe qq_spin2_gammagamma.lhe ZH_bb.lhe WH_Zgamma.lhe ee_gammaH_bb.lhe VBF_ZZ.lhe HJJ_WW.lhe HJ_gammagamma.lhe ttH_tautau.lhe gg_bbH_tautau.lhe qq_bbH.lhe tqH_110.lhe tqH_111.lhe tqH_112.lhe tqH_113.lhe tqH_114.lhe tWH_115.lhe tWH_116.lhe tWH_117.lhe VBFoffshell_69.lhe"
         REFERENCE_FILENAME_GGH: "ggH_ZZ.lhe"
         REFERENCE_FILENAME_VBF: "VBF_ZZ.lhe"
         REFERENCE_FILENAME_HJJ: "HJJ_WW.lhe"
@@ -302,6 +302,9 @@ jobs:
       - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=112 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_112 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS_SPIN0"
       - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=113 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_113 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS_SPIN0"
       - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=114 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_114 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS_SPIN0"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=115 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tWH_115 TopDK=1 DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS_SPIN0"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=116 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tWH_116 TopDK=1 DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS_SPIN0"
+      - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=117 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tWH_117 TopDK=1 DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS_SPIN0"
 
       - run:
           name: VBF offshell grids
@@ -470,7 +473,7 @@ jobs:
       #- run: "! $DOSYNTAX || ./JHUGen PDFSet=2 Collider=1 Process=52 Unweighted=1 VegasNc1=100000 VegasNc2=1000000 DataFile=$LHEDIR/gg_HH_bbbb FacScheme=2 RenScheme=2 MuFacMultiplier=1d0 MuRenMultiplier=1d0 Interf=0 Seed=1"
       #H+J
       - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=62 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/HJ"
-      #ttH, bbH, tH
+      #ttH, bbH, tH, tHW
       - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=80  VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/ttH DecayMode1=11 DecayMode2=11 TopDK=1"
       - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=90  VegasNc0=100000 VegasNc2=10  DataFile=$LHEDIR/gg_bbH PChannel=0"
       - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=90  VegasNc0=100000 VegasNc2=10  DataFile=$LHEDIR/qq_bbH PChannel=1"
@@ -479,13 +482,19 @@ jobs:
       - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=112 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tH_s    DecayMode1=11 TopDK=1"
       - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=113 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tbarH_s DecayMode1=11 TopDK=1"
       - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=114 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tH_all  DecayMode1=11 TopDK=1"
-      #Decays for t(t)H which have complicated quarks, to check colors
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=115 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tWmH  DecayMode1=11 DecayMode2=11 TopDK=1"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=116 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tbWpH  DecayMode1=11 DecayMode2=11 TopDK=1"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 Process=117 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tWH_all  DecayMode1=11 DecayMode2=11 TopDK=1"
+      #Decays for t(t,W)H which have complicated quarks, to check colors
       - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 VegasNc0=100000            DecayMode1=1 DecayMode2=1 ReadLHE=$LHEDIR/ttH.lhe DataFile=$LHEDIR/ttH_ZZ"
       - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 VegasNc0=100000 TauDK=1    DecayMode1=5 DecayMode2=5 ReadLHE=$LHEDIR/ttH.lhe DataFile=$LHEDIR/ttH_tautau"
       - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 VegasNc0=100000            DecayMode1=5 DecayMode2=5 ReadLHE=$LHEDIR/tH_t.lhe DataFile=$LHEDIR/tH_t_WW"
       - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 VegasNc0=100000            DecayMode1=1 DecayMode2=1 ReadLHE=$LHEDIR/tbarH_t.lhe DataFile=$LHEDIR/tbarH_t_ZZ"
       - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 VegasNc0=100000 TauDK=1    DecayMode1=5 DecayMode2=5 ReadLHE=$LHEDIR/tH_s.lhe DataFile=$LHEDIR/tH_s_tautau"
       - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 VegasNc0=100000 ghzgs2=1,0 DecayMode1=0 DecayMode2=7 ReadLHE=$LHEDIR/tH_all.lhe DataFile=$LHEDIR/tH_all_Zgamma.lhe"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 VegasNc0=100000            DecayMode1=1 DecayMode2=1 ReadLHE=$LHEDIR/tWmH.lhe DataFile=$LHEDIR/tWmH_ZZ"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 VegasNc0=100000 TauDK=1    DecayMode1=5 DecayMode2=5 ReadLHE=$LHEDIR/tbWpH.lhe DataFile=$LHEDIR/tbWpH_tautau"
+      - run: "! $DOSYNTAX || ./JHUGen PDFSet=3 VegasNc0=100000 ghzgs2=1,0 DecayMode1=0 DecayMode2=7 ReadLHE=$LHEDIR/tWH_all.lhe DataFile=$LHEDIR/tWH_all_Zgamma"
       #make sure that the mass was read correctly and the interference determined
       - run: "! $DOSYNTAX || grep -q 'Interference: T' $LHEDIR/ttH_ZZ.lhe"
       - run: "! $DOSYNTAX || grep -q 'Interference: F' $LHEDIR/tbarH_t_ZZ.lhe"

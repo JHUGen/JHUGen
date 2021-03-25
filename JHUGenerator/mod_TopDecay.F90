@@ -1,7 +1,8 @@
 MODULE ModTopDecay
 implicit none
 
-public :: TopDecay
+public :: TopDecay, WDecay
+public :: ubarSpi_Dirac, vSpi_Dirac
 private
 
  CONTAINS
@@ -96,6 +97,52 @@ WProp = (0d0,-1d0)*NWAFactor_W
 RETURN
 END SUBROUTINE
 
+
+
+
+
+
+SUBROUTINE WDecay(Charge,Mom,WCurr)
+use ModMisc
+use ModParameters
+implicit none
+real(8) :: Mom(1:4,1:2)
+integer :: Charge
+real(8) :: WMom(1:4)
+complex(8) :: Spi(1:4),BarSpi(1:4),BotSpi(1:4),WCurr(1:4)
+real(8) :: NWAFactor_W
+complex(8) :: WProp
+real(8),parameter :: Nc=xn,NFlav=2
+
+NWAFactor_W   = 1d0/dsqrt(2d0*Ga_W*m_W)
+WProp = (0d0,-1d0)*dsqrt(gwsq)*NWAFactor_W
+
+
+
+    WMom(1:4) = Mom(1:4,1)+Mom(1:4,2)
+    if( TOPDECAYS.eq.0 ) then
+        WCurr(1:4) = 0d0
+        RETURN
+    endif
+
+
+    if( Charge.eq.Wp_ ) then ! W+ decay
+!       assemble lepton current
+        call    vSpi_Weyl(dcmplx(Mom(1:4,1)),+1,Spi(1:4))     ! l+ or dn_bar
+        call ubarSpi_Weyl(dcmplx(Mom(1:4,2)),-1,BarSpi(1:4))  ! nu or up
+        WCurr(1:4)  = vbqq_Weyl(BarSpi(1:4),Spi(1:4)) * WProp ! vbqq introduces -i/Sqrt(2)
+        
+    elseif( Charge.eq.Wm_ ) then ! W- decay
+!       assemble lepton current
+        call ubarSpi_Weyl(dcmplx(Mom(1:4,1)),-1,BarSpi(1:4))  ! l- or dn
+        call    vSpi_Weyl(dcmplx(Mom(1:4,2)),+1,Spi(1:4))     ! nubar or up_bar
+        WCurr(1:4)  = vbqq_Weyl(BarSpi(1:4),Spi(1:4)) * WProp ! vbqq introduces -i/Sqrt(2)
+        
+    endif
+
+
+RETURN
+END SUBROUTINE
 
 
 
@@ -223,6 +270,7 @@ END SUBROUTINE
 
 
         FUNCTION vbqg_Weyl(sp,e1)
+        use ModMisc                
         implicit none
         complex(8), intent(in) :: e1(:)
         complex(8), intent(in) :: sp(:)
@@ -235,41 +283,8 @@ END SUBROUTINE
 
 
 
-
-        FUNCTION vbqq_Weyl(sp1,sp2)
-        implicit none
-        complex(8), intent(in) :: sp1(:), sp2(:)
-        integer, parameter ::  Dv=4
-        integer :: i
-        complex(8) :: vbqq_Weyl(Dv)
-        complex(8) :: rr, va(Dv),sp1a(size(sp1))
-        real(8), parameter :: sqrt2 = 1.4142135623730950488016887242096980786d0
-
-            va=(0d0,0d0)
-            vbqq_Weyl=(0d0,0d0)
-
-            do i=1,Dv
-              if (i.eq.1) then
-                va(1)=(1d0,0d0)
-              else
-                va(i)=(-1d0,0d0)
-              endif
-              sp1a=spb2_Weyl(sp1,va)
-
-              rr=(0d0,-1d0)/sqrt2*psp1_(sp1a,sp2)
-              if (i.eq.1) then
-                    vbqq_Weyl = vbqq_Weyl + rr*va
-                else
-                    vbqq_Weyl = vbqq_Weyl - rr*va
-              endif
-              va(i)=(0d0,0d0)
-            enddo
-
-        END FUNCTION
-
-
-
         function vgq_Weyl(e1,sp)
+        use ModMisc                
         implicit none
         complex(8), intent(in) :: e1(:)
         complex(8), intent(in) :: sp(:)
@@ -279,135 +294,6 @@ END SUBROUTINE
             vgq_Weyl = (0d0,-1d0)/sqrt2*spb2_Weyl(sp,e1)
 
         end function
-
-
-
-
-
-      function spb2_Weyl(sp,v)
-      implicit none
-      complex(8), intent(in) :: sp(:),v(:)
-      integer, parameter ::  Dv=4, Ds=4
-      complex (8) :: spb2_Weyl(size(sp))
-      complex(8) :: x0(4,4),xx(4,4),xy(4,4)
-      complex(8) :: xz(4,4),x5(4,4)
-      complex(8) :: y1,y2,y3,y4,bp,bm,cp,cm
-      integer :: i,i1,i2,i3,imax
-
-
-
-      imax = Ds/4
-
-           do i=1,imax
-           i1= 1+4*(i-1)
-           i2=i1+3
-
-           y1=sp(i1)
-           y2=sp(i1+1)
-           y3=sp(i1+2)
-           y4=sp(i1+3)
-
-           x0(1,i)=y3
-           x0(2,i)=y4
-           x0(3,i)=y1
-           x0(4,i)=y2
-
-           xx(1,i) = y4
-           xx(2,i) = y3
-           xx(3,i) = -y2
-           xx(4,i) = -y1
-
-           xy(1,i)=(0d0,1d0)*y4
-           xy(2,i)=-(0d0,1d0)*y3
-           xy(3,i)=-(0d0,1d0)*y2
-           xy(4,i)=(0d0,1d0)*y1
-
-           xz(1,i)=y3
-           xz(2,i)=-y4
-           xz(3,i)=-y1
-           xz(4,i)=y2
-
-           x5(1,i)=y1
-           x5(2,i)=y2
-           x5(3,i)=-y3
-           x5(4,i)=-y4
-
-           enddo
-
-
-
-           do i=1,4
-
-           spb2_Weyl(i)=v(1)*x0(i,1)-v(2)*xx(i,1)-v(3)*xy(i,1)-v(4)*xz(i,1)
-
-           enddo
-
-
-           end function
-
-
-
-
-
-         function spi2_Weyl(v,sp)
-         implicit none
-         complex(8), intent(in) :: sp(:),v(:)
-         complex(8) :: spi2_Weyl(size(sp))
-         integer, parameter ::  Dv=4,Ds=4
-         complex(8) :: x0(4,4),xx(4,4),xy(4,4)
-         complex(8) :: xz(4,4),x5(4,4)
-         complex(8) ::  y1,y2,y3,y4,bp,bm,cp,cm
-         integer :: i,i1,i2,i3,imax
-
-
-         imax = Ds/4
-
-           do i=1,imax
-           i1= 1+4*(i-1)
-           i2=i1+3
-
-           y1=sp(i1)
-           y2=sp(i1+1)
-           y3=sp(i1+2)
-           y4=sp(i1+3)
-
-           x0(1,i)=y3
-           x0(2,i)=y4
-           x0(3,i)=y1
-           x0(4,i)=y2
-
-
-           xx(1,i) = -y4
-           xx(2,i) = -y3
-           xx(3,i) = y2
-           xx(4,i) = y1
-
-
-           xy(1,i)=(0d0,1d0)*y4
-           xy(2,i)=-(0d0,1d0)*y3
-           xy(3,i)=-(0d0,1d0)*y2
-           xy(4,i)=(0d0,1d0)*y1
-
-           xz(1,i)=-y3
-           xz(2,i)=y4
-           xz(3,i)=y1
-           xz(4,i)=-y2
-
-           x5(1,i)=y1
-           x5(2,i)=y2
-           x5(3,i)=-y3
-           x5(4,i)=-y4
-
-           enddo
-
-
-           do i=1,4
-
-           spi2_Weyl(i)=v(1)*x0(i,1)-v(2)*xx(i,1) -v(3)*xy(i,1)-v(4)*xz(i,1)
-           enddo
-
-
-           end function
 
 
 
@@ -436,6 +322,89 @@ END SUBROUTINE
             res = sum(sp1(1:)*sp2(1:))
 
            end function
+           
+           
+
+
+
+          subroutine ubarSpi_Dirac(p,m,i,f)
+          use ModMisc
+          implicit none
+          integer i
+          real(8) m
+          complex(8) p(4)
+          complex(8) f(4),fc
+          real(8)  p0,px,py,pz,fc2
+
+          p0=dreal(p(1))
+          px=dreal(p(2))
+          py=dreal(p(3))
+          pz=dreal(p(4))
+
+          fc2=p0+m
+          fc=cdsqrt( dcmplx(fc2))
+!           fc=dsqrt(fc2)
+
+          if (i.eq.1) then
+            f(1)=fc
+            f(2)=dcmplx(0d0,0d0)
+            f(3)=-1d0*pz*fc/fc2
+            f(4)=-(px-(0d0,1d0)*py)*fc/fc2
+          elseif (i.eq.-1) then
+            f(1)=dcmplx(0d0,0d0)
+            f(2)=fc
+            f(3)=-(px+(0d0,1d0)*py)*fc/fc2
+            f(4)=pz*fc/fc2
+          else
+              print *, "wrong helicity setting in ubarSpi"
+              stop
+          endif
+
+          return
+          end subroutine
+
+
+
+
+
+
+
+
+          subroutine vSpi_Dirac(p,m,i,f)
+          use ModMisc
+          implicit none
+          integer i
+          real(8) m
+          complex(8) p(4)
+          complex(8) f(4),fc
+          real(8) p0,px,py,pz,fc2
+
+          p0=dreal(p(1))
+          px=dreal(p(2))
+          py=dreal(p(3))
+          pz=dreal(p(4))
+
+          fc2 = p0+m
+          fc=cdsqrt(dcmplx(fc2))
+!           fc=dsqrt(fc2)
+
+          if (i.eq.1) then
+            f(1)=pz*fc/fc2
+            f(2)=(px+(0d0,1d0)*py)*fc/fc2
+            f(3)=fc
+            f(4)=dcmplx(0d0,0d0)
+          elseif (i.eq.-1) then
+            f(1)=(px-(0d0,1d0)*py)*fc/fc2
+            f(2)=-pz*fc/fc2
+            f(3)=dcmplx(0d0,0d0)
+            f(4)=fc
+          else
+              print *, "wrong helicity setting in vSpi"
+          endif
+
+          return
+          end SUBROUTINE
+           
 
 
 

@@ -67,7 +67,7 @@ integer :: iddk1_mcfm,iddk2_mcfm
    else
         if( Process.eq.0 .or. Process.eq.1  .or. Process.eq.2 .or. Process.eq.80 &
                          .or. Process.eq.60 .or. Process.eq.61 .or. (Process.ge.66 .and. Process.le.75) &
-                         .or. Process.eq.90 .or. Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113 .or. Process.eq.114 ) then
+                         .or. Process.eq.90 .or. Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113 .or. Process.eq.114 .or. Process.eq.115 .or. Process.eq.116 .or. Process.eq.117 ) then
            call StartVegas_NEW(VG_Result,VG_Error)
         else
            call StartVegas(VG_Result,VG_Error)
@@ -135,7 +135,10 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
             Process.eq.111 .or. &
             Process.eq.112 .or. &
             Process.eq.113 .or. &
-            Process.eq.114      &
+            Process.eq.114 .or. &
+            Process.eq.115 .or. &
+            Process.eq.116 .or. &
+            Process.eq.117      &     
          )                      &
       ) call Error("main::InitProcessScaleSchemes: Renormalization and factorization schemes are not implemented for process",Process)
 
@@ -184,6 +187,13 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
          ) then
             FacScheme = -kRenFacScheme_mj_mhstar
             MuFacMultiplier = 0.25d0
+         elseif( &
+         Process.eq.115 .or. & !- t+H
+         Process.eq.116 .or. & !- tb+H
+         Process.eq.117      & !- t+H s-channel
+         ) then
+            FacScheme = -kRenFacScheme_mj_mhstar
+            MuFacMultiplier = 0.25d0   
          endif
       endif
 
@@ -229,6 +239,13 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
          Process.eq.112 .or. & !- t+H s-channel
          Process.eq.113 .or. & !- tb+H s-channel
          Process.eq.114      & !- sum of all channels
+         ) then
+            RenScheme = -kRenFacScheme_mj_mhstar
+            MuRenMultiplier = 0.25d0
+         elseif( &
+         Process.eq.115 .or. & !- t+H
+         Process.eq.116 .or. & !- tb+H
+         Process.eq.117      & !- t+H s-channel
          ) then
             RenScheme = -kRenFacScheme_mj_mhstar
             MuRenMultiplier = 0.25d0
@@ -1361,7 +1378,7 @@ type(SaveValues) :: tosave, oldsavevalues
 
     if( Process.ge.110 .and. Process.le.114 ) DecayMode2 = DecayMode1
 
-    if( (TopDecays.ne.0 .and. TopDecays.ne.1) .and. (Process.eq.80 .or. (Process.ge.110 .and. Process.le.114)) ) call Error("Specify TopDK=0,1")
+    if( (TopDecays.ne.0 .and. TopDecays.ne.1) .and. (Process.eq.80 .or. (Process.ge.110 .and. Process.le.117)) ) call Error("Specify TopDK=0,1")
     if( (TopDecays.eq.1) .and. .not. IsAWDecay(DecayMode1) ) call Error("Invalid DecayMode1 for top decays")
     if( (TopDecays.eq.1) .and. .not. IsAWDecay(DecayMode2) ) call Error("Invalid DecayMode2 for top decays")
 
@@ -1805,7 +1822,7 @@ type(SaveValues) :: tosave, oldsavevalues
       kappa_tilde_4gen_bot = czero
     endif
     if (SetAnomalousHffMCFM) then
-      if (Process.eq.80 .or. (Process.ge.110 .and. Process.le.114))then
+      if (Process.eq.80 .or. (Process.ge.110 .and. Process.le.117))then
         kappa = kappa_top
         kappa_tilde = kappa_tilde_top
       else if (Process.eq.90)then
@@ -2525,6 +2542,42 @@ include "vegas_common.f"
          VegasNc1_default =  500000
          VegasNc2_default =  500000
       endif
+     ! TM added -- t+Wm+H
+      if(Process.eq.115) then
+         NDim = 9
+         NDim = NDim + 2 ! sHat integration
+         NDim = NDim + 1 ! select partonic channel
+         NDim = NDim + 2 ! Wm decay         
+
+         VegasIt1_default = 10
+         VegasNc0_default =  500000
+         VegasNc1_default =  500000
+         VegasNc2_default =  500000
+      endif   
+     ! TM added -- tb+Wp+H
+      if(Process.eq.116) then
+         NDim = 9
+         NDim = NDim + 2 ! sHat integration
+         NDim = NDim + 1 ! select partonic channel
+         NDim = NDim + 2 ! Wp decay                  
+
+         VegasIt1_default = 10
+         VegasNc0_default =  500000
+         VegasNc1_default =  500000
+         VegasNc2_default =  500000
+      endif 
+     ! sum of all TWH channels
+      if(Process.eq.117) then
+         NDim = 9
+         NDim = NDim + 2 ! sHat integration
+         NDim = NDim + 1 ! select partonic channel
+         NDim = NDim + 2 ! Wm/Wp decay                  
+
+         VegasIt1_default = 5
+         VegasNc0_default =  500000
+         VegasNc1_default =  500000
+         VegasNc2_default =  500000
+      endif              
 
 END SUBROUTINE
 
@@ -2652,6 +2705,8 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
       call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113)  then
       call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
+    elseif (Process.eq.115 .or. Process.eq.116)  then
+      call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
    else
       call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
 !       call vegas(EvalWeighted_tautau,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
@@ -2696,6 +2751,8 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     elseif (Process.eq.90) then
       call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113) then
+      call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
+    elseif (Process.eq.115 .or. Process.eq.116) then
       call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
     else
       call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
@@ -3057,6 +3114,10 @@ character(len=len(CSmaxFile)+20) :: FileToRead
          if( Process.eq.112) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
          if( Process.eq.113) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
          if( Process.eq.114) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+         if( Process.eq.115) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+         if( Process.eq.116) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+         if( Process.eq.117) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                                   
        endif
 
        !DATA RUN
@@ -3092,8 +3153,10 @@ character(len=len(CSmaxFile)+20) :: FileToRead
        if( Process.eq.112) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
        if( Process.eq.113) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
        if( Process.eq.114) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-
-
+       if( Process.eq.115) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+       if( Process.eq.116) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+       if( Process.eq.117) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                    
 
 
    elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
@@ -3136,6 +3199,9 @@ character(len=len(CSmaxFile)+20) :: FileToRead
                  if( Process.eq.112) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
                  if( Process.eq.113) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
                  if( Process.eq.114) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.115) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.116) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.117) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
 
                  itmx = 2
                  writeout=.true.
@@ -3151,6 +3217,9 @@ character(len=len(CSmaxFile)+20) :: FileToRead
                  if( Process.eq.112) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
                  if( Process.eq.113) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
                  if( Process.eq.114) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.115) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.116) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.117) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
 
 
                  CrossSecMax(:,:) = 0d0
@@ -3168,6 +3237,9 @@ character(len=len(CSmaxFile)+20) :: FileToRead
                  if( Process.eq.112) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
                  if( Process.eq.113) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
                  if( Process.eq.114) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.115) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.116) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.117) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
                  writeout=.false.
                  ingridfile=trim(outgridfile)
 
@@ -3201,6 +3273,8 @@ character(len=len(CSmaxFile)+20) :: FileToRead
                 call getRef_HJJchannelHash(ijSel)
              elseif( Process.ge.110 .and. Process .le.114 ) then
                 call getRef_THchannelHash(ijSel)
+             elseif( Process.ge.115 .and. Process .le.117 ) then
+                call getRef_TWHchannelHash(ijSel)
              else
                 call getRef_GENchannelHash(ijSel)
              endif
@@ -3265,6 +3339,9 @@ character(len=len(CSmaxFile)+20) :: FileToRead
                  if( Process.eq.112) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
                  if( Process.eq.113) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
                  if( Process.eq.114) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.115) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.116) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+                 if( Process.eq.117) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
 
 
          !         call system('clear')
@@ -3590,6 +3667,10 @@ character(len=len(CSmaxFile)+20) :: FileToRead
                           dum = EvalUnWeighted_TH(yRnd,.false.,(/-99,-99/),RES)
                       elseif( Process.eq.113 ) then
                           dum = EvalUnWeighted_TH(yRnd,.false.,(/-99,-99/),RES)
+                      elseif( Process.eq.115 ) then
+                          dum = EvalUnWeighted_TH(yRnd,.false.,(/-99,-99/),RES)
+                      elseif( Process.eq.116 ) then
+                          dum = EvalUnWeighted_TH(yRnd,.false.,(/-99,-99/),RES)
                       endif
                       VG(:,:) = VG(:,:) + RES(:,:)
                       PChannel = PChannel_aux
@@ -3667,6 +3748,10 @@ character(len=len(CSmaxFile)+20) :: FileToRead
                     elseif( Process.eq.112 ) then
                         dum = EvalUnWeighted_TH(yRnd,.true.,(/i1,j1/),RES)
                     elseif( Process.eq.113 ) then
+                        dum = EvalUnWeighted_TH(yRnd,.true.,(/i1,j1/),RES)
+                    elseif( Process.eq.115 ) then
+                        dum = EvalUnWeighted_TH(yRnd,.true.,(/i1,j1/),RES)
+                    elseif( Process.eq.116 ) then
                         dum = EvalUnWeighted_TH(yRnd,.true.,(/i1,j1/),RES)
                     endif
                     StatusPercent = int(100d0*(AccepCounter_part(i1,j1))  /  dble(RequEvents(i1,j1))  )
@@ -4790,6 +4875,8 @@ implicit none
      call InitHisto_BBBH()
   elseif (Process.eq.110 .or. Process .eq. 111 .or. Process.eq.112 .or. Process .eq. 113 .or. Process .eq. 114) then
      call InitHisto_TH()
+  elseif (Process .eq. 115 .or. Process .eq. 116 .or. Process .eq. 117) then
+     call InitHisto_TWH()
   else
 
      if( TauDecays.eq.0 .or. TauDecays.eq.1 ) then
@@ -5254,6 +5341,109 @@ integer :: AllocStatus,NHisto
           Histo(7)%LowVal = 0d0
           Histo(7)%SetScale= 1d0
 
+
+
+  do NHisto=1,NumHistograms
+      Histo(NHisto)%Value(:) = 0d0
+      Histo(NHisto)%Value2(:)= 0d0
+      Histo(NHisto)%Hits(:)  = 0
+  enddo
+
+RETURN
+END SUBROUTINE
+
+SUBROUTINE InitHisto_TWH()
+use ModMisc
+use ModKinematics
+use ModParameters
+implicit none
+integer :: AllocStatus,NHisto
+
+          it_sav = 1
+          NumHistograms = 13
+          if( .not.allocated(Histo) ) then
+                allocate( Histo(1:NumHistograms), stat=AllocStatus  )
+                if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
+          endif
+
+          Histo(1)%Info   = "pT_top"
+          Histo(1)%NBins  = 50
+          Histo(1)%BinSize= 10d0*GeV
+          Histo(1)%LowVal = 0d0
+          Histo(1)%SetScale= 1d0/GeV
+
+          Histo(2)%Info   = "pT_H"
+          Histo(2)%NBins  = 50
+          Histo(2)%BinSize= 10d0*GeV
+          Histo(2)%LowVal = 0d0
+          Histo(2)%SetScale= 1d0/GeV
+
+          Histo(3)%Info   = "mt"
+          Histo(3)%NBins  = 50
+          Histo(3)%BinSize= 0.4d0*GeV
+          Histo(3)%LowVal = 160d0*GeV
+          Histo(3)%SetScale= 1d0/GeV
+
+          Histo(4)%Info   = "mWm"
+          Histo(4)%NBins  = 50
+          Histo(4)%BinSize= 0.4d0*GeV
+          Histo(4)%LowVal = 70d0*GeV
+          Histo(4)%SetScale= 1d0/GeV
+
+          Histo(5)%Info   = "mWp"
+          Histo(5)%NBins  = 50
+          Histo(5)%BinSize= 0.4d0*GeV
+          Histo(5)%LowVal = 70d0*GeV
+          Histo(5)%SetScale= 1d0/GeV
+
+          Histo(6)%Info   = "pT_b"
+          Histo(6)%NBins  = 50
+          Histo(6)%BinSize= 10d0*GeV
+          Histo(6)%LowVal = 0d0
+          Histo(6)%SetScale= 1d0/GeV
+
+          Histo(7)%Info   = "pT_l"
+          Histo(7)%NBins  = 50
+          Histo(7)%BinSize= 10d0*GeV
+          Histo(7)%LowVal = 0d0
+          Histo(7)%SetScale= 1d0/GeV
+          
+          Histo(8)%Info   = "pT_lm"
+          Histo(8)%NBins  = 50
+          Histo(8)%BinSize= 10d0*GeV
+          Histo(8)%LowVal = 0d0
+          Histo(8)%SetScale= 1d0/GeV
+
+          Histo(9)%Info   = "pT_miss"
+          Histo(9)%NBins  = 50
+          Histo(9)%BinSize= 10d0*GeV
+          Histo(9)%LowVal = 0d0
+          Histo(9)%SetScale= 1d0/GeV
+          
+          Histo(10)%Info   = "y(top)"
+          Histo(10)%NBins  = 60
+          Histo(10)%BinSize= 0.1d0
+          Histo(10)%LowVal = -3d0
+          Histo(10)%SetScale= 1d0
+
+          Histo(11)%Info   = "y(W)"
+          Histo(11)%NBins  = 100
+          Histo(11)%BinSize= 0.1d0
+          Histo(11)%LowVal = -5d0
+          Histo(11)%SetScale= 1d0
+
+          Histo(12)%Info   = "y(Higgs)"
+          Histo(12)%NBins  = 100
+          Histo(12)%BinSize= 0.1d0
+          Histo(12)%LowVal = -5d0
+          Histo(12)%SetScale= 1d0
+                    
+
+          Histo(13)%Info   = "D_0minus"
+          Histo(13)%NBins  = 50
+          Histo(13)%BinSize= 0.02
+          Histo(13)%LowVal = 0d0
+          Histo(13)%SetScale= 1d0
 
 
   do NHisto=1,NumHistograms
@@ -5935,35 +6125,38 @@ character :: arg*(1000)
     if( Process.eq.112) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
     if( Process.eq.113) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
     if( Process.eq.114) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.115) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.116) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
+    if( Process.eq.117) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso/GeV," width=",Ga_Reso/GeV
     if( ReadLHEFile )    write(TheUnit,"(4X,A)") "           (This is ReadLHEFile mode. Resonance mass/width are read from LHE input parameters.)"
     if( ConvertLHEFile ) write(TheUnit,"(4X,A)") "           (This is ConvertLHEFile mode. Resonance mass/width are read from LHE input parameters.)"
     if( HiggsDecayLengthMM.ne.0d0 ) write(TheUnit,"(4X,A,F10.5,A)") "           Resonance ctau=", HiggsDecayLengthMM/ctauUnit, " mm"
     if( &
-         (.not.ReadLHEFile .and. (Process.le.2 .or. Process.eq.50 .or. Process.eq.60 .or. (Process.ge.66 .and. Process.le.75) .or. ((TopDecays.eq.1).and.Process.eq.80) .or. (Process.ge.110 .and. Process.le.113))) &
+         (.not.ReadLHEFile .and. (Process.le.2 .or. Process.eq.50 .or. Process.eq.60 .or. (Process.ge.66 .and. Process.le.75) .or. ((TopDecays.eq.1).and.Process.eq.80) .or. (Process.ge.110 .and. Process.le.113) .or. (Process.ge.115 .and. Process.le.116))) &
     .or. (ReadLHEFile .and. TauDecays.ne.0) &
     .or. ConvertLHEFile ) &
     then
-        if( .not.ReadLHEFile .and. (ConvertLHEFile .or. Process.eq.50 .or. (Process.ge.110 .and. Process.le.114)) ) then
+        if( .not.ReadLHEFile .and. (ConvertLHEFile .or. Process.eq.50 .or. (Process.ge.110 .and. Process.le.117)) ) then
             write(TheUnit,"(4X,A,I2,2X,A,I2)") "DecayMode1:",DecayMode1
-        else if( ReadLHEFile .or. Process.le.2 .or. Process .eq. 80 ) then
+        else if( ReadLHEFile .or. Process.le.2 .or. Process .eq. 80 .or. (Process.ge.115 .and. Process.le.117) ) then
             write(TheUnit,"(4X,A,I2,2X,A,I2)") "DecayMode1:",DecayMode1, "DecayMode2:",DecayMode2
         endif
         if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.75) .or. IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z boson: mass=",M_Z/GeV,", width=",Ga_Z/GeV
         if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.75) .or. IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W boson: mass=",M_W/GeV,", width=",Ga_W/GeV
     endif
-    if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or.Process.eq.112 .or. Process.eq.113 .or. Process.eq.114) then
+    if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or.Process.eq.112 .or. Process.eq.113 .or. Process.eq.114 .or. Process.eq.115 .or. Process.eq.116 .or. Process.eq.117) then
         write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Top quark mass=",m_top/GeV,", width=",Ga_top/GeV
     else if( Process.ge.73 .and. Process.le.75) then
         write(TheUnit,"(4X,A,F8.4)") "Top quark mass=",m_top/GeV
     endif
-    if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113 .or. Process.eq.114) write(TheUnit,"(4X,A,I2)") "Top quark decay=",TOPDECAYS
+    if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113 .or. Process.eq.114 .or. Process.eq.115 .or. Process.eq.116 .or. Process.eq.117) write(TheUnit,"(4X,A,I2)") "Top quark decay=",TOPDECAYS
     if( Process.eq.90 .or. (Process.ge.73 .and. Process.le.75) ) write(TheUnit,"(4X,A,F8.4)") "Bottom quark mass=",m_bot/GeV
     if( Process.ge.73 .and. Process.le.75 ) then
         if ((abs(kappa_4gen_top)+abs(kappa2_4gen_top)).gt.0d0) write(TheUnit,"(4X,A,F8.4)") "4th gen. top quark mass=",m_top_4gen/GeV
         if ((abs(kappa_4gen_bot)+abs(kappa2_4gen_bot)).gt.0d0) write(TheUnit,"(4X,A,F8.4)") "4th gen. bot quark mass=",m_bot_4gen/GeV
     endif
     if( Process.eq.50 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.62 .or. (Process.ge.66 .and. Process.le.75) .or. Process.eq.90 .or. &
-       ((Process.eq.80 .or. (Process.ge.110 .and. Process.le.114)) .and. m_Top.lt.10d0*GeV) ) then
+       ((Process.eq.80 .or. (Process.ge.110 .and. Process.le.117)) .and. m_Top.lt.10d0*GeV) ) then
         write(TheUnit,"(4X,A)") "Jet cuts:"
         write(TheUnit,"(12X,A,F8.2,A)") "pT >= ", pTjetcut/GeV, " GeV"
         if( Process.ge.66 .and. Process.le.75 ) then
@@ -6844,6 +7037,8 @@ implicit none
         print *, "                      110=t+H t channel, 111=tbar+H t channel,"
         print *, "                      112=t+H s channel, 113=tbar+H s channel"
         print *, "                      114=t/tbar+H t/s channels"
+        print *, "                      115=t+W+H, 116=tbar+W+H"
+        print *, "                      117=t/tbar+W+H"
         print *, "   DecayMode1:        decay mode for vector boson 1 (Z/W/gamma)"
         print *, "   DecayMode2:        decay mode for vector boson 2 (Z/W/gamma)"
         print *, "                        0=Z->2l,  1=Z->2q, 2=Z->2tau, 3=Z->2nu,"

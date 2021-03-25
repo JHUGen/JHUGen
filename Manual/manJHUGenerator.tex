@@ -413,6 +413,13 @@ Examples of running the generator.  The number of events is determined using \te
 		./JHUGen Process=114 DecayMode1=11 VegasNc2=100000 DataFile=tH_s
 		\end{verbatim}
 	\end{itemize}
+	\item $pp \to tHW$, \texttt{Process=117}:
+	\begin{itemize}
+		\item $tHW^-+\bar{t}HW^+$, with inclusive top and $W$ decay (change \verb|DecayMode1| for specific $t$ decays and \verb|DecayMode2| for specific $W$ decays; use processes 115--116 restrict to either $t$ or $\bar{t}$:
+		\begin{verbatim}
+		./JHUGen Process=117 DecayMode1=11 DecayMode2=11 VegasNc2=100000 DataFile=tHW
+		\end{verbatim}
+	\end{itemize}
 	\item Decay-only mode, for generating the decay of a stable Higgs boson produced by the JHU generator or another generator (e.g. POWHEG).
 	\begin{itemize}
 		\item $H\to VV$ decay:
@@ -460,6 +467,8 @@ This is the list of command line configurables (also defined in the \verb|README
                        110=t+H t channel, 111=tbar+H t channel,
                        112=t+H s channel, 113=tbar+H s channel
                        114=t/tbar+H t/s channels
+                       115=t+W+H, 116=tbar+W+H
+                       117=t/tbar+W+H
     DecayMode1:        decay mode for vector boson 1 (Z/W/gamma)
     DecayMode2:        decay mode for vector boson 2 (Z/W/gamma)
                          0=Z->2l,  1=Z->2q, 2=Z->2tau, 3=Z->2nu,
@@ -618,6 +627,7 @@ This is the list of command line configurables (also defined in the \verb|README
 \item In $VH$ production and \verb|ConvertLHE| mode, \verb|DecayMode1| is used for the decay of the $V$.  If it is a $Z$ decay mode, $ZH$ will be produced; if it is a $W$ decay mode, $WH$ will be produced; if it is $7$, $\gamma H$ will be produced, with $\gamma$ stable.
 \item In $ttH$ production, if \verb|TopDK| is true, \verb|DecayMode1| and \verb|DecayMode2| are used to decay the $W$ bosons from the top decay.  Only $W$ decay modes are allowed.
 \item In $t+H$ production, if \verb|TopDK| is true, \verb|DecayMode1| is used to decay the $W$ boson from the top decay.
+\item In $t+H+W$ production, if \verb|TopDK| is true, \verb|DecayMode1| is used to decay the $W$ boson from the top decay while \verb|DecayMode2| is used to decay the associated $W$ boson.
 \item In $H\to \tau\tau$ decay, if \verb|TauDK| is true, \verb|DecayMode1,2| are used to decay the $W$ bosons from the $\tau$ decays.
 \end{itemize}
 \item \verb|Interf|: For final states with 4 same flavor fermions, this parameter controls whether or not to include interference effects.

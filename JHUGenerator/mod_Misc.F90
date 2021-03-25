@@ -1548,7 +1548,7 @@ character(len=*) :: title
     write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D86 (2012) 095031;  arXiv:1208.4018  [hep-ph],", linelength)
     write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D89 (2014) 035007;  arXiv:1309.4819  [hep-ph],", linelength)
     write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D94 (2016) 055023;  arXiv:1606.03107 [hep-ph].", linelength)
-    write(TheUnit, *) " ", CenterWithStars("                              arXiv:2002.09888 [hep-ph].", linelength)
+    write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D102 (2020) 056022; arXiv:2002.09888 [hep-ph].", linelength)
     write(TheUnit, *) " ", CenterWithStars("", linelength)
     write(TheUnit, *) " ", repeat("*", linelength)
     write(TheUnit, *) " "
@@ -1585,6 +1585,8 @@ function CalculatesXsec(Process)
   elseif (Process.eq.80 .or. Process.eq.90) then
     CalculatesXsec=.false.
   elseif (Process.ge.110 .and. Process.le.114) then
+    CalculatesXsec=.true.
+  elseif (Process.ge.115 .and. Process.le.117) then
     CalculatesXsec=.true.
   else
     print *, "Unknown process in CalculatesXsec", process, "; setting CalculatesXsec=false."
