@@ -290,6 +290,12 @@ degrees of freedom:
 \end{eqnarray}
 
 
+The Standard Modell $Zff$ couplings are defined as 
+\begin{eqnarray}
+	g_\mathrm{L}^{Zff} =& \frac{e}{s_w \,c_w} \left( T^3_{f_\mathrm{L}} - s_w^2 Q_f \right)  \; &=: \frac{e}{2\, s_w\, c_w} a_\mathrm{L}^f, \nonumber \\
+	g_\mathrm{R}^{Zff} =& \frac{e}{s_w \,c_w} \left( - s_w^2 Q_f \right)  \; &=: \frac{e}{2\, s_w\, c_w} a_\mathrm{R}^f. 
+	\label{eq:def:Zff}
+\end{eqnarray}
 
 \section{Installation}
 
@@ -795,6 +801,8 @@ The general syntax is:
 \item \verb|zprime_qq_left|, \verb|zprime_qq_right|, \verb|zprime_zz_1|, and \verb|zprime_zz_2| for spin 1
 \item \verb|aX|, \verb|bX|, \verb|graviton_qq_left|, \verb|and graviton_qq_right| for spin 2 (see the list for the range of X)
 \item The $Hff$ couplings \verb|kappa| and \verb|kappa_tilde| and variants
+\item The $Zff$ couplings $a^f_\mathrm{L,R}$ in Eq.~(\ref{eq:def:Zff}) can be modified with \verb|az_Lep_left, az_Lep_right|, \verb|az_Neu_left, az_Neu_right|, 
+\verb|az_QUp_left, az_QUp_right| and \verb|az_QDn_left, az_QDn_right|.
 \end{itemize}
 Except for the form factors (\verb|cz_qXsq|, \verb|Lambda_zXY|, and their $WW$ equivalents), the couplings are complex, and must be set with a comma between the real and imaginary parts.  For example:
 \begin{verbatim}
@@ -970,7 +978,7 @@ The couplings between $V^\prime$ and fermions are set by
    complex(8), public :: ewp_Chm_right  = (0d0,0d0)
 \end{verbatim}
 
-The values of \verb|ezp*left| (\verb|ezp*right|) couplings that give SM couplings can be set by $2 \left(T_{3}^{f}-Q_{f} \sin^2 \theta_{W}\right)$ ($-2 Q_{f} \sin^2 \theta_{W}$), where $T_{3}^{f}$ and $Q_{f}$ are the weak isospin and charge of the fermion in consideration. 
+The values of \verb|ezp*left| (\verb|ezp*right|) couplings that give SM couplings can be set by $2 \left(T^{3}_{f}-Q_{f} \sin^2 \theta_{W}\right)$ ($-2 Q_{f} \sin^2 \theta_{W}$), where $T^{3}_{f}$ and $Q_{f}$ are the weak isospin and charge of the fermion in consideration. 
 With the similar conventions, the values of \verb|ewp*left| (\verb|ewp*right|) couplings that give SM couplings can be set by $\sqrt{2 \left(1-\sin^2 \theta_{W}\right)}$ ($0$).
 The CKM mechanism is assumed to affect the $W^\prime ff$ couplings the same way as it affects the $Wff$ couplings.
 
