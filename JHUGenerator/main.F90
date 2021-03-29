@@ -2843,7 +2843,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
      VG = VG/dble(VegasNc0)
      csmax   = 1.5d0*csmax    !  adjustment factors, can be choosen  separately channel/by/channel
 
-
+     print *, "Cross section = ",sum(VG), "fb"
 
 !        print *, " gg/qqb ratio = ", VG(0,0)/(VG(+1,-1) + VG(+2,-2) + VG(+3,-3) + VG(+4,-4) + VG(+5,-5)   &
 !                                             +VG(-1,+1) + VG(-2,+2) + VG(-3,+3) + VG(-4,+4) + VG(-5,+5))
@@ -5699,9 +5699,9 @@ integer :: AllocStatus,NHisto
           Histo(1)%SetScale= 1d0/GeV
 
           Histo(2)%Info   = "m(ll)"
-          Histo(2)%NBins  = 80
-          Histo(2)%BinSize= 20d0*GeV/80d0
-          Histo(2)%LowVal = 75d0*GeV
+          Histo(2)%NBins  = 200
+          Histo(2)%BinSize= 200d0*GeV/200d0
+          Histo(2)%LowVal = 0d0*GeV
           Histo(2)%SetScale= 1d0/GeV
 
           Histo(3)%Info   = "pt(V)"
