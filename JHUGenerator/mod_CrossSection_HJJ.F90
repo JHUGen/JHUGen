@@ -28,7 +28,7 @@ real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5),msq_VgsWgt(-5:5,-5:5),Wgt_Rati
 integer :: id_MCFM(mxpart),MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),NHisto,ipart,jpart
 integer, pointer :: ijSel(:,:)
 integer :: iPartChannel,PartChannelAvg,NumPartonicChannels,iflip,i,j,k
-real(8) :: PreFac,VegasWeighted_HJJ_fulldecay,xRnd,LeptonAndVegasWeighted_HJJ_fulldecay
+real(8) :: PreFac,VegasWeighted_HJJ_fulldecay,xRnd,LeptonAndVegasWeighted_HJJ_fulldecay,FudgeFactor
 logical :: applyPSCut,swap34_56,do78
 integer :: id12_78
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
@@ -36,6 +36,7 @@ include 'vegas_common.f'
 include 'maxwt.f'
 EvalWeighted_HJJ_fulldecay = 0d0
 m1ffwgt=1d0;m2ffwgt=1d0;m3ffwgt=1d0
+FudgeFactor=1d0
 
    if (Process.eq.69) then
       call getRef_MCFM_qqVVqqStrong_Hash(ijSel) ! ijSel is in JHU convention
@@ -203,7 +204,9 @@ m1ffwgt=1d0;m2ffwgt=1d0;m3ffwgt=1d0
 
    originalprobability = msq_MCFM(iPart_sel,jPart_sel)
 
-   PreFac = hbarc2XsecUnit * FluxFac * PSWgt * sHatJacobi * m1ffwgt * m2ffwgt * m3ffwgt
+   if( DecayMode1.eq.DecayMode2 ) FudgeFactor = 0.5d0
+
+   PreFac = hbarc2XsecUnit * FluxFac * PSWgt * sHatJacobi * m1ffwgt * m2ffwgt * m3ffwgt * FudgeFactor
    msq_MCFM = msq_MCFM * PreFac / (GeV**8)  ! adjust msq_MCFM for GeV units of MCFM mat.el.
 !    do ipart=-5,5; do jpart=-5,5
 !       msq_MCFM(ipart,jpart)=msq_MCFM(ipart,jpart) * pdf(LHA2M_pdf(ipart),1)*pdf(LHA2M_pdf(jpart),2)
