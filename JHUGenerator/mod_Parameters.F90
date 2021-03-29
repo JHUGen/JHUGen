@@ -993,6 +993,16 @@ real(8), public, parameter :: Lambda2 = 1000d0    *GeV      ! for second resonan
   complex(8), public, parameter  :: c7 = (0d0,0d0) ! this coupling does not contribute to gamma+gamma final states
 
 
+! user Zff couplings
+   real(8), public :: az_Lep_left  = (0d0)
+   real(8), public :: az_Lep_right  = (0d0)
+   real(8), public :: az_Neu_left  = (0d0)
+   real(8), public :: az_Neu_right  = (0d0)
+   real(8), public :: az_QUp_left  = (0d0)
+   real(8), public :: az_QUp_right  = (0d0)
+   real(8), public :: az_QDn_left  = (0d0)
+   real(8), public :: az_QDn_right  = (0d0)
+
 !=====================================================
 
 !=====================================================
@@ -2789,6 +2799,17 @@ implicit none
    aL_QUp =2d0*(T3uL-QuL*xw)
    aR_QDn =2d0*(T3dR-QdR*xw)
    aL_QDn =2d0*(T3dL-QdL*xw)
+   
+   ! overwriting default settings above if specified by command line
+   if( az_Lep_left.ne.0d0  ) aL_lep = az_Lep_left 
+   if( az_Lep_right.ne.0d0 ) aR_lep = az_Lep_right
+   if( az_Neu_left.ne.0d0  ) aL_neu = az_Neu_left
+   if( az_Neu_right.ne.0d0 ) aR_neu = az_Neu_right
+   if( az_QUp_left.ne.0d0  ) aL_QUp = az_Qup_left
+   if( az_QUp_right.ne.0d0 ) aR_Qup = az_Qup_right
+   if( az_QDn_left.ne.0d0  ) aL_QDn = az_QDn_left
+   if( az_QDn_right.ne.0d0 ) aR_QDn = az_QDn_right
+   
    ! W couplings
    bL = sqrt(2d0*(1d0-xw))
    bR = 0d0
@@ -2809,6 +2830,8 @@ implicit none
    couplAZff = -gwsq*sitW/2.0_dp/sqrt(1.0_dp-xw)
    couplAffsq = gwsq*xw
 
+
+   
 
 end subroutine ComputeEWVariables
 

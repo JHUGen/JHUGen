@@ -418,6 +418,7 @@ logical :: SetAnomalousHff, Setkappa
 logical :: SetAnomalousHffMCFM, SetAnomalousHffMCFM_mbot4gen, SetAnomalousHffMCFM_mtop4gen
 logical :: Setkappatop, Setkappabot, SetAnomalousSpin0gg4gen, Setkappa4gentop, Setkappa4genbot, Setkappa2top, Setkappa2bot, SetAnomalousSpin0Res2gg, Setkappa24gentop, Setkappa24genbot, SetAnomalousSpin0Res2gg4gen
 logical :: SetSpin0Res2VVcoupling
+logical :: SetZff
 logical :: SetZprimeff, SetWprimeff, SetHZprime, SetHWprime
 logical :: SetMZprime, SetGaZprime, SetMWprime, SetGaWprime
 logical :: SetATQGC
@@ -506,6 +507,7 @@ type(SaveValues) :: tosave, oldsavevalues
    SetAnomalousSpin0Res2gg=.false.
    SetAnomalousSpin0Res2gg4gen=.false.
 
+   SetZff=.false.
 
    SetHZprime=.false.
    SetZprimeff=.false.
@@ -1233,6 +1235,16 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "dAAWpWm", success, dAAWpWm, success2=SetATQGC, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
     call ReadCommandLineArgument(arg, "dZAWpWm", success, dZAWpWm, success2=SetATQGC, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
     call ReadCommandLineArgument(arg, "dZZWpWm", success, dZZWpWm, success2=SetATQGC, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
+
+    ! Zff couplings
+    call ReadCommandLineArgument(arg, "az_Lep_left",  success, az_Lep_left, success2=SetZff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "az_Lep_right", success, az_Lep_right, success2=SetZff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "az_Neu_left", success, az_Neu_left, success2=SetZff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "az_Neu_right",success, az_Neu_right, success2=SetZff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "az_QUp_left",  success, az_QUp_left, success2=SetZff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "az_QUp_right", success, az_QUp_right, success2=SetZff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "az_QDn_left",  success, az_QDn_left, success2=SetZff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "az_QDn_right", success, az_QDn_right, success2=SetZff, checkdestchange=.true., tosave=tosave)
 
     ! CKM elements
     call ReadCommandLineArgument(arg, "Vud", success, VCKM_ud, success2=SetCKM, tosave=tosave)
@@ -6629,6 +6641,15 @@ character :: arg*(1000)
                endif
             endif
         endif
+        if( az_Lep_left.ne.0d0 )  write(TheUnit,"(6X,A,2E16.8)") "az_Lep_left=  ",az_Lep_left
+        if( az_Lep_right.ne.0d0 ) write(TheUnit,"(6X,A,2E16.8)") "az_Lep_right= ",az_Lep_right
+        if( az_Neu_left.ne.0d0 )  write(TheUnit,"(6X,A,2E16.8)") "az_Neu_left=  ",az_Neu_left
+        if( az_Neu_right.ne.0d0 ) write(TheUnit,"(6X,A,2E16.8)") "az_Neu_right= ",az_Neu_right
+        if( az_QUp_left.ne.0d0 )  write(TheUnit,"(6X,A,2E16.8)") "az_QUp_left=  ",az_QUp_left
+        if( az_QUp_right.ne.0d0 ) write(TheUnit,"(6X,A,2E16.8)") "az_QUp_right= ",az_QUp_right
+        if( az_QDn_left.ne.0d0 )  write(TheUnit,"(6X,A,2E16.8)") "az_QDn_left=  ",az_QDn_left
+        if( az_QDn_right.ne.0d0 ) write(TheUnit,"(6X,A,2E16.8)") "az_QDn_right= ",az_QDn_right
+        
         if(includeVprime) then
             if( IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) then
                 if(M_Zprime.ge.0d0) then
