@@ -75,8 +75,8 @@ void JHUGenLexiconOptionParser::interpretOption(std::string const& wish, std::st
   else if (wish=="distinguish_HWWcouplings"){ flags[wish] = false; castStringToValue(value, flags[wish]); }
   else if (wish=="include_triple_quartic_gauge"){ flags[wish] = false; castStringToValue(value, flags[wish]); }
   else if (wish=="custodial_symmetry"){flags[wish] = false; castStringToValue(value, flags[wish]); }
-  else if (wish=="charged_current"){flags[wish] = false; castStringToValue(value, flags[wish]); }
-  else if (wish=="neutral_current"){flags[wish] = false; castStringToValue(value, flags[wish]); }
+  else if (wish=="HW_couplings_only"){flags[wish] = false; castStringToValue(value, flags[wish]); }
+  else if (wish=="HZ_couplings_only"){flags[wish] = false; castStringToValue(value, flags[wish]); }
   else if (wish=="include_delta"){flags[wish] = false; castStringToValue(value, flags[wish]); }
   // Parameters come next, check if a comma is not found to assign them
   else if (value.find(",")==std::string::npos) parameters[wish] = stod(value);
@@ -104,8 +104,9 @@ void JHUGenLexiconOptionParser::printOptionsHelp(bool command_fail)const{
   cout << "- distinguish_HWWcouplings: Distinguish HZZ and HWW couplings in the JHUGen amplitude basis if it is the input. Default is false.\n\n";
   cout << "- include_triple_quartic_gauge: Return triple gauge couplings. Default is false.\n\n";
   cout << "- custodial_symmetry: set delta_m = 0 (Note: This also fixes delta_v in the Warsaw Basis)\n\n";  
-  cout << "- charged_current: Only return charged current couplings. Only used for JHUGen_Amplitude Basis. Default is false.\n\n";
-  cout << "- neutral_current: Only return neutral current couplings. Only used for JHUGen_Amplitude Basis. Default is false.\n\n";
+  cout << "- HW_couplings_only: Only return HWW couplings. Only used for JHUGen_Amplitude Basis. Default is false.\n\n";
+  cout << "- HZ_couplings_only: Only return HZZ, HZgamma and Hgammagamma couplings. Only used for JHUGen_Amplitude Basis. Default is false.\n\n";
+  cout << "- NOTE: HW_couplings_only and HZ_couplings_only does not affect the output of include_triple_quartic_gauge.";
 
   cout << "- The format to set any parameter is [specifier]=[value].\n\n";
   cout << "- The format to set any coupling [specifier] to the complex number ([vRe], [vIm]) is [specifier]=[vRe],[vIm].\n\n";

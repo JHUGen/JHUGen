@@ -26,8 +26,8 @@ void JHUGenLexiconTranslator::translate(){
   auto const& basis_input = opts.getInputBasis();
   auto const& basis_output = opts.getOutputBasis();
   bool include_triple_quartic_gauge; getValueWithDefault<std::string, bool>(input_flags, "include_triple_quartic_gauge", include_triple_quartic_gauge, false); 
-  bool charged_current; getValueWithDefault<std::string, bool>(input_flags, "charged_current", charged_current, false);
-  bool neutral_current; getValueWithDefault<std::string, bool>(input_flags, "neutral_current", neutral_current, false);
+  bool HW_couplings_only; getValueWithDefault<std::string, bool>(input_flags, "HW_couplings_only", HW_couplings_only, false);
+  bool HZ_couplings_only; getValueWithDefault<std::string, bool>(input_flags, "HZ_couplings_only", HZ_couplings_only, false);
   bool custodial_symmetry; getValueWithDefault<std::string, bool>(input_flags, "custodial_symmetry", custodial_symmetry, false);
   double vev_lam; getValueWithDefault<std::string, double>(input_parameters, "vev_lam", vev_lam, DEFVAL_VEV_LAM);
   double delta_v; getValueWithDefault<std::string, double>(input_parameters, "delta_v" , delta_v ,DEFVAL_DELTA_V);
@@ -324,7 +324,7 @@ void JHUGenLexiconTranslator::translate(){
   // Format for either CC or NC output
   
   // Formatting for Charged Current
-  if (charged_current){
+  if (HW_couplings_only){
     if (basis_output==bAmplitude_JHUGen){
       if(include_triple_quartic_gauge){
         std::vector< std::pair<double, double> > tempoutput(17, std::pair<double, double>(0, 0));
@@ -359,7 +359,7 @@ void JHUGenLexiconTranslator::translate(){
       }
     }
   }
-  else if (neutral_current){
+  else if (HZ_couplings_only){
     if (basis_output==bAmplitude_JHUGen){
       if(include_triple_quartic_gauge){
         std::vector< std::pair<double, double> > tempoutput(23, std::pair<double, double>(0, 0));
@@ -1860,8 +1860,8 @@ void JHUGenLexiconTranslator::interpretOutputCouplings(
 ){
   bool useMCFMAtOutput; getValueWithDefault<std::string, bool>(input_flags, "useMCFMAtOutput", useMCFMAtOutput, false);
   bool include_triple_quartic_gauge; getValueWithDefault<std::string, bool>(input_flags, "include_triple_quartic_gauge", include_triple_quartic_gauge, false);
-  bool charged_current; getValueWithDefault<std::string, bool>(input_flags, "charged_current", charged_current, false);
-  bool neutral_current; getValueWithDefault<std::string, bool>(input_flags, "neutral_current", neutral_current, false);
+  bool HW_couplings_only; getValueWithDefault<std::string, bool>(input_flags, "HW_couplings_only", HW_couplings_only, false);
+  bool HZ_couplings_only; getValueWithDefault<std::string, bool>(input_flags, "HZ_couplings_only", HZ_couplings_only, false);
   double MZ; getValueWithDefault<std::string, double>(input_parameters, "MZ", MZ, DEFVAL_MZ);
   double MW; getValueWithDefault<std::string, double>(input_parameters, "MW", MW, DEFVAL_MW);
   double Lambda_z1; getValueWithDefault<std::string, double>(input_parameters, "Lambda_z1", Lambda_z1, DEFVAL_LAMBDA_VI);
@@ -1877,10 +1877,10 @@ void JHUGenLexiconTranslator::interpretOutputCouplings(
     case bAmplitude_JHUGen:
     {
       if (include_triple_quartic_gauge){
-	if (charged_current){
+	if (HW_couplings_only){
           AMPLITUDE_JHUGEN_INCLUDE_TRIPLE_CHARGED_CURRENT_COUPLING_COMMANDS
         }
-	else if (neutral_current){
+	else if (HZ_couplings_only){
           AMPLITUDE_JHUGEN_INCLUDE_TRIPLE_NEUTRAL_CURRENT_COUPLING_COMMANDS
         }
         else{
@@ -1888,10 +1888,10 @@ void JHUGenLexiconTranslator::interpretOutputCouplings(
         }
       }
       else{
-        if (charged_current){
+        if (HW_couplings_only){
           AMPLITUDE_JHUGEN_CHARGED_CURRENT_COUPLING_COMMANDS
         }
-        else if (neutral_current){
+        else if (HZ_couplings_only){
           AMPLITUDE_JHUGEN_NEUTRAL_CURRENT_COUPLING_COMMANDS
         }
         else{
