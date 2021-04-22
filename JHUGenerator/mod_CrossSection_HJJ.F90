@@ -36,7 +36,7 @@ include 'vegas_common.f'
 include 'maxwt.f'
 EvalWeighted_HJJ_fulldecay = 0d0
 m1ffwgt=1d0;m2ffwgt=1d0;m3ffwgt=1d0
-FudgeFactor=2d0
+FudgeFactor=0.5d0
 
    if (Process.eq.69) then
       call getRef_MCFM_qqVVqqStrong_Hash(ijSel) ! ijSel is in JHU convention

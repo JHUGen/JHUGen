@@ -170,7 +170,9 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
    call EvalAlphaS()
    call setPDFs(eta1,eta2,pdf)
 
-   if( DecayMode1.eq.DecayMode2 ) FudgeFactor = 0.5d0
+   if( DecayMode1.ne.DecayMode2 ) FudgeFactor = FudgeFactor * 2d0
+   if( IsAWDecay(DecayMode1) .and. IsAWDecay(DecayMode2) ) FudgeFactor = FudgeFactor * 2d0
+   if( IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) ) FudgeFactor = FudgeFactor * 1d0
 
    FluxFac = 1d0/(2d0*EHat**2)
    PDFFac = pdf(LHA2M_pdf(iPart_sel),1)  *  pdf(LHA2M_pdf(jPart_sel),2)

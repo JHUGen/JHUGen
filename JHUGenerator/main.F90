@@ -2843,7 +2843,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
      VG = VG/dble(VegasNc0)
      csmax   = 1.5d0*csmax    !  adjustment factors, can be choosen  separately channel/by/channel
 
-     print *, "Cross section = ",sum(VG), "fb"
+     print *, " Cross section = ",sum(VG), "fb"
 
 !        print *, " gg/qqb ratio = ", VG(0,0)/(VG(+1,-1) + VG(+2,-2) + VG(+3,-3) + VG(+4,-4) + VG(+5,-5)   &
 !                                             +VG(-1,+1) + VG(-2,+2) + VG(-3,+3) + VG(-4,+4) + VG(-5,+5))
