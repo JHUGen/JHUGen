@@ -40,7 +40,7 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
     EvalWeighted = 0d0
     m1ffwgt = 1d0 ! Multiplicative factor
     m2ffwgt = 1d0 ! Multiplicative factor
-    FudgeFactor = 1d0
+    FudgeFactor = 8d0
 
     if( OffShellReson ) then
       call PDFMapping(10,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
