@@ -10,7 +10,8 @@
 #define DEFVAL_LAMBDA_VI 10000.
 #define DEFVAL_ALPHA .0072973525693 //Used to set e^2
 #define DEFVAL_VEV_LAM .0024622 //Vacuum Expectation Value GeV / Lambda Warsaw Basis
-
+#define DEFVAL_DELTA_V 0 // Delta V used in Warsaw Basis
+#define DEFVAL_DELTA_M 0 // Delta M used in Warsaw Basis
 
 // Coupling definitions
 // Added gluon couplings that appear in H->VV
@@ -41,6 +42,49 @@
   COUPLING_COMMAND(dZZWpWm, ampjhutrip, 0.) \
   COUPLING_COMMAND(dZAWpWm, ampjhutrip, 0.) \
   COUPLING_COMMAND(dAAWpWm, ampjhutrip, 0.) \
+
+#define AMPLITUDE_JHUGEN_INCLUDE_TRIPLE_NEUTRAL_CURRENT_COUPLING_COMMANDS \
+  COUPLING_COMMAND(ghz1, ampjhutripnc, 0.) \
+  COUPLING_COMMAND(ghz1_prime2, ampjhutripnc, 0.) \
+  COUPLING_COMMAND(ghz2, ampjhutripnc, 0.) \
+  COUPLING_COMMAND(ghz4, ampjhutripnc, 0.) \
+  COUPLING_COMMAND(ghzgs1_prime2, ampjhutripnc, 0.) \
+  COUPLING_COMMAND(ghzgs2, ampjhutripnc, 0.) \
+  COUPLING_COMMAND(ghzgs4, ampjhutripnc, 0.) \
+  COUPLING_COMMAND(ghgsgs2, ampjhutripnc, 0.) \
+  COUPLING_COMMAND(ghgsgs4, ampjhutripnc, 0.) \
+  COUPLING_COMMAND(ghg2, ampjhutripnc, 0.) \
+  COUPLING_COMMAND(ghg4, ampjhutripnc, 0.) \
+  COUPLING_COMMAND(dV_Z, ampjhutripnc, 0.) \
+  COUPLING_COMMAND(dV_A, ampjhutripnc, 0.) \
+  COUPLING_COMMAND(dP_Z, ampjhutripnc, 0.) \
+  COUPLING_COMMAND(dP_A, ampjhutripnc, 0.) \
+  COUPLING_COMMAND(dM_Z, ampjhutripnc, 0.) \
+  COUPLING_COMMAND(dM_A, ampjhutripnc, 0.) \
+  COUPLING_COMMAND(dFour_Z, ampjhutripnc, 0.) \
+  COUPLING_COMMAND(dFour_A, ampjhutripnc, 0.) \
+  COUPLING_COMMAND(dZZWpWm, ampjhutripnc, 0.) \
+  COUPLING_COMMAND(dZAWpWm, ampjhutripnc, 0.) \
+  COUPLING_COMMAND(dAAWpWm, ampjhutripnc, 0.) \
+
+#define AMPLITUDE_JHUGEN_INCLUDE_TRIPLE_CHARGED_CURRENT_COUPLING_COMMANDS \
+  COUPLING_COMMAND(ghw1, ampjhutripcc, 0.) \
+  COUPLING_COMMAND(ghw1_prime2, ampjhutripcc, 0.) \
+  COUPLING_COMMAND(ghw2, ampjhutripcc, 0.) \
+  COUPLING_COMMAND(ghw4, ampjhutripcc, 0.) \
+  COUPLING_COMMAND(ghg2, ampjhutripcc, 0.) \
+  COUPLING_COMMAND(ghg4, ampjhutripcc, 0.) \
+  COUPLING_COMMAND(dV_Z, ampjhutripcc, 0.) \
+  COUPLING_COMMAND(dV_A, ampjhutripcc, 0.) \
+  COUPLING_COMMAND(dP_Z, ampjhutripcc, 0.) \
+  COUPLING_COMMAND(dP_A, ampjhutripcc, 0.) \
+  COUPLING_COMMAND(dM_Z, ampjhutripcc, 0.) \
+  COUPLING_COMMAND(dM_A, ampjhutripcc, 0.) \
+  COUPLING_COMMAND(dFour_Z, ampjhutripcc, 0.) \
+  COUPLING_COMMAND(dFour_A, ampjhutripcc, 0.) \
+  COUPLING_COMMAND(dZZWpWm, ampjhutripcc, 0.) \
+  COUPLING_COMMAND(dZAWpWm, ampjhutripcc, 0.) \
+  COUPLING_COMMAND(dAAWpWm, ampjhutripcc, 0.) \
 
 #define EFT_JHUGEN_COUPLING_COMMANDS \
   COUPLING_COMMAND(ghz1, eftjhu, 0.) \
@@ -128,6 +172,28 @@
   COUPLING_COMMAND(ghg2, ampjhu, 0.) \
   COUPLING_COMMAND(ghg4, ampjhu, 0.) \
 
+#define AMPLITUDE_JHUGEN_NEUTRAL_CURRENT_COUPLING_COMMANDS \
+  COUPLING_COMMAND(ghz1, ampjhunc, 0.) \
+  COUPLING_COMMAND(ghz1_prime2, ampjhunc, 0.) \
+  COUPLING_COMMAND(ghz2, ampjhunc, 0.) \
+  COUPLING_COMMAND(ghz4, ampjhunc, 0.) \
+  COUPLING_COMMAND(ghzgs1_prime2, ampjhunc, 0.) \
+  COUPLING_COMMAND(ghzgs2, ampjhunc, 0.) \
+  COUPLING_COMMAND(ghzgs4, ampjhunc, 0.) \
+  COUPLING_COMMAND(ghgsgs2, ampjhunc, 0.) \
+  COUPLING_COMMAND(ghgsgs4, ampjhunc, 0.) \
+  COUPLING_COMMAND(ghg2, ampjhunc, 0.) \
+  COUPLING_COMMAND(ghg4, ampjhunc, 0.) \
+
+#define AMPLITUDE_JHUGEN_CHARGED_CURRENT_COUPLING_COMMANDS \
+  COUPLING_COMMAND(ghw1, ampjhucc, 0.) \
+  COUPLING_COMMAND(ghw1_prime2, ampjhucc, 0.) \
+  COUPLING_COMMAND(ghw2, ampjhucc, 0.) \
+  COUPLING_COMMAND(ghw4, ampjhucc, 0.) \
+  COUPLING_COMMAND(ghg2, ampjhucc, 0.) \
+  COUPLING_COMMAND(ghg4, ampjhucc, 0.) \
+
+
 // This basis is for when user wants the output in higgs basis couplings with the triple gauge couplings included 
 #define HIGGSBASIS_INCLUDE_TRIPLE_COUPLING_COMMANDS \
   COUPLING_COMMAND(dCz, hbasistrip, 0.) \
@@ -196,9 +262,25 @@ namespace JHUGenLexiconCouplings{
     AMPLITUDE_JHUGEN_COUPLING_COMMANDS
     nAmplitude_JHUGen_CouplingTypes
   };
+  enum Amplitude_JHUGen_Charged_Current_CouplingType{
+    AMPLITUDE_JHUGEN_CHARGED_CURRENT_COUPLING_COMMANDS
+    nAmplitude_JHUGen_Charged_Current_CouplingTypes
+  };
+  enum Amplitude_JHUGen_Neutral_Current_CouplingType{
+    AMPLITUDE_JHUGEN_NEUTRAL_CURRENT_COUPLING_COMMANDS
+    nAmplitude_JHUGen_Neutral_Current_CouplingTypes
+  };
   enum Amplitude_JHUGen_Include_Triple_CouplingType{
     AMPLITUDE_JHUGEN_INCLUDE_TRIPLE_COUPLING_COMMANDS
     nAmplitude_JHUGen_Include_Triple_CouplingTypes
+  };
+  enum Amplitude_JHUGen_Include_Triple_Charged_Current_CouplingType{
+    AMPLITUDE_JHUGEN_INCLUDE_TRIPLE_CHARGED_CURRENT_COUPLING_COMMANDS
+    nAmplitude_JHUGen_Include_Triple_Charged_Current_CouplingTypes
+  };
+  enum Amplitude_JHUGen_Include_Triple_Neutral_Current_CouplingType{
+    AMPLITUDE_JHUGEN_INCLUDE_TRIPLE_NEUTRAL_CURRENT_COUPLING_COMMANDS
+    nAmplitude_JHUGen_Include_Triple_Neutral_Current_CouplingTypes
   };
   enum EFT_JHUGen_CouplingType{
     EFT_JHUGEN_COUPLING_COMMANDS
@@ -233,7 +315,11 @@ namespace JHUGenLexiconCouplings{
 
   // Functions to get the coupling names from the indices
   std::string getCouplingName(JHUGenLexiconCouplings::Amplitude_JHUGen_CouplingType type);
+  std::string getCouplingName(JHUGenLexiconCouplings::Amplitude_JHUGen_Charged_Current_CouplingType type);
+  std::string getCouplingName(JHUGenLexiconCouplings::Amplitude_JHUGen_Neutral_Current_CouplingType type);
   std::string getCouplingName(JHUGenLexiconCouplings::Amplitude_JHUGen_Include_Triple_CouplingType type);
+  std::string getCouplingName(JHUGenLexiconCouplings::Amplitude_JHUGen_Include_Triple_Charged_Current_CouplingType type);
+  std::string getCouplingName(JHUGenLexiconCouplings::Amplitude_JHUGen_Include_Triple_Neutral_Current_CouplingType type);
   std::string getCouplingName(JHUGenLexiconCouplings::EFT_JHUGen_CouplingType type);
   std::string getCouplingName(JHUGenLexiconCouplings::EFT_JHUGen_Include_Triple_CouplingType type);
   std::string getCouplingName(JHUGenLexiconCouplings::HiggsBasis_CouplingType type);
