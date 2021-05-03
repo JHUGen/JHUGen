@@ -1236,15 +1236,15 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "dZAWpWm", success, dZAWpWm, success2=SetATQGC, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
     call ReadCommandLineArgument(arg, "dZZWpWm", success, dZZWpWm, success2=SetATQGC, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
 
-    ! Zff couplings
-    call ReadCommandLineArgument(arg, "az_Lep_left",  success, az_Lep_left, success2=SetZff, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "az_Lep_right", success, az_Lep_right, success2=SetZff, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "az_Neu_left", success, az_Neu_left, success2=SetZff, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "az_Neu_right",success, az_Neu_right, success2=SetZff, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "az_QUp_left",  success, az_QUp_left, success2=SetZff, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "az_QUp_right", success, az_QUp_right, success2=SetZff, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "az_QDn_left",  success, az_QDn_left, success2=SetZff, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "az_QDn_right", success, az_QDn_right, success2=SetZff, checkdestchange=.true., tosave=tosave)
+    ! shift of Zff couplings
+    call ReadCommandLineArgument(arg, "daz_Lep_left",  success, daz_Lep_left, success2=SetZff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "daz_Lep_right", success, daz_Lep_right, success2=SetZff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "daz_Neu_left", success, daz_Neu_left, success2=SetZff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "daz_Neu_right",success, daz_Neu_right, success2=SetZff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "daz_QUp_left",  success, daz_QUp_left, success2=SetZff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "daz_QUp_right", success, daz_QUp_right, success2=SetZff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "daz_QDn_left",  success, daz_QDn_left, success2=SetZff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "daz_QDn_right", success, daz_QDn_right, success2=SetZff, checkdestchange=.true., tosave=tosave)
 
     ! CKM elements
     call ReadCommandLineArgument(arg, "Vud", success, VCKM_ud, success2=SetCKM, tosave=tosave)
@@ -6641,14 +6641,14 @@ character :: arg*(1000)
                endif
             endif
         endif
-        if( az_Lep_left.ne.0d0 )  write(TheUnit,"(6X,A,2E16.8)") "az_Lep_left=  ",az_Lep_left
-        if( az_Lep_right.ne.0d0 ) write(TheUnit,"(6X,A,2E16.8)") "az_Lep_right= ",az_Lep_right
-        if( az_Neu_left.ne.0d0 )  write(TheUnit,"(6X,A,2E16.8)") "az_Neu_left=  ",az_Neu_left
-        if( az_Neu_right.ne.0d0 ) write(TheUnit,"(6X,A,2E16.8)") "az_Neu_right= ",az_Neu_right
-        if( az_QUp_left.ne.0d0 )  write(TheUnit,"(6X,A,2E16.8)") "az_QUp_left=  ",az_QUp_left
-        if( az_QUp_right.ne.0d0 ) write(TheUnit,"(6X,A,2E16.8)") "az_QUp_right= ",az_QUp_right
-        if( az_QDn_left.ne.0d0 )  write(TheUnit,"(6X,A,2E16.8)") "az_QDn_left=  ",az_QDn_left
-        if( az_QDn_right.ne.0d0 ) write(TheUnit,"(6X,A,2E16.8)") "az_QDn_right= ",az_QDn_right
+        if( daz_Lep_left.ne.0d0 )  write(TheUnit,"(6X,A,2E16.8)") "daz_Lep_left=  ",daz_Lep_left
+        if( daz_Lep_right.ne.0d0 ) write(TheUnit,"(6X,A,2E16.8)") "daz_Lep_right= ",daz_Lep_right
+        if( daz_Neu_left.ne.0d0 )  write(TheUnit,"(6X,A,2E16.8)") "daz_Neu_left=  ",daz_Neu_left
+        if( daz_Neu_right.ne.0d0 ) write(TheUnit,"(6X,A,2E16.8)") "daz_Neu_right= ",daz_Neu_right
+        if( daz_QUp_left.ne.0d0 )  write(TheUnit,"(6X,A,2E16.8)") "daz_QUp_left=  ",daz_QUp_left
+        if( daz_QUp_right.ne.0d0 ) write(TheUnit,"(6X,A,2E16.8)") "daz_QUp_right= ",daz_QUp_right
+        if( daz_QDn_left.ne.0d0 )  write(TheUnit,"(6X,A,2E16.8)") "daz_QDn_left=  ",daz_QDn_left
+        if( daz_QDn_right.ne.0d0 ) write(TheUnit,"(6X,A,2E16.8)") "daz_QDn_right= ",daz_QDn_right
         
         if(includeVprime) then
             if( IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) then
