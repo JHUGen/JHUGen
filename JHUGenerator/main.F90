@@ -1237,14 +1237,14 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "dZZWpWm", success, dZZWpWm, success2=SetATQGC, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
 
     ! shift of Zff couplings
-    call ReadCommandLineArgument(arg, "daz_Lep_left",  success, daz_Lep_left, success2=SetZff, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "daz_Lep_right", success, daz_Lep_right, success2=SetZff, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "daz_Neu_left", success, daz_Neu_left, success2=SetZff, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "daz_Neu_right",success, daz_Neu_right, success2=SetZff, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "daz_QUp_left",  success, daz_QUp_left, success2=SetZff, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "daz_QUp_right", success, daz_QUp_right, success2=SetZff, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "daz_QDn_left",  success, daz_QDn_left, success2=SetZff, checkdestchange=.true., tosave=tosave)
-    call ReadCommandLineArgument(arg, "daz_QDn_right", success, daz_QDn_right, success2=SetZff, checkdestchange=.true., tosave=tosave)
+    call ReadCommandLineArgument(arg, "daz_Lep_left",  success, daz_Lep_left, success2=SetZff, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "daz_Lep_right", success, daz_Lep_right, success2=SetZff, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "daz_Neu_left", success, daz_Neu_left, success2=SetZff, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "daz_Neu_right",success, daz_Neu_right, success2=SetZff, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "daz_QUp_left",  success, daz_QUp_left, success2=SetZff, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "daz_QUp_right", success, daz_QUp_right, success2=SetZff, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "daz_QDn_left",  success, daz_QDn_left, success2=SetZff, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "daz_QDn_right", success, daz_QDn_right, success2=SetZff, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
 
     ! CKM elements
     call ReadCommandLineArgument(arg, "Vud", success, VCKM_ud, success2=SetCKM, tosave=tosave)
