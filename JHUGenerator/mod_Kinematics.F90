@@ -5910,7 +5910,11 @@ implicit none
 !print*,inv_mass(4),mass(4,1)
         jacobian4=1d0
       elseif(.not.hasInterference)then
-        inv_mass(4) = dsqrt(dabs(bw_sq(yRnd(12),mass(4,1), mass(4,2), (inv_mass(3)-inv_mass(5))**2, jacobian4)))
+        if( ghzgs2.ne.(0d0,0d0) .or. ghzgs4.ne.(0d0,0d0) .or. ghgsgs2.ne.(0d0,0d0) .or. ghgsgs4.ne.(0d0,0d0) ) then 
+				inv_mass(4) = dsqrt(dabs(bw_sq(yRnd(12),mass(4,1), mass(4,2)*50d0, (inv_mass(3)-inv_mass(5))**2, jacobian4)))
+		else
+				inv_mass(4) = dsqrt(dabs(bw_sq(yRnd(12),mass(4,1), mass(4,2), (inv_mass(3)-inv_mass(5))**2, jacobian4)))
+        endif
         jacobian4 = jacobian4 /16d0 /Pi**2 != (ds4/2pi)*(1/8pi)
       else
         inv_mass(4) = dsqrt(dabs(bw_sq(yRnd(12),mass(4,1), mass(4,2), (inv_mass(3)-inv_mass(5))**2, jacobian4)))

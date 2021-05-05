@@ -993,6 +993,16 @@ real(8), public, parameter :: Lambda2 = 1000d0    *GeV      ! for second resonan
   complex(8), public, parameter  :: c7 = (0d0,0d0) ! this coupling does not contribute to gamma+gamma final states
 
 
+! user Zff couplings
+   real(8), public :: daz_Lep_left  = (0d0)
+   real(8), public :: daz_Lep_right  = (0d0)
+   real(8), public :: daz_Neu_left  = (0d0)
+   real(8), public :: daz_Neu_right  = (0d0)
+   real(8), public :: daz_QUp_left  = (0d0)
+   real(8), public :: daz_QUp_right  = (0d0)
+   real(8), public :: daz_QDn_left  = (0d0)
+   real(8), public :: daz_QDn_right  = (0d0)
+
 !=====================================================
 
 !=====================================================
@@ -2789,6 +2799,17 @@ implicit none
    aL_QUp =2d0*(T3uL-QuL*xw)
    aR_QDn =2d0*(T3dR-QdR*xw)
    aL_QDn =2d0*(T3dL-QdL*xw)
+   
+   ! Zff couplings: adding user specified values (default 0.0) to SM values 
+   aL_lep = aL_lep + daz_Lep_left 
+   aR_lep = aR_lep + daz_Lep_right
+   aL_neu = aL_neu + daz_Neu_left
+   aR_neu = aR_neu + daz_Neu_right
+   aL_QUp = aL_QUp + daz_Qup_left
+   aR_Qup = aR_Qup + daz_Qup_right
+   aL_QDn = aL_QDn + daz_QDn_left
+   aR_QDn = aR_QDn + daz_QDn_right
+   
    ! W couplings
    bL = sqrt(2d0*(1d0-xw))
    bR = 0d0
@@ -2809,6 +2830,8 @@ implicit none
    couplAZff = -gwsq*sitW/2.0_dp/sqrt(1.0_dp-xw)
    couplAffsq = gwsq*xw
 
+
+   
 
 end subroutine ComputeEWVariables
 

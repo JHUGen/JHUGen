@@ -418,6 +418,7 @@ logical :: SetAnomalousHff, Setkappa
 logical :: SetAnomalousHffMCFM, SetAnomalousHffMCFM_mbot4gen, SetAnomalousHffMCFM_mtop4gen
 logical :: Setkappatop, Setkappabot, SetAnomalousSpin0gg4gen, Setkappa4gentop, Setkappa4genbot, Setkappa2top, Setkappa2bot, SetAnomalousSpin0Res2gg, Setkappa24gentop, Setkappa24genbot, SetAnomalousSpin0Res2gg4gen
 logical :: SetSpin0Res2VVcoupling
+logical :: SetZff
 logical :: SetZprimeff, SetWprimeff, SetHZprime, SetHWprime
 logical :: SetMZprime, SetGaZprime, SetMWprime, SetGaWprime
 logical :: SetATQGC
@@ -506,6 +507,7 @@ type(SaveValues) :: tosave, oldsavevalues
    SetAnomalousSpin0Res2gg=.false.
    SetAnomalousSpin0Res2gg4gen=.false.
 
+   SetZff=.false.
 
    SetHZprime=.false.
    SetZprimeff=.false.
@@ -1233,6 +1235,16 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "dAAWpWm", success, dAAWpWm, success2=SetATQGC, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
     call ReadCommandLineArgument(arg, "dZAWpWm", success, dZAWpWm, success2=SetATQGC, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
     call ReadCommandLineArgument(arg, "dZZWpWm", success, dZZWpWm, success2=SetATQGC, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
+
+    ! shift of Zff couplings
+    call ReadCommandLineArgument(arg, "daz_Lep_left",  success, daz_Lep_left, success2=SetZff, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "daz_Lep_right", success, daz_Lep_right, success2=SetZff, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "daz_Neu_left", success, daz_Neu_left, success2=SetZff, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "daz_Neu_right",success, daz_Neu_right, success2=SetZff, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "daz_QUp_left",  success, daz_QUp_left, success2=SetZff, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "daz_QUp_right", success, daz_QUp_right, success2=SetZff, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "daz_QDn_left",  success, daz_QDn_left, success2=SetZff, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
+    call ReadCommandLineArgument(arg, "daz_QDn_right", success, daz_QDn_right, success2=SetZff, checkdestchange=.true., tosave=tosave) !undocumented, pending chapter in manual
 
     ! CKM elements
     call ReadCommandLineArgument(arg, "Vud", success, VCKM_ud, success2=SetCKM, tosave=tosave)
@@ -2831,7 +2843,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
      VG = VG/dble(VegasNc0)
      csmax   = 1.5d0*csmax    !  adjustment factors, can be choosen  separately channel/by/channel
 
-
+     print *, " Cross section = ",sum(VG), "fb"
 
 !        print *, " gg/qqb ratio = ", VG(0,0)/(VG(+1,-1) + VG(+2,-2) + VG(+3,-3) + VG(+4,-4) + VG(+5,-5)   &
 !                                             +VG(-1,+1) + VG(-2,+2) + VG(-3,+3) + VG(-4,+4) + VG(-5,+5))
@@ -5687,9 +5699,9 @@ integer :: AllocStatus,NHisto
           Histo(1)%SetScale= 1d0/GeV
 
           Histo(2)%Info   = "m(ll)"
-          Histo(2)%NBins  = 80
-          Histo(2)%BinSize= 20d0*GeV/80d0
-          Histo(2)%LowVal = 75d0*GeV
+          Histo(2)%NBins  = 200
+          Histo(2)%BinSize= 200d0*GeV/200d0
+          Histo(2)%LowVal = 0d0*GeV
           Histo(2)%SetScale= 1d0/GeV
 
           Histo(3)%Info   = "pt(V)"
@@ -6629,6 +6641,15 @@ character :: arg*(1000)
                endif
             endif
         endif
+        if( daz_Lep_left.ne.0d0 )  write(TheUnit,"(6X,A,2E16.8)") "daz_Lep_left=  ",daz_Lep_left
+        if( daz_Lep_right.ne.0d0 ) write(TheUnit,"(6X,A,2E16.8)") "daz_Lep_right= ",daz_Lep_right
+        if( daz_Neu_left.ne.0d0 )  write(TheUnit,"(6X,A,2E16.8)") "daz_Neu_left=  ",daz_Neu_left
+        if( daz_Neu_right.ne.0d0 ) write(TheUnit,"(6X,A,2E16.8)") "daz_Neu_right= ",daz_Neu_right
+        if( daz_QUp_left.ne.0d0 )  write(TheUnit,"(6X,A,2E16.8)") "daz_QUp_left=  ",daz_QUp_left
+        if( daz_QUp_right.ne.0d0 ) write(TheUnit,"(6X,A,2E16.8)") "daz_QUp_right= ",daz_QUp_right
+        if( daz_QDn_left.ne.0d0 )  write(TheUnit,"(6X,A,2E16.8)") "daz_QDn_left=  ",daz_QDn_left
+        if( daz_QDn_right.ne.0d0 ) write(TheUnit,"(6X,A,2E16.8)") "daz_QDn_right= ",daz_QDn_right
+        
         if(includeVprime) then
             if( IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) then
                 if(M_Zprime.ge.0d0) then

@@ -30,7 +30,7 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
  integer, pointer :: ijSel(:,:)
  integer :: NumPartonicChannels,iPartChannel,PartChannelAvg,flav1,flav2,ID_DK(6:9)
  real(8) :: EHat,PSWgt,PSWgt2,PSWgt3,ML1,ML2,ML3,ML4,MZ1,MZ2
- real(8) :: MomExt(1:4,1:8),MomDK(1:4,1:4),xRnd
+ real(8) :: MomExt(1:4,1:8),MomDK(1:4,1:4),xRnd,FudgeFactor
  logical :: applyPSCut
  include 'vegas_common.f'
 
@@ -40,6 +40,7 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
     EvalWeighted = 0d0
     m1ffwgt = 1d0 ! Multiplicative factor
     m2ffwgt = 1d0 ! Multiplicative factor
+    FudgeFactor = 8d0
 
     if( OffShellReson ) then
       call PDFMapping(10,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
@@ -169,9 +170,13 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
    call EvalAlphaS()
    call setPDFs(eta1,eta2,pdf)
 
+   if( DecayMode1.ne.DecayMode2 ) FudgeFactor = FudgeFactor * 2d0
+   if( IsAWDecay(DecayMode1) .and. IsAWDecay(DecayMode2) ) FudgeFactor = FudgeFactor * 2d0
+   if( IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) ) FudgeFactor = FudgeFactor * 1d0
+
    FluxFac = 1d0/(2d0*EHat**2)
    PDFFac = pdf(LHA2M_pdf(iPart_sel),1)  *  pdf(LHA2M_pdf(jPart_sel),2)
-   PreFac = hbarc2XsecUnit * FluxFac * sHatJacobi * PSWgt * PDFFac * VgsWgt * PartChannelAvg * FinalStateWeight
+   PreFac = hbarc2XsecUnit * FluxFac * sHatJacobi * PSWgt * PDFFac * VgsWgt * PartChannelAvg * FinalStateWeight * FudgeFactor
 
    !print *,"Mom1: ",MomExt(1:4,1)
    !print *,"Mom2: ",MomExt(1:4,2)
