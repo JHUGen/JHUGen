@@ -995,13 +995,13 @@ real(8), public, parameter :: Lambda2 = 1000d0    *GeV      ! for second resonan
 
 ! user Zff couplings
    real(8), public :: daz_Lep_left  = (0d0)
-   real(8), public :: daz_Lep_right = (0d0)
+   real(8), public :: daz_Lep_right  = (0d0)
    real(8), public :: daz_Neu_left  = (0d0)
-   real(8), public :: daz_Neu_right = (0d0)
+   real(8), public :: daz_Neu_right  = (0d0)
    real(8), public :: daz_QUp_left  = (0d0)
-   real(8), public :: daz_QUp_right = (0d0)
+   real(8), public :: daz_QUp_right  = (0d0)
    real(8), public :: daz_QDn_left  = (0d0)
-   real(8), public :: daz_QDn_right = (0d0)
+   real(8), public :: daz_QDn_right  = (0d0)
 
 !=====================================================
 
