@@ -28,7 +28,7 @@ Manual for the JHU generator and MELA package
 \begin{center}
 \small
 For simulation, reweighting, and analysis of single-produced resonances at hadron colliders \\
-(version v7.5.0, release date June 25, 2021) \\
+(version v7.5.0, release date June 10, 2021) \\
 \normalsize
 \end{center}
 
@@ -115,7 +115,22 @@ using effective field theory coefficients of the mass-eigenstate basis \cite{deF
 +  \tilde c_{gg} {g_s^2 \over 4} G_{\mu \nu}^a \tilde G_{\mu \nu}^a  
 \right ],
 \end{eqnarray} 
-in accordance with Eq.~(II.2.20) in Ref.~\cite{deFlorian:2016spz}.
+in accordance with Eq.~(II.2.20) in Ref.~\cite{deFlorian:2016spz}, where $e^2=4\pi \alpha$ and $g_s^2= 4\pi \alpha_s$ are the squared electromagnetic and strong coupling constants, 
+respectively, and $s_w=\sqrt{1-c_w^2}$ is the sine of the weak mixing angle. 
+The covariant derivative used to derive this expression is 
+$D_\mu = \partial_\mu -\mathrm{i} \frac{e}{2 s_w} \sigma^i W_\mu^i - \mathrm{i} \frac{e}{2 c_w} B_\mu$~\cite{deFlorian:2016spz, Falkowski:2001958}.  
+We note that the convention $\varepsilon_{0123}=+1$ defines the relative sign of the $CP$-odd $\tilde{c}_i$ and 
+$CP$-even ${c}_i$ couplings~\cite{Gritsan:2020pib}, while the relative sign in front of the $W_\mu^i$ and $B_\mu$ terms 
+in the covariant derivative defines the sign of the $Z\gamma$ couplings relative to the $ZZ$ and $\gamma\gamma$. 
+The latter could be viewed as the sign of $s_w$, should a different convention be adopted.
+In the actual parameterization of the \textsc{JHUGen} framework documented here
+and in Refs.~\cite{Gao:2010qx,Bolognesi:2012,Anderson:2013,Gritsan:2016hjl,Gritsan:2020pib,Martini:2021uey} 
+% \cite{Gao:2010qx,Bolognesi:2012mm,Anderson:2013afp,Gritsan:2016hjl,Gritsan:2020pib,Martini:2021uey}, 
+the $D_\mu = \partial_\mu -\mathrm{i} \frac{e}{2 s_w} \sigma^i W_\mu^i + \mathrm{i} \frac{e}{2 c_w} B_\mu$
+convention was adopted for historical reasons. A transformation $g_i^{Z\gamma}\to -g_i^{Z\gamma}$ or $\kappa_i^{Z\gamma}\to -\kappa_i^{Z\gamma}$
+of the input parameters in this framework would lead to the convention 
+$D_\mu = \partial_\mu -\mathrm{i} \frac{e}{2 s_w} \sigma^i W_\mu^i - \mathrm{i} \frac{e}{2 c_w} B_\mu$,
+which is needed for consistent application of the formalism discussed in this section on notation. 
 
 There is unique representation of each EFT coefficient in Eq.~(\ref{eq:EFT_hvv}) by couplings in Eq.~(\ref{eq:HVV}),
 as shown below:
@@ -691,19 +706,19 @@ but none of the jobs in the the second set can start until all jobs in the first
 \begin{enumerate}
 	\item Grid generation (\verb|VBFoffsh=1..164|):
 	\begin{itemize}
-		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=1}
-		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=2}
-		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=3}
-		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=4}
-		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=5}
+		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 ReweightInterf=0 ghz1=1d0,0d0 VBFoffsh\_run=1}
+		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 ReweightInterf=0 ghz1=1d0,0d0 VBFoffsh\_run=2}
+		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 ReweightInterf=0 ghz1=1d0,0d0 VBFoffsh\_run=3}
+		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 ReweightInterf=0 ghz1=1d0,0d0 VBFoffsh\_run=4}
+		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 ReweightInterf=0 ghz1=1d0,0d0 VBFoffsh\_run=5}
 	\end{itemize}
 	\item Event generation, which can only begin after all previous jobs have ended:
 	\begin{itemize}
-		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=1 VegasNc2=10000 ReadCSmax}
-		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=2 VegasNc2=10000 ReadCSmax}
-		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=3 VegasNc2=10000 ReadCSmax}
-		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=4 VegasNc2=10000 ReadCSmax}
-		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=5 VegasNc2=10000 ReadCSmax}
+		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 ReweightInterf=0 ghz1=1d0,0d0 VBFoffsh\_run=1 VegasNc2=10000 ReadCSmax}
+		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 ReweightInterf=0 ghz1=1d0,0d0 VBFoffsh\_run=2 VegasNc2=10000 ReadCSmax}
+		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 ReweightInterf=0 ghz1=1d0,0d0 VBFoffsh\_run=3 VegasNc2=10000 ReadCSmax}
+		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 ReweightInterf=0 ghz1=1d0,0d0 VBFoffsh\_run=4 VegasNc2=10000 ReadCSmax}
+		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 ReweightInterf=0 ghz1=1d0,0d0 VBFoffsh\_run=5 VegasNc2=10000 ReadCSmax}
 	\end{itemize}
 \end{enumerate}
 
