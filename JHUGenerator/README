@@ -42,6 +42,7 @@ Command line parameters for quick reference:
                          represent f=(nu; e, mu; d, u, s, c, b). In order to have a
                          V->f1 f2 decay, please specify the decay mode as -p1*p2
                          for the p1 and p2 that match f1 and f2.
+                         (Note: negative DecayMode is in beta development mode in this version)
     Interf:            0=neglect interference for 4f final states,
                        1=include interference
     ReweightInterf:    if true, include interference as LHE event weights for
