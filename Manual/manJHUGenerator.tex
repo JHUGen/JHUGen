@@ -86,34 +86,35 @@ in the rest of this manual.
 
 The parameterization of the amplitude in Eq.~(\ref{eq:HVV}) can be related to a fundamental Lagrange density function,
 using effective field theory coefficients of the mass-eigenstate basis \cite{deFlorian:2016spz}:
+%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{eqnarray}
 \label{eq:EFT_hvv}
  {\cal L}_{\rm hvv} =& & {h \over v} \left [ 
-  \left (1 +  \delta c_z \right )  {(g^2+g^{\prime 2}) v^2 \over 4} Z_\mu Z_\mu
-+ c_{zz} {g^2 + g'{}^2 \over  4} Z_{\mu \nu} Z_{\mu\nu}  
-+c_{z \Box} g^2 Z_\mu \partial_\nu Z_{\mu \nu}
-+ \tilde c_{zz}  {g^2 + g'{}^2  \over  4} Z_{\mu \nu} \tilde Z_{\mu\nu}
+  M_Z^2 \left (1 +  \delta c_z \right )   Z_\mu Z^\mu
++ \frac{M_Z^2}{v^2} c_{zz} Z_{\mu \nu} Z^{\mu\nu}  
++ \frac{e^2}{s_w^2} c_{z \Box} Z_\mu \partial_\nu Z^{\mu \nu}
++ \frac{M_Z^2}{v^2} \tilde c_{zz}  Z^{\mu \nu} \tilde Z_{\mu\nu}
 \right . \nonumber \\ & & \left . 
 % 
 % 
- +\left (1 +  \delta c_w \right )  {g^2 v^2 \over 2} W_\mu^+ W_\mu^- 
-+ c_{ww}  {g^2 \over  2} W_{\mu \nu}^+  W_{\mu\nu}^- 
-+ c_{w \Box} g^2 \left (W_\mu^- \partial_\nu W_{\mu \nu}^+ + {\mathrm h.c.} \right )  
- + \tilde c_{ww}  {g^2 \over  2} W_{\mu \nu}^+   \tilde W_{\mu\nu}^- 
+ +2 M_W^2 \left (1 +  \delta c_w \right ) W_\mu^+ W^{-\mu} 
++ 2 \frac{M_W^2}{v^2} c_{ww}  W_{\mu \nu}^+  W^{-\mu\nu} 
++ \frac{e^2}{s_w^2} c_{w \Box} \left (W_\mu^- \partial_\nu W^{+\mu \nu} + {\mathrm h.c.} \right )  
+ + \frac{e^2}{2 s_w^2} \tilde c_{ww}  W^{+\mu \nu}   \tilde W_{\mu\nu}^- 
  \right . \nonumber \\ & & \left . 
 % 
 % 
-+ c_{z \gamma} {e \sqrt{g^2 + g'{}^2}  \over  2} Z_{\mu \nu} A_{\mu\nu} 
-+ \tilde c_{z \gamma} {e \sqrt{g^2 + g'{}^2} \over  2} Z_{\mu \nu} \tilde A_{\mu\nu}
-+ c_{\gamma \Box} g g' Z_\mu \partial_\nu A_{\mu \nu}
++ \frac{e^2}{2 s_w c_w} c_{z \gamma}  Z_{\mu \nu} A^{\mu\nu} 
++ \frac{e^2}{2 s_w c_w} \tilde c_{z \gamma} Z_{\mu \nu} \tilde A^{\mu\nu}
++ \frac{e^2}{s_w c_w} c_{\gamma \Box}  Z_\mu \partial_\nu A^{\mu \nu}
 \right . \nonumber \\ & & \left . 
 % 
 % 
-+ c_{\gamma \gamma} {e^2 \over 4} A_{\mu \nu} A_{\mu \nu} 
-+ \tilde c_{\gamma \gamma} {e^2 \over 4} A_{\mu \nu} \tilde A_{\mu \nu} 
-+  c_{gg} {g_s^2 \over 4 } G_{\mu \nu}^a G_{\mu \nu}^a   
-+  \tilde c_{gg} {g_s^2 \over 4} G_{\mu \nu}^a \tilde G_{\mu \nu}^a  
-\right ],
++ c_{\gamma \gamma} {e^2 \over 4} A_{\mu \nu} A^{\mu \nu} 
++ \tilde c_{\gamma \gamma} {e^2 \over 4} A^{\mu \nu} \tilde A_{\mu \nu} 
++  c_{gg} {g_s^2 \over 4 } G_{\mu \nu}^a G^{a \mu \nu}   
++  \tilde c_{gg} {g_s^2 \over 4} G^{a\mu \nu} \tilde G_{\mu \nu}^a  
+\right ]\,,
 \end{eqnarray} 
 in accordance with Eq.~(II.2.20) in Ref.~\cite{deFlorian:2016spz}, where $e^2=4\pi \alpha$ and $g_s^2= 4\pi \alpha_s$ are the squared electromagnetic and strong coupling constants, 
 respectively, and $s_w=\sqrt{1-c_w^2}$ is the sine of the weak mixing angle. 
