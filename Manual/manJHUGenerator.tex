@@ -28,14 +28,14 @@ Manual for the JHU generator and MELA package
 \begin{center}
 \small
 For simulation, reweighting, and analysis of single-produced resonances at hadron colliders \\
-(version v7.4.0, release date July 4, 2020) \\
+(version v7.5.0, release date July 10, 2021) \\
 \normalsize
 \end{center}
 
 \noindent
-The generator from \cite{Gao:2010qx,Bolognesi:2012,Anderson:2013,Gritsan:2016,Gritsan:2020pib} 
+The generator from \cite{Gao:2010qx,Bolognesi:2012,Anderson:2013,Gritsan:2016hjl,Gritsan:2020pib,Martini:2021uey} 
 is a model-independent generator for studying spin-parity properties of new resonances, including the Higgs boson(s). 
-Please cite \cite{Gao:2010qx,Bolognesi:2012,Anderson:2013,Gritsan:2016,Gritsan:2020pib} 
+Please cite \cite{Gao:2010qx,Bolognesi:2012,Anderson:2013,Gritsan:2016hjl,Gritsan:2020pib,Martini:2021uey} 
 if using the ``JHU generator'' (or JHUGen). The code can be downloaded from \cite{thesite}.
 The generator outputs LHE files which can be passed to parton shower programs for hadronization.
 Only relative values of cross sections are supposed to produce meaningful results, 
@@ -65,7 +65,7 @@ which includes an interface to the generator and matrix element library and can 
 
 \section{Notation}
 
-The notation has been set in Refs.~\cite{Gao:2010qx,Bolognesi:2012,Anderson:2013,Gritsan:2016} ,
+The notation has been set in Refs.~\cite{Gao:2010qx,Bolognesi:2012,Anderson:2013,Gritsan:2016hjl,Gritsan:2020pib},
 the $HVV$ scattering amplitude of a spin-zero boson $H$ and two vector bosons with polarization vectors 
 $\varepsilon_{1}^\mu(q_1)$ and $\varepsilon_{2}^\mu(q_2)$
 is parameterized by
@@ -76,7 +76,7 @@ is parameterized by
 + \frac{2 q_1\cdot q_2}{M_V^2} g_2^{VV}\bigg) (\varepsilon_1 \cdot \varepsilon_2) 
 \nonumber \\ &&
                         -2 g_2^{VV} \, {(\varepsilon_1 \cdot q_2)(\varepsilon_2 \cdot q_1)}
-                        -2  g_4^{VV} \, {\varepsilon^{\varepsilon_1\,\varepsilon_2\,q_1\,q_2}}
+                        -2  g_4^{VV} \, {\varepsilon_{\varepsilon_1\,\varepsilon_2\,q_1\,q_2}}
                                \bigg\}.
 \label{eq:HVV}
 \end{eqnarray}
@@ -85,37 +85,53 @@ The couplings used in Eq.~(\ref{eq:HVV}) are the direct input to the JHU generat
 in the rest of this manual. 
 
 The parameterization of the amplitude in Eq.~(\ref{eq:HVV}) can be related to a fundamental Lagrange density function,
-using effective field theory coefficients of the so-called Higgs basis \cite{deFlorian:2016spz}:
+using effective field theory coefficients of the mass-eigenstate basis \cite{deFlorian:2016spz}:
+%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{eqnarray}
 \label{eq:EFT_hvv}
  {\cal L}_{\rm hvv} =& & {h \over v} \left [ 
-  \left (1 +  \delta c_z \right )  {(g^2+g^{\prime 2}) v^2 \over 4} Z_\mu Z_\mu
-+ c_{zz} {g^2 + g'{}^2 \over  4} Z_{\mu \nu} Z_{\mu\nu}  
-+c_{z \Box} g^2 Z_\mu \partial_\nu Z_{\mu \nu}
-+ \tilde c_{zz}  {g^2 + g'{}^2  \over  4} Z_{\mu \nu} \tilde Z_{\mu\nu}
+  M_Z^2 \left (1 +  \delta c_z \right )   Z_\mu Z^\mu
++ \frac{M_Z^2}{v^2} c_{zz} Z_{\mu \nu} Z^{\mu\nu}  
++ \frac{e^2}{s_w^2} c_{z \Box} Z_\mu \partial_\nu Z^{\mu \nu}
++ \frac{M_Z^2}{v^2} \tilde c_{zz}  Z^{\mu \nu} \tilde Z_{\mu\nu}
 \right . \nonumber \\ & & \left . 
 % 
 % 
- +\left (1 +  \delta c_w \right )  {g^2 v^2 \over 2} W_\mu^+ W_\mu^- 
-+ c_{ww}  {g^2 \over  2} W_{\mu \nu}^+  W_{\mu\nu}^- 
-+ c_{w \Box} g^2 \left (W_\mu^- \partial_\nu W_{\mu \nu}^+ + {\mathrm h.c.} \right )  
- + \tilde c_{ww}  {g^2 \over  2} W_{\mu \nu}^+   \tilde W_{\mu\nu}^- 
+ +2 M_W^2 \left (1 +  \delta c_w \right ) W_\mu^+ W^{-\mu} 
++ 2 \frac{M_W^2}{v^2} c_{ww}  W_{\mu \nu}^+  W^{-\mu\nu} 
++ \frac{e^2}{s_w^2} c_{w \Box} \left (W_\mu^- \partial_\nu W^{+\mu \nu} + {\mathrm h.c.} \right )  
+ + \frac{e^2}{2 s_w^2} \tilde c_{ww}  W^{+\mu \nu}   \tilde W_{\mu\nu}^- 
  \right . \nonumber \\ & & \left . 
 % 
 % 
-+ c_{z \gamma} {e \sqrt{g^2 + g'{}^2}  \over  2} Z_{\mu \nu} A_{\mu\nu} 
-+ \tilde c_{z \gamma} {e \sqrt{g^2 + g'{}^2} \over  2} Z_{\mu \nu} \tilde A_{\mu\nu}
-+ c_{\gamma \Box} g g' Z_\mu \partial_\nu A_{\mu \nu}
++ \frac{e^2}{2 s_w c_w} c_{z \gamma}  Z_{\mu \nu} A^{\mu\nu} 
++ \frac{e^2}{2 s_w c_w} \tilde c_{z \gamma} Z_{\mu \nu} \tilde A^{\mu\nu}
++ \frac{e^2}{s_w c_w} c_{\gamma \Box}  Z_\mu \partial_\nu A^{\mu \nu}
 \right . \nonumber \\ & & \left . 
 % 
 % 
-+ c_{\gamma \gamma} {e^2 \over 4} A_{\mu \nu} A_{\mu \nu} 
-+ \tilde c_{\gamma \gamma} {e^2 \over 4} A_{\mu \nu} \tilde A_{\mu \nu} 
-+  c_{gg} {g_s^2 \over 4 } G_{\mu \nu}^a G_{\mu \nu}^a   
-+  \tilde c_{gg} {g_s^2 \over 4} G_{\mu \nu}^a \tilde G_{\mu \nu}^a  
-\right ],
++ c_{\gamma \gamma} {e^2 \over 4} A_{\mu \nu} A^{\mu \nu} 
++ \tilde c_{\gamma \gamma} {e^2 \over 4} A^{\mu \nu} \tilde A_{\mu \nu} 
++  c_{gg} {g_s^2 \over 4 } G_{\mu \nu}^a G^{a \mu \nu}   
++  \tilde c_{gg} {g_s^2 \over 4} G^{a\mu \nu} \tilde G_{\mu \nu}^a  
+\right ]\,,
 \end{eqnarray} 
-in accordance with Eq.~(II.2.20) in Ref.~\cite{deFlorian:2016spz}.
+in accordance with Eq.~(II.2.20) in Ref.~\cite{deFlorian:2016spz}, where $e^2=4\pi \alpha$ and $g_s^2= 4\pi \alpha_s$ are the squared electromagnetic and strong coupling constants, 
+respectively, and $s_w=\sqrt{1-c_w^2}$ is the sine of the weak mixing angle. 
+The covariant derivative used to derive this expression is 
+$D_\mu = \partial_\mu -\mathrm{i} \frac{e}{2 s_w} \sigma^i W_\mu^i - \mathrm{i} \frac{e}{2 c_w} B_\mu$~\cite{deFlorian:2016spz, Falkowski:2001958}.  
+We note that the convention $\varepsilon_{0123}=+1$ defines the relative sign of the $CP$-odd $\tilde{c}_i$ and 
+$CP$-even ${c}_i$ couplings~\cite{Gritsan:2020pib}, while the relative sign in front of the $W_\mu^i$ and $B_\mu$ terms 
+in the covariant derivative defines the sign of the $Z\gamma$ couplings relative to the $ZZ$ and $\gamma\gamma$. 
+The latter could be viewed as the sign of $s_w$, should a different convention be adopted.
+In the actual parameterization of the \textsc{JHUGen} framework documented here
+and in Refs.~\cite{Gao:2010qx,Bolognesi:2012,Anderson:2013,Gritsan:2016hjl,Gritsan:2020pib,Martini:2021uey} 
+% \cite{Gao:2010qx,Bolognesi:2012mm,Anderson:2013afp,Gritsan:2016hjl,Gritsan:2020pib,Martini:2021uey}, 
+the $D_\mu = \partial_\mu -\mathrm{i} \frac{e}{2 s_w} \sigma^i W_\mu^i + \mathrm{i} \frac{e}{2 c_w} B_\mu$
+convention was adopted for historical reasons. A transformation $g_i^{Z\gamma}\to -g_i^{Z\gamma}$ or $\kappa_i^{Z\gamma}\to -\kappa_i^{Z\gamma}$
+of the input parameters in this framework would lead to the convention 
+$D_\mu = \partial_\mu -\mathrm{i} \frac{e}{2 s_w} \sigma^i W_\mu^i - \mathrm{i} \frac{e}{2 c_w} B_\mu$,
+which is needed for consistent application of the formalism discussed in this section on notation. 
 
 There is unique representation of each EFT coefficient in Eq.~(\ref{eq:EFT_hvv}) by couplings in Eq.~(\ref{eq:HVV}),
 as shown below:
@@ -179,7 +195,7 @@ Enforcing linear relations for the dependent coefficients~\cite{deFlorian:2016sp
 Automatic relationship of couplings in the EFT approach discussed here is not implemented directly in the generator, 
 but could be obtained with a script following the formulas above. 
 There is a one-to-one correspondence of the couplings used in the generator settings in Eq.~(\ref{eq:HVV}) 
-and the couplings used in the Higgs basis~\cite{deFlorian:2016spz}. 
+and the couplings used in the other bases (e.g. Higgs, Warsaw, SILH)~\cite{deFlorian:2016spz}. 
 \\
 
 
@@ -488,6 +504,7 @@ This is the list of command line configurables (also defined in the \verb|README
                          represent f=(nu; e, mu; d, u, s, c, b). In order to have a
                          V->f1 f2 decay, please specify the decay mode as -p1*p2
                          for the p1 and p2 that match f1 and f2.
+                         (Note: negative DecayMode is in beta development mode in this version)
     Interf:            0=neglect interference for 4f final states,
                        1=include interference
     ReweightInterf:    if true, include interference as LHE event weights for
@@ -690,19 +707,19 @@ but none of the jobs in the the second set can start until all jobs in the first
 \begin{enumerate}
 	\item Grid generation (\verb|VBFoffsh=1..164|):
 	\begin{itemize}
-		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=1}
-		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=2}
-		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=3}
-		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=4}
-		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=5}
+		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 ReweightInterf=0 ghz1=1d0,0d0 VBFoffsh\_run=1}
+		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 ReweightInterf=0 ghz1=1d0,0d0 VBFoffsh\_run=2}
+		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 ReweightInterf=0 ghz1=1d0,0d0 VBFoffsh\_run=3}
+		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 ReweightInterf=0 ghz1=1d0,0d0 VBFoffsh\_run=4}
+		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 ReweightInterf=0 ghz1=1d0,0d0 VBFoffsh\_run=5}
 	\end{itemize}
 	\item Event generation, which can only begin after all previous jobs have ended:
 	\begin{itemize}
-		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=1 VegasNc2=10000 ReadCSmax}
-		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=2 VegasNc2=10000 ReadCSmax}
-		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=3 VegasNc2=10000 ReadCSmax}
-		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=4 VegasNc2=10000 ReadCSmax}
-		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 Interf=0 ghz1=1d0,0d0 VBFoffsh\_run=5 VegasNc2=10000 ReadCSmax}
+		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 ReweightInterf=0 ghz1=1d0,0d0 VBFoffsh\_run=1 VegasNc2=10000 ReadCSmax}
+		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 ReweightInterf=0 ghz1=1d0,0d0 VBFoffsh\_run=2 VegasNc2=10000 ReadCSmax}
+		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 ReweightInterf=0 ghz1=1d0,0d0 VBFoffsh\_run=3 VegasNc2=10000 ReadCSmax}
+		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 ReweightInterf=0 ghz1=1d0,0d0 VBFoffsh\_run=4 VegasNc2=10000 ReadCSmax}
+		\item \texttt{./JHUGen Process=68 deltaRcut=0.3 pTjetcut=10 mJJcut=70 m4l\_min=70 m4l\_max=13000 VegasNc0=10000000 ReweightInterf=0 ghz1=1d0,0d0 VBFoffsh\_run=5 VegasNc2=10000 ReadCSmax}
 	\end{itemize}
 \end{enumerate}
 
@@ -804,8 +821,8 @@ The general syntax is:
 \item \verb|zprime_qq_left|, \verb|zprime_qq_right|, \verb|zprime_zz_1|, and \verb|zprime_zz_2| for spin 1
 \item \verb|aX|, \verb|bX|, \verb|graviton_qq_left|, \verb|and graviton_qq_right| for spin 2 (see the list for the range of X)
 \item The $Hff$ couplings \verb|kappa| and \verb|kappa_tilde| and variants
-\item The $Zff$ couplings $a^f_\mathrm{L,R}$ in Eq.~(\ref{eq:def:Zff}) can be modified with \verb|az_Lep_left, az_Lep_right|, \verb|az_Neu_left, az_Neu_right|, 
-\verb|az_QUp_left, az_QUp_right| and \verb|az_QDn_left, az_QDn_right|.
+\item The $Zff$ couplings $a^f_\mathrm{L,R}$ in Eq.~(\ref{eq:def:Zff}) can be modified with corrections to their SM values as \verb|daz_Lep_left, az_Lep_right|, \verb|daz_Neu_left, az_Neu_right|, \verb|daz_QUp_left, daz_QUp_right| and \verb|daz_QDn_left, daz_QDn_right|.
+For example,  $a^\ell_\mathrm{L}$ is set as \verb|aL_lep| +  \verb|daz_Lep_left|
 \end{itemize}
 Except for the form factors (\verb|cz_qXsq|, \verb|Lambda_zXY|, and their $WW$ equivalents), the couplings are complex, and must be set with a comma between the real and imaginary parts.  For example:
 \begin{verbatim}
@@ -1347,13 +1364,14 @@ Lambda_z1=100 Lambda_w1=100 Lambda_zgs1=100
 
 \section{Release notes}
 \noindent
-In going from \verb|v7.4.0| to \verb|v7.4.1| (April, 2021), the updates are as follows:
+In going from \verb|v7.4.0| to \verb|v7.5.0| (July 10, 2021), the updates are as follows:
 \begin{itemize}
 \item Add Processes 115,116,117: $pp\to tHW$
+\item Flexible parameterization of Zff couplings as corrections of the SM values 
 \item Optimize $VH$ processes 
 \item Cross section calibration in $gg\to H$ Process 0
-% \item update DecayMode symmetry factors and relative cross sections 
-% \item expand JHUGenLexicon with more options 
+\item Update DecayMode symmetry factors and relative cross sections (negative DecayMode in beta)
+\item Expand JHUGenLexicon with more options 
 \end{itemize}
 \noindent
 In going from \verb|v7.3.0| to \verb|v7.4.0| (July 4, 2020), the updates are as follows:
@@ -1614,16 +1632,21 @@ If an exclusive production mode is desired (e.g. $q\bar{q}$ or $gg$), this is ha
 \verb|a5=1,0 b8=1,0|
 \begin{thebibliography}{99}
 \bibitem{Gao:2010qx}
-Y.Y. Gao, A. V. Gritsan, Z.J. Guo, K. Melnikov, M. Schulze and N. V. Tran, ``Spin-Determination of Single-Produced Resonances at Hadron Colliders''. Phys. Rev. D \textbf{81}, 075022 (2010). arXiv:1001.3396 [hep-ph].
+Y.Y. Gao, A. V. Gritsan, Z.J. Guo, K. Melnikov, M. Schulze and N. V. Tran, ``Spin-Determination of Single-Produced Resonances at Hadron Colliders.'' Phys. Rev. D \textbf{81}, 075022 (2010). arXiv:1001.3396 [hep-ph].
 \bibitem{Bolognesi:2012}
-S. Bolognesi, Y.Y. Gao, A. V. Gritsan, K. Melnikov, M. Schulze, N. V. Tran and A. Whitbeck, ``On the Spin and Parity of Single-Produced Resonance at the LHC''. Phys. Rev. D \textbf{86}, 095031 (2012). arXiv:1208.4018 [hep-ph].
+S. Bolognesi, Y.Y. Gao, A. V. Gritsan, K. Melnikov, M. Schulze, N. V. Tran and A. Whitbeck, ``On the Spin and Parity of Single-Produced Resonance at the LHC.'' Phys. Rev. D \textbf{86}, 095031 (2012). arXiv:1208.4018 [hep-ph].
 \bibitem{Anderson:2013}
-I. Anderson, S. Bolognesi, F. Caola, Y.Y. Gao, A. V. Gritsan, C. B. Martin, K. Melnikov, M. Schulze, N. V. Tran, A. Whitbeck, Y. Zhou, ``Constraining anomalous HVV interactions at proton and lepton colliders''. Phys. Rev. D \textbf{89}, 035007 (2014). arXiv:1309.4819 [hep-ph].
-\bibitem{Gritsan:2016}
-A. V. Gritsan, R. R\"ontsch, M. Schulze, M. Xiao, ``Constraining anomalous Higgs boson couplings to the heavy flavor fermions using matrix element techniques''. Phys. Rev. D \textbf{94} (2016) 055023. arXiv:1606.03107 [hep-ph].
+I. Anderson, S. Bolognesi, F. Caola, Y.Y. Gao, A. V. Gritsan, C. B. Martin, K. Melnikov, M. Schulze, N. V. Tran, A. Whitbeck, Y. Zhou, ``Constraining anomalous HVV interactions at proton and lepton colliders.'' Phys. Rev. D \textbf{89}, 035007 (2014). arXiv:1309.4819 [hep-ph].
+\bibitem{Gritsan:2016hjl}
+A. V. Gritsan, R. R\"ontsch, M. Schulze, M. Xiao, ``Constraining anomalous Higgs boson couplings to the heavy flavor fermions using matrix element techniques.'' Phys. Rev. D \textbf{94} (2016) 055023. arXiv:1606.03107 [hep-ph].
 \bibitem{Gritsan:2020pib} 
  A.~V.~Gritsan, J.~Roskes, U.~Sarica, M.~Schulze, M.~Xiao and Y.~Zhou, ``New features in the JHU generator framework: 
- constraining Higgs boson properties from on-shell and off-shell production,'' arXiv:2002.09888 [hep-ph].
+ constraining Higgs boson properties from on-shell and off-shell production.'' 
+ Phys. Rev. D \textbf{102} (2020) 056022. arXiv:2002.09888 [hep-ph].
+ \bibitem{Martini:2021uey}
+T.~Martini, R.~Q.~Pan, M.~Schulze and M.~Xiao,
+``Probing the CP structure of the top quark Yukawa coupling: Loop sensitivity vs. on-shell sensitivity.''
+[arXiv:2104.04277 [hep-ph]].
 \bibitem{thesite}
 See webpage: \url{http://spin.pha.jhu.edu}
 \bibitem{Chatrchyan:2012ufa}

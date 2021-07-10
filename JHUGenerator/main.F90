@@ -1,7 +1,3 @@
-! If you use this program please cite Phys.Rev. D81 (2010) 075022; arXiv:1001.3396  [hep-ph],
-!                                     Phys.Rev. D86 (2012) 095031; arXiv:1208.4018  [hep-ph],
-!                                     Phys.Rev. D89 (2014) 035007; arXiv:1309.4819  [hep-ph],
-!                                 and Phys.Rev. D94 (2016) 055023; arXiv:1606.03107 [hep-ph].
 PROGRAM JHUGenerator
 #if compiler==1
 use ifport
@@ -7071,6 +7067,7 @@ implicit none
         print *, "                        represent f=(nu; e, mu; d, u, s, c, b). In order to have a"
         print *, "                        V->f1 f2 decay, please specify the decay mode as -p1*p2"
         print *, "                        for the p1 and p2 that match f1 and f2."
+        print *, "                        (Note: negative DecayMode is in beta development mode in this version)"
         print *, "   Interf:            0=neglect interference for 4f final states,"
         print *, "                      1=include interference"
         print *, "   ReweightInterf:    if true, include interference as LHE event weights for"
