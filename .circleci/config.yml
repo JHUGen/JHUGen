@@ -85,7 +85,7 @@ jobs:
           command: |
             cd ~ &&
             if ! [ -d ~/boost_1_61_0 ]; then
-              wget https://sourceforge.net/projects/boost/files/boost/1.61.0/boost_1_61_0.tar.gz &&
+              wget https://sourceforge.net/projects/boost/files/boost/1.61.0/boost_1_61_0.tar.gz --no-check-certificate &&
               tar -xvzf boost_1_61_0.tar.gz &&
               cd boost_1_61_0 &&
               ./bootstrap.sh &&
