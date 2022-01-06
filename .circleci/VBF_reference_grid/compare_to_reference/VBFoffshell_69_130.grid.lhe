@@ -1,0 +1,42 @@
+<LesHouchesEvents version="1.0">
+<!--
+Output from the JHUGenerator v7.5.0 described in arXiv:1001.3396 [hep-ph], arXiv:1208.4018 [hep-ph], arXiv:1309.4819 [hep-ph], arXiv:1606.03107 [hep-ph]
+   
+   Command line: ./JHUGen Seed=765543533 Process=69 DecayMode1=0 DecayMode2=0 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=compare_to_reference/VBFoffshell_69.lhe CSmaxFile=VBFoffshell_69/output VBFoffsh_run=130
+   
+   Input Parameter:
+    Collider: P-P, sqrt(s)=13000.00
+    Z boson: mass=91.188, width=2.4952
+    W boson: mass=80.399, width=2.0850
+    Jet cuts:
+            pT >=    15.00 GeV
+         |eta| <=     6.50
+        DeltaR >=     0.30
+           mJJ >=    30.00 GeV
+    Lepton cuts:
+            pT >=     3.00 GeV
+         |eta| <=     2.70
+    Mass cuts:
+           m(gammastar) >=     4.00 GeV
+    124.99 GeV <= m4f <=     125.01 GeV
+    Random seed:   765543533
+    To reproduce results using this seed, JHUGen should be compiled with the same compiler:
+      GNU Fortran (GCC) 7.3.1 20180127
+    
+    WidthScheme:   2
+    PDFSet:   3
+    Unweighted: T
+    Interference: Included through event weights
+    Intermediate off-shell gluons: T
+    
+    
+    LHE output: compare_to_reference/VBFoffshell_69_130.lhe
+    Histogram output: compare_to_reference/VBFoffshell_69_130.dat
+    Log file: compare_to_reference/VBFoffshell_69_130.log
+    
+-->
+<init>
+2212 2212   6500.0000000000000000    6500.0000000000000000 0 0  263000  263000  4  1
+ 1.3782493E-07  1.4466555E-08  1.0000000E+00  69
+</init>
+</LesHouchesEvents>

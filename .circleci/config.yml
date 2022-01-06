@@ -234,7 +234,6 @@ jobs:
       - run:
           <<: *jhugenversion
       - run: mkdir -p reference_check compare_to_reference
-
       - run:
           name: "md5sum of files relevant for the generator"
           command: |
@@ -312,7 +311,8 @@ jobs:
             if ! $DOREFERENCE ; then exit 0; fi
             for igrid in {69..69}; do
               mkdir -p VBFoffshell_${igrid}/
-              ./JHUGen.py Seed=$SEED Process=${igrid} DecayMode1=0 DecayMode2=0 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=compare_to_reference/VBFoffshell_${igrid}.lhe CSmaxFile=VBFoffshell_${igrid}/output
+              cp ../.circleci/VBF_reference_grid/compare_to_reference/* compare_to_reference/
+              cp ../.circleci/VBF_reference_grid/VBFoffshell_${igrid}/* VBFoffshell_${igrid}/
             done
       - run:
           name: VBF offshell

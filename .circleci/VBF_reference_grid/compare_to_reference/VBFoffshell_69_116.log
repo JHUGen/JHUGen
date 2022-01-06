@@ -1,0 +1,61 @@
+  
+  ***************************************************************************************
+  *                                JHU Generator v7.5.0                                 *
+  ***************************************************************************************
+  *                                                                                     *
+  *   Spin and parity determination of single-produced resonances at hadron colliders   *
+  *                                                                                     *
+  *         I. Anderson, S. Bolognesi, F. Caola, J. Davis, Y. Gao, A. Gritsan,          *
+  *          Z. Guo, C. Martin, K. Melnikov, R. Rontsch, H. Roskes, U. Sarica,          *
+  *                 M. Schulze, N. Tran, A. Whitbeck, M. Xiao, Y. Zhou                  *
+  *              Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396  [hep-ph],               *
+  *              Phys.Rev. D86 (2012) 095031;  arXiv:1208.4018  [hep-ph],               *
+  *              Phys.Rev. D89 (2014) 035007;  arXiv:1309.4819  [hep-ph],               *
+  *              Phys.Rev. D94 (2016) 055023;  arXiv:1606.03107 [hep-ph],               *
+  *              Phys.Rev. D102 (2020) 056022; arXiv:2002.09888 [hep-ph],               *
+  *                                            arXiv:2104.04277 [hep-ph].               *
+  *                                                                                     *
+  ***************************************************************************************
+  
+   
+   Command line: ./JHUGen Seed=765543533 Process=69 DecayMode1=0 DecayMode2=0 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=compare_to_reference/VBFoffshell_69.lhe CSmaxFile=VBFoffshell_69/output VBFoffsh_run=116
+   
+   Input Parameter:
+    Collider: P-P, sqrt(s)=13000.00
+    Z boson: mass=91.188, width=2.4952
+    W boson: mass=80.399, width=2.0850
+    Jet cuts:
+            pT >=    15.00 GeV
+         |eta| <=     6.50
+        DeltaR >=     0.30
+           mJJ >=    30.00 GeV
+    Lepton cuts:
+            pT >=     3.00 GeV
+         |eta| <=     2.70
+    Mass cuts:
+           m(gammastar) >=     4.00 GeV
+    124.99 GeV <= m4f <=     125.01 GeV
+    Random seed:   765543533
+    To reproduce results using this seed, JHUGen should be compiled with the same compiler:
+      GNU Fortran (GCC) 7.3.1 20180127
+    
+    WidthScheme:   2
+    PDFSet:   3
+    Unweighted: T
+    Interference: Included through event weights
+    Intermediate off-shell gluons: T
+    
+    
+    LHE output: compare_to_reference/VBFoffshell_69_116.lhe
+    Histogram output: compare_to_reference/VBFoffshell_69_116.dat
+    Log file: compare_to_reference/VBFoffshell_69_116.log
+    
+
+Accepted Events:         0
+Branchings:
+            Br_Z_ll_counter     NaN %    +/-   NaN %
+            Br_Z_inv_counter    NaN %    +/-   NaN %
+            Br_Z_uu_counter     NaN %    +/-   NaN %
+            Br_Z_dd_counter     NaN %    +/-   NaN %
+            Br_W_ll_counter     NaN %    +/-   NaN %
+            Br_W_ud_counter     NaN %    +/-   NaN %
