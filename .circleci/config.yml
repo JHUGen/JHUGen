@@ -1179,9 +1179,9 @@ workflows:
       - generator_syntax:
           requires:
             - build
-      - plots_ggH:
-          requires:
-            - generator_reference
+      #- plots_ggH:
+      #    requires:
+      #      - generator_reference
       - plots_VBF:
           requires:
             - generator_reference
