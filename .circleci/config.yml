@@ -538,7 +538,7 @@ jobs:
             if ! $DOSYNTAX ; then exit 0; fi
             #for igrid in {66..72}; do
             for igrid in {69..69}; do
-              ./JHUGen.py Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=${igrid} DecayMode1=8 DecayMode2=8 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=$LHEDIR/VBFoffshell_${igrid}.lhe CSmaxFile=VBFoffshell_${igrid}/output ReadCSmax VegasNc2=10
+              ./JHUGen.py Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=${igrid} DecayMode1=0 DecayMode2=0 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=$LHEDIR/VBFoffshell_${igrid}.lhe CSmaxFile=VBFoffshell_${igrid}/output ReadCSmax VegasNc2=10
             done
           no_output_timeout: 2h
 
