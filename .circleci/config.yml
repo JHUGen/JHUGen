@@ -506,14 +506,11 @@ jobs:
           command: |
             if ! $DOSYNTAX ; then exit 0; fi
             #for igrid in {66..69}; do
+            if ! $DOREFERENCE ; then exit 0; fi
             for igrid in {69..69}; do
               mkdir -p VBFoffshell_${igrid}/
-              for i in {001..164}; do
-                if ! [ -e VBFoffshell_${igrid}/output_${i}_step2.grid ]; then
-                  ./JHUGen.py Seed="$(expr $SEED + $CIRCLE_BUILD_NUM)" Process=${igrid} DecayMode1=8 DecayMode2=8 VegasNc0=50000 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=$LHEDIR/VBFoffshell_${igrid}.lhe CSmaxFile=VBFoffshell_${igrid}/output
-                  break
-                fi
-              done
+              cp ../.circleci/VBF_reference_grid/VBFoffshell_${igrid}/* VBFoffshell_${igrid}/
+              cp ../.circleci/VBF_reference_grid/compare_to_reference/* $LHEDIR/
             done
             #mkdir -p VBFoffshell_69/
             #for i in {001..175}; do
@@ -1117,7 +1114,7 @@ jobs:
           command: |
             cd
             if ! [ -d ~/dos2unix-7.4.0 ]; then
-              wget https://downloads.sourceforge.net/project/dos2unix/dos2unix/7.4.0/dos2unix-7.4.0.tar.gz
+              wget https://downloads.sourceforge.net/project/dos2unix/dos2unix/7.4.0/dos2unix-7.4.0.tar.gz --no-check-certificate
               tar -xvzf dos2unix-7.4.0.tar.gz
               cd dos2unix-7.4.0
               sed -i -r "s/(ENABLE_NLS *=)/#\1/" Makefile
