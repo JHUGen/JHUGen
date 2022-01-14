@@ -313,7 +313,7 @@ jobs:
               mkdir -p VBFoffshell_${igrid}/
               cd ../.circleci/VBF_reference_grid/
               tar -xzf compare_to_reference.tar.gz
-              tar -xzf VBFoffshell_69_grid.tar.gz
+              tar -xzf VBFoffshell_69.tar.gz
               cd -
               cp ../.circleci/VBF_reference_grid/compare_to_reference/* compare_to_reference/
               cp ../.circleci/VBF_reference_grid/VBFoffshell_${igrid}/* VBFoffshell_${igrid}/
@@ -522,7 +522,7 @@ jobs:
               mkdir -p VBFoffshell_${igrid}/
               cd ../.circleci/VBF_reference_grid/
               tar -xzf compare_to_reference.tar.gz 
-              tar -xzf VBFoffshell_69_grid.tar.gz  
+              tar -xzf VBFoffshell_69.tar.gz  
               cd -
               cp ../.circleci/VBF_reference_grid/VBFoffshell_${igrid}/* VBFoffshell_${igrid}/
               cp ../.circleci/VBF_reference_grid/compare_to_reference/* $LHEDIR/
