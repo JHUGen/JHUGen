@@ -311,7 +311,7 @@ jobs:
             if ! $DOREFERENCE ; then exit 0; fi
             for igrid in {69..69}; do
               mkdir -p VBFoffshell_${igrid}/
-              mkdir -p VBFoffshel_grid_test_${igrid}/
+              mkdir -p VBFoffshell_grid_test_${igrid}/
               cd ../.circleci/VBF_reference_grid/
               tar -xzf compare_to_reference.tar.gz
               tar -xzf VBFoffshell_69.tar.gz
