@@ -1180,7 +1180,7 @@ integer :: n, i, j
 integer, intent(in) :: TotalNumberOfSeats
 real(8), intent(in) :: XSecArray(-5:5,-5:5)
 integer(8), intent(out) :: NumberOfSeats(-5:5,-5:5)
-
+  totalxsec = 0
   NumberOfSeats(:,:) = 0
   if (TotalNumberOfSeats.lt.1) return
 
@@ -1234,7 +1234,7 @@ real(8) :: totalxsec, CrossSecNormalized(size(XSecArray)), yRnd
 integer :: n,i,nchannels
 integer, intent(in) :: TotalNumberOfSeats
 integer(8), intent(out) :: NumberOfSeats(:)
-
+  totalxsec = 0
   NumberOfSeats(:) = 0
   if (TotalNumberOfSeats.lt.1) return
 
