@@ -253,9 +253,9 @@ jobs:
           name: "see if we need to test the generator"
           command: |
             DOREFERENCE=true
-            #if [ "$(cat no-need-for-generator-reference)" ]; then
-            #  DOREFERENCE=false
-            #fi
+            if [ "$(cat no-need-for-generator-reference)" ]; then
+              DOREFERENCE=false
+            fi
             echo "export DOREFERENCE=$DOREFERENCE" >> $BASH_ENV
 
       - run: "! $DOREFERENCE || ./JHUGen Seed=$SEED PDFSet=3 Process=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ggH_ZZ DecayMode1=9 DecayMode2=9 $REFERENCE_COUPLINGS_SPIN0"
