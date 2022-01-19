@@ -1541,7 +1541,7 @@ character(len=*) :: title
     write(TheUnit, *) " ", CenterWithStars("", linelength)
     write(TheUnit, *) " ", CenterWithStars("Spin and parity determination of single-produced resonances at hadron colliders", linelength)
     write(TheUnit, *) " ", CenterWithStars("", linelength)
-    write(TheUnit, *) " ", CenterWithStars("I. Anderson, S. Bolognesi, F. Caola, J. Davis, Y. Gao, A. Gritsan, L. Guerra,", linelength)
+    write(TheUnit, *) " ", CenterWithStars("I. Anderson, S. Bolognesi, F. Caola, J. Davis, Y. Gao, A. Gritsan, L. S. Mandacaru Guerra,", linelength)
     write(TheUnit, *) " ", CenterWithStars("Z. Guo, C. Martin, T. Martini, K. Melnikov, R. Pan, R. Rontsch,", linelength)
     write(TheUnit, *) " ", CenterWithStars("H. Roskes, U. Sarica, M. Schulze, N. Tran, A. Whitbeck, M. Xiao, Y. Zhou", linelength)
     write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396  [hep-ph],", linelength)
