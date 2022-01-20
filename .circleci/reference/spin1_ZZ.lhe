@@ -1,6 +1,6 @@
 <LesHouchesEvents version="1.0">
 <!--
-Output from the JHUGenerator v7.5.0 described in arXiv:1001.3396 [hep-ph], arXiv:1208.4018 [hep-ph], arXiv:1309.4819 [hep-ph], arXiv:1606.03107 [hep-ph]
+Output from the JHUGenerator v7.5.1 described in arXiv:1001.3396 [hep-ph], arXiv:1208.4018 [hep-ph], arXiv:1309.4819 [hep-ph], arXiv:1606.03107 [hep-ph]
    
    Command line: ./JHUGen Seed=765543533 PDFSet=3 Process=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/spin1_ZZ DecayMode1=9 DecayMode2=9 zprime_qq_left=0.159847991225521,0.324512374690709 zprime_qq_right=0.514696145793129,0.150317974674483 zprime_zz_1=0.4084476008646,0.289302928999951 zprime_zz_2=0.328820833481286,0.910335641048151
    

@@ -4,7 +4,7 @@
 Merged from 175 jobs by JHUGen.py
 =================================
 
-Output from the JHUGenerator v7.5.0 described in arXiv:1001.3396 [hep-ph], arXiv:1208.4018 [hep-ph], arXiv:1309.4819 [hep-ph], arXiv:1606.03107 [hep-ph]
+Output from the JHUGenerator v7.5.1 described in arXiv:1001.3396 [hep-ph], arXiv:1208.4018 [hep-ph], arXiv:1309.4819 [hep-ph], arXiv:1606.03107 [hep-ph]
    
    Command line: ./JHUGen Seed=765543533 Process=69 DecayMode1=0 DecayMode2=0 PDFSet=3 ReweightInterf=1 mJJcut=30 MPhotonCutoff=4 deltaRcut=0.3 pTjetcut=15 m4l_min=124.99 m4l_max=125.01 etajetcut=6.5 MReso=125 GaReso=0.00407 DataFile=compare_to_reference/VBFoffshell_69.lhe CSmaxFile=VBFoffshell_69/output ReadCSmax VegasNc2=10 VBFoffsh_run=*
    
