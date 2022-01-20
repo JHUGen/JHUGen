@@ -369,7 +369,7 @@ jobs:
                 echo $filename
                 echo "================"
                 echo
-                sdiff -s reference/$filename compare_to_reference/$filename && echo "no change" || {
+                sdiff -s <(tail -n +3 reference/$filename) <(tail -n +3 compare_to_reference/$filename) && echo "no change" || {
                   echo 1 > reference_check/exit_status
                   touch reference_check/reference_failed
                   if [ $filename == $REFERENCE_FILENAME_GGH ]; then
