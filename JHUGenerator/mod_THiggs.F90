@@ -653,7 +653,7 @@ END SUBROUTINE EvalAmp_GBB_TBWPH
 
          om1 = ghz1/2d0  ! this should be proper a1,a2,a3
          om2 = ghz2
-         om3 = ghz3     * (-1d0) ! correct buggy minus sign in Raoul's code
+         om3 = ghz4    * (-1d0) ! correct buggy minus sign in Raoul's code
 
 
         ampw(1) =  + om3 * (  - 1d0/2d0*za(p5,p2)*za(e4,p1)*zb(p1,p2)*&
