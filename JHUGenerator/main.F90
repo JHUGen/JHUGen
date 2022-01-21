@@ -6024,8 +6024,7 @@ integer :: stat
             write(io_LHEOutFile ,'(A)') '<LesHouchesEvents version="1.0">'
         endif
         write(io_LHEOutFile ,'(A)') '<!--'
-        write(io_LHEOutFile ,'(A,A,A)') 'Output from the JHUGenerator ',trim(JHUGen_Version),' described in arXiv:1001.3396 [hep-ph], arXiv:1208.4018 [hep-ph], arXiv:1309.4819 [hep-ph], arXiv:1606.03107 [hep-ph]'
-
+        write(io_LHEOutFile ,'(A,A,A)') 'Output from the JHUGenerator ',trim(JHUGen_Version),' described in arXiv:1001.3396 , arXiv:1208.4018 , arXiv:1309.4819 , arXiv:1606.03107 , arXiv:2002.09888 , arXiv:2104.04277, arXiv:2109.13363'
         if( writegit ) then
             write(io_LHEOutFile,'(A)') ""
             write(io_LHEOutFile,'(A)') "Current git commit:"

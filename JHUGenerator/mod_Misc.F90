@@ -1180,7 +1180,7 @@ integer :: n, i, j
 integer, intent(in) :: TotalNumberOfSeats
 real(8), intent(in) :: XSecArray(-5:5,-5:5)
 integer(8), intent(out) :: NumberOfSeats(-5:5,-5:5)
-
+  totalxsec = 0
   NumberOfSeats(:,:) = 0
   if (TotalNumberOfSeats.lt.1) return
 
@@ -1234,7 +1234,7 @@ real(8) :: totalxsec, CrossSecNormalized(size(XSecArray)), yRnd
 integer :: n,i,nchannels
 integer, intent(in) :: TotalNumberOfSeats
 integer(8), intent(out) :: NumberOfSeats(:)
-
+  totalxsec = 0
   NumberOfSeats(:) = 0
   if (TotalNumberOfSeats.lt.1) return
 
@@ -1531,7 +1531,7 @@ SUBROUTINE PrintLogo(TheUnit, title)
 use modParameters
 implicit none
 integer :: TheUnit
-integer, parameter :: linelength = 87
+integer, parameter :: linelength = 89
 character(len=*) :: title
 
     write(TheUnit, *) " "
@@ -1541,15 +1541,16 @@ character(len=*) :: title
     write(TheUnit, *) " ", CenterWithStars("", linelength)
     write(TheUnit, *) " ", CenterWithStars("Spin and parity determination of single-produced resonances at hadron colliders", linelength)
     write(TheUnit, *) " ", CenterWithStars("", linelength)
-    write(TheUnit, *) " ", CenterWithStars("I. Anderson, S. Bolognesi, F. Caola, J. Davis, Y. Gao, A. Gritsan,", linelength)
-    write(TheUnit, *) " ", CenterWithStars("Z. Guo, C. Martin, K. Melnikov, R. Rontsch, H. Roskes, U. Sarica,", linelength)
-    write(TheUnit, *) " ", CenterWithStars("M. Schulze, N. Tran, A. Whitbeck, M. Xiao, Y. Zhou", linelength)
+    write(TheUnit, *) " ", CenterWithStars("I. Anderson, S. Bolognesi, F. Caola, J. Davis, Y. Gao, A. V. Gritsan,", linelength)
+    write(TheUnit, *) " ", CenterWithStars("L. S. Mandacaru Guerra, Z. Guo, C. B. Martin, T. Martini, K. Melnikov, R. Pan,", linelength)
+    write(TheUnit, *) " ", CenterWithStars("R. Rontsch, J. Roskes, U. Sarica, M. Schulze, N. V. Tran, A. Whitbeck, M. Xiao, Y. Zhou", linelength)
     write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396  [hep-ph],", linelength)
     write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D86 (2012) 095031;  arXiv:1208.4018  [hep-ph],", linelength)
     write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D89 (2014) 035007;  arXiv:1309.4819  [hep-ph],", linelength)
     write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D94 (2016) 055023;  arXiv:1606.03107 [hep-ph],", linelength)
     write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D102 (2020) 056022; arXiv:2002.09888 [hep-ph],", linelength)
-    write(TheUnit, *) " ", CenterWithStars("                              arXiv:2104.04277 [hep-ph].", linelength)
+    write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D102 (2021) 055045; arXiv:2104.04277 [hep-ph].", linelength)
+    write(TheUnit, *) " ", CenterWithStars("                              arXiv:2109.13363 [hep-ph].", linelength)
     write(TheUnit, *) " ", CenterWithStars("", linelength)
     write(TheUnit, *) " ", repeat("*", linelength)
     write(TheUnit, *) " "

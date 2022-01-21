@@ -369,7 +369,7 @@ jobs:
                 echo $filename
                 echo "================"
                 echo
-                sdiff -s reference/$filename compare_to_reference/$filename && echo "no change" || {
+                sdiff -s <(sed '/Output from the JHUGenerator/d' ./reference/$filename) <(sed '/Output from the JHUGenerator/d' ./compare_to_reference/$filename) && echo "no change" || {
                   echo 1 > reference_check/exit_status
                   touch reference_check/reference_failed
                   if [ $filename == $REFERENCE_FILENAME_GGH ]; then
