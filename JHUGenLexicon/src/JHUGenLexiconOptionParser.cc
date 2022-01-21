@@ -78,6 +78,7 @@ void JHUGenLexiconOptionParser::interpretOption(std::string const& wish, std::st
   else if (wish=="HW_couplings_only"){flags[wish] = false; castStringToValue(value, flags[wish]); }
   else if (wish=="HZ_couplings_only"){flags[wish] = false; castStringToValue(value, flags[wish]); }
   else if (wish=="include_delta"){flags[wish] = false; castStringToValue(value, flags[wish]); }
+  else if (wish=="switch_convention"){flags[wish] = false; castStringToValue(value, flags[wish]); }
   // Parameters come next, check if a comma is not found to assign them
   else if (value.find(",")==std::string::npos) parameters[wish] = stod(value);
 
@@ -106,7 +107,8 @@ void JHUGenLexiconOptionParser::printOptionsHelp(bool command_fail)const{
   cout << "- custodial_symmetry: set delta_m = 0 (Note: This also fixes delta_v in the Warsaw Basis)\n\n";  
   cout << "- HW_couplings_only: Only return HWW couplings. Only used for JHUGen_Amplitude Basis. Default is false.\n\n";
   cout << "- HZ_couplings_only: Only return HZZ, HZgamma and Hgammagamma couplings. Only used for JHUGen_Amplitude Basis. Default is false.\n\n";
-  cout << "- NOTE: HW_couplings_only and HZ_couplings_only does not affect the output of include_triple_quartic_gauge.";
+  cout << "- NOTE: HW_couplings_only and HZ_couplings_only does not affect the output of include_triple_quartic_gauge.\n\n";
+  cout << "- switch_convention: Switch the relative sign on the Zgamma couplings.\n\n";
 
   cout << "- The format to set any parameter is [specifier]=[value].\n\n";
   cout << "- The format to set any coupling [specifier] to the complex number ([vRe], [vIm]) is [specifier]=[vRe],[vIm].\n\n";

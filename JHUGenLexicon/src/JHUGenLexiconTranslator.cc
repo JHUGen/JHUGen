@@ -1794,6 +1794,7 @@ std::vector< std::pair<double, double> > JHUGenLexiconTranslator::getOrderedInpu
   bool useMCFMAtInput; getValueWithDefault<std::string, bool>(input_flags, "useMCFMAtInput", useMCFMAtInput, false);
   bool includeTripleGauge; getValueWithDefault<std::string, bool>(input_flags, "includeTripleGauge", includeTripleGauge, false);
   bool distinguish_HWWcouplings; getValueWithDefault<std::string, bool>(input_flags, "distinguish_HWWcouplings", distinguish_HWWcouplings, false);
+  bool switch_convention; getValueWithDefault<std::string, bool>(input_flags, "switch_convention", switch_convention, false);
   double MZ; getValueWithDefault<std::string, double>(input_parameters, "MZ", MZ, DEFVAL_MZ);
   double MW; getValueWithDefault<std::string, double>(input_parameters, "MW", MW, DEFVAL_MW);
   double sw; getValueWithDefault<std::string, double>(input_parameters, "sw", sw, DEFVAL_SW);
@@ -1810,7 +1811,7 @@ std::vector< std::pair<double, double> > JHUGenLexiconTranslator::getOrderedInpu
   if (std::string(#NAME).find("ghzgs")!=std::string::npos && std::string(#NAME).find("prime2")!=std::string::npos){ res.at(coupl_##PREFIX##_##NAME).first *= std::pow(MZ/Lambda_zgs1, 2); res.at(coupl_##PREFIX##_##NAME).second *= std::pow(MZ/Lambda_zgs1, 2); } \
   else if (std::string(#NAME).find("ghz")!=std::string::npos && std::string(#NAME).find("prime2")!=std::string::npos){ res.at(coupl_##PREFIX##_##NAME).first *= std::pow(MZ/Lambda_z1, 2); res.at(coupl_##PREFIX##_##NAME).second *= std::pow(MZ/Lambda_z1, 2); } \
   else if (std::string(#NAME).find("ghw")!=std::string::npos && std::string(#NAME).find("prime2")!=std::string::npos){ res.at(coupl_##PREFIX##_##NAME).first *= std::pow(MW/Lambda_w1, 2); res.at(coupl_##PREFIX##_##NAME).second *= std::pow(MW/Lambda_w1, 2); } \
-  //if (std::string(#NAME).find("dFour_Z")!=std::string::npos){ res.at(coupl_##PREFIX##_##NAME).first *= std::pow(cw/sw, 1.0); res.at(coupl_##PREFIX##_##NAME).second *= std::pow(cw/sw,1.0); }
+  if (switch_convention && ((std::string(#NAME).find("ghzgs2")!=std::string::npos) || (std::string(#NAME).find("ghzgs4")!=std::string::npos) || (std::string(#NAME).find("Cza")!=std::string::npos) || (std::string(#NAME).find("tCza")!=std::string::npos))){ res.at(coupl_##PREFIX##_##NAME).first *= -1.0; res.at(coupl_##PREFIX##_##NAME).second *= -1.0; }
   switch (basis_input){
   case bAmplitude_JHUGen:
   {
@@ -1858,10 +1859,12 @@ void JHUGenLexiconTranslator::interpretOutputCouplings(
   std::unordered_map<std::string, double> const& input_parameters,
   std::vector< std::pair<double, double> >& output_vector
 ){
+  auto const& basis_input = opts.getInputBasis();
   bool useMCFMAtOutput; getValueWithDefault<std::string, bool>(input_flags, "useMCFMAtOutput", useMCFMAtOutput, false);
   bool include_triple_quartic_gauge; getValueWithDefault<std::string, bool>(input_flags, "include_triple_quartic_gauge", include_triple_quartic_gauge, false);
   bool HW_couplings_only; getValueWithDefault<std::string, bool>(input_flags, "HW_couplings_only", HW_couplings_only, false);
   bool HZ_couplings_only; getValueWithDefault<std::string, bool>(input_flags, "HZ_couplings_only", HZ_couplings_only, false);
+  bool switch_convention; getValueWithDefault<std::string, bool>(input_flags, "switch_convention", switch_convention, false);
   double MZ; getValueWithDefault<std::string, double>(input_parameters, "MZ", MZ, DEFVAL_MZ);
   double MW; getValueWithDefault<std::string, double>(input_parameters, "MW", MW, DEFVAL_MW);
   double Lambda_z1; getValueWithDefault<std::string, double>(input_parameters, "Lambda_z1", Lambda_z1, DEFVAL_LAMBDA_VI);
@@ -1872,7 +1875,8 @@ void JHUGenLexiconTranslator::interpretOutputCouplings(
   if (std::string(#NAME).find("ghzgs")!=std::string::npos && std::string(#NAME).find("prime2")!=std::string::npos){ output_vector.at(coupl_##PREFIX##_##NAME).first /= std::pow(MZ/Lambda_zgs1, 2); output_vector.at(coupl_##PREFIX##_##NAME).second /= std::pow(MZ/Lambda_zgs1, 2); } \
   else if (std::string(#NAME).find("ghz")!=std::string::npos && std::string(#NAME).find("prime2")!=std::string::npos){ output_vector.at(coupl_##PREFIX##_##NAME).first /= std::pow(MZ/Lambda_z1, 2); output_vector.at(coupl_##PREFIX##_##NAME).second /= std::pow(MZ/Lambda_z1, 2); } \
   else if (std::string(#NAME).find("ghw")!=std::string::npos && std::string(#NAME).find("prime2")!=std::string::npos){ output_vector.at(coupl_##PREFIX##_##NAME).first /= std::pow(MW/Lambda_w1, 2); output_vector.at(coupl_##PREFIX##_##NAME).second /= std::pow(MW/Lambda_w1, 2); } \
-  result_couplings[#NAME] = output_vector.at(coupl_##PREFIX##_##NAME);
+  else if (basis_input == bWarsawBasis && switch_convention && ((std::string(#NAME).find("ghzgs2")!=std::string::npos) || (std::string(#NAME).find("ghzgs4")!=std::string::npos) || (std::string(#NAME).find("Cza")!=std::string::npos) || (std::string(#NAME).find("tCza")!=std::string::npos))){ output_vector.at(coupl_##PREFIX##_##NAME).first *= -1.0; output_vector.at(coupl_##PREFIX##_##NAME).second *= -1.0; } \
+  result_couplings[#NAME] = output_vector.at(coupl_##PREFIX##_##NAME);  
   switch (basis_output){
     case bAmplitude_JHUGen:
     {
