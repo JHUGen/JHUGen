@@ -2434,16 +2434,16 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
 
 !if e+ e- collider
     else if(Collider.eq.0)then
-      MomExt(1,3)=ILC_Energy
+      MomExt(1,3)=Collider_Energy
       MomExt(2,3)=0d0
       MomExt(3,3)=0d0
       MomExt(4,3)=0d0
 
-      MomExt(1,1)=ILC_Energy/2d0
+      MomExt(1,1)=Collider_Energy/2d0
       MomExt(2,1)=0d0
       MomExt(3,1)=0d0
       MomExt(4,1)=MomExt(1,1)
-      MomExt(1,2)=ILC_Energy/2d0
+      MomExt(1,2)=Collider_Energy/2d0
       MomExt(2,2)=0d0
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
@@ -2452,7 +2452,7 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell=IsAPhoton(DecayMode1))
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
-      FluxFac = 1d0/(2d0*ILC_Energy**2)
+      FluxFac = 1d0/(2d0*Collider_Energy**2)
       PreFac = hbarc2XsecUnit * FluxFac * PSWgt * DKWgt
       LO_Res_Unpol=0d0
       EvalWeighted_VHiggs=0d0
@@ -2740,16 +2740,16 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1)) then
 
 !if e+ e- collider
     else if(Collider.eq.0)then
-      MomExt(1,3)=ILC_Energy
+      MomExt(1,3)=Collider_Energy
       MomExt(2,3)=0d0
       MomExt(3,3)=0d0
       MomExt(4,3)=0d0
 
-      MomExt(1,1)=ILC_Energy/2d0
+      MomExt(1,1)=Collider_Energy/2d0
       MomExt(2,1)=0d0
       MomExt(3,1)=0d0
       MomExt(4,1)=MomExt(1,1)
-      MomExt(1,2)=ILC_Energy/2d0
+      MomExt(1,2)=Collider_Energy/2d0
       MomExt(2,2)=0d0
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
@@ -2758,7 +2758,7 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1)) then
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell=IsAPhoton(DecayMode1))
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
-      FluxFac = 1d0/(2d0*ILC_Energy**2)
+      FluxFac = 1d0/(2d0*Collider_Energy**2)
       PreFac = hbarc2XsecUnit * FluxFac * PSWgt * DKWgt
     endif
 
