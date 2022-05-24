@@ -385,11 +385,11 @@ real(8) :: MomExt1(1:4,1:10),MomExt2(1:4,1:10),MomExt3(1:4,1:10),MomExt4(1:4,1:1
 
 !if e+ e- collider
   if(Collider.eq.0.and.VH_PC.eq."ee")then
-    call EvalPhasespace_VH(yRnd(6:13),ILC_Energy,Mom(:,1:9),id(6:9),PSWgt,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+    call EvalPhasespace_VH(yRnd(6:13),Collider_Energy,Mom(:,1:9),id(6:9),PSWgt,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
     Mom_save(1:4,1:9)=Mom(1:4,1:9)
     call kinematics_eeVH(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
     if( applyPSCut .or. PSWgt.le.zero ) return    
-    FluxFac = 1d0/(2d0*ILC_Energy**2)
+    FluxFac = 1d0/(2d0*Collider_Energy**2)
     PreFac = hbarc2XsecUnit * FluxFac * PSWgt
     EvalWeighted_VH=0d0
     id(1:2)=(/convertLHE(ElP_),convertLHE(ElM_)/)
@@ -1750,12 +1750,12 @@ Function EvalUnWeighted_VH(yRnd,genEvt,RES)
 
 !if e+ e- collider
   if(Collider.eq.0.and.VH_PC.eq."ee")then
-    call EvalPhasespace_VH(yRnd(6:13),ILC_Energy,Mom(:,1:9),id(6:9),PSWgt,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
+    call EvalPhasespace_VH(yRnd(6:13),Collider_Energy,Mom(:,1:9),id(6:9),PSWgt,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
     Mom_save=Mom
     call kinematics_eeVH(id,Mom,NBin,applyPSCut,HbbDecays,PhoOnshell=IsAPhoton(DecayMode1))
     if( applyPSCut .or. PSWgt.le.zero ) return    
 
-    FluxFac = 1d0/(2d0*ILC_Energy**2)
+    FluxFac = 1d0/(2d0*Collider_Energy**2)
     PreFac = hbarc2XsecUnit * FluxFac * PSWgt
 !    EvalWeighted_VH=0d0
 !    id(2)=convertLHE(ElM_)
