@@ -28,14 +28,14 @@ Manual for the JHU generator and MELA package
 \begin{center}
 \small
 For simulation, reweighting, and analysis of single-produced resonances at hadron colliders \\
-(version v7.5.1, release date January 28, 2022) \\
+(version v7.5.2, release date May 25, 2022) \\
 \normalsize
 \end{center}
 
 \noindent
-The generator from \cite{Gao:2010qx,Bolognesi:2012,Anderson:2013,Gritsan:2016hjl,Gritsan:2020pib,Martini:2021uey} 
+The generator from \cite{Gao:2010qx,Bolognesi:2012,Anderson:2013,Gritsan:2016hjl,Gritsan:2020pib,Martini:2021uey,Davis:2022} 
 is a model-independent generator for studying spin-parity properties of new resonances, including the Higgs boson(s). 
-Please cite \cite{Gao:2010qx,Bolognesi:2012,Anderson:2013,Gritsan:2016hjl,Gritsan:2020pib,Martini:2021uey} 
+Please cite \cite{Gao:2010qx,Bolognesi:2012,Anderson:2013,Gritsan:2016hjl,Gritsan:2020pib,Martini:2021uey,Davis:2022} 
 if using the ``JHU generator'' (or JHUGen). The code can be downloaded from \cite{thesite}.
 The generator outputs LHE files which can be passed to parton shower programs for hadronization.
 Only relative values of cross sections are supposed to produce meaningful results, 
@@ -65,7 +65,7 @@ which includes an interface to the generator and matrix element library and can 
 
 \section{Notation}
 
-The notation has been set in Refs.~\cite{Gao:2010qx,Bolognesi:2012,Anderson:2013,Gritsan:2016hjl,Gritsan:2020pib},
+The notation has been set in Refs.~\cite{Gao:2010qx,Bolognesi:2012,Anderson:2013,Gritsan:2016hjl,Gritsan:2020pib,Davis:2022},
 the $HVV$ scattering amplitude of a spin-zero boson $H$ and two vector bosons with polarization vectors 
 $\varepsilon_{1}^\mu(q_1)$ and $\varepsilon_{2}^\mu(q_2)$
 is parameterized by
@@ -125,7 +125,7 @@ $CP$-even ${c}_i$ couplings~\cite{Gritsan:2020pib}, while the relative sign in f
 in the covariant derivative defines the sign of the $Z\gamma$ couplings relative to the $ZZ$ and $\gamma\gamma$. 
 The latter could be viewed as the sign of $s_w$, should a different convention be adopted.
 In the actual parameterization of the \textsc{JHUGen} framework documented here
-and in Refs.~\cite{Gao:2010qx,Bolognesi:2012,Anderson:2013,Gritsan:2016hjl,Gritsan:2020pib,Martini:2021uey} 
+and in Refs.~\cite{Gao:2010qx,Bolognesi:2012,Anderson:2013,Gritsan:2016hjl,Gritsan:2020pib,Martini:2021uey,Davis:2022} 
 % \cite{Gao:2010qx,Bolognesi:2012mm,Anderson:2013afp,Gritsan:2016hjl,Gritsan:2020pib,Martini:2021uey}, 
 the $D_\mu = \partial_\mu -\mathrm{i} \frac{e}{2 s_w} \sigma^i W_\mu^i + \mathrm{i} \frac{e}{2 c_w} B_\mu$
 convention was adopted for historical reasons. A transformation $g_i^{Z\gamma}\to -g_i^{Z\gamma}$ or $\kappa_i^{Z\gamma}\to -\kappa_i^{Z\gamma}$
@@ -1366,6 +1366,11 @@ Lambda_z1=100 Lambda_w1=100 Lambda_zgs1=100
 
 \section{Release notes}
 \noindent 
+In going from \verb|v7.5.1| to \verb|v7.5.2| (May 25 2022)
+\noindent
+\begin{itemize}
+\item Fixed ColliderEnergy parameter in $ee\to VH$ (Process 50 for Collider 0)
+\end{itemize}
 In going from \verb|v7.5.0| to \verb|v7.5.1| (January 28 2022)
 \noindent
 \begin{itemize}
@@ -1655,6 +1660,9 @@ A. V. Gritsan, R. R\"ontsch, M. Schulze, M. Xiao, ``Constraining anomalous Higgs
 T.~Martini, R.~Q.~Pan, M.~Schulze and M.~Xiao,
 ``Probing the CP structure of the top quark Yukawa coupling: Loop sensitivity vs. on-shell sensitivity.''
 [arXiv:2104.04277 [hep-ph]].
+\bibitem{Davis:2022} 
+J.~Davis, A.~V.~Gritsan, L.~S.~Mandacar\'{u}~Guerra, S.~Kyriacou, J.~Roskes, M.~Schulze, ``Constraining anomalous Higgs boson couplings to virtual photons.'' 
+ Phys. Rev. D \textbf{105} (2022) 096027. arXiv:2109.13363 [hep-ph].
 \bibitem{thesite}
 See webpage: \url{http://spin.pha.jhu.edu}
 \bibitem{Chatrchyan:2012ufa}
