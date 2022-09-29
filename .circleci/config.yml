@@ -127,7 +127,7 @@ jobs:
       - restore_cache:
           key: v2_boost_1_61_0
       - run:
-     compile mela
+          name: compile mela
           command: |
             cd JHUGenMELA/MELA/
             ./setup.sh -j
