@@ -130,7 +130,8 @@ jobs:
           name: compile mela
           command: |
             cd JHUGenMELA/MELA/
-            ./setup.sh -j standalone
+            ./setup.sh -j
+            eval $(./setup.sh env)
       - run:
           name: compile generator with linkMELA=Yes
           command: |
@@ -198,7 +199,8 @@ jobs:
           name: compile mela
           command: |
             cd JHUGenMELA/MELA/
-            ./setup.sh -j standalone
+            ./setup.sh -j 
+            eval $(./setup.sh env)
       - run:
           name: compile generator with linkMELA=Yes
           command: |
@@ -865,7 +867,7 @@ jobs:
           command: cd test; ./testME_more.py "$(expr $SEED + $CIRCLE_BUILD_NUM)"
           when: always
       - run:
-          name: "example stuff in mela.py"
+          name: "examplmela.py"
           command: cd python; python mela.py
       - run:
           name: ""
