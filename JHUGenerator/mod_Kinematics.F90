@@ -5387,10 +5387,8 @@ FUNCTION GetBWPropagator(sHat, scheme)
    
        if( scheme.eq.1 ) then! running width
            GetBWPropagator =  1d0/( (sHat-M_Reso**2)**2 + (sHat*Ga_Reso/M_Reso)**2 )
-   
        elseif( scheme.eq.2 ) then! fixed width
            GetBWPropagator = 1d0/( (sHat-M_Reso**2)**2 + (M_Reso*Ga_Reso)**2 )
-   
        elseif( scheme.eq.3 ) then! Passarino's CPS
            if( mubarH.lt.0d0 .or. gabarH.lt.0d0 ) then
              call CALL_HTO(M_Reso/GeV, m_top/GeV, mhb, ghb)
@@ -5420,23 +5418,16 @@ FUNCTION GetBWPropagator(sHat, scheme)
          else
             decayMass = M_Z !if you're doing Z-ZPrime stuff this scheme won't work anyways so the point is moot
          end if
-   
-         ! decayMass = 3.09689e-2
          ! PRINT *, decayMass, decayMass**2, sHat, 0.25d0*sHat, M_Reso, 0.25d0*M_Reso**2
-   
-         if(0.25d0*(sHat) < decayMass**2) then !sHat is the mass squared!!!
+         if(0.25d0*(sHat) < decayMass**2) then !sHat is the mass squared!
             qqq = 0
          else
             qqq = sqrt(0.25d0*(sHat) - decayMass**2)
          endif
-         
          qqq0=sqrt(0.25d0*(M_Reso**2) - decayMass**2)
-   
          GetBWPropagator =  1d0/( (sHat-M_Reso**2)**2 + (M_Reso*Ga_Reso*qqq/qqq0)**2 ) !new style running width
-   
        elseif( scheme.eq.0 ) then  !remove the propagator completely
            GetBWPropagator = 1d0
-   
        else
            print *, "Invalid scheme: ", scheme
            stop 1
