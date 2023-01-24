@@ -5384,7 +5384,6 @@ real(8) :: GetBWPropagator,sHat
 real(8) :: mhb, ghb, BigGamma
 integer :: scheme
 double precision decayMass, qqq, qqq0
-   
 
     if( scheme.eq.1 ) then! running width
         GetBWPropagator =  1d0/( (sHat-M_Reso**2)**2 + (sHat*Ga_Reso/M_Reso)**2 )
@@ -5412,7 +5411,6 @@ double precision decayMass, qqq, qqq0
         !BigGamma = BigGamma*GeV
 
         !print *, dsqrt(dabs(sHat))/GeV, gabarH/GeV, BigGamma/GeV
-   
     elseif( scheme.eq.4) then !jpsi running width.
         if ( M_Zprime.ne.-1 ) then !if you're using ZPrime then it will consider the ZPrime mass
            decayMass = M_Zprime
