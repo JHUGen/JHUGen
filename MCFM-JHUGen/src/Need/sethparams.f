@@ -11,6 +11,7 @@ c---   br,wwbr,zzbr,tautaubr : the LO calculated values
       include 'process.f' 
       include 'verbose.f'
       include 'cpscheme.f'
+      include 'widthscheme.f'
       double precision br,gamgambr,zgambr,wwbr,zzbr,tautaubr,x_w,x_z,
      & msqgamgam,hzgamwidth,msqhbb,msqhtautau,
      & pw_bb,pw_tautau,pw_gamgam,pw_ww,pw_zz,pw_zgam,
@@ -71,7 +72,7 @@ c--- are not actually used in our calculations
         hwidth=pw_bb+pw_tautau+pw_ww+pw_zz+pw_gamgam+pw_zgam
       endif 
 
-c--- complex pole scheme, if desired
+c--- complex pole scheme, if desired. 
       CPscheme=.false.
       if (CPscheme) then
         call interpolate_hto(hmass,hwidth)
@@ -81,6 +82,10 @@ c        stop
       endif
 c      hwidth=4.17116d-3 ! HTO width at 126 GeV
 
+c--- If the complex pole scheme is not desired, then the width scheme should be selected.
+c--- The width scheme has the same enumeration as that of JHUGen. 
+c--- 1-> running width, 2-> fixed width, 3 (skipped due to CPscheme as a boolean), 4 -> new running width, 5 -> propagator removal
+      widthscheme=2 !the default configuration is no CPscheme and a fixed width
 
 c--- Set up anomalous width of the Higgs boson if required
       if (abs(hwidth_ratio-1d0) .lt. 1d-6) then
