@@ -12,7 +12,7 @@ c--- otherwise it takes the usual Breit-Wigner form
       !include 'first.f'
       double precision s,mhbarsq,mhbar,gammahbar
       double complex cfac
-      double precision mjpsi, qqq, qqq0 !added for running width
+      double precision qqq, qqq0 !added for running width
       save mhbarsq,cfac
 
       ! PRINT *, "h1:", hmass, hwidth
@@ -32,14 +32,12 @@ c--- Breit Wigner propagator
         else if(widthscheme.eq.2) then
             higgsprop=1d0/dcmplx(s-hmass**2,hmass*hwidth)
         else if(widthscheme.eq.4) then !3 is skipped as by JHU convention is would be the CPscheme, but that is already covered
-            mjpsi = 3.09689d0
-            if (0.25d0*s < mjpsi**2) then
-                  ! PRINT *, mjpsi, mjpsi**2, s, 0.25d0*(s**2)
+            if (0.25d0*s < zmass**2) then
                   qqq = 0
             else
-                  qqq = sqrt(0.25d0*s - mjpsi**2)
+                  qqq = sqrt(0.25d0*s - zmass**2)
             endif
-            qqq0 = sqrt(0.25d0*(hmass**2) - mjpsi**2)
+            qqq0 = sqrt(0.25d0*(hmass**2) - zmass**2)
             !   PRINT *, s, qqq, qqq0
             higgsprop=1d0/dcmplx(s-hmass**2,hmass*hwidth*qqq/qqq0) !inserted multiplication by qqq/qqq0 for running width
         else
@@ -69,7 +67,7 @@ c--- otherwise it takes the usual Breit-Wigner form
       include 'spinzerohiggs_anomcoupl.f'
       double precision s,mhbarsq,mhbar,gammahbar
       double complex cfac
-      double precision mjpsi, qqq, qqq0 !added for running width
+      double precision qqq, qqq0 !added for running width
       save mhbarsq,cfac
 
       ! PRINT *, "h2:", h2mass, h2width
@@ -94,14 +92,12 @@ c--- Breit Wigner propagator
         else if(widthscheme.eq.2) then
             higgs2prop=1d0/dcmplx(s-h2mass**2,h2mass*h2width)
         else if(widthscheme.eq.4) then !3 is skipped as by JHU convention is would be the CPscheme, but that is already covered
-            mjpsi = 3.09689d0
-            if (0.25d0*s < mjpsi**2) then
-                  ! PRINT *, mjpsi, mjpsi**2, s, 0.25d0*(s**2)
+            if (0.25d0*s < zmass**2) then
                   qqq = 0
             else
-                  qqq = sqrt(0.25d0*s - mjpsi**2)
+                  qqq = sqrt(0.25d0*s - zmass**2)
             endif
-            qqq0 = sqrt(0.25d0*(h2mass**2) - mjpsi**2)
+            qqq0 = sqrt(0.25d0*(h2mass**2) - zmass**2)
             !   PRINT *, s, qqq, qqq0
             higgs2prop=1d0/dcmplx(s-h2mass**2,h2mass*h2width*qqq/qqq0) !inserted multiplication by qqq/qqq0 for running width
         else
