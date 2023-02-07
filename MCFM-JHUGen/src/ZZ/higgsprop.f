@@ -8,11 +8,14 @@ c--- otherwise it takes the usual Breit-Wigner form
       include 'constants.f'
       include 'masses.f'
       include 'cpscheme.f'
+      include 'widthscheme.f'
       !include 'first.f'
       double precision s,mhbarsq,mhbar,gammahbar
       double complex cfac
+      double precision mjpsi, qqq, qqq0 !added for running width
       save mhbarsq,cfac
 
+      ! PRINT *, "h1:", hmass, hwidth
       if (CPscheme) then
 c--- complex pole scheme propagator      
         mhbarsq=hmass**2+hwidth**2
@@ -21,8 +24,27 @@ c--- complex pole scheme propagator
         cfac=dcmplx(1d0,gammahbar/mhbar)
         higgsprop=cfac/(s*cfac-dcmplx(mhbarsq,0d0))
       else
-c--- Breit Wigner propagator      
-        higgsprop=1d0/dcmplx(s-hmass**2,hmass*hwidth)
+c--- Breit Wigner propagator
+        if(widthscheme.eq.0) then
+            higgsprop = 1d0
+        else if(widthscheme.eq.1) then
+            higgsprop=1d0/dcmplx(s-hmass**2,s*hwidth/hmass)
+        else if(widthscheme.eq.2) then
+            higgsprop=1d0/dcmplx(s-hmass**2,hmass*hwidth)
+        else if(widthscheme.eq.4) then !3 is skipped as by JHU convention is would be the CPscheme, but that is already covered
+            mjpsi = 3.09689d0
+            if (0.25d0*s < mjpsi**2) then
+                  ! PRINT *, mjpsi, mjpsi**2, s, 0.25d0*(s**2)
+                  qqq = 0
+            else
+                  qqq = sqrt(0.25d0*s - mjpsi**2)
+            endif
+            qqq0 = sqrt(0.25d0*(hmass**2) - mjpsi**2)
+            !   PRINT *, s, qqq, qqq0
+            higgsprop=1d0/dcmplx(s-hmass**2,hmass*hwidth*qqq/qqq0) !inserted multiplication by qqq/qqq0 for running width
+        else
+            print *, "Invalid width scheme", widthscheme
+        endif
       endif
       
       return
@@ -42,12 +64,15 @@ c--- otherwise it takes the usual Breit-Wigner form
       include 'constants.f'
       include 'masses.f'
       include 'cpscheme.f'
+      include 'widthscheme.f'
       !include 'first.f'
       include 'spinzerohiggs_anomcoupl.f'
       double precision s,mhbarsq,mhbar,gammahbar
       double complex cfac
+      double precision mjpsi, qqq, qqq0 !added for running width
       save mhbarsq,cfac
 
+      ! PRINT *, "h2:", h2mass, h2width
       if(h2mass.lt.zip) then
          higgs2prop=czip
          return
@@ -61,8 +86,27 @@ c--- complex pole scheme propagator
         cfac=dcmplx(1d0,gammahbar/mhbar)
         higgs2prop=cfac/(s*cfac-dcmplx(mhbarsq,0d0))
       else
-c--- Breit Wigner propagator      
-        higgs2prop=1d0/dcmplx(s-h2mass**2,h2mass*h2width)
+c--- Breit Wigner propagator
+        if(widthscheme.eq.0) then
+            higgs2prop = 1d0
+        else if(widthscheme.eq.1) then
+            higgs2prop=1d0/dcmplx(s-h2mass**2,s*h2width/h2mass)
+        else if(widthscheme.eq.2) then
+            higgs2prop=1d0/dcmplx(s-h2mass**2,h2mass*h2width)
+        else if(widthscheme.eq.4) then !3 is skipped as by JHU convention is would be the CPscheme, but that is already covered
+            mjpsi = 3.09689d0
+            if (0.25d0*s < mjpsi**2) then
+                  ! PRINT *, mjpsi, mjpsi**2, s, 0.25d0*(s**2)
+                  qqq = 0
+            else
+                  qqq = sqrt(0.25d0*s - mjpsi**2)
+            endif
+            qqq0 = sqrt(0.25d0*(h2mass**2) - mjpsi**2)
+            !   PRINT *, s, qqq, qqq0
+            higgs2prop=1d0/dcmplx(s-h2mass**2,h2mass*h2width*qqq/qqq0) !inserted multiplication by qqq/qqq0 for running width
+        else
+            print *, "Invalid width scheme", widthscheme
+        endif
       endif
       
       return
