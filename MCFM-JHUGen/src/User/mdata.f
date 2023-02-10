@@ -29,6 +29,7 @@ c     Begin anomalous couplings
       include 'spinzerohiggs_anomcoupl.f'
 
       data AllowAnomalousCouplings / 0 / ! Disables anomalous couplings
+      data AllowAnomalousZffCouplings / 1 / ! Disables anomalous Zff Couplings
       data distinguish_HWWcouplings / 0 /
       data AnomalCouplPR,AnomalCouplDK / 1, 1/
       data channeltoggle_stu / 2 /
@@ -349,8 +350,25 @@ c     anomalous couplings for triple and quartic gauge boson coupling with d_1-3
 c     anomalous couplings for triple and quartic gauge boson coupling with d_4 (SM: set all to 0)
       data dFour_A / (0d0,0d0) /
       data dFour_Z / (0d0,0d0) /
+      
+c     right handed Z couplings to charged leptons (set separately for each Z)
+      data reZ / 0.54837d0 / ! SM = (-2*-1*xw_inp)/(2*sqrt(xw_inp*(1-xw_inp)))
+c      data reZ2 / (0.54837d0,0d0) / ! SM = (-2*-1*xw_inp)/(2*sqrt(xw_inp*(1-xw_inp)))
+
+c     left handed Z couplings to charged leptons (set separately for each Z)
+      data leZ / -0.63760d0 / ! SM = (-1-2*-1*xw_inp)/(2*sqrt(xw_inp*(1-xw_inp)))
+c      data leZ2 / (-0.63760d0,0d0) / ! SM = (-1-2*-1*xw_inp)/(2*sqrt(xw_inp*(1-xw_inp)))
+      
+c     left handed Z couplings to neutrinos 
+      data lnZ / 1.18598d0 / ! SM = (1)/(2*sqrt(xw_inp*(1-xw_inp))
+c      data lnZ2 / (1.18598d0,0d0) / ! SM = (1)/(2*sqrt(xw_inp*(1-xw_inp))
+
+c     right handed Z couplings to neutrinos
+      data rnZ / 0d0 / ! SM = 0 
+c      data rnZ2 / (0d0,0d0) / ! SM = 0
 
 
+c     Z couplings to Neutrinos 
 c     End anomalous couplings
 
 

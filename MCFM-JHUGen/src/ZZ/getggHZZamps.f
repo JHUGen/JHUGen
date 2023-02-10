@@ -22,6 +22,7 @@ c---
       include 'scale.f'
       include 'anom_higgs.f'
       include 'spinzerohiggs_anomcoupl.f'
+      include 'plabel.f'
       integer h1,h34,h56
       double precision p(mxpart,4),mb2,mt2,mtX2,mbX2
       double complex Mloop_bquark(2,2,2,2),Mloop_tquark(2,2,2,2),
@@ -62,6 +63,28 @@ c--- Amplitudes for production
       call anomhggvtxamp(1,2,1,za,zb,ggHmq)
       ! Overall factor=1
       !ggHmq(:,:,:) = ggHmq(:,:,:)
+
+c--- Setting Anomalous Zff Couplings 
+      if (AllowAnomalousZffCouplings .eq. 1) then
+        if ((plabel(3) .eq. 'el') .or. (plabel(3) .eq. 'ml')
+     &.or. (plabel(3) .eq. 'tl')) then
+          l1 = leZ
+          r1 = reZ 
+        endif
+        elseif (plabel(3) .eq. 'nl') then
+          l1 = lnZ*dsqrt(3d0)
+          r1 = rnZ*dsqrt(3d0) 
+        endif
+      if (AllowAnomalousZffCouplings .eq. 1) then
+        if ((plabel(5) .eq. 'el') .or. (plabel(5) .eq. 'ml')
+     &.or. (plabel(5) .eq. 'tl')) then
+          l2 = leZ
+          r2 = reZ 
+        endif
+        elseif (plabel(5) .eq. 'nl') then
+          l2 = lnZ*dsqrt(3d0)
+          r2 = rnZ*dsqrt(3d0) 
+        endif
 
 c--- Amplitudes for decay
       H4l(1,1)=
