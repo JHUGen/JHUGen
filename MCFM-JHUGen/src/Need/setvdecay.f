@@ -5,6 +5,7 @@ c---
 c--- Vector boson is p(idv) with charge vcharge
 c---
 c--- If vdecayid = FALSE, returns without doing anything
+
       implicit none
       include 'constants.f'
       include 'ewcharge.f'
@@ -19,7 +20,7 @@ c--- If vdecayid = FALSE, returns without doing anything
 
 c--- return if decay not specified in input file
       if (vdecayid .eqv. .false.) return
-      
+
       if     (idv .eq. 34) then
         vdecay=v34id
       elseif (idv .eq. 56) then
