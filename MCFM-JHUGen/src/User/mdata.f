@@ -375,7 +375,6 @@ c     Note, these are called as shifts to SM values
       data clanod / 0d0 / ! SM = 0
       data cranod / 0d0 / ! SM = 0
       
-      
 c     Z couplings to Neutrinos 
 c     End anomalous couplings
 
