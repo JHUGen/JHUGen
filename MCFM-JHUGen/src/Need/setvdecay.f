@@ -5,7 +5,6 @@ c---
 c--- Vector boson is p(idv) with charge vcharge
 c---
 c--- If vdecayid = FALSE, returns without doing anything
-
       implicit none
       include 'constants.f'
       include 'ewcharge.f'
