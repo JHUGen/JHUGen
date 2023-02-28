@@ -139,7 +139,6 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
      & Lambda_w12,Lambda_w22,Lambda_w32,Lambda_w42,
      & Lambda_w10,Lambda_w20,Lambda_w30,Lambda_w40,
 
-
      & h2mass,h2width,
 
      & Lambda2BSM,Lambda2_Q,
@@ -219,5 +218,3 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
      & clanou,cranou,clanod,cranod,
 
      & AllowAnomalousZffCouplings
-
-     
