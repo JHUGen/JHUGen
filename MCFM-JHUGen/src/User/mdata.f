@@ -29,7 +29,7 @@ c     Begin anomalous couplings
       include 'spinzerohiggs_anomcoupl.f'
 
       data AllowAnomalousCouplings / 0 / ! Disables anomalous couplings
-      data AllowAnomalousZffCouplings / 1 / ! Disables anomalous Zff Couplings
+      data AllowAnomalousZffCouplings / 0 / ! Disables anomalous Zff Couplings
       data distinguish_HWWcouplings / 0 /
       data AnomalCouplPR,AnomalCouplDK / 1, 1/
       data channeltoggle_stu / 2 /
