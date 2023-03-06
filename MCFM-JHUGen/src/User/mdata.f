@@ -352,13 +352,13 @@ c     anomalous couplings for triple and quartic gauge boson coupling with d_4 (
       data dFour_Z / (0d0,0d0) /
       
 c     right handed Z couplings to charged leptons (set separately for each Z)
-      data reZ / 0.54837d0 / ! SM = (-2*-1*xw_inp)/(2*sqrt(xw_inp*(1-xw_inp)))
+      data reZ / 0d0 / ! SM = (-2*-1*xw_inp)/(2*sqrt(xw_inp*(1-xw_inp)))
 
 c     left handed Z couplings to charged leptons (set separately for each Z)
-      data leZ / -0.63760d0 / ! SM = (-1-2*-1*xw_inp)/(2*sqrt(xw_inp*(1-xw_inp)))
+      data leZ / 0d0 / ! SM = (-1-2*-1*xw_inp)/(2*sqrt(xw_inp*(1-xw_inp)))
 
 c     left handed Z couplings to neutrinos 
-      data lnZ / 1.18598d0 / ! SM = (1)/(2*sqrt(xw_inp*(1-xw_inp))
+      data lnZ / 0d0 / ! SM = (1)/(2*sqrt(xw_inp*(1-xw_inp))
 
 c     right handed Z couplings to neutrinos
       data rnZ / 0d0 / ! SM = 0 
