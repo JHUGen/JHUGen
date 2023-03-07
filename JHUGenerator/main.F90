@@ -1715,6 +1715,19 @@ type(SaveValues) :: tosave, oldsavevalues
         print *, "WidthScheme=0 removes the propagator entirely!  This generally only makes sense in PrintPMZZ mode."
         print *, "If you really want to use it anyway, remove this error in main.F90 and recompile."
         stop 1
+    !Checks if M_ZPrime is enabled and sees whether you are too close to the threshold.
+    !Does the same for M_Z when using widthscheme 4
+    else if( (WidthScheme.eq.4 .or. WidthSchemeIn.eq.4)) then
+        if( ((M_Zprime.ne.-1) .and. ((M_Reso - 2d0*M_Zprime) < 2.5d0*Ga_Reso)) .or. ((M_Reso - 2d0*M_Z) < 2.5d0*Ga_Reso) ) then
+            print *, "The resonance's pole mass is too close to the threshold for this widthscheme to work properly."
+            if( (M_Zprime.ne.-1) ) then
+                print *, "The resonance's pole mass is", (M_Reso - 2d0*M_Zprime)/Ga_Reso, "< 2.5 resonance widths away from the threshold of", 2d0*M_Zprime, "GeV"
+            else
+                print *, "The resonance's pole mass is", (M_Reso - 2d0*M_Z)/Ga_Reso, "< 2.5 resonance widths away from the threshold of", 2d0*M_Z, "GeV"
+            endif
+            print *, "Please reconsider using WidthScheme 4, and consult the manual for more information."
+            stop 1
+        endif
     endif
     if( .not.ReadLHEFile .and. .not.DoPrintPMZZ ) then
         if( ReweightDecay .or. WidthSchemeIn.gt.0 ) then
