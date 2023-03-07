@@ -34,6 +34,7 @@ c--- expected to be unreliable, namely pt(Z)<ptZsafetycut set below
       include 'qlfirst.f'
       include 'spinzerohiggs_anomcoupl.f'
       include 'plabel.f'
+      include 'ewcharge.f'
       logical dolight,dobottom,dotop,ggZZuse6d
       integer h1,h2,h34,h56,up,dn,om,nu
       double precision p(mxpart,4),cvec(2),cax(2),cl1(2),cl2(2),
@@ -166,21 +167,35 @@ c --- Modified by Jeff
      &.or. (plabel(3) .eq. 'tl')) then
           cl1(1) = leZ
           cl1(2) = reZ 
-        endif
         elseif (plabel(3) .eq. 'nl') then
           cl1(1) = lnZ*dsqrt(3d0)
           cl1(2) = rnZ*dsqrt(3d0) 
+        elseif ((plabel(5) .eq. 'bq') .or. (plabel(5) .eq. 'sq')
+     &.or. (plabel(5) .eq. 'dq')) then
+          cl1(1)=lqdZ*dsqrt(3d0)
+          cl1(2)=rqdZ*dsqrt(3d0)
+        elseif ((plabel(5) .eq. 'uq') .or. (plabel(5) .eq. 'cq')) then
+          cl1(1)=lquZ*dsqrt(3d0)
+          cl1(2)=rquZ*dsqrt(3d0) 
         endif
+      endif
       if (AllowAnomalousZffCouplings .eq. 1) then
         if ((plabel(5) .eq. 'el') .or. (plabel(5) .eq. 'ml')
      &.or. (plabel(5) .eq. 'tl')) then
           cl2(1) = leZ
           cl2(2) = reZ 
-        endif
         elseif (plabel(5) .eq. 'nl') then
           cl2(1) = lnZ*dsqrt(3d0)
-          cl2(2) = rnZ*dsqrt(3d0) 
-        endif  
+          cl2(2) = rnZ*dsqrt(3d0)
+        elseif ((plabel(5) .eq. 'bq') .or. (plabel(5) .eq. 'sq')
+     &.or. (plabel(5) .eq. 'dq')) then
+          cl2(1)=lqdZ*dsqrt(3d0)
+          cl2(2)=rqdZ*dsqrt(3d0)
+        elseif ((plabel(5) .eq. 'uq') .or. (plabel(5) .eq. 'cq')) then
+          cl2(1)=lquZ*dsqrt(3d0)
+          cl2(2)=rquZ*dsqrt(3d0)  
+        endif
+      endif  
 c--- vector and axial couplings as an array for up/down quarks
       cvec(up)=half*(L(up)+R(up))
       cvec(dn)=half*(L(dn)+R(dn))

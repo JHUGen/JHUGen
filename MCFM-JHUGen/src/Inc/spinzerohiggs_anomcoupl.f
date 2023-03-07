@@ -11,6 +11,7 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
 
 
       integer AllowAnomalousCouplings
+      integer AllowAnomalousZffCouplings
       integer distinguish_HWWcouplings
       integer AnomalCouplPR
       integer AnomalCouplDK
@@ -21,6 +22,7 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
       integer cw_q1sq,cw_q2sq,cw_q12sq
       integer c2z_q1sq,c2z_q2sq,c2z_q12sq
       integer c2w_q1sq,c2w_q2sq,c2w_q12sq
+      
 
       double precision mb_4gen,mt_4gen
 
@@ -47,6 +49,9 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
       double precision Lambda2_w11,Lambda2_w21,Lambda2_w31,Lambda2_w41
       double precision Lambda2_w12,Lambda2_w22,Lambda2_w32,Lambda2_w42
       double precision Lambda2_w10,Lambda2_w20,Lambda2_w30,Lambda2_w40
+      double precision reZ,leZ,lnZ,rnZ
+      double precision rquZ,lquZ,rqdZ,lqdZ 
+      double precision clanou,cranou,clanod,cranod
 
       double complex kappa_top,kappa_tilde_top
       double complex kappa_bot,kappa_tilde_bot
@@ -111,13 +116,13 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
       double complex dV_A,dP_A,dM_A,dFour_A
       double complex dV_Z,dP_Z,dM_Z,dFour_Z
       double complex dZZWpWm,dZAWpWm,dAAWpWm
-      double precision reZ,leZ,lnZ,rnZ
-      double precision clanou,cranou,clanod,cranod
-      integer AllowAnomalousZffCouplings
+      
+      
 
 
       common/spinzerohiggs_anomcoupl/
      & AllowAnomalousCouplings,
+     & AllowAnomalousZffCouplings,
      & distinguish_HWWcouplings,
      & AnomalCouplPR,AnomalCouplDK,
      & channeltoggle_stu,vvhvvtoggle_vbfvh,
@@ -125,6 +130,7 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
      & cw_q1sq,cw_q2sq,cw_q12sq,
      & c2z_q1sq,c2z_q2sq,c2z_q12sq,
      & c2w_q1sq,c2w_q2sq,c2w_q12sq,
+     
 
      & mb_4gen,mt_4gen,
 
@@ -151,7 +157,9 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
      & Lambda2_w11,Lambda2_w21,Lambda2_w31,Lambda2_w41,
      & Lambda2_w12,Lambda2_w22,Lambda2_w32,Lambda2_w42,
      & Lambda2_w10,Lambda2_w20,Lambda2_w30,Lambda2_w40,
-
+     & reZ,leZ,lnZ,rnZ,
+     & rquZ,lquZ,rqdZ,lqdZ,
+     & clanou,cranou,clanod,cranod,
 
      & kappa_top,kappa_tilde_top,
      & kappa_bot,kappa_tilde_bot,
@@ -212,9 +220,3 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
 
      & dV_A,dP_A,dM_A,dFour_A,
      & dV_Z,dP_Z,dM_Z,dFour_Z,
-     & dZZWpWm,dZAWpWm,dAAWpWm,
-     
-     & reZ,leZ,lnZ,rnZ,
-     & clanou,cranou,clanod,cranod,
-
-     & AllowAnomalousZffCouplings
