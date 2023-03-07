@@ -363,20 +363,18 @@ c     left handed Z couplings to neutrinos
 c     right handed Z couplings to neutrinos
       data rnZ / 0d0 / ! SM = 0 
 
-c     Anomalous Couplings for the Z to up type quarks
+c     Anomalous Couplings for the Z to up type quarks in production 
 c     Note, these are called as shifts to SM values
 
       data clanou / 0d0 / ! SM = 0
       data cranou / 0d0 / ! SM = 0
 
-c     Anomalous Couplings for the Z to down type quarks
+c     Anomalous Couplings for the Z to down type quarks in production
 c     Note, these are called as shifts to SM values
       
       data clanod / 0d0 / ! SM = 0
       data cranod / 0d0 / ! SM = 0
-      
-      
-c     Z couplings to Neutrinos 
+
 c     End anomalous couplings
 
       data ewscheme  / +3                  /   ! Chooses EW scheme
