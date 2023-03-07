@@ -29,7 +29,7 @@ c     Begin anomalous couplings
       include 'spinzerohiggs_anomcoupl.f'
 
       data AllowAnomalousCouplings / 0 / ! Disables anomalous couplings
-      data AllowAnomalousZffCouplings / 1 / ! Disables anomalous Zff Couplings
+      data AllowAnomalousZffCouplings / 0 / ! Disables anomalous Zff Couplings
       data distinguish_HWWcouplings / 0 /
       data AnomalCouplPR,AnomalCouplDK / 1, 1/
       data channeltoggle_stu / 2 /
@@ -370,6 +370,9 @@ c     Note, these are called as shifts to SM values
 
 c     Anomalous Couplings for the Z to down type quarks in production
 c     Note, these are called as shifts to SM values
+      data clanod / 0d0 / ! SM = 0
+      data cranod / 0d0 / ! SM = 0
+      
 c     Anomalous Couplings for Z to up type quarks in decay 
       data lquZ / 0d0 / ! SM = (tau(j)-two*Q(j)*xw)/two*sqrt(xw*(1d0-xw))
       data rquZ / 0d0 / ! SM = (-two*Q(j)*xw)/two*sqrt(xw*(1d0-xw))
