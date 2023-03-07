@@ -127,7 +127,8 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
      & cw_q1sq,cw_q2sq,cw_q12sq,
      & c2z_q1sq,c2z_q2sq,c2z_q12sq,
      & c2w_q1sq,c2w_q2sq,c2w_q12sq,
-
+     & AllowAnomalousZffCouplings,
+     
      & mb_4gen,mt_4gen,
 
      & LambdaBSM,Lambda_Q,
@@ -154,7 +155,8 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
      & Lambda2_w11,Lambda2_w21,Lambda2_w31,Lambda2_w41,
      & Lambda2_w12,Lambda2_w22,Lambda2_w32,Lambda2_w42,
      & Lambda2_w10,Lambda2_w20,Lambda2_w30,Lambda2_w40,
-
+     & reZ,leZ,lnZ,rnZ,
+     & clanou,cranou,clanod,cranod,
 
      & kappa_top,kappa_tilde_top,
      & kappa_bot,kappa_tilde_bot,
@@ -215,11 +217,4 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
 
      & dV_A,dP_A,dM_A,dFour_A,
      & dV_Z,dP_Z,dM_Z,dFour_Z,
-     & dZZWpWm,dZAWpWm,dAAWpWm,
-     
-     & reZ,leZ,lnZ,rnZ,
-     & clanou,cranou,clanod,cranod,
-
-     & AllowAnomalousZffCouplings
-
-     
+     & dZZWpWm,dZAWpWm,dAAWpWm
