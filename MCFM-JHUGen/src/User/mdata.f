@@ -365,15 +365,18 @@ c     right handed Z couplings to neutrinos
 
 c     Anomalous Couplings for the Z to up type quarks in production 
 c     Note, these are called as shifts to SM values
-
       data clanou / 0d0 / ! SM = 0
       data cranou / 0d0 / ! SM = 0
 
 c     Anomalous Couplings for the Z to down type quarks in production
 c     Note, these are called as shifts to SM values
-      
-      data clanod / 0d0 / ! SM = 0
-      data cranod / 0d0 / ! SM = 0
+c     Anomalous Couplings for Z to up type quarks in decay 
+      data lquZ / 0d0 / ! SM = (tau(j)-two*Q(j)*xw)/two*sqrt(xw*(1d0-xw))
+      data rquZ / 0d0 / ! SM = (-two*Q(j)*xw)/two*sqrt(xw*(1d0-xw))
+
+c     Anomalous Couplings for Z to down type quarks in decay
+      data lqdZ / 0d0 / ! SM = (tau(j)-two*Q(j)*xw)/two*sqrt(xw*(1d0-xw))
+      data rqdZ / 0d0 / ! SM = (-two*Q(j)*xw)/two*sqrt(xw*(1d0-xw))
 
 c     End anomalous couplings
 
