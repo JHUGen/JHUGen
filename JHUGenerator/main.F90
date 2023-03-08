@@ -1718,7 +1718,7 @@ type(SaveValues) :: tosave, oldsavevalues
         stop 1
     !Checks if M_ZPrime is enabled and sees whether you are too close to the threshold.
     !Does the same for M_Z when using widthscheme 4
-    else if( (WidthScheme.eq.4 .or. WidthSchemeIn.eq.4) .and. .not.ignoreRunningWidthResonanceCheck ) then
+    else if( (WidthScheme.eq.4 .or. WidthSchemeIn.eq.4) ) then
         if( ((M_Zprime.ne.-1) .and. ((M_Reso - 2d0*M_Zprime) < 2d0*Ga_Reso)) .or. ((M_Reso - 2d0*M_Z) < 2d0*Ga_Reso) ) then
             print *, "ERROR: The resonance's pole mass is too close to the threshold for this widthscheme to work properly."
             if( (M_Zprime.ne.-1) ) then
@@ -1726,20 +1726,14 @@ type(SaveValues) :: tosave, oldsavevalues
             else
                 print *, "The resonance's pole mass is", (M_Reso - 2d0*M_Z)/Ga_Reso, "< 2 resonance widths away from the threshold of", 2d0*M_Z, "GeV"
             endif
-            print *, "Please reconsider using WidthScheme 4, and consult the manual for more information."
-            print *, "If you would still like to use WidthScheme 4 with these parameters, please set 'ignoreRunningWidthResonanceCheck' to true in main.F90 and make JHUGen."
-            stop 1
-        endif
-    else if( (WidthScheme.eq.4 .or. WidthSchemeIn.eq.4) .and. ignoreRunningWidthResonanceCheck ) then
-        if( ((M_Zprime.ne.-1) .and. ((M_Reso - 2d0*M_Zprime) < 2d0*Ga_Reso)) .or. ((M_Reso - 2d0*M_Z) < 2d0*Ga_Reso) ) then
-            print *, "WARNING: The resonance's pole mass is too close to the threshold for this widthscheme to work properly."
-            if( (M_Zprime.ne.-1) ) then
-                print *, "The resonance's pole mass is", (M_Reso - 2d0*M_Zprime)/Ga_Reso, "< 2 resonance widths away from the threshold of", 2d0*M_Zprime, "GeV"
+            if( .not.ignoreRunningWidthResonanceCheck ) then
+                print *, "Please reconsider using WidthScheme 4, and consult the manual for more information."
+                print *, "If you would still like to use WidthScheme 4 with these parameters, please set 'ignoreRunningWidthResonanceCheck' to true in main.F90 and make JHUGen."
+                stop 1
             else
-                print *, "The resonance's pole mass is", (M_Reso - 2d0*M_Z)/Ga_Reso, "< 2 resonance widths away from the threshold of", 2d0*M_Z, "GeV"
+                print *, "Since you have opted to ignore the resonance restriction for WidthScheme 4, generatio will continue."
+                print *, "If this was not the behavior you wanted, please set 'ignoreRunningWidthResonanceCheck' to false in main.F90 and make JHUGen."
             endif
-            print *, "Since you have opted to ignore the resonance restriction for WidthScheme 4, generatio will continue."
-            print *, "If this was not the behavior you wanted, please set 'ignoreRunningWidthResonanceCheck' to false in main.F90 and make JHUGen."
         endif
     endif
     if( .not.ReadLHEFile .and. .not.DoPrintPMZZ ) then
