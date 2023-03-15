@@ -12,6 +12,7 @@ c---   br,wwbr,zzbr,tautaubr : the LO calculated values
       include 'verbose.f'
       include 'cpscheme.f'
       include 'widthscheme.f'
+      include 'spinzerohiggs_anomcoupl.f'
       double precision br,gamgambr,zgambr,wwbr,zzbr,tautaubr,x_w,x_z,
      & msqgamgam,hzgamwidth,msqhbb,msqhtautau,
      & pw_bb,pw_tautau,pw_gamgam,pw_ww,pw_zz,pw_zgam,
@@ -85,8 +86,10 @@ c      hwidth=4.17116d-3 ! HTO width at 126 GeV
 c--- If the complex pole scheme is not desired, then the width scheme should be selected.
 c--- The width scheme has the same enumeration as that of JHUGen. 
 c--- 1-> running width, 2-> fixed width, 3 (skipped due to CPscheme as a boolean), 4 -> new running width, 5 -> propagator removal
+c--- There is a protection against generation if the resonance is < 2 widths from the decay threshold (i.e. 2*M_Z) for widthscheme 4
+c--- ignoreWidthSchemeFourRestriction can be set to true if you want to bypass this protection (at your own risk!)
       widthscheme=2 !the default configuration is no CPscheme and a fixed width
-
+      ignoreWidthSchemeFourRestriction=.false.
 c--- Set up anomalous width of the Higgs boson if required
       if (abs(hwidth_ratio-1d0) .lt. 1d-6) then
         anom_Higgs=.false.
