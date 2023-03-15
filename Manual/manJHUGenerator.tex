@@ -792,11 +792,11 @@ need to be set and are common to both resonances. The masses modifying the third
 \item \verb|widthscheme|: This option controls the widths scheme in MCFM, and is set in Need/sethparams.f. The options are 1 for running width, 2 for fixed width (the default), and 4 for the alternate running width. The MCFM complex pole-scheme is set in the same file, where, if enabled, will ignore any widthscheme selection.
 \begin{itemize}
   \item WidthScheme 4 is an approximation of decay to two narrow resonances modelled by:
-  \[
-    \frac{1}{(\hat{s} - M_{resonance}^2)^2 + (M_{resonance}\Gamma_{resonance}\frac{qqq}{qqq0})}\\
-    qqq=\sqrt{\frac{\hat{s}}{4} - M_{z/z'}^2}; \quad qqq0=\sqrt{\frac{M_{resonance}}{4} - M_{z/z'}^2}
-  \]
-  Where $M_{resonance}$ is the pole mass of the resonance, $\Gamma_{resonance}$ is the width of the resonance, and $M_{z/z'}$ is either the Z mass or the ZPrime mass, depending on what you use.
+  \begin{align*}
+    \frac{1}{(\hat{s} - M_{r}^2)^2 + (M_{r}\Gamma_{r}\frac{qqq}{qqq0})}; \quad qqq=\sqrt{\frac{\hat{s}}{4} - M_{z/z'}^2}; \quad qqq0=\sqrt{\frac{M_{r}}{4} - M_{z/z'}^2}
+  \end{align*}
+  
+  Where $M_{r}$ is the pole mass of the resonance, $\Gamma_{r}$ is the width of the resonance, and $M_{z/z'}$ is either the Z mass or the ZPrime mass, depending on what you use as the decay mass.
   \item By default, generation will not occur under WidthScheme 4 if $M_{resonance} < 2 M_{z/z'} + 2\Gamma_{resonance}$. This restriction can be bypassed by setting 'ignoreRunningWidthResonanceCheck=true' as a command line argument.
   \item For MCFM-JHUGen, the widthscheme is set in Need/sethparams.f. Just like JHUGen, one can ignore the resonance mass restriction by setting 'ignoreWidthSchemeFourRestriction=true' in the same file.
 \end{itemize}
