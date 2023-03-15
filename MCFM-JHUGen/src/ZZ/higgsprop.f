@@ -32,15 +32,6 @@ c--- Breit Wigner propagator
         else if(widthscheme.eq.2) then
             higgsprop=1d0/dcmplx(s-hmass**2,hmass*hwidth)
         else if(widthscheme.eq.4) then !3 is skipped as by JHU convention it would be the CPscheme, but that is already covered
-            if ( (hmass - 2d0*zmass < 2d0*hwidth) ) then
-                  if (ignoreWidthSchemeFourRestriction) then
-                    print *,'ignoring width restriction.'
-                  else
-                    print *, "reconsider using WidthScheme 4" 
-                    print *, "or ignore it"
-                    stop 1
-                  endif
-            endif
             if (0.25d0*s < zmass**2) then
                   qqq = 0
             else
@@ -101,17 +92,6 @@ c--- Breit Wigner propagator
         else if(widthscheme.eq.2) then
             higgs2prop=1d0/dcmplx(s-h2mass**2,h2mass*h2width)
         else if(widthscheme.eq.4) then !3 is skipped as by JHU convention is would be the CPscheme, but that is already covered
-            if ( (h2mass .ne. -1d0) ) then
-                  if ((h2mass - 2d0*zmass).lt.(2d0*h2width)) then
-                    if (ignoreWidthSchemeFourRestriction) then
-                        print *,'ignoring width restriction.'
-                    else
-                        print *, "reconsider using WidthScheme 4" 
-                        print *, "or ignore it"
-                        stop 1
-                    endif
-                  endif
-            endif
             if (0.25d0*s < zmass**2) then
                   qqq = 0
             else

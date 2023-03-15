@@ -613,7 +613,7 @@ This is the list of command line configurables (also defined in the \verb|README
                        (off by default)
   Higgs propagator and decay width:
     WidthScheme:       Higgs width scheme: 1 for running width, 2 for fixed width (default),
-                       and 3 for the CPS
+                       3 for the CPS, 4 for alternate running width (narrow width decay products)
     WidthSchemeIn:     For decay mode, reweight from one propagator to another by setting
                        WidthScheme and WidthSchemeIn to different values
     ReweightDecay:     For decay mode, reweight input decay by the decay probability
@@ -788,7 +788,18 @@ need to be set and are common to both resonances. The masses modifying the third
 \end{itemize}
 \subsubsection{Higgs propagator and decay width}
 \begin{itemize}
-\item \verb|WidthScheme|: This option controls the width scheme in JHUGen. The options are 1 for running width, 2 for fixed width, and 3 for the complex pole scheme~\cite{Passarino:2010qk,Goria:2011wa}. 2 is the default option.  Note that the parameter values have the same meaning as in POWHEG.
+\item \verb|WidthScheme|: This option controls the width scheme in JHUGen. The options are 1 for running width, 2 for fixed width, 3 for the complex pole scheme~\cite{Passarino:2010qk,Goria:2011wa}, and 4 for the alternate running width scheme. 2 is the default option.  Note that the parameter values have the same meaning as in POWHEG.
+\item \verb|widthscheme|: This option controls the widths scheme in MCFM, and is set in Need/sethparams.f. The options are 1 for running width, 2 for fixed width (the default), and 4 for the alternate running width. The MCFM complex pole-scheme is set in the same file, where, if enabled, will ignore any widthscheme selection.
+\begin{itemize}
+  \item WidthScheme 4 is an approximation of decay to two narrow resonances modelled by:
+  \[
+    \frac{1}{(\hat{s} - M_{resonance}^2)^2 + (M_{resonance}\Gamma_{resonance}\frac{qqq}{qqq0})}\\
+    qqq=\sqrt{\frac{\hat{s}}{4} - M_{z/z'}^2}; \quad qqq0=\sqrt{\frac{M_{resonance}}{4} - M_{z/z'}^2}
+  \]
+  Where $M_{resonance}$ is the pole mass of the resonance, $\Gamma_{resonance}$ is the width of the resonance, and $M_{z/z'}$ is either the Z mass or the ZPrime mass, depending on what you use.
+  \item By default, generation will not occur under WidthScheme 4 if $M_{resonance} < 2 M_{z/z'} + 2\Gamma_{resonance}$. This restriction can be bypassed by setting 'ignoreRunningWidthResonanceCheck=true' as a command line argument.
+  \item For MCFM-JHUGen, the widthscheme is set in Need/sethparams.f. Just like JHUGen, one can ignore the resonance mass restriction by setting 'ignoreWidthSchemeFourRestriction=true' in the same file.
+\end{itemize}
 \item \verb|WidthSchemeIn|: In \verb|ReadLHE| mode, if this is specified and is different than \verb|WidthScheme|, the resonance propagator will be reweighted between the three options specified above by multiplying the LHE weight of each event by the ratio of the propagators.
 \item \verb|ReweightDecay|: By default, in \verb|ReadLHE| mode, output events are written with the same weight as in the input file.  For a wide resonance, this is not fully correct.  The full probability for a $gg\to X\to VV\to 4f$ event can be written as
 \[
