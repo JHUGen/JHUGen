@@ -88,7 +88,7 @@ c--- The width scheme has the same enumeration as that of JHUGen.
 c--- 1-> running width, 2-> fixed width, 3 (skipped due to CPscheme as a boolean), 4 -> new running width, 5 -> propagator removal
 c--- There is a protection against generation if the resonance is < 2 widths from the decay threshold (i.e. 2*M_Z) for widthscheme 4
 c--- ignoreWidthSchemeFourRestriction can be set to true if you want to bypass this protection (at your own risk!)
-      widthscheme=4 !the default configuration is no CPscheme and a fixed width
+      widthscheme=2 !the default configuration is no CPscheme and a fixed width
       ignoreWidthSchemeFourRestriction=.false.
       if (widthscheme.eq.4) then
             if ( (hmass - 2d0*zmass < 2d0*hwidth) ) then
