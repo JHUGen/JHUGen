@@ -7196,7 +7196,7 @@ implicit none
         print *, "                      (off by default)"
         print *, " Higgs propagator and decay width:"
         print *, "   WidthScheme:       Higgs width scheme: 1 for running width, 2 for fixed width (default),"
-        print *, "                      and 3 for the CPS"
+        print *, "                      3 for the CPS, 4 for alternate running width (narrow width decay products)"
         print *, "   WidthSchemeIn:     For decay mode, reweight from one propagator to another by setting"
         print *, "                      WidthScheme and WidthSchemeIn to different values"
         print *, "   ReweightDecay:     For decay mode, reweight input decay by the decay probability"

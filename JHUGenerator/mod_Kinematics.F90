@@ -5411,7 +5411,7 @@ double precision decayMass, qqq, qqq0
         !BigGamma = BigGamma*GeV
 
         !print *, dsqrt(dabs(sHat))/GeV, gabarH/GeV, BigGamma/GeV
-    elseif( scheme.eq.4) then !jpsi running width.
+    elseif( scheme.eq.4) then !alternate running width
         if ( M_Zprime.ne.-1 ) then !if you're using ZPrime then it will consider the ZPrime mass
             decayMass = M_Zprime
         else
