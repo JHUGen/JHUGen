@@ -163,7 +163,7 @@ c--- cl1 associated with Z(3+4), cl2 associated with Z(5+6)
 
       c --- Modifications to lepton couplings as arrays for anomalous Zll couplings 
 c --- Modified by Jeff
-      if (AllowAnomalousZffCouplings .eq. 1) then
+      if (AllowAnomalousZffCouplings .eq. 2) then
         if ((plabel(3) .eq. 'el') .or. (plabel(3) .eq. 'ml')
      &.or. (plabel(3) .eq. 'tl')) then
           cl1(1) = leZ
@@ -180,7 +180,7 @@ c --- Modified by Jeff
           cl1(2)=rquZ*dsqrt(3d0) 
         endif
       endif
-      if (AllowAnomalousZffCouplings .eq. 1) then
+      if (AllowAnomalousZffCouplings .eq. 2) then
         if ((plabel(5) .eq. 'el') .or. (plabel(5) .eq. 'ml')
      &.or. (plabel(5) .eq. 'tl')) then
           cl2(1) = leZ
@@ -205,7 +205,7 @@ c--- vector and axial couplings as an array for up/down quarks
       cax(dn)=half*(L(dn)-R(dn))
 
 c--- Optionally will add shifts to SM up and down type Zqq couplings
-      if (AllowAnomalousZffCouplings .eq. 1) then 
+      if (AllowAnomalousZffCouplings .eq. 2) then 
         cvec(up)=half*(L(up)+R(up)) + (clanou+cranou)/2.
         cvec(dn)=half*(L(dn)+R(dn)) + (clanod+cranod)/2.
         cax(up)=half*(L(up)-R(up))  + (clanou-cranou)/2.

@@ -65,7 +65,7 @@ c--- Amplitudes for production
       !ggHmq(:,:,:) = ggHmq(:,:,:)
 
 c--- Setting Anomalous Zff Couplings 
-      if (AllowAnomalousZffCouplings .eq. 1) then
+      if (AllowAnomalousZffCouplings .eq. 2) then
         if ((plabel(3) .eq. 'el') .or. (plabel(3) .eq. 'ml')
      &.or. (plabel(3) .eq. 'tl')) then
           l1 = leZ
@@ -82,7 +82,7 @@ c--- Setting Anomalous Zff Couplings
           r1=rquZ*dsqrt(3d0)
         endif 
       endif
-      if (AllowAnomalousZffCouplings .eq. 1) then
+      if (AllowAnomalousZffCouplings .eq. 2) then
         if ((plabel(5) .eq. 'el') .or. (plabel(5) .eq. 'ml')
      &.or. (plabel(5) .eq. 'tl')) then
           l2 = leZ
