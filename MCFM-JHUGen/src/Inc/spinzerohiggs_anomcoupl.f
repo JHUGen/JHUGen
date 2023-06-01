@@ -156,7 +156,7 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
 
      & reZ,leZ,lnZ,rnZ,
      & rquZ,lquZ,rqdZ,lqdZ,
-     & clanou,cranou,clanod,cranod
+     & clanou,cranou,clanod,cranod,
 
      & kappa_top,kappa_tilde_top,
      & kappa_bot,kappa_tilde_bot,
