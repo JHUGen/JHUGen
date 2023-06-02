@@ -161,7 +161,7 @@ c--- cl1 associated with Z(3+4), cl2 associated with Z(5+6)
       cl2(1)=l2
       cl2(2)=r2
 
-      c --- Modifications to lepton couplings as arrays for anomalous Zll couplings 
+c --- Modifications to lepton couplings as arrays for anomalous Zll couplings 
 c --- Modified by Jeff
       if (AllowAnomalousZffCouplings .eq. 2) then
         if ((plabel(3) .eq. 'el') .or. (plabel(3) .eq. 'ml')
