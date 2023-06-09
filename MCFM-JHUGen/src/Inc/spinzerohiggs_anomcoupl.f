@@ -47,7 +47,6 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
       double precision Lambda2_w11,Lambda2_w21,Lambda2_w31,Lambda2_w41
       double precision Lambda2_w12,Lambda2_w22,Lambda2_w32,Lambda2_w42
       double precision Lambda2_w10,Lambda2_w20,Lambda2_w30,Lambda2_w40
-      double precision clanou,cranou,clanod,cranod
 
       double complex kappa_top,kappa_tilde_top
       double complex kappa_bot,kappa_tilde_bot
@@ -149,7 +148,6 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
      & Lambda2_w12,Lambda2_w22,Lambda2_w32,Lambda2_w42,
      & Lambda2_w10,Lambda2_w20,Lambda2_w30,Lambda2_w40,
 
-     & clanou,cranou,clanod,cranod,
 
      & kappa_top,kappa_tilde_top,
      & kappa_bot,kappa_tilde_bot,
