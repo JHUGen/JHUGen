@@ -124,7 +124,7 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
      & c2w_q1sq,c2w_q2sq,c2w_q12sq,
 
      & mb_4gen,mt_4gen,
-     
+
      & LambdaBSM,Lambda_Q,
      & Lambda_zgs1,
      & Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4,
