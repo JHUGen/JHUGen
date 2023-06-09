@@ -11,7 +11,6 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
 
 
       integer AllowAnomalousCouplings
-      integer AllowAnomalousZffCouplings
       integer distinguish_HWWcouplings
       integer AnomalCouplPR
       integer AnomalCouplDK
@@ -119,7 +118,6 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
 
       common/spinzerohiggs_anomcoupl/
      & AllowAnomalousCouplings,
-     & AllowAnomalousZffCouplings,
      & distinguish_HWWcouplings,
      & AnomalCouplPR,AnomalCouplDK,
      & channeltoggle_stu,vvhvvtoggle_vbfvh,
