@@ -1375,6 +1375,42 @@ tCzz=1.05,0 Cza=1,.5 tCza=.5,1 Cabx=0,0 Caa=0,.5 tCaa=.5,1 Cgg=2.1,0 neutral_cur
 Lambda_z1=100 Lambda_w1=100 Lambda_zgs1=100
 \end{verbatim}
 
+\section{Modified Zff couplings in MCFM}
+We support modified Zff couplings in certain processes in the standalone JHUGen-MCFM package of the JHU Generator Framework. We allow modified Zff couplings both production and decay for $gg \to 4l$ processes. Zff couplings are set separately for production and decay.
+In production, we parameterize the modifications to the Zff couplings in production as shifts to the SM coupling of the Z-boson to up-type and down-type quarks. In decay, we allow the user to set the exact value of the Zff couplings to leptons and quarks. To utilize these features one must install the required package
+\begin{verbatim}
+cd MCFM-JHUGen
+./Install
+\end{verbatim}
+Then the user can modify these couplings my manually editing the fortran code:
+\begin{verbatim}
+  src/User/mdata.f
+\end{verbatim}
+To turn on anomalous Zff couplings set to 1:
+\begin{verbatim}
+  data AllowAnomalousZffCouplings / 0 /
+\end{verbatim}
+Anomalous Zff couplings are listed below:
+\begin{verbatim}
+    data leZ / 0d0 / left handed Z couplings to charged leptons
+    data reZ / 0d0 / right handed Z couplings to charged leptons 
+    data lnZ / 0d0 / left handed Z couplings to neutrinos 
+    data rnZ / 0d0 / right handed Z couplings to neutrinos
+    data lquZ / 0d0 / left handed couplings for Z to up type quarks in decay 
+    data rquZ / 0d0 / right handed couplings for Z to up type quarks in decay 
+    data lqdZ / 0d0 / left handed couplings for Z to down type quarks in decay
+    data rqdZ / 0d0 / right handed couplings for Z to down type quarks in decay
+    data clanou / 0d0 / shift in left handed coupling of Z to up type quarks in production  
+    data cranou / 0d0 / shift in right handed coupling of Z to up type quarks in production 
+    data clanod / 0d0 / shift in left handed coupling of Z to down type quarks in production  
+    data cranod / 0d0 / shift in right handed coupling of Z to down type quarks in production  
+\end{verbatim}
+Be sure to recompile MCFM to make sure the coupling changes are implemented. Then to run your process do 
+\begin{verbatim}
+    cd bin 
+    ./mcfm
+\end{verbatim}
+
 \section{Release notes}
 \noindent 
 In going from \verb|v7.5.2| to \verb|v7.5.3| (January 25, 2023), the updates are as follows:
