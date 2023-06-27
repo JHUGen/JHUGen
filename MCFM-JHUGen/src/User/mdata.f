@@ -27,8 +27,10 @@ c
 
 c     Begin anomalous couplings
       include 'spinzerohiggs_anomcoupl.f'
+      include 'AnomZffCouplings.f'
 
       data AllowAnomalousCouplings / 0 / ! Disables anomalous couplings
+      data AllowAnomalousZffCouplings / 0 / ! Disables anomalous Zff Couplings
       data distinguish_HWWcouplings / 0 /
       data AnomalCouplPR,AnomalCouplDK / 1, 1/
       data channeltoggle_stu / 2 /
@@ -350,6 +352,36 @@ c     anomalous couplings for triple and quartic gauge boson coupling with d_4 (
       data dFour_A / (0d0,0d0) /
       data dFour_Z / (0d0,0d0) /
 
+c     right handed Z couplings to charged leptons (set separately for each Z)
+      data reZ / 0d0 / ! SM = (-2*-1*xw_inp)/(2*sqrt(xw_inp*(1-xw_inp)))
+
+c     left handed Z couplings to charged leptons (set separately for each Z)
+      data leZ / 0d0 / ! SM = (-1-2*-1*xw_inp)/(2*sqrt(xw_inp*(1-xw_inp)))
+
+c     End anomalous couplings
+c     left handed Z couplings to neutrinos 
+      data lnZ / 0d0 / ! SM = (1)/(2*sqrt(xw_inp*(1-xw_inp))
+
+c     right handed Z couplings to neutrinos
+      data rnZ / 0d0 / ! SM = 0 
+
+c     Anomalous Couplings for the Z to up type quarks in production 
+c     Note, these are called as shifts to SM values
+      data clanou / 0d0 / ! SM = 0
+      data cranou / 0d0 / ! SM = 0
+
+c     Anomalous Couplings for the Z to down type quarks in production
+c     Note, these are called as shifts to SM values
+      data clanod / 0d0 / ! SM = 0
+      data cranod / 0d0 / ! SM = 0
+
+c     Anomalous Couplings for Z to up type quarks in decay 
+      data lquZ / 0d0 / ! SM = (tau(j)-two*Q(j)*xw)/two*sqrt(xw*(1d0-xw))
+      data rquZ / 0d0 / ! SM = (-two*Q(j)*xw)/two*sqrt(xw*(1d0-xw))
+
+c     Anomalous Couplings for Z to down type quarks in decay
+      data lqdZ / 0d0 / ! SM = (tau(j)-two*Q(j)*xw)/two*sqrt(xw*(1d0-xw))
+      data rqdZ / 0d0 / ! SM = (-two*Q(j)*xw)/two*sqrt(xw*(1d0-xw))
 
 c     End anomalous couplings
 
