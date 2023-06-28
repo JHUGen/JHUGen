@@ -401,7 +401,7 @@ use ModCommandLine
 implicit none
 character :: arg*(500)
 integer :: NumArgs,NArg
-logical :: help, PrintVersion, PrintHeader, DryRun, success, SetLastArgument, interfSet
+logical :: help, PrintVersion, PrintHeader, DryRun, success, SetLastArgument, interfSet, ignoreRunningWidthResonanceCheck
 logical :: SetRenScheme, SetMuRenMultiplier, SetFacScheme, SetMuFacMultiplier
 logical :: SetMReso, SetGaReso, SetMReso2, SetGaReso2
 logical :: SetAnomalousSpin0gg, Setghg2, SetAnomalousSpin0VV, Setghz1
@@ -442,6 +442,7 @@ type(SaveValues) :: tosave, oldsavevalues
 
    WidthScheme=-1
    WidthSchemeIn=-1
+   ignoreRunningWidthResonanceCheck = .false.   !If WidthScheme=4, this setting will ignore the pole mass check. Use at your own risk!
 
    includeInterference = .false.   ! no interference by default
    reweightInterference = .false.
@@ -611,6 +612,7 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "ReweightDecay", success, ReweightDecay)
     call ReadCommandLineArgument(arg, "WidthScheme", success, WidthScheme, tosave=tosave)
     call ReadCommandLineArgument(arg, "WidthSchemeIn", success, WidthSchemeIn)
+    call ReadCommandLineArgument(arg, "ignoreRunningWidthResonanceCheck", success, ignoreRunningWidthResonanceCheck, tosave=tosave)
 
     call ReadCommandLineArgument(arg, "ReadPmHstar", success, ReadPMZZ)
     call ReadCommandLineArgument(arg, "PmHstarFile", success, PMZZfile)
@@ -1715,6 +1717,25 @@ type(SaveValues) :: tosave, oldsavevalues
         print *, "WidthScheme=0 removes the propagator entirely!  This generally only makes sense in PrintPMZZ mode."
         print *, "If you really want to use it anyway, remove this error in main.F90 and recompile."
         stop 1
+    !Checks if M_ZPrime is enabled and sees whether you are too close to the threshold.
+    !Does the same for M_Z when using widthscheme 4
+    else if( (WidthScheme.eq.4 .or. WidthSchemeIn.eq.4) ) then
+        if( ((M_Zprime.ne.-1) .and. ((M_Reso - 2d0*M_Zprime) < 2d0*Ga_Reso)) .or. ((M_Reso - 2d0*M_Z) < 2d0*Ga_Reso) ) then
+            print *, "WARNING: The resonance's pole mass is too close to the threshold for this widthscheme to work properly."
+            if( (M_Zprime.ne.-1) ) then
+                print *, "The resonance's pole mass is", (M_Reso - 2d0*M_Zprime)/Ga_Reso, "< 2 resonance widths away from the threshold of", 2d0*M_Zprime, "GeV"
+            else
+                print *, "The resonance's pole mass is", (M_Reso - 2d0*M_Z)/Ga_Reso, "< 2 resonance widths away from the threshold of", 2d0*M_Z, "GeV"
+            endif
+            if( ignoreRunningWidthResonanceCheck ) then
+                print *, "Since you have opted to ignore the resonance restriction for WidthScheme 4, generation will continue."
+                print *, "If this was not the behavior you wanted, please set 'ignoreRunningWidthResonanceCheck' to false in the command line"
+            else
+                print *, "ERROR: resonance's pole mass is too close to the threshold."
+                print *, "Either reconsider using WidthScheme 4 or ignore it by setting 'ignoreRunningWidthResonanceCheck=true' at your own risk."
+                stop 1
+            endif
+        endif
     endif
     if( .not.ReadLHEFile .and. .not.DoPrintPMZZ ) then
         if( ReweightDecay .or. WidthSchemeIn.gt.0 ) then
@@ -7175,7 +7196,7 @@ implicit none
         print *, "                      (off by default)"
         print *, " Higgs propagator and decay width:"
         print *, "   WidthScheme:       Higgs width scheme: 1 for running width, 2 for fixed width (default),"
-        print *, "                      and 3 for the CPS"
+        print *, "                      3 for the CPS, 4 for alternate running width (narrow width decay products)"
         print *, "   WidthSchemeIn:     For decay mode, reweight from one propagator to another by setting"
         print *, "                      WidthScheme and WidthSchemeIn to different values"
         print *, "   ReweightDecay:     For decay mode, reweight input decay by the decay probability"

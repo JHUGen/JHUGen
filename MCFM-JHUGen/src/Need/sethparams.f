@@ -11,6 +11,8 @@ c---   br,wwbr,zzbr,tautaubr : the LO calculated values
       include 'process.f' 
       include 'verbose.f'
       include 'cpscheme.f'
+      include 'widthscheme.f'
+      include 'spinzerohiggs_anomcoupl.f'
       double precision br,gamgambr,zgambr,wwbr,zzbr,tautaubr,x_w,x_z,
      & msqgamgam,hzgamwidth,msqhbb,msqhtautau,
      & pw_bb,pw_tautau,pw_gamgam,pw_ww,pw_zz,pw_zgam,
@@ -71,7 +73,7 @@ c--- are not actually used in our calculations
         hwidth=pw_bb+pw_tautau+pw_ww+pw_zz+pw_gamgam+pw_zgam
       endif 
 
-c--- complex pole scheme, if desired
+c--- complex pole scheme, if desired. 
       CPscheme=.false.
       if (CPscheme) then
         call interpolate_hto(hmass,hwidth)
@@ -81,7 +83,35 @@ c        stop
       endif
 c      hwidth=4.17116d-3 ! HTO width at 126 GeV
 
-
+c--- If the complex pole scheme is not desired, then the width scheme should be selected.
+c--- The width scheme has the same enumeration as that of JHUGen. 
+c--- 1-> running width, 2-> fixed width, 3 (skipped due to CPscheme as a boolean), 4 -> new running width, 5 -> propagator removal
+c--- There is a protection against generation if the resonance is < 2 widths from the decay threshold (i.e. 2*M_Z) for widthscheme 4
+c--- ignoreWidthSchemeFourRestriction can be set to true if you want to bypass this protection (at your own risk!)
+      widthscheme=2 !the default configuration is no CPscheme and a fixed width
+      ignoreWidthSchemeFourRestriction=.false.
+      if (widthscheme.eq.4) then
+            if ( (hmass - 2d0*zmass < 2d0*hwidth) ) then
+                  if (ignoreWidthSchemeFourRestriction) then
+                        print *,'ignoring width restriction.'
+                  else
+                        print *, "reconsider using WidthScheme 4" 
+                        print *, "or ignore it"
+                        stop 1
+                  endif
+            endif
+            if ( (h2mass .ne. -1d0) ) then
+                  if ((h2mass - 2d0*zmass).lt.(2d0*h2width)) then
+                        if (ignoreWidthSchemeFourRestriction) then
+                              print *,'ignoring width restriction.'
+                        else
+                              print *, "reconsider using WidthScheme 4" 
+                              print *, "or ignore it"
+                              stop 1
+                        endif
+                  endif
+            endif
+      endif
 c--- Set up anomalous width of the Higgs boson if required
       if (abs(hwidth_ratio-1d0) .lt. 1d-6) then
         anom_Higgs=.false.

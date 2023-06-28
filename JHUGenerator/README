@@ -151,7 +151,7 @@ Command line parameters for quick reference:
                        (off by default)
   Higgs propagator and decay width:
     WidthScheme:       Higgs width scheme: 1 for running width, 2 for fixed width (default),
-                       and 3 for the CPS
+                       3 for the CPS, 4 for alternate running width (narrow width decay products)
     WidthSchemeIn:     For decay mode, reweight from one propagator to another by setting
                        WidthScheme and WidthSchemeIn to different values
     ReweightDecay:     For decay mode, reweight input decay by the decay probability

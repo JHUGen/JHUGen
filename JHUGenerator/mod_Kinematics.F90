@@ -5383,6 +5383,7 @@ implicit none
 real(8) :: GetBWPropagator,sHat
 real(8) :: mhb, ghb, BigGamma
 integer :: scheme
+double precision decayMass, qqq, qqq0
 
     if( scheme.eq.1 ) then! running width
         GetBWPropagator =  1d0/( (sHat-M_Reso**2)**2 + (sHat*Ga_Reso/M_Reso)**2 )
@@ -5410,6 +5411,20 @@ integer :: scheme
         !BigGamma = BigGamma*GeV
 
         !print *, dsqrt(dabs(sHat))/GeV, gabarH/GeV, BigGamma/GeV
+    elseif( scheme.eq.4) then !alternate running width
+        if ( M_Zprime.ne.-1 ) then !if you're using ZPrime then it will consider the ZPrime mass
+            decayMass = M_Zprime
+        else
+            decayMass = M_Z !if you're doing Z-ZPrime stuff this scheme won't work anyways so the point is moot
+        end if
+        ! PRINT *, decayMass, decayMass**2, sHat, 0.25d0*sHat, M_Reso, 0.25d0*M_Reso**2
+        if(0.25d0*(sHat) < decayMass**2) then !sHat is the mass squared!
+            qqq = 0
+        else
+            qqq = sqrt(0.25d0*(sHat) - decayMass**2)
+        endif
+        qqq0=sqrt(0.25d0*(M_Reso**2) - decayMass**2)
+        GetBWPropagator =  1d0/( (sHat-M_Reso**2)**2 + (M_Reso*Ga_Reso*qqq/qqq0)**2 ) !new style running width
     elseif( scheme.eq.0 ) then  !remove the propagator completely
         GetBWPropagator = 1d0
     else
