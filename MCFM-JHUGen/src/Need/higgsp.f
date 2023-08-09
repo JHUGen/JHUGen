@@ -4,6 +4,7 @@ C  interpolating the Spira tables br.sm1 br.sm2
 C  Other branching ratios could be added.
       implicit none
       include 'masses.f'
+      include 'spinzerohiggs_anomcoupl.f'
       !include 'first.f'
       logical first_higgsp
       data first_higgsp/.true./
@@ -58,7 +59,11 @@ C  Other branching ratios could be added.
       zgambr=brzgam(nlo)+(htemp-nlo)*(brzgam(nlo+1)-brzgam(nlo))
       wwbr=brww(nlo)+(htemp-nlo)*(brww(nlo+1)-brww(nlo))
       zzbr=brzz(nlo)+(htemp-nlo)*(brzz(nlo+1)-brzz(nlo))
-      hwidth=width(nlo)+(htemp-nlo)*(width(nlo+1)-width(nlo))
+      if(custom_hwidth.eq.-1) then
+          hwidth=width(nlo)+(htemp-nlo)*(width(nlo+1)-width(nlo))
+      else
+          hwidth=custom_hwidth
+      endif
       return
 
  44   continue

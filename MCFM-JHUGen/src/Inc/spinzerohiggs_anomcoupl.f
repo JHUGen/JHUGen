@@ -35,7 +35,7 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
       double precision Lambda_w12,Lambda_w22,Lambda_w32,Lambda_w42
       double precision Lambda_w10,Lambda_w20,Lambda_w30,Lambda_w40
 
-      double precision h2mass,h2width
+      double precision h2mass,h2width,custom_hwidth
 
       double precision Lambda2BSM,Lambda2_Q
       double precision Lambda2_zgs1
@@ -136,7 +136,7 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
      & Lambda_w12,Lambda_w22,Lambda_w32,Lambda_w42,
      & Lambda_w10,Lambda_w20,Lambda_w30,Lambda_w40,
 
-     & h2mass,h2width,
+     & h2mass,h2width,custom_hwidth,
 
      & Lambda2BSM,Lambda2_Q,
      & Lambda2_zgs1,
