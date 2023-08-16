@@ -193,7 +193,6 @@ c     MARKUS: anomalous couplings for 2nd resonance
 c     Mass and width for second resonance
       data h2mass  /-1d0/ ! -1 disables the resonance
       data h2width /0d0/
-      data custom_hwidth /-1d0/ ! -1 uses the default hwidth value from input.dat
 
 c     Hgg and Hff anomalous couplings
       data kappa2_top / (0d0,0d0) /
