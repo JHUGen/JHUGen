@@ -1,4 +1,5 @@
       double precision function lowint(r,wgt)
+      use ieee_arithmetic, only: ieee_is_nan, ieee_is_finite
       implicit none
       include 'constants.f'
       include 'masses.f'
@@ -788,6 +789,13 @@ c--- loop over all PDF error sets, if necessary
 
       val=lowint*wgt
       val2=val**2
+      if (ieee_is_nan(val)) then
+        write(6,*) 'lowint val = ',val
+        write(6,*) 'Discarding point with random variables',r
+        lowint=zip
+        val=zip
+        goto 999
+      endif
 c---  SSbegin
       lowint = lowint*reweight
 c---  SSend
