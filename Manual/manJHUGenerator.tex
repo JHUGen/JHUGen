@@ -24,13 +24,16 @@
 \large
 Manual for the JHU generator and MELA package
 }
+\author{I. Anderson, S. Bolognesi, F. Caola, J. Davis, Y. Gao, A. V. Gritsan, L. S. Mandacaru Guerra, Z. Guo, C. B. Martin, T. Martini, K. Melnikov, 
+R. Pan, M. Panagiotou, R. Rontsch, J. Roskes, U. Sarica, M. Schulze, M. V. Srivastav, N. V. Tran, A. Whitbeck, M. Xiao, Y. Zhou}
 \maketitle
 \begin{center}
 \small
 For simulation, reweighting, and analysis of single-produced resonances at hadron colliders \\
-(version v7.5.2, release date October 1, 2022) \\
+(version v7.5.4, release date August 25, 2023) \\
 \normalsize
 \end{center}
+
 
 \noindent
 The generator from \cite{Gao:2010qx,Bolognesi:2012,Anderson:2013,Gritsan:2016hjl,Gritsan:2020pib,Martini:2021uey,Davis:2022} 
@@ -1375,8 +1378,36 @@ tCzz=1.05,0 Cza=1,.5 tCza=.5,1 Cabx=0,0 Caa=0,.5 tCaa=.5,1 Cgg=2.1,0 neutral_cur
 Lambda_z1=100 Lambda_w1=100 Lambda_zgs1=100
 \end{verbatim}
 
-\section{Modified Zff couplings in MCFM}
-We support modified Zff couplings in certain processes in the standalone JHUGen-MCFM package of the JHU Generator Framework. We allow modified Zff couplings both production and decay for $gg \to 4l$ processes. Zff couplings are set separately for production and decay.
+\section{Modified Zff couplings in Generation}
+\subsection{JHUGen}
+We support modified Zff couplings in all on-shell Spin-0,Spin-1 and Spin-2 decays in JHUGen. Modifications to Zff couplings for associated Z in process 50 and 51 is not currently supported.
+These couplings are defined below as:
+
+\begin{verbatim}
+real(8), public :: daz_Lep_left  = (0d0)
+real(8), public :: daz_Lep_right  = (0d0)
+real(8), public :: daz_Neu_left  = (0d0)
+real(8), public :: daz_Neu_right  = (0d0)
+real(8), public :: daz_QUp_left  = (0d0)
+real(8), public :: daz_QUp_right  = (0d0)
+real(8), public :: daz_QDn_left  = (0d0)
+real(8), public :: daz_QDn_right  = (0d0)
+\end{verbatim}
+
+where \verb|daz_(Lep/Neu/QUp/QDn)_left| are the shifts to the SM values of Z coupling to left handed leptons,neutrinos,up-type quarks and down-type quarks and 
+\verb|daz_(Lep/Neu/QUp/QDn)_right| are the shifts to the SM values of the Z coupling to right handed leptons,neutrinos,up-type quarks and down-type quarks.
+Note that the SM values of the Zff couplings in JHUGen are given by:
+
+\begin{eqnarray*}
+\verb|daz_(*)_left| = 2 \left(T^{3}_{f}-Q_{f} \sin^2 \theta_{W}\right) \\
+\verb|daz_(*)_right| = -2 Q_{f} \sin^2 \theta_{W}
+\end{eqnarray*}
+
+where $T^{3}_{f}$ and $Q_{f}$ are the weak isospin and charge of the fermion in consideration and $\theta_{W}$ is the weinberg angle.
+
+\subsection{MCFM}
+We support modified Zff couplings in certain processes in the standalone JHUGen-MCFM package of the JHU Generator Framework. We allow modified Zff couplings both production and decay for $gg \to 4f$ processes. This corresponds to MCFM 
+process numbers 128,132, and 131 for $gg \to H \to 4f$, $gg \to ZZ\backslash Z\gamma^{\ast} \to 4f $, and the interefernce between the two processes respectively. Zff couplings are set separately for production and decay.
 In production, we parameterize the modifications to the Zff couplings in production as shifts to the SM coupling of the Z-boson to up-type and down-type quarks. In decay, we allow the user to set the exact value of the Zff couplings to leptons and quarks. To utilize these features one must install the required package
 \begin{verbatim}
 cd MCFM-JHUGen
@@ -1411,12 +1442,64 @@ Be sure to recompile MCFM to make sure the coupling changes are implemented. The
     ./mcfm
 \end{verbatim}
 
+The SM Zff couplings in MCFM-JHUGen are defined as:
+
+\begin{eqnarray*}
+  \verb|daz_(*)_left| = \frac{1}{\sin\theta_{W}\cos\theta_{W}} \left(T^{3}_{f}-Q_{f} \sin^2 \theta_{W}\right) \\
+  \verb|daz_(*)_right| = -\frac{1}{\sin\theta_{W}\cos\theta_{W}} Q_{f} \sin^2 \theta_{W}
+\end{eqnarray*}
+
+where $T^{3}_{f}$ and $Q_{f}$ are the weak isospin and charge of the fermion in consideration and $\theta_{W}$ is the weinberg angle.
+
+\section{Modified Zff couplings in MELA}
+
+We support modified Zff couplings in certain MELA Processes. In MELA, all of the Zff couplings in decay are set directly in the interface. We only consider
+anomalous Zqq couplings in production as shifts to the SM values for these couplings. The convention for the SM values is the same as in section VIII. for JHUGen
+and MCFM matrix elements. If there is any anomalous Zff coupling set to a non-zero value in MELA all of the the other Zff couplings will be assumed to be 0
+unless they are also explicitly set to some non-zero value.
+
+\subsection{In JHUGen}
+
+In JHUGen to set the Zff couplings manually in MELA:
+
+\begin{verbatim}
+mela->setProcess(TVar.SelfDefine_spin0, TVar.JHUGen, TVar.ZZGG)
+mela->selfDAZffcoupl[gAZff_ZllRH][0] = 0.46238
+mela->selfDAZffcoupl[gAZff_ZllLH][0] = -0.53762
+mela->selfDAZffcoupl[gAZff_ZuuRH] = -0.30825
+mela->selfDAZffcoupl[gAZff_ZddRH] = 0.15413
+\end{verbatim}
+
+This would correspond to SM Zll couplings, and SM Z couplings to right handed quarks. In this example since other Zff couplings are not set, the 
+Z$\nu\nu$ and Z coupling to left-handed quarks would be 0. 
+
+\subsection{In MCFM}
+
+In JHUGen to set the Zff couplings manually in MELA:
+
+\begin{verbatim}
+mela->setProcess(TVar.bkgZZ_SMHiggs, TVar.MCFM, TVar.ZZGG)
+mela->selfDAZffcoupl[gAZff_ZllRH][0] = 0.46238
+mela->selfDAZffcoupl[gAZff_ZllLH][0] = -0.53762
+mela->selfDAZffcoupl[gAZff_ZuuRH] = -0.30825
+mela->selfDAZffcoupl[gAZff_ZddRH] = 0.15413
+mela->selzDAZffcoupl[gAZff_ZnnRH]b = 1
+mela->selfDAZffcoupl[gAZff_uZLH] = 0.1 
+\end{verbatim}
+
+This would correspond to SM Zll couplings, and SM Z couplings to right handed quarks. The Z coupling to right-handed neutrinos is set to 1 and the SM Z coupling to left-handed
+up-type quarks in production is shifted by 0.1. Again in this example, since the other Zff couplings are not set, they are set to 0 in the matrix element calculation.
+
 \section{Release notes}
 \noindent 
-In going from \verb|v7.5.2| to \verb|v7.5.3| (June 28, 2023), the updates are as follows:
+In going from \verb|v7.5.2| to \verb|v7.5.4| (August 25, 2023) the updates are as follows:
 \noindent
 \begin{itemize}
-\item Added width scheme 4 (running) in JHUGen and MCFM-JHUGen processes
+\item Add anomalous Zff couplings in off-shell $gg\to H \to 4f$ and $gg \to 4f$ MCFM matrix elements (MCFM Process 128,131,132).
+\item Add anomalous Zff couplings for on-shell Higgs decays in JHUGen matrix elements
+\item Add interface for anomalous Zff couplings in MELA
+\item Add width scheme 4 (running) in JHUGen and MCFM-JHUGen processes
+\item Improve numerical stability in off-shell $gg \to 4f$ processes at low $q^2$ 
 \end{itemize}
 \noindent 
 In going from \verb|v7.5.1| to \verb|v7.5.2| (October 1, 2022), the updates are as follows:
@@ -1710,10 +1793,10 @@ A. V. Gritsan, R. R\"ontsch, M. Schulze, M. Xiao, ``Constraining anomalous Higgs
  A.~V.~Gritsan, J.~Roskes, U.~Sarica, M.~Schulze, M.~Xiao and Y.~Zhou, ``New features in the JHU generator framework: 
  constraining Higgs boson properties from on-shell and off-shell production.'' 
  Phys. Rev. D \textbf{102} (2020) 056022. arXiv:2002.09888 [hep-ph].
- \bibitem{Martini:2021uey}
+\bibitem{Martini:2021uey}
 T.~Martini, R.~Q.~Pan, M.~Schulze and M.~Xiao,
 ``Probing the CP structure of the top quark Yukawa coupling: Loop sensitivity vs. on-shell sensitivity.''
-[arXiv:2104.04277 [hep-ph]].
+Phys. Rev. D \textbf{104} (2021) 055045. arXiv:2104.04277 [hep-ph].
 \bibitem{Davis:2022} 
 J.~Davis, A.~V.~Gritsan, L.~S.~Mandacar\'{u}~Guerra, S.~Kyriacou, J.~Roskes, M.~Schulze, ``Constraining anomalous Higgs boson couplings to virtual photons.'' 
  Phys. Rev. D \textbf{105} (2022) 096027. arXiv:2109.13363 [hep-ph].
