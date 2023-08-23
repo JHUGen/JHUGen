@@ -249,7 +249,7 @@ void JHUGenLexiconTranslator::translate(){
 	if(include_triple_quartic_gauge){
 	  voutput.at(coupl_hbasistrip_dCz).first += (vev_lam)*-3.0*delta_v;
 	  voutput.at(coupl_hbasistrip_dCw).first += (vev_lam)*-(sw)/(cw-sw) *delta_v;
-	  voutput.at(coupl_hbasistrip_Czbx).first += (vev_lam)*2.0*pow(e,2)/(sw)*delta_v; /// Edited!!!
+	  voutput.at(coupl_hbasistrip_Czbx).first += (vev_lam)*4.0*(sw)/(2.0*pow(e,2))*delta_v;
 	  voutput.at(coupl_hbasistrip_Cwbx).first += (vev_lam)*(pow(MW,2)*sw)/(2.0*pow(e,2)*pow(MZ,2)*(1-2.0*sw))*delta_v;
 	  voutput.at(coupl_hbasistrip_Cabx).first += (vev_lam)*-(4.0*cw*sw)/(pow(e,2)*(cw-sw)) *delta_v;
 	  voutput.at(coupl_hbasistrip_dKz).first += (vev_lam)*4.0/(16.0*sw-8.0) * delta_v;
