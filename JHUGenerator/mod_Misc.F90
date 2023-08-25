@@ -1543,7 +1543,7 @@ character(len=*) :: title
     write(TheUnit, *) " ", CenterWithStars("", linelength)
     write(TheUnit, *) " ", CenterWithStars("I. Anderson, S. Bolognesi, F. Caola, J. Davis, Y. Gao, A. V. Gritsan,", linelength)
     write(TheUnit, *) " ", CenterWithStars("L. S. Mandacaru Guerra, Z. Guo, C. B. Martin, T. Martini, K. Melnikov, R. Pan,", linelength)
-    write(TheUnit, *) " ", CenterWithStars("M. Panagiotou, R. Rontsch, J. Roskes, U. Sarica, M. Schulze, M. R. Srivastav,", linelength)
+    write(TheUnit, *) " ", CenterWithStars("M. Panagiotou, R. Rontsch, J. Roskes, U. Sarica, M. Schulze, M. V. Srivastav,", linelength)
     write(TheUnit, *) " ", CenterWithStars("N. V. Tran, A. Whitbeck, M. Xiao, Y. Zhou", linelength)
     write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396  [hep-ph],", linelength)
     write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D86 (2012) 095031;  arXiv:1208.4018  [hep-ph],", linelength)
