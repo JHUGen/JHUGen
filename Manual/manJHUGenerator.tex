@@ -1408,7 +1408,7 @@ SM values. If any anomalous Zff coupling is set to a non-zero value in MELA all 
 unless they are also explicitly set to some non-zero value. An example to set the JHUGen Zff couplings directly in MELA is given below: 
 
 \begin{verbatim}
-mela->setProcess(TVar.SelfDefine_spin0, TVar.JHUGen, TVar.ZZGG)
+mela->setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, TVar::ZZGG)
 mela->selfDAZffcoupl[gAZff_ZllRH][0] = 0.46238
 mela->selfDAZffcoupl[gAZff_ZllLH][0] = -0.53762
 mela->selfDAZffcoupl[gAZff_ZuuRH] = -0.30825
@@ -1466,7 +1466,7 @@ are set directly in the interface. We only consider anomalous Zqq couplings in p
 unless they are also explicitly set to some non-zero value. An example for setting Zff couplings in MCFM-JHUGen matrix elements with MELA is given below:
 
 \begin{verbatim}
-mela->setProcess(TVar.bkgZZ_SMHiggs, TVar.MCFM, TVar.ZZGG)
+mela->setProcess(TVar::bkgZZ_SMHiggs, TVar::MCFM, TVar::ZZGG)
 mela->selfDAZffcoupl[gAZff_ZllRH][0] = 0.46238
 mela->selfDAZffcoupl[gAZff_ZllLH][0] = -0.53762
 mela->selfDAZffcoupl[gAZff_ZuuRH] = -0.30825
