@@ -84,6 +84,13 @@ c--- warning message, if necessary
       write(6,*) '*  Phys.Rev.D60:113006, hep-ph/9905386 (diboson) *'
       write(6,*) '*                                                *'
       write(6,*) '* On the web:  http://mcfm.fnal.gov/             *'
+      write(6,*) '*                                                *'
+      write(6,*) '*  With modifications from the JHUGen Team:      *'
+      write(6,*) '*  https://spin.pha.jhu.edu/                     *'
+      write(6,*) '*                                                *'
+      write(6,*) '*  Special thanks from JHUGen Team               *'
+      write(6,*) '*  to Oscar Eboli for anomalous Zqq couplings    *'
+      write(6,*) '*  in ggZZ process                               *'
       write(6,*) '**************************************************'
       write(6,*) 
  
