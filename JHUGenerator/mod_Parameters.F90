@@ -18,7 +18,7 @@ integer, public :: Collider,PChannel,Process,DecayMode1,DecayMode2,TopDecays,Tau
 integer, public :: VegasIt1,VegasNc0,VegasNc1,VegasNc2,PMZZEvals
 real(8), public :: Collider_Energy
 integer, public :: FacScheme,RenScheme
-real(8), public :: MuFacMultiplier,MuRenMultiplier
+real(8), public :: MuFacMultiplier,MuRenMultiplier,CustomUpperScaleBound, CustomLowerScaleBound
 integer, public :: VegasIt1_default,VegasNc0_default,VegasNc1_default,VegasNc2_default
 integer, public :: NumHistograms
 integer, public :: RequestNLeptons(1:2) = -1
@@ -41,7 +41,8 @@ integer, public, parameter :: kRenFacScheme_mj_mhstar=8
 integer, public, parameter :: kRenFacScheme_mj=9
 integer, public, parameter :: kRenFacScheme_maxpTj=10
 integer, public, parameter :: kRenFacScheme_minpTj=11
-integer, public, parameter :: nRenFacSchemes=12
+integer, public, parameter :: kRenFacScheme_custom_scale=12
+integer, public, parameter :: nRenFacSchemes=13
 integer, public, parameter :: maxpart = 30
 integer, public, parameter :: NMAXCHANNELS=200 ! Maximum 250 from vegas_common xi dimensions
 integer(8), public :: EvalCounter=0

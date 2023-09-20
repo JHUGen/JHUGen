@@ -431,6 +431,67 @@ real(8) :: dest_store
 
 end subroutine ReadCommandLineArgument_real8
 
+subroutine ReadCommandLineArgument_2_tuple_real8(argument, argumentname, success, dest, dest2, SetLastArgument, success2, success3, success4, success5, success6, checkdestchange, multiply, tosave)
+  implicit none
+  character(len=*) :: argument, argumentname
+  real(8), intent(inout) :: dest, dest2
+  logical, intent(inout) :: success
+  logical, optional, intent(inout) :: SetLastArgument, success2, success3, success4, success5, success6
+  logical, optional, intent(in) :: checkdestchange
+  type(SaveValues), optional :: tosave
+  real(8), optional, intent(in) :: multiply
+  logical :: successval
+  integer :: length
+  real(8) :: lower, upper
+  real(8) :: dest_store, dest_store2
+  
+      successval = .true.
+      dest_store = dest
+      dest_store2 = dest2
+  
+      if (present(SetLastArgument)) SetLastArgument=.false.
+  
+      length=len(trim(argumentname))
+  
+      if( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
+          if( Index(argument(length+2:len(trim(argument))),",").eq.0 &
+         .and. Index(argument(length+2:len(trim(argument)))," ").eq.0 ) then
+              print *, "Argument ", argumentname, " is a tuple consisting of an upper and lower bound for a range."
+              print *, "Example syntax for arguments:"
+              print *, "      ", argumentname, "=1,2"
+              print *, "   or ", argumentname, "=1.0d0,2.0d0"
+              print *, "for a range of [1,2]"
+              stop 1
+          endif
+          read(argument(length+2:len(argument)), *) lower, upper
+          
+          dest = lower
+          dest2 = upper
+
+          if (present(multiply)) then 
+            dest = dest*multiply
+            dest2 = dest2*multiply
+          endif
+          ! Checkdestchange after all multiplications are done!
+          if (present(checkdestchange)) then
+             !print *, argumentname,": checkdestchange, dest_store, dest",checkdestchange,dest_store,dest
+             successval = (.not. checkdestchange .or. dest.ne.dest_store).and.(.not. checkdestchange .or. dest2.ne.dest_store2)
+          endif
+          if (present(SetLastArgument)) SetLastArgument=successval
+          if (present(success2)) success2=success2 .or. successval
+          if (present(success3)) success3=success3 .or. successval
+          if (present(success4)) success4=success4 .or. successval
+          if (present(success5)) success5=success5 .or. successval
+          if (present(success6)) success6=success6 .or. successval
+
+          if (successval .and. present(tosave)) then
+            call tosave%savevalue_real8(argumentname, dest)
+            call tosave%savevalue_real8(argumentname, dest2)
+          endif
+          success = .true.
+      endif
+  
+  end subroutine ReadCommandLineArgument_2_tuple_real8
 
 subroutine ReadCommandLineArgument_complex8(argument, argumentname, success, dest, SetLastArgument, success2, success3, success4, success5, success6, checkdestchange, multiply, multiplyreal, tosave)
 implicit none
