@@ -248,6 +248,10 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
          endif
       endif
 
+      if(FacScheme.eq.kRenFacScheme_custom_scale) then !If you are using a custom scale there is no need for other checks
+        return
+     endif
+
       ! H+2j MEs
       if( &
          (                     &
@@ -323,9 +327,7 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
             Process.eq. 2      & !- ggH spin-2
          ) .and. (             &
             (abs(FacScheme).ne.kRenFacScheme_mhstar) .or. (abs(RenScheme).ne.kRenFacScheme_mhstar)      &
-         ) .and. (                     &
-            FacScheme.ne.kRenFacScheme_custom_scale     &
-         )                             &
+         )                     &
       ) call Error("Invalid scheme for the H+0J processes. Choose a different renormalization or factorization scheme.")
 
 
