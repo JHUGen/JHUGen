@@ -1371,6 +1371,7 @@ type(SaveValues) :: tosave, oldsavevalues
       (MuFacMultiplier.le.0d0) .or. (MuRenMultiplier.le.0d0)                                  &
     ) call Error("The renormalization or factorization scheme is invalid, or the scale multiplier to either is not positive.")
     if( SetFacScheme .and. (FacScheme.eq.12) .and. (.not.SetSchemeBounds)) call Error("If you want to set a bounded scale, please set the bounds!")
+    if( SetFacScheme .and. (FacScheme.eq.12) .and. (CustomLowerScaleBound > CustomUpperScaleBound)) call Error("Bounds must be set as lower<=upper!")
     if( (SetFacScheme.neqv.SetMuFacMultiplier).and.(.not.FacScheme.eq.12) ) call Error("If you want to set the factorization scale, please set both the scheme (FacScheme) and the multiplier (MuFacMultiplier)")
     if( (SetRenScheme.neqv.SetMuRenMultiplier).and.(.not.FacScheme.eq.12) ) call Error("If you want to set the renormalization scale, please set both the scheme (RenScheme) and the multiplier (MuRenMultiplier)")
     !DecayModes
