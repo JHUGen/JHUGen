@@ -768,7 +768,7 @@ need to be set and are common to both resonances. The masses modifying the third
 \subsubsection{Renormalization and factorization scales}
 \begin{itemize}
 	\item \verb|FacScheme|, \verb|MuFacMultiplier|, and \verb|RenScheme|, \verb|MuRenMultiplier|: There are currently 10 different schemes, which set the basis of the scale up to the scale multiplier. A postive integer uses running scales per event whereas a negative one uses a fixed scale, and \verb|MuFacMultiplier| and \verb|MuRenMultiplier| determine the scale multipliers for the factorization and renormalization scales, respectively.
-  \item \verb|SetSchemeBounds|: Setting the Factorization Scheme to 12 is a special case - you will also need to set \verb|SetSchemeBounds| as a range between a lower and upper bound
+  \item \verb|MuFacBounds|: Setting the Factorization Scheme to 12 is a special case - you will also need to set \verb|MuFacBounds| as a range between a lower and upper bound
 	\begin{itemize}
 		\item $\pm0$: $\mu_{F,\,R}$ are set to the default values of each process. The command line values of \verb|MuFacMultiplier| and \verb|MuRenMultiplier| are disregarded.
 		\item $\pm1$: $\mu_{F,\,R} \propto \sqrt{q^2_H}$ if the scheme number is positive, or $\mu_{F,\,R} \propto m_H$ if the scheme number is negative. $+1$ is the default value for \verb|Process| 0, 1 and 2 with scale multiplier $0.5$, and  $-1$ is the default value for \verb|Process| 50, 60, 61 and 62 with scale multiplier $1$.
@@ -782,7 +782,7 @@ need to be set and are common to both resonances. The masses modifying the third
 		\item $\pm9$: If the scheme number is positive, $\mu_{F,\,R} \propto \sqrt{q^2_{J}}$, where $J$ is the more massive associated particle. If the scheme number is negative and the matrix element treats an associated particle as massive (\eg $t$ in $t+H$), $\mu_{F,\,R} \propto m_{J}$.
 		\item $+10$: $\mu_{F,\,R} \propto p_T^J$, where $J$ is the hardest associated jet.
 		\item $+11$: $\mu_{F,\,R} \propto p_T^J$, where $J$ is the softest associated jet.
-    \item $+12$: This sets the range between the two values given in \verb|SetSchemeBounds|. The factorization scale will be pulled from a uniform random distribution between in the range [lower, upper)
+    \item $+12$: This sets the range between the two values given in \verb|MuFacBounds|. The factorization scale will be pulled from a uniform random distribution between in the range [lower, upper)
 	\end{itemize}
 \end{itemize}
 \subsubsection{Lepton and jet filter}
