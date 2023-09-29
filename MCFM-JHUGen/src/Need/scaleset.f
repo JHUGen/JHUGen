@@ -41,6 +41,8 @@ c--- routines for exact definitions of the scales.
         call scaleset_ddis(p,mu0)
       elseif (dynstring .eq. 's-hat') then
         call scaleset_shat(p,mu0)
+      elseif (dynstring .eq. 'rand') then
+        call scaleset_randrange(p,mu0)
       else
         write(6,*) 'Dynamic scale choice not recognized'
         write(6,*) '   dynamicscale = ',dynstring

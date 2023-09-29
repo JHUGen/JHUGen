@@ -882,6 +882,7 @@ scaleset_m34sqsumptjsq.o \
 scaleset_ptphoton.o \
 scaleset_HT.o \
 scaleset_ddis.o \
+scaleset_randrange.o \
 sethparams.o \
 setmb_msbar.o \
 setrunname.o \
