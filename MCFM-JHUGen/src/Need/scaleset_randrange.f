@@ -5,52 +5,21 @@ c--- invariant mass of particles 3, 4, 5 and 6
       include 'constants.f'
       include 'process.f'
       include 'facscale.f'
+      include 'facscale_range.f'
       double precision p(mxpart,4),mu0
-
+      if(facscale_high.lt.facscale_low) then
+        write(6,*)'high scale bound must be < low!'
+        write(6,*)'Please edit factorization_range.f'
+        stop
+      endif
       if(
-     &   (case .eq. 'WWqqbr') .or.
-     &   (case .eq. 'WWnpol') .or.
-     &   (case .eq. 'WW_jet') .or.
-     &   (case .eq. 'WZbbar') .or.
-     &   (case .eq. 'ZZlept') .or.
-     &   (case .eq. 'WHbbar') .or.
-     &   (case .eq. 'WHgaga') .or.
-     &   (case .eq. 'ZHbbar') .or.
-     &   (case .eq. 'ZHgaga') .or.
-     &   (case .eq. 'HWW_4l') .or.
-     &   (case .eq. 'HWW_tb') .or.
-     &   (case .eq. 'HWWint') .or.
-     &   (case .eq. 'HWWH+i') .or.
-     &   (case .eq. 'ggWW4l') .or.
-     &   (case .eq. 'ggWWbx') .or.
      &   (case .eq. 'HZZ_4l') .or.
-     &   (case .eq. 'HZZ_tb') .or.
-     &   (case .eq. 'HZZint') .or.
-     &   (case .eq. 'HZZH+i') .or.
-     &   (case .eq. 'HZZqgI') .or.
-     &   (case .eq. 'HZZ+jt') .or.
-     &   (case .eq. 'HWWjet') .or.
-     &   (case .eq. 'HZZjet') .or.
-     &   (case .eq. 'HWW2jt') .or.
-     &   (case .eq. 'HZZ2jt') .or.
-     &   (case .eq. 'qq_HZZ') .or.
-     &   (case .eq. 'fourga') .or.
-     &   (case .eq. 'W_2gam') .or.
-     &   (case .eq. 'Z_2gam') .or.
      &   (case .eq. 'HmZZ4l') .or.
-     &   (case .eq. 'HVV_tb') .or.
-     &   (case .eq. 'ggVV4l') .or.
-     &   (case .eq. 'ggVVbx') .or.
      &   (case .eq. 'ggZZ4l') .or.
-     &   (case .eq. 'ggZZbx') .or.
-     &   (case .eq. 'HmZZ4l') .or.
-     &   (case .eq. 'qqZZqq') .or.
-     &   (case .eq. 'qqWWqq') .or.
-     &   (case .eq. 'qqVVqq')
+     &   (case .eq. 'ZZlept')
      & ) then
         call random_number(mu0)
         mu0 = (facscale_high - facscale_low)*mu0 + facscale_low
-        ! mu0 = mu0/100
       else
         write(6,*)'dynamicscale rand not supported for this process.'
         stop

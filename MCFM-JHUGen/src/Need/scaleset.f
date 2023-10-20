@@ -49,8 +49,12 @@ c--- routines for exact definitions of the scales.
         stop
       endif
       
+      if (dynstring .eq. 'rand') then
+        facscale=mu0
+      else
+        facscale=fscalestart*mu0
+      endif
       scale=rscalestart*mu0
-      facscale=fscalestart*mu0
       frag_scale=frag_scalestart*mu0
           
       if (first) then

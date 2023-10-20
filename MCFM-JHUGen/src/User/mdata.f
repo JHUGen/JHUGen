@@ -510,15 +510,3 @@ c     .    0d0,1d0,0.000d0/
       data epinv2/1d3/
       end
 ************************************************************************
-
-************************************************************************
-*     Dim. Reg. parameter epsilon, used for checking the proper        *
-*      operation of the NLO code in the program                        *
-************************************************************************
-      block data factorization_scale
-      implicit none
-      include 'facscale.f'
-      data facscale_low/10d0/
-      data facscale_high/40d0/
-      end
-************************************************************************
