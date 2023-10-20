@@ -1333,6 +1333,7 @@ jetlabel_to_stdhep.o \
 jetreorder.o \
 mcfm_getunweighted.o \
 mdata.o \
+fac_range.o \
 miscclust.o \
 nplotter.o \
 nplotter_4ftwdk.o \
