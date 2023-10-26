@@ -6,7 +6,7 @@ MELADir = ""
 MELAFortranDir = ""
 MELADataDir = ""
 MELALibDir = ""
-MCFMLib = mcfm_708
+MCFMLib = mcfm_709
 PDFDir = $(Here)/pdfs
 VegasDir = $(Here)/vegas
 CollierDir = $(Here)/../lib/COLLIER/
@@ -25,7 +25,7 @@ UseLHAPDF=No
 #          LHAPDF_DATA_PATH=/.../LHAPDF-x.y.z/share/LHAPDF/:${LHAPDF_DATA_PATH}
 
 ## link MCFM libraries from MELA
-linkMELA = No
+linkMELA = Yes
 # remember to export
 #          LD_LIBRARY_PATH=/.../MELA/data/$SCRAM_ARCH/:${LD_LIBRARY_PATH}
 
