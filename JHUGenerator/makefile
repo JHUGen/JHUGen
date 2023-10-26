@@ -25,7 +25,7 @@ UseLHAPDF=No
 #          LHAPDF_DATA_PATH=/.../LHAPDF-x.y.z/share/LHAPDF/:${LHAPDF_DATA_PATH}
 
 ## link MCFM libraries from MELA
-linkMELA = Yes
+linkMELA = No
 # remember to export
 #          LD_LIBRARY_PATH=/.../MELA/data/$SCRAM_ARCH/:${LD_LIBRARY_PATH}
 
