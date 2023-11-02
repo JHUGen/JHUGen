@@ -248,6 +248,10 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
          endif
       endif
 
+      if(FacScheme.eq.kRenFacScheme_custom_scale) then !If you are using a custom scale there is no need for other checks
+        return
+     endif
+
       ! H+2j MEs
       if( &
          (                     &
@@ -402,7 +406,7 @@ implicit none
 character :: arg*(500)
 integer :: NumArgs,NArg
 logical :: help, PrintVersion, PrintHeader, DryRun, success, SetLastArgument, interfSet, ignoreRunningWidthResonanceCheck
-logical :: SetRenScheme, SetMuRenMultiplier, SetFacScheme, SetMuFacMultiplier
+logical :: SetRenScheme, SetMuRenMultiplier, SetFacScheme, SetMuFacMultiplier, SetSchemeBounds
 logical :: SetMReso, SetGaReso, SetMReso2, SetGaReso2
 logical :: SetAnomalousSpin0gg, Setghg2, SetAnomalousSpin0VV, Setghz1
 logical :: SetZZcoupling, SetZZprimecoupling, SetZprimeZprimecoupling
@@ -452,7 +456,7 @@ type(SaveValues) :: tosave, oldsavevalues
    SetMuRenMultiplier = .false.
    SetFacScheme = .false.
    SetRenScheme = .false.
-
+   SetSchemeBounds = .false.
    SetMReso=.false.
    SetGaReso=.false.
    SetMReso2=.false.
@@ -605,6 +609,7 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "RenScheme", success, RenScheme, success2=SetRenScheme, tosave=tosave)
     call ReadCommandLineArgument(arg, "MuFacMultiplier", success, MuFacMultiplier, success2=SetMuFacMultiplier, tosave=tosave)
     call ReadCommandLineArgument(arg, "MuRenMultiplier", success, MuRenMultiplier, success2=SetMuRenMultiplier, tosave=tosave)
+    call ReadCommandLineArgument_2_tuple_real8(arg, "MuFacBounds", success, CustomLowerScaleBound, CustomUpperScaleBound, success2=SetSchemeBounds, tosave=tosave)
     call ReadCommandLineArgument(arg, "TopDK", success, TopDecays, tosave=tosave)
     call ReadCommandLineArgument(arg, "TauDK", success, TauDecays, tosave=tosave)
     call ReadCommandLineArgument(arg, "HbbDK", success, H_DK, tosave=tosave)
@@ -1365,9 +1370,10 @@ type(SaveValues) :: tosave, oldsavevalues
       (FacScheme .eq. -kRenFacScheme_minpTj) .or. (RenScheme .eq. -kRenFacScheme_minpTj) .or. &
       (MuFacMultiplier.le.0d0) .or. (MuRenMultiplier.le.0d0)                                  &
     ) call Error("The renormalization or factorization scheme is invalid, or the scale multiplier to either is not positive.")
-    if( SetFacScheme.neqv.SetMuFacMultiplier ) call Error("If you want to set the factorization scale, please set both the scheme (FacScheme) and the multiplier (MuFacMultiplier)")
-    if( SetRenScheme.neqv.SetMuRenMultiplier ) call Error("If you want to set the renormalization scale, please set both the scheme (RenScheme) and the multiplier (MuRenMultiplier)")
-
+    if( SetFacScheme .and. (FacScheme.eq.12) .and. (.not.SetSchemeBounds)) call Error("If you want to set a bounded scale, please set the bounds!")
+    if( SetFacScheme .and. (FacScheme.eq.12) .and. (CustomLowerScaleBound > CustomUpperScaleBound)) call Error("Bounds must be set as lower<=upper!")
+    if( (SetFacScheme.neqv.SetMuFacMultiplier).and.(.not.FacScheme.eq.12) ) call Error("If you want to set the factorization scale, please set both the scheme (FacScheme) and the multiplier (MuFacMultiplier)")
+    if( (SetRenScheme.neqv.SetMuRenMultiplier).and.(.not.FacScheme.eq.12) ) call Error("If you want to set the renormalization scale, please set both the scheme (RenScheme) and the multiplier (MuRenMultiplier)")
     !DecayModes
 
     if( ConvertLHEFile ) then

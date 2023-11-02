@@ -7787,6 +7787,10 @@ integer idx,ip
       Mu_Fact = maxpTjet
    elseif(FacScheme .eq. kRenFacScheme_minpTj) then
       Mu_Fact = minpTjet
+   elseif(FacScheme .eq. kRenFacScheme_custom_scale) then
+      call random_number(Mu_Fact)
+      Mu_Fact = (CustomUpperScaleBound - CustomLowerScaleBound)*Mu_Fact + CustomLowerScaleBound
+      Mu_Fact = Mu_Fact/100 !correction to make sure that you are operating in single GeVs, not hundreds of GeV
    else
       call Error("This should never be able to happen.")
    endif
