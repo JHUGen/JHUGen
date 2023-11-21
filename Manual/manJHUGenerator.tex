@@ -30,7 +30,7 @@ R. Pan, M. Panagiotou, R. Rontsch, J. Roskes, U. Sarica, M. Schulze, M. V. Sriva
 \begin{center}
 \small
 For simulation, reweighting, and analysis of resonances produced at hadron colliders \\
-(version v7.5.4, release date November 6, 2023) \\
+(version v7.5.5, release date December 31, 2023) \\
 \normalsize
 \end{center}
 
@@ -324,9 +324,9 @@ Download the package from \url{spin.pha.jhu.edu} and untar the file.  Go to the 
 $ make
 \end{verbatim}
 
-By default, the makefile options \verb|linkMELA| and \verb|linkCollierLib| are set to \verb|No|. If you need to use the NLO features, you need to set \verb|linkCollierLib = Yes|, and download and compile the COLLIER package using \verb|./downloadcollier.sh| with optional arguments \verb|compiler| and \verb|-j| to specify the Fortran compiler and the number of cores to use for compilation, respectively. Likewise, if you need to use off-shell processes, which use modified MCFM matrix elements, you need to set \verb|linkMELA = Yes| and compile JHUGenMELA with at least the option \verb|deps| before compiling JHUGenerator (see compilation instructions for JHUGenMELA for more details). In the case \verb|linkMELA = Yes|, the compiler has to be set to \verb|Comp = gfort|, and the gcc version should be at least 4.6. Notice that JHUGenMELA has its own compilation routine and location for the COLLIER library.
+By default, the makefile options \verb|linkMELA| and \verb|linkCollierLib| are set to \verb|No|. If you need to use the NLO features, you need to set \verb|linkCollierLib = Yes|, and download and compile the COLLIER package using \verb|lib/downloadcollier.sh| with optional arguments \verb|compiler| and \verb|-j| to specify the Fortran compiler and the number of cores to use for compilation, respectively. Likewise, if you need to use off-shell processes, which use modified MCFM matrix elements, you need to set \verb|linkMELA = Yes| and compile JHUGenMELA with at least the option \verb|deps| before compiling JHUGenerator (see compilation instructions for JHUGenMELA for more details). In the case \verb|linkMELA = Yes|, the compiler has to be set to \verb|Comp = gfort|, and the gcc version should be at least 4.6. Notice that JHUGenMELA has its own compilation routine and location for the COLLIER library.
 
-Also note that after JHUGenerator v7.3.0 was released, the naming scheme used for COLLIER libraries was changed. For any version of JHUGenerator preceding and including v7.3.0, this change in package location must be accounted for before installing the COLLIER library. If you are compiling JHUGenMELA, the script \verb|COLLIER/setup.sh| must be edited to use \verb|pkgname = "collier-1.2.0"|. In the case you do not link JHUGenMELA but still need COLLIER, \verb|./downloadcollier.sh| should reference \verb|collier-1.2.0.tar.gz| instead of \verb|collier-1.2.tar.gz|.
+Also note that after JHUGenerator v7.3.0 was released, the naming scheme used for COLLIER libraries was changed. For any version of JHUGenerator preceding and including v7.3.0, this change in package location must be accounted for before installing the COLLIER library. If you are compiling JHUGenMELA, the script \verb|JHUGenMELA/MELA/COLLIER/setup.sh| must be edited to use \verb|pkgname = "collier-1.2.0"|. In the case you do not link JHUGenMELA but still need COLLIER, \verb|lib/downloadcollier.sh| should reference \verb|collier-1.2.0.tar.gz| instead of \verb|collier-1.2.tar.gz|.
 
 \section{Quick start}
 
@@ -1482,6 +1482,12 @@ This would correspond to SM Zll couplings, and SM Z couplings to right handed qu
 up-type quarks in production is shifted by 0.1. Again in this example, since the other Zff couplings are not set, they are set to 0 in the matrix element calculation.
 
 \section{Release notes}
+\noindent 
+In going from \verb|v7.5.4| to \verb|v7.5.5| (December 31, 2023) the updates are as follows:
+\noindent
+\begin{itemize}
+\item Minor fixes to makefiles and setup scripts for correct library linkage.
+\end{itemize}
 \noindent 
 In going from \verb|v7.5.3| to \verb|v7.5.4| (November 6, 2023) the updates are as follows:
 \noindent
