@@ -1709,6 +1709,10 @@ type(SaveValues) :: tosave, oldsavevalues
     else !If neither is set then use the BreitWigner Cutoff. Default value for it is 20
         m4l_minmax(1) = M_Reso - BreitWignerCutoff*Ga_Reso
         m4l_minmax(2) = M_Reso + BreitWignerCutoff*Ga_Reso
+        if( m4l_minmax(1).ge.m4l_minmax(2) ) then
+            print *, "m4l_min must be less than m4l_max!"
+            stop 1
+        endif
     endif
 
     !---------------------------------------!
