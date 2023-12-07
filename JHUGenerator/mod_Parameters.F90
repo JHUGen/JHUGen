@@ -19,7 +19,6 @@ integer, public :: VegasIt1,VegasNc0,VegasNc1,VegasNc2,PMZZEvals
 real(8), public :: Collider_Energy
 integer, public :: FacScheme,RenScheme
 real(8), public :: MuFacMultiplier,MuRenMultiplier,CustomUpperScaleBound, CustomLowerScaleBound
-real(8), public :: BreitWignerLowerBound, BreitWignerUpperBound
 integer, public :: VegasIt1_default,VegasNc0_default,VegasNc1_default,VegasNc2_default
 integer, public :: NumHistograms
 integer, public :: RequestNLeptons(1:2) = -1
