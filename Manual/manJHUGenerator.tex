@@ -769,7 +769,22 @@ need to be set and are common to both resonances. The masses modifying the third
 \item \verb|pTjetcut|, \verb|etajetcut|, \verb|detajetcut|, \verb|deltaRcut|, \verb|mJJcut|, \verb|m4l_min|, \verb|m4l_max|, \verb|m2l_min|, \verb|m2l_max|, \verb|mVH_min|, \verb|mVH_max|, \verb|pTlepcut|, \verb|etalepcut|, and \verb|pTHcut| are available for Process 51. The default values are set such that there is no cuts.
 \end{itemize}
 \subsubsection{On-shell Cuts}
-These two cuts are on the mass range in the on-shell regime of JHUGen. The default mass cut is made at an upper and lower bound of $M_{Reso}\pm20\Gamma_{Reso}$
+These two cuts are on the mass range in the on-shell regime of JHUGen. The default mass cut is made at an upper and lower bound of $M_{Reso}\pm20\Gamma_{Reso}$. Here is a truth table of inputs and outcomes:
+\begin{table}[!ht]
+  \centering
+  \begin{tabular}{|l|l|l|l|l|}
+  \hline
+      \verb|m4l_min| set & \verb|m4l_max| set & \verb|BreitWignerCutoff| set & outcome\\ \hline
+      False & False & False & Use default \verb|BreitWignerCutoff| = 20 \\ \hline
+      False & False & True & Use user input for \verb|BreitWignerCutoff|\\ \hline
+      False & True & False & Error \\ \hline
+      False & True & True & Error \\ \hline
+      True & False & False & Error \\ \hline
+      True & False & True & Error \\ \hline
+      True & True & False & Use user input for \verb|m4l_min|/\verb|m4l_max| \\ \hline
+      True & True & True & Error \\ \hline
+  \end{tabular}
+\end{table}
 \begin{itemize}
 \item \verb|BreitWignerCutoff|: This parameter changes the mass range by making the upper and lower bounds a set number of widths from the pole mass.
 \item \verb|m4l_min|, \verb|m4l_max|: These two values, when used in conjunction, provide an upper and lower bound to the mass range.
