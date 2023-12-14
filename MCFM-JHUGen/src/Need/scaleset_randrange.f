@@ -16,7 +16,8 @@ c--- invariant mass of particles 3, 4, 5 and 6
      &   (case .eq. 'HZZ_4l') .or.
      &   (case .eq. 'HmZZ4l') .or.
      &   (case .eq. 'ggZZ4l') .or.
-     &   (case .eq. 'ZZlept')
+     &   (case .eq. 'ZZlept') .or.
+     &   (case .eq. 'HZZ_tb')
      & ) then
         call random_number(mu0)
         mu0 = (facscale_high - facscale_low)*mu0 + facscale_low
