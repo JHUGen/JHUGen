@@ -7197,6 +7197,7 @@ implicit none
         print *, "   pTlepcut:          Minimum pT for leptons in off-shell EW, in GeV (default: 3)"
         print *, "   etalepcut:         Maximum |eta| for leptons in off-shell EW (default: 2.7)"
         print *, "   m4l_min, m4l_max:  Minimum and maximum four-lepton mass in off-shell EW"
+        print *, "   BreitWignerCutoff: Value of the width multiplier for the mass range in on-shell processes (default: 20)"
         print *, "   m2l_min:   Minimum invariant mass of V (on-shell) in new VH (\texttt{Process=51}) (default: 0)"
         print *, "   m2l_max:   Maximum invariant mass of V (on-shell) in new VH (\texttt{Process=51}) (default: infinity)"
         print *, "   mVH_min:   Minimum invariant mass of VH in new VH (\texttt{Process=51}) (default: 0)"
