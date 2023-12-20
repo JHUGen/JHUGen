@@ -30,7 +30,7 @@ R. Pan, M. Panagiotou, R. Rontsch, J. Roskes, U. Sarica, M. Schulze, M. V. Sriva
 \begin{center}
 \small
 For simulation, reweighting, and analysis of resonances produced at hadron colliders \\
-(version v7.5.5, release date December 31, 2023) \\
+(version v7.5.5, release date December 22, 2023) \\
 \normalsize
 \end{center}
 
@@ -324,9 +324,9 @@ Download the package from \url{spin.pha.jhu.edu} and untar the file.  Go to the 
 $ make
 \end{verbatim}
 
-By default, the makefile options \verb|linkMELA| and \verb|linkCollierLib| are set to \verb|No|. If you need to use the NLO features, you need to set \verb|linkCollierLib = Yes|, and download and compile the COLLIER package using \verb|lib/downloadcollier.sh| with optional arguments \verb|compiler| and \verb|-j| to specify the Fortran compiler and the number of cores to use for compilation, respectively. Likewise, if you need to use off-shell processes, which use modified MCFM matrix elements, you need to set \verb|linkMELA = Yes| and compile JHUGenMELA with at least the option \verb|deps| before compiling JHUGenerator (see compilation instructions for JHUGenMELA for more details). In the case \verb|linkMELA = Yes|, the compiler has to be set to \verb|Comp = gfort|, and the gcc version should be at least 4.6. Notice that JHUGenMELA has its own compilation routine and location for the COLLIER library.
+By default, the makefile options \verb|linkMELA| and \verb|linkCollierLib| are set to \verb|No|. If you need to use the NLO features, you need to set \verb|linkCollierLib = Yes|, and download and compile the COLLIER package using \verb|./downloadcollier.sh| with optional arguments \verb|compiler| and \verb|-j| to specify the Fortran compiler and the number of cores to use for compilation, respectively. Likewise, if you need to use off-shell processes, which use modified MCFM matrix elements, you need to set \verb|linkMELA = Yes| and compile JHUGenMELA with at least the option \verb|deps| before compiling JHUGenerator (see compilation instructions for JHUGenMELA for more details). In the case \verb|linkMELA = Yes|, the compiler has to be set to \verb|Comp = gfort|, and the gcc version should be at least 4.6. Notice that JHUGenMELA has its own compilation routine and location for the COLLIER library.
 
-Also note that after JHUGenerator v7.3.0 was released, the naming scheme used for COLLIER libraries was changed. For any version of JHUGenerator preceding and including v7.3.0, this change in package location must be accounted for before installing the COLLIER library. If you are compiling JHUGenMELA, the script \verb|JHUGenMELA/MELA/COLLIER/setup.sh| must be edited to use \verb|pkgname = "collier-1.2.0"|. In the case you do not link JHUGenMELA but still need COLLIER, \verb|lib/downloadcollier.sh| should reference \verb|collier-1.2.0.tar.gz| instead of \verb|collier-1.2.tar.gz|.
+Also note that after JHUGenerator v7.3.0 was released, the naming scheme used for COLLIER libraries was changed. For any version of JHUGenerator preceding and including v7.3.0, this change in package location must be accounted for before installing the COLLIER library. If you are compiling JHUGenMELA, the script \verb|COLLIER/setup.sh| must be edited to use \verb|pkgname = "collier-1.2.0"|. In the case you do not link JHUGenMELA but still need COLLIER, \verb|./downloadcollier.sh| should reference \verb|collier-1.2.0.tar.gz| instead of \verb|collier-1.2.tar.gz|.
 
 \section{Quick start}
 
@@ -587,7 +587,8 @@ This is the list of command line configurables (also defined in the \verb|README
                        (default: true)
     pTlepcut:          Minimum pT for leptons in off-shell EW, in GeV (default: 3)
     etalepcut:         Maximum |eta| for leptons in off-shell EW (default: 2.7)
-    m4l_min, m4l_max:  Minimum and maximum four-lepton mass in off-shell EW
+    m4l_min, m4l_max:  Minimum and maximum four-lepton mass 
+    BreitWignerCutoff: Value of the width multiplier for the mass range in on-shell processes (default: 20) 
     m2l_min:   Minimum invariant mass of V (on-shell) in new VH (\texttt{Process=51}) (default: 0)
     m2l_max:   Maximum invariant mass of V (on-shell) in new VH (\texttt{Process=51}) (default: infinity)
     mVH_min:   Minimum invariant mass of VH in new VH (\texttt{Process=51}) (default: 0)
@@ -758,12 +759,33 @@ need to be set and are common to both resonances. The masses modifying the third
 \begin{itemize}
 \item {\verb|OffshellX|}: The flag specifies whether the events for processes 0, 1 or 2 feature a delta-function resonance mass (when set to 0) at or a finite-width distribution around the resonance mass (when set to 1). This option replaces the \verb|OffXVV| numerical flag in previous versions.
 \end{itemize}
-\subsubsection{Cuts}
+\subsubsection{Off-shell Cuts}
 \begin{itemize}
 \item \verb|pTjetcut|, \verb|etajetcut|, \verb|deltaRcut|, \verb|mJJcut| All of these cuts are used in processes 60 (VBF), 61 ($H+jj$), 90 ($bbH$), 66-75 (off-shell), and also 80 ($ttH$) if \verb|m_Top| is set to be light ($<10 \text{GeV}$).  In addition, \verb|pTjetcut| is used in process 62 ($H+j$) and also processes 110--113 ($t/\bar{t}+H$) if \verb|m_Top| is light.
 \item \verb|pTlepcut|, \verb|etalepcut| similarly adjust the $p_T$ or $|\eta|$ of leptons.
 \item \verb|MPhotonCutoff| If the decay is to $ZZ$ and any of the couplings to photons (\verb|ghzgsX| or \verb|ghgsgsX|, or continuum amplitudes with virtual photons) is set, the $\gamma^*$ contribution will be included along with the $Z$'s.  Similarly, if the decay is to $Z\gamma$ and any of the \verb|ghgsgsX| couplings are set, the $\gamma\gamma^*$ contribution will be included as well.  In this case, a lower cut on the photon invariant mass has to be placed in order to avoid the collinear singularity.  This can be set using MPhotonCutoff.
 \item \verb|pTjetcut|, \verb|etajetcut|, \verb|detajetcut|, \verb|deltaRcut|, \verb|mJJcut|, \verb|m4l_min|, \verb|m4l_max|, \verb|m2l_min|, \verb|m2l_max|, \verb|mVH_min|, \verb|mVH_max|, \verb|pTlepcut|, \verb|etalepcut|, and \verb|pTHcut| are available for Process 51. The default values are set such that there is no cuts.
+\end{itemize}
+\subsubsection{On-shell Cuts}
+These two cuts are on the mass range in the on-shell regime of JHUGen. The default mass cut is made at an upper and lower bound of $M_{Reso}\pm20\Gamma_{Reso}$. Here is a truth table of inputs and outcomes:
+\begin{table}[!ht]
+  \centering
+  \begin{tabular}{|l|l|l|l|l|}
+  \hline
+      \verb|m4l_min| set & \verb|m4l_max| set & \verb|BreitWignerCutoff| set & outcome\\ \hline
+      False & False & False & Use default \verb|BreitWignerCutoff| = 20 \\ \hline
+      False & False & True & Use user input for \verb|BreitWignerCutoff|\\ \hline
+      False & True & False & Error \\ \hline
+      False & True & True & Error \\ \hline
+      True & False & False & Error \\ \hline
+      True & False & True & Error \\ \hline
+      True & True & False & Use user input for \verb|m4l_min|/\verb|m4l_max| \\ \hline
+      True & True & True & Error \\ \hline
+  \end{tabular}
+\end{table}
+\begin{itemize}
+\item \verb|BreitWignerCutoff|: This parameter changes the mass range by making the upper and lower bounds a set number of widths from the pole mass.
+\item \verb|m4l_min|, \verb|m4l_max|: These two values, when used in conjunction, provide an upper and lower bound to the mass range.
 \end{itemize}
 \subsubsection{Renormalization and factorization scales}
 \begin{itemize}
@@ -1482,11 +1504,10 @@ This would correspond to SM Zll couplings, and SM Z couplings to right handed qu
 up-type quarks in production is shifted by 0.1. Again in this example, since the other Zff couplings are not set, they are set to 0 in the matrix element calculation.
 
 \section{Release notes}
-\noindent 
-In going from \verb|v7.5.4| to \verb|v7.5.5| (December 31, 2023) the updates are as follows:
+In going from \verb|v7.5.4| to \verb|v7.5.5| (December 22, 2023) the updates are as follows:
 \noindent
 \begin{itemize}
-\item Minor fixes to makefiles and setup scripts for correct library linkage.
+\item Add mass ranges to onshell JHUGen processes between user-specified bounds.
 \end{itemize}
 \noindent 
 In going from \verb|v7.5.3| to \verb|v7.5.4| (November 6, 2023) the updates are as follows:

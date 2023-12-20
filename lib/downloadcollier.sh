@@ -42,11 +42,10 @@ mv COLLIER-1.2 COLLIER
 
 cd COLLIER/build
 cmake -DCMAKE_Fortran_COMPILER=$compiler ..
-make # ncores>1 is not supported yet.
-#if [[ $ncores -eq 0 ]];then
-#  make
-#elif [[ $ncores -eq -1 ]];then
-#  make -j
-#else
-#  make -j $ncores
-#fi
+if [[ $ncores -eq 0 ]];then
+  make
+elif [[ $ncores -eq -1 ]];then
+  make -j
+else
+  make -j $ncores
+fi

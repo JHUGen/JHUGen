@@ -26,31 +26,22 @@ UseLHAPDF=No
 
 ## link MCFM libraries from MELA
 linkMELA = No
-# remember to run the 'eval $(JHUGenMELA/MELA/setup.sh env)' command at the end of the MELA setup
+# remember to export
+#          LD_LIBRARY_PATH=/.../MELA/data/$SCRAM_ARCH/:${LD_LIBRARY_PATH}
 
 ## include Collier Loop Integral Library
 linkCollierLib = No
-# remember to export
-#          LD_LIBRARY_PATH=/.../lib/COLLIER/:${LD_LIBRARY_PATH}
-# if not linking MELA already; otherwise, no need for the extra export.
 
 ###############################################
 ## COMPILER SETTINGS BASED ON THE USER FLAGS ##
 ###############################################
 ## LHAPDF options
-MyLHADirLib=
-MyLHADirInc=
+# directory which contains libLHAPDF.a, libLHAPDF.la, libLHAPDF.so
+# this one in terms of the environment variable should work in most cases
+MyLHADir=${LHAPDF_DATA_PATH}/../../lib/
 
 ifeq ($(UseLHAPDF),Yes)
-   ifeq (, $(shell which lhapdf-config))
-     $(error "No lhapdf-config found. Consider modifying PATH to be able to run this script.")
-   endif
-
-   MyLHADirLib=$(shell lhapdf-config --libdir)
-   MyLHADirInc=$(shell lhapdf-config --incdir)
-   #$(info $$MyLHADirLib is [${MyLHADirLib}])
-
-   LHAPDFflags = -L$(MyLHADirLib) -lLHAPDF -I$(MyLHADirInc) -DuseLHAPDF=1 -lstdc++
+   LHAPDFflags = -L$(MyLHADir) -lLHAPDF -I$(MyLHADir)/../include -DuseLHAPDF=1 -lstdc++
 else
    LHAPDFflags = -DuseLHAPDF=0
 endif
@@ -58,10 +49,13 @@ endif
 ## MELA options
 MELAflags = -DlinkMELA=0
 ifeq ($(linkMELA),Yes)
-  MELALibDir = ${MELA_LIB_PATH}
-  MELADir = $(MELALibDir)/../..
+  ifndef SCRAM_ARCH
+    $(error $$SCRAM_ARCH is not set. Please set the MELA environment properly)
+  endif
+  MELADir = $(Here)/../JHUGenMELA/MELA
   MELAFortranDir = $(MELADir)/fortran
   MELADataDir = $(MELADir)/data
+  MELALibDir = $(MELADataDir)/$(SCRAM_ARCH)
   #$(info $$MELALibDir is [${MELALibDir}])
 
   ifeq ($(Comp),gfort)
