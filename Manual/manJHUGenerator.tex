@@ -587,7 +587,7 @@ This is the list of command line configurables (also defined in the \verb|README
                        (default: true)
     pTlepcut:          Minimum pT for leptons in off-shell EW, in GeV (default: 3)
     etalepcut:         Maximum |eta| for leptons in off-shell EW (default: 2.7)
-    mHstar_min, mHstar_max:  Minimum and maximum four-lepton mass 
+    m4l_min, m4l_max:  Minimum and maximum four-lepton mass 
     BreitWignerCutoff: Value of the width multiplier for the mass range in on-shell processes (default: 20) 
     m2l_min:   Minimum invariant mass of V (on-shell) in new VH (\texttt{Process=51}) (default: 0)
     m2l_max:   Maximum invariant mass of V (on-shell) in new VH (\texttt{Process=51}) (default: infinity)
@@ -764,7 +764,7 @@ need to be set and are common to both resonances. The masses modifying the third
 \item \verb|pTjetcut|, \verb|etajetcut|, \verb|deltaRcut|, \verb|mJJcut| All of these cuts are used in processes 60 (VBF), 61 ($H+jj$), 90 ($bbH$), 66-75 (off-shell), and also 80 ($ttH$) if \verb|m_Top| is set to be light ($<10 \text{GeV}$).  In addition, \verb|pTjetcut| is used in process 62 ($H+j$) and also processes 110--113 ($t/\bar{t}+H$) if \verb|m_Top| is light.
 \item \verb|pTlepcut|, \verb|etalepcut| similarly adjust the $p_T$ or $|\eta|$ of leptons.
 \item \verb|MPhotonCutoff| If the decay is to $ZZ$ and any of the couplings to photons (\verb|ghzgsX| or \verb|ghgsgsX|, or continuum amplitudes with virtual photons) is set, the $\gamma^*$ contribution will be included along with the $Z$'s.  Similarly, if the decay is to $Z\gamma$ and any of the \verb|ghgsgsX| couplings are set, the $\gamma\gamma^*$ contribution will be included as well.  In this case, a lower cut on the photon invariant mass has to be placed in order to avoid the collinear singularity.  This can be set using MPhotonCutoff.
-\item \verb|pTjetcut|, \verb|etajetcut|, \verb|detajetcut|, \verb|deltaRcut|, \verb|mJJcut|, \verb|mHstar_min|, \verb|mHstar_max|, \verb|m2l_min|, \verb|m2l_max|, \verb|mVH_min|, \verb|mVH_max|, \verb|pTlepcut|, \verb|etalepcut|, and \verb|pTHcut| are available for Process 51. The default values are set such that there is no cuts.
+\item \verb|pTjetcut|, \verb|etajetcut|, \verb|detajetcut|, \verb|deltaRcut|, \verb|mJJcut|, \verb|m4l_min|, \verb|m4l_max|, \verb|m2l_min|, \verb|m2l_max|, \verb|mVH_min|, \verb|mVH_max|, \verb|pTlepcut|, \verb|etalepcut|, and \verb|pTHcut| are available for Process 51. The default values are set such that there is no cuts.
 \end{itemize}
 \subsubsection{On-shell Cuts}
 These two cuts are on the mass range in the on-shell regime of JHUGen. The default mass cut is made at an upper and lower bound of $M_{Reso}\pm20\Gamma_{Reso}$. Here is a truth table of inputs and outcomes:
@@ -772,20 +772,20 @@ These two cuts are on the mass range in the on-shell regime of JHUGen. The defau
   \centering
   \begin{tabular}{|l|l|l|l|l|}
   \hline
-      \verb|mHstar_min| set & \verb|mHstar_max| set & \verb|BreitWignerCutoff| set & outcome\\ \hline
+      \verb|m4l_min| set & \verb|m4l_max| set & \verb|BreitWignerCutoff| set & outcome\\ \hline
       False & False & False & Use default \verb|BreitWignerCutoff| = 20 \\ \hline
       False & False & True & Use user input for \verb|BreitWignerCutoff|\\ \hline
       False & True & False & Error \\ \hline
       False & True & True & Error \\ \hline
       True & False & False & Error \\ \hline
       True & False & True & Error \\ \hline
-      True & True & False & Use user input for \verb|mHstar_min|/\verb|mHstar_max| \\ \hline
+      True & True & False & Use user input for \verb|m4l_min|/\verb|m4l_max| \\ \hline
       True & True & True & Error \\ \hline
   \end{tabular}
 \end{table}
 \begin{itemize}
 \item \verb|BreitWignerCutoff|: This parameter changes the mass range by making the upper and lower bounds a set number of widths from the pole mass.
-\item \verb|mHstar_min|, \verb|mHstar_max|: These two values, when used in conjunction, provide an upper and lower bound to the mass range.
+\item \verb|m4l_min|, \verb|m4l_max|: These two values, when used in conjunction, provide an upper and lower bound to the mass range.
 \end{itemize}
 \subsubsection{Renormalization and factorization scales}
 \begin{itemize}
