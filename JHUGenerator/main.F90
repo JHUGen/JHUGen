@@ -407,7 +407,7 @@ character :: arg*(500)
 integer :: NumArgs,NArg
 logical :: help, PrintVersion, PrintHeader, DryRun, success, SetLastArgument, interfSet, ignoreRunningWidthResonanceCheck
 logical :: SetRenScheme, SetMuRenMultiplier, SetFacScheme, SetMuFacMultiplier, SetSchemeBounds
-logical :: SetMReso, SetGaReso, SetMReso2, SetGaReso2
+logical :: SetMReso, SetGaReso, SetMReso2, SetGaReso2, SetBreitWignerCutoff, Setm4l_max, Setm4l_min
 logical :: SetAnomalousSpin0gg, Setghg2, SetAnomalousSpin0VV, Setghz1
 logical :: SetZZcoupling, SetZZprimecoupling, SetZprimeZprimecoupling
 logical :: SetZgammacoupling, Setgammagammacoupling, SetZprimegammacoupling
@@ -457,6 +457,9 @@ type(SaveValues) :: tosave, oldsavevalues
    SetFacScheme = .false.
    SetRenScheme = .false.
    SetSchemeBounds = .false.
+   SetBreitWignerCutoff = .false.
+   Setm4l_max = .false.
+   Setm4l_min = .false.
    SetMReso=.false.
    SetGaReso=.false.
    SetMReso2=.false.
@@ -590,6 +593,7 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "GaZ", success, Ga_Z, multiply=GeV, tosave=tosave)
     call ReadCommandLineArgument(arg, "MW", success, M_W, multiply=GeV, tosave=tosave)
     call ReadCommandLineArgument(arg, "GaW", success, Ga_W, multiply=GeV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "BreitWignerCutoff", success, BreitWignerCutoff, success2=SetBreitWignerCutoff, tosave=tosave)
 
     call ReadCommandLineArgument(arg, "ctauReso", success, HiggsDecayLengthMM, multiply=ctauUnit, tosave=tosave)
     call ReadCommandLineArgument(arg, "ctauVprime", success, VprimeDecayLengthMM, multiply=ctauUnit, tosave=tosave)
@@ -1267,8 +1271,8 @@ type(SaveValues) :: tosave, oldsavevalues
     call ReadCommandLineArgument(arg, "detajetcut", success, detajetcut, success2=Setdetajetcut, tosave=tosave)
     call ReadCommandLineArgument(arg, "deltaRcut", success, Rjet, success2=SetdeltaRcut, tosave=tosave)
     call ReadCommandLineArgument(arg, "mJJcut", success, mJJcut, multiply=GeV, tosave=tosave)
-    call ReadCommandLineArgument(arg, "m4l_min", success, m4l_minmax(1), multiply=GeV, tosave=tosave)
-    call ReadCommandLineArgument(arg, "m4l_max", success, m4l_minmax(2), multiply=GeV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "mHstar_min", success, m4l_minmax(1), success2=Setm4l_min, multiply=GeV, tosave=tosave)
+    call ReadCommandLineArgument(arg, "mHstar_max", success, m4l_minmax(2), success2=Setm4l_max, multiply=GeV, tosave=tosave)
     call ReadCommandLineArgument(arg, "m2l_min", success, m2l_minmax(1), multiply=GeV, success2=Setm2l_min, tosave=tosave)
     call ReadCommandLineArgument(arg, "m2l_max", success, m2l_minmax(2), multiply=GeV, success2=Setm2l_max, tosave=tosave)
     call ReadCommandLineArgument(arg, "mVH_min", success, mVH_minmax(1), multiply=GeV, success2=SetmVH_min, tosave=tosave)
@@ -1329,8 +1333,9 @@ type(SaveValues) :: tosave, oldsavevalues
     endif
 
     if( Process.ge.66 .and. Process.le.75) then
-      if( m4l_minmax(1).lt.0d0 ) call Error("Have to set m4l_min for offshell")
-      if( m4l_minmax(1).gt.m4l_minmax(2) ) call Error("Have to set m4l_max to something bigger than m4l_min")
+      if( m4l_minmax(1).lt.0d0 ) call Error("Have to set mHstar_min for offshell")
+      if( m4l_minmax(1).gt.m4l_minmax(2) ) call Error("Have to set mHstar_max to something bigger than mHstar_min")
+      if( SetBreitWignerCutoff ) call Error("Cannot set BreitWignerCutoff for offshell processes")
     endif
 
     !PChannel
@@ -1690,6 +1695,25 @@ type(SaveValues) :: tosave, oldsavevalues
     if((Process.eq.61 .or. Process.eq.62) .and. pTjetcut.le.0d0) then
        print *, " Process=",Process," requires a non-zero pT cut. Current setting cut ",pTjetcut/GeV," GeV is not allowed."
        stop 1
+    endif
+    if((Setm4l_min .or. Setm4l_max) .and. (SetBreitWignerCutoff)) then
+        print *, "mHstar_min/mHstar_max and BreitWignerCutoff are mutually exclusive!"
+        stop 1
+    elseif( (Setm4l_min .neqv. Setm4l_max) .and. (Setm4l_min .or. Setm4l_max) ) then
+        print *, "Need to set both mHstar_min and mHstar_max to use mass bounds"
+        stop 1
+    elseif( (Setm4l_min .and. Setm4l_max) ) then
+        if( m4l_minmax(1).ge.m4l_minmax(2) ) then
+            print *, "mHstar_min must be less than mHstar_max!"
+            stop 1
+        endif
+    else !If neither is set then use the BreitWigner Cutoff. Default value for it is 20
+        m4l_minmax(1) = M_Reso - BreitWignerCutoff*Ga_Reso
+        m4l_minmax(2) = M_Reso + BreitWignerCutoff*Ga_Reso
+        if( m4l_minmax(1).ge.m4l_minmax(2) ) then
+            print *, "mHstar_min must be less than mHstar_max!"
+            stop 1
+        endif
     endif
 
     !---------------------------------------!
@@ -7173,7 +7197,8 @@ implicit none
         print *, "                      (default: true)"
         print *, "   pTlepcut:          Minimum pT for leptons in off-shell EW, in GeV (default: 3)"
         print *, "   etalepcut:         Maximum |eta| for leptons in off-shell EW (default: 2.7)"
-        print *, "   m4l_min, m4l_max:  Minimum and maximum four-lepton mass in off-shell EW"
+        print *, "   mHstar_min, mHstar_max:  Minimum and maximum four-lepton mass"
+        print *, "   BreitWignerCutoff: Value of the width multiplier for the mass range in on-shell processes (default: 20)"
         print *, "   m2l_min:   Minimum invariant mass of V (on-shell) in new VH (\texttt{Process=51}) (default: 0)"
         print *, "   m2l_max:   Maximum invariant mass of V (on-shell) in new VH (\texttt{Process=51}) (default: infinity)"
         print *, "   mVH_min:   Minimum invariant mass of VH in new VH (\texttt{Process=51}) (default: 0)"
