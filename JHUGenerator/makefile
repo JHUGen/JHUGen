@@ -55,7 +55,7 @@ ifeq ($(linkMELA),Yes)
   MELADir = $(Here)/../JHUGenMELA/MELA
   MELAFortranDir = $(MELADir)/fortran
   MELADataDir = $(MELADir)/data
-  MELALibDir = $(MELADataDir)/$(SCRAM_ARCH)
+  MELALibDir = $(MELADataDir)/$(MELA_ARCH)
   #$(info $$MELALibDir is [${MELALibDir}])
 
   ifeq ($(Comp),gfort)
