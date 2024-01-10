@@ -136,8 +136,9 @@ jobs:
           name: compile generator with linkMELA=Yes
           command: |
             cd JHUGenerator
-            echo $MELA_DIR
+            echo "MELA DIR" $MELA_DIR
             sed -i -r -e "s/^(linkMELA *= *)No/\1Yes/" makefile
+            head -80 makefile
             make
             git checkout -- makefile
       - run: cd JHUGenerator/pdfs && ./downloadNNPDF.sh
