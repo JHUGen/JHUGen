@@ -136,6 +136,7 @@ jobs:
           name: compile generator with linkMELA=Yes
           command: |
             cd JHUGenerator
+            echo $MELA_DIR
             sed -i -r -e "s/^(linkMELA *= *)No/\1Yes/" makefile
             make
             git checkout -- makefile
