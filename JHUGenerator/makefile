@@ -25,7 +25,7 @@ UseLHAPDF=No
 #          LHAPDF_DATA_PATH=/.../LHAPDF-x.y.z/share/LHAPDF/:${LHAPDF_DATA_PATH}
 
 ## link MCFM libraries from MELA
-linkMELA = No
+linkMELA = Yes
 # remember to export
 #          LD_LIBRARY_PATH=/.../MELA/data/$SCRAM_ARCH/:${LD_LIBRARY_PATH}
 
@@ -56,8 +56,7 @@ ifeq ($(linkMELA),Yes)
   MELAFortranDir = $(MELADir)/fortran
   MELADataDir = $(MELADir)/data
   MELALibDir = $(MELADataDir)/$(MELA_ARCH)
-  #$(info $$MELALibDir is [${MELALibDir}])
-
+  $(info $$MELALibDir is [${MELALibDir}])
   ifeq ($(Comp),gfort)
     MELAflags = -DlinkMELA=1 -L$(MELALibDir) -l$(MCFMLib)
   else
