@@ -131,7 +131,8 @@ jobs:
           command: |
             cd JHUGenMELA/MELA/
             ./setup.sh -j
-            echo "Print exports" ./setup.sh env
+            echo "Print exports" 
+            ./setup.sh env
             eval $(./setup.sh env)
       - run:
           name: compile generator with linkMELA=Yes
