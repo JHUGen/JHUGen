@@ -37,7 +37,7 @@ env: &env
         #to run JHUGen, convert to root files, and make the plots
         #and also update the cache bookkeeping
         WHICHPLOTS: 4
-  resource_class: large
+  resource_class: xlarge
 cmsrelcmsenv: &cmsrelcmsenv
   name: "cmsrel, cmsenv"
   command: |
