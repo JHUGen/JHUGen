@@ -1,3 +1,38 @@
+c--- Interpolation function for form factors of trilinear
+      subroutine lin_interpolate(xvals, yvals, length, x, y)
+      implicit none
+      integer :: length, i, t
+      real*8 :: xvals(length), yvals(length), x0, x1, y0, y1
+      real*8, intent(in) :: x
+      real*8, intent(out) :: y
+      if (x<xvals(1)) then
+         y=0
+      end if
+      if (x>xvals(size(xvals))) then
+         y=0
+      end if
+         
+      do i = 1, size(xvals)
+         if (xvals(i) > x) then
+            x0 = xvals(i-1)
+            x1 = xvals(i)
+            y0 = yvals(i-1)
+            y1 = yvals(i)
+            exit
+         end if
+      end do
+        
+      if (x>xvals(1)) then
+         if (x<xvals(size(xvals))) then
+            y = (y1-y0)/(x1-x0)*(x-x0) + y0
+         end if
+      end if  
+
+      return 
+      end subroutine lin_interpolate
+
+
+
 c---
 c--- MODIFICATION OF THE ORIGINAL MCFM SUBROUTINE TO ALLOW FOR ANOMALOUS H-Z-Z COUPLINGS  (e.g. nproc=128)
 c--- SAME CHOICE OF CONVENTIONS AS IN JHUGEN
