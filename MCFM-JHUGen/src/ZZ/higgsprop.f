@@ -110,5 +110,79 @@ c--- Breit Wigner propagator
    99 format(' *    MHB = ',f9.4,' GeV    GHB = ',f9.4,' GeV    *')
       
       end
-      
+c--- 
+c---  One-loop correction to the Higgs propagator
+c---      
+      function sigmah(s,c6,wfr)
+      implicit none
+c---  include 'types.f'
+      double complex sigmah
+
+      include 'constants.f'
+c---  include 'cplx.h'
+      include 'masses.f'
+      include 'ewcouple.f'
+      include 'qlfirst.f'
+      double precision s, c6, wfr, MH2, dB0h, dZh, dmhsq
+      double complex qlI2
+
+      if (qlfirst) then
+        qlfirst=.false. 
+        call qlinit
+      endif
+
+      MH2=hmass**2
+
+c--- Wavefunction renormalisation
+      dB0h = (-9 + 2*sqrt(3d0)*Pi)/(9*MH2)
+      dZh  = -wfr*dB0h  
+c--- Mass renormalisation
+      dmhsq = qlI2(MH2,MH2,MH2,1d0,0)
+c--- Renormalised correction
+      sigmah = (9*c6*(2d0 + c6)*MH2**2*
+     & (-dZh*(MH2 - s)))/
+     & (32d0*Pi**2*vevsq)
+
+      sigmah = sigmah + (9*c6*(2d0 + c6)*MH2**2*
+     & (qlI2(s,MH2,MH2,1d0,0) - dmhsq))/
+     & (32d0*Pi**2*vevsq)
+
+      sigmah= sigmah/dcmplx(s-MH2,hmass*hwidth) 
+
+
+      end
+
+c--- 
+c---  One-loop correction to the Higgs propagator due to 
+c---      
+      function sigmahx(s,cx,mx)
+      implicit none
+c---  include 'types.f'
+      double complex sigmahx
+      double precision MH2 
+      include 'constants.f'
+c---  include 'cplx.h'
+      include 'masses.f'
+      include 'ewcouple.f'
+      include 'qlfirst.f'
+      double precision s, cx, mx
+      double complex qlI2
+
+      if (qlfirst) then
+        qlfirst=.false. 
+        call qlinit
+      endif
+
+      MH2=hmass**2
+
+c--- Renormalised correction without wavefunction correction
+
+      sigmahx = cx**2*vevsq* 
+     &     (qlI2(s,mx**2,mx**2,1d0,0) -
+     &      dreal(qlI2(MH2,mx**2,mx**2,1d0,0)))/
+     & (8.d0*Pi**2)
+      sigmahx = sigmahx/dcmplx(s-MH2,hmass*hwidth) 
+
+
+      end   
       
