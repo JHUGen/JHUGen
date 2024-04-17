@@ -59,6 +59,8 @@ c---
       include 'spinzerohiggs_anomcoupl.f'
       include 'plabel.f'
       include 'AnomZffCouplings.f'
+      include 'AnomTriLinear.f'
+      include 'qlfirst.f'
       integer h1,h34,h56
       double precision p(mxpart,4),mb2,mt2,mtX2,mbX2
       double complex Mloop_bquark(2,2,2,2),Mloop_tquark(2,2,2,2),
