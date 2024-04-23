@@ -190,18 +190,18 @@ c     HVV anomalous couplings
       data ghw4_prime7 / (0d0,0d0) /
 
 c     Higgs tri-linear coupling and WFR constants
-      data c6 /0d0/
-      data t1 /0d0/
-      data t2 /0d0/
-      data t3 /0d0/
-      data t4 /0d0/
-      data t5 /0d0/
-      data t6 /0d0/
-      data w1 /0d0/
-      data w2 /0d0/
-      data w3 /0d0/
-      data w4 /0d0/
-      data w5 /0d0/
+      data c6 /0d0/ ! SM = 0 
+      data t1 /1d0/ ! All ti should = 1
+      data t2 /1d0/
+      data t3 /1d0/
+      data t4 /1d0/
+      data t5 /1d0/
+      data t6 /1d0/
+      data w1 /1d0/ ! All wi should = 1
+      data w2 /1d0/
+      data w3 /1d0/
+      data w4 /1d0/
+      data w5 /1d0/
 
 c     MARKUS: anomalous couplings for 2nd resonance
 c     Mass and width for second resonance
