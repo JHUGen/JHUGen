@@ -149,6 +149,6 @@ c--- Renormalised correction
 
       sigmah= sigmah/dcmplx(s-MH2,hmass*hwidth) 
 
-
+      return 
       end
       

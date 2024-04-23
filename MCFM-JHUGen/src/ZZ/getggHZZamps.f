@@ -195,7 +195,7 @@ c--- production correction
 c--- Since the prop12 is already included in H4l we do not need another higgs prop
 c     Mloop_c6_production(h1,h1,h34,h56) = t4*im*ggHmt_c6(h1,h1)* H4l(h34,h56)*prop12
       Mloop_c6_production(h1,h1,h34,h56) = 
-     &     t4*im*ggHmt_c6(h1,h1)* H4l(h34,h56)
+     &     t4*im*ggHmt_c6(h1,h1)* H4l(h34,h56)*prop12
 c--- decay correction  
       Mloop_c6_decay(h1,h1,h34,h56)=im*ggHmt(h1,h1)*
      &     (t2*H4l_c6_gmunu(h34,h56)+t3*H4l_c6_qmuqnu(h34,h56))*prop12

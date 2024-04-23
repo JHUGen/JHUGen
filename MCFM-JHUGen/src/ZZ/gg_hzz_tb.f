@@ -69,7 +69,10 @@ c--- compute total c6 correction to Higgs amplitude
      &  +Mloop_c6_propagator(h1,h2,h34,h56)
      &  +Mloop_c6_decay(h1,h2,h34,h56)
      &  +Mloop_c6_production(h1,h2,h34,h56)
-     &  +Mloop_c6_width(h1,h2,h34,h56) 
+     &  +Mloop_c6_width(h1,h2,h34,h56)
+     
+c--- ME checks 
+c--- print *,AHiggs, AHiggs_c6
 c-------------------------------
 
       if (interference .eqv. .false.) then
@@ -93,7 +96,7 @@ c--- with interference
           oprat=1d0-2d0*dble(dconjg(AHiggs+AHiggs_c6)*
      &    (AHiggs_swap+AHiggs_c6_swap))
      &                 /(cdabs(AHiggs+AHiggs_c6)**2+
-     &    cdabs(AHiggs_swap++AHiggs_c6_swap)**2)
+     &    cdabs(AHiggs_swap+AHiggs_c6_swap)**2)
         else
           oprat=1d0
         endif
