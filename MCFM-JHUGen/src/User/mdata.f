@@ -31,6 +31,7 @@ c     Begin anomalous couplings
       include 'AnomTriLinear.f'
       data AllowAnomalousCouplings / 0 / ! Disables anomalous couplings
       data AllowAnomalousZffCouplings / 0 / ! Disables anomalous Zff Couplings
+      data AllowAnomTriLinear / 0 / ! Disables anomalous self couplings
       data distinguish_HWWcouplings / 0 /
       data AnomalCouplPR,AnomalCouplDK / 1, 1/
       data channeltoggle_stu / 2 /
