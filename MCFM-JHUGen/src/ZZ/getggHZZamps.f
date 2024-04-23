@@ -1,43 +1,10 @@
-c--- Interpolation function for form factors of trilinear
-      subroutine lin_interpolate(xvals, yvals, length, x, y)
-      implicit none
-      integer :: length, i, t
-      real*8 :: xvals(length), yvals(length), x0, x1, y0, y1
-      real*8, intent(in) :: x
-      real*8, intent(out) :: y
-      if (x<xvals(1)) then
-         y=0
-      end if
-      if (x>xvals(size(xvals))) then
-         y=0
-      end if
-         
-      do i = 1, size(xvals)
-         if (xvals(i) > x) then
-            x0 = xvals(i-1)
-            x1 = xvals(i)
-            y0 = yvals(i-1)
-            y1 = yvals(i)
-            exit
-         end if
-      end do
-        
-      if (x>xvals(1)) then
-         if (x<xvals(size(xvals))) then
-            y = (y1-y0)/(x1-x0)*(x-x0) + y0
-         end if
-      end if  
-
-      return 
-      end subroutine lin_interpolate
-
-
-
 c---
 c--- MODIFICATION OF THE ORIGINAL MCFM SUBROUTINE TO ALLOW FOR ANOMALOUS H-Z-Z COUPLINGS  (e.g. nproc=128)
 c--- SAME CHOICE OF CONVENTIONS AS IN JHUGEN
 c---
-      subroutine getggHZZamps(p,Mloop_bquark,Mloop_tquark)
+      subroutine getggHZZamps(p,Mloop_bquark,Mloop_tquark,
+     &Mloop_c6_propagator,Mloop_c6_decay,
+     &Mloop_c6_production,Mloop_c6_width)
 c--- Returns a series of arrays representing the dressed amp[itudes
 c--- for the process gg->Higgs->ZZ; there are:
 c---        Mloop_bquark(h1,h2,h34,h56)   top quark mass=mt
@@ -63,9 +30,15 @@ c---
       include 'qlfirst.f'
       integer h1,h34,h56
       double precision p(mxpart,4),mb2,mt2,mtX2,mbX2
+      double precision MH2
+      double precision dB0h, dZh
       double complex Mloop_bquark(2,2,2,2),Mloop_tquark(2,2,2,2),
-     & ggHmq(2,2,2),prop12,prop34,prop56,
-     & H4l(2,2),facHZZ,facHZA,facHAZ,facHAA,higgsprop
+     & Mloop_c6_production(2,2,2,2),Mloop_c6_width(2,2,2,2),
+     & Mloop_c6_propagator(2,2,2,2),Mloop_c6_decay(2,2,2,2),
+     & ggHmt(2,2),ggHmt_c6(2,2),ggHmq(2,2,2),prop12,prop34,prop56,
+     & H4l(2,2),facHZZ,facHZA,facHAZ,facHAA,higgsprop,
+     & prop12_c6,sigmah,hwidth_c6,width_c6,
+     & H4l_c6_gmunu(2,2), H4l_c6_qmuqnu(2,2)
       double precision rescale
       double complex anomhzzamp,anomhzaamp,anomhaaamp
 
@@ -76,8 +49,19 @@ c---
          rescale=1d0
       endif
 
+c     Get the SM top loop 
+      
+
+
+c---  end width corrections
       Mloop_bquark(:,:,:,:)=czip
       Mloop_tquark(:,:,:,:)=czip
+      Mloop_c6_production(:,:,:,:)=czip
+      Mloop_c6_width(:,:,:,:)=czip
+      Mloop_c6_propagator(:,:,:,:)=czip
+      Mloop_c6_decay(:,:,:,:)=czip
+      ggHmt_c6(:,:)=czip
+      ggHmt(:,:)=czip
       if(hmass.lt.zip) then
          return
       endif
@@ -91,6 +75,29 @@ c--- propagator factors
       prop34=cone/dcmplx(s(3,4)-zmass**2,zmass*zwidth)
       prop56=cone/dcmplx(s(5,6)-zmass**2,zmass*zwidth)
 
+c--- propagator correction from c6
+c--- c6 correction to propagator including cx/mx      
+c      prop12_c6=-higgsprop(s(1,2))*(sigmah(s(1,2),c6,w1) +
+c     & sigmahx(s(1,2),cx,mx))
+c--- c6 correction to propagator      
+      prop12_c6=-higgsprop(s(1,2))*(sigmah(s(1,2),c6,w1))
+
+c--- for width corrections due to c6 operator
+      if(AllowAnomTriLinear .eq. 1)then
+        MH2 = hmass**2
+        dB0h = (-9 + 2*Sqrt(3.)*Pi)/(9.*MH2)
+      
+        dZh = (-9*c6*(2.d0 + c6)*dB0h*MH2**2)/(32.d0*Pi**2*vevsq)
+
+        hwidth_c6 = 0.0023*c6*hwidth
+          
+        width_c6 = im*hmass*(t5*w4*dZh*hwidth -
+     &  t6*(w5*dZh/2.d0*hwidth + hwidth_c6))*prop12
+      else
+        width_c6 = 0 
+      endif 
+
+
 c--- Factor
       facHZZ=im*rescale*prop12*prop34*prop56/(2d0*xw*(1d0-xw))
       facHZA=-im*rescale*prop12*prop34/s(5,6)/(2d0*xw*(1d0-xw))
@@ -101,6 +108,20 @@ c--- Amplitudes for production
       call anomhggvtxamp(1,2,1,za,zb,ggHmq)
       ! Overall factor=1
       !ggHmq(:,:,:) = ggHmq(:,:,:)
+c--- c6 production corrections
+      if(AllowAnomTriLinear .eq. 1)then 
+        call anomhggvtxamp_c6(za,zb,ggHmt_c6)
+      endif
+c--- c6 decay correction
+      if(AllowAnomTriLinear .eq. 1)then 
+        call anomhzzamp_c6(prop34,prop56,za,zb,
+     & H4l_c6_gmunu,H4l_c6_qmuqnu)
+      endif
+
+c---  Load SM gghtloop for c6 width correction
+      if(AllowAnomTriLinear .eq. 1)then 
+        call SMggHmtvertex(za,zb,ggHmt)
+      endif
 
 c--- Setting Anomalous Zff Couplings 
       if (AllowAnomalousZffCouplings .eq. 1) then
@@ -166,16 +187,30 @@ c--- Assemble
       do h56=1,2
       Mloop_bquark(h1,h1,h34,h56)=ggHmq(1,h1,h1)*H4l(h34,h56)
       Mloop_tquark(h1,h1,h34,h56)=ggHmq(2,h1,h1)*H4l(h34,h56)
+c--- propagator correction
+c---  Could replace ggHmt(h1,h1) with ggHmq(2,h1,h1) to include anomalous effects
+      Mloop_c6_propagator(h1,h1,h34,h56)=t1*im*ggHmt(h1,h1)*
+     &     H4l(h34,h56)*prop12_c6
+c--- production correction
+c--- Since the prop12 is already included in H4l we do not need another higgs prop
+c     Mloop_c6_production(h1,h1,h34,h56) = t4*im*ggHmt_c6(h1,h1)* H4l(h34,h56)*prop12
+      Mloop_c6_production(h1,h1,h34,h56) = 
+     &     t4*im*ggHmt_c6(h1,h1)* H4l(h34,h56)
+c--- decay correction  
+      Mloop_c6_decay(h1,h1,h34,h56)=im*ggHmt(h1,h1)*
+     &     (t2*H4l_c6_gmunu(h34,h56)+t3*H4l_c6_qmuqnu(h34,h56))*prop12
+c---  width correction
+c---  Could replace ggHmt(h1,h1) with ggHmq(2,h1,h1) to include anomalous effects
+      Mloop_c6_width(h1,h1,h34,h56)=im*ggHmt(h1,h1)*
+     &     H4l(h34,h56)*prop12*width_c6
       enddo
       enddo
       enddo
+
+c---  Assemble c6 ggH vertex corrections
 
       return
       end
-
-
-
-
 
       subroutine getggH2ZZamps(p,Mloop_bquark,Mloop_tquark)
       implicit none

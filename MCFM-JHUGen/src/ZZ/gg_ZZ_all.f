@@ -23,7 +23,16 @@ c--- The effect of massive bottom and top quark loops is included
      & ggH_bquark_swap(2,2,2,2),ggH_tquark_swap(2,2,2,2),Ahiggs_swap,
      & Acont_swap,Mamp,Samp,
      & ggH2_bquark(2,2,2,2),ggH2_tquark(2,2,2,2),
-     & ggH2_bquark_swap(2,2,2,2),ggH2_tquark_swap(2,2,2,2)
+     & ggH2_bquark_swap(2,2,2,2),ggH2_tquark_swap(2,2,2,2),
+     & Mloop_c6_propagator(2,2,2,2),
+     & Mloop_c6_propagator_swap(2,2,2,2),
+     & AHiggs_c6,AHiggs_c6_swap,
+     & Mloop_c6_decay(2,2,2,2),
+     & Mloop_c6_decay_swap(2,2,2,2),
+     & Mloop_c6_production(2,2,2,2),
+     & Mloop_c6_production_swap(2,2,2,2),
+     & Mloop_c6_width(2,2,2,2),
+     & Mloop_c6_width_swap(2,2,2,2)  
       logical includegens1and2,includebottom,includetop
 
 c--- set this to true to include generations 1 and 2 of (light) quarks
@@ -58,7 +67,9 @@ c      if (pttwo(3,4,p) .lt. 7d0) return ! Kauer gg2VV cut on |H+C|^2
       call getggZZamps(p,includegens1and2,includebottom,includetop,
      & Mloop_uptype,Mloop_dntype,Mloop_bquark,Mloop_tquark)
 
-      call getggHZZamps(p,ggH_bquark,ggH_tquark)
+      call getggHZZamps(p,ggH_bquark,ggH_tquark,
+     & Mloop_c6_propagator,Mloop_c6_decay,
+     & Mloop_c6_production,Mloop_c6_width)
       call getggH2ZZamps(p,ggH2_bquark,ggH2_tquark)
       
       if (interference) then
@@ -71,7 +82,9 @@ c--- for interference, compute amplitudes after 4<->6 swap
        pswap(6,:)=p(4,:)
        call getggZZamps(pswap,includegens1and2,includebottom,includetop,
      &  Sloop_uptype,Sloop_dntype,Sloop_bquark,Sloop_tquark)
-       call getggHZZamps(pswap,ggH_bquark_swap,ggH_tquark_swap)
+       call getggHZZamps(pswap,ggH_bquark_swap,ggH_tquark_swap, 
+     & Mloop_c6_propagator_swap,Mloop_c6_decay_swap,
+     & Mloop_c6_production_swap,Mloop_c6_width_swap) 
        call getggH2ZZamps(pswap,ggH2_bquark_swap,ggH2_tquark_swap)
       endif
       
@@ -94,8 +107,15 @@ c--- compute total Higgs amplitude
      &  +ggH2_bquark(h1,h2,h34,h56)   
      &  +ggH2_tquark(h1,h2,h34,h56)   
 
+c--- compute total c6 correction to Higgs amplitude        
+      AHiggs_c6=
+     &  +Mloop_c6_propagator(h1,h2,h34,h56)
+     &  +Mloop_c6_decay(h1,h2,h34,h56)
+     &  +Mloop_c6_production(h1,h2,h34,h56)
+     &  +Mloop_c6_width(h1,h2,h34,h56)  
+
 c---- This accumulates all contributions
-      Mamp=Acont+AHiggs
+      Mamp=Acont+AHiggs+AHiggs_c6
       
       if (interference .eqv. .false.) then
 c--- normal case
@@ -112,7 +132,13 @@ c--- with interference
      &  +ggH_tquark_swap(h1,h2,h34,h56)
      &  +ggH2_bquark_swap(h1,h2,h34,h56)
      &  +ggH2_tquark_swap(h1,h2,h34,h56)
-        Samp=Acont_swap+AHiggs_swap
+        AHiggs_c6_swap=
+     &  +Mloop_c6_propagator_swap(h1,h2,h34,h56)
+     &  +Mloop_c6_decay_swap(h1,h2,h34,h56)
+     &  +Mloop_c6_production_swap(h1,h2,h34,h56)
+     &  +Mloop_c6_width_swap(h1,h2,h34,h56)  
+
+        Samp=Acont_swap+AHiggs_swap+AHiggs_c6_swap
         if (h34 .eq. h56) then
           oprat=1d0-2d0*dble(dconjg(Mamp)*Samp)
      &                 /(cdabs(Mamp)**2+cdabs(Samp)**2)
