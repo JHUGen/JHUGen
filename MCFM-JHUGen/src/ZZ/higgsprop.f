@@ -151,38 +151,4 @@ c--- Renormalised correction
 
 
       end
-
-c--- 
-c---  One-loop correction to the Higgs propagator due to 
-c---      
-      function sigmahx(s,cx,mx)
-      implicit none
-c---  include 'types.f'
-      double complex sigmahx
-      double precision MH2 
-      include 'constants.f'
-c---  include 'cplx.h'
-      include 'masses.f'
-      include 'ewcouple.f'
-      include 'qlfirst.f'
-      double precision s, cx, mx
-      double complex qlI2
-
-      if (qlfirst) then
-        qlfirst=.false. 
-        call qlinit
-      endif
-
-      MH2=hmass**2
-
-c--- Renormalised correction without wavefunction correction
-
-      sigmahx = cx**2*vevsq* 
-     &     (qlI2(s,mx**2,mx**2,1d0,0) -
-     &      dreal(qlI2(MH2,mx**2,mx**2,1d0,0)))/
-     & (8.d0*Pi**2)
-      sigmahx = sigmahx/dcmplx(s-MH2,hmass*hwidth) 
-
-
-      end   
       
