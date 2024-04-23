@@ -201,8 +201,6 @@ c     Higgs tri-linear coupling and WFR constants
       data w3 /0d0/
       data w4 /0d0/
       data w5 /0d0/
-      data cx /0d0/
-      data mx /0d0/
 
 c     MARKUS: anomalous couplings for 2nd resonance
 c     Mass and width for second resonance
