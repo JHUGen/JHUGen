@@ -191,6 +191,42 @@ c--- Amplitudes for production
       call anomhggvtxamp(1,2,2,za,zb,ggHmq)
       ! Overall factor=1
       !ggHmq(:,:,:) = ggHmq(:,:,:)
+      
+c--- Setting Anomalous Zff Couplings 
+      if (AllowAnomalousZffCouplings .eq. 1) then
+        if ((plabel(3) .eq. 'el') .or. (plabel(3) .eq. 'ml')
+     &.or. (plabel(3) .eq. 'tl')) then
+          l1 = leZ
+          r1 = reZ 
+        elseif (plabel(3) .eq. 'nl') then
+          l1 = lnZ*dsqrt(3d0)
+          r1 = rnZ*dsqrt(3d0) 
+        elseif ((plabel(5) .eq. 'bq') .or. (plabel(5) .eq. 'sq')
+     &.or. (plabel(5) .eq. 'dq')) then
+          l1=lqdZ*dsqrt(3d0)
+          r1=rqdZ*dsqrt(3d0)
+        elseif ((plabel(5) .eq. 'uq') .or. (plabel(5) .eq. 'cq')) then
+          l1=lquZ*dsqrt(3d0)
+          r1=rquZ*dsqrt(3d0)
+        endif 
+      endif
+      if (AllowAnomalousZffCouplings .eq. 1) then
+        if ((plabel(5) .eq. 'el') .or. (plabel(5) .eq. 'ml')
+     &.or. (plabel(5) .eq. 'tl')) then
+          l2 = leZ
+          r2 = reZ 
+        elseif (plabel(5) .eq. 'nl') then
+          l2 = lnZ*dsqrt(3d0)
+          r2 = rnZ*dsqrt(3d0)
+        elseif ((plabel(5) .eq. 'bq') .or. (plabel(5) .eq. 'sq')
+     &.or. (plabel(5) .eq. 'dq')) then
+            l2=lqdZ*dsqrt(3d0)
+            r2=rqdZ*dsqrt(3d0)
+        elseif ((plabel(5) .eq. 'uq') .or. (plabel(5) .eq. 'cq')) then
+            l2=lquZ*dsqrt(3d0)
+            r2=rquZ*dsqrt(3d0)  
+        endif
+      endif
 
 c--- Amplitudes for decay
       H4l(1,1)=
