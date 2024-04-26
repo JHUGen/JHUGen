@@ -151,6 +151,8 @@ c--- Assemble
       include 'scale.f'
       include 'anom_higgs.f'
       include 'spinzerohiggs_anomcoupl.f'
+      include 'plabel.f'
+      include 'AnomZffCouplings.f'
       integer h1,h34,h56
       double precision p(mxpart,4),mb2,mt2,mbX2,mtX2
       double complex Mloop_bquark(2,2,2,2),Mloop_tquark(2,2,2,2),
@@ -191,7 +193,7 @@ c--- Amplitudes for production
       call anomhggvtxamp(1,2,2,za,zb,ggHmq)
       ! Overall factor=1
       !ggHmq(:,:,:) = ggHmq(:,:,:)
-      
+
 c--- Setting Anomalous Zff Couplings 
       if (AllowAnomalousZffCouplings .eq. 1) then
         if ((plabel(3) .eq. 'el') .or. (plabel(3) .eq. 'ml')
