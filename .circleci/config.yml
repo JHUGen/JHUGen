@@ -72,7 +72,7 @@ jobs:
           name: "Update Submodule"
           command: |
             git config --global remote."origin".fetch '+refs/pull/*/head:refs/remotes/origin/pr/*'
-            sed -i 's#git@github.com:JHUGen/JHUGenMELA#https://github.com/JHUGen/JHUGenMELA.git#g' .gitmodules 
+            git config --file=.gitmodules submodule.JHUGenMELA.url https://github.com/JHUGen/JHUGenMela.git
             git submodule update --init
       - restore_cache:
           key: v2_boost_1_61_0
