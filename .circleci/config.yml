@@ -1139,6 +1139,7 @@ jobs:
           name: "check that newlines are not annoying"
           command: |
             dos2unix $(git ls-files | grep -v 'MCFM-JHUGen/Bin/Pdfdata.*[.]dat$' | grep -v 'ffperm5[.]dat$')
+            git update-index --assume-unchanged .gitmodules
             git diff --exit-code --stat
           when: always
       - save_cache:
@@ -1156,6 +1157,7 @@ jobs:
                 chmod u-x $filename
               fi
             done
+            git update-index --assume-unchanged .gitmodules
             git diff --exit-code
           when: always
       - run: git checkout -- .
