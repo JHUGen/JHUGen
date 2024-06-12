@@ -63,52 +63,52 @@ jobs:
           at: ~/JHUGen
       - run:
           <<: *cmsrelcmsenv
-      - run: 
-          name: "Manual Checkout"
-          command: |
-            git clone https://github.com/JHUGen/JHUGen.git .
-            git pull origin pull/$CIRCLE_PR_NUMBER/head
-      - run: 
-          name: "Update Submodule"
-          command: |
-            git config --global remote."origin".fetch '+refs/pull/*/head:refs/remotes/origin/pr/*'
-            git config --file=.gitmodules submodule.JHUGenMELA.url https://github.com/JHUGen/JHUGenMela.git
-            git submodule update --init
-      - restore_cache:
-          key: v2_boost_1_61_0
-      - run:
-          name: install boost
-          command: |
-            cd ~ &&
-            if ! [ -d ~/boost_1_61_0 ]; then
-              wget https://sourceforge.net/projects/boost/files/boost/1.61.0/boost_1_61_0.tar.gz --no-check-certificate &&
-              tar -xvzf boost_1_61_0.tar.gz &&
-              cd boost_1_61_0 &&
-              ./bootstrap.sh &&
-              (./b2 || true)
-            fi
-      - save_cache:
-          key: v2_boost_1_61_0
-          paths: ~/boost_1_61_0
-      - persist_to_workspace:
-          root: ~/JHUGen
-          paths:
-           - .circleci
-           - .git
-           - .gitignore
-           - .gitmodules
-           - AnalyticMELA
-           - JHUGenerator
-           - JHUGenLexicon
-           - JHUGenMELA
-           - lib
-           - LICENSE
-           - MCFM-JHUGen
-           - Manual
-           - NOTICE
-           - README.md
-           - VH_NLO
-           - Web
+      #- run: 
+      #    name: "Manual Checkout"
+      #    command: |
+      #      git clone https://github.com/JHUGen/JHUGen.git .
+      #      git pull origin pull/$CIRCLE_PR_NUMBER/head
+      #- run: 
+      #    name: "Update Submodule"
+      #    command: |
+      #      git config --global remote."origin".fetch '+refs/pull/*/head:refs/remotes/origin/pr/*'
+      #      git config --file=.gitmodules submodule.JHUGenMELA.url https://github.com/JHUGen/JHUGenMela.git
+      #      git submodule update --init
+      #- restore_cache:
+      #    key: v2_boost_1_61_0
+      #- run:
+      #    name: install boost
+      #    command: |
+      #      cd ~ &&
+      #      if ! [ -d ~/boost_1_61_0 ]; then
+      #        wget https://sourceforge.net/projects/boost/files/boost/1.61.0/boost_1_61_0.tar.gz --no-check-certificate &&
+      #        tar -xvzf boost_1_61_0.tar.gz &&
+      #        cd boost_1_61_0 &&
+      #        ./bootstrap.sh &&
+      #        (./b2 || true)
+      #      fi
+      #- save_cache:
+      #    key: v2_boost_1_61_0
+      #    paths: ~/boost_1_61_0
+      #- persist_to_workspace:
+      #    root: ~/JHUGen
+      #    paths:
+      #     - .circleci
+      #     - .git
+      #     - .gitignore
+      #     - .gitmodules
+      #     - AnalyticMELA
+      #     - JHUGenerator
+      #     - JHUGenLexicon
+      #     - JHUGenMELA
+      #     - lib
+      #     - LICENSE
+      #     - MCFM-JHUGen
+      #     - Manual
+      #     - NOTICE
+      #     - README.md
+      #     - VH_NLO
+      #     - Web
 
   build:
     <<: *env
