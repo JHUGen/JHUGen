@@ -1,6 +1,6 @@
 env: &env
   docker:
-    - image: cmssw/cmssw:CMSSW_10_6_12
+    - image: cmssw/cmssw:CMSSW_9_3_2
       environment:
         PATH: "/home/cmsbld/dos2unix-7.4.0/:/home/cmsbld/githack/:/home/cmsbld/CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
         LIBRARY_PATH: "/home/cmsbld/boost_1_61_0/stage/lib"
@@ -44,8 +44,8 @@ cmsrelcmsenv: &cmsrelcmsenv
     echo "source /opt/cms/cmsset_default.sh" >> $BASH_ENV
     source $BASH_ENV
     cd $HOME
-    scram p CMSSW CMSSW_10_6_12
-    echo 'cd ~/CMSSW_10_6_12 && eval $(scram ru -sh) && cd - > /dev/null' >> $BASH_ENV
+    scram p CMSSW CMSSW_9_3_2
+    echo 'cd ~/CMSSW_9_3_2 && eval $(scram ru -sh) && cd - > /dev/null' >> $BASH_ENV
 jhugenversion: &jhugenversion
   name: find JHUGen version
   command: |
@@ -63,52 +63,52 @@ jobs:
           at: ~/JHUGen
       - run:
           <<: *cmsrelcmsenv
-      #- run: 
-      #    name: "Manual Checkout"
-      #    command: |
-      #      git clone https://github.com/JHUGen/JHUGen.git .
-      #      git pull origin pull/$CIRCLE_PR_NUMBER/head
-      #- run: 
-      #    name: "Update Submodule"
-      #    command: |
-      #      git config --global remote."origin".fetch '+refs/pull/*/head:refs/remotes/origin/pr/*'
-      #      git config --file=.gitmodules submodule.JHUGenMELA.url https://github.com/JHUGen/JHUGenMela.git
-      #      git submodule update --init
-      #- restore_cache:
-      #    key: v2_boost_1_61_0
-      #- run:
-      #    name: install boost
-      #    command: |
-      #      cd ~ &&
-      #      if ! [ -d ~/boost_1_61_0 ]; then
-      #        wget https://sourceforge.net/projects/boost/files/boost/1.61.0/boost_1_61_0.tar.gz --no-check-certificate &&
-      #        tar -xvzf boost_1_61_0.tar.gz &&
-      #        cd boost_1_61_0 &&
-      #        ./bootstrap.sh &&
-      #        (./b2 || true)
-      #      fi
-      #- save_cache:
-      #    key: v2_boost_1_61_0
-      #    paths: ~/boost_1_61_0
-      #- persist_to_workspace:
-      #    root: ~/JHUGen
-      #    paths:
-      #     - .circleci
-      #     - .git
-      #     - .gitignore
-      #     - .gitmodules
-      #     - AnalyticMELA
-      #     - JHUGenerator
-      #     - JHUGenLexicon
-      #     - JHUGenMELA
-      #     - lib
-      #     - LICENSE
-      #     - MCFM-JHUGen
-      #     - Manual
-      #     - NOTICE
-      #     - README.md
-      #     - VH_NLO
-      #     - Web
+      - run: 
+          name: "Manual Checkout"
+          command: |
+            git clone https://github.com/JHUGen/JHUGen.git .
+            git pull origin pull/$CIRCLE_PR_NUMBER/head
+      - run: 
+          name: "Update Submodule"
+          command: |
+            git config --global remote."origin".fetch '+refs/pull/*/head:refs/remotes/origin/pr/*'
+            git config --file=.gitmodules submodule.JHUGenMELA.url https://github.com/JHUGen/JHUGenMela.git
+            git submodule update --init
+      - restore_cache:
+          key: v2_boost_1_61_0
+      - run:
+          name: install boost
+          command: |
+            cd ~ &&
+            if ! [ -d ~/boost_1_61_0 ]; then
+              wget https://sourceforge.net/projects/boost/files/boost/1.61.0/boost_1_61_0.tar.gz --no-check-certificate &&
+              tar -xvzf boost_1_61_0.tar.gz &&
+              cd boost_1_61_0 &&
+              ./bootstrap.sh &&
+              (./b2 || true)
+            fi
+      - save_cache:
+          key: v2_boost_1_61_0
+          paths: ~/boost_1_61_0
+      - persist_to_workspace:
+          root: ~/JHUGen
+          paths:
+           - .circleci
+           - .git
+           - .gitignore
+           - .gitmodules
+           - AnalyticMELA
+           - JHUGenerator
+           - JHUGenLexicon
+           - JHUGenMELA
+           - lib
+           - LICENSE
+           - MCFM-JHUGen
+           - Manual
+           - NOTICE
+           - README.md
+           - VH_NLO
+           - Web
 
   build:
     <<: *env
