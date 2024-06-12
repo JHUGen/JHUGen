@@ -1,6 +1,6 @@
 env: &env
   docker:
-    - image: cmssw/cmssw:CMSSW_10_2_18
+    - image: cmssw/cmssw:CMSSW_9_3_2
       environment:
         PATH: "/home/cmsbld/dos2unix-7.4.0/:/home/cmsbld/githack/:/home/cmsbld/CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
         LIBRARY_PATH: "/home/cmsbld/boost_1_61_0/stage/lib"
@@ -44,8 +44,8 @@ cmsrelcmsenv: &cmsrelcmsenv
     echo "source /opt/cms/cmsset_default.sh" >> $BASH_ENV
     source $BASH_ENV
     cd $HOME
-    scram p CMSSW CMSSW_10_2_18
-    echo 'cd ~/CMSSW_10_2_18 && eval $(scram ru -sh) && cd - > /dev/null' >> $BASH_ENV
+    scram p CMSSW CMSSW_9_3_2
+    echo 'cd ~/CMSSW_9_3_2 && eval $(scram ru -sh) && cd - > /dev/null' >> $BASH_ENV
 jhugenversion: &jhugenversion
   name: find JHUGen version
   command: |
