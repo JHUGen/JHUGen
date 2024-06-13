@@ -126,7 +126,7 @@ jobs:
           name: compile mela
           command: |
             cd JHUGenMELA/MELA/
-            ./setup.sh -j
+            ./setup.sh nopython
             eval $(./setup.sh env)
       - run:
           name: compile generator with linkMELA=Yes
@@ -195,7 +195,7 @@ jobs:
           name: compile mela
           command: |
             cd JHUGenMELA/MELA/
-            ./setup.sh -j 
+            ./setup.sh nopython 
             eval $(./setup.sh env)
       - run:
           name: compile generator with linkMELA=Yes
