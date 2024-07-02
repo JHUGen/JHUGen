@@ -858,10 +858,10 @@ jobs:
             mkdir -p ~/artifacts/MELA/
             mv *.out ~/artifacts/MELA/
           when: on_fail
-      #- run:
-      #    name: "testME_more"
-      #    command: cd test; ./testME_more.py "$(expr $SEED + $CIRCLE_BUILD_NUM)"
-      #    when: always
+      - run:
+          name: "testME_more"
+          command: cd test; ./testME_more.py "$(expr $SEED + $CIRCLE_BUILD_NUM)"
+          when: always
       #- run:
       #    name: "examplmela.py"
       #    command: cd python; python mela.py
