@@ -101,6 +101,7 @@ jobs:
            - JHUGenerator
            - JHUGenLexicon
            - JHUGenMELA
+           - madMELA
            - lib
            - LICENSE
            - MCFM-JHUGen
@@ -141,6 +142,7 @@ jobs:
           paths:
             - JHUGenerator
             - JHUGenMELA
+            - madMELA
 
   build-lexicon:
     <<: *env
