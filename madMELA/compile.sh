@@ -1,3 +1,5 @@
+#!/bin/bash
+
 LIBFOLDER=ggF-SMEFTsim-standalone_all
 LIBNAME=libSMEFTsim.so
 
