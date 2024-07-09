@@ -1,5 +1,7 @@
+#!/bin/bash
+
 LIBFOLDER=ggF-SMEFTsim-standalone_all
-LIBNAME=libSMEFTsim.so
+LIBNAME=libMG_SMEFTsim_v1.so
 
 bold=$(tput bold)
 normal=$(tput sgr0)

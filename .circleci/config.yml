@@ -105,6 +105,7 @@ jobs:
            - lib
            - LICENSE
            - MCFM-JHUGen
+           - madMELA
            - Manual
            - NOTICE
            - README.md
