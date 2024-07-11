@@ -28,6 +28,7 @@ allmatrix$(MENUM)py.so: $(patsubst %/matrix.f,%$(MENUM)py.so,$(wildcard */matrix
 cpp: $(patsubst %.f,%.o,$(wildcard */matrix.f)) all_matrix.o
 	g++ -O2 -ggdb -Wpadded -Wpacked -malign-double -mpreferred-stack-boundary=8 -fPIC -shared -lgfortran all_matrix.f */matrix.f -L ../lib/ -ldhelas -lmodel -ffixed-line-length-0 -o libMG_SMEFTsim_v1.so
 
+
 $(LIBDIR)/$(LIBRARY): $(patsubst %.f,%.o,$(wildcard */matrix.f))  all_matrix.o
 	$(call CREATELIB, $@, $^)
 
