@@ -130,7 +130,7 @@ jobs:
             cd JHUGenMELA/MELA/
             sed -i '/[ ]*wget/ s/$/ --no-check-certificate/' downloadNNPDF.sh
             ./setup.sh nopython
-            sed -i '/ --no-check-certificate/d' downloadNNPDF.sh 
+            sed -i 's/ --no-check-certificate//' downloadNNPDF.sh 
             eval $(./setup.sh env)
       - run:
           name: compile generator with linkMELA=Yes
@@ -202,7 +202,7 @@ jobs:
             cd JHUGenMELA/MELA/
             sed -i '/[ ]*wget/ s/$/ --no-check-certificate/' downloadNNPDF.sh
             ./setup.sh nopython
-            sed -i '/ --no-check-certificate/d' downloadNNPDF.sh 
+            sed -i 's/ --no-check-certificate//' downloadNNPDF.sh 
             eval $(./setup.sh env)
       - run:
           name: compile generator with linkMELA=Yes
