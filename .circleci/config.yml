@@ -63,22 +63,17 @@ jobs:
           at: ~/JHUGen
       - run:
           <<: *cmsrelcmsenv
-      - run:
-          name: "git checkout -B hack"
+      - run: 
+          name: "Manual Checkout"
           command: |
-            mkdir $HOME/githack &&
-            echo '#!/bin/bash
-                  cd ~/CMSSW_9_3_2 && eval $(scram ru -sh) && cd - > /dev/null &&
-                  git "$@"
-                 ' > $HOME/githack/git &&
-            chmod u+x $HOME/githack/git
-      - checkout
-      - run:
-          name: "undo git checkout -B hack"
-          command: rm -r $HOME/githack
-      #from https://gist.github.com/karlhorky/88b3c8c258796cd3eb97615da36e07be, handles submodule fetching for MELA PRs that have been squash merged
-      - run: git config --global remote."origin".fetch '+refs/pull/*/head:refs/remotes/origin/pr/*'
-      - run: git submodule update --init
+            git clone https://github.com/JHUGen/JHUGen.git .
+            git pull origin pull/$CIRCLE_PR_NUMBER/head
+      - run: 
+          name: "Update Submodule"
+          command: |
+            git config --global remote."origin".fetch '+refs/pull/*/head:refs/remotes/origin/pr/*'
+            git config --file=.gitmodules submodule.JHUGenMELA.url https://github.com/JHUGen/JHUGenMela.git
+            git submodule update --init
       - restore_cache:
           key: v2_boost_1_61_0
       - run:
@@ -109,6 +104,7 @@ jobs:
            - lib
            - LICENSE
            - MCFM-JHUGen
+           - madMELA
            - Manual
            - NOTICE
            - README.md
@@ -146,6 +142,7 @@ jobs:
           paths:
             - JHUGenerator
             - JHUGenMELA
+            - madMELA
 
   build-lexicon:
     <<: *env
@@ -1144,6 +1141,7 @@ jobs:
           name: "check that newlines are not annoying"
           command: |
             dos2unix $(git ls-files | grep -v 'MCFM-JHUGen/Bin/Pdfdata.*[.]dat$' | grep -v 'ffperm5[.]dat$')
+            git update-index --assume-unchanged .gitmodules
             git diff --exit-code --stat
           when: always
       - save_cache:
@@ -1161,6 +1159,7 @@ jobs:
                 chmod u-x $filename
               fi
             done
+            git update-index --assume-unchanged .gitmodules
             git diff --exit-code
           when: always
       - run: git checkout -- .
