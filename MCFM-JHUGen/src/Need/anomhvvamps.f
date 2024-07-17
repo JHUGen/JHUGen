@@ -996,10 +996,10 @@ c----- loop intgral for top
 
 c------ top quark in the loop
       ggHmt(2,2)=mt2*(two-s(1,2)*C0mt*(1d0-4d0*mt2/s(1,2)))
-     & /(two*wmass*sinthw)
       ggHmt(1,1)=ggHmt(2,2)*za(1,2)/zb(1,2)
       ggHmt(2,2)=ggHmt(2,2)*zb(1,2)/za(1,2)
-
+      
+c------ print *,"Here", ggHmt(1,1)
       return
       end
       
