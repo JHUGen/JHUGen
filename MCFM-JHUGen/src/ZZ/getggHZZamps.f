@@ -189,6 +189,7 @@ c--- propagator correction
 c--- production correction
       Mloop_c6_production(h1,h1,h34,h56) = 
      &     t4*ggHmt_c6(h1,h1)* H4lSM(h34,h56)
+     &     * (2*wmass*sqrt(xw))
 c--- decay correction  
       Mloop_c6_decay(h1,h1,h34,h56)=im*ggHmt(h1,h1)*
      &     (t2*H4l_c6_gmunu(h34,h56)+t3*H4l_c6_qmuqnu(h34,h56))*prop12
