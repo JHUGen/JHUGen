@@ -1,1 +1,1 @@
-/eos/home-m/msrivast/JHUGen_DEV/madMELA/libSMEFTSIM/coupl.inc
+../../../libSMEFTSIM/coupl.inc

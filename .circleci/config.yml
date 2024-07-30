@@ -105,6 +105,7 @@ jobs:
            - lib
            - LICENSE
            - MCFM-JHUGen
+           - madMELA
            - Manual
            - NOTICE
            - README.md
@@ -138,9 +139,6 @@ jobs:
             sed -i -r -e "s/^(linkMELA *= *)No/\1Yes/" makefile
             make
             git checkout -- makefile
-      - run:
-          name: compile madMELA area
-          command: cd madMELA && ./compile.sh
       - run: cd JHUGenerator/pdfs && ./downloadNNPDF.sh
       - persist_to_workspace:
           root: ~/JHUGen

@@ -243,17 +243,18 @@ if __name__ == "__main__":
     print("Creating symbolic links to new files...")
     for name in coupling_files_to_replace.keys():
         makefile_options = makefile_options_to_replace[name]
+        os.chdir(makefile_options[:makefile_options.rfind('/')])
         subprocess.run(["rm", makefile_options])
-        os.symlink(f"{output_area}/make_opts", makefile_options)
+        os.symlink(f"../../libSMEFTSIM/make_opts", makefile_options)
 
+        os.chdir("MODEL")
         coupling_file = coupling_files_to_replace[name]
         subprocess.run(f"rm {coupling_file}", shell=True, check=True)
-        os.symlink(f"{output_area}/coupl.inc", coupling_file)
+        os.symlink(f"../../../libSMEFTSIM/coupl.inc", coupling_file)
 
         input_file = input_files_to_replace[name]
         subprocess.run(f"rm {input_file}", shell=True, check=True)
-        os.symlink(f"{output_area}/input.inc", input_file)
-        os.chdir(coupling_file[:coupling_file.rfind('/')])
+        os.symlink(f"../../../libSMEFTSIM/input.inc", input_file)
 
         subprocess.run("make clean", shell=True, check=True)
         subprocess.run("make", shell=True, check=True)
