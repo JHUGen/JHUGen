@@ -9,7 +9,7 @@
 \usepackage{amsmath}
 \usepackage[hidelinks]{hyperref}
 \usepackage{wasysym}
-
+\listfiles
 % \textwidth18cm
 % \addtolength{\oddsidemargin}{-2cm}
 % \addtolength{\evensidemargin}{-2cm}
@@ -309,7 +309,7 @@ degrees of freedom:
 \end{eqnarray}
 
 
-The Standard Modell $Zff$ couplings are defined as 
+The Standard Model $Zff$ couplings are defined as 
 \begin{eqnarray}
 	g_\mathrm{L}^{Zff} =& \frac{e}{s_w \,c_w} \left( T^3_{f_\mathrm{L}} - s_w^2 Q_f \right)  \; &=: \frac{e}{2\, s_w\, c_w} a_\mathrm{L}^f, \nonumber \\
 	g_\mathrm{R}^{Zff} =& \frac{e}{s_w \,c_w} \left( - s_w^2 Q_f \right)  \; &=: \frac{e}{2\, s_w\, c_w} a_\mathrm{R}^f. 
@@ -1049,18 +1049,19 @@ By default, $Z^\prime$ and $W^\prime$ are assumed to have infinite mass. Under t
 Off-shell VBF processes 66 (signal), 67 (background), and 68 (signal+background+interference) involve triple and 
 quartic gauge couplings in Eqs.~(\ref{eq:VVV}-\ref{eq:VVVV}).
 To set the couplings in Eq.~(\ref{eq:VVVVSM}) on the command line use e.g. 
+
 \begin{eqnarray*}
-d_1^\gamma \quad \leftrightarrow \quad  {\verb dVA   },\quad\quad
-d_2^\gamma \quad \leftrightarrow \quad  {\verb dPA   },\quad\quad
-d_3^\gamma \quad \leftrightarrow& \quad  &{\verb dMA   },\\
-d_1^Z      \quad \leftrightarrow \quad  {\verb dVZ   },\quad\quad
-d_2^Z      \quad \leftrightarrow \quad  {\verb dPZ   },\quad\quad
-d_3^Z      \quad \leftrightarrow& \quad  &{\verb dMZ   },\\
-d_4^\gamma \times d^{\gamma WW} \quad \leftrightarrow& \quad  &{\verb dFourA   },\\
-d_4^Z      \times d^{Z      WW} \quad \leftrightarrow& \quad  &{\verb dFourZ   },\\
-d^{\gamma\gamma WW}      \quad \leftrightarrow& \quad  &{\verb dAAWpWm   },\\
-\frac{s_w}{c_w} \times d^{Z\gamma WW}      \quad \leftrightarrow& \quad  &{\verb dZAWpWm   },\\
-\frac{s_w^2}{c_w^2} \times d^{ZZ WW}      \quad \leftrightarrow& \quad  &{\verb dZZWpWm   }.\\
+d_1^{\gamma} \quad \leftrightarrow \quad\verb|dVA|  ,\quad\quad
+d_2^\gamma \quad \leftrightarrow \quad  {\verb|dPA|   },\quad\quad
+d_3^\gamma \quad \leftrightarrow& \quad  &{\verb|dMA|   },\\
+d_1^Z      \quad \leftrightarrow \quad  {\verb|dVZ|   },\quad\quad
+d_2^Z      \quad \leftrightarrow \quad  {\verb|dPZ|   },\quad\quad
+d_3^Z      \quad \leftrightarrow& \quad  &{\verb|dMZ|   },\\
+d_4^\gamma \times d^{\gamma WW} \quad \leftrightarrow& \quad  &{\verb|dFourA|   },\\
+d_4^Z      \times d^{Z      WW} \quad \leftrightarrow& \quad  &{\verb|dFourZ|   },\\
+d^{\gamma\gamma WW}      \quad \leftrightarrow& \quad  &{\verb|dAAWpWm|   },\\
+\frac{s_w}{c_w} \times d^{Z\gamma WW}      \quad \leftrightarrow& \quad  &{\verb|dZAWpWm|   },\\
+\frac{s_w^2}{c_w^2} \times d^{ZZ WW}      \quad \leftrightarrow& \quad  &{\verb|dZZWpWm|   }.\\
 % d^{WW WW}      \quad \leftrightarrow& \quad  &{\text{currently not needed/available}}\\
 \end{eqnarray*}
 For example, in order to simulate the hypothesis with 
@@ -1256,7 +1257,8 @@ After extracting the code, you can go to the directory \texttt{JHUGenMELA/MELA} 
 To compile the code, simply run \texttt{./setup.sh}. You can specify the option \verb|-j N| for multi-core compilation, or option \verb|clean| for cleanup. There is also the option \verb|deps| to only set up dependencies without compiling MELA itself, which is useful if you only intend to use the dependencies for linking to JHUGenerator. The script will print a set of instructions to run at the end of its execution in order to set up to three environment variables that are needed to run \texttt{MELA}: \texttt{LD\_LIBRARY\_PATH} needs to include the library path for MELA, \texttt{PYTHONPATH} needs to contain the path for the Python MELA interface, and \texttt{SCRAM\_ARCH} needs to be set to refer to one of the folders inside MELA/data for the correct version of the MCFM library.
 
 \textbf{Please take note: The setup relies on Madgraph and MCFM libraries, which are downloaded from the main webpage during the \texttt{setup.sh} script.  They are provided for \texttt{gfort + gcc version 4.6} or later, for SLC 5,6, and 7 and EL 9. They work out-of-the-box with other compiler versions that are not too far away, and we regularly monitor new versions. If you are using a very new gfort/gcc version that requires a new precompiled library, let us know and we will provide it promptly.}
-If the precompiled libraries do not work, you can always compile the MCFM library yourself by going into the MCFM-JHUGen directory and running \verb|./compile.sh (-j N)| (\verb|./compile.sh clean| for cleanup).
+If the precompiled libraries do not work, you can always compile the MCFM library yourself by going into the MCFM-JHUGen directory and running \verb|./compile.sh (-j N)| (\verb|./compile.sh clean| for cleanup). 
+In a similar vein, if the precompiled Madgraph library does not work, you can compile the Madgraph yourself by going into the madMELA directory and running \verb|./compile.sh| (\verb|./compile.sh clean| for cleanup).
 
 MELA requires the ROOT package~\cite{root}, and the simplest way to use MELA is to compile in ROOT. Run the \texttt|loadMELA.C| script in the test directory before compiling or loading any other scripts that rely on MELA.  It is also possible to link against the MELA code directly.
 \subsection{Starting out}
@@ -1283,7 +1285,7 @@ mela->setInputEvent(&daughters, &associated, &mothers, false);
 The last argument tells MELA whether the event is a generator-level event (true) or a reconstructed event (false).  This affects how the output probabilities are normalized.
 
 \subsection{Process selection}
-Once MELA has the event, you can calculate as many matrix elements as you want.  Each matrix element is calculated for a particular process and Higgs boson hypothesis and uses the matrix elements from a particular generator (either \texttt{JHUGen} or \texttt{MCFM}).  These are set using the \texttt{setProcess} function, with the help of the enums in \texttt{TVar.hh}.  For example
+Once MELA has the event, you can calculate as many matrix elements as you want.  Each matrix element is calculated for a particular process and Higgs boson hypothesis and uses the matrix elements from a particular generator (either \texttt{JHUGen}, \texttt{MCFM} or \textttt{Madgraph}).  These are set using the \texttt{setProcess} function, with the help of the enums in \texttt{TVar.hh}.  For example
 \begin{verbatim}
 //For a Standard Model Higgs boson in gluon fusion production
 mela->setProcess(TVar::HSMHiggs, TVar::JHUGen, TVar::ZZGG);
@@ -1293,7 +1295,7 @@ mela->setProcess(TVar::bkgZZ, TVar::MCFM, TVar::ZZQQB);
 mela->setProcess(TVar::H0minus, TVar::JHUGen, TVar::JJVBF);
 \end{verbatim}
 
-For full flexibility in the couplings, the texttt{SelfDefine} processes can be used instead of the pre-cooked ones.  In that case the couplings are set manually:
+For full flexibility in the couplings, the \texttt{SelfDefine} processes can be used instead of the pre-cooked ones.  In that case the couplings are set manually:
 \begin{verbatim}
 mela->setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, TVar::Had_ZH)
 mela->selfDHzzcoupl[0][gHIGGS_VV_1][0] = 1;
@@ -1321,15 +1323,46 @@ mela->resetInputEvent()
 \end{verbatim}
 to avoid memory leaks.  This is particularly important when processing many events in one job.
 
-\subsection{Python interface}
-We also provide a python interface for MELA, which works essentially the same way as the C\+\+ interface. It requires an instance of PyBind11, a header-only method of creating Python libraries from linked C\+\+ code, and is compiled alongside the other code.
+\subsection{Madgraph Interface}
+We provide an interface to Madgraph matrix elements, colloquially known as MadMELA. So far, there are 2 production modes available - $gg\rightarrow H$ and $q\bar{q}\rightarrow H$, with $q\bar{q}\rightarrow H$ containing signal, background, and (signal+background+interference) processes. All of these processes are designed for specific EFT use cases, so if there is a use case that is not covered, simply ask the authors and we may put that process in for you.
+
+The physical libraries that are compiled are located in the madMELA directory, which is also where you can compile the library if it does not work for you out of the box by running \verb|./compile.sh| within the directory.
+
+The couplings used by the Madgraph interface utilize the SMEFTsim package for Madgraph at NLO \cit{SMEFTsim1} \cite{SMEFTsim2}. These are expressed as real-valued Wilson Coefficients, and affect far more than just the amplitudes within couplings.
+
+The full expression for what is affected can be found within the source code of your process. For instance, if one was using the $q\bar{q}\rightarrow H$/signal production/process in MELA, then the full definition of all terms used can be found in \verb|madMELA/qq4l-sig-SMEFTsim-standalone_all/Source/MODEL/intparam_defintion.inc|. The same goes for any other area, simply replace \verb|qq4l-sig-SMEFTsim-standalone_all| with your desired area.
+
+\subsection{Python Interface}
+We also provide a python interface for MELA, which works essentially the same way as the C\texttt{++} interface. It requires an instance of PyBind11, a header-only method of creating Python libraries from linked C\texttt{++} code, and is compiled alongside the other code.
 
 For more information, use the Python help function:
 \begin{verbatim}
 >>> import Mela
 >>> help(Mela)
 \end{verbatim}
-Since text processing is simple in Python, the Python MELA interface is especially useful for running quick jobs on LHE files. Since the Python MELA interface calls the C\+\+ code directly, it is also useful for calculations that would interface to libraries like NumPy that are commonly used in analyses.
+Since text processing is simple in Python, the Python MELA interface is especially useful for running quick jobs on LHE files. Since the Python MELA interface calls the C\texttt{++} code directly, it is also useful for calculations that would interface to libraries like NumPy that are commonly used in analyses.
+
+The Python framework also interfaces with couplings differently, as they are named couplings. For instance, while in C\texttt{++} couplings are set via arrays, in Python they can \em{also} be set via named values. For instance, the Pythonic version of the code snippet for Self-Defined couplings above is depicted below:
+\begin{verbatim}
+  import Mela
+  m = Mela.Mela()
+  m.setProcess(
+    Mela.Process.SelfDefine_spin0, 
+    Mela.MatrixElement.JHUGen, 
+    Mela.Production.Had_ZH
+  )
+  #These also work with tuples or numpy arrays!
+  #They set the real and imaginary part
+  
+  #Equivalent to mela->selfDHzzcoupl[0][gHIGGS_VV_1][0] = 1;
+  m.ghz1 = [1,0] 
+
+  #Equivalent to:
+  #mela->selfDHzzcoupl[0][gHIGGS_VV_4][0] = 1;
+  #mela->selfDHzzcoupl[0][gHIGGS_VV_4][1] = 1;
+  m.ghz4 = [1,1]
+\end{verbatim}
+
 
 \section{JHU Generator Coupling Converter (JHUGenLexicon)}
 
@@ -1376,7 +1409,7 @@ command line when calling JHUGenLexicon. Available parameters to set include the
     alpha (default = 0.302862)
     vev_lam (default =.0024622)
 \end{verbatim}
-where Lambda\_z1,Lambda\_w1,Lambda\_zgs1 correspond to $\Lambda_1^{ZZ}$,$\Lambda_1^{WW}$,$\Lambda_1^{Z\gamma}$ 
+where Lambda\_z1, Lambda\_w1, Lambda\_zgs1 correspond to $\Lambda_1^{ZZ}$,$\Lambda_1^{WW}$,$\Lambda_1^{Z\gamma}$ 
 seen in Eq.~(1) respectively, MZ is the mass of the Z Boson, MW is the of the W Boson, sin2ThetaW is $sin^2(\theta_W)$, alpha corresponds to the fine structure constant $\alpha$ and vev\_lam is $\frac{v^2}{\Lambda^2}$ as in Eq.(A1) of \cite{Gritsan:2020pib}. Notice that there is no option to set the strong coupling, $\alpha_s$. Since this is a running parameter, and JHUGen internally handles $\alpha_s$, we make sure to remove all factors of $g_s$ from translations of gluon couplings. Relations between gluon couplings are given by $c_{gg}=-\frac{2}{g_s^2}g_2^{gg}$ between the JHUGen amplitude basis and higgs basis and $c_{gg}=\frac{v^2}{\Lambda^2}\frac{4}{g_s^2} \omega_{\phi G}$ between the higgs and warsaw basis. Users should be careful to scale gluon coupling inputs and outputs accordingly. 
 
 % In some JHUGen Processes, only couplings to W bosons or only couplings to Z bosons are expected. In this case, the command 
@@ -1505,6 +1538,13 @@ This would correspond to SM Zll couplings, and SM Z couplings to right handed qu
 up-type quarks in production is shifted by 0.1. Again in this example, since the other Zff couplings are not set, they are set to 0 in the matrix element calculation.
 
 \section{Release notes}
+\noindent
+In going from \verb|v7.5.7| to \verb|v7.5.8| (July 31, 2024) the updates are as follows:
+\noindent
+\begin{itemize}
+\item Introduced signal, background, and BSI matrix elements for $\{u,d,c,s,b\} \rightarrow 4\ell$ utilizing Madgraph matrix elements.
+\end{itemize}
+\noindent
 In going from \verb|v7.5.5| to \verb|v7.5.6| (July 8, 2024) the updates are as follows:
 \noindent
 \begin{itemize}
@@ -1876,5 +1916,9 @@ See webpage: \url{https://root.cern.ch}
 A.~Falkowski {et~al.}, ``{Rosetta: an operator basis translator for Standard Model effective field theory}'',
  { Eur. Phys. J.}  {\bf C75} (2015) 583,
  doi{10.1140/epjc/s10052-015-3806-x}, arXiv:1508.05895 [hep-ph].
+\bibitem{SMEFTsim1}
+I. Brivio, Y. Jiang, M. Trott, ``{The SMEFTsim package, theory and tools}'', JHEP 12 (2017) 070, https://doi.org/10.48550/arXiv.1709.06492, arXiv:1709.06492
+\bibitem{SMEFTsim2}
+I. Brivio ``{SMEFTsim 3.0 -- a practical guide}'', JHEP 04 (2021) 073, https://doi.org/10.48550/arXiv.2012.11343, arXiv:2012.11343
 \end{thebibliography}
 \end{document}
