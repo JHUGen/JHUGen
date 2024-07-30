@@ -140,9 +140,7 @@ jobs:
             git checkout -- makefile
       - run:
           name: compile madMELA area
-          command: |
-          cd madMELA
-          ./compile.sh
+          command: cd madMELA && ./compile.sh
       - run: cd JHUGenerator/pdfs && ./downloadNNPDF.sh
       - persist_to_workspace:
           root: ~/JHUGen
