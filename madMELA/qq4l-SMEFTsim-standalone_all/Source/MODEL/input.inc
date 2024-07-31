@@ -1,1 +1,1 @@
-/eos/home-m/msrivast/JHUGen_DEV/madMELA/libSMEFTSIM/input.inc
+../../../libSMEFTSIM/input.inc
