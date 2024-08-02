@@ -54,33 +54,34 @@ if __name__ == "__main__":
 
     output_area = os.path.abspath("libSMEFTSIM")
 
-    areas_to_cd_into = {
-        name : str(os.path.abspath(area)) + "/SubProcesses" for 
-        name, area in areas_to_merge.items()
-    }
+    areas_to_cd_into = {}
+    for name, area in areas_to_merge.items():
+        areas_to_cd_into[name] = str(os.path.abspath(area)) + "/SubProcesses"
     
-    coupling_files_to_access = {
-        name : f"{PWD}/archive/{name}_coupl.inc" for 
-        name in areas_to_merge.keys()
-    }
-    coupling_files_to_replace = {
-        name : str(os.path.abspath(area)) + "/Source/MODEL/coupl.inc" for 
-        name, area in areas_to_merge.items()
-    }
+    coupling_files_to_access = {}
+    for name in areas_to_merge.keys():
+        coupling_files_to_access[name] = PWD + "/archive/" + name + "_coupl.inc" 
     
-    input_files_to_access = {
-        name : f"{PWD}/archive/{name}_input.inc" for 
-        name in areas_to_merge.keys()
-    }
-    input_files_to_replace = {
-        name : str(os.path.abspath(area)) + "/Source/MODEL/input.inc" for 
-        name, area in areas_to_merge.items()
-    }
+    
+    coupling_files_to_replace = {}
+    for name, area in areas_to_merge.items():
+        coupling_files_to_replace[name] = str(os.path.abspath(area)) + "/Source/MODEL/coupl.inc" 
+    
+    
+    input_files_to_access = {}
+    for name in areas_to_merge.keys():
+        input_files_to_access[name] = PWD + "/archive/" + name + "_input.inc" 
+    
+    
+    input_files_to_replace = {}
+    for name, area in areas_to_merge.items():
+        input_files_to_replace[name] = str(os.path.abspath(area)) + "/Source/MODEL/input.inc" 
+    
 
-    makefile_options_to_replace = {
-        name : str(os.path.abspath(area)) + "/Source/make_opts" for
-        name, area in areas_to_merge.items()
-    }
+    makefile_options_to_replace = {}
+    for name, area in areas_to_merge.items():
+        makefile_options_to_replace[name] = str(os.path.abspath(area)) + "/Source/make_opts" 
+    
 
     ##################### COMBINING COMMON BLOCKS #################3
 
@@ -88,12 +89,12 @@ if __name__ == "__main__":
         coupling_file = coupling_files_to_replace[name]
         coupling_file_name = coupling_file.split("/")[-1]
         if not os.path.islink(coupling_file):
-            subprocess.run(["cp", coupling_file, f"archive/{name}_{coupling_file_name}"], check=True)
+            subprocess.run(["cp", coupling_file, "archive/" + name + "_" + coupling_file_name], check=True)
         
         input_file = input_files_to_replace[name]
         input_file_name = input_file.split("/")[-1]
         if not os.path.islink(input_file):
-            subprocess.run(["cp", input_file, f"archive/{name}_{input_file_name}"], check=True)
+            subprocess.run(["cp", input_file, "archive/" + name + "_" + input_file_name], check=True)
 
 
     common_block_regex = re.compile(
@@ -112,10 +113,10 @@ if __name__ == "__main__":
         
         with open(coupling_file) as f:
             all_matches = re.finditer(common_block_regex, f.read())
-            named_couplings = {match.group("COMMON_NAME").strip() :
-                "".join(match.group("terms").split()).replace('$', '')
-                for match in all_matches
-            }
+            named_couplings = {}
+            for match in all_matches:
+                named_couplings[match.group("COMMON_NAME").strip()] = "".join(match.group("terms").split()).replace('$', '')
+
             coupling_name = "COUPLINGS"
             coupling_set = named_couplings[coupling_name]
             coupling_set = set(coupling_set.strip().split(","))
@@ -130,7 +131,7 @@ if __name__ == "__main__":
         )
 
     print("Creating combined coupl.inc...")
-    with open(f"{output_area}/coupl.inc", "w+") as f:
+    with open(output_area + "/coupl.inc", "w+") as f:
         f.write(coupling_block_header)
         f.write(" "*6 + "DOUBLE COMPLEX ")
 
@@ -182,10 +183,10 @@ if __name__ == "__main__":
         
         with open(input_file) as f:
             all_matches = re.finditer(common_block_regex, f.read())
-            named_inputs = {match.group("COMMON_NAME").strip() :
-                "".join(match.group("terms").split()).replace('$', '')
-                for match in all_matches
-            }
+            named_inputs = {}
+            for match in all_matches:
+                named_inputs[match.group("COMMON_NAME").strip()] = "".join(match.group("terms").split()).replace('$', '')
+
             for input_name, input_set in named_inputs.items():
                 input_set = set(input_set.strip().split(","))
                 if input_name in inputs.keys():
@@ -198,7 +199,7 @@ if __name__ == "__main__":
 
 
     print("Creating combined input.inc...")
-    with open(f"{output_area}/input.inc", "w+") as f:
+    with open(output_area + "/input.inc", "w+") as f:
         f.write(input_block_header)
         for name, input_type in input_types.items():
             f.write("\n\n\n" + " "*6 + input_type + " ")
@@ -220,7 +221,7 @@ if __name__ == "__main__":
                         f.write(input + ',')
                 i += 1
 
-            f.write("\n\n\n" + " "*6 + f"COMMON/{name}/ ")
+            f.write("\n\n\n" + " "*6 + "COMMON/" + name + "/ ")
 
             firstLine = True
             i = 0
@@ -244,30 +245,30 @@ if __name__ == "__main__":
     for name in coupling_files_to_replace.keys():
         makefile_options = makefile_options_to_replace[name]
         os.chdir(makefile_options[:makefile_options.rfind('/')])
-        subprocess.run(["rm", makefile_options])
-        os.symlink(f"../../libSMEFTSIM/make_opts", makefile_options)
+        subprocess.call(["rm", makefile_options])
+        os.symlink("../../libSMEFTSIM/make_opts", makefile_options)
 
         os.chdir("MODEL")
         coupling_file = coupling_files_to_replace[name]
-        subprocess.run(f"rm {coupling_file}", shell=True, check=True)
-        os.symlink(f"../../../libSMEFTSIM/coupl.inc", coupling_file)
+        subprocess.check_call(["rm", coupling_file])
+        os.symlink("../../../libSMEFTSIM/coupl.inc", coupling_file)
 
         input_file = input_files_to_replace[name]
-        subprocess.run(f"rm {input_file}", shell=True, check=True)
-        os.symlink(f"../../../libSMEFTSIM/input.inc", input_file)
+        subprocess.check_call(["rm", input_file])
+        os.symlink("../../../libSMEFTSIM/input.inc", input_file)
 
-        subprocess.run("make clean", shell=True, check=True)
-        subprocess.run("make", shell=True, check=True)
+        subprocess.check_call("make clean", shell=True)
+        subprocess.check_call("make", shell=True)
         os.chdir("../DHELAS")
-        subprocess.run("make clean", shell=True, check=True)
-        subprocess.run("make", shell=True, check=True)
+        subprocess.check_call("make clean", shell=True)
+        subprocess.check_call("make", shell=True)
 
 
     for name, area in areas_to_cd_into.items():
         print("Compiling", name)
 
         os.chdir(area)
-        subprocess.run("rm *.o */*.o", shell=True)
+        subprocess.call("rm *.o */*.o", shell=True)
         
         make_cpp_flag = True
         full_text = ""
@@ -281,8 +282,8 @@ if __name__ == "__main__":
             with open("makefile", "a") as makefile:
                 makefile.write("\ncpp: $(LIBDIR)/$(LIBRARY)")
         
-        subprocess.run(["make", "cpp"], check=True)
-        subprocess.run("rm *.a", shell=True)
+        subprocess.check_call(["make", "cpp"])
+        subprocess.call("rm *.a", shell=True)
         files_to_compile = []
         for compilation_glob in (
             "../Source/DHELAS/*.o", 
@@ -290,9 +291,10 @@ if __name__ == "__main__":
             "all_matrix.o", 
             "*/matrix.o"):
             files_to_compile += glob.glob(compilation_glob)
-        subprocess.run(["ar", "cru", f"lib{name}.a"] + files_to_compile, check=True)
-        subprocess.run(["ranlib", f"lib{name}.a"], check=True)
-        named_values = subprocess.check_output(["nm", f"lib{name}.a"]).decode(sys.stdout.encoding).strip()
+        subprocess.check_call(["ar", "cru", "lib" + name + ".a"] + files_to_compile)
+        subprocess.check_call(["ranlib", "lib" + name + ".a"])
+        p = subprocess.Popen(["nm", "lib" + name + ".a"], stdout=subprocess.PIPE, encoding='utf-8')
+        named_values, _ = p.communicate()
         
         all_entries = named_values.split('\n')
         things_to_rename = {}
@@ -305,22 +307,22 @@ if __name__ == "__main__":
                     "params_r_", "params_c_"
                     ):
                     continue
-                things_to_rename[columns[2]] = f"{name}_{columns[2]}"
+                things_to_rename[columns[2]] = name + "_" + columns[2]
         rename_command = " --redefine-sym "
-        command = rename_command + rename_command.join(
-            [f"{old}={new}" for old, new in things_to_rename.items()]
-            )
-        command = f"objcopy lib{name}.a lib{name}_renamed.a" + command
+        temp_command = []
+        for old, new in things_to_rename.items():
+            temp_command.append(old + "=" + new)
+        command = rename_command + rename_command.join(temp_command)
+        command = "objcopy lib" + name + ".a lib" + name + "_renamed.a" + command
         # print()
         # print(command)
         # print()
-        subprocess.run(command, shell=True, check=True)
+        subprocess.check_call(command, shell=True)
     
     os.chdir(PWD)
-    subprocess.run(
+    subprocess.call(
         "g++ -Wl,--whole-archive */SubProcesses/*{SIG,BKG,BSI}_renamed.a -Wl,--no-whole-archive -fPIC -lgfortran -shared -o libSMEFTSIM/libSMEFTsim.so > debug_compileAll 2>&1",
-        shell=True,
-        check=True
+        shell=True
     )
     
         
