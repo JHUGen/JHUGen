@@ -1,25 +1,22 @@
 #!/bin/bash
 
+LIBVERSION=2
 LIBFOLDER=ggF-SMEFTsim-standalone_all
-LIBNAME=libMG_SMEFTsim_v1.so
+LIBNAME="libMG_SMEFTsim_v${LIBVERSION}.so"
 
 bold=$(tput bold)
 normal=$(tput sgr0)
 
-cd "${LIBFOLDER}"/Source/MODEL || exit 1
-make clean || exit 1
-make || exit 1
+if [ "$1" = "clean" ]; then
+    find -name "*.o" -delete -o -name "*.a" -delete -o -name "*.so" -delete
+    exit 0
+fi
 
-cd ../DHELAS || exit 1
-make clean || exit 1
-make || exit 1
+python3 madMela_mergeProcessing.py
 
-cd ../../SubProcesses || exit 1
-make cpp || exit 1
 echo "Done compiling!"
 echo "Moving compiled library to the top directory..."
-mv "${LIBNAME}" ../../ || exit 1
-cd ../../ || exit 1
+mv "libSMEFTSIM/libSMEFTsim.so" ${LIBNAME} || exit 1
 if [[ -z "${MELA_LIB_PATH}" ]]; then
     echo "${bold}Please go to the MELA directory and run eval \$(./setup.sh env) to set your MELA paths"
     echo "Then place this library within the path specified in \$MELA_LIB_PATH ${normal}"
