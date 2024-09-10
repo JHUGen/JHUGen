@@ -28,10 +28,8 @@ c
 c     Begin anomalous couplings
       include 'spinzerohiggs_anomcoupl.f'
       include 'AnomZffCouplings.f'
-      include 'AnomTriLinear.f'
       data AllowAnomalousCouplings / 0 / ! Disables anomalous couplings
       data AllowAnomalousZffCouplings / 0 / ! Disables anomalous Zff Couplings
-      data AllowAnomTriLinear / 0 / ! Disables anomalous self couplings
       data distinguish_HWWcouplings / 0 /
       data AnomalCouplPR,AnomalCouplDK / 1, 1/
       data channeltoggle_stu / 2 /
@@ -191,17 +189,17 @@ c     HVV anomalous couplings
 
 c     Higgs tri-linear coupling and WFR constants
       data c6 /0d0/ ! SM = 0 
-      data t1 /1d0/ ! All ti should = 1
-      data t2 /1d0/
-      data t3 /1d0/
-      data t4 /1d0/
-      data t5 /1d0/
-      data t6 /1d0/
-      data w1 /1d0/ ! All wi should = 1
-      data w2 /1d0/
-      data w3 /1d0/
-      data w4 /1d0/
-      data w5 /1d0/
+      data t1_c6 /0d0/ ! All ti should = 1 to include all effects
+      data t2_c6 /0d0/
+      data t3_c6 /0d0/
+      data t4_c6 /0d0/
+      data t5_c6 /0d0/
+      data t6_c6 /0d0/
+      data w1_c6 /0d0/ ! All wi should = 1 to include all effects
+      data w2_c6 /0d0/
+      data w3_c6 /0d0/
+      data w4_c6 /0d0/
+      data w5_c6 /0d0/
 
 c     MARKUS: anomalous couplings for 2nd resonance
 c     Mass and width for second resonance

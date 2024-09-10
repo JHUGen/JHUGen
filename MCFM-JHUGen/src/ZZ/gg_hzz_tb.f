@@ -71,8 +71,8 @@ c--- compute total c6 correction to Higgs amplitude
      &  +Mloop_c6_production(h1,h2,h34,h56)
      &  +Mloop_c6_width(h1,h2,h34,h56)
      
-c--- ME checks 
-c--- print *,AHiggs, AHiggs_c6
+c---- ME Check
+c----      Print *, AHiggs_c6, AHiggs 
 c-------------------------------
 
       if (interference .eqv. .false.) then

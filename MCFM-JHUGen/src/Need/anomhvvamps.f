@@ -439,7 +439,7 @@ c--- Interpolation function for form factors of trilinear
       include 'constants.f'
       include 'masses.f'
       include 'scale.f'
-      include 'AnomTriLinear.f'
+      include 'spinzerohiggs_anomcoupl.f'
       include 'sprods_com.f'
       include 'zprods_decl.f'
       include 'ewcouple.f'
@@ -826,7 +826,7 @@ c--- Calculate the 2-loop form factor
 
 c--- Wave function renormalisation constant
 
-      dZh  = -w3*dB0h
+      dZh  = -w3_c6*dB0h
 
 c--- Assemble the renormalised 2-loop form factor        
  
@@ -846,7 +846,7 @@ c--- Assemble the renormalised 2-loop form factor
       include 'masses.f'
       include 'scale.f'
       include 'zcouple.f'
-      include 'AnomTriLinear.f'
+      include 'spinzerohiggs_anomcoupl.f'
       include 'sprods_com.f'
       include 'zprods_decl.f'
       include 'ewcouple.f'
@@ -887,7 +887,7 @@ c--- c6 correction to HZZ vertex
       q2sq = s(5,6)
 
       dB0h = (-9 + 2*Sqrt(3.)*Pi)/(9.*MH2)
-      dZh  = -w2*dB0h 
+      dZh  = -w2_c6*dB0h 
 
 c--- SM part of HZZ vertex
 

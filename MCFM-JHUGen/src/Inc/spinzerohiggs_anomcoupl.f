@@ -22,6 +22,10 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
       integer c2z_q1sq,c2z_q2sq,c2z_q12sq
       integer c2w_q1sq,c2w_q2sq,c2w_q12sq
 
+      double precision c6
+      double precision t1_c6,t2_c6,t3_c6,t4_c6,t5_c6,t6_c6
+      double precision w1_c6,w2_c6,w3_c6,w4_c6,w5_c6
+
       double precision mb_4gen,mt_4gen
 
       double precision LambdaBSM,Lambda_Q
@@ -76,7 +80,6 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
       double complex ghw1_prime6,ghw2_prime6,ghw3_prime6,ghw4_prime6
       double complex ghw1_prime7,ghw2_prime7,ghw3_prime7,ghw4_prime7
 
-
       double complex kappa2_top,kappa2_tilde_top
       double complex kappa2_bot,kappa2_tilde_bot
       double complex gh2g2,gh2g3,gh2g4
@@ -122,7 +125,9 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
      & cw_q1sq,cw_q2sq,cw_q12sq,
      & c2z_q1sq,c2z_q2sq,c2z_q12sq,
      & c2w_q1sq,c2w_q2sq,c2w_q12sq,
-
+     & c6,
+     & t1_c6,t2_c6,t3_c6,t4_c6,t5_c6,t6_c6,
+     & w1_c6,w2_c6,w3_c6,w4_c6,w5_c6,
      & mb_4gen,mt_4gen,
 
      & LambdaBSM,Lambda_Q,
@@ -177,7 +182,6 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
      & ghw1_prime5,ghw2_prime5,ghw3_prime5,ghw4_prime5,
      & ghw1_prime6,ghw2_prime6,ghw3_prime6,ghw4_prime6,
      & ghw1_prime7,ghw2_prime7,ghw3_prime7,ghw4_prime7,
-
 
      & kappa2_top,kappa2_tilde_top,
      & kappa2_bot,kappa2_tilde_bot,

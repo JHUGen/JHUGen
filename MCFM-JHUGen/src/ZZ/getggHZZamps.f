@@ -26,9 +26,10 @@ c---
       include 'spinzerohiggs_anomcoupl.f'
       include 'plabel.f'
       include 'AnomZffCouplings.f'
-      include 'AnomTriLinear.f'
       include 'qlfirst.f'
       integer h1,h34,h56
+      integer AllowAnomTriLinear, wfn
+      double precision wf(11)
       double precision p(mxpart,4),mb2,mt2,mtX2,mbX2
       double precision MH2
       double precision dB0h, dZh
@@ -53,6 +54,7 @@ c---  end width corrections
       Mloop_bquark(:,:,:,:)=czip
       Mloop_tquark(:,:,:,:)=czip
 c---  Set c6 corrections to 0 by default
+      AllowAnomTriLinear = zip
       prop12_c6=zip
       width_c6=zip
       Mloop_c6_production(:,:,:,:)=czip
@@ -85,17 +87,27 @@ c--- Amplitudes for production
       ! Overall factor=1
       !ggHmq(:,:,:) = ggHmq(:,:,:)
 
+
+c--- Check if any wavefunctions are non zero
+      wf = (/ t1_c6,t2_c6,t3_c6,t4_c6,t5_c6,t6_c6,
+     & w1_c6,w2_c6,w3_c6,w4_c6,w5_c6 /)
+      do wfn = 1, size(wf)
+        if(wf(wfn) .ne. 0) then 
+          AllowAnomTriLinear = 1
+        endif
+      end do
+c--- Do self couplings if allowed  
       if(AllowAnomTriLinear .eq. 1)then
 c--- c6 correction to propagator      
-        prop12_c6=-higgsprop(s(1,2))*(sigmah(s(1,2),c6,w1))
+        prop12_c6=-higgsprop(s(1,2))*(sigmah(s(1,2),c6,w1_c6))
                   
 c--- for width corrections due to c6 operator
         MH2 = hmass**2
         dB0h = (-9 + 2*Sqrt(3.)*Pi)/(9.*MH2)
         dZh = (-9*c6*(2.d0 + c6)*dB0h*MH2**2)/(32.d0*Pi**2*vevsq)
         hwidth_c6 = 0.0023*c6*hwidth
-        width_c6 = im*hmass*(t5*w4*dZh*hwidth -
-     &  t6*(w5*dZh/2.d0*hwidth + hwidth_c6))*prop12
+        width_c6 = im*hmass*(t5_c6*w4_c6*dZh*hwidth -
+     &  t6_c6*(w5_c6*dZh/2.d0*hwidth + hwidth_c6))*prop12
 
 c--- c6 production corrections
         call anomhggvtxamp_c6(za,zb,ggHmt_c6)
@@ -184,16 +196,16 @@ c--- Could replace H4lSM with H4l to include anomalous effects
 c--- Propbably not correct to do but may be worth considering
 c-------------------------------------------------------------
 c--- propagator correction
-      Mloop_c6_propagator(h1,h1,h34,h56)=t1*ggHmt(h1,h1)*
+      Mloop_c6_propagator(h1,h1,h34,h56)=t1_c6*ggHmt(h1,h1)*
      &     H4lSM(h34,h56)*prop12_c6/prop12
 c--- production correction
       Mloop_c6_production(h1,h1,h34,h56) = 
-     &     t4*ggHmt_c6(h1,h1)* H4lSM(h34,h56)
+     &     t4_c6*ggHmt_c6(h1,h1)* H4lSM(h34,h56)
      &     * (2*wmass*sqrt(xw))
 c--- decay correction  
       Mloop_c6_decay(h1,h1,h34,h56)=im*ggHmt(h1,h1)*
-     &     (t2*H4l_c6_gmunu(h34,h56)+t3*H4l_c6_qmuqnu(h34,h56))*prop12
-     &     *rescale*(1d0/(2*wmass*sqrt(xw)))
+     &     (t2_c6*H4l_c6_gmunu(h34,h56)+t3_c6*H4l_c6_qmuqnu(h34,h56))*
+     &     prop12*rescale*(1d0/(2*wmass*sqrt(xw)))
 c---  width correction
       Mloop_c6_width(h1,h1,h34,h56)=ggHmt(h1,h1)*
      &     H4lSM(h34,h56)*width_c6
