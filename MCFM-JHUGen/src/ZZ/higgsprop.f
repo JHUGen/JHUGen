@@ -9,6 +9,7 @@ c--- otherwise it takes the usual Breit-Wigner form
       include 'masses.f'
       include 'cpscheme.f'
       include 'widthscheme.f'
+      include 'spinzerohiggs_anomcoupl.f'
       !include 'first.f'
       double precision s,mhbarsq,mhbar,gammahbar
       double complex cfac
@@ -44,7 +45,14 @@ c--- Breit Wigner propagator
             print *, "Invalid width scheme", widthscheme
         endif
       endif
-      
+c--- Jeff: Apply Form Factors regardless of width scheme
+c--- Note: default value (n=1) does not change propagator
+c--- FF1(2) = 1/(1+|Q^2|/(Lambda_FF1(2))^2)^n_ff1(2)
+      if (AllowAnomalousCouplings .eq. 1) then
+        higgsprop = higgsprop * 
+     &  1d0/(1d0+abs(s)/(Lambda_ff1**2))**n_ff1 * 
+     &  1d0/(1d0+abs(s)/(Lambda_ff2**2))**n_ff2
+      endif
       return
    
    99 format(' *    MHB = ',f9.4,' GeV    GHB = ',f9.4,' GeV    *')
@@ -104,6 +112,13 @@ c--- Breit Wigner propagator
             print *, "Invalid width scheme", widthscheme
         endif
       endif
+c--- Jeff: Apply Form Factors regardless of width scheme
+c--- Note: default value (n=0) does not change propagator
+c--- FF1(2) = 1/(1+|Q^2|/(Lambda2_FF1(2))^2)^n2_ff1(2)
+c---if (AllowAnomalousCouplings .eq. 1) 
+      higgs2prop = higgs2prop * 
+     &  1d0/(1d0+abs(s)/(Lambda2_ff1**2))**n2_ff1 * 
+     &  1d0/(1d0+abs(s)/(Lambda2_ff2**2))**n2_ff2
       
       return
    

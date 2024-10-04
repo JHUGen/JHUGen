@@ -448,8 +448,8 @@ c--- Interpolation function for form factors of trilinear
       double precision mb2,mt2,sinthw
       double precision qhsq, q1sq, q2sq, MH2, MZ2, dB0h, dZh, Z
       double precision Fre_x(314), Fre_y(314), Fim_x(314), Fim_y(314)
-      double precision Fre, Fim, F_1l, F_2l, sqrts 
-      double complex qlI3,C0mt
+      double precision Fre, Fim, sqrts 
+      double complex qlI3,C0mt,F_1l,F_2l
 c--- squared masses and sin(thetaw)     
       mt2=mt**2
       mb2=mb**2
@@ -462,7 +462,6 @@ c--- Needed factor
 
 c--- Amplitudes for production 
       C0mt=qlI3(zip,zip,s(1,2),mt2,mt2,mt2,musq,0)
-
 c--- c6 correction to ggH vertex      
 
 c--- The real part of the 2-loop form factor 
@@ -812,6 +811,7 @@ c--- Calculate the 1-loop form factor
 
       F_1l = mt2*(two-s(1,2)*C0mt*(1d0-4d0*mt2/s(1,2)))
      &  /(two*wmass*sinthw)
+
 c--- Anomalous top allowed
       
 
