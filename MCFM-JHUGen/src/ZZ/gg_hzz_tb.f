@@ -70,14 +70,11 @@ c--- compute total c6 correction to Higgs amplitude
      &  +Mloop_c6_decay(h1,h2,h34,h56)
      &  +Mloop_c6_production(h1,h2,h34,h56)
      &  +Mloop_c6_width(h1,h2,h34,h56)
-     
-c---- ME Check
-c----      Print *, AHiggs_c6, AHiggs 
-c-------------------------------
 
       if (interference .eqv. .false.) then
 c--- normal case
         msqgg=msqgg+cdabs(AHiggs+AHiggs_c6)**2
+cs        print*,cdabs(AHiggs+AHiggs_c6)**2,msqgg
       else
 c--- with interference
         AHiggs_swap=
@@ -100,10 +97,10 @@ c--- with interference
         else
           oprat=1d0
         endif
-
         msqgg=msqgg+cdabs(AHiggs+AHiggs_c6)**2*oprat
      &  +cdabs(AHiggs_swap+AHiggs_c6_swap)**2*oprat
-
+c        print*,"OPRAT", oprat
+c        print*, "MEsq" ,msqgg
       endif
       enddo
       enddo
@@ -111,9 +108,21 @@ c--- with interference
 
 c--- overall factor extracted (c.f. getggHZZamps.f)
       fac=avegg*V*(4d0*esq*gsq/(16d0*pisq)*esq)**2
-
+c      print*,"avegg",avegg,"V",V,"esq",esq,"gsq",gsq,"pi2",pisq
+c      print*,"Fac",fac,"vsym",vsymfact
       msq(0,0)=msqgg*fac*vsymfact
-
+c--- for ME check
+c      print*,"|||||||||||||||| phase space point: ||||||||||||||||||"
+c      print*,p(1,:)
+c      print*,p(2,:)
+c      print*,p(3,:)
+c      print*,p(4,:)
+c      print*,p(5,:)
+c      print*,p(6,:)
+c      print*,""
+c      print*,"msq gg_hZZ_tb: ", msq(0,0)
+c      stop
+c--- end of ME check
       return
       end
 

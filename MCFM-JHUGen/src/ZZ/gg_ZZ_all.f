@@ -117,8 +117,6 @@ c--- compute total c6 correction to Higgs amplitude
 
 c---- This accumulates all contributions
       Mamp=Acont+AHiggs+AHiggs_c6
-c---- ME Check
-c---- Print *, AHiggs_c6, AHiggs, Acont, Mamp
 
       if (interference .eqv. .false.) then
 c--- normal case
