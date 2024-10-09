@@ -999,7 +999,6 @@ c------ top quark in the loop
       ggHmt(1,1)=ggHmt(2,2)*za(1,2)/zb(1,2)
       ggHmt(2,2)=ggHmt(2,2)*zb(1,2)/za(1,2)
       
-c------ print *,"Here", ggHmt(1,1)
       return
       end
       
