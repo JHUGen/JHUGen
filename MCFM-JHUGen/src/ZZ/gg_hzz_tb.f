@@ -74,7 +74,6 @@ c--- compute total c6 correction to Higgs amplitude
       if (interference .eqv. .false.) then
 c--- normal case
         msqgg=msqgg+cdabs(AHiggs+AHiggs_c6)**2
-cs        print*,cdabs(AHiggs+AHiggs_c6)**2,msqgg
       else
 c--- with interference
         AHiggs_swap=
@@ -99,7 +98,7 @@ c--- with interference
         endif
         msqgg=msqgg+cdabs(AHiggs+AHiggs_c6)**2*oprat
      &  +cdabs(AHiggs_swap+AHiggs_c6_swap)**2*oprat
-     
+
       endif
       enddo
       enddo
