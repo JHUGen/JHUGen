@@ -28,7 +28,8 @@ c
 c     Begin anomalous couplings
       include 'spinzerohiggs_anomcoupl.f'
       include 'AnomZffCouplings.f'
-      data AllowAnomalousCouplings / 0 / ! Disables anomalous couplings
+
+      data AllowAnomalousCouplings / 1 / ! Disables anomalous couplings
       data AllowAnomalousZffCouplings / 0 / ! Disables anomalous Zff Couplings
       data distinguish_HWWcouplings / 0 /
       data AnomalCouplPR,AnomalCouplDK / 1, 1/
@@ -44,9 +45,9 @@ c     4th generation quark masses
 
 c     MARKUS: anomalous couplings for the first resonance
 c     Hgg and Hff anomalous couplings
-      data kappa_top / (0d0,0d0) / ! SM=1,0
+      data kappa_top / (1d0,0d0) / ! SM=1,0
       data kappa_tilde_top / (0d0,0d0) / ! SM=0,0
-      data kappa_bot / (0d0,0d0) / ! SM=1,0
+      data kappa_bot / (1d0,0d0) / ! SM=1,0
       data kappa_tilde_bot / (0d0,0d0) / ! SM=0,0
       data ghg2 / (0d0,0d0) / ! SM=0,0
       data ghg3 / (0d0,0d0) / ! SM=0,0
@@ -187,19 +188,26 @@ c     HVV anomalous couplings
       data ghw4_prime6 / (0d0,0d0) /
       data ghw4_prime7 / (0d0,0d0) /
 
+c     Form Factors in Higgs Propagator
+      data Lambda_ff1 / 1000d0 /
+      data Lambda_ff2 / 1000d0 /
+      
+      data n_ff1 / 2 /
+      data n_ff2 / 2 /
+
 c     Higgs tri-linear coupling and WFR constants
-      data c6 /0d0/ ! SM = 0 
-      data t1_c6 /0d0/ ! All ti should = 1 to include all effects
-      data t2_c6 /0d0/
-      data t3_c6 /0d0/
-      data t4_c6 /0d0/
-      data t5_c6 /0d0/
-      data t6_c6 /0d0/
-      data w1_c6 /0d0/ ! All wi should = 1 to include all effects
-      data w2_c6 /0d0/
-      data w3_c6 /0d0/
-      data w4_c6 /0d0/
-      data w5_c6 /0d0/
+      data c6 /15d0/ ! SM = 0 
+      data t1_c6 /1d0/ ! All ti should = 1 to include all effects
+      data t2_c6 /1d0/
+      data t3_c6 /1d0/
+      data t4_c6 /1d0/
+      data t5_c6 /1d0/
+      data t6_c6 /1d0/
+      data w1_c6 /1d0/ ! All wi should = 1 to include all effects
+      data w2_c6 /1d0/
+      data w3_c6 /1d0/
+      data w4_c6 /1d0/
+      data w5_c6 /1d0/
 
 c     MARKUS: anomalous couplings for 2nd resonance
 c     Mass and width for second resonance
@@ -349,6 +357,13 @@ c     HVV anomalous couplings
       data gh2w4_prime5 / (0d0,0d0) /
       data gh2w4_prime6 / (0d0,0d0) /
       data gh2w4_prime7 / (0d0,0d0) /
+
+c     Form Factors in Higgs Propagator
+      data Lambda2_ff1 / 1000d0 /
+      data Lambda2_ff2 / 1000d0 /
+      
+      data n2_ff1 / 0 /
+      data n2_ff2 / 0 /
 
 c     anomalous couplings for triple and quartic gauge boson coupling with d_1-3 (SM: set all to 1)
       data dV_A / (1d0,0d0) /

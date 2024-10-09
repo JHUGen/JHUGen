@@ -132,11 +132,12 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
      & cw_q1sq,cw_q2sq,cw_q12sq,
      & c2z_q1sq,c2z_q2sq,c2z_q12sq,
      & c2w_q1sq,c2w_q2sq,c2w_q12sq,
+     & n_ff1,n_ff2,
+     & n2_ff1,n2_ff2,
      & c6,
      & t1_c6,t2_c6,t3_c6,t4_c6,t5_c6,t6_c6,
      & w1_c6,w2_c6,w3_c6,w4_c6,w5_c6,
-     & n_ff1,n_ff2,
-     & n2_ff1,n2_ff2,
+
 
      & mb_4gen,mt_4gen,
 
