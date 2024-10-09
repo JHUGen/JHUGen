@@ -197,6 +197,7 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
      & ghw1_prime6,ghw2_prime6,ghw3_prime6,ghw4_prime6,
      & ghw1_prime7,ghw2_prime7,ghw3_prime7,ghw4_prime7,
 
+     
      & kappa2_top,kappa2_tilde_top,
      & kappa2_bot,kappa2_tilde_bot,
      & gh2g2,gh2g3,gh2g4,
