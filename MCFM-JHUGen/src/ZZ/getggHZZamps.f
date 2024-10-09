@@ -75,6 +75,7 @@ c--- propagator factors
       prop12=higgsprop(s(1,2))
       prop34=cone/dcmplx(s(3,4)-zmass**2,zmass*zwidth)
       prop56=cone/dcmplx(s(5,6)-zmass**2,zmass*zwidth)
+c      print*, prop12,prop34,prop56
 
 c--- Factor
       facHZZ=im*rescale*prop12*prop34*prop56/(2d0*xw*(1d0-xw))
@@ -187,6 +188,9 @@ c--- Assemble
       do h1=1,2
       do h34=1,2
       do h56=1,2
+c --- print *, ggHmq(2,h1,h1),ggHmt(h1,h1)
+c --- print *, H4l(h34,h56),H4lSM(h34,h56)
+
       Mloop_bquark(h1,h1,h34,h56)=ggHmq(1,h1,h1)*H4l(h34,h56)
       Mloop_tquark(h1,h1,h34,h56)=ggHmq(2,h1,h1)*H4l(h34,h56)
 c--- Assemble c6 corrections
@@ -199,7 +203,7 @@ c--- propagator correction
       Mloop_c6_propagator(h1,h1,h34,h56)=t1_c6*ggHmt(h1,h1)*
      &     H4lSM(h34,h56)*prop12_c6/prop12
 c--- production correction
-      Mloop_c6_production(h1,h1,h34,h56) = 
+      Mloop_c6_production(h1,h1,h34,h56) =
      &     t4_c6*ggHmt_c6(h1,h1)* H4lSM(h34,h56)
      &     * (2*wmass*sqrt(xw))
 c--- decay correction  
@@ -213,10 +217,12 @@ c---  width correction
       enddo
       enddo
 
-c---  Assemble c6 ggH vertex corrections
-
       return
       end
+
+
+
+
 
       subroutine getggH2ZZamps(p,Mloop_bquark,Mloop_tquark)
       implicit none
