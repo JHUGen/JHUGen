@@ -394,8 +394,8 @@ c--- q^2-dependent couplings
 
       ! Multiply by the tensor structure
       do iv=1,2
-      hggvtxamp(iv,1,1)=(hggvtxamp(iv,1,1))*za(i1,i2)/zb(i1,i2) 
-      hggvtxamp(iv,2,2)=(hggvtxamp(iv,2,2))*zb(i1,i2)/za(i1,i2)
+      hggvtxamp(iv,1,1)=hggvtxamp(iv,1,1)*za(i1,i2)/zb(i1,i2)
+      hggvtxamp(iv,2,2)=hggvtxamp(iv,2,2)*zb(i1,i2)/za(i1,i2)
       enddo
 
       return
