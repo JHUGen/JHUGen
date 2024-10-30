@@ -9,6 +9,7 @@ c--- otherwise it takes the usual Breit-Wigner form
       include 'masses.f'
       include 'cpscheme.f'
       include 'widthscheme.f'
+      include 'spinzerohiggs_anomcoupl.f'
       !include 'first.f'
       double precision s,mhbarsq,mhbar,gammahbar
       double complex cfac
@@ -44,7 +45,14 @@ c--- Breit Wigner propagator
             print *, "Invalid width scheme", widthscheme
         endif
       endif
-      
+c--- Jeff: Apply Form Factors regardless of width scheme
+c--- Note: default value (n=1) does not change propagator
+c--- FF1(2) = 1/(1+|Q^2|/(Lambda_FF1(2))^2)^n_ff1(2)
+      if (AllowAnomalousCouplings .eq. 1) then
+        higgsprop = higgsprop * 
+     &  1d0/(1d0+abs(s)/(Lambda_ff1**2))**n_ff1 * 
+     &  1d0/(1d0+abs(s)/(Lambda_ff2**2))**n_ff2
+      endif
       return
    
    99 format(' *    MHB = ',f9.4,' GeV    GHB = ',f9.4,' GeV    *')
@@ -104,11 +112,58 @@ c--- Breit Wigner propagator
             print *, "Invalid width scheme", widthscheme
         endif
       endif
+c--- Jeff: Apply Form Factors regardless of width scheme
+c--- Note: default value (n=0) does not change propagator
+c--- FF1(2) = 1/(1+|Q^2|/(Lambda2_FF1(2))^2)^n2_ff1(2)
+c---if (AllowAnomalousCouplings .eq. 1) 
+      higgs2prop = higgs2prop * 
+     &  1d0/(1d0+abs(s)/(Lambda2_ff1**2))**n2_ff1 * 
+     &  1d0/(1d0+abs(s)/(Lambda2_ff2**2))**n2_ff2
       
       return
    
    99 format(' *    MHB = ',f9.4,' GeV    GHB = ',f9.4,' GeV    *')
       
       end
-      
+c--- 
+c---  One-loop correction to the Higgs propagator
+c---      
+      function sigmah(s,c6,wfr)
+      implicit none
+c---  include 'types.f'
+      double complex sigmah
+
+      include 'constants.f'
+c---  include 'cplx.h'
+      include 'masses.f'
+      include 'ewcouple.f'
+      include 'qlfirst.f'
+      double precision s, c6, wfr, MH2, dB0h, dZh, dmhsq
+      double complex qlI2
+
+      if (qlfirst) then
+        qlfirst=.false. 
+        call qlinit
+      endif
+
+      MH2=hmass**2
+
+c--- Wavefunction renormalisation
+      dB0h = (-9 + 2*sqrt(3d0)*Pi)/(9*MH2)
+      dZh  = -wfr*dB0h  
+c--- Mass renormalisation
+      dmhsq = qlI2(MH2,MH2,MH2,1d0,0)
+c--- Renormalised correction
+      sigmah = (9*c6*(2d0 + c6)*MH2**2*
+     & (-dZh*(MH2 - s)))/
+     & (32d0*Pi**2*vevsq)
+
+      sigmah = sigmah + (9*c6*(2d0 + c6)*MH2**2*
+     & (qlI2(s,MH2,MH2,1d0,0) - dmhsq))/
+     & (32d0*Pi**2*vevsq)
+
+      sigmah= sigmah/dcmplx(s-MH2,hmass*hwidth) 
+
+      return 
+      end
       
