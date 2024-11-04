@@ -67,6 +67,8 @@ jobs:
           name: "Manual Checkout"
           command: |
             git clone https://github.com/JHUGen/JHUGen.git .
+            git config user.name 'CircleCI'
+            git config user.email 'CirclCI@jhugen.edu'
             git pull origin pull/$CIRCLE_PR_NUMBER/head
       - run: 
           name: "Update Submodule"
