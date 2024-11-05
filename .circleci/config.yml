@@ -69,7 +69,7 @@ jobs:
             git clone https://github.com/JHUGen/JHUGen.git .
             git config user.name 'CircleCI'
             git config user.email 'CirclCI@jhugen.edu'
-            git pull origin pull/$CIRCLE_PR_NUMBER/head -f
+            git pull origin pull/$CIRCLE_PR_NUMBER/head --rebase true
       - run: 
           name: "Update Submodule"
           command: |
