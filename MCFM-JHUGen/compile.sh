@@ -19,7 +19,7 @@ if [[ -z "${SCRAM_ARCH+x}" ]];then
     export SCRAM_ARCH="slc7_amd64_gcc820"
   fi
 fi
-LIB=libmcfm_710.so
+LIB=libmcfm_711.so
 
 for aDir in QCDLoop/ff QCDLoop/ql QCDLoop TensorReduction/ov TensorReduction/pv TensorReduction/ov TensorReduction/recur/smallY TensorReduction/recur/smallP TensorReduction/recur/smallG TensorReduction/recur/smallF TensorReduction/recur
 do
