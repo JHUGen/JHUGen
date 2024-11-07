@@ -23,7 +23,11 @@ c--- (default: included)
      & Mlight(2,2,2,2),Mgen3(2,2,2,2),
      & Mamp,faczz,facww
       double complex ggHZZ_bquark(2,2,2,2),ggHZZ_tquark(2,2,2,2),
-     & ggHWW_bquark(2,2,2,2),ggHWW_tquark(2,2,2,2)
+     & ggHWW_bquark(2,2,2,2),ggHWW_tquark(2,2,2,2),
+     & ggHZZ_c6_propagator(2,2,2,2),
+     & ggHZZ_c6_decay(2,2,2,2),
+     & ggHZZ_c6_production(2,2,2,2),
+     & ggHZZ_c6_width(2,2,2,2)
       double complex ggH2ZZ_bquark(2,2,2,2),ggH2ZZ_tquark(2,2,2,2),
      & ggH2WW_bquark(2,2,2,2),ggH2WW_tquark(2,2,2,2)
 
@@ -63,9 +67,15 @@ c--- compute all gg->WW and gg->ZZ amplitudes
      & Mloop_uptype,Mloop_dntype,Mloop_bquark,Mloop_tquark)
 
 c--- compute all gg->H->WW and gg->H->ZZ amplitudes
+c--- Note from Jeff: Note inclusion of the c6 trilinear corrections
+c--- trilinear is not supported in the process so regardless of what c6 is
+c--- set to, we will still get the expected ggHZZ amp
+c--- In the future we could incorportate the corrections very easily
       call getggHWWamps(pswap,
      & ggHWW_bquark(:,:,1,1),ggHWW_tquark(:,:,1,1))
-      call getggHZZamps(p,ggHZZ_bquark,ggHZZ_tquark)
+      call getggHZZamps(p,ggHZZ_bquark,ggHZZ_tquark,
+     & ggHZZ_c6_propagator,ggHZZ_c6_decay,
+     & ggHZZ_c6_production,ggHZZ_c6_width)
       call getggH2WWamps(pswap,
      & ggH2WW_bquark(:,:,1,1),ggH2WW_tquark(:,:,1,1))
       call getggH2ZZamps(p,ggH2ZZ_bquark,ggH2ZZ_tquark)
