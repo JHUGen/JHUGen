@@ -22,6 +22,13 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
       integer c2z_q1sq,c2z_q2sq,c2z_q12sq
       integer c2w_q1sq,c2w_q2sq,c2w_q12sq
 
+      integer n_ff1,n_ff2
+      integer n2_ff1,n2_ff2
+
+      double precision c6
+      double precision t1_c6,t2_c6,t3_c6,t4_c6,t5_c6,t6_c6
+      double precision w1_c6,w2_c6,w3_c6,w4_c6,w5_c6
+
       double precision mb_4gen,mt_4gen
 
       double precision LambdaBSM,Lambda_Q
@@ -35,6 +42,8 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
       double precision Lambda_w12,Lambda_w22,Lambda_w32,Lambda_w42
       double precision Lambda_w10,Lambda_w20,Lambda_w30,Lambda_w40
 
+      double precision Lambda_ff1,Lambda_ff2
+
       double precision h2mass,h2width
 
       double precision Lambda2BSM,Lambda2_Q
@@ -46,7 +55,9 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
       double precision Lambda2_w1,Lambda2_w2,Lambda2_w3,Lambda2_w4
       double precision Lambda2_w11,Lambda2_w21,Lambda2_w31,Lambda2_w41
       double precision Lambda2_w12,Lambda2_w22,Lambda2_w32,Lambda2_w42
-      double precision Lambda2_w10,Lambda2_w20,Lambda2_w30,Lambda2_w40
+      double precision Lambda2_w10,Lambda2_w20,Lambda2_w30,Lambda2_w40      
+      
+      double precision Lambda2_ff1,Lambda2_ff2
 
       double complex kappa_top,kappa_tilde_top
       double complex kappa_bot,kappa_tilde_bot
@@ -122,6 +133,12 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
      & cw_q1sq,cw_q2sq,cw_q12sq,
      & c2z_q1sq,c2z_q2sq,c2z_q12sq,
      & c2w_q1sq,c2w_q2sq,c2w_q12sq,
+     & n_ff1,n_ff2,
+     & n2_ff1,n2_ff2,
+     & c6,
+     & t1_c6,t2_c6,t3_c6,t4_c6,t5_c6,t6_c6,
+     & w1_c6,w2_c6,w3_c6,w4_c6,w5_c6,
+
 
      & mb_4gen,mt_4gen,
 
@@ -135,6 +152,8 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
      & Lambda_w11,Lambda_w21,Lambda_w31,Lambda_w41,
      & Lambda_w12,Lambda_w22,Lambda_w32,Lambda_w42,
      & Lambda_w10,Lambda_w20,Lambda_w30,Lambda_w40,
+     
+     & Lambda_ff1,Lambda_ff2,
 
      & h2mass,h2width,
 
@@ -149,6 +168,7 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
      & Lambda2_w12,Lambda2_w22,Lambda2_w32,Lambda2_w42,
      & Lambda2_w10,Lambda2_w20,Lambda2_w30,Lambda2_w40,
 
+     & Lambda2_ff1,Lambda2_ff2,
 
      & kappa_top,kappa_tilde_top,
      & kappa_bot,kappa_tilde_bot,
