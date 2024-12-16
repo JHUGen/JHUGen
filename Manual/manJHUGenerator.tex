@@ -1327,7 +1327,7 @@ We provide an interface to Madgraph matrix elements, colloquially known as MadME
 
 The physical libraries that are compiled are located in the madMELA directory, which is also where you can compile the library if it does not work for you out of the box by running \verb|./compile.sh| within the directory.
 
-The couplings used by the Madgraph interface utilize the SMEFTsim package for Madgraph at NLO \cit{SMEFTsim1} \cite{SMEFTsim2}. These are expressed as real-valued Wilson Coefficients, and affect far more than just the amplitudes within couplings.
+The couplings used by the Madgraph interface utilize the SMEFTsim package for Madgraph at NLO \cite{SMEFTsim1} \cite{SMEFTsim2}. These are expressed as real-valued Wilson Coefficients, and affect far more than just the amplitudes within couplings.
 
 The full expression for what is affected can be found within the source code of your process. For instance, if one was using the $q\bar{q}\rightarrow H$/signal production/process in MELA, then the full definition of all terms used can be found in \verb|madMELA/qq4l-sig-SMEFTsim-standalone_all/Source/MODEL/intparam_defintion.inc|. The same goes for any other area, simply replace \verb|qq4l-sig-SMEFTsim-standalone_all| with your desired area.
 
@@ -1478,7 +1478,7 @@ Z$\nu\nu$ and Z coupling to left-handed quarks would be 0.
 \subsection{MCFM}
 We support modified Zff couplings in certain processes in the standalone JHUGen-MCFM package of the JHU Generator Framework. We allow modified Zff couplings both production and decay for $gg \to 4f$ processes. This corresponds to MCFM 
 process numbers 128,132, and 131 for $gg \to H \to 4f$, $gg \to ZZ\backslash Z\gamma^{\ast} \to 4f $, and the interefernce between the two processes respectively. Zff couplings are set separately for production and decay.
-In production, we parameterize the modifications to the Zff couplings in production as shifts to the SM coupling of the Z-boson to up-type and down-type quarks\footnote{Special thanks from JHUGen Team to Oscar Eboli for anomalous Zqq couplings in ggZZ process}. In decay, we allow the user to set the exact value of the Zff couplings to leptons and quarks. To utilize these features one must install the required package
+In production, we parameterize the modifications to the Zff couplings in production as shifts to the SM coupling of the Z-boson to up-type and down-type quarks\footnote{Special thanks from JHUGen Team to Oscar Eboli for anomalous Zqq couplings in ggZZ process}. In decay, we allow the user to set the exact value of the Zff couplings to leptons and quarks. To utilize these features one must install the required package.
 \begin{verbatim}
 cd MCFM-JHUGen
 ./Install
@@ -1538,10 +1538,13 @@ up-type quarks in production is shifted by 0.1. Again in this example, since the
 
 \section{Release notes}
 \noindent
-In going from \verb|v7.5.7| to \verb|v7.5.8| (August 30, 2024) the updates are as follows:
+In going from \verb|v7.5.6| to \verb|v7.5.7| (December 20, 2024) the updates are as follows:
 \noindent
 \begin{itemize}
 \item Introduced signal, background, and BSI matrix elements for $\{u,d,c,s,b\} \rightarrow 4\ell$ utilizing Madgraph matrix elements.
+\item Introduced Higgs self-coupling for gluon-fusion into the MCFM matrix element.
+We would like to thank Ulrich Haisch and Gabriël Koole for their efforts in including
+the Higgs self-coupling into the gluon fusion process for MCFM~\cite{SelfCoupling}.
 \end{itemize}
 \noindent
 In going from \verb|v7.5.5| to \verb|v7.5.6| (July 8, 2024) the updates are as follows:
@@ -1919,5 +1922,9 @@ A.~Falkowski {et~al.}, ``{Rosetta: an operator basis translator for Standard Mod
 I. Brivio, Y. Jiang, M. Trott, ``{The SMEFTsim package, theory and tools}'', JHEP 12 (2017) 070, https://doi.org/10.48550/arXiv.1709.06492, arXiv:1709.06492
 \bibitem{SMEFTsim2}
 I. Brivio ``{SMEFTsim 3.0 -- a practical guide}'', JHEP 04 (2021) 073, https://doi.org/10.48550/arXiv.2012.11343, arXiv:2012.11343
+\bibitem{SelfCoupling}
+Haisch, U., Koole, G., ``{Off-shell Higgs production at the LHC as a probe of the trilinear Higgs coupling}'',
+{ J. High Energ. Phys. } (2022) 30,
+doi{10.48550}, arXiv:2111.12589v2 [hep-ph]
 \end{thebibliography}
 \end{document}

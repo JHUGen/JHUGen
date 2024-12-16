@@ -12,7 +12,7 @@ C
       REAL*8 M3
       REAL*8 OM3
       REAL*8 P3(0:3)
-      COMPLEX*16 TMP21
+      COMPLEX*16 TMP9
       COMPLEX*16 V3(6)
       REAL*8 W3
       COMPLEX*16 DENOM
@@ -24,15 +24,15 @@ C
       P3(1) = -DBLE(V3(2))
       P3(2) = -DIMAG(V3(2))
       P3(3) = -DIMAG(V3(1))
-      TMP21 = (F1(5)*(F2(3)*(P3(0)-P3(3))-F2(4)*(P3(1)+CI*(P3(2))))
+      TMP9 = (F1(5)*(F2(3)*(P3(0)-P3(3))-F2(4)*(P3(1)+CI*(P3(2))))
      $ +F1(6)*(F2(3)*(-P3(1)+CI*(P3(2)))+F2(4)*(P3(0)+P3(3))))
       DENOM = COUP/(P3(0)**2-P3(1)**2-P3(2)**2-P3(3)**2 - M3 * (M3 -CI
      $ * W3))
-      V3(3)= DENOM*(-CI)*(F2(3)*F1(5)+F2(4)*F1(6)-P3(0)*OM3*TMP21)
-      V3(4)= DENOM*(-CI)*(F2(3)*F1(6)+F2(4)*F1(5)-P3(1)*OM3*TMP21)
-      V3(5)= DENOM*(-CI)*(-CI*(F2(3)*F1(6))+CI*(F2(4)*F1(5))-P3(2)*OM3
-     $ *TMP21)
-      V3(6)= DENOM*(-CI)*(F2(3)*F1(5)-F2(4)*F1(6)-P3(3)*OM3*TMP21)
+      V3(3)= DENOM*(-CI)*(F2(3)*F1(5)+F2(4)*F1(6)-P3(0)*OM3*TMP9)
+      V3(4)= DENOM*(-CI)*(F2(4)*F1(5)+F2(3)*F1(6)-P3(1)*OM3*TMP9)
+      V3(5)= DENOM*(-CI)*(+CI*(F2(4)*F1(5))-CI*(F2(3)*F1(6))-P3(2)*OM3
+     $ *TMP9)
+      V3(6)= DENOM*(-CI)*(F2(3)*F1(5)-F2(4)*F1(6)-P3(3)*OM3*TMP9)
       END
 
 
