@@ -16,7 +16,11 @@ c      include 'interference.f'
      & pswap(mxpart,4),oprat,pttwo
       double complex ggHZZ_bquark(2,2,2,2),ggHZZ_tquark(2,2,2,2),
      & ggHWW_bquark(2,2,2,2),ggHWW_tquark(2,2,2,2),Ahiggs,
-     & faczz,facww
+     & faczz,facww,
+     & ggHZZ_c6_propagator(2,2,2,2),
+     & ggHZZ_c6_decay(2,2,2,2),
+     & ggHZZ_c6_production(2,2,2,2),
+     & ggHZZ_c6_width(2,2,2,2)
       double complex ggH2ZZ_bquark(2,2,2,2),ggH2ZZ_tquark(2,2,2,2),
      & ggH2WW_bquark(2,2,2,2),ggH2WW_tquark(2,2,2,2)
 
@@ -47,7 +51,9 @@ c--- this is the swap to get to the right configuration for the WW call
 
       call getggHWWamps(pswap,
      & ggHWW_bquark(:,:,1,1),ggHWW_tquark(:,:,1,1))
-      call getggHZZamps(p,ggHZZ_bquark,ggHZZ_tquark)
+      call getggHZZamps(p,ggHZZ_bquark,ggHZZ_tquark,
+     & ggHZZ_c6_propagator,ggHZZ_c6_decay,
+     & ggHZZ_c6_production,ggHZZ_c6_width)
       call getggH2WWamps(pswap,
      & ggH2WW_bquark(:,:,1,1),ggH2WW_tquark(:,:,1,1))
       call getggH2ZZamps(p,ggH2ZZ_bquark,ggH2ZZ_tquark)
