@@ -91,6 +91,9 @@ c--- warning message, if necessary
       write(6,*) '*  Special thanks from JHUGen Team               *'
       write(6,*) '*  to Oscar Eboli for anomalous Zqq couplings    *'
       write(6,*) '*  in ggZZ process                               *'
+      write(6,*) '*  and to Ulrich Haisch and Gabriël Koole        *'
+      write(6,*) '*  for Higgs self-coupling in the ggH process    *'
+      write(6,*) '*  arXiv:2111.12589 (Higgs self-coupling)        *'
       write(6,*) '**************************************************'
       write(6,*) 
  

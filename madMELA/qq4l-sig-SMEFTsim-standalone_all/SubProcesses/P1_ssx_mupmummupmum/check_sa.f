@@ -91,7 +91,7 @@ c
 c     
 c     Now we can call the matrix element!
 c
-      CALL M10_smatrix(P,MATELEM)
+      CALL M7_smatrix(P,MATELEM)
 c
 
       write (*,*) "Matrix element = ", MATELEM, " GeV^",-(2*nexternal-8)	
@@ -123,7 +123,7 @@ c         write (*,'(i2,1x,5e15.7)') i, P(0,i),P(1,i),P(2,i),P(3,i),
 c     .dsqrt(dabs(DOT(p(0,i),p(0,i))))
 c      enddo
 c
-c      CALL M10_smatrix(P,MATELEM)
+c      CALL M7_smatrix(P,MATELEM)
 c
 c      write (*,*) "-------------------------------------------------"
 c      write (*,*) "Matrix element = ", MATELEM, " GeV^",-(2*nexternal-8)	

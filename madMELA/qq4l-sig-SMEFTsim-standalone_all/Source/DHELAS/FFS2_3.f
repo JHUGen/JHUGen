@@ -12,7 +12,7 @@ C
       REAL*8 M3
       REAL*8 P3(0:3)
       COMPLEX*16 S3(3)
-      COMPLEX*16 TMP32
+      COMPLEX*16 TMP7
       REAL*8 W3
       COMPLEX*16 DENOM
       S3(1) = +F1(1)+F2(1)
@@ -21,10 +21,10 @@ C
       P3(1) = -DBLE(S3(2))
       P3(2) = -DIMAG(S3(2))
       P3(3) = -DIMAG(S3(1))
-      TMP32 = (F2(3)*F1(3)+F2(4)*F1(4)+F2(5)*F1(5)+F2(6)*F1(6))
+      TMP7 = (F2(3)*F1(3)+F2(4)*F1(4)+F2(5)*F1(5)+F2(6)*F1(6))
       DENOM = COUP/(P3(0)**2-P3(1)**2-P3(2)**2-P3(3)**2 - M3 * (M3 -CI
      $ * W3))
-      S3(3)= DENOM*CI * TMP32
+      S3(3)= DENOM*CI * TMP7
       END
 
 

@@ -107,8 +107,8 @@ class JobSubmitter(object):
     try:
       JHUGen(*JHUGenargs + ["DryRun"], hideoutput=True)
     except subprocess.CalledProcessError as e:
-      print "Invalid command line: " + " ".join(JHUGenargs)
-      print e.output
+      print("Invalid command line: " + " ".join(JHUGenargs))
+      print(e.output)
       raise
 
   @contextlib.contextmanager
@@ -147,7 +147,7 @@ class JobSubmitter(object):
   def submit(self):
     if self.hasmultiplejobs and self.VBFoffsh_run is None and self.args.array_index is None:
       if self.Seed is None: raise ValueError("To run multiple jobs, please set a seed on the command line so it will be common to all jobs")
-      arrayjobs=["{:03d}".format(_) for _ in xrange(1, self.njobs+1)]
+      arrayjobs=["{:03d}".format(_) for _ in range(1, self.njobs+1)]
       with self.setenvandcd():
         for _ in arrayjobs:
           self.dodryrun(array_index=_)
@@ -162,7 +162,7 @@ class JobSubmitter(object):
     jobindicesrunning, jobids = self.jobindicesrunning(arrayjobs)
     if jobids:
       plural = len(jobids) > 1
-      print "job{} {} {} already running".format("s" if plural else "", ", ".join(sorted(jobids)), "are" if plural else "is")
+      print("job{} {} {} already running").format("s" if plural else "", ", ".join(sorted(jobids)), "are" if plural else "is")
       for index in jobindicesrunning:
         arrayjobs.remove(index)
 
@@ -369,9 +369,9 @@ class JobRunner(JobSubmitter):
     if not self.hasmultiplejobs:
       raise ValueError("Nothing to merge for process {}".format(self.Process))
     if self.args.on_queue: return
-    if not all(os.path.exists(self.resultfile("{:03d}".format(i))) for i in xrange(1, self.njobs+1)): raise ValueError("Can't merge, not all files exist")
+    if not all(os.path.exists(self.resultfile("{:03d}".format(i))) for i in range(1, self.njobs+1)): raise ValueError("Can't merge, not all files exist")
     if os.path.exists(self.resultfile(None)) and not self.args.overwrite: return
-    with opens(*(self.resultfile("{:03d}".format(i)) for i in xrange(1, self.njobs+1))) as fs, open(self.resultfile(None), "w") as newf:
+    with opens(*(self.resultfile("{:03d}".format(i)) for i in range(1, self.njobs+1))) as fs, open(self.resultfile(None), "w") as newf:
       #find number of events in each file
       fileswithevents = []
       for f in fs:
@@ -445,9 +445,9 @@ class JobSubmitterSlurm(JobSubmitter):
         stderr=subprocess.STDOUT,
       )
     except subprocess.CalledProcessError as e:
-      print e.output,
+      print (e.output),
       raise
-    print sbatchout,
+    print (sbatchout),
     for arrayjob in arrayjobs:
       with open(self.logfile(arrayjob), "w") as f:
         f.write(sbatchout)
