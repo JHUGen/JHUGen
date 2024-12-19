@@ -13,7 +13,7 @@ C
       COMPLEX*16 F4(*)
       REAL*8 M2
       REAL*8 P2(0:3)
-      COMPLEX*16 TMP4
+      COMPLEX*16 TMP2
       REAL*8 W2
       COMPLEX*16 DENOM
       F2(1) = +F1(1)+F3(1)+F4(1)
@@ -22,15 +22,15 @@ C
       P2(1) = -DBLE(F2(2))
       P2(2) = -DIMAG(F2(2))
       P2(3) = -DIMAG(F2(1))
-      TMP4 = (F4(3)*F3(3)+F4(4)*F3(4))
+      TMP2 = (F4(3)*F3(3)+F4(4)*F3(4))
       DENOM = COUP/(P2(0)**2-P2(1)**2-P2(2)**2-P2(3)**2 - M2 * (M2 -CI
      $ * W2))
-      F2(3)= DENOM*CI * TMP4*(F1(5)*(P2(0)-P2(3))+F1(6)*(-P2(1)+CI
+      F2(3)= DENOM*CI * TMP2*(F1(5)*(P2(0)-P2(3))+F1(6)*(-P2(1)+CI
      $ *(P2(2))))
-      F2(4)= DENOM*(-CI )* TMP4*(F1(5)*(P2(1)+CI*(P2(2)))-F1(6)*(P2(0)
+      F2(4)= DENOM*(-CI )* TMP2*(F1(5)*(P2(1)+CI*(P2(2)))-F1(6)*(P2(0)
      $ +P2(3)))
-      F2(5)= DENOM*CI * TMP4*F1(5)*M2
-      F2(6)= DENOM*CI * TMP4*F1(6)*M2
+      F2(5)= DENOM*CI * F1(5)*TMP2*M2
+      F2(6)= DENOM*CI * F1(6)*TMP2*M2
       END
 
 

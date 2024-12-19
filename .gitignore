@@ -6,3 +6,4 @@
 **/*.pyc
 JHUGenLexicon/lib
 JHUGenLexicon/JHUGenLexicon
+*.mod
