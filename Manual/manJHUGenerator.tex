@@ -47,9 +47,9 @@ Additionally, the package includes code for computing the matrix elements standa
 Please reference the above papers and refer to ``MELA'' when using the matrix element likelihood approach.
 The latter was also introduced in Ref.~\cite{Chatrchyan:2012ufa}. The matrix element package (MELA) and off-shell EW generation 
 also depend on MCFM libraries for background parameterization which should be referenced~\cite{Campbell:2010ff} when used. Special thanks to Ulrich Haisch and Gabriël Koole for their efforts in including
-the Higgs self-coupling, and to Oscar Eboli for introducing anomalous Zqq couplings, into the gluon fusion process for MCFM~\cite{SelfCoupling}.
-Certain processes, such as quark-antiquark Higgs production, similarly depend on Madgraph utilizing SMEFTsim,
-colloquially referred to as ``madMELA''~\cite{SMEFTsim1, SMEFTsim2}.
+the Higgs self-coupling~\cite{SelfCoupling}, and to Oscar Eboli for introducing anomalous Zqq couplings, into the gluon fusion process for MCFM.
+Certain processes, such as quark-antiquark Higgs production, similarly depend on Madgraph utilizing SMEFTsim~\cite{SMEFTsim1, SMEFTsim2,Madgraph},
+colloquially referred to as ``madMELA''.
 In order to simplify the translation between different coupling conventions, we provide the JHUGenLexicon program within the JHU generator framework,
 which includes an interface to the generator and matrix element library, and can also be used for standalone or other applications. 
 
@@ -1330,7 +1330,7 @@ We provide an interface to Madgraph matrix elements, colloquially known as madME
 
 The physical libraries that are compiled are located in the madMELA directory, which is also where you can compile the library if it does not work for you out of the box by running \verb|./compile.sh| within the directory.
 
-The couplings used by the Madgraph interface utilize the SMEFTsim package for Madgraph at NLO \cite{SMEFTsim1, SMEFTsim2}. These are expressed as real-valued Wilson Coefficients, and affect far more than just the amplitudes within couplings.
+The couplings used by the Madgraph interface utilize the SMEFTsim package for Madgraph \cite{SMEFTsim1, SMEFTsim2}. These are expressed as real-valued Wilson Coefficients, and affect far more than just the amplitudes within couplings.
 
 The full expression for what is affected can be found within the source code of your process. For instance, if one was using the $q\bar{q}\rightarrow H$/signal production/process in MELA, then the full definition of all terms used can be found in \verb|madMELA/qq4l-sig-SMEFTsim-standalone_all/Source/MODEL/intparam_defintion.inc|. The same goes for any other area, simply replace \verb|qq4l-sig-SMEFTsim-standalone_all| with your desired area.
 
@@ -1548,7 +1548,7 @@ In going from \verb|v7.5.6| to \verb|v7.5.7| (December 20, 2024) the updates are
 \item Introduced Higgs self-coupling for gluon-fusion into the MCFM matrix element.
 We would like to thank Ulrich Haisch and Gabriël Koole for their efforts in including
 the Higgs self-coupling into the gluon fusion process for MCFM~\cite{SelfCoupling}.
-\item Fixed a sign mistake in JHUGenLexicon
+\item Corrected a sign convention in one term within JHUGenLexicon
 \end{itemize}
 \noindent
 In going from \verb|v7.5.5| to \verb|v7.5.6| (July 8, 2024) the updates are as follows:
@@ -1930,5 +1930,8 @@ I. Brivio ``{SMEFTsim 3.0 -- a practical guide}'', JHEP 04 (2021) 073, https://d
 Haisch, U., Koole, G., ``{Off-shell Higgs production at the LHC as a probe of the trilinear Higgs coupling}'',
 { J. High Energ. Phys. } (2022) 30,
 doi{10.48550}, arXiv:2111.12589v2 [hep-ph]
+\bibitem{Madgraph}
+J.~Alwall {et-al}, ``{Madgraph 5: Going Beyond}'',
+JHEP 06 (2011) 128, https://arxiv.org/abs/1106.0522, arXiv:1106.0522
 \end{thebibliography}
 \end{document}
