@@ -29,7 +29,7 @@ R. Pan, M. Panagiotou, R. Rontsch, J. Roskes, U. Sarica, M. Schulze, M. V. Sriva
 \begin{center}
 \small
 For simulation, reweighting, and analysis of resonances produced at hadron colliders \\
-(version v7.5.6, release date July 8, 2024) \\
+(version v7.5.7, release date December 20, 2024) \\
 \normalsize
 \end{center}
 
@@ -46,9 +46,12 @@ while absolute values are often subject to an arbitrary normalization.
 Additionally, the package includes code for computing the matrix elements standalone which can be used in a numerical matrix element analysis.
 Please reference the above papers and refer to ``MELA'' when using the matrix element likelihood approach.
 The latter was also introduced in Ref.~\cite{Chatrchyan:2012ufa}. The matrix element package (MELA) and off-shell EW generation 
-also depend on MCFM libraries for background parameterization which should be referenced~\cite{Campbell:2010ff} when used.
-In order to simplify translation between different coupling conventions, within the JHU generator framework, we provide the JHUGenLexicon program,
-which includes an interface to the generator and matrix element library and can also be used for standalone or other applications. 
+also depend on MCFM libraries for background parameterization which should be referenced~\cite{Campbell:2010ff} when used. Special thanks to Ulrich Haisch and Gabriël Koole for their efforts in including
+the Higgs self-coupling, and to Oscar Eboli for introducing anomalous Zqq couplings, into the gluon fusion process for MCFM~\cite{SelfCoupling}.
+Certain processes, such as quark-antiquark Higgs production, similarly depend on Madgraph utilizing SMEFTsim,
+colloquially referred to as ``madMELA''~\cite{SMEFTsim1, SMEFTsim2}.
+In order to simplify the translation between different coupling conventions, we provide the JHUGenLexicon program within the JHU generator framework,
+which includes an interface to the generator and matrix element library, and can also be used for standalone or other applications. 
 
 
 \vspace{0.5cm}
@@ -1323,11 +1326,11 @@ mela->resetInputEvent()
 to avoid memory leaks.  This is particularly important when processing many events in one job.
 
 \subsection{Madgraph Interface}
-We provide an interface to Madgraph matrix elements, colloquially known as MadMELA. So far, there are 2 production modes available - $gg\rightarrow H$ and $q\bar{q}\rightarrow H$, with $q\bar{q}\rightarrow H$ containing signal, background, and (signal+background+interference) processes. All of these processes are designed for specific EFT use cases, so if there is a use case that is not covered, simply ask the authors and we may put that process in for you.
+We provide an interface to Madgraph matrix elements, colloquially known as madMELA. So far, there are 2 production modes available - $gg\rightarrow H$ and $q\bar{q}\rightarrow H$, with $q\bar{q}\rightarrow H$ containing signal, background, and (signal+background+interference) processes. All of these processes are designed for specific EFT use cases, so if there is a use case that is not covered, simply ask the authors and we may put that process in for you.
 
 The physical libraries that are compiled are located in the madMELA directory, which is also where you can compile the library if it does not work for you out of the box by running \verb|./compile.sh| within the directory.
 
-The couplings used by the Madgraph interface utilize the SMEFTsim package for Madgraph at NLO \cite{SMEFTsim1} \cite{SMEFTsim2}. These are expressed as real-valued Wilson Coefficients, and affect far more than just the amplitudes within couplings.
+The couplings used by the Madgraph interface utilize the SMEFTsim package for Madgraph at NLO \cite{SMEFTsim1, SMEFTsim2}. These are expressed as real-valued Wilson Coefficients, and affect far more than just the amplitudes within couplings.
 
 The full expression for what is affected can be found within the source code of your process. For instance, if one was using the $q\bar{q}\rightarrow H$/signal production/process in MELA, then the full definition of all terms used can be found in \verb|madMELA/qq4l-sig-SMEFTsim-standalone_all/Source/MODEL/intparam_defintion.inc|. The same goes for any other area, simply replace \verb|qq4l-sig-SMEFTsim-standalone_all| with your desired area.
 
@@ -1541,10 +1544,11 @@ up-type quarks in production is shifted by 0.1. Again in this example, since the
 In going from \verb|v7.5.6| to \verb|v7.5.7| (December 20, 2024) the updates are as follows:
 \noindent
 \begin{itemize}
-\item Introduced signal, background, and BSI matrix elements for $\{u,d,c,s,b\} \rightarrow 4\ell$ utilizing Madgraph matrix elements.
+\item Introduced signal, background, and BSI matrix elements for $\{u,d,c,s,b\} \rightarrow 4\ell$ utilizing Madgraph matrix elements within madMELA.
 \item Introduced Higgs self-coupling for gluon-fusion into the MCFM matrix element.
 We would like to thank Ulrich Haisch and Gabriël Koole for their efforts in including
 the Higgs self-coupling into the gluon fusion process for MCFM~\cite{SelfCoupling}.
+\item Fixed a sign mistake in JHUGenLexicon
 \end{itemize}
 \noindent
 In going from \verb|v7.5.5| to \verb|v7.5.6| (July 8, 2024) the updates are as follows:
