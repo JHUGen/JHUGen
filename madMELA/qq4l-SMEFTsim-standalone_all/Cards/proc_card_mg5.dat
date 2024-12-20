@@ -8,7 +8,7 @@
 #*                *                       *                 *
 #*                                                          *
 #*                                                          *
-#*         VERSION 2.9.19                2024-03-20         *
+#*         VERSION 2.9.21                2024-09-26         *
 #*                                                          *
 #*    The MadGraph5_aMC@NLO Development Team - Find us at   *
 #*    https://server06.fynu.ucl.ac.be/projects/madgraph     *
@@ -39,9 +39,9 @@ define l- = e- mu-
 define vl = ve vm vt
 define vl~ = ve~ vm~ vt~
 import model SMEFTsim_U35_alphaScheme_UFO
-define l- = e- mu- ta-
 define l+ = e+ mu+ ta+
+define l- = e- mu- ta-
 define q~ = u~ d~ s~ c~ b~
 define q = u d s c b
-generate q q~ > l+ l- l+ l- NP<=1 SMHLOOP=0 NPprop=0
-output standalone qq4l_SMEFTSim-standalone_all --prefix=int
+generate q q~ > l+ l- l+ l- NP<=1 SMHLOOP=0 NPprop=0 --diagram_filter
+output standalone qq4l-sig-SMEFTsim-standalone_all --prefix=int

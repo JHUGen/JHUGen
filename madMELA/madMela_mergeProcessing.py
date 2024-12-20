@@ -324,6 +324,10 @@ if __name__ == "__main__":
         "g++ -Wl,--whole-archive */SubProcesses/*{SIG,BKG,BSI}_renamed.a -Wl,--no-whole-archive -fPIC -lgfortran -shared -o libSMEFTSIM/libSMEFTsim.so > debug_compileAll 2>&1",
         shell=True
     )
+    subprocess.call(
+        "find . -xtype l -delete",
+        shell=True
+    )
     
         
     #g++ -Wl,--whole-archive */SubProcesses/*{SIG,BKG,BSI}_renamed.a -Wl,--no-whole-archive -fPIC -lgfortran -shared -o libSMEFTsim.so > debug_compileAll 2>&1
