@@ -120,7 +120,18 @@ C---setup propagators
       prop3456=dcmplx(s3456-hmass**2,htheta(s3456)*hmass*hwidth)
       prop1734=dcmplx(s1734-hmass**2,htheta(s1734)*hmass*hwidth)
       prop1756=dcmplx(s1756-hmass**2,htheta(s1756)*hmass*hwidth)
-
+c--- Jeff: Apply Form Factors regardless of width scheme
+      if (AllowAnomalousCouplings .eq. 1) then
+        prop3456 = prop3456 * 
+     &  (1d0+abs(s3456)/(Lambda_ff1**2))**n_ff1 * 
+     &  (1d0+abs(s3456)/(Lambda_ff2**2))**n_ff2
+        prop1734 = prop1734 * 
+     &  (1d0+abs(s1734)/(Lambda_ff1**2))**n_ff1 * 
+     &  (1d0+abs(s1734)/(Lambda_ff2**2))**n_ff2
+        prop1756 = prop1756 *    
+     &  (1d0+abs(s1756)/(Lambda_ff1**2))**n_ff1 * 
+     &  (1d0+abs(s1756)/(Lambda_ff2**2))**n_ff2
+      endif
       propX3456=dcmplx(s3456-h2mass**2,htheta(s3456)*h2mass*h2width)
       propX1734=dcmplx(s1734-h2mass**2,htheta(s1734)*h2mass*h2width)
       propX1756=dcmplx(s1756-h2mass**2,htheta(s1756)*h2mass*h2width)
