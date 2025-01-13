@@ -10,10 +10,10 @@ C
       REAL*8 P1(0:3)
       REAL*8 P2(0:3)
       COMPLEX*16 S3(*)
-      COMPLEX*16 TMP18
+      COMPLEX*16 TMP24
+      COMPLEX*16 TMP25
+      COMPLEX*16 TMP26
       COMPLEX*16 TMP27
-      COMPLEX*16 TMP28
-      COMPLEX*16 TMP9
       COMPLEX*16 V1(*)
       COMPLEX*16 V2(*)
       COMPLEX*16 VERTEX
@@ -25,11 +25,11 @@ C
       P2(1) = DBLE(V2(2))
       P2(2) = DIMAG(V2(2))
       P2(3) = DIMAG(V2(1))
-      TMP18 = (V2(3)*V1(3)-V2(4)*V1(4)-V2(5)*V1(5)-V2(6)*V1(6))
-      TMP27 = (P1(0)*V2(3)-P1(1)*V2(4)-P1(2)*V2(5)-P1(3)*V2(6))
-      TMP28 = (P2(0)*V1(3)-P2(1)*V1(4)-P2(2)*V1(5)-P2(3)*V1(6))
-      TMP9 = (P1(0)*P2(0)-P1(1)*P2(1)-P1(2)*P2(2)-P1(3)*P2(3))
-      VERTEX = COUP*S3(3)*(-CI*(TMP27*TMP28)+CI*(TMP9*TMP18))
+      TMP24 = (P1(0)*V2(3)-P1(1)*V2(4)-P1(2)*V2(5)-P1(3)*V2(6))
+      TMP25 = (P2(0)*V1(3)-P2(1)*V1(4)-P2(2)*V1(5)-P2(3)*V1(6))
+      TMP26 = (V2(3)*V1(3)-V2(4)*V1(4)-V2(5)*V1(5)-V2(6)*V1(6))
+      TMP27 = (P1(0)*P2(0)-P1(1)*P2(1)-P1(2)*P2(2)-P1(3)*P2(3))
+      VERTEX = COUP*S3(3)*(-CI*(TMP24*TMP25)+CI*(TMP26*TMP27))
       END
 
 
