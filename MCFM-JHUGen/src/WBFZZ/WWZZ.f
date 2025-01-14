@@ -117,6 +117,12 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
       propw28=dcmplx(s28-wmass**2,wmass*wwidth)
       propz3456=dcmplx(s3456-zmass**2,zmass*zwidth)
       prop3456=dcmplx(s3456-hmass**2,hmass*hwidth)
+c--- Jeff: Apply Form Factors regardless of width scheme
+      if (AllowAnomalousCouplings .eq. 1) then
+        prop3456 = prop3456 * 
+     &  (1d0+abs(s3456)/(Lambda_ff1**2))**n_ff1 * 
+     &  (1d0+abs(s3456)/(Lambda_ff2**2))**n_ff2
+      endif
       propWBF=propw17*propw28*prop34*prop56
 
       propX3456=dcmplx(s3456-h2mass**2,h2mass*h2width)
