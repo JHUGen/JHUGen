@@ -172,7 +172,7 @@
             lambda_v120 = (/ Lambda_w41, Lambda_w42, Lambda_w40 /)
          endif
       endif
-
+      ! print *, "COUPLINGS=",vvcoupl
       if(vvcoupl(2).ne.czip) then
          restmp = vvcoupl(2)*lambda_v**4
          restmp = restmp/(lambda_v**2+abs(sWp))

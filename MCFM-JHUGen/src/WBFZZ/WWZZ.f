@@ -30,7 +30,9 @@
       double complex anomhzzamp,anomhzaamp,anomhaaamp,anomhwwamp
       double complex anomhzzamp_c6_g1,anomhzzamp_c6_g2
       double complex anomhwwamp_c6_g1,anomhwwamp_c6_g2
-      double complex srL_anom,srR_anom
+      double complex srL_anom,srR_anom,sr_cW
+      double complex prefactor_cW,coeff_WWZZ_cW,coeff_WWAZ_cW
+      double complex coeff_WWAA_cW
 !$omp threadprivate(ZZ3456)
       t4(i1,i2,i3,i4)=
      & +s(i1,i2)+s(i1,i3)+s(i1,i4)
@@ -39,29 +41,29 @@
       zab2(i1,i2,i3,i4)=za(i1,i2)*zb(i2,i4)+za(i1,i3)*zb(i3,i4)
       zba2(i1,i2,i3,i4)=zb(i1,i2)*za(i2,i4)+zb(i1,i3)*za(i3,i4)
 
-      srL(i1,i2,i3,i4,i5,i6,i7,i8)=
-     & (2d0*zab2(i7,i2,i8,i1)*za(i3,i8)*zb(i6,i4)*zba2(i2,i4,i6,i5)
-     & -2d0*zab2(i8,i1,i7,i2)*za(i3,i7)*zb(i6,i4)*zba2(i1,i4,i6,i5)
-     & +((zab2(i3,i1,i7,i6)-zab2(i3,i2,i8,i6))*za(i6,i5)
-     & + (zab2(i3,i1,i7,i4)-zab2(i3,i2,i8,i4))*za(i4,i5))
-     & *za(i7,i8)*zb(i2,i1)*zb(i6,i4))/t3(i4,i5,i6)
-     &+(2d0*zab2(i8,i1,i7,i2)*za(i3,i5)*zb(i1,i4)*zba2(i6,i3,i5,i7)
-     & -2d0*zab2(i7,i2,i8,i1)*za(i3,i5)*zb(i2,i4)*zba2(i6,i3,i5,i8)
-     & +(zb(i6,i5)*(zab2(i5,i2,i8,i4)-zab2(i5,i1,i7,i4))
-     & + zb(i6,i3)*(zab2(i3,i2,i8,i4)-zab2(i3,i1,i7,i4)))
-     & *za(i7,i8)*za(i3,i5)*zb(i2,i1))/t3(i3,i5,i6)
+!       srL(i1,i2,i3,i4,i5,i6,i7,i8)=
+!      & (2d0*zab2(i7,i2,i8,i1)*za(i3,i8)*zb(i6,i4)*zba2(i2,i4,i6,i5)
+!      & -2d0*zab2(i8,i1,i7,i2)*za(i3,i7)*zb(i6,i4)*zba2(i1,i4,i6,i5)
+!      & +((zab2(i3,i1,i7,i6)-zab2(i3,i2,i8,i6))*za(i6,i5)
+!      & + (zab2(i3,i1,i7,i4)-zab2(i3,i2,i8,i4))*za(i4,i5))
+!      & *za(i7,i8)*zb(i2,i1)*zb(i6,i4))/t3(i4,i5,i6)
+!      &+(2d0*zab2(i8,i1,i7,i2)*za(i3,i5)*zb(i1,i4)*zba2(i6,i3,i5,i7)
+!      & -2d0*zab2(i7,i2,i8,i1)*za(i3,i5)*zb(i2,i4)*zba2(i6,i3,i5,i8)
+!      & +(zb(i6,i5)*(zab2(i5,i2,i8,i4)-zab2(i5,i1,i7,i4))
+!      & + zb(i6,i3)*(zab2(i3,i2,i8,i4)-zab2(i3,i1,i7,i4)))
+!      & *za(i7,i8)*za(i3,i5)*zb(i2,i1))/t3(i3,i5,i6)
 
-      srR(i1,i2,i3,i4,i5,i6,i7,i8)=
-     & (2d0*zab2(i7,i2,i8,i1)*zab2(i8,i4,i5,i6)*za(i5,i4)*zb(i3,i2)
-     & -2d0*zab2(i7,i4,i5,i6)*zab2(i8,i1,i7,i2)*za(i5,i4)*zb(i3,i1)
-     & +(zb(i5,i6)*(zba2(i3,i1,i7,i5)-zba2(i3,i2,i8,i5))
-     & + zb(i4,i6)*(zba2(i3,i1,i7,i4)-zba2(i3,i2,i8,i4)))
-     & *za(i7,i8)*za(i5,i4)*zb(i2,i1))/t3(i4,i5,i6)
-     &+(2d0*zab2(i8,i1,i7,i2)*zab2(i5,i3,i6,i1)*za(i7,i4)*zb(i3,i6)
-     & -2d0*zab2(i7,i2,i8,i1)*zab2(i5,i3,i6,i2)*za(i8,i4)*zb(i3,i6)
-     & +(za(i5,i6)*(zba2(i6,i2,i8,i4)-zba2(i6,i1,i7,i4))
-     & +za(i5,i3)*(zba2(i3,i2,i8,i4)-zba2(i3,i1,i7,i4)))
-     & *za(i7,i8)*zb(i2,i1)*zb(i3,i6))/t3(i3,i5,i6)
+!       srR(i1,i2,i3,i4,i5,i6,i7,i8)=
+!      & (2d0*zab2(i7,i2,i8,i1)*zab2(i8,i4,i5,i6)*za(i5,i4)*zb(i3,i2)
+!      & -2d0*zab2(i7,i4,i5,i6)*zab2(i8,i1,i7,i2)*za(i5,i4)*zb(i3,i1)
+!      & +(zb(i5,i6)*(zba2(i3,i1,i7,i5)-zba2(i3,i2,i8,i5))
+!      & + zb(i4,i6)*(zba2(i3,i1,i7,i4)-zba2(i3,i2,i8,i4)))
+!      & *za(i7,i8)*za(i5,i4)*zb(i2,i1))/t3(i4,i5,i6)
+!      &+(2d0*zab2(i8,i1,i7,i2)*zab2(i5,i3,i6,i1)*za(i7,i4)*zb(i3,i6)
+!      & -2d0*zab2(i7,i2,i8,i1)*zab2(i5,i3,i6,i2)*za(i8,i4)*zb(i3,i6)
+!      & +(za(i5,i6)*(zba2(i6,i2,i8,i4)-zba2(i6,i1,i7,i4))
+!      & +za(i5,i3)*(zba2(i3,i2,i8,i4)-zba2(i3,i1,i7,i4)))
+!      & *za(i7,i8)*zb(i2,i1)*zb(i3,i6))/t3(i3,i5,i6)
 C---end statement functions
 
       sinthw=sqrt(xw)
@@ -123,6 +125,14 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
       propz3456=dcmplx(s3456-zmass**2,zmass*zwidth)
       prop3456=dcmplx(s3456-hmass**2,hmass*hwidth)
       prop12=1d0/prop3456
+
+C--- N.Pinto: Prefactors for cW. Need to modify to incorporate effects of cPhiW and cPhiB! 
+      ! prefactor_cW = -6d0*dcmplx(0d0,1d0)*sqrt(esq)*(cone-cxw)/sinthw
+      prefactor_cW = -1d0
+      coeff_WWZZ_cW = -6d0*dcmplx(0d0,1d0)*sqrt(esq)*(cone-xw)/sinthw ! = -6ie(cos^2(theta_W)/sin(theta_W))
+      coeff_WWAZ_cW = 6d0*dcmplx(0d0,1d0)*sqrt(esq)*sqrt(cxw)         ! = 6iecos(theta_W)
+      coeff_WWAA_cW = -6d0*dcmplx(0d0,1d0)*sqrt(esq)*sinthw       ! = tan^2(theta_W)
+
 c--- Jeff: Apply Form Factors regardless of width scheme
       if (AllowAnomalousCouplings .eq. 1) then
         prop3456 = prop3456 * 
@@ -160,28 +170,43 @@ c--- Make sure WWZA vertices included
 !
 !       print *, "before",ggWW(:,:)
 
-      ggWW(1,1)=dcmplx(xq1/s34)*dcmplx(xq2/s56)* dAAWpWm
-     &         +rxw*dcmplx(xl1)/prop34*dcmplx(xq2/s56)* dZAWpWm
-     &         +dcmplx(xq1/s34)*rxw*dcmplx(xl2)/prop56* dZAWpWm
-     &         +rxw*dcmplx(xl1)/prop34*rxw*dcmplx(xl2)/prop56* dZZWpWm
+      ggWW(1,1)=dcmplx(xq1/s34)*dcmplx(xq2/s56)
+     & *(dAAWpWm-1+alpha_SMEW)
+     & +rxw*dcmplx(xl1)/prop34*dcmplx(xq2/s56)
+     & *(dZAWpWm-1+alpha_SMEW)
+     & +dcmplx(xq1/s34)*rxw*dcmplx(xl2)/prop56
+     & *(dZAWpWm-1+alpha_SMEW)
+     & +rxw*dcmplx(xl1)/prop34*rxw*dcmplx(xl2)/prop56
+     & *(dZZWpWm-1+alpha_SMEW)
 
 
-      ggWW(1,2)=dcmplx(xq1/s34)*dcmplx(xq2/s56)* dAAWpWm
-     &        +rxw*dcmplx(xl1)/prop34*dcmplx(xq2/s56)* dZAWpWm
-     &        +dcmplx(xq1/s34)*rxw*dcmplx(xr2)/prop56* dZAWpWm
-     &        +rxw*dcmplx(xl1)/prop34*rxw*dcmplx(xr2)/prop56* dZZWpWm
+      ggWW(1,2)=dcmplx(xq1/s34)*dcmplx(xq2/s56)
+     & *(dAAWpWm-1+alpha_SMEW)
+     & +rxw*dcmplx(xl1)/prop34*dcmplx(xq2/s56)
+     & *(dZAWpWm-1+alpha_SMEW)
+     & +dcmplx(xq1/s34)*rxw*dcmplx(xr2)/prop56
+     & *(dZAWpWm-1+alpha_SMEW)
+     & +rxw*dcmplx(xl1)/prop34*rxw*dcmplx(xr2)/prop56
+     & *(dZZWpWm-1+alpha_SMEW)
+
+      ggWW(2,1)=dcmplx(xq1/s34)*dcmplx(xq2/s56)
+     & *(dAAWpWm-1+alpha_SMEW)
+     & +rxw*dcmplx(xr1)/prop34*dcmplx(xq2/s56)
+     & *(dZAWpWm-1+alpha_SMEW)
+     & +dcmplx(xq1/s34)*rxw*dcmplx(xl2)/prop56
+     & *(dZAWpWm-1+alpha_SMEW)
+     & +rxw*dcmplx(xr1)/prop34*rxw*dcmplx(xl2)/prop56
+     & *(dZZWpWm-1+alpha_SMEW)
 
 
-      ggWW(2,1)=dcmplx(xq1/s34)*dcmplx(xq2/s56)* dAAWpWm
-     &         +rxw*dcmplx(xr1)/prop34*dcmplx(xq2/s56)* dZAWpWm
-     &         +dcmplx(xq1/s34)*rxw*dcmplx(xl2)/prop56* dZAWpWm
-     &         +rxw*dcmplx(xr1)/prop34*rxw*dcmplx(xl2)/prop56* dZZWpWm
-
-
-      ggWW(2,2)=dcmplx(xq1/s34)*dcmplx(xq2/s56)* dAAWpWm
-     &         +rxw*dcmplx(xr1)/prop34*dcmplx(xq2/s56)* dZAWpWm
-     &         +dcmplx(xq1/s34)*rxw*dcmplx(xr2)/prop56* dZAWpWm
-     &         +rxw*dcmplx(xr1)/prop34*rxw*dcmplx(xr2)/prop56* dZZWpWm
+      ggWW(2,2)=dcmplx(xq1/s34)*dcmplx(xq2/s56)*dAAWpWm
+     & *(dAAWpWm-1+alpha_SMEW)
+     & +rxw*dcmplx(xr1)/prop34*dcmplx(xq2/s56)
+     & *(dZAWpWm-1+alpha_SMEW)
+     & +dcmplx(xq1/s34)*rxw*dcmplx(xr2)/prop56
+     & *(dZAWpWm-1+alpha_SMEW)
+     & +rxw*dcmplx(xr1)/prop34*rxw*dcmplx(xr2)/prop56
+     & *(dZZWpWm-1+alpha_SMEW)
 
 !       print *, "after ",ggWW(:,:)
 !       pause
@@ -442,18 +467,45 @@ C----Background contribution
       i4=n4
       srWW(1,h56)=2d0/(cxw*propw17*propw28)*(
      & +srgmWW56(1,h56)
-     & *srL_anom(i1,i2,i3,i4,i5,i6,i7,i8,za,zb,dP_A,dM_A,dV_A,dFour_A)
+     & *srL_anom(i1,i2,i3,i4,i5,i6,i7,i8,za,zb,
+     & dP_A-1+alpha_SMEW,
+     & dM_A-1+alpha_SMEW,
+     & dV_A-1+alpha_SMEW,dFour_A)
      & +srZWW56(1,h56)
-     & *srL_anom(i1,i2,i3,i4,i5,i6,i7,i8,za,zb,dP_Z,dM_Z,dV_Z,dFour_Z)
+     & *srL_anom(i1,i2,i3,i4,i5,i6,i7,i8,za,zb,
+     & dP_Z-1+alpha_SMEW,
+     & dM_Z-1+alpha_SMEW,
+     & dV_Z-1+alpha_SMEW,dFour_Z)
      & )*BBit
 
       srWW(2,h56)=2d0/(cxw*propw17*propw28)*(
      & +srgmWW56(2,h56)
-     & *srR_anom(i1,i2,i3,i4,i5,i6,i7,i8,za,zb,dP_A,dM_A,dV_A,dFour_A)
+     & *srR_anom(i1,i2,i3,i4,i5,i6,i7,i8,za,zb,
+     & dP_A-1+alpha_SMEW,
+     & dM_A-1+alpha_SMEW,
+     & dV_A-1+alpha_SMEW,dFour_A)
      & +srZWW56(2,h56)
-     & *srR_anom(i1,i2,i3,i4,i5,i6,i7,i8,za,zb,dP_Z,dM_Z,dV_Z,dFour_Z)
+     & *srR_anom(i1,i2,i3,i4,i5,i6,i7,i8,za,zb,
+     & dP_Z-1+alpha_SMEW,
+     & dM_Z-1+alpha_SMEW,
+     & dV_Z-1+alpha_SMEW,dFour_Z)
      & )*BBit
 
+      srWW(1,h56)=srWW(1,h56)
+     & +prefactor_cW/(propw17*propw28)*(
+     & +coeff_WWZZ_cW*ZZ3456(1,h56)/(prop34*prop56)
+     & +coeff_WWAZ_cW*ZA3456(1,h56)/(prop34*s56)
+     & +coeff_WWAZ_cW*AZ3456(1,h56)/(s34*prop56)
+     & +coeff_WWAA_cW*AA3456(1,h56)/(s34*s56)
+     & )*sr_cW(i1,i2,i3,i4,i5,i6,i7,i8,za,zb,cW,LambdaBSM)*BBit
+
+      srWW(2,h56)=srWW(2,h56)
+     & +prefactor_cW/(propw17*propw28)*(
+     & +coeff_WWZZ_cW*ZZ3456(2,h56)/(prop34*prop56)
+     & +coeff_WWAZ_cW*ZA3456(2,h56)/(prop34*s56)
+     & +coeff_WWAZ_cW*AZ3456(2,h56)/(s34*prop56)
+     & +coeff_WWAA_cW*AA3456(2,h56)/(s34*s56)
+     & )*sr_cW(i1,i2,i3,i4,i5,i6,i7,i8,za,zb,cW,LambdaBSM)*BBit
 
       enddo
 
@@ -471,17 +523,46 @@ C----Background contribution
       i6=n6
       srWW(h34,1)=srWW(h34,1)+2d0/(cxw*propw17*propw28)*(
      & +srgmWW34(1,h34)
-     & *srL_anom(i1,i2,i5,i6,i3,i4,i7,i8,za,zb,dP_A,dM_A,dV_A,dFour_A)
+     & *srL_anom(i1,i2,i5,i6,i3,i4,i7,i8,za,zb,
+     & dP_A-1+alpha_SMEW,
+     & dM_A-1+alpha_SMEW,
+     & dV_A-1+alpha_SMEW,dFour_A)
      & +srZWW34(1,h34)
-     & *srL_anom(i1,i2,i5,i6,i3,i4,i7,i8,za,zb,dP_Z,dM_Z,dV_Z,dFour_Z)
+     & *srL_anom(i1,i2,i5,i6,i3,i4,i7,i8,za,zb,
+     & dP_Z-1+alpha_SMEW,
+     & dM_Z-1+alpha_SMEW,
+     & dV_Z-1+alpha_SMEW,dFour_Z)
      & )*BBit
 
       srWW(h34,2)=srWW(h34,2)+2d0/(cxw*propw17*propw28)*(
      & +srgmWW34(2,h34)
-     & *srR_anom(i1,i2,i5,i6,i3,i4,i7,i8,za,zb,dP_A,dM_A,dV_A,dFour_A)
+     & *srR_anom(i1,i2,i5,i6,i3,i4,i7,i8,za,zb,
+     & dP_A-1+alpha_SMEW,
+     & dM_A-1+alpha_SMEW,
+     & dV_A-1+alpha_SMEW,dFour_A)
      & +srZWW34(2,h34)
-     & *srR_anom(i1,i2,i5,i6,i3,i4,i7,i8,za,zb,dP_Z,dM_Z,dV_Z,dFour_Z)
+     & *srR_anom(i1,i2,i5,i6,i3,i4,i7,i8,za,zb,
+     & dP_Z-1+alpha_SMEW,
+     & dM_Z-1+alpha_SMEW,
+     & dV_Z-1+alpha_SMEW,dFour_Z)
      & )*BBit
+
+C--- N.Pinto: Add cW quartic gauge contributions (note swapped indices i3,i4 <-> i5,i6)
+      srWW(h34,1)=srWW(h34,1)
+     & +prefactor_cW/(propw17*propw28)*(
+     & +coeff_WWZZ_cW*ZZ3456(h34,1)/(prop34*prop56)
+     & +coeff_WWAZ_cW*ZA3456(h34,1)/(prop34*s56)
+     & +coeff_WWAZ_cW*AZ3456(h34,1)/(s34*prop56)
+     & +coeff_WWAA_cW*AA3456(h34,1)/(s34*s56)
+     & )*sr_cW(i1,i2,i5,i6,i3,i4,i7,i8,za,zb,cW,LambdaBSM)*BBit
+
+      srWW(h34,2)=srWW(h34,2)
+     & +prefactor_cW/(propw17*propw28)*(
+     & +coeff_WWZZ_cW*ZZ3456(h34,2)/(prop34*prop56)
+     & +coeff_WWAZ_cW*ZA3456(h34,2)/(prop34*s56)
+     & +coeff_WWAZ_cW*AZ3456(h34,2)/(s34*prop56)
+     & +coeff_WWAA_cW*AA3456(h34,2)/(s34*s56)
+     & )*sr_cW(i1,i2,i5,i6,i3,i4,i7,i8,za,zb,cW,LambdaBSM)*BBit
 
       enddo
 
@@ -785,5 +866,62 @@ C----Background contribution
      -        zb(i6,i8)))/t356
 
 
+      return
+      end
+
+      function sr_cW(i1,i2,i3,i4,i5,i6,i7,i8,za,zb,cW,LambdaBSM)
+      implicit none
+      include 'constants.f'
+      include 'zprods_decl.f'
+      include 'sprods_com.f'
+      double complex sr_cW,cW
+      double precision LambdaBSM
+      double complex zab2
+      double complex, parameter :: cI=(0d0,1d0)
+      integer i1,i2,i3,i4,i5,i6,i7,i8
+      
+C---statement function
+      zab2(i1,i2,i3,i4)=za(i1,i2)*zb(i2,i4)+za(i1,i3)*zb(i3,i4)
+C---end statement function
+      
+      sr_cW = (1/LambdaBSM**2)*cW*(
+     & 2d0*za(i7,i3)*zb(i4,i1)*zab2(i8,i3,i4,i2)*zab2(i5,i7,i1,i6)
+     & -2d0*za(i7,i3)*zb(i4,i1)*zab2(i8,i7,i1,i2)*zab2(i5,i3,i4,i6)
+     & -2d0*za(i7,i3)*zb(i4,i1)*zab2(i8,i5,i6,i2)*zab2(i5,i7,i1,i6)
+     & -2d0*za(i7,i3)*zb(i4,i1)*zab2(i8,i3,i4,i2)*zab2(i5,i8,i2,i6)
+     & +2d0*za(i7,i5)*zb(i6,i1)*zab2(i8,i5,i6,i2)*zab2(i3,i7,i1,i4)
+     & -2d0*za(i7,i5)*zb(i6,i1)*zab2(i8,i7,i1,i2)*zab2(i3,i5,i6,i4)
+     & -2d0*za(i7,i5)*zb(i6,i1)*zab2(i8,i3,i4,i2)*zab2(i3,i7,i1,i4)
+     & -2d0*za(i7,i5)*zb(i6,i1)*zab2(i8,i5,i6,i2)*zab2(i3,i8,i2,i4)
+     & +2d0*za(i8,i3)*zb(i4,i2)*zab2(i7,i3,i4,i1)*zab2(i5,i8,i2,i6)
+     & -2d0*za(i8,i3)*zb(i4,i2)*zab2(i7,i8,i2,i1)*zab2(i5,i3,i4,i6)
+     & -2d0*za(i8,i3)*zb(i4,i2)*zab2(i7,i5,i6,i1)*zab2(i5,i8,i2,i6)
+     & -2d0*za(i8,i3)*zb(i4,i2)*zab2(i7,i3,i4,i1)*zab2(i5,i7,i1,i6)
+     & +2d0*za(i8,i5)*zb(i6,i2)*zab2(i7,i5,i6,i1)*zab2(i3,i8,i2,i4)
+     & -2d0*za(i8,i5)*zb(i6,i2)*zab2(i7,i8,i2,i1)*zab2(i3,i5,i6,i4)
+     & -2d0*za(i8,i5)*zb(i6,i2)*zab2(i7,i3,i4,i1)*zab2(i3,i8,i2,i4)
+     & -2d0*za(i8,i5)*zb(i6,i2)*zab2(i7,i5,i6,i1)*zab2(i3,i7,i1,i4)
+     & -2d0*za(i7,i8)*zb(i2,i1)*zab2(i3,i5,i6,i4)*zab2(i5,i3,i4,i6)
+     & -2d0*za(i7,i8)*zb(i2,i1)*zab2(i5,i3,i4,i6)*zab2(i3,i5,i6,i4)
+     & -2d0*za(i3,i5)*zb(i6,i4)*zab2(i7,i8,i2,i1)*zab2(i8,i7,i1,i2)
+     & -2d0*za(i3,i5)*zb(i6,i4)*zab2(i8,i7,i1,i2)*zab2(i7,i8,i2,i1)
+     & +2d0*za(i7,i3)*zb(i4,i1)*za(i8,i5)*zb(i6,i2)
+     & *(s(i7,i5)+s(i7,i6)+s(i1,i5)+s(i1,i6))
+     & +2d0*za(i7,i3)*zb(i4,i1)*za(i8,i5)*zb(i6,i2)
+     & *(s(i8,i3)+s(i8,i4)+s(i2,i3)+s(i2,i4))
+     & +2d0*za(i7,i5)*zb(i6,i1)*za(i8,i3)*zb(i4,i2)
+     & *(s(i7,i3)+s(i7,i4)+s(i1,i3)+s(i1,i4))
+     & +2d0*za(i7,i5)*zb(i6,i1)*za(i8,i3)*zb(i4,i2)
+     & *(s(i8,i5)+s(i8,i6)+s(i2,i5)+s(i2,i6))
+     & -2d0*za(i7,i8)*zb(i2,i1)*za(i3,i5)*zb(i6,i4)
+     & *(s(i7,i3)+s(i7,i4)+s(i1,i3)+s(i1,i4))
+     & -2d0*za(i7,i8)*zb(i2,i1)*za(i3,i5)*zb(i6,i4)
+     & *(s(i7,i5)+s(i7,i6)+s(i1,i5)+s(i1,i6))
+     & -2d0*za(i7,i8)*zb(i2,i1)*za(i3,i5)*zb(i6,i4)
+     & *(s(i8,i3)+s(i8,i4)+s(i2,i3)+s(i2,i4))
+     & -2d0*za(i7,i8)*zb(i2,i1)*za(i3,i5)*zb(i6,i4)
+     & *(s(i8,i5)+s(i8,i6)+s(i2,i5)+s(i2,i6))
+     & )
+      
       return
       end

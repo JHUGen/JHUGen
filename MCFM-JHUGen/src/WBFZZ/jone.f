@@ -8,14 +8,15 @@
       include 'sprods_com.f'
       include 'zprods_decl.f'
       include 'zacouplejk.f'
-      include 'spinzerohiggs_anomcoupl.f'      
+      include 'spinzerohiggs_anomcoupl.f'
       integer h12,h34,i1,i2,i3,i4,n1,n2,n3,n4,jdu
-      double precision s12,s34,s123,s124,s134,s234,bit,
+      double precision s12,s34,s123,s124,s134,s234,s1234,bit,
      & xl,xr,xq
       double complex zab(mxpart,4,mxpart),zba(mxpart,4,mxpart),
      & j1(4,2,2,2),propz34,propz12,propw12,gmZ(2,2,2),gmZ12(2,2,2),
      & after(4,2,2),before(4,2,2),jw(4,2,2),zab2,rxw,
      & j1l(4,2,2,2),WWZ(2,2,2),WWgm(2,2,2) !,WWgmZ(2,2,2)
+      double complex coeff_WWZ_cW, coeff_WWA_cW
 C      after(mu,h17,h34),before(mu,h17,h34),jw(mu,jdu,h34)
 C---The one Z-current multiplied by i
 C---order of indices Lorentz,jdu up or down,
@@ -51,8 +52,11 @@ c      bit=0d0
 c      else
       bit=1d0
 c      endif
-
+      coeff_WWZ_cW = -6d0*dcmplx(0d0,1d0)*sqrt(cxw) ! -6icos(theta_w) Needs to fixed for cPhiW and cPhiB effects. 
+      coeff_WWA_cW = -6d0*dcmplx(0d0,1d0)*sqrt(cone-cxw) !  -6isin(theta_w)
 C---setting up couplings dependent on whether we are doing 34-line or 56-line
+      coeff_WWZ_cW = -6d0*dcmplx(0d0,1d0)*sqrt(cxw) ! -6icos(theta_w) Needs to fixed for cPhiW and cPhiB effects. 
+      coeff_WWA_cW = -6d0*dcmplx(0d0,1d0)*sqrt(cone-cxw) !  -6isin(theta_w)
       if ((n3+n4 == 7) .or. (n3+n4 == 9)) then
       xl=l1
       xr=r1
@@ -68,6 +72,7 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
 
       s34=s(n3,n4)
       s12=s(n1,n2)
+      s1234 = s(n1,n2)+s(n1,n3)+s(n1,n4)+s(n2,n3)+s(n2,n4)+s(n3,n4)
       propz34=dcmplx(s34-zmass**2,zmass*zwidth)
       propz12=dcmplx(s12-zmass**2,zmass*zwidth)
       propw12=dcmplx(s12-wmass**2,wmass*wwidth)
@@ -99,12 +104,12 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
 !       WWgmZ(jdu,1,2)=-(dcmplx(bit*xq/s34)+dcmplx(xr)*rxw/propz34)
 !       WWgmZ(jdu,2,1)=-(dcmplx(bit*xq/s34)+dcmplx(xl)*rxw/propz34)
 !       WWgmZ(jdu,2,2)=-(dcmplx(bit*xq/s34)+dcmplx(xr)*rxw/propz34)
-      
+
       WWgm(jdu,1,1)=-(dcmplx(bit*xq/s34))
       WWgm(jdu,1,2)=-(dcmplx(bit*xq/s34))
       WWgm(jdu,2,1)=-(dcmplx(bit*xq/s34))
       WWgm(jdu,2,2)=-(dcmplx(bit*xq/s34))
-      
+
       WWZ(jdu,1,1)=-(dcmplx(xl)*rxw/propz34)
       WWZ(jdu,1,2)=-(dcmplx(xr)*rxw/propz34)
       WWZ(jdu,2,1)=-(dcmplx(xl)*rxw/propz34)
@@ -115,12 +120,12 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
 !       WWgmZ(jdu,1,2)=(dcmplx(bit*xq/s34)+dcmplx(xr)*rxw/propz34)
 !       WWgmZ(jdu,2,1)=(dcmplx(bit*xq/s34)+dcmplx(xl)*rxw/propz34)
 !       WWgmZ(jdu,2,2)=(dcmplx(bit*xq/s34)+dcmplx(xr)*rxw/propz34)
-      
+
       WWgm(jdu,1,1)=(dcmplx(bit*xq/s34))
       WWgm(jdu,1,2)=(dcmplx(bit*xq/s34))
       WWgm(jdu,2,1)=(dcmplx(bit*xq/s34))
       WWgm(jdu,2,2)=(dcmplx(bit*xq/s34))
-      
+
       WWZ(jdu,1,1)=(dcmplx(xl)*rxw/propz34)
       WWZ(jdu,1,2)=(dcmplx(xr)*rxw/propz34)
       WWZ(jdu,2,1)=(dcmplx(xl)*rxw/propz34)
@@ -153,7 +158,7 @@ C---indices before(mu,h12,h34),after(mu,h12,h34)
       after(:,2,h34)=
      & -zb(i2,i4)*(za(i3,i2)*zba(i2,:,i1)+za(i3,i4)*zba(i4,:,i1))/s234
 
-      
+
 
       do jdu=1,2
 ! C----Gamma/Z attachment to quark line
@@ -165,52 +170,109 @@ C---indices before(mu,h12,h34),after(mu,h12,h34)
 !      & *(zab2(i3,i1,i2,i4)*zab(i2,:,i1)-zab2(i2,i3,i4,i1)*zab(i3,:,i4)
 !      &  -0.5d0*za(i2,i3)*zb(i4,i1)
 !      & *(zab(i1,:,i1)+zab(i2,:,i2)-zab(i3,:,i3)-zab(i4,:,i4)))
-! 
+!
 !       print *, "check old jone",jdu,jw(:,jdu,h34)
-     
-     
-! C----Gamma/Z attachment to quark line      
-!    MARKUS: this is the new VWW vertex with anomalous couplings dV,dP,dM,dFour      
-      jw(:,jdu,h34)=
-     &     gmZ(jdu,1,h34)*before(:,1,h34)
-     &    +gmZ(3-jdu,1,h34)*after(:,1,h34)     
-C----Gamma attachment to exchanged W     
+
+
+! C----Gamma/Z attachment to quark line
+!    MARKUS: this is the new VWW vertex with anomalous couplings dV,dP,dM,dFour
+!    MOHIT: Added alpha_SMEW to allow for SM background amplitude to go to 0
+!    MOHIT: when alpha_SMEW=0 and no BSM, amplitude should be 0!
+      jw(:,jdu,h34) =
+     &     alpha_SMEW*gmZ(jdu,1,h34)*before(:,1,h34)
+     &    +alpha_SMEW*gmZ(3-jdu,1,h34)*after(:,1,h34)
+C----Gamma attachment to exchanged W
      & +(WWgm(jdu,1,h34))/propw12*0.5d0*
-     & (-(((dM_A + dP_A)*za(i1,i3)*zab(i2,:,i1) 
-     & + im*dFour_A*za(i3,i4)*zab(i2,:,i4) 
-     & - (dM_A + dV_A)*za(i2,i4)*zab(i3,:,i4))*zb(i1,i4))
-     & + za(i2,i3)*((dM_A + dV_A)*zab(i3,:,i4)*zb(i1,i3) 
-     & + dP_A*(zab(i1,:,i1) + zab(i2,:,i2))*zb(i1,i4) 
-     & - dV_A*(zab(i3,:,i3) + zab(i4,:,i4))*zb(i1,i4) 
-     & - (dM_A + dP_A)*zab(i2,:,i1)*zb(i2,i4) 
+     & (-(((dM_A + dP_A - 2)*za(i1,i3)*zab(i2,:,i1)
+     & + im*dFour_A*za(i3,i4)*zab(i2,:,i4)
+     & - (dM_A + dV_A - 2)*za(i2,i4)*zab(i3,:,i4))*zb(i1,i4))
+     & + za(i2,i3)*((dM_A + dV_A - 2)*zab(i3,:,i4)*zb(i1,i3)
+     & + (dP_A - 1)*(zab(i1,:,i1) + zab(i2,:,i2))*zb(i1,i4)
+     & - (dV_A - 1)*(zab(i3,:,i3) + zab(i4,:,i4))*zb(i1,i4)
+     & - (dM_A + dP_A - 2)*zab(i2,:,i1)*zb(i2,i4)
      & - im*dFour_A*zab(i3,:,i1)*zb(i3,i4)))
-C----Z attachment to exchanged W          
+C----SM portion to deal with alpha_SMEW
+     & +(WWgm(jdu,1,h34))/propw12*0.5d0*alpha_SMEW*
+     & (-((2*za(i1,i3)*zab(i2,:,i1)
+     & - 2*za(i2,i4)*zab(i3,:,i4))*zb(i1,i4))
+     & + za(i2,i3)*(2*zab(i3,:,i4)*zb(i1,i3)
+     & + (zab(i1,:,i1) + zab(i2,:,i2))*zb(i1,i4)
+     & - (zab(i3,:,i3) + zab(i4,:,i4))*zb(i1,i4)
+     & - 2*zab(i2,:,i1)*zb(i2,i4)))
+C----Z attachment to exchanged W
      & +(WWZ(jdu,1,h34))/propw12*0.5d0*
-     & (-(((dM_Z + dP_Z)*za(i1,i3)*zab(i2,:,i1) 
-     & + im*dFour_Z*za(i3,i4)*zab(i2,:,i4) 
-     & - (dM_Z + dV_Z)*za(i2,i4)*zab(i3,:,i4))*zb(i1,i4))
-     & + za(i2,i3)*((dM_Z + dV_Z)*zab(i3,:,i4)*zb(i1,i3) 
-     & + dP_Z*(zab(i1,:,i1) + zab(i2,:,i2))*zb(i1,i4) 
-     & - dV_Z*(zab(i3,:,i3) + zab(i4,:,i4))*zb(i1,i4) 
-     & - (dM_Z + dP_Z)*zab(i2,:,i1)*zb(i2,i4) 
+     & (-(((dM_Z + dP_Z - 2)*za(i1,i3)*zab(i2,:,i1)
+     & + im*dFour_Z*za(i3,i4)*zab(i2,:,i4)
+     & - (dM_Z + dV_Z - 2)*za(i2,i4)*zab(i3,:,i4))*zb(i1,i4))
+     & + za(i2,i3)*((dM_Z + dV_Z - 2)*zab(i3,:,i4)*zb(i1,i3)
+     & + (dP_Z - 1)*(zab(i1,:,i1) + zab(i2,:,i2))*zb(i1,i4)
+     & - (dV_Z - 1)*(zab(i3,:,i3) + zab(i4,:,i4))*zb(i1,i4)
+     & - (dM_Z + dP_Z - 2)*zab(i2,:,i1)*zb(i2,i4)
      & - im*dFour_Z*zab(i3,:,i1)*zb(i3,i4)))
-     
-!       print *, "check new jone",jdu,jw(:,jdu,h34)
-!       pause
+C----SM portion to deal with alpha_SMEW
+     & +(WWZ(jdu,1,h34))/propw12*0.5d0*alpha_SMEW*
+     & (-(((2)*za(i1,i3)*zab(i2,:,i1)
+     & - (2)*za(i2,i4)*zab(i3,:,i4))*zb(i1,i4))
+     & + za(i2,i3)*((2)*zab(i3,:,i4)*zb(i1,i3)
+     & + (zab(i1,:,i1) + zab(i2,:,i2))*zb(i1,i4)
+     & - (zab(i3,:,i3) + zab(i4,:,i4))*zb(i1,i4)
+     & - (2)*zab(i2,:,i1)*zb(i2,i4)))
+C----N.Pinto: WWZ vertex contribution from cW in warsaw basis: -1d0 is an ad-hoc correction to match momentum convention. 
+     & + -1d0*coeff_WWZ_cW*(1/LambdaBSM**2)*cW*(WWZ(jdu,1,h34))/propw12
+     & *(
+     & -zab2(i2,i3,i4,i1)*zab2(i3,i1,i2,i4)
+     & *0.5d0*(zab(i3,:,i3)+zab(i4,:,i4))
+     & +zab2(i2,i3,i4,i1)*zab2(i3,i1,i2,i4)
+     & *0.5d0*(zab(i1,:,i1)+zab(i2,:,i2))
+     & +2*za(i2,i3)*zb(i4,i1)*(0.5d0*(zab(i1,:,i1)+zab(i2,:,i2))
+     & *(-0.5d0*(s1234 - s(i1,i2)+s(i3,i4))) !eta_mu1mu2 line starts here
+     & - 0.5d0*(zab(i3,:,i3)+zab(i4,:,i4))
+     & *(-0.5d0*(s1234 + (s(i1,i2) - s(i3,i4))))) 
+     & +zab(i3,:,i4)*(zab2(i2,i3,i4,i1)
+     & *(-0.5d0*(s1234 + s(i1,i2) - s(i3,i4))) !eta_mu2mu3 line starts here
+     & + zab2(i2,i3,i4,i1)
+     & *(0.5d0*(s1234 - s(i1,i2) - s(i3,i4)))) 
+     & +zab(i2,:,i1)*(-1d0*zab2(i3,i1,i2,i4)
+     & *(0.5d0*(s1234 - s(i1,i2) - s(i3,i4))) ! eta_mu3mu1 line starts here 
+     & -zab2(i3,i1,i2,i4)*(-0.5d0*(s1234 - s(i1,i2) + s(i3,i4))))
+     & )
+C----N.Pinto: WWgam vertex contribution from cW in warsaw basis: 
+     & + -1d0*coeff_WWA_cW*(1/LambdaBSM**2)*cW*(WWgm(jdu,1,h34))/propw12
+     & *(
+     & -zab2(i2,i3,i4,i1)*zab2(i3,i1,i2,i4)
+     & *0.5d0*(zab(i3,:,i3)+zab(i4,:,i4))
+     & +zab2(i2,i3,i4,i1)*zab2(i3,i1,i2,i4)
+     & *0.5d0*(zab(i1,:,i1)+zab(i2,:,i2))
+     & +2*za(i2,i3)*zb(i4,i1)*(0.5d0*(zab(i1,:,i1)+zab(i2,:,i2))
+     & *(-0.5d0*(s1234 - s(i1,i2)+s(i3,i4))) !eta_mu1mu2 line starts here
+     & - 0.5d0*(zab(i3,:,i3)+zab(i4,:,i4))
+     & *(-0.5d0*(s1234 + (s(i1,i2) - s(i3,i4))))) 
+     & +zab(i3,:,i4)*(zab2(i2,i3,i4,i1)
+     & *(-0.5d0*(s1234 + s(i1,i2) - s(i3,i4))) !eta_mu2mu3 line starts here
+     & + zab2(i2,i3,i4,i1)
+     & *(0.5d0*(s1234 - s(i1,i2) - s(i3,i4)))) 
+     & +zab(i2,:,i1)*(-1d0*zab2(i3,i1,i2,i4)
+     & *(0.5d0*(s1234 - s(i1,i2) - s(i3,i4))) ! eta_mu3mu1 line starts here 
+     & -zab2(i3,i1,i2,i4)
+     & *(-0.5d0*(s1234 - s(i1,i2) + s(i3,i4)))))
+      ! print *, "check cW",cW
+      ! pause
 
 
-! 
+!
 C----non-resonant e-e+ production by exchanged W-line.
       if (h34 .eq. 1) then
       if (((jdu .eq. 1) .and. (xq .le. 0d0)) .or.
      &    ((jdu .eq. 2) .and. (xq .ge. 0d0))) then
       jw(:,jdu,h34)=jw(:,jdu,h34)
-     & -(zb(i1,i2)*zab(i2,:,i4)+zb(i1,i3)*zab(i3,:,i4))*za(i3,i2)*bit
+     & -(zb(i1,i2)*zab(i2,:,i4)+zb(i1,i3)*zab(i3,:,i4))
+     & *za(i3,i2)*bit*alpha_SMEW
      & /(2d0*cxw*propw12*s123)
       elseif (((jdu .eq. 2) .and. (xq .le. 0d0)) .or.
      &        ((jdu .eq. 1) .and. (xq .ge. 0d0))) then
       jw(:,jdu,h34)=jw(:,jdu,h34)
-     & +(zab(i3,:,i1)*za(i1,i2)+zab(i3,:,i4)*za(i4,i2))*zb(i1,i4)*bit
+     & +(zab(i3,:,i1)*za(i1,i2)+zab(i3,:,i4)*za(i4,i2))
+     & *zb(i1,i4)*bit*alpha_SMEW
      & /(2d0*cxw*propw12*s124)
       endif
       endif
@@ -221,20 +283,21 @@ C---add normalization factor
 C--Apply couplings for jdu=1,2 to j1
       do h12=1,2
       j1(:,jdu,h12,h34)=
-     & 2d0*gmZ(jdu,h12,h34)*(before(:,h12,h34)+after(:,h12,h34))
+     & alpha_SMEW*2d0*gmZ(jdu,h12,h34)
+     & *(before(:,h12,h34)+after(:,h12,h34))
       enddo
 
 C----non-resonant e-e+ production by exchanged Z/gamma-line.
       j1l(:,jdu,1,h34)=
      & -(zb(i1,i2)*zab(i2,:,i4)+zb(i1,i3)*zab(i3,:,i4))*za(i3,i2)*bit
-     & *gmZ12(jdu,1,h34)/s123*2d0
+     & *gmZ12(jdu,1,h34)*alpha_SMEW/s123*2d0
      & +(zab(i3,:,i1)*za(i1,i2)+zab(i3,:,i4)*za(i4,i2))*zb(i1,i4)*bit
-     & *gmZ12(jdu,1,h34)/s124*2d0
+     & *gmZ12(jdu,1,h34)*alpha_SMEW/s124*2d0
       j1l(:,jdu,2,h34)=
      & -(zb(i2,i1)*zab(i1,:,i4)+zb(i2,i3)*zab(i3,:,i4))*za(i3,i1)*bit
-     & *gmZ12(jdu,2,h34)/s123*2d0
+     & *gmZ12(jdu,2,h34)*alpha_SMEW/s123*2d0
      & +(zab(i3,:,i2)*za(i2,i1)+zab(i3,:,i4)*za(i4,i1))*zb(i2,i4)*bit
-     & *gmZ12(jdu,2,h34)/s124*2d0
+     & *gmZ12(jdu,2,h34)*alpha_SMEW/s124*2d0
 
 c--- to get opposite helicity, 3<->4 swap needs additional minus sign
       if (h34 .eq. 2) then

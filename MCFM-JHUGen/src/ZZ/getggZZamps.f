@@ -64,7 +64,7 @@ c--- omit t,b quark loops for pt(Z) < "ptZsafetycut_massive"  (for num. stabilit
          qlfirst=.false.
       endif
 
-c--- set up spinor products      
+c--- set up spinor products
       call spinoru(6,p,za,zb)
 
 c--- if this variable (passed via common block) is true then
@@ -119,7 +119,7 @@ c--- a64v amplitudes have overall color factor delta(A,B);
 c--- put in factor of two to extract delta(A,B)/2 as in massive case
         Avec(:,:,:,:)=2d0*Avec(:,:,:,:)
       endif
-      
+
 c--- compute amplitudes with a massive bottom quark internal loop
       if (dobottom) then
         if (ggZZuse6d) then ! scalar integrals including 6-d box
@@ -128,7 +128,7 @@ c--- compute amplitudes with a massive bottom quark internal loop
           call ggZZmassamp(p,za,zb,mb,AmbLL,AmbLR)
         endif
       endif
-      
+
 c--- compute amplitudes with a massive top quark internal loop
       if (dotop) then
         if (docheck) write(6,*) '>>>>>> TOP AMPLITUDE <<<<<'
@@ -148,7 +148,7 @@ c--- compute amplitudes with a massive top quark internal loop
           write(6,'(a15,SP,2e20.10)') 'AmtLL(1,2,1,1)',AmtLL(1,2,1,1)
           stop
         endif
-      endif      
+      endif
 
 c--- propagator factors
       prop34=s(3,4)/dcmplx(s(3,4)-zmass**2,zmass*zwidth)
@@ -156,35 +156,35 @@ c--- propagator factors
 
 c--- left and right-handed lepton couplings as an array
 c--- cl1 associated with Z(3+4), cl2 associated with Z(5+6)
-      cl1(1)=l1 
+      cl1(1)=l1
       cl1(2)=r1
       cl2(1)=l2
       cl2(2)=r2
 
-c --- Modifications to lepton couplings as arrays for anomalous Zll couplings 
+c --- Modifications to lepton couplings as arrays for anomalous Zll couplings
 c --- Modified by Jeff
       if (AllowAnomalousZffCouplings .eq. 1) then
         if ((plabel(3) .eq. 'el') .or. (plabel(3) .eq. 'ml')
      &.or. (plabel(3) .eq. 'tl')) then
           cl1(1) = leZ
-          cl1(2) = reZ 
+          cl1(2) = reZ
         elseif (plabel(3) .eq. 'nl') then
           cl1(1) = lnZ*dsqrt(3d0)
-          cl1(2) = rnZ*dsqrt(3d0) 
+          cl1(2) = rnZ*dsqrt(3d0)
         elseif ((plabel(5) .eq. 'bq') .or. (plabel(5) .eq. 'sq')
      &.or. (plabel(5) .eq. 'dq')) then
           cl1(1)=lqdZ*dsqrt(3d0)
           cl1(2)=rqdZ*dsqrt(3d0)
         elseif ((plabel(5) .eq. 'uq') .or. (plabel(5) .eq. 'cq')) then
           cl1(1)=lquZ*dsqrt(3d0)
-          cl1(2)=rquZ*dsqrt(3d0) 
+          cl1(2)=rquZ*dsqrt(3d0)
         endif
       endif
       if (AllowAnomalousZffCouplings .eq. 1) then
         if ((plabel(5) .eq. 'el') .or. (plabel(5) .eq. 'ml')
      &.or. (plabel(5) .eq. 'tl')) then
           cl2(1) = leZ
-          cl2(2) = reZ 
+          cl2(2) = reZ
         elseif (plabel(5) .eq. 'nl') then
           cl2(1) = lnZ*dsqrt(3d0)
           cl2(2) = rnZ*dsqrt(3d0)
@@ -194,7 +194,7 @@ c --- Modified by Jeff
           cl2(2)=rqdZ*dsqrt(3d0)
         elseif ((plabel(5) .eq. 'uq') .or. (plabel(5) .eq. 'cq')) then
           cl2(1)=lquZ*dsqrt(3d0)
-          cl2(2)=rquZ*dsqrt(3d0)  
+          cl2(2)=rquZ*dsqrt(3d0)
         endif
       endif
 
@@ -207,7 +207,7 @@ c--- vector and axial couplings as an array for up/down quarks
       cax(3)=half*(L(up)-R(up))
 
 c--- Optionally will add shifts to SM up and down type Zqq couplings
-      if (AllowAnomalousZffCouplings .eq. 1) then 
+      if (AllowAnomalousZffCouplings .eq. 1) then
         cvec(up)=half*(L(up)+R(up)) + (clanou+cranou)/2.
         cvec(dn)=half*(L(dn)+R(dn)) + (clanod+cranod)/2.
         cvec(3)=half*(L(up)+R(up)) + (clanot+cranot)/2.
@@ -223,11 +223,11 @@ c--- dress vector and axial amplitudes with appropriate couplings
       do h56=1,2
 
       if (dolight) then
-c--- internal loops of massless up-type quarks      
+c--- internal loops of massless up-type quarks
         Mloop_uptype(h1,h2,h34,h56)=Avec(h1,h2,h34,h56)*(
      & (Qu*q1+cvec(up)*cl1(h34)*prop34)*(Qu*q2+cvec(up)*cl2(h56)*prop56)
-     & +(cax(up)*cl1(h34)*prop34)*(cax(up)*cl2(h56)*prop56))      
-c--- internal loops of massless down-type quarks      
+     & +(cax(up)*cl1(h34)*prop34)*(cax(up)*cl2(h56)*prop56))
+c--- internal loops of massless down-type quarks
         Mloop_dntype(h1,h2,h34,h56)=Avec(h1,h2,h34,h56)*(
      & (Qd*q1+cvec(dn)*cl1(h34)*prop34)*(Qd*q2+cvec(dn)*cl2(h56)*prop56)
      & +(cax(dn)*cl1(h34)*prop34)*(cax(dn)*cl2(h56)*prop56))
@@ -235,7 +235,7 @@ c--- internal loops of massless down-type quarks
         Mloop_uptype(h1,h2,h34,h56)=czip
         Mloop_dntype(h1,h2,h34,h56)=czip
       endif
-      
+
       if (dobottom) then
 c--- implementation of b-quark loop in terms of vector and axial couplings
         Amb_vec=2d0*(AmbLL(h1,h2,h34,h56)+AmbLR(h1,h2,h34,h56))
@@ -247,7 +247,7 @@ c--- implementation of b-quark loop in terms of vector and axial couplings
       else
         Mloop_bquark(h1,h2,h34,h56)=czip
       endif
-      
+
       if (dotop) then
 c--- implementation of t-quark loop in terms of vector and axial couplings
       Amt_vec=2d0*(AmtLL(h1,h2,h34,h56)+AmtLR(h1,h2,h34,h56))
@@ -259,24 +259,24 @@ c--- implementation of t-quark loop in terms of vector and axial couplings
       else
         Mloop_tquark(h1,h2,h34,h56)=czip
       endif
-      
+
       enddo
       enddo
       enddo
       enddo
 
-c--- remove contributions if in unstable regions (pt(Z) small)          
+c--- remove contributions if in unstable regions (pt(Z) small)
       ptZ=pttwo(3,4,p)
       if (ptZ .lt. ptZsafetycut_massless) then
         Mloop_uptype(:,:,:,:)=czip
         Mloop_dntype(:,:,:,:)=czip
         Mloop_bquark(:,:,:,:)=czip
-      endif  
+      endif
       if (ptZ .lt. ptZsafetycut_massive) then
         Mloop_tquark(:,:,:,:)=czip
-      endif  
-            
+      endif
+
       return
       end
-      
-      
+
+

@@ -8,6 +8,7 @@
       include 'zprods_decl.f'
       include 'anom_higgs.f'
       include 'WWbits.f'
+      include 'spinzerohiggs_anomcoupl.f'
       integer nmax
       parameter(nmax=10)
       integer k,l,
@@ -73,11 +74,18 @@ c--- propagators and currents are not used in calculation of Higgs contribution
      & ll7341,ll7561,ll7342,ll7562,
      & gmZl7341,gmZl7561,gmZl7342,gmZl7562,
      & gmZl8562,gmZl8342,gmZl8561,gmZl8341)
-
-      call jzero(j7,j1,zab,zba,j7_1)
-      call jzero(j7,j2,zab,zba,j7_2)
-      call jzero(j8,j1,zab,zba,j8_1)
-      call jzero(j8,j2,zab,zba,j8_2)
+      
+      if (alpha_SMEW .ne. 0) then
+            call jzero(j7,j1,zab,zba,j7_1)
+            call jzero(j7,j2,zab,zba,j7_2)
+            call jzero(j8,j1,zab,zba,j8_1)
+            call jzero(j8,j2,zab,zba,j8_2)
+      else
+            j7_1(:,:) = czip
+            j7_2(:,:) = czip
+            j8_1(:,:) = czip
+            j8_2(:,:) = czip
+      endif
 
       call jone(j7,j3,j4,j1,za,zb,zab,zba,j7_34_1,jw7_34_1,jl7_34_1)
       call jone(j7,j3,j4,j2,za,zb,zab,zba,j7_34_2,jw7_34_2,jl7_34_2)
@@ -88,10 +96,18 @@ c--- propagators and currents are not used in calculation of Higgs contribution
       call jone(j8,j5,j6,j1,za,zb,zab,zba,j8_56_1,jw8_56_1,jl8_56_1)
       call jone(j8,j5,j6,j2,za,zb,zab,zba,j8_56_2,jw8_56_2,jl8_56_2)
 
+      if (alpha_SMEW .ne. 0) then
       call jtwo(j7,j3,j4,j5,j6,j1,za,zb,zab,zba,j7_3456_1,jw7_3456_1)
       call jtwo(j7,j3,j4,j5,j6,j2,za,zb,zab,zba,j7_3456_2,jw7_3456_2)
       call jtwo(j8,j3,j4,j5,j6,j1,za,zb,zab,zba,j8_3456_1,jw8_3456_1)
       call jtwo(j8,j3,j4,j5,j6,j2,za,zb,zab,zba,j8_3456_2,jw8_3456_2)
+      else
+            jw7_3456_1(:,:,:,:) = czip
+            jw7_3456_2(:,:,:,:) = czip
+            jw8_3456_1(:,:,:,:) = czip
+            jw8_3456_2(:,:,:,:) = czip
+      endif
+      
 
       k7341(:)=0.5d0*(zab(j1,:,j1)+zab(j3,:,j3)
      & +zab(j4,:,j4)+zab(j7,:,j7))
@@ -103,23 +119,51 @@ c--- propagators and currents are not used in calculation of Higgs contribution
      & +zab(j6,:,j6)+zab(j7,:,j7))
 
 C-----Singly resonant production in VBF style diagrams
-      call ZZSingleres(j1,j2,j3,j4,j5,j6,j7,j8,za,zb,
+      if (alpha_SMEW .ne. 0) then
+            call ZZSingleres(j1,j2,j3,j4,j5,j6,j7,j8,za,zb,
      & ZZ7341,WWp7341,WWm7341)
-      call ZZSingleres(j1,j2,j5,j6,j3,j4,j7,j8,za,zb,
+            call ZZSingleres(j1,j2,j5,j6,j3,j4,j7,j8,za,zb,
      & ZZ7561,WWp7561,WWm7561)
-      call ZZSingleres(j1,j2,j3,j4,j5,j6,j8,j7,za,zb,
+            call ZZSingleres(j1,j2,j3,j4,j5,j6,j8,j7,za,zb,
      & ZZ8341,WWp8341,WWm8341)
-      call ZZSingleres(j1,j2,j5,j6,j3,j4,j8,j7,za,zb,
+            call ZZSingleres(j1,j2,j5,j6,j3,j4,j8,j7,za,zb,
      & ZZ8561,WWp8561,WWm8561)
+      else
+            ZZ7341(:,:,:,:,:,:) = czip
+            WWp7341(:) = czip
+            WWm7341(:) = czip
+
+            ZZ7561(:,:,:,:,:,:) = czip
+            WWp7561(:) = czip
+            WWm7561(:) = czip
+
+            ZZ8341(:,:,:,:,:,:) = czip
+            WWp8341(:) = czip
+            WWm8341(:) = czip
+
+            ZZ8561(:,:,:,:,:,:) = czip
+            WWp8561(:) = czip
+            WWm8561(:) = czip
+      endif
       endif
 
 
 
 C----ZZ->ZZ scattering with the exchange of a H
-      call ZZHZZamp(j1,j2,j3,j4,j5,j6,j7,j8,
+C----This is the slowest part of the code
+      if (
+     & (Hbit.eq.cone)
+     & .and.
+     & (EW_ZZH_prod_flag .eqv. .true.)
+     & ) then
+            call ZZHZZamp(j1,j2,j3,j4,j5,j6,j7,j8,
      & za,zb,ZZHamp71_82)
-      call ZZHZZamp(j1,j2,j3,j4,j5,j6,j8,j7,
+            call ZZHZZamp(j1,j2,j3,j4,j5,j6,j8,j7,
      & za,zb,ZZHamp81_72)
+      else
+            ZZHamp71_82(:,:,:,:,:,:) = czip
+            ZZHamp81_72(:,:,:,:,:,:) = czip
+      endif
 C----Four boson vertex + WW->Higgs diagram
       call WWZZ(j1,j2,j3,j4,j5,j6,j7,j8,
      & za,zb,WWZZ71_82amp,srWWZZ71_82amp)
@@ -129,6 +173,10 @@ C----Four boson vertex + WW->Higgs diagram
      & za,zb,WWZZ82_71amp,srWWZZ82_71amp)
       call WWZZ(j2,j1,j3,j4,j5,j6,j7,j8,
      & za,zb,WWZZ72_81amp,srWWZZ72_81amp)
+      ! print *,"WW",WWZZ71_82amp,srWWZZ71_82amp
+      ! print *,"WW",WWZZ81_72amp,srWWZZ81_72amp
+      ! print *,"WW",WWZZ82_71amp,srWWZZ82_71amp
+      ! print *,"WW",WWZZ72_81amp,srWWZZ72_81amp
 
 C-----setup for (uqbq_uqbq) (2,5)->(2,5)
       do h1=1,2
@@ -214,7 +262,6 @@ C-----setup for uqsq_dqcq W diagrams (2,3)->(1,4)
      & +(cdotpr(jw7_34_1(:,2,h3),jw8_56_2(:,1,h5))
      &  -cdotpr(jw7_34_1(:,2,h3),k7341(:))
      &  *cdotpr(k7341(:),jw8_56_2(:,1,h5))/cwmass2)/propw7341
-
       amp(uqsq_dqcq,h1,h2,h3,h5)=amp(uqsq_dqcq,h1,h2,h3,h5)
      & +(cdotpr(jw7_56_1(:,2,h5),jw8_34_2(:,1,h3))
      &  -cdotpr(jw7_56_1(:,2,h5),k1567(:))

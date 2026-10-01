@@ -12,6 +12,7 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
 
       integer AllowAnomalousCouplings
       integer distinguish_HWWcouplings
+      logical EW_ZZH_prod_flag
       integer AnomalCouplPR
       integer AnomalCouplDK
       integer channeltoggle_stu ! 0, 1, 2 for s, t+u and s+t+u
@@ -122,11 +123,13 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
       double complex dV_A,dP_A,dM_A,dFour_A
       double complex dV_Z,dP_Z,dM_Z,dFour_Z
       double complex dZZWpWm,dZAWpWm,dAAWpWm
+      double complex alpha_SMEW,cW
 
 
       common/spinzerohiggs_anomcoupl/
      & AllowAnomalousCouplings,
      & distinguish_HWWcouplings,
+     & EW_ZZH_prod_flag,
      & AnomalCouplPR,AnomalCouplDK,
      & channeltoggle_stu,vvhvvtoggle_vbfvh,
      & cz_q1sq,cz_q2sq,cz_q12sq,
@@ -229,5 +232,5 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
 
      & dV_A,dP_A,dM_A,dFour_A,
      & dV_Z,dP_Z,dM_Z,dFour_Z,
-     & dZZWpWm,dZAWpWm,dAAWpWm
-
+     & dZZWpWm,dZAWpWm,dAAWpWm,
+     & alpha_SMEW,cW

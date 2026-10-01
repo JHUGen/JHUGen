@@ -74,6 +74,7 @@ void JHUGenLexiconOptionParser::interpretOption(std::string const& wish, std::st
   else if (wish=="useMCFMAtOutput"){ flags[wish] = false; castStringToValue(value, flags[wish]); }
   else if (wish=="distinguish_HWWcouplings"){ flags[wish] = false; castStringToValue(value, flags[wish]); }
   else if (wish=="include_triple_quartic_gauge"){ flags[wish] = false; castStringToValue(value, flags[wish]); }
+  else if (wish=="TQG_only"){ flags[wish] = false; castStringToValue(value, flags[wish]); }
   else if (wish=="custodial_symmetry"){flags[wish] = false; castStringToValue(value, flags[wish]); }
   else if (wish=="HW_couplings_only"){flags[wish] = false; castStringToValue(value, flags[wish]); }
   else if (wish=="HZ_couplings_only"){flags[wish] = false; castStringToValue(value, flags[wish]); }
@@ -104,6 +105,7 @@ void JHUGenLexiconOptionParser::printOptionsHelp(bool command_fail)const{
   cout << "- useMCFMAtOutput: Use MCFM conventions in the output JHUGen couplings. Divides the ghv* couplings by 2.\n\n";
   cout << "- distinguish_HWWcouplings: Distinguish HZZ and HWW couplings in the JHUGen amplitude basis if it is the input. Default is false.\n\n";
   cout << "- include_triple_quartic_gauge: Return triple gauge couplings. Default is false.\n\n";
+  cout << "- TQG_only: Return only the triple gauge couplings and keep the Higgs inputs to SM when include_triple_quartic_gauge is true. Only used for JHUGen_Amplitude Basus. Default is false.\n\n";
   cout << "- custodial_symmetry: set delta_m = 0 (Note: This also fixes delta_v in the Warsaw Basis)\n\n";  
   cout << "- HW_couplings_only: Only return HWW couplings. Only used for JHUGen_Amplitude Basis. Default is false.\n\n";
   cout << "- HZ_couplings_only: Only return HZZ, HZgamma and Hgammagamma couplings. Only used for JHUGen_Amplitude Basis. Default is false.\n\n";

@@ -131,7 +131,11 @@ c--   Call the VVZZ amplitudes
         call getVVZZamps(amp_swap,ampa_swap,ampb_swap,za,zb,zab,zba,
      &   j1(j),j2(j),3,6,5,4,j7(j),j8(j),doHO,doBO)
       endif
-
+      ! print *,"SETUP=",AnomalCouplPR,AnomalCouplDK
+      ! print *,amp
+      ! print *,ampa
+      ! print *,ampb
+      ! print *
       ! Kill amp or ampa in j=5,6,7,8 for VH
       ! Kill amp or ampa in j=9,10,11,12 for VBF
       if( (

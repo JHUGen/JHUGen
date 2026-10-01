@@ -70,16 +70,16 @@ F90 = gfortran
 # Define CompileForMELA to compile for MELA libraries
 DoCompileForMELA = YES
 ifeq ($(DoCompileForMELA),YES)
-  FFLAGS 	= -fno-automatic -fno-f2c $(OMPFLAG) -O2 -fPIC -g -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
+  FFLAGS 	= -fno-automatic -fno-f2c $(OMPFLAG) -O3 -fPIC -g -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
   #FFLAGS 	= -fno-automatic -fno-f2c -cpp -DCompileForMELA $(OMPFLAG) -O0 -fPIC -g -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
-  #FFLAGS 	=  -fno-f2c $(OMPFLAG) -O2 -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
-  F90FLAGS = -fno-automatic -fno-f2c -DCompileForMELA $(OMPFLAG) -O2 -fPIC -g -I$(INCPATH) -I$(OBJNAME) -J$(OBJNAME)
+  #FFLAGS 	=  -fno-f2c $(OMPFLAG) -O3 -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
+  F90FLAGS = -fno-automatic -fno-f2c -DCompileForMELA $(OMPFLAG) -O3 -fPIC -g -I$(INCPATH) -I$(OBJNAME) -J$(OBJNAME)
   #F90FLAGS = -fno-f2c $(OMPFLAG) -I$(INCPATH) -I$(OBJNAME) -J$(OBJNAME)
 else
-  FFLAGS 	= -fno-automatic -fno-f2c $(OMPFLAG) -O2 -fPIC -g -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
+  FFLAGS 	= -fno-automatic -fno-f2c $(OMPFLAG) -O3 -fPIC -g -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
   #FFLAGS 	= -fno-automatic -fno-f2c -cpp $(OMPFLAG) -O0 -fPIC -g -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
-  #FFLAGS 	=  -fno-f2c $(OMPFLAG) -O2 -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
-  F90FLAGS = -fno-automatic -fno-f2c $(OMPFLAG) -O2 -fPIC -g -I$(INCPATH) -I$(OBJNAME) -J$(OBJNAME)
+  #FFLAGS 	=  -fno-f2c $(OMPFLAG) -O3 -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
+  F90FLAGS = -fno-automatic -fno-f2c $(OMPFLAG) -O3 -fPIC -g -I$(INCPATH) -I$(OBJNAME) -J$(OBJNAME)
   #F90FLAGS = -fno-f2c $(OMPFLAG) -I$(INCPATH) -I$(OBJNAME) -J$(OBJNAME)
 endif
 
